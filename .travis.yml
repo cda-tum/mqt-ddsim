@@ -67,6 +67,22 @@ matrix:
             - boost
           update: true
 
+    - os: windows
+      env:
+        - BUILD='Release'
+        - COVERAGE=0
+      install:
+        - cmake --version
+        - wget https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.7z
+        - 7z x boost_1_70_0.7z -o/C/local
+        - cd "/C/local/boost_1_70_0"
+        - ./bootstrap.bat
+        - ./b2.exe -j8 toolset=msvc-14.1 address-model=64 link=static threading=multi runtime-link=shared variant=release --build-type=minimal --with-program_options
+        - cd "/C/Users/travis/build/hillmich/ddsim"
+        - export Boost_DIR="/C/local/boost_1_70_0"
+        - setx path "%path%;c:\local\boost_1_70_0"
+        - setx lib "%lib%;c:\local\boost_1_70_0\stage\lib"
+        - setx libpath "%libpath%;c:\local\boost_1_70_0\stage\lib"
 
 install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
@@ -80,11 +96,16 @@ install:
 
 before_script:
   - mkdir -p build && cd build
-  - cmake .. -G Ninja -LA -DCMAKE_BUILD_TYPE=${BUILD} -DCOVERAGE=${COVERAGE}
-  - cmake --build .
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+      cmake .. -G "Visual Studio 15 2017" -A x64 -LA -DCMAKE_BUILD_TYPE=${BUILD} -DCOVERAGE=${COVERAGE} -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_MULTITHREADED=ON -DBoost_USE_STATIC_RUNTIME=OFF
+    else
+      cmake .. -G Ninja -LA -DCMAKE_BUILD_TYPE=${BUILD} -DCOVERAGE=${COVERAGE}
+    fi
+  - cmake --build . --config ${BUILD}
 
 script:
-  - ctest
+  - ctest -C ${BUILD}
 
 after_success:
   - |

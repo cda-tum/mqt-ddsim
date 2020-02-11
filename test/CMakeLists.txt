@@ -1,3 +1,6 @@
+# Prevent overriding the parent project's compiler/linker
+# settings on Windows
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 add_subdirectory("${PROJECT_SOURCE_DIR}/extern/googletest" "extern/googletest")
 mark_as_advanced(
 		BUILD_GMOCK BUILD_GTEST BUILD_SHARED_LIBS
@@ -15,11 +18,16 @@ macro(package_add_test TESTNAME)
 	# link the Google test infrastructure, mocking library, and a default main fuction to
 	# the test executable.  Remove g_test_main if writing your own main function.
 	target_link_libraries(${TESTNAME} PRIVATE ${PROJECT_NAME} gtest gmock gtest_main)
-	target_compile_options(${TESTNAME} PUBLIC -mtune=native -march=native -pipe)
 	set_property(TARGET ${TESTNAME} PROPERTY CXX_EXTENSIONS OFF)
 	if (COVERAGE)
 		target_compile_options(${TESTNAME} PRIVATE --coverage)
 		target_link_libraries(${TESTNAME} PRIVATE --coverage)
+	endif()
+	if(MSVC)
+		target_compile_options(${TESTNAME} PUBLIC "/W4" "$<$<CONFIG:RELEASE>:/O2 /GL>")
+		target_link_options(${TESTNAME} PUBLIC "$<$<CONFIG:Release>:/LTCG>")
+	else()
+		target_compile_options(${TESTNAME} PUBLIC -Wall -DNDEBUG -g0 $<$<CONFIG:DEBUG>:-Og -Wextra -Wpedantic -pedantic> $<$<CONFIG:RELEASE>:-O3 -mtune=native -march=native>)
 	endif()
 
 	# gtest_discover_tests replaces gtest_add_tests,

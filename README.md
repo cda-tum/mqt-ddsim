@@ -48,23 +48,31 @@ It can either be used as a **standalone executable** with command-line interface
   
 ### System requirements
 
-Building (and running) is continuously tested under Linux (Ubuntu 18.04) using gcc-7.4, gcc-9 and clang-9 and MacOS (Mojave 10.14) using AppleClang. 
+Building (and running) is continuously tested under Linux (Ubuntu 18.04) using gcc-7.4, gcc-9 and clang-9, MacOS (Mojave 10.14) using AppleClang and gcc-9, and Windows using MSVC 15.9. 
 However, the implementation should be compatible with any current C++ compiler supporting C++14 and a minimum CMake version of 3.10.
+
+`boost/program_options >= 1.50` is required for building the executable simulator.
 
 ### Build and Run
 For building the library alone the CMake target `ddsim` is available, i.e.,
 ```commandline
 mkdir build && cd build
-cmake ..
-cmake --build . --target ddsim
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build . --target ddsim --config Release
 ```
 
-To build the executable simulator, build the `ddsim_simple` CMake target and run the resulting executable with options according to your needs.
+Windows users need to configure CMake by calling 
+
+`cmake .. -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=Release`
+
+instead.
+
+To build the executable simulator, build the `ddsim_simple` CMake target (which requires `boost/program_options`) and run the resulting executable with options according to your needs. 
 The output is JSON-formatted as shown below (with hopefully intuitive naming, the `dummy` object is just for easier handling of trailing commas).
 
 ```commandline
 # (still in the build directory after building the ddsim target from above)
-cmake --build . --target ddsim_simple
+cmake --build . --target ddsim_simple --config Release
 ./ddsim_simple --simulate_file entanglement_4.real --display_vector --shots 1000 --ps
 {
   "measurements": {
@@ -108,7 +116,7 @@ Process finished with exit code 0
 
 The repository also includes some (rudimentary) unit tests (using GoogleTest), which aim to ensure the correct behaviour of the tool. They can be built and executed in the following way:
 ```commandline
-cmake --build . --target ddsim_test
+cmake --build . --target ddsim_test --config Release
 ./ddsim_test
 ```
 
