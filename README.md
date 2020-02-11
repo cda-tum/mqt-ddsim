@@ -48,7 +48,7 @@ It can either be used as a **standalone executable** with command-line interface
   
 ### System requirements
 
-Building (and running) is continuously tested under Linux (Ubuntu 18.04) using gcc-7.4, gcc-9 and clang-9 and MacOS (Mojave 10.14) using AppleClang and gcc-9. 
+Building (and running) is continuously tested under Linux (Ubuntu 18.04) using gcc-7.4, gcc-9 and clang-9 and MacOS (Mojave 10.14) using AppleClang. 
 However, the implementation should be compatible with any current C++ compiler supporting C++14 and a minimum CMake version of 3.10.
 
 ### Build and Run

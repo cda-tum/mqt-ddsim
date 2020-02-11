@@ -12,6 +12,7 @@ matrix:
             - cmake
             - ninja-build
             - lcov
+            - libboost-program-options-dev
 
     - os: linux
       dist: bionic
@@ -22,6 +23,7 @@ matrix:
           packages:
             - cmake
             - ninja-build
+            - libboost-program-options-dev
 
     - os: linux
       dist: bionic
@@ -36,6 +38,7 @@ matrix:
             - ninja-build
             - gcc-9
             - g++-9
+            - libboost-program-options-dev
 
     - os: linux
       dist: bionic
@@ -50,6 +53,7 @@ matrix:
             - cmake
             - ninja-build
             - clang-9
+            - libboost-program-options-dev
 
     - os: osx
       osx_image: xcode11.3
@@ -60,24 +64,14 @@ matrix:
           packages:
             - cmake
             - ninja
-          update: true
-
-    - os: osx
-      osx_image: xcode11.3
-      compiler: "gcc-9"
-      env: BUILD='Release' CC=gcc-9 CXX=g++-9 COVERAGE=0
-      addons:
-        homebrew:
-          packages:
-            - cmake
-            - ninja
-            - gcc@9
+            - boost
           update: true
 
 
 install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
     export PATH="$(brew --prefix llvm)/bin:$PATH";
+    export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/lib;
     fi
   - echo ${CC}
   - echo ${CXX}
