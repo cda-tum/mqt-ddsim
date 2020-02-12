@@ -78,7 +78,7 @@ matrix:
         - cd "/C/local/boost_1_70_0"
         - ./bootstrap.bat
         - ./b2.exe -j8 toolset=msvc-14.1 address-model=64 link=static threading=multi runtime-link=shared variant=release --build-type=minimal --with-program_options
-        - cd "/C/Users/travis/build/hillmich/ddsim"
+        - cd "/C/Users/travis/build/iic-jku/ddsim"
         - export Boost_DIR="/C/local/boost_1_70_0"
         - setx path "%path%;c:\local\boost_1_70_0"
         - setx lib "%lib%;c:\local\boost_1_70_0\stage\lib"
