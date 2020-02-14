@@ -122,16 +122,9 @@ cmake --build . --target ddsim_test --config Release
 
 ## Reference
 
-If you use our tool for your research, we will be thankful if you refer to it by citing the following publications:
+If you use our tool for your research, we will be thankful if you refer to it by citing the following publication:
 
 ```bibtex
-@article{zulehner2019package,
-    title={How to Efficiently Handle Complex Values? Implementing Decision Diagrams for Quantum Computing},
-    author={Zulehner, Alwin and Hillmich, Stefan and Wille, Robert},
-    journal={International Conference on Computer-Aided Design (ICCAD)},
-    year={2019}
-}
-
 @article{zulehner2019advanced,
     title = {Advanced Simulation of Quantum Computations},
     author = {Zulehner, Alwin and Wille, Robert},
