@@ -6,7 +6,7 @@
 
 A tool for quantum circuit simulation by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at).
 
-Developers: Stefan Hillmich, Lukas Burgholzer, and Robert Wille.
+Developers: Stefan Hillmich, Lukas Burgholzer, Alwin Zulehner, and Robert Wille.
 
 The tool builds upon [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git) which in turns builds on [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git).
 
