@@ -9,15 +9,15 @@ mark_as_advanced(
 )
 set_target_properties(gtest PROPERTIES FOLDER extern)
 set_target_properties(gtest_main PROPERTIES FOLDER extern)
-set_target_properties(gmock PROPERTIES FOLDER extern)
-set_target_properties(gmock_main PROPERTIES FOLDER extern)
+target_compile_features(gtest PUBLIC cxx_std_14)
+target_compile_features(gtest_main PUBLIC cxx_std_14)
 
 macro(package_add_test TESTNAME)
 	# create an exectuable in which the tests will be stored
 	add_executable(${TESTNAME} ${ARGN})
 	# link the Google test infrastructure, mocking library, and a default main fuction to
 	# the test executable.  Remove g_test_main if writing your own main function.
-	target_link_libraries(${TESTNAME} PRIVATE ${PROJECT_NAME} gtest gmock gtest_main)
+	target_link_libraries(${TESTNAME} PRIVATE ${PROJECT_NAME} gtest_main)
 	set_property(TARGET ${TESTNAME} PROPERTY CXX_EXTENSIONS OFF)
 	if (COVERAGE)
 		target_compile_options(${TESTNAME} PRIVATE --coverage)
