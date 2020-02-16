@@ -13,14 +13,11 @@ void SimpleSimulator::Simulate() {
     root_edge = dd->makeZeroState(n_qubits);
     dd->incRef(root_edge);
 
-    unsigned long op_num = 0;
+    //unsigned long op_num = 0;
 
     for (auto& op : *qc) {
         if (!op->isUnitary()) {
-	        // TODO: If circuit description contains measurements/resets this should be handled here
-        	// Measurement operations store qubits to measure as "controls" and classical registers to measure to as "targets"
-
-        	if(qc::NonUnitaryOperation* nu_op = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
+        	if(auto* nu_op = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
         	    if (nu_op->getName()[0] == 'M') {
         	        std::cout << "[WARN] Measurements are not saved to classical registers.\n";
                     for(const auto& qubit : nu_op->getControls()) {

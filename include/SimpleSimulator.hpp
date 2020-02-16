@@ -50,7 +50,7 @@ public:
     // TODO: dd::Edge ApproximateBySampling(unsigned int nSamples, unsigned int threshold, bool removeNodes)
 
     std::unique_ptr<dd::Package> dd = std::make_unique<dd::Package>();
-    dd::Edge root_edge = {nullptr};
+    dd::Edge root_edge{};
 private:
     std::mt19937_64 mt;
     std::unique_ptr<qc::QuantumComputation>& qc;
