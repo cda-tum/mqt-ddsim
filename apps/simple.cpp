@@ -6,10 +6,11 @@
 #include <boost/program_options.hpp>
 #include <algorithms/Grover.hpp>
 #include <algorithms/QFT.hpp>
+#include <algorithms/Entanglement.hpp>
 
 #include "SimpleSimulator.hpp"
 
-void increment_numerical_string(std::string& s);
+//void increment_numerical_string(std::string& s);
 
 int main(int argc, char** argv) {
     namespace po = boost::program_options;
@@ -20,7 +21,8 @@ int main(int argc, char** argv) {
             ("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")
             ("simulate_qft", po::value<unsigned int>(), "simulate Quantum Fourier Transform for given number of qubits")
             ("simulate_grover", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle")
-            ("shots", po::value<unsigned int>()->default_value(1), "number of measurements on the final quantum state")
+            ("simulate_ghz", po::value<unsigned int>(), "simulate state preparation of GHZ state for given number of qubits")
+		    ("shots", po::value<unsigned int>()->default_value(1), "number of measurements on the final quantum state")
             ("display_vector", "display the state vector")
             ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
             ;
@@ -45,6 +47,9 @@ int main(int argc, char** argv) {
     } else if (vm.count("simulate_grover")) {
         const unsigned int n_qubits = vm["simulate_grover"].as<unsigned int>();
 	    quantumComputation = std::make_unique<qc::Grover>(n_qubits);
+    } else if (vm.count("simulate_ghz")) {
+	    const unsigned int n_qubits = vm["simulate_ghz"].as<unsigned int>();
+	    quantumComputation = std::make_unique<qc::Entanglement>(n_qubits);
     } else {
         std::cout << description << "\n";
         return 1;
