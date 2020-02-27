@@ -102,10 +102,13 @@ before_script:
     else
       cmake .. -G Ninja -LA -DCMAKE_BUILD_TYPE=${BUILD} -DCOVERAGE=${COVERAGE}
     fi
-  - cmake --build . --config ${BUILD}
-
+  - if [ "$TRAVIS_OS_NAME" == "windows" ]; then cmake --build . --config ${BUILD} --target INSTALL; fi
+  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then cmake --build . --config ${BUILD} --target ddsim; fi
+  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then cmake --build . --config ${BUILD} --target ddsim_simple; fi
+  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then cmake --build . --config ${BUILD} --target ddsim_test; fi
+  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then sudo cmake --build . --config ${BUILD} --target install; fi
 script:
-  - ctest -C ${BUILD}
+  - ctest -C ${BUILD} --jobs 2 --output-on-failure
 
 after_success:
   - |

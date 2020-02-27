@@ -58,7 +58,7 @@ For building the library alone the CMake target `ddsim` is available, i.e.,
 ```commandline
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build . --target ddsim --config Release
+cmake --build . --config Release --target ddsim
 ```
 
 Windows users need to configure CMake by calling 
@@ -72,7 +72,7 @@ The output is JSON-formatted as shown below (with hopefully intuitive naming, th
 
 ```commandline
 # (still in the build directory after building the ddsim target from above)
-cmake --build . --target ddsim_simple --config Release
+cmake --build . --config Release --target ddsim_simple
 ./ddsim_simple --simulate_file entanglement_4.real --display_vector --shots 1000 --ps
 {
   "measurements": {
@@ -116,8 +116,23 @@ Process finished with exit code 0
 
 The repository also includes some (rudimentary) unit tests (using GoogleTest), which aim to ensure the correct behaviour of the tool. They can be built and executed in the following way:
 ```commandline
-cmake --build . --target ddsim_test --config Release
+cmake --build . --config Release --target ddsim_test
 ./ddsim_test
+```
+
+The DDSIM library and tool may be installed on the system by executing
+
+```commandline
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build . --config Release --target install
+```
+
+It can then also be included in other projects using the following CMake snippet
+
+```cmake
+find_package(ddsim)
+target_link_libraries(${TARGET_NAME} PRIVATE JKQ::ddsim)
 ```
 
 ## Reference

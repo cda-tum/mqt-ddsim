@@ -22,3 +22,11 @@ if(MSVC)
 else()
 	target_compile_options(${PROJECT_NAME}_simple PUBLIC -Wall -DNDEBUG -g0 $<$<CONFIG:DEBUG>:-Og -Wextra -Wpedantic -pedantic> $<$<CONFIG:RELEASE>:-O3 -mtune=native -march=native>)
 endif()
+
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_app ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_app)
+
+include(GNUInstallDirs)
+install(TARGETS ${PROJECT_NAME}_simple
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+set_target_properties(${PROJECT_NAME}_simple PROPERTIES EXPORT_NAME ${PROJECT_NAME}_simple)
