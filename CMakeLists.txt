@@ -4,7 +4,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 project(ddsim
-        VERSION 1.0.0
+        VERSION 1.0.1
         DESCRIPTION "A front end to utilize the dd_package and qfr for simulation"
         LANGUAGES CXX)
 
