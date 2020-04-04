@@ -78,7 +78,7 @@ matrix:
         - cd "/C/local/boost_1_70_0"
         - ./bootstrap.bat
         - ./b2.exe -j8 toolset=msvc-14.1 address-model=64 link=static threading=multi runtime-link=shared variant=release --build-type=minimal --with-program_options
-        - cd "/C/Users/travis/build/hillmich/ddsim"
+        - cd "/C/Users/travis/build/iic-jku/ddsim"
         - export Boost_DIR="/C/local/boost_1_70_0"
         - setx path "%path%;c:\local\boost_1_70_0"
         - setx lib "%lib%;c:\local\boost_1_70_0\stage\lib"
@@ -108,8 +108,7 @@ before_script:
   - if [ "$TRAVIS_OS_NAME" != "windows" ]; then cmake --build . --config ${BUILD} --target ddsim_test; fi
   - if [ "$TRAVIS_OS_NAME" != "windows" ]; then sudo cmake --build . --config ${BUILD} --target install; fi
 script:
-  - if [ "$TRAVIS_OS_NAME" == "windows" ]; then cd test/${BUILD} && ./ddsim_test.exe; fi
-  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then cd test && ./ddsim_test; fi
+  - ctest -C ${BUILD} --jobs 2 --output-on-failure
 
 after_success:
   - |
@@ -119,5 +118,5 @@ after_success:
       lcov --remove coverage.info '/usr/*' '*/extern/*' '*/BaseResults*' --output-file coverage.info # filter system-files
       lcov --list coverage.info # debug info
       # Uploading report to CodeCov
-      bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
+      bash <(curl -s https://codecov.io/bash) -f coverage.info -t 8bf3bb78-f29a-4f81-8ad1-3a7c4fa781b8 || echo "Codecov did not collect coverage reports"
     fi
