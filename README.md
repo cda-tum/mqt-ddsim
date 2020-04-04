@@ -6,7 +6,7 @@
 
 A tool for quantum circuit simulation by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at).
 
-Developers: Stefan Hillmich, Lukas Burgholzer, Alwin Zulehner, and Robert Wille.
+Developers: Stefan Hillmich, Lukas Burgholzer, and Robert Wille.
 
 The tool builds upon [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git) which in turns builds on [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git).
 
@@ -137,9 +137,16 @@ target_link_libraries(${TARGET_NAME} PRIVATE JKQ::ddsim)
 
 ## Reference
 
-If you use our tool for your research, we will be thankful if you refer to it by citing the following publication:
+If you use our tool for your research, we will be thankful if you refer to it by citing the following publications:
 
 ```bibtex
+@article{zulehner2019package,
+    title={How to Efficiently Handle Complex Values? Implementing Decision Diagrams for Quantum Computing},
+    author={Zulehner, Alwin and Hillmich, Stefan and Wille, Robert},
+    journal={International Conference on Computer-Aided Design (ICCAD)},
+    year={2019}
+}
+
 @article{zulehner2019advanced,
     title = {Advanced Simulation of Quantum Computations},
     author = {Zulehner, Alwin and Wille, Robert},

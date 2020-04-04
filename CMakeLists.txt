@@ -47,10 +47,13 @@ add_subdirectory(src)
 option(BUILD_TESTS "Also build tests for DDSIM project" OFF)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR BUILD_TESTS)
 	handle_submodule(googletest)
+	handle_submodule(benchmark)
+
 	enable_testing()
 	include(GoogleTest)
 	add_subdirectory(test)
 
+	add_subdirectory(extern/benchmark)
 	add_subdirectory(apps)
 endif()
 

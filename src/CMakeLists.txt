@@ -12,8 +12,13 @@ file(RELATIVE_PATH relDir
 set(CMAKE_INSTALL_RPATH ${basePoint} ${basePoint}/${relDir})
 
 add_library(${PROJECT_NAME}
-        ${PROJECT_SOURCE_DIR}/include/SimpleSimulator.hpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/SimpleSimulator.cpp)
+		${PROJECT_SOURCE_DIR}/include/Simulator.hpp
+		${CMAKE_CURRENT_SOURCE_DIR}/Simulator.cpp
+		${PROJECT_SOURCE_DIR}/include/QFRSimulator.hpp
+		${CMAKE_CURRENT_SOURCE_DIR}/QFRSimulator.cpp
+		${PROJECT_SOURCE_DIR}/include/GroverSimulator.hpp
+		${CMAKE_CURRENT_SOURCE_DIR}/GroverSimulator.cpp
+		)
 add_library(JKQ::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PUBLIC
