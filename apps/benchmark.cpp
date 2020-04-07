@@ -112,7 +112,7 @@ static void BM_sim_QCBM(benchmark::State& state) {
     state.SetLabel("QCBM");
 }
 
-BENCHMARK(BM_sim_QCBM)->DenseRange(4, 25);
+BENCHMARK(BM_sim_QCBM)->DenseRange(4, 21); // on our compute server, the 22 qubit instance takes more than 48h
 
 static void BM_extra_QCBM_optimized(benchmark::State& state) {
     const unsigned int n_qubits = state.range(0);
@@ -176,4 +176,4 @@ static void BM_extra_QCBM_optimized(benchmark::State& state) {
     state.SetLabel("QCBM preprocessed");
 }
 
-BENCHMARK(BM_extra_QCBM_optimized)->DenseRange(4, 25);
+BENCHMARK(BM_extra_QCBM_optimized)->DenseRange(4, 21);
