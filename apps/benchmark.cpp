@@ -6,6 +6,10 @@
 
 #include <algorithm>
 
+
+auto min_estimator = [](const std::vector<double>& v) -> double {return *(std::min_element(std::begin(v), std::end(v)));};
+
+
 static void BM_sim_X(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::X);
@@ -15,7 +19,7 @@ static void BM_sim_X(benchmark::State& state) {
     }
     state.SetLabel("X");
 }
-BENCHMARK(BM_sim_X)->DenseRange(4, 25);
+BENCHMARK(BM_sim_X)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 
 static void BM_sim_H(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
@@ -26,7 +30,7 @@ static void BM_sim_H(benchmark::State& state) {
     }
     state.SetLabel("H");
 }
-BENCHMARK(BM_sim_H)->DenseRange(4, 25);
+BENCHMARK(BM_sim_H)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 
 static void BM_sim_T(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
@@ -37,7 +41,7 @@ static void BM_sim_T(benchmark::State& state) {
     }
     state.SetLabel("T");
 }
-BENCHMARK(BM_sim_T)->DenseRange(4, 25);
+BENCHMARK(BM_sim_T)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 
 static void BM_sim_CNOT(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
@@ -48,7 +52,7 @@ static void BM_sim_CNOT(benchmark::State& state) {
     }
     state.SetLabel("CNOT");
 }
-BENCHMARK(BM_sim_CNOT)->DenseRange(4, 25);
+BENCHMARK(BM_sim_CNOT)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 
 static void BM_sim_TOFFOLI(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
@@ -60,7 +64,7 @@ static void BM_sim_TOFFOLI(benchmark::State& state) {
     }
     state.SetLabel("Toffoli");
 }
-BENCHMARK(BM_sim_TOFFOLI)->DenseRange(4, 25);
+BENCHMARK(BM_sim_TOFFOLI)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 
 /**
  * The following is translated from the other benchmarks at Roger-luo/quantum-benchmarks and does the following:
@@ -112,7 +116,7 @@ static void BM_sim_QCBM(benchmark::State& state) {
     state.SetLabel("QCBM");
 }
 
-BENCHMARK(BM_sim_QCBM)->DenseRange(4, 21); // on our compute server, the 22 qubit instance takes more than 48h
+BENCHMARK(BM_sim_QCBM)->DenseRange(4, 21)->ComputeStatistics("min", min_estimator); // on our compute server, the 22 qubit instance takes more than 48h
 
 static void BM_extra_QCBM_optimized(benchmark::State& state) {
     const unsigned int n_qubits = state.range(0);
@@ -176,4 +180,4 @@ static void BM_extra_QCBM_optimized(benchmark::State& state) {
     state.SetLabel("QCBM preprocessed");
 }
 
-BENCHMARK(BM_extra_QCBM_optimized)->DenseRange(4, 21);
+BENCHMARK(BM_extra_QCBM_optimized)->DenseRange(4, 21)->ComputeStatistics("min", min_estimator);
