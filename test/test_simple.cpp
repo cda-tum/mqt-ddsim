@@ -14,6 +14,22 @@ TEST(SimulatorTest, SingleOneQubitGateOnTwoQubitCircuit) {
     ASSERT_EQ("01", m);
 }
 
+TEST(SimulatorTest, ClassicControlledOp) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
+    std::vector<unsigned short> qubit_to_measure = {0};
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, qubit_to_measure, qubit_to_measure);
+    std::unique_ptr<qc::Operation> op (new qc::StandardOperation(2, 1, qc::X));
+    quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, 0);
+
+    QFRSimulator ddsim(quantumComputation);
+    ddsim.Simulate();
+
+    auto m = ddsim.MeasureAll(false);
+
+    ASSERT_EQ("11", m);
+}
+
 
 TEST(SimulatorTest, DestructiveMeasurementAll) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);

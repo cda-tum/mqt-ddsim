@@ -11,16 +11,16 @@ void QFRSimulator::Simulate() {
 
     unsigned long op_num = 0;
 
-    std::map<unsigned int, bool> classic_values;
+    std::map<int, bool> classic_values;
 
     for (auto& op : *qc) {
-        if (!op->isUnitary()) {
-            if(auto* nu_op = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
-                if (nu_op->getName()[0] == 'M') {
+        if (op->isNonUnitaryOperation()) {
+            if (auto *nu_op = dynamic_cast<qc::NonUnitaryOperation *>(op.get())) {
+                if (nu_op->getName()[0] == 'M') { // Measure starts with 'M', quite hacky though
                     auto quantum = nu_op->getControls();
                     auto classic = nu_op->getTargets();
 
-                    if(quantum.size() != classic.size()) {
+                    if (quantum.size() != classic.size()) {
                         std::cerr << "[ERROR] Measurement: Sizes of quantum and classic register mismatch.\n";
                         std::exit(1);
                     }
@@ -40,6 +40,17 @@ void QFRSimulator::Simulate() {
             }
             dd->garbageCollect();
         } else {
+            if (op->isClassicControlledOperation()) {
+                if (auto *cc_op = dynamic_cast<qc::ClassicControlledOperation *>(op.get())) {
+                    auto classic_bit_index = static_cast<short>(cc_op->getParameter().at(0)); // fp -> short *argh*
+                    if (!classic_values[classic_bit_index]) {
+                        continue;
+                    }
+                } else {
+                    std::cerr << "[ERROR] Dynamic cast to ClassicControlledOperation failed." << std::endl;
+                    std::exit(1);
+                }
+            }
             //std::clog << "[INFO] op " << op_num++ << " is " << op->getName()
             //          << " #controls=" << op->getControls().size()
             //          << " statesize=" << dd->size(root_edge) << "\n";
