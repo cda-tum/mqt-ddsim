@@ -1,14 +1,11 @@
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME OFF)
-find_package( Boost 1.50 COMPONENTS program_options REQUIRED )
-message(STATUS "Boost version: ${Boost_VERSION}")
+find_package( Boost 1.50 COMPONENTS program_options )
 
-if(NOT TARGET Boost::program_options)
-	add_library(Boost::program_options IMPORTED INTERFACE)
-	set_property(TARGET Boost::program_options PROPERTY
-	             INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
-	set_property(TARGET Boost::program_options PROPERTY
-	             INTERFACE_LINK_LIBRARIES ${Boost_LIBRARIES})
+if(Boost_FOUND)
+	message(STATUS "Boost version: ${Boost_VERSION}")
+else()
+	message(STATUS "Boost not found. Certain targets may not be available.")
 endif()
 
 include(GNUInstallDirs)
@@ -35,5 +32,9 @@ macro(add_sim_executable APPNAME)
 	set_target_properties(${PROJECT_NAME}_${APPNAME} PROPERTIES EXPORT_NAME ${PROJECT_NAME}_${APPNAME})
 endmacro()
 
-add_sim_executable(simple Boost::program_options)
+if(Boost_FOUND)
+	add_sim_executable(simple Boost::program_options)
+else()
+	message(STATUS "Did not find Boost! Commandline interface will not be an available target!")
+endif()
 add_sim_executable(benchmark benchmark::benchmark_main)
