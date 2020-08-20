@@ -191,7 +191,7 @@ char Simulator::MeasureOneCollapsing(unsigned short index) {
     dd::Edge e = dd->multiply(m_gate, root_edge);
     dd->decRef(root_edge);
 
-    dd::Complex c = dd->cn.getCachedComplex(std::sqrt(1.0L/norm_factor), 0);
+    dd::Complex c = dd->cn.getTempCachedComplex(std::sqrt(1.0L/norm_factor), 0);
     CN::mul(c, e.w, c);
     e.w = dd->cn.lookup(c);
     dd->incRef(e);
