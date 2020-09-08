@@ -73,7 +73,7 @@ matrix:
         - COVERAGE=0
       install:
         - cmake --version
-        - wget https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.7z
+        - wget https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.7z --no-check-certificate
         - 7z x boost_1_70_0.7z -o/C/local
         - cd "/C/local/boost_1_70_0"
         - ./bootstrap.bat
