@@ -20,7 +20,8 @@ TEST(SimulatorTest, ClassicControlledOp) {
     std::vector<unsigned short> qubit_to_measure = {0};
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, qubit_to_measure, qubit_to_measure);
     std::unique_ptr<qc::Operation> op (new qc::StandardOperation(2, 1, qc::X));
-    quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, 0);
+    auto classical_register = std::make_pair<unsigned short, unsigned short>(0,1);
+    quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classical_register, 1);
 
     QFRSimulator ddsim(quantumComputation);
     ddsim.Simulate();

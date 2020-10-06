@@ -74,6 +74,11 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    if (quantumComputation->getNqubits() > dd::MAXN) {
+        std::cerr << "Quantum computation contains to many qubits (limit is set to " << dd::MAXN << "). See documentation for details.\n";
+        std::exit(1);
+    }
+
 
     auto t1 = std::chrono::high_resolution_clock::now();
     ddsim->Simulate();

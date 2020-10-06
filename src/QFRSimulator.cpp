@@ -42,8 +42,18 @@ void QFRSimulator::Simulate() {
         } else {
             if (op->isClassicControlledOperation()) {
                 if (auto *cc_op = dynamic_cast<qc::ClassicControlledOperation *>(op.get())) {
-                    auto classic_bit_index = static_cast<short>(cc_op->getParameter().at(0)); // fp -> short *argh*
-                    if (!classic_values[classic_bit_index]) {
+                    const auto start_index = static_cast<unsigned short>(cc_op->getParameter().at(0));
+                    const auto length = static_cast<unsigned short>(cc_op->getParameter().at(1));
+                    const unsigned int expected_value = cc_op->getExpectedValue();
+
+                    unsigned int actual_value = 0;
+                    for(unsigned int i = 0; i < length; i++) {
+                        actual_value |= (classic_values[start_index+i]?1u:0u) << i;
+                    }
+
+                    std::cout << "expected " << expected_value << " and actual value was " << actual_value << "\n";
+
+                    if (actual_value != expected_value) {
                         continue;
                     }
                 } else {

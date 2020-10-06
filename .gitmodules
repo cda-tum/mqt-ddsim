@@ -1,9 +1,6 @@
 [submodule "extern/qfr"]
 	path = extern/qfr
 	url = https://github.com/iic-jku/qfr.git
-[submodule "extern/googletest"]
-	path = extern/googletest
-	url = https://github.com/google/googletest.git
 [submodule "extern/benchmark"]
 	path = extern/benchmark
 	url = https://github.com/google/benchmark.git

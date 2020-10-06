@@ -4,7 +4,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
 endif()
 
 project(ddsim
-        VERSION 1.0.1
+        VERSION 1.0.2
         DESCRIPTION "A front end to utilize the dd_package and qfr for simulation"
         LANGUAGES CXX)
 
@@ -18,8 +18,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
 	    STRING "Choose the type of build." FORCE)
 	# Set the possible values of build type for cmake-gui
-	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
-	             "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
 option(GIT_SUBMODULE "Check submodules during build" ON)
@@ -27,11 +26,11 @@ macro(handle_submodule MODULENAME)
 	find_package(Git QUIET)
 	if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git" AND GIT_SUBMODULE)
 		message(STATUS "${MODULENAME} update")
-		execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --remote -- extern/${MODULENAME}
+		execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- extern/${MODULENAME}
 		                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		                RESULT_VARIABLE GIT_SUBMOD_RESULT)
 		if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-			message(FATAL_ERROR "git submodule update --init --recursive --remote -- extern/${MODULENAME} failed with ${GIT_SUBMOD_RESULT}.")
+			message(FATAL_ERROR "git submodule update --init --recursive -- extern/${MODULENAME} failed with ${GIT_SUBMOD_RESULT}.")
 		endif()
 	endif()
 
@@ -46,7 +45,6 @@ add_subdirectory(src)
 
 option(BUILD_TESTS "Also build tests for DDSIM project" OFF)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR BUILD_TESTS)
-	handle_submodule(googletest)
 	handle_submodule(benchmark)
 
 	enable_testing()

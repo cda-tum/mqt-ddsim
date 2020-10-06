@@ -8,10 +8,10 @@
 std::string Simulator::MeasureAll(const bool collapse) {
     if(std::abs(dd::ComplexNumbers::mag2(root_edge.w) -1.0L) > epsilon) {
         if(CN::equalsZero(root_edge.w)) {
-            std::cerr << "ERROR: numerical instabilities led to a 0-vector! Abort simulation!\n";
+            std::cerr << "ERROR in MAll: numerical instabilities led to a 0-vector! Abort simulation!\n";
             std::exit(1);
         }
-        std::cerr << "WARNING in measurement: numerical instability occurred during simulation: |alpha|^2 + |beta|^2 - 1 = "
+        std::cerr << "WARNING in MAll: numerical instability occurred during simulation: |alpha|^2 + |beta|^2 - 1 = "
                   << 1.0L - dd::ComplexNumbers::mag2(root_edge.w) << ", but should be 1!\n";
     }
 
@@ -27,7 +27,7 @@ std::string Simulator::MeasureAll(const bool collapse) {
         fp tmp = p0 + p1;
 
         if(std::abs(tmp-1.0L) > epsilon) {
-            std::cerr << "[ERROR] In MeasureAll: Added probabilities differ from 1 by "
+            std::cerr << "ERROR in MAll: Added probabilities differ from 1 by "
                       << std::scientific << std::abs(tmp-1.0L) << std::defaultfloat << std::endl;
             std::exit(1);
         }
@@ -191,7 +191,7 @@ char Simulator::MeasureOneCollapsing(unsigned short index) {
     dd::Edge e = dd->multiply(m_gate, root_edge);
     dd->decRef(root_edge);
 
-    dd::Complex c = dd->cn.getCachedComplex(std::sqrt(1.0L/norm_factor), 0);
+    dd::Complex c = dd->cn.getTempCachedComplex(std::sqrt(1.0L/norm_factor), 0);
     CN::mul(c, e.w, c);
     e.w = dd->cn.lookup(c);
     dd->incRef(e);
@@ -401,10 +401,10 @@ dd::Edge Simulator::RemoveNodes(dd::Edge e, std::map<dd::NodePtr, dd::Edge>& dag
 std::pair<dd::ComplexValue, std::string> Simulator::getPathOfLeastResistance() {
     if(std::abs(dd::ComplexNumbers::mag2(root_edge.w) -1.0L) > epsilon) {
         if(CN::equalsZero(root_edge.w)) {
-            std::cerr << "ERROR: numerical instabilities led to a 0-vector! Abort simulation!\n";
+            std::cerr << "ERROR in PoLR: numerical instabilities led to a 0-vector! Abort simulation!\n";
             std::exit(1);
         }
-        std::cerr << "WARNING in measurement: numerical instability occurred during simulation: |alpha|^2 + |beta|^2 - 1 = "
+        std::cerr << "WARNING in PoLR: numerical instability occurred during simulation: |alpha|^2 + |beta|^2 - 1 = "
                   << 1.0L - dd::ComplexNumbers::mag2(root_edge.w) << ", but should be 1!\n";
     }
 
@@ -417,7 +417,7 @@ std::pair<dd::ComplexValue, std::string> Simulator::getPathOfLeastResistance() {
         fp tmp = p0 + p1;
 
         if(std::abs(tmp-1.0L) > epsilon) {
-            std::cerr << "[ERROR] In MeasureAll: Added probabilities differ from 1 by "
+            std::cerr << "ERROR in PoLR: Added probabilities differ from 1 by "
                       << std::scientific << std::abs(tmp-1.0L) << std::defaultfloat << std::endl;
             std::exit(1);
         }
