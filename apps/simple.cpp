@@ -16,7 +16,7 @@
 
 int main(int argc, char** argv) {
     namespace po = boost::program_options;
-    po::options_description description("DDSIM by http://iic.jku.at/eda/ -- Allowed options");
+    po::options_description description("JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
     description.add_options()
             ("help,h", "produce help message")
             ("seed", po::value<unsigned long>()->default_value(0), "seed for random number generator (default zero is directly used as seed!)")
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
     }
 
     std::unique_ptr<qc::QuantumComputation> quantumComputation;
-    std::unique_ptr<Simulator> ddsim;
+    std::unique_ptr<Simulator> ddsim{nullptr};
     if (vm.count("simulate_file")) {
         const std::string fname = vm["simulate_file"].as<std::string>();
     	quantumComputation = std::make_unique<qc::QuantumComputation>(fname);
@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    if (quantumComputation->getNqubits() > dd::MAXN) {
+    if (quantumComputation && quantumComputation->getNqubits() > dd::MAXN) {
         std::cerr << "Quantum computation contains to many qubits (limit is set to " << dd::MAXN << "). See documentation for details.\n";
         std::exit(1);
     }

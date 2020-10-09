@@ -1,16 +1,18 @@
 [![Build Status](https://travis-ci.com/iic-jku/ddsim.svg?branch=master)](https://travis-ci.com/iic-jku/ddsim)
 [![codecov](https://codecov.io/gh/iic-jku/ddsim/branch/master/graph/badge.svg)](https://codecov.io/gh/iic-jku/ddsim)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![toolset: JKQ](https://img.shields.io/badge/toolset-JKQ-blue)](https://github.com/iic-jku/jkq)
 
-# JKQ-DDSIM - A quantum simulator based on decision diagrams written in C++
+# JKQ DDSIM - A quantum simulator based on decision diagrams written in C++
 
-A tool for quantum circuit simulation by the [Institute for Integrated Circuits](http://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at).
+A tool for quantum circuit simulation by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at) 
+and a part of the [JKQ toolset](https://github.com/iic-jku/jkq).
 
 Developers: Stefan Hillmich, Lukas Burgholzer, and Robert Wille.
 
 The tool builds upon [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git) which in turns builds on [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git).
 
-For more information, please visit [iic.jku.at/eda/research/quantum_simulation](http://iic.jku.at/eda/research/quantum_simulation).
+For more information, please visit [iic.jku.at/eda/research/quantum_simulation](https://iic.jku.at/eda/research/quantum_simulation).
 
 If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an [issue](https://github.com/iic-jku/ddsim/issues) on GitHub.
 
@@ -26,6 +28,8 @@ This tool can be used for simulating quantum circuits provided in any of the fol
   * [QUEKO](https://github.com/tbcdebug/QUEKO-benchmark) (focus on mapping though)
 * `GRCS` 
   * [GRCS Repo](https://github.com/sboixo/GRCS)
+* `TFC` 
+  * [Reversible Logic Synthesis Benchmarks Page](http://webhome.cs.uvic.ca/~dmaslov/mach-read.html)
 
 
 The format is automatically detected through the file extension.
@@ -37,25 +41,25 @@ The following additional algorithms are integrated in [QFR](https://github.com/i
 * GHZ / Entanglement
 * Grover's search (see `--help` for different call options)
 
-For details on the available methods we refer to [iic.jku.at/eda/research/quantum_simulation](http://iic.jku.at/eda/research/quantum_simulation).
+For details on the available methods we refer to [iic.jku.at/eda/research/quantum_simulation](https://iic.jku.at/eda/research/quantum_simulation).
 
 It can either be used as a **standalone executable** with command-line interface, or as a **library** for the incorporation in other projects.
 - The standalone executable is launched in the following way, showing available options:
     ```commandline
-    $ ./ddsim_simple --help  
-    DDSIM by http://iic.jku.at/eda/ -- Allowed options:
+    $ ./ddsim_simple --help
+    JKQ DDSIM by http://iic.jku.at/eda/ -- Allowed options:
       -h [ --help ]                         produce help message
-      --seed arg (=0)                       seed for random number generator (default zero is directly used as seed!)
-      --simulate_file arg                   simulate a quantum circuit given by file (detection by the file extension)
-      --simulate_qft arg                    simulate Quantum Fourier Transform for given number of qubits
-      --simulate_grover arg                 simulate Grover's search for given number of qubits with random oracle
-      --simulate_grover_emulated arg        simulate Grover's search for given number of qubits with random oracle and emulation
-      --simulate_grover_oracle_emulated arg simulate Grover's search for given number of qubits with given oracle and emulation
-      --simulate_ghz arg                    simulate state preparation of GHZ state for given number of qubits
+      --seed arg (=0)                       seed for random number generator (default zero is directly used as seed!) 
       --shots arg (=0)                      number of measurements on the final quantum state
       --display_vector                      display the state vector
       --ps                                  print simulation stats (applied gates, sim. time, and maximal size of the DD)
       --benchmark                           print simulation stats in a single CSV style line (overrides --ps and suppresses most other output)
+      --simulate_file arg                   simulate a quantum circuit given by file (detection by the file extension)
+      --simulate_qft arg                    simulate Quantum Fourier Transform for given number of qubits
+      --simulate_ghz arg                    simulate state preparation of GHZ state for given number of qubits
+      --simulate_grover arg                 simulate Grover's search for given number of qubits with random oracle
+      --simulate_grover_emulated arg        simulate Grover's search for given number of qubits with random oracle and emulation
+      --simulate_grover_oracle_emulated arg simulate Grover's search for given number of qubits with given oracle and emulation
     ```
    
 - The library can be used by including, for example, the```QFRSimulator.hpp``` header file and
@@ -71,10 +75,10 @@ It can either be used as a **standalone executable** with command-line interface
   
 ### System requirements
 
-Building (and running) is continuously tested under Linux (Ubuntu 18.04) using gcc-7.4, gcc-9 and clang-9, MacOS (Mojave 10.14) using AppleClang and gcc-9, and Windows using MSVC 15.9. 
+Building (and running) is continuously tested under Linux (Ubuntu 18.04) using gcc-7.4, gcc-9 and clang-9, MacOS (Catalina 10.15) using AppleClang, and Windows using MSVC 15.9. 
 However, the implementation should be compatible with any current C++ compiler supporting C++14 and a minimum CMake version of 3.10.
 
-`boost/program_options >= 1.50` is required for building the executable simulator.
+`boost/program_options >= 1.50` is required for building the the commandline interface `ddsim_simple` to the simulator.
 
 ### Build and Run
 For building the library alone the CMake target `ddsim` is available, i.e.,
