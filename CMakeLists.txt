@@ -51,6 +51,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR BUILD_TESTS)
 	include(GoogleTest)
 	add_subdirectory(test)
 
+	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Skip gbenchmark self tests")
 	add_subdirectory(extern/benchmark)
 	add_subdirectory(apps)
 endif()
