@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-TEST(SimulatorTest, SingleOneQubitGateOnTwoQubitCircuit) {
+TEST(QFRSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
 	quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
     QFRSimulator ddsim(quantumComputation);
@@ -14,7 +14,7 @@ TEST(SimulatorTest, SingleOneQubitGateOnTwoQubitCircuit) {
     ASSERT_EQ("01", m);
 }
 
-TEST(SimulatorTest, ClassicControlledOp) {
+TEST(QFRSimTest, ClassicControlledOp) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
     std::vector<unsigned short> qubit_to_measure = {0};
@@ -32,7 +32,7 @@ TEST(SimulatorTest, ClassicControlledOp) {
 }
 
 
-TEST(SimulatorTest, DestructiveMeasurementAll) {
+TEST(QFRSimTest, DestructiveMeasurementAll) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::H);
@@ -53,7 +53,7 @@ TEST(SimulatorTest, DestructiveMeasurementAll) {
     ASSERT_EQ(v_after[i].i, 0.0);
 }
 
-TEST(SimulatorTest, DestructiveMeasurementOne) {
+TEST(QFRSimTest, DestructiveMeasurementOne) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::H);

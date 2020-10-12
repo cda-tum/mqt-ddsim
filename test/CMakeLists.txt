@@ -36,7 +36,7 @@ macro(package_add_test TESTNAME)
 		target_compile_options(${TESTNAME} PUBLIC "/W4" "$<$<CONFIG:RELEASE>:/O2 /GL>")
 		target_link_options(${TESTNAME} PUBLIC "$<$<CONFIG:Release>:/LTCG>")
 	else()
-		target_compile_options(${TESTNAME} PUBLIC -Wall -DNDEBUG -g0 $<$<CONFIG:DEBUG>:-Og -Wextra -Wpedantic -pedantic> $<$<CONFIG:RELEASE>:-O3 -mtune=native -march=native>)
+		target_compile_options(${TESTNAME} PUBLIC -Wall $<$<CONFIG:DEBUG>:-g3 -Og -Wextra -Wpedantic -pedantic> $<$<CONFIG:RELEASE>:-DNDEBUG -g0 -O3 -mtune=native -march=native>)
 	endif()
 
 	# gtest_discover_tests replaces gtest_add_tests,
@@ -49,7 +49,11 @@ macro(package_add_test TESTNAME)
 	set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
 endmacro()
 
-package_add_test(${PROJECT_NAME}_test ${CMAKE_CURRENT_SOURCE_DIR}/test_simple.cpp)
+package_add_test(${PROJECT_NAME}_test
+									${CMAKE_CURRENT_SOURCE_DIR}/test_qfr_sim.cpp
+									${CMAKE_CURRENT_SOURCE_DIR}/test_shor_sim.cpp
+									${CMAKE_CURRENT_SOURCE_DIR}/test_grover_sim.cpp
+		)
 
 add_custom_command(TARGET ${PROJECT_NAME}_test
                    POST_BUILD

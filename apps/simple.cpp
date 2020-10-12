@@ -7,6 +7,7 @@
 #include <algorithms/Grover.hpp>
 #include <algorithms/QFT.hpp>
 #include <algorithms/Entanglement.hpp>
+#include <ShorSimulator.hpp>
 
 
 #include "Simulator.hpp"
@@ -16,20 +17,27 @@
 
 int main(int argc, char** argv) {
     namespace po = boost::program_options;
+    unsigned long long seed;
     po::options_description description("JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
     description.add_options()
             ("help,h", "produce help message")
-            ("seed", po::value<unsigned long>()->default_value(0), "seed for random number generator (default zero is directly used as seed!)")
+            ("seed", po::value<unsigned long long>(&seed)->default_value(0), "seed for random number generator (default zero is directly used as seed!)")
+            ("shots", po::value<unsigned int>()->default_value(0), "number of measurements on the final quantum state")
+            ("display_vector", "display the state vector")
+            ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
+            ("verbose", "Causes some simulators to print additional information to STDERR")
+            ("benchmark", "print simulation stats in a single CSV style line (overrides --ps and suppresses most other output)")
+
             ("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")
             ("simulate_qft", po::value<unsigned int>(), "simulate Quantum Fourier Transform for given number of qubits")
+            ("simulate_ghz", po::value<unsigned int>(), "simulate state preparation of GHZ state for given number of qubits")
+
             ("simulate_grover", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle")
             ("simulate_grover_emulated", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle and emulation")
             ("simulate_grover_oracle_emulated", po::value<std::string>(), "simulate Grover's search for given number of qubits with given oracle and emulation")
-            ("simulate_ghz", po::value<unsigned int>(), "simulate state preparation of GHZ state for given number of qubits")
-		    ("shots", po::value<unsigned int>()->default_value(0), "number of measurements on the final quantum state")
-            ("display_vector", "display the state vector")
-            ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
-            ("benchmark", "print simulation stats in a single CSV style line (overrides --ps and suppresses most other output)")
+
+            ("simulate_shor", po::value<unsigned int>(), "simulate Shor's algorithm factoring this number")
+            ("simulate_shor_coprime", po::value<unsigned int>()->default_value(0), "coprime number to use with Shor's algorithm")
             ;
     po::variables_map vm;
     try {
@@ -48,26 +56,31 @@ int main(int argc, char** argv) {
 
     std::unique_ptr<qc::QuantumComputation> quantumComputation;
     std::unique_ptr<Simulator> ddsim{nullptr};
+
     if (vm.count("simulate_file")) {
         const std::string fname = vm["simulate_file"].as<std::string>();
     	quantumComputation = std::make_unique<qc::QuantumComputation>(fname);
-        ddsim = std::make_unique<QFRSimulator>(quantumComputation, vm["seed"].as<unsigned long>());
+        ddsim = std::make_unique<QFRSimulator>(quantumComputation, seed);
     } else if (vm.count("simulate_qft")) {
 	    const unsigned int n_qubits = vm["simulate_qft"].as<unsigned int>();
 	    quantumComputation = std::make_unique<qc::QFT>(n_qubits);
-        ddsim = std::make_unique<QFRSimulator>(quantumComputation, vm["seed"].as<unsigned long>());
+        ddsim = std::make_unique<QFRSimulator>(quantumComputation, seed);
+    } else if (vm.count("simulate_shor")) {
+        const unsigned int composite_number = vm["simulate_shor"].as<unsigned int>();
+        const unsigned int coprime = vm["simulate_shor_coprime"].as<unsigned int>();
+        ddsim = std::make_unique<ShorSimulator>(composite_number, coprime, seed, vm.count("verbose") > 0);
     } else if (vm.count("simulate_grover")) {
         const unsigned int n_qubits = vm["simulate_grover"].as<unsigned int>();
-        quantumComputation = std::make_unique<qc::Grover>(n_qubits, vm["seed"].as<unsigned long>());
-        ddsim = std::make_unique<QFRSimulator>(quantumComputation, vm["seed"].as<unsigned long>());
+        quantumComputation = std::make_unique<qc::Grover>(n_qubits, seed);
+        ddsim = std::make_unique<QFRSimulator>(quantumComputation, seed);
     } else if (vm.count("simulate_grover_emulated")) {
-        ddsim = std::make_unique<GroverSimulator>(vm["simulate_grover_emulated"].as<unsigned int>(), vm["seed"].as<unsigned long>());
+        ddsim = std::make_unique<GroverSimulator>(vm["simulate_grover_emulated"].as<unsigned int>(), seed);
     } else if (vm.count("simulate_grover_oracle_emulated")) {
-        ddsim = std::make_unique<GroverSimulator>(vm["simulate_grover_oracle_emulated"].as<std::string>(), vm["seed"].as<unsigned long>());
+        ddsim = std::make_unique<GroverSimulator>(vm["simulate_grover_oracle_emulated"].as<std::string>(), seed);
     } else if (vm.count("simulate_ghz")) {
 	    const unsigned int n_qubits = vm["simulate_ghz"].as<unsigned int>();
 	    quantumComputation = std::make_unique<qc::Entanglement>(n_qubits);
-        ddsim = std::make_unique<QFRSimulator>(quantumComputation, vm["seed"].as<unsigned long>());
+        ddsim = std::make_unique<QFRSimulator>(quantumComputation, seed);
     } else {
         std::cerr << "Did not find anything to simulate. See help below.\n"
                   << description << "\n";
@@ -78,7 +91,6 @@ int main(int argc, char** argv) {
         std::cerr << "Quantum computation contains to many qubits (limit is set to " << dd::MAXN << "). See documentation for details.\n";
         std::exit(1);
     }
-
 
     auto t1 = std::chrono::high_resolution_clock::now();
     ddsim->Simulate();
@@ -151,5 +163,5 @@ int main(int argc, char** argv) {
         std::cout << "    \"seed\": " << ddsim->getSeed() << "\n"
                   << "  },\n";
     }
-    std::cout << "  \"dummy\": 0\n}\n";
+    std::cout << "  \"dummy\": 0\n}\n"; // trailing element to make json printout easier
 }

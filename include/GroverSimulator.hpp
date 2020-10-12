@@ -26,7 +26,7 @@ public:
         std::uniform_int_distribution<int> dist(0, 1);
         oracle = std::string(n_qubits, '0');
         for (unsigned short i = 0; i < n_qubits; i++) {
-            if (dist(mt)) {
+            if (dist(mt) == 1) {
                 oracle[i] = '1';
             }
         }

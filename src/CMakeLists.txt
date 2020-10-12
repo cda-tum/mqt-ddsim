@@ -18,6 +18,8 @@ add_library(${PROJECT_NAME}
 		${CMAKE_CURRENT_SOURCE_DIR}/QFRSimulator.cpp
 		${PROJECT_SOURCE_DIR}/include/GroverSimulator.hpp
 		${CMAKE_CURRENT_SOURCE_DIR}/GroverSimulator.cpp
+		${PROJECT_SOURCE_DIR}/include/ShorSimulator.hpp
+		${CMAKE_CURRENT_SOURCE_DIR}/ShorSimulator.cpp
 		)
 add_library(JKQ::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
