@@ -6,9 +6,7 @@
 #include <chrono>
 #include <limits>
 
-ShorSimulator::~ShorSimulator() {
-    
-}
+ShorSimulator::~ShorSimulator() = default;
 
 void ShorSimulator::Simulate() {
     if (verbose) {
@@ -57,7 +55,7 @@ void ShorSimulator::Simulate() {
     }
 
     if (verbose) {
-        std::clog << "Find a coprime to N: " << coprime_a << "\n";
+        std::clog << "Find a coprime to N=" << n << ": " << coprime_a << "\n";
     }
 
     auto* as = new unsigned long long[2*required_bits];
@@ -79,9 +77,23 @@ void ShorSimulator::Simulate() {
     const int mod = std::ceil(2*required_bits / 6.0); // log_0.9(0.5) is about 6
     int fidelity_runs = 0;
     auto t1 = std::chrono::steady_clock::now();
-    for(int i=0; i < 2*required_bits; i++) {
-        u_a_emulate(as[i], i);
+
+    if (emulate) {
+        for(int i=0; i < 2*required_bits; i++) {
+            if (verbose) {
+                std::clog << "[ " << (i+1) << "/" << 2*required_bits <<" ] u_a_emulate(" << as[i] << ", " << i << ") " << std::chrono::duration<float>(std::chrono::steady_clock::now() - t1).count() << "\n" << std::flush;
+            }
+            u_a_emulate(as[i], i);
+        }
+    } else {
+        for(int i=0; i < 2*required_bits; i++) {
+            if (verbose) {
+                std::clog << "[ " << (i+1) << "/" << 2*required_bits <<" ] u_a(" << as[i] << ", " << n << ", " << 0 << ") " << std::chrono::duration<float>(std::chrono::steady_clock::now() - t1).count() << "\n" << std::flush;
+            }
+            u_a(as[i], n, 0);
+        }
     }
+
     auto t2 = std::chrono::steady_clock::now();
 
     if (verbose) {
@@ -235,7 +247,7 @@ void ShorSimulator::Simulate() {
     }
     delete[] as;
     if (success) {
-        sim_result = std::string("SUCCESS(") + std::to_string(f1) + "*" + std::to_string(f2);
+        sim_result = std::string("SUCCESS(") + std::to_string(f1) + "*" + std::to_string(f2) + ")";
         factor1 = f1;
         factor2 = f2;
     } else {

@@ -50,8 +50,6 @@ class ShorSimulator : public Simulator {
     void ApplyGate(qc::GateMatrix matrix);
 
     unsigned long long ts[dd::MAXN]{};
-    std::map<dd::NodePtr, dd::Edge> nodesOnLevel[dd::MAXN];
-
 
     dd::Edge addConst(unsigned long long a);
     dd::Edge addConstMod(unsigned long long a);
@@ -70,18 +68,20 @@ class ShorSimulator : public Simulator {
 
     std::string sim_result = "did not start";
 
-    const bool emulate = true;
+    const bool emulate;
     const bool verbose;
 
     dd::Edge limitStateVector(dd::Edge e);
     std::map<dd::NodePtr , dd::Edge> dag_edges;
 
 public:
-    ShorSimulator(int composite_number, int coprime_a, bool verbose = false) : Simulator(), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), verbose(verbose) {
+    ShorSimulator(int composite_number, int coprime_a, bool emulate = true, bool verbose = false) :
+    Simulator(), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), emulate(emulate), verbose(verbose) {
         line.fill(qc::LINE_DEFAULT);
     };
 
-    ShorSimulator(int composite_number, int coprime_a, unsigned long long seed, bool verbose = false) : Simulator(seed), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), verbose(verbose) {
+    ShorSimulator(int composite_number, int coprime_a, unsigned long long seed, bool emulate = true, bool verbose = false) :
+    Simulator(seed), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), emulate(emulate), verbose(verbose) {
         line.fill(qc::LINE_DEFAULT);
     };
 
@@ -109,6 +109,7 @@ public:
         return {
                 {"composite_number",std::to_string(n)},
                 {"coprime_a", std::to_string(coprime_a)},
+                {"emulation", std::to_string(emulate)},
                 {"result", sim_result},
                 {"factor1", std::to_string(factor1)},
                 {"factor2", std::to_string(factor2)},

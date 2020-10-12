@@ -18,6 +18,7 @@
 int main(int argc, char** argv) {
     namespace po = boost::program_options;
     unsigned long long seed;
+
     po::options_description description("JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
     description.add_options()
             ("help,h", "produce help message")
@@ -37,7 +38,8 @@ int main(int argc, char** argv) {
             ("simulate_grover_oracle_emulated", po::value<std::string>(), "simulate Grover's search for given number of qubits with given oracle and emulation")
 
             ("simulate_shor", po::value<unsigned int>(), "simulate Shor's algorithm factoring this number")
-            ("simulate_shor_coprime", po::value<unsigned int>()->default_value(0), "coprime number to use with Shor's algorithm")
+            ("simulate_shor_coprime", po::value<unsigned int>()->default_value(0), "coprime number to use with Shor's algorithm (zero randomly generates a coprime)")
+            ("simulate_shor_no_emulatation", "Force Shor simulator to do modular exponentiation instead of using emulation (you'll usually want emulation)")
             ;
     po::variables_map vm;
     try {
@@ -68,7 +70,7 @@ int main(int argc, char** argv) {
     } else if (vm.count("simulate_shor")) {
         const unsigned int composite_number = vm["simulate_shor"].as<unsigned int>();
         const unsigned int coprime = vm["simulate_shor_coprime"].as<unsigned int>();
-        ddsim = std::make_unique<ShorSimulator>(composite_number, coprime, seed, vm.count("verbose") > 0);
+        ddsim = std::make_unique<ShorSimulator>(composite_number, coprime, seed, vm.count("simulate_shor_no_emulation") == 0,vm.count("verbose") > 0);
     } else if (vm.count("simulate_grover")) {
         const unsigned int n_qubits = vm["simulate_grover"].as<unsigned int>();
         quantumComputation = std::make_unique<qc::Grover>(n_qubits, seed);
