@@ -15,10 +15,6 @@ public:
 
     void Simulate();
 
-    virtual std::map<std::string, std::string> AdditionalStatistics() {
-        return {};
-    };
-
 
     unsigned short getNumberOfQubits() const override {return qc->getNqubits();};
     unsigned long getNumberOfOps() const override {return qc->getNops();};

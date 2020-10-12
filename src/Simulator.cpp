@@ -296,6 +296,7 @@ double Simulator::ApproximateByFidelity(double targetFidelity, bool removeNodes)
 }
 
 double Simulator::ApproximateBySampling(int nSamples, int threshold, bool removeNodes) {
+    assert(nSamples > threshold);
     std::map<dd::NodePtr, int> visited_nodes;
     std::uniform_real_distribution<fp> dist(0.0, 1.0L);
 
