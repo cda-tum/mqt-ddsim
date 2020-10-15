@@ -122,18 +122,49 @@ void ShorSimulator::Simulate() {
         line[(n_qubits-1)-(i)] = -1;
     }
 
-    std::string samples_reversed = MeasureAll(false);
-    std::string samples{samples_reversed.rbegin(), samples_reversed.rend()};
-    
+    delete[] as;
+
+    // Non-Quantum Post Processing
+
+    // measure result (involves randomness)
+    {
+        std::string sample_reversed = MeasureAll(false);
+        std::string sample{sample_reversed.rbegin(), sample_reversed.rend()};
+        sim_factors = post_processing(sample);
+        if (sim_factors.first != 0 && sim_factors.second != 0) {
+            sim_result =
+                    std::string("SUCCESS(") + std::to_string(sim_factors.first) + "*" + std::to_string(sim_factors.second) + ")";
+        } else {
+            sim_result = "FAILURE";
+        }
+    }
+
+    // path of least resistance result (does not involve randomness)
+    {
+        std::pair<dd::ComplexValue, std::string> polr_pair = getPathOfLeastResistance();
+        //std::clog << polr_pair.first << " " << polr_pair.second << "\n";
+        std::string polr_reversed = polr_pair.second;
+        std::string polr = {polr_reversed.rbegin(), polr_reversed.rend()};
+        polr_factors = post_processing(polr);
+
+        if (polr_factors.first != 0 && polr_factors.second != 0) {
+            polr_result = std::string("SUCCESS(") + std::to_string(polr_factors.first) + "*" + std::to_string(polr_factors.second) + ")";
+        } else {
+            polr_result = "FAILURE";
+        }
+    }
+}
+
+std::pair<unsigned int, unsigned int> ShorSimulator::post_processing(const std::string& sample) {
     unsigned long long res = 0;
     if (verbose) {
         std::clog << "measurement: ";
     }
     for(int i=0; i < 2*required_bits; i++) {
         if (verbose) {
-            std::clog << samples[required_bits + i];
+            std::clog << sample[required_bits + i];
         }
-        res = (res << 1u) + (samples[required_bits+i] == '1');
+        res = (res << 1u) + (sample[required_bits + i] == '1');
     }
 
     if (verbose) {
@@ -141,8 +172,6 @@ void ShorSimulator::Simulate() {
     }
     unsigned long long denom = 1ull << (2*required_bits);
 
-
-    //Post processing (non-quantum part)
     bool success = false;
     unsigned long long f1{0}, f2{0};
     if(res == 0) {
@@ -176,15 +205,15 @@ void ShorSimulator::Simulate() {
             unsigned long long denominator = cf[i];
             unsigned long long numerator = 1;
 
-            for(int j=i-1; j >= 0; j--) {
-                unsigned long long tmp = numerator + cf[j]*denominator;
+            for (int j = i - 1; j >= 0; j--) {
+                unsigned long long tmp = numerator + cf[j] * denominator;
                 numerator = denominator;
                 denominator = tmp;
             }
             if (verbose) {
                 std::clog << "  Candidate " << numerator << "/" << denominator << ": ";
             }
-            if(denominator > n) {
+            if (denominator > n) {
                 if (verbose) {
                     std::clog << " denominator too large (greater than " << n << ")!\n";
                 }
@@ -194,37 +223,41 @@ void ShorSimulator::Simulate() {
                 }
                 break;
             } else {
-                double delta = (double)old_res / (double)old_denom - (double)numerator / (double) denominator;
-                if(std::abs(delta) < 1.0/(2.0*old_denom)) {
+                double delta = (double) old_res / (double) old_denom - (double) numerator / (double) denominator;
+                if (std::abs(delta) < 1.0 / (2.0 * old_denom)) {
                     unsigned long long fact = 1;
-                    while(denominator * fact < n && modpow(coprime_a, denominator * fact, n) != 1) {
+                    while (denominator * fact < n && modpow(coprime_a, denominator * fact, n) != 1) {
                         fact++;
                     }
-                    if(modpow(coprime_a, denominator * fact, n) == 1) {
+                    if (modpow(coprime_a, denominator * fact, n) == 1) {
                         if (verbose) {
-                            std::clog << "found period: " << denominator << " * " << fact << " = " << (denominator * fact) << "\n";
+                            std::clog << "found period: " << denominator << " * " << fact << " = "
+                                      << (denominator * fact) << "\n";
                         }
-                        if((denominator * fact) & 1) {
+                        if ((denominator * fact) & 1u) {
                             if (verbose) {
                                 std::clog << "Factorization failed (period is odd)!\n";
                             }
                         } else {
 
-                            f1 = modpow(coprime_a, (denominator * fact) >> 1, n);
-                            f2 = (f1+1)%n;
-                            f1 = (f1 == 0) ? n-1 : f1-1;
+                            f1 = modpow(coprime_a, (denominator * fact) >> 1u, n);
+                            f2 = (f1 + 1) % n;
+                            f1 = (f1 == 0) ? n - 1 : f1 - 1;
                             f1 = gcd(f1, n);
                             f2 = gcd(f2, n);
 
-                            if(f1 == 1ull || f2 == 1ull) {
+                            if (f1 == 1ull || f2 == 1ull) {
                                 if (verbose) {
-                                    std::clog << "Factorization failed: found trivial factors " << f1 << " and " << f2 << "\n";
+                                    std::clog << "Factorization failed: found trivial factors " << f1 << " and " << f2
+                                              << "\n";
                                 }
                             } else {
                                 if (verbose) {
                                     std::clog << "Factorization succeeded! Non-trivial factors are: \n"
-                                              << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)-1" << "," << n << ") = " << f1 << "\n"
-                                              << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)+1" << "," << n << ") = " << f2 << "\n";
+                                              << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)-1" << "," << n
+                                              << ") = " << f1 << "\n"
+                                              << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)+1" << "," << n
+                                              << ") = " << f2 << "\n";
                                 }
                                 success = true;
                             }
@@ -243,17 +276,11 @@ void ShorSimulator::Simulate() {
                 }
             }
         }
-
     }
-    delete[] as;
     if (success) {
-        sim_result = std::string("SUCCESS(") + std::to_string(f1) + "*" + std::to_string(f2) + ")";
-        factor1 = f1;
-        factor2 = f2;
+        return {f1, f2};
     } else {
-        sim_result = "FAILURE";
-        factor1 = 0;
-        factor2 = 0;
+        return {0,0};
     }
 }
 

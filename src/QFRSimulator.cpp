@@ -12,6 +12,7 @@ void QFRSimulator::Simulate() {
     unsigned long op_num = 0;
 
     std::map<int, bool> classic_values;
+    std::map<unsigned short, unsigned short> variable_map;
 
     for (auto& op : *qc) {
         if (op->isNonUnitaryOperation()) {
@@ -21,8 +22,7 @@ void QFRSimulator::Simulate() {
                     auto classic = nu_op->getTargets();
 
                     if (quantum.size() != classic.size()) {
-                        std::cerr << "[ERROR] Measurement: Sizes of quantum and classic register mismatch.\n";
-                        std::exit(1);
+                        throw std::runtime_error("Measurement: Sizes of quantum and classic register mismatch.");
                     }
 
                     for (unsigned int i = 0; i < quantum.size(); ++i) {
@@ -31,12 +31,10 @@ void QFRSimulator::Simulate() {
                         classic_values[classic[i]] = result == '1';
                     }
                 } else {
-                    std::cerr << "[ERROR] Unsupported non-unitary functionality." << std::endl;
-                    std::exit(1);
+                    throw std::runtime_error("Unsupported non-unitary functionality.");
                 }
             } else {
-                std::cerr << "[ERROR] Dynamic cast to NonUnitaryOperation failed." << std::endl;
-                std::exit(1);
+                throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
             }
             dd->garbageCollect();
         } else {
@@ -51,16 +49,16 @@ void QFRSimulator::Simulate() {
                         actual_value |= (classic_values[start_index+i]?1u:0u) << i;
                     }
 
-                    std::cout << "expected " << expected_value << " and actual value was " << actual_value << "\n";
+                    //std::clog << "expected " << expected_value << " and actual value was " << actual_value << "\n";
 
                     if (actual_value != expected_value) {
                         continue;
                     }
                 } else {
-                    std::cerr << "[ERROR] Dynamic cast to ClassicControlledOperation failed." << std::endl;
-                    std::exit(1);
+                    throw std::runtime_error("Dynamic cast to ClassicControlledOperation failed.");
                 }
             }
+
             //std::clog << "[INFO] op " << op_num++ << " is " << op->getName()
             //          << " #controls=" << op->getControls().size()
             //          << " statesize=" << dd->size(root_edge) << "\n";

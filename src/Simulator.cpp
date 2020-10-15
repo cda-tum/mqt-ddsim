@@ -8,8 +8,7 @@
 std::string Simulator::MeasureAll(const bool collapse) {
     if(std::abs(dd::ComplexNumbers::mag2(root_edge.w) -1.0L) > epsilon) {
         if(CN::equalsZero(root_edge.w)) {
-            std::cerr << "ERROR in MAll: numerical instabilities led to a 0-vector! Abort simulation!\n";
-            std::exit(1);
+            throw std::runtime_error("Numerical instabilities led to a 0-vector! Abort simulation!");
         }
         std::cerr << "WARNING in MAll: numerical instability occurred during simulation: |alpha|^2 + |beta|^2 - 1 = "
                   << 1.0L - dd::ComplexNumbers::mag2(root_edge.w) << ", but should be 1!\n";
@@ -27,9 +26,7 @@ std::string Simulator::MeasureAll(const bool collapse) {
         fp tmp = p0 + p1;
 
         if(std::abs(tmp-1.0L) > epsilon) {
-            std::cerr << "ERROR in MAll: Added probabilities differ from 1 by "
-                      << std::scientific << std::abs(tmp-1.0L) << std::defaultfloat << std::endl;
-            std::exit(1);
+            throw std::runtime_error("Added probabilities differ from 1 by " + std::to_string(std::abs(tmp-1.0L)));
         }
         p0 /= tmp;
 
@@ -157,8 +154,7 @@ char Simulator::MeasureOneCollapsing(unsigned short index) {
     }
 
     if(std::abs(pzero + pone - 1) > epsilon) {
-        std::cerr << "WARNING in measurement: numerical instability occurred during simulation: |alpha|^2 + |beta|^2 = " << (pzero + pone) << ", but should be 1!\n";
-        std::exit(1);
+        throw std::runtime_error("Numerical instability occurred during measurement: |alpha|^2 + |beta|^2 = " + std::to_string(pzero + pone) + ", but should be 1!");
     }
 
     const fp sum = pzero + pone;
@@ -402,8 +398,7 @@ dd::Edge Simulator::RemoveNodes(dd::Edge e, std::map<dd::NodePtr, dd::Edge>& dag
 std::pair<dd::ComplexValue, std::string> Simulator::getPathOfLeastResistance() {
     if(std::abs(dd::ComplexNumbers::mag2(root_edge.w) -1.0L) > epsilon) {
         if(CN::equalsZero(root_edge.w)) {
-            std::cerr << "ERROR in PoLR: numerical instabilities led to a 0-vector! Abort simulation!\n";
-            std::exit(1);
+            throw std::runtime_error("Numerical instabilities led to a 0-vector! Abort simulation!");
         }
         std::cerr << "WARNING in PoLR: numerical instability occurred during simulation: |alpha|^2 + |beta|^2 - 1 = "
                   << 1.0L - dd::ComplexNumbers::mag2(root_edge.w) << ", but should be 1!\n";
@@ -418,9 +413,7 @@ std::pair<dd::ComplexValue, std::string> Simulator::getPathOfLeastResistance() {
         fp tmp = p0 + p1;
 
         if(std::abs(tmp-1.0L) > epsilon) {
-            std::cerr << "ERROR in PoLR: Added probabilities differ from 1 by "
-                      << std::scientific << std::abs(tmp-1.0L) << std::defaultfloat << std::endl;
-            std::exit(1);
+            throw std::runtime_error("Added probabilities differ from 1 by " + std::to_string(std::abs(tmp-1.0L)));
         }
         p0 /= tmp;
 

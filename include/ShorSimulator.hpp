@@ -55,8 +55,11 @@ class ShorSimulator : public Simulator {
     dd::Edge addConstMod(unsigned long long a);
     dd::Edge limitTo(unsigned long long a);
 
+    std::pair<unsigned int, unsigned int> post_processing(const std::string& sample);
 
-    std::array<short, qc::MAX_QUBITS> line{};
+
+
+        std::array<short, qc::MAX_QUBITS> line{};
 
     /// composite number to be factored
     const unsigned int n;
@@ -64,9 +67,12 @@ class ShorSimulator : public Simulator {
     unsigned int coprime_a;
     const unsigned int required_bits;
     unsigned int n_qubits{};
-    unsigned int factor1{}, factor2{};
 
     std::string sim_result = "did not start";
+    std::pair<unsigned, unsigned> sim_factors{0,0};
+
+    std::string polr_result = "did not start";
+    std::pair<unsigned, unsigned> polr_factors{0,0};
 
     const bool emulate;
     const bool verbose;
@@ -102,7 +108,7 @@ public:
     }
 
     std::pair<unsigned, unsigned> getFactors() {
-        return {factor1, factor2};
+        return sim_factors;
     }
 
     std::map<std::string, std::string> AdditionalStatistics() override {
@@ -110,9 +116,12 @@ public:
                 {"composite_number",std::to_string(n)},
                 {"coprime_a", std::to_string(coprime_a)},
                 {"emulation", std::to_string(emulate)},
-                {"result", sim_result},
-                {"factor1", std::to_string(factor1)},
-                {"factor2", std::to_string(factor2)},
+                {"sim_result", sim_result},
+                {"sim_factor1", std::to_string(sim_factors.first)},
+                {"sim_factor2", std::to_string(sim_factors.second)},
+                {"polr_result", polr_result},
+                {"polr_factor1", std::to_string(polr_factors.first)},
+                {"polr_factor2", std::to_string(polr_factors.second)},
         };
     }
 
