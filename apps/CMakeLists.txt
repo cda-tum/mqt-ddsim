@@ -34,6 +34,7 @@ endmacro()
 
 if(Boost_FOUND)
 	add_sim_executable(simple Boost::program_options)
+	add_sim_executable(primebases Boost::program_options)
 else()
 	message(STATUS "Did not find Boost! Commandline interface will not be an available target!")
 endif()

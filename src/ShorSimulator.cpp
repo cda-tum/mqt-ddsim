@@ -43,12 +43,12 @@ void ShorSimulator::Simulate() {
 
 
     if(coprime_a != 0 && gcd(coprime_a, n) != 1) {
-        std::clog << "Warning: gcd(a,n) != 1 --> choosing a new value for a\n";
+        std::clog << "Warning: gcd(a=" << coprime_a << ", n=" << n << ") != 1 --> choosing a new value for a\n";
         coprime_a = 0;
     }
 
     if(coprime_a == 0) {
-        std::uniform_int_distribution<> distribution(1, n-1); // range is inclusive
+        std::uniform_int_distribution<unsigned int> distribution(1, n-1); // range is inclusive
         do {
             coprime_a = distribution(mt);
         } while (gcd(coprime_a, n) != 1 || coprime_a == 1);
@@ -102,8 +102,11 @@ void ShorSimulator::Simulate() {
 
     //EXACT QFT
     for(int i=0; i < 2*required_bits; i++) {
+        if(verbose) {
+            std::clog << "[ " << i+1 << "/" << 2*required_bits << " ] QFT Pass. dd size=" << dd->size(root_edge) << "\n";
+        }
         line[(n_qubits-1)-(i)] = 2;
-        long long q = 2;
+        double q = 2;
 
         for(int j =i-1; j >= 0; j--) {
 
@@ -114,12 +117,16 @@ void ShorSimulator::Simulate() {
             qc::GateMatrix Qm{qc::complex_one, qc::complex_zero, qc::complex_zero, {q_r, q_i}};
             ApplyGate(Qm);
             line[(n_qubits-1)-(j)] = -1;
-            q = q << 1u;
+            q *= 2;
         }
 
         ApplyGate(qc::Hmat);
 
         line[(n_qubits-1)-(i)] = -1;
+        std::clog << "  old dd size = " << dd->size(root_edge) << "\n";
+        auto step_fidelity = 1;//ApproximateByFidelity(0.7, true);
+        std::clog << "  step_fidelity = " << step_fidelity << "\n";
+        std::clog << "  new dd size = " << dd->size(root_edge) << "\n";
     }
 
     delete[] as;
@@ -341,7 +348,7 @@ dd::Edge ShorSimulator::addConst(unsigned long long a) {
     dd::Edge new_left, new_right;
     for(;p < required_bits; p++) {
         edges[0]=edges[1]=edges[2]=edges[3]=dd->DDzero;
-        if((a>>p) & 1) {
+        if((a>>p) & 1u) {
             edges[2] = left;
             new_left = dd->makeNonterminal(p, edges, false);
             edges[2] = dd->DDzero;
@@ -414,11 +421,6 @@ dd::Edge ShorSimulator::limitStateVector(dd::Edge e) {
 
 
 void ShorSimulator::u_a_emulate(unsigned long long a, int q) {
-
-    if (verbose) {
-        std::clog << "Build x*" << a << " mod " << n << ":\n";
-    }
-
     dd->setMode(dd::Matrix);
 
     dd::Edge limit = dd->makeIdent(0, required_bits-1);
@@ -529,21 +531,20 @@ int ShorSimulator::inverse_mod(int a, int n) {
 
 
 
-void ShorSimulator::add_phi(int n, int c1, int c2) {
-
-    int q;
+void ShorSimulator::add_phi(int a, int c1, int c2) {
     int controls = 0;
     if(c1 != std::numeric_limits<int>::min()) controls++;
     if(c2 != std::numeric_limits<int>::min()) controls++;
+
     for(int i = required_bits; i>= 0; --i) {
-        q = 1;
-        int fac = 0;
+        double q = 1;
+        unsigned int fac = 0;
         for(int j = i; j >= 0; --j) {
-            if((n >> j)&1u) {
+            if((a >> j) & 1u) {
                 fac |= 1u;
             }
-            q*=2;
-            fac = fac << 1u;
+            fac *= 2;
+            q *= 2;
         }
         if(c1 != std::numeric_limits<int>::min()) {
             line[(n_qubits-1)-c1] = 1;
@@ -570,20 +571,19 @@ void ShorSimulator::add_phi(int n, int c1, int c2) {
     }
 }
 
-void ShorSimulator::add_phi_inv(int n, int c1, int c2) {
-    int q;
+void ShorSimulator::add_phi_inv(int a, int c1, int c2) {
     int controls = 0;
     if(c1 != std::numeric_limits<int>::min()) controls++;
     if(c2 != std::numeric_limits<int>::min()) controls++;
     for(int i = required_bits; i>= 0; --i) {
-        q = 1;
-        int fac = 0;
+        double q = 1;
+        unsigned int fac = 0;
         for(int j = i; j >= 0; --j) {
-            if((n >> j)&1) {
-                fac |= 1;
+            if((a >> j) & 1u) {
+                fac |= 1u;
             }
-            fac = fac << 1;
-            q*=2;
+            fac *= 2;
+            q *= 2;
         }
         if(c1 != std::numeric_limits<int>::min()) {
             line[(n_qubits-1)-c1] = 1;
@@ -615,7 +615,7 @@ void ShorSimulator::qft() {
         ApplyGate(qc::Hmat);
         line[(n_qubits-1)-i] = -1;
 
-        int q = 2;
+        double q = 2;
         for(int j = i+1; j < 2*required_bits+2; j++) {
             line[(n_qubits-1)-j] = 1;
             line[(n_qubits-1)-i] = 2;
@@ -634,14 +634,13 @@ void ShorSimulator::qft() {
 
 void ShorSimulator::qft_inv() {
     for(int i = 2*required_bits+1; i >= required_bits+1; i--) {
-        int q = 2;
+        double q = 2;
         for(int j = i+1; j < 2*required_bits+2; j++) {
-            int qq = q;
             line[(n_qubits-1)-j] = 1;
             line[(n_qubits-1)-i] = 2;
 
-            double q_r = QMDDcos(1, -qq);
-            double q_i = QMDDsin(1, -qq);
+            double q_r = QMDDcos(1, -q);
+            double q_i = QMDDsin(1, -q);
             qc::GateMatrix Qm{qc::complex_one, qc::complex_zero, qc::complex_zero, {q_r, q_i}};
 
             ApplyGate(Qm);

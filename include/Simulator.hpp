@@ -7,6 +7,7 @@
 #include <map>
 #include <random>
 #include <utility>
+#include <unordered_map>
 
 #include "DDpackage.h"
 
@@ -30,7 +31,7 @@ public:
 
     std::string MeasureAll(bool collapse=false);
     std::map<std::string, unsigned int> MeasureAllNonCollapsing(unsigned int shots);
-    char MeasureOneCollapsing(unsigned short index);
+    char MeasureOneCollapsing(unsigned short index, bool assume_probability_normalization = true);
     // TODO: void ResetOne(unsigned short index);
     // TODO: void ResetAll();
     std::vector<dd::ComplexValue> getVector() const;
@@ -59,6 +60,8 @@ protected:
     const fp epsilon = 0.001L;
 
     static void NextPath(std::string &s);
+
+     double assign_probs(dd::Edge edge, std::unordered_map<dd::NodePtr, double> &probs);
 };
 
 

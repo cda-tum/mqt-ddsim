@@ -1,10 +1,10 @@
-#ifndef DDSIM_SHORSIMULATOR_HPP
-#define DDSIM_SHORSIMULATOR_HPP
+#ifndef DDSIM_SHORFASTSIMULATOR_HPP
+#define DDSIM_SHORFASTSIMULATOR_HPP
 
 #include "Simulator.hpp"
 #include "QuantumComputation.hpp"
 
-class ShorSimulator : public Simulator {
+class ShorFastSimulator : public Simulator {
     static unsigned long long modpow(unsigned long long base, unsigned long long exp, unsigned long long modulus) {
         base %= modulus;
         unsigned long long result = 1ull;
@@ -34,77 +34,62 @@ class ShorSimulator : public Simulator {
         return std::sin((qc::PI * fac)/div);
     }
 
-    void u_a(unsigned long long a, int N, int c);
-    void cmult_inv(int a, int N, int c);
-    void cmult(int a, int N, int c);
-    void mod_add_phi_inv(int a, int N, int c1, int c2);
-    void mod_add_phi(int a, int N, int c1, int c2);
-    void qft_inv();
-    void qft();
-    void add_phi_inv(int a, int c1, int c2);
-    void add_phi(int a, int c1, int c2);
-    int inverse_mod(int a, int n);
+    void u_a_emulate2(unsigned long long a);
+    void u_a_emulate2_rec(dd::Edge e);
 
-    void u_a_emulate(unsigned long long a, int q);
-
+    std::pair<unsigned int, unsigned int> post_processing(const std::string& sample) const;
     void ApplyGate(qc::GateMatrix matrix);
 
     unsigned long long ts[dd::MAXN]{};
+    std::map<dd::NodePtr , dd::Edge> nodesOnLevel[dd::MAXN];
 
     dd::Edge addConst(unsigned long long a);
     dd::Edge addConstMod(unsigned long long a);
     dd::Edge limitTo(unsigned long long a);
 
-    std::pair<unsigned int, unsigned int> post_processing(const std::string& sample);
-
-
-
-        std::array<short, qc::MAX_QUBITS> line{};
+    std::array<short, qc::MAX_QUBITS> line{};
 
     /// composite number to be factored
     const unsigned int n;
     /// coprime number to `n`. Setting this to zero will randomly generate a suitable number
     unsigned int coprime_a;
     const unsigned int required_bits;
-    unsigned int n_qubits{};
+    const unsigned int n_qubits;
 
     std::string sim_result = "did not start";
     std::pair<unsigned, unsigned> sim_factors{0,0};
 
-    std::string polr_result = "did not start";
-    std::pair<unsigned, unsigned> polr_factors{0,0};
+    unsigned long number_of_operations{};
 
-    const bool emulate;
     const bool verbose;
 
-    dd::Edge limitStateVector(dd::Edge e);
     std::map<dd::NodePtr , dd::Edge> dag_edges;
 
 public:
-    ShorSimulator(int composite_number, int coprime_a, bool emulate = true, bool verbose = false) :
-    Simulator(), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), emulate(emulate), verbose(verbose) {
+    ShorFastSimulator(int composite_number, int coprime_a, bool verbose = false) :
+    Simulator(), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), n_qubits(std::ceil(std::log2(n)) + 1), verbose(verbose) {
         line.fill(qc::LINE_DEFAULT);
     };
 
-    ShorSimulator(int composite_number, int coprime_a, unsigned long long seed, bool emulate = true, bool verbose = false) :
-    Simulator(seed), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), emulate(emulate), verbose(verbose) {
+    ShorFastSimulator(int composite_number, int coprime_a, unsigned long long seed, bool verbose = false) :
+    Simulator(seed), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), n_qubits(std::ceil(std::log2(n)) + 1), verbose(verbose) {
         line.fill(qc::LINE_DEFAULT);
     };
 
-    virtual ~ShorSimulator();
+    virtual ~ShorFastSimulator();
 
     void Simulate() override;
     void Reset();
 
     std::string getName() const override {
-        return "shor_"+std::to_string(n)+"_"+std::to_string(coprime_a);
+        return "fast_shor_"+std::to_string(n)+"_"+std::to_string(coprime_a);
     }
 
     unsigned short getNumberOfQubits() const override {
         return n_qubits;
     }
     unsigned long getNumberOfOps() const override {
-        return 0;
+        return number_of_operations;
     }
 
     std::pair<unsigned, unsigned> getFactors() {
@@ -115,17 +100,13 @@ public:
         return {
                 {"composite_number",std::to_string(n)},
                 {"coprime_a", std::to_string(coprime_a)},
-                {"emulation", std::to_string(emulate)},
                 {"sim_result", sim_result},
                 {"sim_factor1", std::to_string(sim_factors.first)},
-                {"sim_factor2", std::to_string(sim_factors.second)},
-                {"polr_result", polr_result},
-                {"polr_factor1", std::to_string(polr_factors.first)},
-                {"polr_factor2", std::to_string(polr_factors.second)},
+                {"sim_factor2", std::to_string(sim_factors.second)}
         };
     }
 
 };
 
 
-#endif //DDSIM_SHORSIMULATOR_HPP
+#endif //DDSIM_SHORFASTSIMULATOR_HPP

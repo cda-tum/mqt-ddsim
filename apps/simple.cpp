@@ -7,12 +7,13 @@
 #include <algorithms/Grover.hpp>
 #include <algorithms/QFT.hpp>
 #include <algorithms/Entanglement.hpp>
-#include <ShorSimulator.hpp>
 
 
 #include "Simulator.hpp"
 #include "QFRSimulator.hpp"
 #include "GroverSimulator.hpp"
+#include "ShorFastSimulator.hpp"
+#include "ShorSimulator.hpp"
 
 
 int main(int argc, char** argv) {
@@ -22,12 +23,12 @@ int main(int argc, char** argv) {
     po::options_description description("JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
     description.add_options()
             ("help,h", "produce help message")
-            ("seed", po::value<unsigned long long>(&seed)->default_value(0), "seed for random number generator (default zero is directly used as seed!)")
+            ("seed", po::value<unsigned long long>(&seed)->default_value(0), "seed for random number generator (default zero is possibly directly used as seed!)")
             ("shots", po::value<unsigned int>()->default_value(0), "number of measurements on the final quantum state")
             ("display_vector", "display the state vector")
             ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
             ("verbose", "Causes some simulators to print additional information to STDERR")
-            ("benchmark", "print simulation stats in a single CSV style line (overrides --ps and suppresses most other output)")
+            ("benchmark", "print simulation stats in a single CSV style line (overrides --ps and suppresses most other output, please don't rely on the format)")
 
             ("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")
             ("simulate_qft", po::value<unsigned int>(), "simulate Quantum Fourier Transform for given number of qubits")
@@ -39,21 +40,23 @@ int main(int argc, char** argv) {
 
             ("simulate_shor", po::value<unsigned int>(), "simulate Shor's algorithm factoring this number")
             ("simulate_shor_coprime", po::value<unsigned int>()->default_value(0), "coprime number to use with Shor's algorithm (zero randomly generates a coprime)")
-            ("simulate_shor_no_emulatation", "Force Shor simulator to do modular exponentiation instead of using emulation (you'll usually want emulation)")
+            ("simulate_shor_no_emulation", "Force Shor simulator to do modular exponentiation instead of using emulation (you'll usually want emulation)")
+
+            ("simulate_fast_shor", po::value<unsigned int>(), "simulate Shor's algorithm factoring this number with intermediate measurements")
+            ("simulate_fast_shor_coprime", po::value<unsigned int>()->default_value(0), "coprime number to use with Shor's algorithm (zero randomly generates a coprime)")
             ;
     po::variables_map vm;
     try {
         po::store(po::parse_command_line(argc, argv, description), vm);
+
+        if (vm.count("help")) {
+            std::cout << description;
+            return 0;
+        }
         po::notify(vm);
     } catch (const po::error &e) {
         std::cerr << "[ERROR] " << e.what() << "! Try option '--help' for available commandline options.\n";
         std::exit(1);
-    }
-
-
-    if (vm.count("help")) {
-        std::cout << description;
-        return 0;
     }
 
     std::unique_ptr<qc::QuantumComputation> quantumComputation;
@@ -67,10 +70,22 @@ int main(int argc, char** argv) {
 	    const unsigned int n_qubits = vm["simulate_qft"].as<unsigned int>();
 	    quantumComputation = std::make_unique<qc::QFT>(n_qubits);
         ddsim = std::make_unique<QFRSimulator>(quantumComputation, seed);
+    } else if (vm.count("simulate_fast_shor")) {
+        const unsigned int composite_number = vm["simulate_fast_shor"].as<unsigned int>();
+        const unsigned int coprime = vm["simulate_fast_shor_coprime"].as<unsigned int>();
+        if (seed == 0) {
+            ddsim = std::make_unique<ShorFastSimulator>(composite_number, coprime, vm.count("verbose") > 0);
+        } else {
+            ddsim = std::make_unique<ShorFastSimulator>(composite_number, coprime, seed, vm.count("verbose") > 0);
+        }
     } else if (vm.count("simulate_shor")) {
         const unsigned int composite_number = vm["simulate_shor"].as<unsigned int>();
         const unsigned int coprime = vm["simulate_shor_coprime"].as<unsigned int>();
-        ddsim = std::make_unique<ShorSimulator>(composite_number, coprime, seed, vm.count("simulate_shor_no_emulation") == 0,vm.count("verbose") > 0);
+        if (seed == 0) {
+            ddsim = std::make_unique<ShorSimulator>(composite_number, coprime, vm.count("verbose") > 0);
+        } else {
+            ddsim = std::make_unique<ShorSimulator>(composite_number, coprime, seed, vm.count("verbose") > 0);
+        }
     } else if (vm.count("simulate_grover")) {
         const unsigned int n_qubits = vm["simulate_grover"].as<unsigned int>();
         quantumComputation = std::make_unique<qc::Grover>(n_qubits, seed);
@@ -105,14 +120,18 @@ int main(int argc, char** argv) {
 
     if (vm.count("benchmark")) {
         auto more_info = ddsim->AdditionalStatistics();
-        std::cout << ddsim->getName() << ","
-                  << ddsim->getNumberOfQubits() << ","
-                  << vm["approximate"].as<float>() << ", "
+        std::cout << ddsim->getName() << ", "
+                  << ddsim->getNumberOfQubits() << ", "
+                  //<< vm["approximate"].as<float>() << ", "
                   << std::fixed << duration_simulation.count() << std::defaultfloat << ", "
                   << std::fixed << duration_measurement.count() << std::defaultfloat << ", "
-                  << more_info["approximation_runs"] << ","
-                  << more_info["final_fidelity"] << ", "
-                  << ddsim->getNumberOfOps() << ","
+                  //<< more_info["approximation_runs"] << ","
+                  //<< more_info["final_fidelity"] << ", "
+                  << more_info["coprime_a"] << ", "
+                  << more_info["sim_result"] << ", "
+                  << more_info["polr_result"] << ", "
+                  << ddsim->getSeed() << ", "
+                  << ddsim->getNumberOfOps() << ", "
                   << ddsim->getMaxNodeCount()
                   << "\n";
         return 0;
@@ -158,7 +177,7 @@ int main(int argc, char** argv) {
                   << "    \"n_qubits\": " << ddsim->getNumberOfQubits() << ",\n"
                   << "    \"applied_gates\": " << ddsim->getNumberOfOps() << ",\n"
                   << "    \"max_nodes\": " << ddsim->getMaxNodeCount() << ",\n"
-                  << "    \"path_of_least_resistance\": \"" << ddsim->getPathOfLeastResistance().second << "\",\n";
+                  ;
         for(const auto& item : ddsim->AdditionalStatistics()) {
             std::cout << "    \"" << item.first << "\": \"" << item.second << "\",\n";
         }

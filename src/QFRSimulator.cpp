@@ -55,19 +55,60 @@ void QFRSimulator::Simulate() {
                         continue;
                     }
                 } else {
-                    throw std::runtime_error("Dynamic cast to ClassicControlledOperation failed.");
+                    throw std::runtime_error(" Dynamic cast to ClassicControlledOperation failed.");
                 }
             }
+            std::clog << "[INFO] op " << op_num++ << " is " << op->getName()
+                      << " #controls=" << op->getControls().size()
+                      << " statesize=" << dd->size(root_edge) << "\n";
 
-            //std::clog << "[INFO] op " << op_num++ << " is " << op->getName()
-            //          << " #controls=" << op->getControls().size()
-            //          << " statesize=" << dd->size(root_edge) << "\n";
-            auto dd_op = op->getDD(dd, line);
-            auto tmp = dd->multiply(dd_op, root_edge);
-            dd->incRef(tmp);
+
+            auto move_to_top = [this](std::unique_ptr<qc::Operation>& op, std::map<unsigned short, unsigned short>& variable_map){
+                if (op->getNcontrols() + op->getNtargets() == 1) {
+                    root_edge = dd->exchange(root_edge, op->getTargets().at(0), qc->getNqubits()-1);
+                    variable_map.at(op->getTargets().at(0)) = qc->getNqubits()-1;
+                    variable_map.at(qc->getNqubits()-1) = op->getTargets().at(0);
+                } else if (op->getNcontrols() == 1 && op->getNtargets() == 1) {
+                    //TODO: variable_map
+                    root_edge = dd->exchange(root_edge, op->getControls().at(0).qubit, qc->getNqubits()-1);
+                    root_edge = dd->exchange(root_edge, op->getTargets().at(0), qc->getNqubits()-2);
+                } else {
+                    // ignore multi-controlled gates
+                }
+            };
+
+            auto move_to_bottom = [this](std::unique_ptr<qc::Operation>& op, std::map<unsigned short, unsigned short>& variable_map){
+                if (op->getNcontrols() + op->getNtargets() == 1) {
+                    root_edge = dd->exchange(root_edge, 0, op->getTargets().at(0));
+                    //TODO: variable_map
+                } else if (op->getNcontrols() == 1 && op->getNtargets() == 1) {
+                    root_edge = dd->exchange(root_edge, 0, op->getControls().at(0).qubit);
+                    root_edge = dd->exchange(root_edge, 1, op->getTargets().at(0));
+                    //TODO: variable_map
+                } else {
+                    // ignore multi-controlled gates
+                }
+            };
+
+            auto sifting = [this](std::unique_ptr<qc::Operation>& op, std::map<unsigned short, unsigned short>& variable_map){
+                /// Idea: sift only if op affects qubits on lower half of DD
+                root_edge = dd->sifting(root_edge, variable_map);
+            };
+
+            // decrease ref count before performing reordering since we will loose the original root_edge
             dd->decRef(root_edge);
-            root_edge = tmp;
+
+            //move_to_top(op, variable_map);
+            //move_to_bottom(op, variable_map);
+            //sifting(op, variable_map);
+
+            auto dd_op = op->getDD(dd, line);
+            root_edge = dd->multiply(dd_op, root_edge);
+            // increase ref count on new root_edge so that it is not removed during garbage collection
+            dd->incRef(root_edge);
             dd->garbageCollect();
         }
     }
+
+    //qc->changePermutation(root_edge, variable_map, line, dd);
 }

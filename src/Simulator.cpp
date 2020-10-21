@@ -2,7 +2,7 @@
 
 #include <queue>
 #include <set>
-
+#include <unordered_map>
 
 
 std::string Simulator::MeasureAll(const bool collapse) {
@@ -100,7 +100,13 @@ void Simulator::NextPath(std::string& s) {
         s.insert(0, "1");
 }
 
-char Simulator::MeasureOneCollapsing(unsigned short index) {
+/***
+ * Destructively measures a single qubit and returns the result
+ * @param index Index of the qubit to be measured
+ * @param assume_probability_normalization Probability normalization makes measurement faster but isn't always given
+ * @return '1' or '0' depending on the measured value
+ */
+char Simulator::MeasureOneCollapsing(unsigned short index, const bool assume_probability_normalization) {
     std::map<dd::NodePtr, fp> probsMone;
     std::set<dd::NodePtr> visited_nodes2;
     std::queue<dd::NodePtr> q;
@@ -140,21 +146,41 @@ char Simulator::MeasureOneCollapsing(unsigned short index) {
     }
 
     fp pzero{0}, pone{0};
-    while(!q.empty()) {
-        dd::NodePtr ptr = q.front();
-        q.pop();
 
-        if(!CN::equalsZero(ptr->e[0].w)) {
-            pzero += probsMone[ptr] * CN::mag2(ptr->e[0].w);
+    if (assume_probability_normalization) {
+        while(!q.empty()) {
+            dd::NodePtr ptr = q.front();
+            q.pop();
+
+            if(!CN::equalsZero(ptr->e[0].w)) {
+                pzero += probsMone[ptr] * CN::mag2(ptr->e[0].w);
+            }
+
+            if(!CN::equalsZero(ptr->e[2].w)) {
+                pone += probsMone[ptr] * CN::mag2(ptr->e[2].w);
+            }
         }
+    } else {
+        std::unordered_map<dd::NodePtr, double> probs;
+        assign_probs(root_edge, probs);
 
-        if(!CN::equalsZero(ptr->e[2].w)) {
-            pone += probsMone[ptr] * CN::mag2(ptr->e[2].w);
+        while(!q.empty()) {
+            dd::NodePtr ptr = q.front();
+            q.pop();
+
+            if(!CN::equalsZero(ptr->e[0].w)) {
+                pzero += probsMone[ptr] * probs[ptr->e[0].p] * CN::mag2(ptr->e[0].w);
+            }
+
+            if(!CN::equalsZero(ptr->e[2].w)) {
+                pone += probsMone[ptr] * probs[ptr->e[2].p] * CN::mag2(ptr->e[2].w);
+            }
         }
     }
 
     if(std::abs(pzero + pone - 1) > epsilon) {
-        throw std::runtime_error("Numerical instability occurred during measurement: |alpha|^2 + |beta|^2 = " + std::to_string(pzero + pone) + ", but should be 1!");
+        throw std::runtime_error("Numerical instability occurred during measurement: |alpha|^2 + |beta|^2 = "
+            + std::to_string(pzero) + " + " + std::to_string(pone) + " = " + std::to_string(pzero + pone) + ", but should be 1!");
     }
 
     const fp sum = pzero + pone;
@@ -428,4 +454,21 @@ std::pair<dd::ComplexValue, std::string> Simulator::getPathOfLeastResistance() {
     }
 
     return {{CN::val(path_value.r), CN::val(path_value.i)}, std::string{result.rbegin(), result.rend()}};
+}
+
+double Simulator::assign_probs(dd::Edge edge, std::unordered_map<dd::NodePtr, double> &probs) {
+    auto it = probs.find(edge.p);
+    if(it != probs.end()) {
+        return CN::mag2(edge.w) * it->second;
+    }
+    double sum;
+    if(dd->isTerminal(edge)) {
+        sum = 1.0;
+    } else {
+        sum = assign_probs(edge.p->e[0], probs) + assign_probs(edge.p->e[2], probs);
+    }
+
+    probs.insert(std::pair<dd::NodePtr , double>(edge.p, sum));
+
+    return CN::mag2(edge.w) * sum;
 }
