@@ -6,7 +6,7 @@
 TEST(QFRSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
 	quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
-    QFRSimulator ddsim(quantumComputation);
+    QFRSimulator ddsim(quantumComputation, 1, 1);
 
     ASSERT_EQ(ddsim.getNumberOfOps(), 1);
 
@@ -26,7 +26,7 @@ TEST(QFRSimTest, ClassicControlledOp) {
     auto classical_register = std::make_pair<unsigned short, unsigned short>(0,1);
     quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classical_register, 1);
 
-    QFRSimulator ddsim(quantumComputation);
+    QFRSimulator ddsim(quantumComputation, 1, 1);
     ddsim.Simulate();
 
     auto m = ddsim.MeasureAll(false);
@@ -39,7 +39,7 @@ TEST(QFRSimTest, DestructiveMeasurementAll) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::H);
-    QFRSimulator ddsim(quantumComputation);
+    QFRSimulator ddsim(quantumComputation, 1, 1);
     ddsim.Simulate();
 
 
@@ -60,7 +60,7 @@ TEST(QFRSimTest, DestructiveMeasurementOne) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::H);
-    QFRSimulator ddsim(quantumComputation);
+    QFRSimulator ddsim(quantumComputation, 1, 1);
     ddsim.Simulate();
 
     const char m = ddsim.MeasureOneCollapsing(0);
@@ -86,7 +86,7 @@ TEST(QFRSimTest, ApproximateByFidelity) {
     quantumComputation->emplace_back<qc::StandardOperation>(3, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, std::vector<qc::Control>{qc::Control{0, qc::Control::pos}, qc::Control{1, qc::Control::pos}}, 2, qc::X);
-    QFRSimulator ddsim(quantumComputation);
+    QFRSimulator ddsim(quantumComputation, 1, 1);
     ddsim.Simulate();
 
     ASSERT_EQ(ddsim.getNodeCount(), 6);
@@ -102,7 +102,7 @@ TEST(QFRSimTest, ApproximateBySampling) {
     quantumComputation->emplace_back<qc::StandardOperation>(3, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, std::vector<qc::Control>{qc::Control{0, qc::Control::pos}, qc::Control{1, qc::Control::pos}}, 2, qc::X);
-    QFRSimulator ddsim(quantumComputation);
+    QFRSimulator ddsim(quantumComputation, 1, 1);
     ddsim.Simulate();
 
     ASSERT_EQ(ddsim.getNodeCount(), 6);
@@ -111,4 +111,20 @@ TEST(QFRSimTest, ApproximateBySampling) {
 
     ASSERT_EQ(ddsim.getNodeCount(), 3);
     ASSERT_LE(resulting_fidelity, 0.75); // the least contributing path has .25
+}
+
+TEST(QFRSimTest, ApproximationInSimulator) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
+    quantumComputation->emplace_back<qc::StandardOperation>(3, 0, qc::H);
+    quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::H);
+    quantumComputation->emplace_back<qc::StandardOperation>(3, std::vector<qc::Control>{qc::Control{0, qc::Control::pos}, qc::Control{1, qc::Control::pos}}, 2, qc::X);
+
+    quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::I); // some dummy operations
+    quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::I);
+
+    QFRSimulator ddsim(quantumComputation, 1, 0.3);
+    ddsim.Simulate();
+
+    ASSERT_EQ(ddsim.getNodeCount(), 4);
+    ASSERT_LE(std::stod(ddsim.AdditionalStatistics()["final_fidelity"]), 0.75); // the least contributing path has .25
 }

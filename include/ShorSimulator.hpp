@@ -55,11 +55,11 @@ class ShorSimulator : public Simulator {
     dd::Edge addConstMod(unsigned long long a);
     dd::Edge limitTo(unsigned long long a);
 
-    std::pair<unsigned int, unsigned int> post_processing(const std::string& sample);
+    std::pair<unsigned int, unsigned int> post_processing(const std::string& sample) const;
 
 
 
-        std::array<short, qc::MAX_QUBITS> line{};
+    std::array<short, qc::MAX_QUBITS> line{};
 
     /// composite number to be factored
     const unsigned int n;

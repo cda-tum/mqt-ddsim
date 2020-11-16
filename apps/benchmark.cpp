@@ -13,7 +13,7 @@ auto min_estimator = [](const std::vector<double>& v) -> double {return *(std::m
 static void BM_sim_X(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::X);
-    QFRSimulator sim{qc};
+    QFRSimulator sim(qc, 1, 1);
     for(auto _ : state) {
         sim.Simulate();
     }
@@ -24,7 +24,7 @@ BENCHMARK(BM_sim_X)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 static void BM_sim_H(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::H);
-    QFRSimulator sim{qc};
+    QFRSimulator sim(qc, 1, 1);
     for(auto _ : state) {
         sim.Simulate();
     }
@@ -35,7 +35,7 @@ BENCHMARK(BM_sim_H)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 static void BM_sim_T(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::T);
-    QFRSimulator sim{qc};
+    QFRSimulator sim(qc, 1, 1);
     for(auto _ : state) {
         sim.Simulate();
     }
@@ -46,7 +46,7 @@ BENCHMARK(BM_sim_T)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 static void BM_sim_CNOT(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     qc->emplace_back<qc::StandardOperation>(state.range(0), qc::Control{0}, 1, qc::X);
-    QFRSimulator sim{qc};
+    QFRSimulator sim(qc, 1, 1);
     for(auto _ : state) {
         sim.Simulate();
     }
@@ -58,7 +58,7 @@ static void BM_sim_TOFFOLI(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     std::vector<qc::Control> controls{qc::Control(0), qc::Control(1)};
     qc->emplace_back<qc::StandardOperation>(state.range(0), controls, 2, qc::X);
-    QFRSimulator sim{qc};
+    QFRSimulator sim(qc, 1, 1);
     for(auto _ : state) {
         sim.Simulate();
     }
@@ -109,7 +109,7 @@ static void BM_sim_QCBM(benchmark::State& state) {
         qc->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RZ, 1.0);
         qc->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RX, 1.0);
     }
-    QFRSimulator sim{qc};
+    QFRSimulator sim(qc, 1, 1);
     for(auto _ : state) {
         sim.Simulate();
     }

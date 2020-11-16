@@ -123,10 +123,6 @@ void ShorSimulator::Simulate() {
         ApplyGate(qc::Hmat);
 
         line[(n_qubits-1)-(i)] = -1;
-        std::clog << "  old dd size = " << dd->size(root_edge) << "\n";
-        auto step_fidelity = 1;//ApproximateByFidelity(0.7, true);
-        std::clog << "  step_fidelity = " << step_fidelity << "\n";
-        std::clog << "  new dd size = " << dd->size(root_edge) << "\n";
     }
 
     delete[] as;
@@ -162,7 +158,7 @@ void ShorSimulator::Simulate() {
     }
 }
 
-std::pair<unsigned int, unsigned int> ShorSimulator::post_processing(const std::string& sample) {
+std::pair<unsigned int, unsigned int> ShorSimulator::post_processing(const std::string& sample) const {
     unsigned long long res = 0;
     if (verbose) {
         std::clog << "measurement: ";

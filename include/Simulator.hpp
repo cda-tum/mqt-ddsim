@@ -21,8 +21,8 @@ public:
         // this is probably overkill but better safe than sorry
         std::array<std::mt19937_64::result_type , std::mt19937_64::state_size> random_data{};
         std::random_device rd;
-        std::generate(begin(random_data), end(random_data), [&](){return rd();});
-        std::seed_seq seeds(begin(random_data), end(random_data));
+        std::generate(std::begin(random_data), std::end(random_data), [&rd](){return rd();});
+        std::seed_seq seeds(std::begin(random_data), std::end(random_data));
         mt.seed(seeds);
     };
 
@@ -61,7 +61,7 @@ protected:
 
     static void NextPath(std::string &s);
 
-     double assign_probs(dd::Edge edge, std::unordered_map<dd::NodePtr, double> &probs);
+    double assign_probs(dd::Edge edge, std::unordered_map<dd::NodePtr, double> &probs);
 };
 
 
