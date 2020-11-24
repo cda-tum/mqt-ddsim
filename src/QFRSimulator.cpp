@@ -20,7 +20,7 @@ void QFRSimulator::Simulate() {
     for (auto& op : *qc) {
         if (op->isNonUnitaryOperation()) {
             if (auto *nu_op = dynamic_cast<qc::NonUnitaryOperation *>(op.get())) {
-                if (nu_op->getName()[0] == 'M') { // Measure starts with 'M', quite hacky though
+                if (op->getType() == qc::Measure) {
                     auto quantum = nu_op->getControls();
                     auto classic = nu_op->getTargets();
 
@@ -33,6 +33,8 @@ void QFRSimulator::Simulate() {
                         assert(result == '0' || result == '1');
                         classic_values[classic[i]] = result == '1';
                     }
+                } else if (op->getType() == qc::Barrier) {
+	                continue;
                 } else {
                     throw std::runtime_error("Unsupported non-unitary functionality.");
                 }
