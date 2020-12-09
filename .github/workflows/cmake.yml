@@ -1,0 +1,49 @@
+name: CMake
+
+on: [push]
+
+jobs:
+  build:
+    env:
+      BUILD_TYPE: Release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure CMake
+      shell: bash
+      run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+    - name: Build
+      shell: bash
+      run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: ctest -C $BUILD_TYPE
+      
+  coverage:
+    runs-on: ubuntu-latest
+    env:
+      BOOST_ROOT : "/usr/local/share/boost/1.72.0"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure CMake
+        shell: bash
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1
+      - name: Build
+        shell: bash
+        run: cmake --build "${{github.workspace}}/build" --config Debug
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        shell: bash
+        run: |
+          which ctest
+          ctest --version
+          ctest -C Debug
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true

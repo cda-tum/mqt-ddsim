@@ -47,7 +47,7 @@ It can either be used as a **standalone executable** with command-line interface
 - The standalone executable is launched in the following way, showing available options:
     ```commandline
     $ ./ddsim_simple --help
-    JKQ DDSIM by http://iic.jku.at/eda/ -- Allowed options:
+    JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
       -h [ --help ]                         produce help message
       --seed arg (=0)                       seed for random number generator (default zero is directly used as seed!) 
       --shots arg (=0)                      number of measurements on the final quantum state
