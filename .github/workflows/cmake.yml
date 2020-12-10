@@ -1,47 +1,83 @@
-name: CMake
+name: continuous integration
 
-on: [push]
+on: [ push, pull_request ]
+
+env:
+  BUILD_TYPE: Release
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
-  build:
-    env:
-      BUILD_TYPE: Release
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Configure CMake
-      shell: bash
-      run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-    - name: Build
-      shell: bash
-      run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      shell: bash
-      run: ctest -C $BUILD_TYPE
-      
-  coverage:
+  build-ubuntu:
+    name: Build on Ubuntu
     runs-on: ubuntu-latest
-    env:
-      BOOST_ROOT : "/usr/local/share/boost/1.72.0"
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: true
       - name: Configure CMake
         shell: bash
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBOOST_ROOT=${BOOST_ROOT_1_72_0}
       - name: Build
         shell: bash
-        run: cmake --build "${{github.workspace}}/build" --config Debug
+        run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
       - name: Test
         working-directory: ${{github.workspace}}/build
         shell: bash
-        run: |
-          which ctest
-          ctest --version
-          ctest -C Debug
+        run: ctest -C $BUILD_TYPE
+
+  build-macos:
+    name: Build on MacOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Install boost dependency
+        run: brew install boost
+      - name: Configure CMake
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      - name: Build
+        run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        shell: bash
+        run: ctest -C $BUILD_TYPE
+
+#  build-windows:
+#    name: Build on Windows
+#    runs-on: windows-latest
+#    env:
+#      BOOST_ROOT: ${BOOST_ROOT_1_72_0}
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          submodules: true
+#      - name: Configure CMake
+#        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -G "Visual Studio 16 2019" -A x64 -T host=x64 -LA -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBOOST_ROOT=${BOOST_ROOT_1_72_0} -DBoost_NO_BOOST_CMAKE=ON
+#      - name: Build
+#        run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
+#      - name: Test
+#        working-directory: ${{github.workspace}}/build
+#        run: ctest -C $BUILD_TYPE
+
+  coverage:
+    name: Coverage
+    needs: [ build-ubuntu, build-macos ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Configure CMake
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1
+      - name: Build
+        run: cmake --build "${{github.workspace}}/build" --config Debug
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: ctest -C Debug
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
