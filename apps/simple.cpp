@@ -35,6 +35,9 @@ int main(int argc, char** argv) {
             ("simulate_ghz", po::value<unsigned int>(), "simulate state preparation of GHZ state for given number of qubits")
             ("step_fidelity", po::value<double>()->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")
             ("steps", po::value<unsigned int>()->default_value(1), "number of approximation steps")
+            ("initial_reorder", po::value<int>()->default_value(0), "Try to find a good initial variable order (0=None, 1=Most affected qubits to the top, 2=Most affected targets to the top)")
+            ("dynamic_reorder", po::value<int>()->default_value(0), "Apply reordering strategy during simulation (0=None, 1=Sifting, 2=Move2Top)")
+            ("post_reorder", po::value<int>()->default_value(0), "Apply a reordering strategy after simulation (0=None, 1=Sifting)")
 
             ("simulate_grover", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle")
             ("simulate_grover_emulated", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle and emulation")
@@ -67,11 +70,17 @@ int main(int argc, char** argv) {
     if (vm.count("simulate_file")) {
         const std::string fname = vm["simulate_file"].as<std::string>();
     	quantumComputation = std::make_unique<qc::QuantumComputation>(fname);
-        ddsim = std::make_unique<QFRSimulator>(quantumComputation, vm["steps"].as<unsigned int>(), vm["step_fidelity"].as<double>(), seed);
+        ddsim = std::make_unique<QFRSimulator>(quantumComputation,
+                                               vm["steps"].as<unsigned int>(), vm["step_fidelity"].as<double>(),
+                                               vm["initial_reorder"].as<int>(), vm["dynamic_reorder"].as<int>(), vm["post_reorder"].as<int>(),
+                                               seed);
     } else if (vm.count("simulate_qft")) {
 	    const unsigned int n_qubits = vm["simulate_qft"].as<unsigned int>();
 	    quantumComputation = std::make_unique<qc::QFT>(n_qubits);
-        ddsim = std::make_unique<QFRSimulator>(quantumComputation, vm["steps"].as<unsigned int>(), vm["step_fidelity"].as<double>(), seed);
+        ddsim = std::make_unique<QFRSimulator>(quantumComputation,
+                                               vm["steps"].as<unsigned int>(), vm["step_fidelity"].as<double>(),
+                                               vm["initial_reorder"].as<int>(), vm["dynamic_reorder"].as<int>(), vm["post_reorder"].as<int>(),
+                                               seed);
     } else if (vm.count("simulate_fast_shor")) {
         const unsigned int composite_number = vm["simulate_fast_shor"].as<unsigned int>();
         const unsigned int coprime = vm["simulate_fast_shor_coprime"].as<unsigned int>();
@@ -91,7 +100,10 @@ int main(int argc, char** argv) {
     } else if (vm.count("simulate_grover")) {
         const unsigned int n_qubits = vm["simulate_grover"].as<unsigned int>();
         quantumComputation = std::make_unique<qc::Grover>(n_qubits, seed);
-        ddsim = std::make_unique<QFRSimulator>(quantumComputation, vm["steps"].as<unsigned int>(), vm["step_fidelity"].as<double>(), seed);
+        ddsim = std::make_unique<QFRSimulator>(quantumComputation,
+                                               vm["steps"].as<unsigned int>(), vm["step_fidelity"].as<double>(),
+                                               vm["initial_reorder"].as<int>(), vm["dynamic_reorder"].as<int>(), vm["post_reorder"].as<int>(),
+                                               seed);
     } else if (vm.count("simulate_grover_emulated")) {
         ddsim = std::make_unique<GroverSimulator>(vm["simulate_grover_emulated"].as<unsigned int>(), seed);
     } else if (vm.count("simulate_grover_oracle_emulated")) {
@@ -99,7 +111,10 @@ int main(int argc, char** argv) {
     } else if (vm.count("simulate_ghz")) {
 	    const unsigned int n_qubits = vm["simulate_ghz"].as<unsigned int>();
 	    quantumComputation = std::make_unique<qc::Entanglement>(n_qubits);
-        ddsim = std::make_unique<QFRSimulator>(quantumComputation, vm["steps"].as<unsigned int>(), vm["step_fidelity"].as<double>(), seed);
+        ddsim = std::make_unique<QFRSimulator>(quantumComputation,
+                                               vm["steps"].as<unsigned int>(), vm["step_fidelity"].as<double>(),
+                                               vm["initial_reorder"].as<int>(), vm["dynamic_reorder"].as<int>(), vm["post_reorder"].as<int>(),
+                                               seed);
     } else {
         std::cerr << "Did not find anything to simulate. See help below.\n"
                   << description << "\n";

@@ -26,6 +26,8 @@ public:
         mt.seed(seeds);
     };
 
+    virtual ~Simulator() = default;
+
     virtual void Simulate() = 0;
     virtual std::map<std::string, std::string> AdditionalStatistics() {return {};};
 

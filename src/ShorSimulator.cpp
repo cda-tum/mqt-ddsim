@@ -6,8 +6,6 @@
 #include <chrono>
 #include <limits>
 
-ShorSimulator::~ShorSimulator() = default;
-
 void ShorSimulator::Simulate() {
     if (verbose) {
         std::clog << "Simulate Shor's algorithm for n=" << n;
@@ -285,10 +283,6 @@ std::pair<unsigned int, unsigned int> ShorSimulator::post_processing(const std::
     } else {
         return {0,0};
     }
-}
-
-void ShorSimulator::Reset() {
-
 }
 
 dd::Edge ShorSimulator::limitTo(unsigned long long a) {

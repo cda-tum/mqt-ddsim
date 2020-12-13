@@ -21,21 +21,10 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-option(GIT_SUBMODULE "Check submodules during build" ON)
+option(GIT_SUBMODULE "Check submodules during build" OFF)
 macro(handle_submodule MODULENAME)
-	find_package(Git QUIET)
-	if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git" AND GIT_SUBMODULE)
-		message(STATUS "${MODULENAME} update")
-		execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- extern/${MODULENAME}
-		                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-		                RESULT_VARIABLE GIT_SUBMOD_RESULT)
-		if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-			message(FATAL_ERROR "git submodule update --init --recursive -- extern/${MODULENAME} failed with ${GIT_SUBMOD_RESULT}.")
-		endif()
-	endif()
-
 	if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/${MODULENAME}/CMakeLists.txt")
-		message(FATAL_ERROR "${MODULENAME} failed to download! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
+		message(FATAL_ERROR "${MODULENAME} was not found. Please update submodules (git submodule update --init --recursive) and try again.")
 	endif()
 endmacro()
 

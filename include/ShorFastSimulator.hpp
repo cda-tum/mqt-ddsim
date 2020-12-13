@@ -76,10 +76,7 @@ public:
         line.fill(qc::LINE_DEFAULT);
     };
 
-    virtual ~ShorFastSimulator();
-
     void Simulate() override;
-    void Reset();
 
     std::string getName() const override {
         return "fast_shor_"+std::to_string(n)+"_"+std::to_string(coprime_a);
