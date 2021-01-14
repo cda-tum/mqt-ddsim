@@ -68,8 +68,9 @@ jobs:
 
       - name: Download boost
         if:   steps.cache-boost.outputs.cache-hit != 'true'
+        shell: cmd
         run:  |
-              "/c/msys64/usr/bin/wget.exe" https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.7z --no-check-certificate
+              C:\msys64\usr\bin\wget.exe https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.7z --no-check-certificate
 
       - uses: ilammy/msvc-dev-cmd@v1
 
