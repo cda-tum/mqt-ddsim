@@ -1,6 +1,11 @@
 name: continuous integration
 
-on: [ push, pull_request ]
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
 
 env:
   BUILD_TYPE: Release
@@ -46,22 +51,46 @@ jobs:
         shell: bash
         run: ctest -C $BUILD_TYPE
 
-#  build-windows:
-#    name: Build on Windows
-#    runs-on: windows-latest
-#    env:
-#      BOOST_ROOT: ${BOOST_ROOT_1_72_0}
-#    steps:
-#      - uses: actions/checkout@v2
-#        with:
-#          submodules: recursive
-#      - name: Configure CMake
-#        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -G "Visual Studio 16 2019" -A x64 -T host=x64 -LA -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBOOST_ROOT=${BOOST_ROOT_1_72_0} -DBoost_NO_BOOST_CMAKE=ON
-#      - name: Build
-#        run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
-#      - name: Test
-#        working-directory: ${{github.workspace}}/build
-#        run: ctest -C $BUILD_TYPE
+  build-windows:
+    name: Build on Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Cache Boost
+        id:   cache-boost
+        uses: actions/cache@v2
+        with:
+          path: ${{github.workspace}}/boost_1_70_0
+          key:  ${{ runner.OS }}-boost
+
+      - name: Download boost
+        if:   steps.cache-boost.outputs.cache-hit != 'true'
+        run:  |
+              C:\msys64\usr\bin\wget.exe https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.7z --no-check-certificate
+
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - name:  Building boost
+        if:    steps.cache-boost.outputs.cache-hit != 'true'
+        shell: bash
+        run:   |
+               "/c/Program Files/7-Zip/7z.exe" x boost_1_70_0.7z "-o${{github.workspace}}"
+               cd boost_1_70_0
+               ./bootstrap.bat
+               ./b2.exe -j8 address-model=64 link=static threading=multi runtime-link=shared variant=release --build-type=minimal --with-program_options
+
+      - name: Configure CMake
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -T "ClangCl" -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_MULTITHREADED=ON -DBoost_USE_STATIC_RUNTIME=OFF -DBOOST_ROOT="${{github.workspace}}\boost_1_70_0" -DBOOST_INCLUDEDIR="${{github.workspace}}\boost_1_70_0\include" -DBOOST_LIBRARYDIR="${{github.workspace}}\boost_1_70_0\lib"
+
+      - name: Build
+        run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --parallel 8
+
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: ctest -C $BUILD_TYPE
 
   coverage:
     name: Coverage
