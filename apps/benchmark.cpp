@@ -15,7 +15,7 @@ static void BM_sim_X(benchmark::State& state) {
     qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::X);
     QFRSimulator sim(qc, 1, 1, 0, 0, 0);
     for(auto _ : state) {
-        sim.Simulate();
+        sim.Simulate(1);
     }
     state.SetLabel("X");
 }
@@ -26,7 +26,7 @@ static void BM_sim_H(benchmark::State& state) {
     qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::H);
     QFRSimulator sim(qc, 1, 1, 0, 0, 0);
     for(auto _ : state) {
-        sim.Simulate();
+        sim.Simulate(1);
     }
     state.SetLabel("H");
 }
@@ -37,7 +37,7 @@ static void BM_sim_T(benchmark::State& state) {
     qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::T);
     QFRSimulator sim(qc, 1, 1, 0, 0, 0);
     for(auto _ : state) {
-        sim.Simulate();
+        sim.Simulate(1);
     }
     state.SetLabel("T");
 }
@@ -48,7 +48,7 @@ static void BM_sim_CNOT(benchmark::State& state) {
     qc->emplace_back<qc::StandardOperation>(state.range(0), qc::Control{0}, 1, qc::X);
     QFRSimulator sim(qc, 1, 1, 0, 0, 0);
     for(auto _ : state) {
-        sim.Simulate();
+        sim.Simulate(1);
     }
     state.SetLabel("CNOT");
 }
@@ -60,7 +60,7 @@ static void BM_sim_TOFFOLI(benchmark::State& state) {
     qc->emplace_back<qc::StandardOperation>(state.range(0), controls, 2, qc::X);
     QFRSimulator sim(qc, 1, 1, 0, 0, 0);
     for(auto _ : state) {
-        sim.Simulate();
+        sim.Simulate(1);
     }
     state.SetLabel("Toffoli");
 }
@@ -111,7 +111,7 @@ static void BM_sim_QCBM(benchmark::State& state) {
     }
     QFRSimulator sim(qc, 1, 1, 0, 0, 0);
     for(auto _ : state) {
-        sim.Simulate();
+        sim.Simulate(1);
     }
     state.SetLabel("QCBM");
 }

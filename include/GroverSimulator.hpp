@@ -32,7 +32,7 @@ public:
         }
     }
 
-    void Simulate() override;
+    std::map<std::string, unsigned int> Simulate(unsigned int shots) override;
 
     std::map<std::string, std::string> AdditionalStatistics() override {
         return {
