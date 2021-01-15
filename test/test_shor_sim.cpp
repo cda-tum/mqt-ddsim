@@ -15,7 +15,7 @@ TEST(ShorSimTest, Factorize15EmulationTest) {
     ASSERT_EQ(ddsim.getFactors().first, 0);
     ASSERT_EQ(ddsim.getFactors().second, 0);
     ASSERT_EQ(ddsim.AdditionalStatistics().at("sim_result"), "did not start");
-    ddsim.Simulate();
+    ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getFactors().first, 3);
     ASSERT_EQ(ddsim.getFactors().second, 5);
@@ -28,7 +28,7 @@ TEST(ShorSimTest, Factorize15EmulationTest) {
 
 TEST(ShorSimTest, Factorize15NegTest) {
     ShorSimulator ddsim(15, 2, 1ull);
-    ddsim.Simulate();
+    ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getFactors().first, 0);
     ASSERT_EQ(ddsim.getFactors().second, 0);
@@ -42,7 +42,7 @@ TEST(ShorSimTest, Factorize15NegTest) {
 
 TEST(ShorSimTest, Factorize15WithoutEmulationTest) {
     ShorSimulator ddsim(15, 2, 1ull, false);
-    ddsim.Simulate();
+    ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getFactors().first, 3);
     ASSERT_EQ(ddsim.getFactors().second, 5);
@@ -52,7 +52,7 @@ TEST(ShorSimTest, Factorize15WithoutEmulationTest) {
 
 TEST(ShorSimTest, Factorize55Test) {
     ShorSimulator ddsim(55, 2, 3ull);
-    ddsim.Simulate();
+    ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getFactors().first, 11);
     ASSERT_EQ(ddsim.getFactors().second, 5);

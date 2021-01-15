@@ -28,7 +28,7 @@ public:
 
     virtual ~Simulator() = default;
 
-    virtual void Simulate() = 0;
+    virtual std::map<std::string, unsigned int> Simulate(unsigned int shots) = 0;
     virtual std::map<std::string, std::string> AdditionalStatistics() {return {};};
 
     std::string MeasureAll(bool collapse=false);

@@ -6,7 +6,7 @@
 #include <chrono>
 #include <limits>
 
-void ShorSimulator::Simulate() {
+std::map<std::string, unsigned int> ShorSimulator::Simulate(unsigned int shots) {
     if (verbose) {
         std::clog << "Simulate Shor's algorithm for n=" << n;
     }
@@ -154,6 +154,8 @@ void ShorSimulator::Simulate() {
             polr_result = "FAILURE";
         }
     }
+
+    return {};
 }
 
 std::pair<unsigned int, unsigned int> ShorSimulator::post_processing(const std::string& sample) const {

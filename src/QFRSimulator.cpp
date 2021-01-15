@@ -1,6 +1,30 @@
 #include "QFRSimulator.hpp"
 
-void QFRSimulator::Simulate() {
+std::map<std::string, unsigned int> QFRSimulator::Simulate(unsigned int shots) {
+    bool has_nonunitary = false;
+    for (auto& op : *qc) {
+        if (op->isNonUnitaryOperation()) {
+            has_nonunitary = true;
+            break;
+        }
+    }
+
+    if(!has_nonunitary) {
+        single_shot();
+        return MeasureAllNonCollapsing(shots);
+    }
+
+    std::map<std::string, unsigned int> m_counter;
+
+    for (unsigned int i=0; i < shots; i++) {
+        single_shot();
+        m_counter[MeasureAll()]++;
+    }
+
+    return m_counter;
+}
+
+void QFRSimulator::single_shot() {
     const unsigned short n_qubits = qc->getNqubits();
     const unsigned int reorder_max_nodes = (2u << n_qubits) * 0.9;
 
@@ -77,6 +101,7 @@ void QFRSimulator::Simulate() {
             /*std::clog << "[INFO] op " << op_num << " is " << op->getName()
                       << " #controls=" << op->getControls().size()
                       << " statesize=" << dd->size(root_edge) << "\n";//*/
+
 
             if (dynamic_reorder > 0 && pre_op_size > 1000 && pre_op_size < reorder_max_nodes && ops_since_reorder > 3) {
                 dd->garbageCollect(true);

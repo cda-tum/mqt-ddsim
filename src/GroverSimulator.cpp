@@ -2,7 +2,7 @@
 #include "QuantumComputation.hpp"
 #include <chrono>
 
-void GroverSimulator::Simulate() {
+std::map<std::string, unsigned int> GroverSimulator::Simulate(unsigned int shots) {
     // Setup X on the last, Hadamard on all qubits
     qc::QuantumComputation qc_setup(n_qubits+n_anciallae);
     qc_setup.emplace_back<qc::StandardOperation>(n_qubits+n_anciallae, n_qubits, qc::X);
@@ -84,4 +84,6 @@ void GroverSimulator::Simulate() {
         root_edge = tmp;
         dd->garbageCollect();
     }
+
+    return MeasureAllNonCollapsing(shots);
 }

@@ -10,7 +10,7 @@ TEST(QFRSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
 
     ASSERT_EQ(ddsim.getNumberOfOps(), 1);
 
-    ddsim.Simulate();
+    ddsim.Simulate(1);
 
     auto m = ddsim.MeasureAll(false);
 
@@ -27,7 +27,7 @@ TEST(QFRSimTest, ClassicControlledOp) {
     quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classical_register, 1);
 
     QFRSimulator ddsim(quantumComputation, 1, 1, 0, 0, 0);
-    ddsim.Simulate();
+    ddsim.Simulate(1);
 
     auto m = ddsim.MeasureAll(false);
 
@@ -40,7 +40,7 @@ TEST(QFRSimTest, DestructiveMeasurementAll) {
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::H);
     QFRSimulator ddsim(quantumComputation, 1, 1, 0, 0, 0);
-    ddsim.Simulate();
+    ddsim.Simulate(1);
 
 
     const std::vector<dd::ComplexValue> v_before = ddsim.getVector();
@@ -61,7 +61,7 @@ TEST(QFRSimTest, DestructiveMeasurementOne) {
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::H);
     QFRSimulator ddsim(quantumComputation, 1, 1, 0, 0, 0);
-    ddsim.Simulate();
+    ddsim.Simulate(1);
 
     const char m = ddsim.MeasureOneCollapsing(0);
     const std::vector<dd::ComplexValue> v_after = ddsim.getVector();
@@ -87,7 +87,7 @@ TEST(QFRSimTest, ApproximateByFidelity) {
     quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, std::vector<qc::Control>{qc::Control{0, qc::Control::pos}, qc::Control{1, qc::Control::pos}}, 2, qc::X);
     QFRSimulator ddsim(quantumComputation, 1, 1, 0, 0, 0);
-    ddsim.Simulate();
+    ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getNodeCount(), 6);
 
@@ -103,7 +103,7 @@ TEST(QFRSimTest, ApproximateBySampling) {
     quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, std::vector<qc::Control>{qc::Control{0, qc::Control::pos}, qc::Control{1, qc::Control::pos}}, 2, qc::X);
     QFRSimulator ddsim(quantumComputation, 1, 1, 0, 0, 0);
-    ddsim.Simulate();
+    ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getNodeCount(), 6);
 
@@ -123,7 +123,7 @@ TEST(QFRSimTest, ApproximationInSimulator) {
     quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::I);
 
     QFRSimulator ddsim(quantumComputation, 1, 0.3, 0, 0, 0);
-    ddsim.Simulate();
+    ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getNodeCount(), 4);
     ASSERT_LE(std::stod(ddsim.AdditionalStatistics()["final_fidelity"]), 0.75); // the least contributing path has .25
@@ -136,5 +136,5 @@ TEST(QFRSimTest, Reordering) {
     quantumComputation->emplace_back<qc::StandardOperation>(3, std::vector<qc::Control>{qc::Control{0, qc::Control::pos}, qc::Control{1, qc::Control::pos}}, 2, qc::X);
 
     QFRSimulator ddsim(quantumComputation, 1, 1, 1, 1, 1);
-    ddsim.Simulate();
+    ddsim.Simulate(1);
 }

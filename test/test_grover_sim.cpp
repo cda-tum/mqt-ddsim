@@ -9,7 +9,7 @@
 
 TEST(GroverSimTest, EmulatedOracle14Test) {
     GroverSimulator ddsim(14, 0);
-    ddsim.Simulate();
+    ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getPathOfLeastResistance().second.substr(1), ddsim.AdditionalStatistics().at("oracle"));
 }

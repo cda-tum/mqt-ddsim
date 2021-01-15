@@ -24,11 +24,11 @@ int main(int argc, char** argv) {
     description.add_options()
             ("help,h", "produce help message")
             ("seed", po::value<unsigned long long>(&seed)->default_value(0), "seed for random number generator (default zero is possibly directly used as seed!)")
-            ("shots", po::value<unsigned int>()->default_value(0), "number of measurements on the final quantum state")
+            ("shots", po::value<unsigned int>()->default_value(0), "number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)")
             ("display_vector", "display the state vector")
             ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
             ("verbose", "Causes some simulators to print additional information to STDERR")
-            ("benchmark", "print simulation stats in a single CSV style line (overrides --ps and suppresses most other output, please don't rely on the format)")
+            ("benchmark", "print simulation stats in a single CSV style line (overrides --ps and suppresses most other output, please don't rely on the format across versions)")
 
             ("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")
             ("simulate_qft", po::value<unsigned int>(), "simulate Quantum Fourier Transform for given number of qubits")
@@ -127,13 +127,10 @@ int main(int argc, char** argv) {
     }
 
     auto t1 = std::chrono::high_resolution_clock::now();
-    ddsim->Simulate();
+    auto m = ddsim->Simulate(vm["shots"].as<unsigned int>());
     auto t2 = std::chrono::high_resolution_clock::now();
-    auto m = ddsim->MeasureAllNonCollapsing(vm["shots"].as<unsigned int>());
-    auto t3 = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<float> duration_simulation = t2-t1;
-    std::chrono::duration<float> duration_measurement = t3-t2;
 
     if (vm.count("benchmark")) {
         auto more_info = ddsim->AdditionalStatistics();
@@ -141,7 +138,6 @@ int main(int argc, char** argv) {
                   << ddsim->getNumberOfQubits() << ", "
                   //<< vm["approximate"].as<float>() << ", "
                   << std::fixed << duration_simulation.count() << std::defaultfloat << ", "
-                  << std::fixed << duration_measurement.count() << std::defaultfloat << ", "
                   //<< more_info["approximation_runs"] << ","
                   //<< more_info["final_fidelity"] << ", "
                   << more_info["coprime_a"] << ", "
@@ -156,7 +152,7 @@ int main(int argc, char** argv) {
 
     std::cout << "{\n";
 
-    if (vm["shots"].as<unsigned int>() > 0) {
+    if (!m.empty()) {
         std::cout << "  \"measurements\": {";
         bool first_element = true;
         for(const auto& element : m)
@@ -187,7 +183,6 @@ int main(int argc, char** argv) {
     if (vm.count("ps")) {
         std::cout << "  \"statistics\": {\n"
                   << "    \"simulation_time\": " << std::fixed << duration_simulation.count() << std::defaultfloat << ",\n"
-                  << "    \"measurement_time\": " << std::fixed << duration_measurement.count() << std::defaultfloat << ",\n"
                   << "    \"benchmark\": \"" << ddsim->getName() << "\",\n"
                   << "    \"shots\": " << vm["shots"].as<unsigned int>() << ",\n"
                   << "    \"distinct_results\": " << m.size() << ",\n"

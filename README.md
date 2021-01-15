@@ -48,18 +48,29 @@ It can either be used as a **standalone executable** with command-line interface
     ```commandline
     $ ./ddsim_simple --help
     JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
-      -h [ --help ]                         produce help message
-      --seed arg (=0)                       seed for random number generator (default zero is directly used as seed!) 
-      --shots arg (=0)                      number of measurements on the final quantum state
-      --display_vector                      display the state vector
-      --ps                                  print simulation stats (applied gates, sim. time, and maximal size of the DD)
-      --benchmark                           print simulation stats in a single CSV style line (overrides --ps and suppresses most other output)
-      --simulate_file arg                   simulate a quantum circuit given by file (detection by the file extension)
-      --simulate_qft arg                    simulate Quantum Fourier Transform for given number of qubits
-      --simulate_ghz arg                    simulate state preparation of GHZ state for given number of qubits
-      --simulate_grover arg                 simulate Grover's search for given number of qubits with random oracle
-      --simulate_grover_emulated arg        simulate Grover's search for given number of qubits with random oracle and emulation
-      --simulate_grover_oracle_emulated arg simulate Grover's search for given number of qubits with given oracle and emulation
+    -h [ --help ]                         produce help message
+    --seed arg (=0)                       seed for random number generator (default zero is possibly directly used as seed!)
+    --shots arg (=0)                      number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)
+    --display_vector                      display the state vector
+    --ps                                  print simulation stats (applied gates, sim. time, and maximal size of the DD)
+    --verbose                             Causes some simulators to print additional information to STDERR
+    --benchmark                           print simulation stats in a single CSV style line (overrides --ps and  suppresses most other output, please don't rely on the format across versions)
+    --simulate_file arg                   simulate a quantum circuit given by file (detection by the file extension)
+    --simulate_qft arg                    simulate Quantum Fourier Transform for given number of qubits
+    --simulate_ghz arg                    simulate state preparation of GHZ state for given number of qubits
+    --step_fidelity arg (=1)              target fidelity for each approximation run (>=1 = disable approximation)
+    --steps arg (=1)                      number of approximation steps
+    --initial_reorder arg (=0)            Try to find a good initial variable order (0=None, 1=Most affected qubits to the top, 2=Most affected targets to the top)
+    --dynamic_reorder arg (=0)            Apply reordering strategy during simulation (0=None, 1=Sifting, 2=Move2Top)
+    --post_reorder arg (=0)               Apply a reordering strategy after simulation (0=None, 1=Sifting)
+    --simulate_grover arg                 simulate Grover's search for given number of qubits with random oracle
+    --simulate_grover_emulated arg        simulate Grover's search for given number of qubits with random oracle and emulation
+    --simulate_grover_oracle_emulated arg simulate Grover's search for given number of qubits with given oracle and emulation
+    --simulate_shor arg                   simulate Shor's algorithm factoring this number
+    --simulate_shor_coprime arg (=0)      coprime number to use with Shor's algorithm (zero randomly generates a coprime)
+    --simulate_shor_no_emulation          Force Shor simulator to do modular exponentiation instead of using emulation (you'll usually want emulation)
+    --simulate_fast_shor arg              simulate Shor's algorithm factoring this number with intermediate measurements
+    --simulate_fast_shor_coprime arg (=0) coprime number to use with Shor's algorithm (zero randomly generates a coprime)
     ```
    
 - The library can be used by including, for example, the```QFRSimulator.hpp``` header file and

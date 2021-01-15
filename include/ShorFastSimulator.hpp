@@ -76,7 +76,7 @@ public:
         line.fill(qc::LINE_DEFAULT);
     };
 
-    void Simulate() override;
+    std::map<std::string, unsigned int> Simulate(unsigned int shots) override;
 
     std::string getName() const override {
         return "fast_shor_"+std::to_string(n)+"_"+std::to_string(coprime_a);

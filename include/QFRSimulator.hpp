@@ -20,7 +20,7 @@ public:
         }
     }
 
-    void Simulate() override;
+    std::map<std::string, unsigned int> Simulate(unsigned int shots) override;
 
     std::map<std::string, std::string> AdditionalStatistics() override {
         std::stringstream vmap_postsim;
@@ -72,6 +72,8 @@ private:
     qc::permutationMap do_initial_reorder(bool use_controls);
     void move_to_top(std::unique_ptr<qc::Operation> &op, qc::permutationMap &variable_map);
     void move_to_bottom(std::unique_ptr<qc::Operation> &op, qc::permutationMap &variable_map);
+
+    void single_shot();
 };
 
 
