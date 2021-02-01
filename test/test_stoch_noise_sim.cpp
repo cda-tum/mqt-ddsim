@@ -187,6 +187,6 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDepolarizationError) {
     QFRSimulator ddsim(quantumComputation, std::string("D"), 0.01, 30000, 1, 1, "0-1000", 0, 0, 0);
     auto m = ddsim.StochSimulate();
 
-    EXPECT_TRUE((m.find("1001")->second >= 0.81) && (m.find("1001")->second <= 0.83));
+    EXPECT_TRUE((m.find("1001")->second >= 0.81) && (m.find("1001")->second <= 0.84));
     EXPECT_TRUE((m.find("0000")->second >= 0.01) && (m.find("0000")->second <= 0.03));
 }
