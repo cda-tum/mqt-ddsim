@@ -629,6 +629,7 @@ dd::CTkind Simulator::ReturnNoiseOperation(char i, double prob) const {
         default:
             std::cerr << "ERROR: Unknown noise effect\n";
             assert(false);
+            return dd::none;
     }
 }
 
