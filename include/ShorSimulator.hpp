@@ -92,6 +92,7 @@ public:
     };
 
     std::map<std::string, unsigned int> Simulate(unsigned int shots) override;
+    std::map<std::string, double> StochSimulate() override { return {}; };
 
     std::string getName() const override {
         return "shor_"+std::to_string(n)+"_"+std::to_string(coprime_a);
