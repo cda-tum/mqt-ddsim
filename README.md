@@ -84,6 +84,12 @@ $ cmake -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=Release -S . -B bui
 
 instead.
 
+Older CMake versions not supporting the above syntax (< 3.13) may be used with
+```commandline
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+```
+
 The library can be used by including, for example, the ``QFRSimulator.hpp`` header file and
 ```c++
 std::string file1 = "PATH_TO_FILE_1.EXT";
