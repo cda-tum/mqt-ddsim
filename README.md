@@ -66,11 +66,19 @@ However, the implementation should be compatible with any current C++ compiler s
 
 `boost/program_options >= 1.50` is required for building the the commandline interface for `ddsim_simple` and `ddsim_noise_aware`. The `ddsim_noise_aware` further requires `Threads::Threads`.
 
-## Build and Run
+## Clone, Build, and Run
+
+The code uses quite a few submodules, which have to be initialized.
+There are two ways to do this:
+
+1. While cloning the repository with the `--recurse-submodules` option to `git clone`. For HTTPS access: `git clone --recurse-submodules https://github.com/iic-jku/ddsim/`.
+2. After cloning with `git submodule update --init --recursive`.
+
 
 ### Library
 
-For building the library alone the CMake target `ddsim` is available, i.e.,
+For building the library alone the CMake target `ddsim` is available.
+In CMake from version 3.13 you can use the following commands:
 ```commandline
 $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
 $ cmake --build build --config Release --target ddsim
@@ -80,14 +88,16 @@ Windows users need to configure CMake by calling
 
 ```commandline
 $ cmake -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=Release -S . -B build
+$ cmake --build build --config Release --target ddsim
 ```
 
 instead.
 
 Older CMake versions not supporting the above syntax (< 3.13) may be used with
 ```commandline
-mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
+$ mkdir build && cd build
+$ cmake .. -DCMAKE_BUILD_TYPE=Release
+$ cmake --build build --config Release --target ddsim
 ```
 
 The library can be used by including, for example, the ``QFRSimulator.hpp`` header file and
