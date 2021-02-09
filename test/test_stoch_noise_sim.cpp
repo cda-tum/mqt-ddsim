@@ -33,7 +33,7 @@ TEST(StochNoiseSimTest, SimulateAdder4TrackFidelityWithNoise) {
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
     quantumComputation->emplace_back<qc::StandardOperation>(4, std::vector<qc::Control>{qc::Control{3, qc::Control::pos}}, 0, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    QFRSimulator ddsim(quantumComputation, std::string("APD"), 0.01, 30000, 1, 1, "-1-1000", 0, 0, 0);
+    QFRSimulator ddsim(quantumComputation, std::string("APD"), 0.01, 30000, 1, 1, "-1-1000");
     auto m = ddsim.StochSimulate();
 
     EXPECT_TRUE((m.find("1000")->second >= 0.14) && (m.find("1000")->second <= 0.16));
@@ -52,7 +52,7 @@ TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
     auto classical_register = std::make_pair<unsigned short, unsigned short>(0, 1);
     quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classical_register, 1);
 
-    QFRSimulator ddsim(quantumComputation, std::string("APD"), 0.02, 30000, 1, 1, "0-1000", 0, 0, 0);
+    QFRSimulator ddsim(quantumComputation, std::string("APD"), 0.02, 30000, 1, 1, "0-1000");
     auto m = ddsim.StochSimulate();
 
     EXPECT_TRUE((m.find("00")->second >= 0.03) && (m.find("00")->second <= 0.06));
@@ -87,7 +87,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithoutNoise) {
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
     quantumComputation->emplace_back<qc::StandardOperation>(4, std::vector<qc::Control>{qc::Control{3, qc::Control::pos}}, 0, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    QFRSimulator ddsim(quantumComputation, 1, 1, 0, 0, 0);
+    QFRSimulator ddsim(quantumComputation, 1, 1);
     ddsim.Simulate(1);
     auto m = ddsim.MeasureAll(false);
     ASSERT_EQ("1001", m);
@@ -119,7 +119,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateError) {
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
     quantumComputation->emplace_back<qc::StandardOperation>(4, std::vector<qc::Control>{qc::Control{3, qc::Control::pos}}, 0, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    QFRSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 30000, 1, 1, "-1-1000", 0, 0, 0);
+    QFRSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 30000, 1, 1, "-1-1000");
     auto m = ddsim.StochSimulate();
 
     EXPECT_TRUE((m.find("0000")->second >= 0.19) && (m.find("0000")->second <= 0.23));
@@ -152,7 +152,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceError) {
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
     quantumComputation->emplace_back<qc::StandardOperation>(4, std::vector<qc::Control>{qc::Control{3, qc::Control::pos}}, 0, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    QFRSimulator ddsim(quantumComputation, std::string("AP"), 0.3, 30000, 1, 1, "0-1000", 0, 0, 0);
+    QFRSimulator ddsim(quantumComputation, std::string("AP"), 0.3, 30000, 1, 1, "0-1000");
     auto m = ddsim.StochSimulate();
 
     EXPECT_TRUE((m.find("0000")->second >= 0.78) && (m.find("0000")->second <= 0.80));
@@ -184,7 +184,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDepolarizationError) {
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
     quantumComputation->emplace_back<qc::StandardOperation>(4, std::vector<qc::Control>{qc::Control{3, qc::Control::pos}}, 0, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    QFRSimulator ddsim(quantumComputation, std::string("D"), 0.01, 30000, 1, 1, "0-1000", 0, 0, 0);
+    QFRSimulator ddsim(quantumComputation, std::string("D"), 0.01, 30000, 1, 1, "0-1000");
     auto m = ddsim.StochSimulate();
 
     EXPECT_TRUE((m.find("1001")->second >= 0.81) && (m.find("1001")->second <= 0.84));

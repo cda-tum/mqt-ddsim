@@ -35,9 +35,6 @@ int main(int argc, char** argv) {
             ("simulate_ghz", po::value<unsigned int>(), "simulate state preparation of GHZ state for given number of qubits")
             ("step_fidelity", po::value<double>()->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")
             ("steps", po::value<unsigned int>()->default_value(1), "number of approximation steps")
-            ("initial_reorder", po::value<int>()->default_value(0), "Try to find a good initial variable order (0=None, 1=Most affected qubits to the top, 2=Most affected targets to the top)")
-            ("dynamic_reorder", po::value<int>()->default_value(0), "Apply reordering strategy during simulation (0=None, 1=Sifting, 2=Move2Top)")
-            ("post_reorder", po::value<int>()->default_value(0), "Apply a reordering strategy after simulation (0=None, 1=Sifting)")
 
             ("simulate_grover", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle")
             ("simulate_grover_emulated", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle and emulation")
@@ -80,7 +77,6 @@ int main(int argc, char** argv) {
     	quantumComputation = std::make_unique<qc::QuantumComputation>(fname);
         ddsim = std::make_unique<QFRSimulator>(quantumComputation,
                                                vm["steps"].as<unsigned int>(), vm["step_fidelity"].as<double>(),
-                                               vm["initial_reorder"].as<int>(), vm["dynamic_reorder"].as<int>(), vm["post_reorder"].as<int>(),
                                                seed);
     } else {
         std::cerr << "Did not find anything to simulate. See help below.\n"
