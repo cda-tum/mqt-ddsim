@@ -51,6 +51,7 @@ endmacro()
 
 package_add_test(${PROJECT_NAME}_test
 									${CMAKE_CURRENT_SOURCE_DIR}/test_qfr_sim.cpp
+									${CMAKE_CURRENT_SOURCE_DIR}/test_circuit_sim.cpp
 									${CMAKE_CURRENT_SOURCE_DIR}/test_shor_sim.cpp
 									${CMAKE_CURRENT_SOURCE_DIR}/test_fast_shor_sim.cpp
 									${CMAKE_CURRENT_SOURCE_DIR}/test_grover_sim.cpp

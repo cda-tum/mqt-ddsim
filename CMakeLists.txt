@@ -24,7 +24,7 @@ endif()
 option(GIT_SUBMODULE "Check submodules during build" OFF)
 macro(handle_submodule MODULENAME)
 	if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/${MODULENAME}/CMakeLists.txt")
-		message(FATAL_ERROR "${MODULENAME} was not found. Please update submodules (git submodule update --init --recursive) and try again.")
+		message(FATAL_ERROR "${MODULENAME} was not found. Please init/update submodules (git submodule update --init --recursive) and try again.")
 	endif()
 endmacro()
 

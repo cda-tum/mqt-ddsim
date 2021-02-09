@@ -26,7 +26,6 @@ std::map<std::string, unsigned int> QFRSimulator::Simulate(unsigned int shots) {
 
 void QFRSimulator::single_shot() {
     const unsigned short n_qubits = qc->getNqubits();
-    const unsigned int reorder_max_nodes = (2u << n_qubits) * 0.9;
 
     std::array<short, qc::MAX_QUBITS> line{};
     line.fill(qc::LINE_DEFAULT);
@@ -36,18 +35,6 @@ void QFRSimulator::single_shot() {
 
     unsigned long op_num = 0;
     std::map<int, bool> classic_values;
-
-    unsigned int ops_since_reorder = 0;
-    std::map<unsigned short, unsigned short> variable_map;
-    qc::permutationMap initial_map = qc->initialLayout;
-
-    if (initial_reorder) {
-        variable_map = do_initial_reorder(initial_reorder == 1);
-    } else {
-        for (int i = 0; i < n_qubits; i++) {
-            variable_map.insert({i, i});
-        }
-    }
 
     const int approx_mod = std::ceil(static_cast<double>(qc->getNops()) / (step_number + 1));
 
@@ -102,31 +89,6 @@ void QFRSimulator::single_shot() {
                       << " #controls=" << op->getControls().size()
                       << " statesize=" << dd->size(root_edge) << "\n";//*/
 
-
-            if (dynamic_reorder > 0 && pre_op_size > 1000 && pre_op_size < reorder_max_nodes && ops_since_reorder > 3) {
-                dd->garbageCollect(true);
-
-                if (dynamic_reorder == 1) {
-                    std::tie(root_edge, sifting_min, sifting_max) = dd->sifting(root_edge, variable_map);
-                } else if (dynamic_reorder == 2) {
-                    move_to_top(op, variable_map);
-                } else if (dynamic_reorder == 3) {
-                    move_to_bottom(op, variable_map);
-                } else {
-                    throw std::runtime_error("Unknown dynamic reordering strategy");
-                }
-                reorder_count++;
-                ops_since_reorder = 0;
-
-                [[maybe_unused]]const unsigned int post_reorder_size = dd->size(root_edge);
-                auto pprec = std::clog.precision(2);
-                /*std::clog << "  Reordering: " << pre_op_size << " -> " << post_reorder_size
-                          << "  (" << (static_cast<double>(post_reorder_size) / pre_op_size) << ")"
-                          << " [" << dd->node_substitutions << "]"
-                          << "\n";//*/
-                std::clog.precision(pprec);
-            }
-
             assert(dd->is_globally_consistent_dd(root_edge));
             auto dd_op = op->getDD(dd, line);
             auto tmp = dd->multiply(dd_op, root_edge);
@@ -150,78 +112,9 @@ void QFRSimulator::single_shot() {
                 }
             }
             dd->garbageCollect();
-            ops_since_reorder++;
-            assert(dd->is_globally_consistent_dd(root_edge));
         }
         op_num++;
     }
-
-    variable_map_postsim = variable_map;
-    if (post_reorder == 1) {
-        std::tie(root_edge, sifting_min, sifting_max) = dd->sifting(root_edge, variable_map);
-        reorder_count++;
-    } else if (dynamic_reorder || initial_reorder) {
-        qc->changePermutation(root_edge, variable_map, qc->outputPermutation, line, dd);
-        reorder_count++;
-    }
-    variable_map_postrestore = variable_map;
-}
-
-qc::permutationMap QFRSimulator::do_initial_reorder(bool use_controls) {
-    std::map<unsigned short, unsigned int> qubit_usage;
-
-    for (auto const &op : *qc) {
-        if (op->isNonUnitaryOperation()) {
-            continue;
-        }
-        for (auto const &target : op->getTargets()) {
-            qubit_usage[target]++;
-        }
-        if (use_controls) {
-            for (auto const &control : op->getControls()) {
-                qubit_usage[control.qubit]++;
-            }
-        }
-    }
-
-    std::vector<std::pair<unsigned short, unsigned int>> vpairs;
-    vpairs.reserve(qc->getNqubits());
-
-    for (int i = 0; i < qc->getNqubits(); ++i) {
-        vpairs.emplace_back(i, qubit_usage[i]);
-    }
-
-    std::sort(vpairs.begin(), vpairs.end(), [](auto const &a, auto const &b) { return a.second < b.second; });
-    qc::permutationMap new_order;
-
-    for (unsigned int i = 0; i < vpairs.size(); ++i) {
-        new_order[i] = vpairs[i].first;
-    }
-    return new_order;
-}
-
-void QFRSimulator::move_to_top(std::unique_ptr<qc::Operation> &op, qc::permutationMap &variable_map) {
-    if (op->getNcontrols() + op->getNtargets() == 1) {
-        root_edge = dd->exchange2(variable_map[op->getTargets().at(0)], qc->getNqubits() - 1, variable_map, root_edge);
-    } else if (op->getNcontrols() == 1 && op->getNtargets() == 1) {
-        root_edge = dd->exchange2(variable_map[op->getControls().at(0).qubit], qc->getNqubits() - 1, variable_map, root_edge);
-        root_edge = dd->exchange2(variable_map[op->getTargets().at(0)], qc->getNqubits() - 2, variable_map, root_edge);
-    } else {
-        // ignore multi-controlled gates
-    }
-    assert(dd->unnormalizedNodes == 0);
-}
-
-void QFRSimulator::move_to_bottom(std::unique_ptr<qc::Operation> &op, qc::permutationMap &variable_map) {
-    if (op->getNcontrols() + op->getNtargets() == 1) {
-        root_edge = dd->exchange2(0, variable_map[op->getTargets().at(0)], variable_map, root_edge);
-    } else if (op->getNcontrols() == 1 && op->getNtargets() == 1) {
-        root_edge = dd->exchange2(0, variable_map[op->getControls().at(0).qubit], variable_map, root_edge);
-        root_edge = dd->exchange2(1, variable_map[op->getTargets().at(0)], variable_map, root_edge);
-    } else {
-        // ignore multi-controlled gates
-    }
-    assert(dd->unnormalizedNodes == 0);
 }
 
 std::map<std::string, double> QFRSimulator::StochSimulate() {

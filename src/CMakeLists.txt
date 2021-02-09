@@ -16,6 +16,8 @@ add_library(${PROJECT_NAME}
 		${CMAKE_CURRENT_SOURCE_DIR}/Simulator.cpp
 		${PROJECT_SOURCE_DIR}/include/QFRSimulator.hpp
 		${CMAKE_CURRENT_SOURCE_DIR}/QFRSimulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/CircuitSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CircuitSimulator.cpp
 		${PROJECT_SOURCE_DIR}/include/GroverSimulator.hpp
 		${CMAKE_CURRENT_SOURCE_DIR}/GroverSimulator.cpp
 		${PROJECT_SOURCE_DIR}/include/ShorSimulator.hpp

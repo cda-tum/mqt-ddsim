@@ -145,7 +145,7 @@ JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
 ```
 
 
-The output is JSON-formatted as shown below (with hopefully intuitive naming, the `dummy` object is just for easier handling of trailing commas).
+The output is JSON-formatted as shown below (with hopefully intuitive naming).
 
 ```commandline
 $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
@@ -197,14 +197,14 @@ The tool also supports noise-aware quantum circuit simulation, based on a stocha
 Building the simulator requires `boost/program_options` and `Threads::Threads`. It can be built by executing
 
 ```commandline
-cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
-cmake --build build --config Release --target ddsim_noise_aware
+$ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
+$ cmake --build build --config Release --target ddsim_noise_aware
 ```
 
 The simulator provides a help function which is called in the following way:
 
 ```commandline
-./build/ddsim_noise_aware --help
+$ ./build/ddsim_noise_aware --help
 JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
   -h [ --help ]                         produce help message
   --seed arg (=0)                       seed for random number generator 
@@ -253,7 +253,7 @@ JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
 An example run, with amplitude damping, phase flip, and depolarization error (each with a probability of 0.1% whenever a gate is applied) looks like this:
 
 ```commandline
-./build/ddsim_noise_aware --noise_effects APD --stoch_runs 10000 --noise_prob 0.001 --simulate_file /home/user/adder4.qasm
+$ ./build/ddsim_noise_aware --noise_effects APD --stoch_runs 10000 --noise_prob 0.001 --simulate_file /home/user/adder4.qasm
 Conducting perfect run ...
 Conducting 10000 runs using 4 cores ...
 Starting 4 threads
@@ -270,9 +270,6 @@ state=|1011> proba=0.00229939
 state=|1100> proba=0.00215185
 state=|1101> proba=0.00284815
 state=|1110> proba=0.00505003
-{
-  "dummy": 0
-}
 ```
 
 ### Installation
@@ -326,11 +323,11 @@ If you use our tool for your research, we will be thankful if you refer to it by
 
 ```bibtex
 @inproceedings{Grurl2020,
-author = {Grurl, Thomas and Kueng, Richard and Fu{\ss}, J{\"{u}}rgen and Wille, Robert},
-booktitle = {Design, Automation and Test in Europe (DATE)},
-title = {{Stochastic Quantum Circuit Simulation Using Decision Diagrams}},
-url = {http://arxiv.org/abs/2012.05620},
-year = {2021}
+    author = {Grurl, Thomas and Kueng, Richard and Fu{\ss}, J{\"{u}}rgen and Wille, Robert},
+    booktitle = {Design, Automation and Test in Europe (DATE)},
+    title = {{Stochastic Quantum Circuit Simulation Using Decision Diagrams}},
+    url = {http://arxiv.org/abs/2012.05620},
+    year = {2021}
 }
 
 ```

@@ -20,7 +20,7 @@ std::string Simulator::MeasureAll(const bool collapse) {
 
     std::uniform_real_distribution<fp> dist(0.0, 1.0L);
 
-    for (int i = dd->invVarOrder[root_edge.p->v]; i >= 0; --i) {
+    for (int i = root_edge.p->v; i >= 0; --i) {
         fp p0 = dd::ComplexNumbers::mag2(cur.p->e[0].w);
         fp p1 = dd::ComplexNumbers::mag2(cur.p->e[2].w);
         fp tmp = p0 + p1;
@@ -443,7 +443,7 @@ double Simulator::ApproximateBySampling(int nSamples, int threshold, bool remove
     for (int j = 0; j < nSamples; j++) {
         dd::Edge cur = root_edge;
 
-        for (int i = dd->invVarOrder[root_edge.p->v]; i >= 0; --i) {
+        for (int i = root_edge.p->v; i >= 0; --i) {
             visited_nodes[cur.p]++;
 
             fp p0 = CN::mag2(cur.p->e[0].w);
@@ -551,7 +551,7 @@ std::pair<dd::ComplexValue, std::string> Simulator::getPathOfLeastResistance() {
     std::string result(getNumberOfQubits(), '0');
     dd::Complex path_value = dd->cn.getTempCachedComplex(CN::val(root_edge.w.r), CN::val(root_edge.w.i));
     dd::Edge cur = root_edge;
-    for (int i = dd->invVarOrder[root_edge.p->v]; i >= 0; --i) {
+    for (int i = root_edge.p->v; i >= 0; --i) {
         fp p0 = dd::ComplexNumbers::mag2(cur.p->e[0].w);
         fp p1 = dd::ComplexNumbers::mag2(cur.p->e[2].w);
         fp tmp = p0 + p1;
