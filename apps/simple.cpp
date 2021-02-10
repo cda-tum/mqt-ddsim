@@ -10,7 +10,6 @@
 
 
 #include "Simulator.hpp"
-#include "QFRSimulator.hpp"
 #include "CircuitSimulator.hpp"
 #include "GroverSimulator.hpp"
 #include "ShorFastSimulator.hpp"
@@ -19,13 +18,19 @@
 
 int main(int argc, char** argv) {
     namespace po = boost::program_options;
+    // variables initialized by boost program_options default values
     unsigned long long seed;
+    unsigned int shots;
+
+    unsigned int approx_steps;
+    double step_fidelity;
+
 
     po::options_description description("JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
     description.add_options()
             ("help,h", "produce help message")
-            ("seed", po::value<unsigned long long>(&seed)->default_value(0), "seed for random number generator (default zero is possibly directly used as seed!)")
-            ("shots", po::value<unsigned int>()->default_value(0), "number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)")
+            ("seed", po::value<>(&seed)->default_value(0), "seed for random number generator (default zero is possibly directly used as seed!)")
+            ("shots", po::value<>(&shots)->default_value(0), "number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)")
             ("display_vector", "display the state vector")
             ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
             ("verbose", "Causes some simulators to print additional information to STDERR")
@@ -34,8 +39,8 @@ int main(int argc, char** argv) {
             ("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")
             ("simulate_qft", po::value<unsigned int>(), "simulate Quantum Fourier Transform for given number of qubits")
             ("simulate_ghz", po::value<unsigned int>(), "simulate state preparation of GHZ state for given number of qubits")
-            ("step_fidelity", po::value<double>()->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")
-            ("steps", po::value<unsigned int>()->default_value(1), "number of approximation steps")
+            ("step_fidelity", po::value<>(&step_fidelity)->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")
+            ("steps", po::value<>(&approx_steps)->default_value(1), "number of approximation steps")
 
             ("simulate_grover", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle")
             ("simulate_grover_emulated", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle and emulation")
@@ -68,13 +73,11 @@ int main(int argc, char** argv) {
     if (vm.count("simulate_file")) {
         const std::string fname = vm["simulate_file"].as<std::string>();
     	quantumComputation = std::make_unique<qc::QuantumComputation>(fname);
-        ddsim = std::make_unique<CircuitSimulator>(quantumComputation, vm["steps"].as<unsigned int>(), vm["step_fidelity"].as<double>(), seed);
+        ddsim = std::make_unique<CircuitSimulator>(quantumComputation, approx_steps, step_fidelity, seed);
     } else if (vm.count("simulate_qft")) {
 	    const unsigned int n_qubits = vm["simulate_qft"].as<unsigned int>();
 	    quantumComputation = std::make_unique<qc::QFT>(n_qubits);
-        ddsim = std::make_unique<QFRSimulator>(quantumComputation,
-                                               vm["steps"].as<unsigned int>(), vm["step_fidelity"].as<double>(),
-                                               seed);
+        ddsim = std::make_unique<CircuitSimulator>(quantumComputation, approx_steps, step_fidelity, seed);
     } else if (vm.count("simulate_fast_shor")) {
         const unsigned int composite_number = vm["simulate_fast_shor"].as<unsigned int>();
         const unsigned int coprime = vm["simulate_fast_shor_coprime"].as<unsigned int>();
@@ -94,9 +97,7 @@ int main(int argc, char** argv) {
     } else if (vm.count("simulate_grover")) {
         const unsigned int n_qubits = vm["simulate_grover"].as<unsigned int>();
         quantumComputation = std::make_unique<qc::Grover>(n_qubits, seed);
-        ddsim = std::make_unique<QFRSimulator>(quantumComputation,
-                                               vm["steps"].as<unsigned int>(), vm["step_fidelity"].as<double>(),
-                                               seed);
+        ddsim = std::make_unique<CircuitSimulator>(quantumComputation, approx_steps, step_fidelity, seed);
     } else if (vm.count("simulate_grover_emulated")) {
         ddsim = std::make_unique<GroverSimulator>(vm["simulate_grover_emulated"].as<unsigned int>(), seed);
     } else if (vm.count("simulate_grover_oracle_emulated")) {
@@ -104,13 +105,11 @@ int main(int argc, char** argv) {
     } else if (vm.count("simulate_ghz")) {
 	    const unsigned int n_qubits = vm["simulate_ghz"].as<unsigned int>();
 	    quantumComputation = std::make_unique<qc::Entanglement>(n_qubits);
-        ddsim = std::make_unique<QFRSimulator>(quantumComputation,
-                                               vm["steps"].as<unsigned int>(), vm["step_fidelity"].as<double>(),
-                                               seed);
+        ddsim = std::make_unique<CircuitSimulator>(quantumComputation, approx_steps, step_fidelity, seed);
     } else {
         std::cerr << "Did not find anything to simulate. See help below.\n"
                   << description << "\n";
-        return 1;
+        std::exit(1);
     }
 
     if (quantumComputation && quantumComputation->getNqubits() > dd::MAXN) {
@@ -119,7 +118,7 @@ int main(int argc, char** argv) {
     }
 
     auto t1 = std::chrono::high_resolution_clock::now();
-    auto m = ddsim->Simulate(vm["shots"].as<unsigned int>());
+    auto m = ddsim->Simulate(shots);
     auto t2 = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<float> duration_simulation = t2-t1;
@@ -128,7 +127,6 @@ int main(int argc, char** argv) {
         auto more_info = ddsim->AdditionalStatistics();
         std::cout << ddsim->getName() << ", "
                   << ddsim->getNumberOfQubits() << ", "
-                  //<< vm["approximate"].as<float>() << ", "
                   << std::fixed << duration_simulation.count() << std::defaultfloat << ", "
                   //<< more_info["approximation_runs"] << ","
                   //<< more_info["final_fidelity"] << ", "
