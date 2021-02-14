@@ -1,3 +1,5 @@
+[>> Quickstart Guide](#quickstart-guide)
+
 [![Build Status](https://github.com/iic-jku/ddsim/workflows/continuous%20integration/badge.svg)](https://github.com/iic-jku/ddsim/actions)
 [![codecov](https://codecov.io/gh/iic-jku/ddsim/branch/master/graph/badge.svg)](https://codecov.io/gh/iic-jku/ddsim)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -26,6 +28,7 @@ If you have any questions, feel free to contact us via [iic-quantum@jku.at](mail
     * [Executable Noise-aware Simulator](#executable-noise-aware-simulator)
     * [Installation](#installation)
 - [Running Tests](#running-tests)
+- [Frequently Asked Questions](#frequently-asked-questions) 
 - [Reference](#reference)
 <!--te-->
 
@@ -190,6 +193,33 @@ $ ./build/ddsim_simple --simulate_ghz 4 --display_vector --shots 1000 --ps
 }
 ```
 
+#### Quickstart Guide
+
+Execute the following lines to get the simulator running in no time:
+
+```commandline
+$ git clone --recurse-submodules https://github.com/iic-jku/ddsim/
+[...]
+
+$ cd ddsim
+
+ddsim/ $ cmake -S . -B build
+-- Build files have been written to: /.../build
+
+ddsim/ $ cmake --build build --config Release --target ddsim_simple
+[...]
+[100%] Built target ddsim_simple
+
+ddsim/ $ build/ddsim_simple --help                            
+JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
+  -h [ --help ]                         produce help message
+[...]
+```
+
+From here on you can start simulating quantum circuits or run the integrated algorithms.
+
+Note that you have to have the Boost program_options library installed.
+
 ### Executable Noise-aware Simulator
 
 The tool also supports noise-aware quantum circuit simulation, based on a stochastic approach. It currently supports global decoherence and gate error noise effects. A detailed summary of the simulator is presented in [[2]](https://arxiv.org/abs/2012.05620). Note that the simulator currently does not support simulating the integrated algorithms.
@@ -296,13 +326,34 @@ $ ./build/test/ddsim_test
 [...]
 ```
 
-## Reference
+## Frequently Asked Questions
+
+**Why is target `ddsim_simple` unavailable when I try to build it?**
+
+To build the commandline interfaces such as `ddsim_simple` you require the Boost program_options library.
+If it is missing, you will see the following message in the CMake generation step
+
+> `-- Did not find Boost! Commandline interface will not be an available target!`
+
+Under Ubuntu you can simply install [`libboost-program-options-dev`](https://packages.ubuntu.com/search?keywords=libboost-program-options-dev&searchon=names&exact=1&suite=all&section=all).
+
+**Why does generation step of CMake fail?**
+
+If you see the following error message
+```
+$ cmake -S . -B <build target directory>
+CMake Error at CMakeLists.txt:27 (message):
+qfr was not found.  Please init/update submodules (git submodule update --init --recursive) and try again.
+```
+Please run `git submodule update --init --recursive` and try again.
+
+## References
 
 If you use our tool for your research, we will be thankful if you refer to it by citing the appropriate publication:
 
 
 <details open>
-<summary>[1] A. Zulehner and R. Wille, “Advanced Simulation of Quantum Computations,” {IEEE} Trans. {CAD} Integr. Circuits Syst., vol. 38, no. 5, pp. 848–859, 2018</summary>
+<summary>[1] A. Zulehner and R. Wille, “Advanced Simulation of Quantum Computations,” Trans. {CAD} Integr. Circuits Syst., vol. 38, no. 5, pp. 848–859, 2019</summary>
 
 ```bibtex
 @article{zulehner2019advanced,
