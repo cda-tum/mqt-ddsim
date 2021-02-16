@@ -1,6 +1,10 @@
 [submodule "extern/qfr"]
 	path = extern/qfr
 	url = https://github.com/iic-jku/qfr.git
+    branch = master
+    shallow = true
 [submodule "extern/benchmark"]
 	path = extern/benchmark
 	url = https://github.com/google/benchmark.git
+	branch = master
+	shallow = true

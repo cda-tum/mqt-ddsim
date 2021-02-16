@@ -65,7 +65,7 @@ The simulator is based on [[1]](https://iic.jku.at/files/eda/2018_tcad_advanced_
 ## System Requirements
 
 Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). 
-However, the implementation should be compatible with any current C++ compiler supporting C++14 and a minimum CMake version of 3.10.
+However, the implementation should be compatible with any current C++ compiler supporting C++17 and a minimum CMake version of 3.13.
 
 `boost/program_options >= 1.50` is required for building the the commandline interface for `ddsim_simple` and `ddsim_noise_aware`. The `ddsim_noise_aware` further requires `Threads::Threads`.
 
@@ -109,7 +109,7 @@ std::string file1 = "PATH_TO_FILE_1.EXT";
 qc::QuantumComputation qc1(file1);
 
 qc::SimpleSimulator sim(qc1);
-sim.Simulate();
+git sim.Simulate();
 auto samples = sim.MeasureAllNonCollapsing(1000);
 /* Use the results */
 ```
@@ -353,13 +353,13 @@ If you use our tool for your research, we will be thankful if you refer to it by
 
 
 <details open>
-<summary>[1] A. Zulehner and R. Wille, “Advanced Simulation of Quantum Computations,” Trans. {CAD} Integr. Circuits Syst., vol. 38, no. 5, pp. 848–859, 2019</summary>
+<summary>[1] A. Zulehner and R. Wille, “Advanced Simulation of Quantum Computations,” Transactions on CAD of Integrated Circuits and Systems (TCAD), vol. 38, no. 5, pp. 848–859, 2019</summary>
 
 ```bibtex
 @article{zulehner2019advanced,
     title = {Advanced Simulation of Quantum Computations},
     author = {Zulehner, Alwin and Wille, Robert},
-    journal = {Trans. on {CAD} of Integrated Circuits and Systems},
+    journal = {Transactions on {CAD} of Integrated Circuits and Systems},
     volume = {38},
     number = {5},
     pages = {848--859},
