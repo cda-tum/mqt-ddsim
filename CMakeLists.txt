@@ -1,12 +1,10 @@
-cmake_minimum_required(VERSION 3.10...3.16)
-if(${CMAKE_VERSION} VERSION_LESS 3.12)
-	cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
-endif()
+cmake_minimum_required(VERSION 3.13...3.19)
 
 project(ddsim
-        VERSION 1.0.2
+		LANGUAGES CXX
+        VERSION 1.1.0
         DESCRIPTION "A front end to utilize the dd_package and qfr for simulation"
-        LANGUAGES CXX)
+        )
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 SET(COVERAGE OFF CACHE BOOL "Coverage")
@@ -21,20 +19,19 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-option(GIT_SUBMODULE "Check submodules during build" OFF)
-macro(handle_submodule MODULENAME)
+macro(check_submodule_present MODULENAME)
 	if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/${MODULENAME}/CMakeLists.txt")
-		message(FATAL_ERROR "${MODULENAME} was not found. Please init/update submodules (git submodule update --init --recursive) and try again.")
+		message(FATAL_ERROR "${MODULENAME} submodule not cloned properly. Please run `git submodule update --init --recursive` from the main project directory")
 	endif()
 endmacro()
 
-handle_submodule(qfr)
+check_submodule_present(qfr)
 
 add_subdirectory(src)
 
 option(BUILD_TESTS "Also build tests for DDSIM project" OFF)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR BUILD_TESTS)
-	handle_submodule(benchmark)
+	check_submodule_present(benchmark)
 
 	enable_testing()
 	include(GoogleTest)

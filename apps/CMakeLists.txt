@@ -8,12 +8,8 @@ else()
 	message(STATUS "Boost not found. Certain targets may not be available.")
 endif()
 
-include(GNUInstallDirs)
-
 macro(add_sim_executable APPNAME)
 	add_executable(${PROJECT_NAME}_${APPNAME} ${CMAKE_CURRENT_SOURCE_DIR}/${APPNAME}.cpp)
-	target_compile_features(${PROJECT_NAME}_${APPNAME} PUBLIC cxx_std_14)
-	set_target_properties(${PROJECT_NAME}_${APPNAME} PROPERTIES CXX_EXTENSIONS OFF)
 	target_link_libraries(${PROJECT_NAME}_${APPNAME} PUBLIC ${PROJECT_NAME} ${ARGN})
 	add_custom_command(TARGET ${PROJECT_NAME}_${APPNAME}
 	                   POST_BUILD
@@ -21,14 +17,6 @@ macro(add_sim_executable APPNAME)
 	                   COMMENT "Creating symlink for ${PROJECT_NAME}_${APPNAME}"
 	                   VERBATIM)
 
-	if(MSVC)
-		target_compile_options(${PROJECT_NAME}_${APPNAME} PUBLIC "/W4" "$<$<CONFIG:RELEASE>:/O2 /GL>")
-		target_link_options(${PROJECT_NAME}_${APPNAME} PUBLIC "$<$<CONFIG:Release>:/LTCG>")
-	else()
-		target_compile_options(${PROJECT_NAME}_${APPNAME} PUBLIC -Wall $<$<CONFIG:DEBUG>:-Og -Wextra -Wpedantic -pedantic> $<$<CONFIG:RELEASE>:-DNDEBUG -g0 -O3 -mtune=native -march=native>)
-	endif()
-
-	install(TARGETS ${PROJECT_NAME}_${APPNAME} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 	set_target_properties(${PROJECT_NAME}_${APPNAME} PROPERTIES EXPORT_NAME ${PROJECT_NAME}_${APPNAME})
 endmacro()
 
@@ -45,7 +33,7 @@ if(Boost_FOUND)
 	endif()
 
 else()
-	message(STATUS "Did not find Boost! Commandline interface will not be an available target!")
+	message(WARNING "Did not find Boost! Commandline interface will not be an available target!")
 endif()
 add_sim_executable(benchmark benchmark::benchmark_main)
 add_sim_executable(vectors)
