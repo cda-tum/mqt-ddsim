@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.13...3.19)
 
 project(ddsim
-		LANGUAGES CXX
+        LANGUAGES CXX
         VERSION 1.1.0
-        DESCRIPTION "A front end to utilize the dd_package and qfr for simulation"
+        DESCRIPTION "DDSIM - A JKQ quantum simulator based on decision diagrams"
         )
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-SET(COVERAGE OFF CACHE BOOL "Coverage")
+option(COVERAGE "Configure for coverage report generation")
 option(BUILD_SHARED_LIBS "Build shared libraries (.dll/.so) instead of static ones (.lib/.a)" OFF)
 
 set(default_build_type "Release")
