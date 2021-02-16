@@ -35,7 +35,7 @@ endif()
 
 # set compiler flags depending on compiler
 if(MSVC)
-	target_compile_options(${PROJECT_NAME} PRIVATE "/W4" "/utf-8" "$<$<CONFIG:RELEASE>:/O2 /GL>")
+	target_compile_options(${PROJECT_NAME} PRIVATE "/W4" "/utf-8")
 else()
 	target_compile_options(${PROJECT_NAME} PRIVATE -Wall $<$<CONFIG:DEBUG>:-g3 -Og -Wextra -Wpedantic -pedantic> $<$<CONFIG:RELEASE>:-g0 -mtune=native -march=native>)
 endif()
