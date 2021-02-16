@@ -99,7 +99,7 @@ void QFRSimulator::single_shot() {
             if (step_fidelity < 1.0) {
                 if ((op_num + 1) % approx_mod == 0 && approximation_runs < step_number) {
                     [[maybe_unused]] const unsigned int size_before = dd->size(root_edge);
-                    const double ap_fid = ApproximateByFidelity(step_fidelity, true);
+                    const double ap_fid = ApproximateByFidelity(step_fidelity, false, true);
                     approximation_runs++;
                     final_fidelity *= ap_fid;
                     /*std::clog << "[INFO] Appromation run finished. "

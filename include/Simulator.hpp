@@ -58,8 +58,8 @@ public:
     virtual unsigned long getNumberOfOps() const = 0;
     virtual std::string getName() const = 0;
 
-    double ApproximateByFidelity(double targetFidelity, bool removeNodes);
-    double ApproximateBySampling(int nSamples, int threshold, bool removeNodes);
+    double ApproximateByFidelity(double targetFidelity, bool allLevels, bool removeNodes, bool verbose=false);
+    double ApproximateBySampling(unsigned int nSamples, unsigned int threshold, bool removeNodes, bool verbose=false);
     dd::Edge RemoveNodes(dd::Edge edge, std::map<dd::NodePtr, dd::Edge> &dag_edges);
 
     std::unique_ptr<dd::Package> dd = std::make_unique<dd::Package>();

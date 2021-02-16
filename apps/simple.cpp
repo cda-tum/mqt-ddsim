@@ -24,6 +24,7 @@ int main(int argc, char** argv) {
 
     unsigned int approx_steps;
     double step_fidelity;
+    ApproximationInfo::ApproximationWhen approx_when;
 
 
     po::options_description description("JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
@@ -41,6 +42,8 @@ int main(int argc, char** argv) {
             ("simulate_ghz", po::value<unsigned int>(), "simulate state preparation of GHZ state for given number of qubits")
             ("step_fidelity", po::value<>(&step_fidelity)->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")
             ("steps", po::value<>(&approx_steps)->default_value(1), "number of approximation steps")
+            ("approx_when", po::value<>(&approx_when)->default_value(ApproximationInfo::FidelityDriven), "approximation method ('fidelity' (default) or 'memory'")
+            ("approx_state", "do excessive approximation runs at the end of the simulation to see how the quantum state behaves")
 
             ("simulate_grover", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle")
             ("simulate_grover_emulated", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle and emulation")
@@ -69,15 +72,16 @@ int main(int argc, char** argv) {
 
     std::unique_ptr<qc::QuantumComputation> quantumComputation;
     std::unique_ptr<Simulator> ddsim{nullptr};
+    ApproximationInfo approx_info(step_fidelity, approx_steps, approx_when);
 
     if (vm.count("simulate_file")) {
         const std::string fname = vm["simulate_file"].as<std::string>();
     	quantumComputation = std::make_unique<qc::QuantumComputation>(fname);
-        ddsim = std::make_unique<CircuitSimulator>(quantumComputation, approx_steps, step_fidelity, seed);
+        ddsim = std::make_unique<CircuitSimulator>(quantumComputation, approx_info, seed);
     } else if (vm.count("simulate_qft")) {
 	    const unsigned int n_qubits = vm["simulate_qft"].as<unsigned int>();
 	    quantumComputation = std::make_unique<qc::QFT>(n_qubits);
-        ddsim = std::make_unique<CircuitSimulator>(quantumComputation, approx_steps, step_fidelity, seed);
+        ddsim = std::make_unique<CircuitSimulator>(quantumComputation, approx_info, seed);
     } else if (vm.count("simulate_fast_shor")) {
         const unsigned int composite_number = vm["simulate_fast_shor"].as<unsigned int>();
         const unsigned int coprime = vm["simulate_fast_shor_coprime"].as<unsigned int>();
@@ -90,14 +94,14 @@ int main(int argc, char** argv) {
         const unsigned int composite_number = vm["simulate_shor"].as<unsigned int>();
         const unsigned int coprime = vm["simulate_shor_coprime"].as<unsigned int>();
         if (seed == 0) {
-            ddsim = std::make_unique<ShorSimulator>(composite_number, coprime, vm.count("verbose") > 0);
+            ddsim = std::make_unique<ShorSimulator>(composite_number, coprime, vm.count("verbose") > 0, step_fidelity < 1);
         } else {
-            ddsim = std::make_unique<ShorSimulator>(composite_number, coprime, seed, vm.count("verbose") > 0);
+            ddsim = std::make_unique<ShorSimulator>(composite_number, coprime, seed, vm.count("verbose") > 0, step_fidelity < 1);
         }
     } else if (vm.count("simulate_grover")) {
         const unsigned int n_qubits = vm["simulate_grover"].as<unsigned int>();
         quantumComputation = std::make_unique<qc::Grover>(n_qubits, seed);
-        ddsim = std::make_unique<CircuitSimulator>(quantumComputation, approx_steps, step_fidelity, seed);
+        ddsim = std::make_unique<CircuitSimulator>(quantumComputation, approx_info, seed);
     } else if (vm.count("simulate_grover_emulated")) {
         ddsim = std::make_unique<GroverSimulator>(vm["simulate_grover_emulated"].as<unsigned int>(), seed);
     } else if (vm.count("simulate_grover_oracle_emulated")) {
@@ -105,7 +109,7 @@ int main(int argc, char** argv) {
     } else if (vm.count("simulate_ghz")) {
 	    const unsigned int n_qubits = vm["simulate_ghz"].as<unsigned int>();
 	    quantumComputation = std::make_unique<qc::Entanglement>(n_qubits);
-        ddsim = std::make_unique<CircuitSimulator>(quantumComputation, approx_steps, step_fidelity, seed);
+        ddsim = std::make_unique<CircuitSimulator>(quantumComputation, approx_info, seed);
     } else {
         std::cerr << "Did not find anything to simulate. See help below.\n"
                   << description << "\n";
@@ -123,13 +127,75 @@ int main(int argc, char** argv) {
 
     std::chrono::duration<float> duration_simulation = t2-t1;
 
+    if (vm.count("approx_state")) {
+        // TargetFidelity
+        ddsim->ApproximateByFidelity(1/100.0, false, false, true);
+        ddsim->ApproximateByFidelity(2/100.0, false, false, true);
+        ddsim->ApproximateByFidelity(4/100.0, false, false, true);
+        for(int i=5; i <= 95; i+=5) {
+            ddsim->ApproximateByFidelity(i/100.0, false, false, true);
+        }
+        ddsim->ApproximateByFidelity(96/100.0, false, false, true);
+        ddsim->ApproximateByFidelity(97/100.0, false, false, true);
+        ddsim->ApproximateByFidelity(98/100.0, false, false, true);
+        ddsim->ApproximateByFidelity(99/100.0, false, false, true);
+        ddsim->ApproximateByFidelity(100/100.0, false, false, true);
+
+        // TargetFidelityPerLevel
+        ddsim->ApproximateByFidelity(1/1000.0, true, false, true);
+        ddsim->ApproximateByFidelity(10/1000.0, true, false, true);
+        ddsim->ApproximateByFidelity(20/1000.0, true, false, true);
+        ddsim->ApproximateByFidelity(30/1000.0, true, false, true);
+        ddsim->ApproximateByFidelity(40/1000.0, true, false, true);
+        for(int i=50; i <= 950; i+=50) {
+            ddsim->ApproximateByFidelity(i/1000.0, true, false, true);
+        }
+        ddsim->ApproximateByFidelity(960/1000.0, true, false, true);
+        ddsim->ApproximateByFidelity(970/1000.0, true, false, true);
+        ddsim->ApproximateByFidelity(980/1000.0, true, false, true);
+        ddsim->ApproximateByFidelity(990/1000.0, true, false, true);
+        ddsim->ApproximateByFidelity(995/1000.0, true, false, true);
+        ddsim->ApproximateByFidelity(1000/1000.0, true, false, true);
+
+        // Traversal
+        ddsim->ApproximateBySampling(1, 0, false, true);
+        ddsim->ApproximateBySampling(2, 0, false, true);
+        ddsim->ApproximateBySampling(4, 0, false, true);
+        ddsim->ApproximateBySampling(6, 0, false, true);
+        ddsim->ApproximateBySampling(8, 0, false, true);
+        for(int i=10; i < 100; i+=10) {
+            ddsim->ApproximateBySampling(i, 0, false, true);
+        }
+        for(int i=100; i < 1000; i+=100) {
+            ddsim->ApproximateBySampling(i, 0, false, true);
+        }
+        for(int i=1000; i <= 100000; i+=1000) {
+            ddsim->ApproximateBySampling(i, 0, false, true);
+        }
+
+        // Traversal+Threshold
+        ddsim->ApproximateBySampling(1000000, 1, false, true);
+        ddsim->ApproximateBySampling(1000000, 2, false, true);
+        ddsim->ApproximateBySampling(1000000, 4, false, true);
+        ddsim->ApproximateBySampling(1000000, 6, false, true);
+        ddsim->ApproximateBySampling(1000000, 8, false, true);
+        for(int i=10; i < 100; i+=10) {
+            ddsim->ApproximateBySampling(1000000, i, false, true);
+        }
+
+        for(int i=100; i <= 5000; i+=100) {
+            ddsim->ApproximateBySampling(1000000, i, false, true);
+        }
+    }
+
     if (vm.count("benchmark")) {
         auto more_info = ddsim->AdditionalStatistics();
         std::cout << ddsim->getName() << ", "
                   << ddsim->getNumberOfQubits() << ", "
                   << std::fixed << duration_simulation.count() << std::defaultfloat << ", "
-                  //<< more_info["approximation_runs"] << ","
-                  //<< more_info["final_fidelity"] << ", "
+                  << more_info["single_shots"] << ","
+                  << more_info["approximation_runs"] << ","
+                  << more_info["final_fidelity"] << ", "
                   << more_info["coprime_a"] << ", "
                   << more_info["sim_result"] << ", "
                   << more_info["polr_result"] << ", "

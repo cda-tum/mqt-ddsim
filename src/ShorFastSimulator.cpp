@@ -266,7 +266,7 @@ dd::Edge ShorFastSimulator::addConst(unsigned long long a) {
     dd::Edge edges[4];
     edges[0]=edges[1]=edges[2]=edges[3]=dd->DDzero;
 
-    int p = 0;
+    short p = 0;
     while(!((a >> p)  & 1u)) {
         edges[0] = f;
         edges[3] = f;
@@ -274,38 +274,37 @@ dd::Edge ShorFastSimulator::addConst(unsigned long long a) {
         p++;
     }
 
-    dd::Edge right, left;
-
     edges[0]=edges[1]=edges[2]=edges[3]=dd->DDzero;
     edges[2]=f;
-    left = dd->makeNonterminal(p, edges, false);
+    dd::Edge left = dd->makeNonterminal(p, edges, false);
     edges[2]=dd->DDzero;
     edges[1]=f;
-    right = dd->makeNonterminal(p, edges, false);
+    dd::Edge right = dd->makeNonterminal(p, edges, false);
     p++;
 
-    dd::Edge new_left, new_right;
     for(;p < required_bits; p++) {
         edges[0]=edges[1]=edges[2]=edges[3]=dd->DDzero;
         if((a>>p) & 1u) {
             edges[2] = left;
-            new_left = dd->makeNonterminal(p, edges, false);
+            dd::Edge new_left = dd->makeNonterminal(p, edges, false);
             edges[2] = dd->DDzero;
             edges[0] = right;
             edges[1] = left;
             edges[3] = right;
-            new_right = dd->makeNonterminal(p, edges, false);
+            dd::Edge new_right = dd->makeNonterminal(p, edges, false);
+            left = new_left;
+            right = new_right;
         } else {
             edges[1] = right;
-            new_right = dd->makeNonterminal(p, edges, false);
+            dd::Edge new_right = dd->makeNonterminal(p, edges, false);
             edges[1] = dd->DDzero;
             edges[0] = left;
             edges[2] = right;
             edges[3] = left;
-            new_left = dd->makeNonterminal(p, edges, false);
+            dd::Edge new_left = dd->makeNonterminal(p, edges, false);
+            left = new_left;
+            right = new_right;
         }
-        left = new_left;
-        right = new_right;
     }
 
     edges[0] = left;

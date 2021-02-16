@@ -3,19 +3,55 @@
 
 #include "Simulator.hpp"
 #include "QuantumComputation.hpp"
+#include <istream>
+
+
+struct ApproximationInfo {
+    enum ApproximationWhen {
+        FidelityDriven,
+        MemoryDriven
+    };
+
+    ApproximationInfo(double step_fidelity, unsigned int step_number, ApproximationWhen approx_when) :
+        step_fidelity(step_fidelity), step_number(step_number), approx_when(approx_when) {
+    }
+
+    friend std::istream& operator>> (std::istream &in, ApproximationWhen &when) {
+        std::string token;
+        in >> token;
+
+        if (token == "fidelity") {
+            when = FidelityDriven;
+        } else if (token == "memory") {
+            when = MemoryDriven;
+        } else {
+            throw std::runtime_error("Unknown approximation method '" + token + "'.");
+        }
+
+        return in;
+    }
+
+    const double step_fidelity;
+    const unsigned int step_number;
+    const ApproximationWhen approx_when;
+};
 
 class CircuitSimulator : public Simulator {
 public:
-    CircuitSimulator(std::unique_ptr<qc::QuantumComputation> &qc, const unsigned int step_number, const double step_fidelity)
-            : qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
-        if (step_number == 0) {
+    explicit CircuitSimulator(std::unique_ptr<qc::QuantumComputation> &qc)
+            : qc(qc), approx_info(ApproximationInfo(1.0, 1, ApproximationInfo::FidelityDriven)) {
+    }
+
+    CircuitSimulator(std::unique_ptr<qc::QuantumComputation> &qc, const ApproximationInfo approx_info)
+            : qc(qc), approx_info(approx_info) {
+        if (approx_info.step_number == 0) {
             throw std::invalid_argument("step_number has to be greater than zero");
         }
     }
 
-    CircuitSimulator(std::unique_ptr<qc::QuantumComputation> &qc, const unsigned int step_number, const double step_fidelity, const unsigned long long seed)
-            : Simulator(seed), qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
-        if (step_number == 0) {
+    CircuitSimulator(std::unique_ptr<qc::QuantumComputation> &qc, const ApproximationInfo approx_info, const unsigned long long seed)
+            : Simulator(seed), qc(qc), approx_info(approx_info) {
+        if (approx_info.step_number == 0) {
             throw std::invalid_argument("step_number has to be greater than zero");
         }
     }
@@ -25,7 +61,7 @@ public:
 
     std::map<std::string, std::string> AdditionalStatistics() override {
         return {
-                {"step_fidelity",     std::to_string(step_fidelity)},
+                {"step_fidelity",     std::to_string(approx_info.step_fidelity)},
                 {"approximation_runs",std::to_string(approximation_runs)},
                 {"final_fidelity",    std::to_string(final_fidelity)},
                 {"single_shots",      std::to_string(single_shots)},
@@ -39,12 +75,13 @@ public:
 
 private:
     std::unique_ptr<qc::QuantumComputation> &qc;
+    unsigned int single_shots{0};
 
-    const unsigned int step_number;
-    const double step_fidelity;
+
+    const ApproximationInfo approx_info;
     unsigned long long approximation_runs{0};
     long double final_fidelity{1.0L};
-    unsigned int single_shots{0};
+
 
     std::map<int, bool> single_shot(bool ignore_nonunitaries);
 };

@@ -90,7 +90,7 @@ std::map<int, bool> CircuitSimulator::single_shot(const bool ignore_nonunitaries
     unsigned long op_num = 0;
     std::map<int, bool> classic_values;
 
-    const int approx_mod = std::ceil(static_cast<double>(qc->getNops()) / (step_number + 1));
+    const int approx_mod = std::ceil(static_cast<double>(qc->getNops()) / (approx_info.step_number + 1));
 
     for (auto &op : *qc) {
         if (op->isNonUnitaryOperation()) {
@@ -148,19 +148,33 @@ std::map<int, bool> CircuitSimulator::single_shot(const bool ignore_nonunitaries
             dd->decRef(root_edge);
             root_edge = tmp;
 
-            if (step_fidelity < 1.0) {
-                if ((op_num + 1) % approx_mod == 0 && approximation_runs < step_number) {
-                    [[maybe_unused]] const unsigned int size_before = dd->size(root_edge);
-                    const double ap_fid = ApproximateByFidelity(step_fidelity, true);
+            if (approx_info.step_fidelity < 1.0) {
+                if (approx_info.approx_when == ApproximationInfo::FidelityDriven && (op_num + 1) % approx_mod == 0 && approximation_runs < approx_info.step_number) {
+                    //const unsigned int size_before = dd->size(root_edge);
+                    const double ap_fid = ApproximateByFidelity(approx_info.step_fidelity, false, true);
                     approximation_runs++;
                     final_fidelity *= ap_fid;
-                    /*std::clog << "[INFO] Appromation run finished. "
+                    /*std::clog << "[INFO] Fidelity-driven ApproximationInfo run finished. "
                               << "op_num=" << op_num
                               << "; previous size=" << size_before
                               << "; attained fidelity=" << ap_fid
                               << "; global fidelity=" << final_fidelity
                               << "; #runs=" << approximation_runs
                               << "\n";//*/
+                } else if (approx_info.approx_when == ApproximationInfo::MemoryDriven) {
+                    const unsigned int size_before = dd->size(root_edge);
+                    if (size_before > (approximation_runs+1)*dd::GCLIMIT1) {
+                        const double ap_fid = ApproximateByFidelity(approx_info.step_fidelity, false, true);
+                        approximation_runs++;
+                        final_fidelity *= ap_fid;
+                        /*std::clog << "[INFO] Memory-driven ApproximationInfo run finished. "
+                                  << "; previous size=" << size_before
+                                  << "; attained fidelity=" << ap_fid
+                                  << "; global fidelity=" << final_fidelity
+                                  << "; #runs=" << approximation_runs
+                                  << "\n";//*/
+
+                    }
                 }
             }
             dd->garbageCollect();
