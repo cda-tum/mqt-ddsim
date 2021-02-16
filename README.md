@@ -109,7 +109,7 @@ std::string file1 = "PATH_TO_FILE_1.EXT";
 qc::QuantumComputation qc1(file1);
 
 qc::SimpleSimulator sim(qc1);
-git sim.Simulate();
+sim.Simulate();
 auto samples = sim.MeasureAllNonCollapsing(1000);
 /* Use the results */
 ```

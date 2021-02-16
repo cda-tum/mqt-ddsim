@@ -22,8 +22,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC JKQ::qfr)
 
 # add coverage compiler and linker flag if COVERAGE is set
 if (COVERAGE)
-	target_compile_options(${PROJECT_NAME} PRIVATE --coverage)
-	target_link_libraries(${PROJECT_NAME} PRIVATE --coverage)
+	target_compile_options(${PROJECT_NAME} PUBLIC --coverage)
+	target_link_libraries(${PROJECT_NAME} PUBLIC --coverage)
 endif()
 
 # check if interprocedural optimization is supported
@@ -35,10 +35,9 @@ endif()
 
 # set compiler flags depending on compiler
 if(MSVC)
-	target_compile_options(${PROJECT_NAME} PRIVATE "/W4" "$<$<CONFIG:RELEASE>:/O2 /GL>")
-	target_link_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:Release>:/LTCG>")
+	target_compile_options(${PROJECT_NAME} PRIVATE "/W4" "/utf-8" "$<$<CONFIG:RELEASE>:/O2 /GL>")
 else()
-	target_compile_options(${PROJECT_NAME} PRIVATE -Wall $<$<CONFIG:DEBUG>:-g3 -Og -Wextra -Wpedantic -pedantic> $<$<CONFIG:RELEASE>:-DNDEBUG -g0 -O3 -mtune=native -march=native>)
+	target_compile_options(${PROJECT_NAME} PRIVATE -Wall $<$<CONFIG:DEBUG>:-g3 -Og -Wextra -Wpedantic -pedantic> $<$<CONFIG:RELEASE>:-g0 -mtune=native -march=native>)
 endif()
 
 if(GENERATE_POSITION_INDEPENDENT_CODE)
