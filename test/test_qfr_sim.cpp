@@ -91,7 +91,7 @@ TEST(QFRSimTest, ApproximateByFidelity) {
 
     ASSERT_EQ(ddsim.getNodeCount(), 6);
 
-    double resulting_fidelity = ddsim.ApproximateByFidelity(0.3, true);
+    double resulting_fidelity = ddsim.ApproximateByFidelity(0.3, false, true);
 
     ASSERT_EQ(ddsim.getNodeCount(), 4);
     ASSERT_DOUBLE_EQ(resulting_fidelity, 0.75); //equal up to 4 ULP

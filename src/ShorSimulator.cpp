@@ -73,7 +73,7 @@ std::map<std::string, unsigned int> ShorSimulator::Simulate(unsigned int shots) 
     }
     long double fidelity = 1.0;
     const int mod = std::ceil(2*required_bits / 6.0); // log_0.9(0.5) is about 6
-    int fidelity_runs = 0;
+    int approximation_runs = 0;
     auto t1 = std::chrono::steady_clock::now();
 
     if (emulate) {
@@ -116,6 +116,11 @@ std::map<std::string, unsigned int> ShorSimulator::Simulate(unsigned int shots) 
             ApplyGate(Qm);
             line[(n_qubits-1)-(j)] = -1;
             q *= 2;
+        }
+
+        if (approximate && (i + 1) % mod == 0) {
+            fidelity *= ApproximateByFidelity(0.9, false, true);
+            approximation_runs++;
         }
 
         ApplyGate(qc::Hmat);

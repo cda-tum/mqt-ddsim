@@ -340,7 +340,7 @@ dd::Edge Simulator::MeasureOneCollapsingConcurrent(unsigned short index, const s
     return local_root_edge;
 }
 
-double Simulator::ApproximateByFidelity(double targetFidelity, bool removeNodes) {
+double Simulator::ApproximateByFidelity(double targetFidelity, bool allLevels, bool removeNodes, bool verbose) {
     std::queue<dd::NodePtr> q;
     std::map<dd::NodePtr, fp> probsMone;
 
@@ -398,12 +398,16 @@ double Simulator::ApproximateByFidelity(double targetFidelity, bool removeNodes)
             sum += 1 - p.first;
             if (sum < 1 - targetFidelity) {
                 remove++;
-                tmp.push_back(p.second);
+                if(allLevels) {
+                    nodes_to_remove.push_back(p.second);
+                } else {
+                    tmp.push_back(p.second);
+                }
             } else {
                 break;
             }
         }
-        if (remove * i > max_remove) {
+        if (!allLevels && remove * i > max_remove) {
             max_remove = remove * i;
             nodes_to_remove = tmp;
         }
@@ -422,9 +426,22 @@ double Simulator::ApproximateByFidelity(double targetFidelity, bool removeNodes)
     CN::div(c, newEdge.w, c);
     newEdge.w = dd->cn.lookup(c);
 
-    double fidelity = -1.0;
-    if (dd->size(newEdge) >= getNumberOfQubits()) {
-        fidelity = dd->fidelity(root_edge, newEdge);
+    fp fidelity = dd->fidelity(root_edge, newEdge);
+
+    if (verbose) {
+        const unsigned size_before = dd->size(root_edge);
+        const unsigned size_after = dd->size(newEdge);
+        std::cout
+                << getName() << ","
+                << getNumberOfQubits() << ","
+                << size_before << ","
+                << "fixed_fidelity" << ","
+                << allLevels << ","
+                << targetFidelity << ","
+                << size_after << ","
+                << static_cast<double>(size_after) / static_cast<double>(size_before) << ","
+                << fidelity
+                << "\n";
     }
 
     if (removeNodes) {
@@ -435,12 +452,12 @@ double Simulator::ApproximateByFidelity(double targetFidelity, bool removeNodes)
     return fidelity;
 }
 
-double Simulator::ApproximateBySampling(int nSamples, int threshold, bool removeNodes) {
+double Simulator::ApproximateBySampling(unsigned int nSamples, unsigned int threshold, bool removeNodes, bool verbose) {
     assert(nSamples > threshold);
-    std::map<dd::NodePtr, int> visited_nodes;
+    std::map<dd::NodePtr, unsigned int> visited_nodes;
     std::uniform_real_distribution<fp> dist(0.0, 1.0L);
 
-    for (int j = 0; j < nSamples; j++) {
+    for (unsigned int j = 0; j < nSamples; j++) {
         dd::Edge cur = root_edge;
 
         for (int i = root_edge.p->v; i >= 0; --i) {
@@ -495,6 +512,22 @@ double Simulator::ApproximateBySampling(int nSamples, int threshold, bool remove
     newEdge.w = dd->cn.lookup(c);
 
     fp fidelity = dd->fidelity(root_edge, newEdge);
+
+    if (verbose) {
+        const unsigned size_before = dd->size(root_edge);
+        const unsigned size_after = dd->size(newEdge);
+        std::cout
+                << getName() << ","
+                << getNumberOfQubits() << ","
+                << size_before << ","
+                << "sampling" << ","
+                << nSamples << ","
+                << threshold << ","
+                << size_after << ","
+                << static_cast<double>(size_after) / static_cast<double>(size_before) << ","
+                << fidelity
+                << "\n";
+    }
 
     if (removeNodes) {
         dd->decRef(root_edge);

@@ -76,18 +76,19 @@ class ShorSimulator : public Simulator {
 
     const bool emulate;
     const bool verbose;
+    const bool approximate;
 
     dd::Edge limitStateVector(dd::Edge e);
     std::map<dd::NodePtr , dd::Edge> dag_edges;
 
 public:
-    ShorSimulator(int composite_number, int coprime_a, bool emulate = true, bool verbose = false) :
-    Simulator(), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), emulate(emulate), verbose(verbose) {
+    ShorSimulator(int composite_number, int coprime_a, bool emulate = true, bool verbose = false, bool approximate = false) :
+    Simulator(), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), emulate(emulate), verbose(verbose), approximate(approximate) {
         line.fill(qc::LINE_DEFAULT);
     };
 
-    ShorSimulator(int composite_number, int coprime_a, unsigned long long seed, bool emulate = true, bool verbose = false) :
-    Simulator(seed), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), emulate(emulate), verbose(verbose) {
+    ShorSimulator(int composite_number, int coprime_a, unsigned long long seed, bool emulate = true, bool verbose = false, bool approximate = false) :
+    Simulator(seed), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), emulate(emulate), verbose(verbose), approximate(approximate) {
         line.fill(qc::LINE_DEFAULT);
     };
 
