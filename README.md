@@ -26,7 +26,6 @@ If you have any questions, feel free to contact us via [iic-quantum@jku.at](mail
     * [Library](#library)
     * [Executable Simulator](#executable-simulator)
     * [Executable Noise-aware Simulator](#executable-noise-aware-simulator)
-    * [Installation](#installation)
 - [Running Tests](#running-tests)
 - [Frequently Asked Questions](#frequently-asked-questions) 
 - [Reference](#reference)
@@ -65,7 +64,7 @@ The simulator is based on [[1]](https://iic.jku.at/files/eda/2018_tcad_advanced_
 ## System Requirements
 
 Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). 
-However, the implementation should be compatible with any current C++ compiler supporting C++17 and a minimum CMake version of 3.13.
+However, the implementation should be compatible with any current C++ compiler supporting C++17 and a minimum CMake version of 3.14.
 
 `boost/program_options >= 1.50` is required for building the the commandline interface for `ddsim_simple` and `ddsim_noise_aware`. The `ddsim_noise_aware` further requires `Threads::Threads`.
 
@@ -90,18 +89,11 @@ $ cmake --build build --config Release --target ddsim
 Windows users need to configure CMake by calling
 
 ```commandline
-$ cmake -G "Visual Studio 15 2017" -A x64 -DCMAKE_BUILD_TYPE=Release -S . -B build
+$ cmake -A x64 -DCMAKE_BUILD_TYPE=Release -S . -B build
 $ cmake --build build --config Release --target ddsim
 ```
 
 instead.
-
-Older CMake versions not supporting the above syntax (< 3.13) may be used with
-```commandline
-$ mkdir build && cd build
-$ cmake .. -DCMAKE_BUILD_TYPE=Release
-$ cmake --build build --config Release --target ddsim
-```
 
 The library can be used by including, for example, the ``QFRSimulator.hpp`` header file and
 ```c++
@@ -300,22 +292,6 @@ state=|1011> proba=0.00229939
 state=|1100> proba=0.00215185
 state=|1101> proba=0.00284815
 state=|1110> proba=0.00505003
-```
-
-### Installation
-
-The DDSIM library and tool may be installed on the system by executing
-
-```commandline
-$ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
-$ cmake --build build --config Release --target install
-```
-
-It can then also be included in other projects using the following CMake snippet
-
-```cmake
-find_package(ddsim)
-target_link_libraries(${TARGET_NAME} PRIVATE JKQ::ddsim)
 ```
 
 ## Running Tests
