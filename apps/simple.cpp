@@ -73,6 +73,7 @@ int main(int argc, char** argv) {
     std::unique_ptr<qc::QuantumComputation> quantumComputation;
     std::unique_ptr<Simulator> ddsim{nullptr};
     ApproximationInfo approx_info(step_fidelity, approx_steps, approx_when);
+    const bool verbose = vm.count("verbose") > 0;
 
     if (vm.count("simulate_file")) {
         const std::string fname = vm["simulate_file"].as<std::string>();
@@ -86,17 +87,18 @@ int main(int argc, char** argv) {
         const unsigned int composite_number = vm["simulate_fast_shor"].as<unsigned int>();
         const unsigned int coprime = vm["simulate_fast_shor_coprime"].as<unsigned int>();
         if (seed == 0) {
-            ddsim = std::make_unique<ShorFastSimulator>(composite_number, coprime, vm.count("verbose") > 0);
+            ddsim = std::make_unique<ShorFastSimulator>(composite_number, coprime, verbose);
         } else {
-            ddsim = std::make_unique<ShorFastSimulator>(composite_number, coprime, seed, vm.count("verbose") > 0);
+            ddsim = std::make_unique<ShorFastSimulator>(composite_number, coprime, seed, verbose);
         }
     } else if (vm.count("simulate_shor")) {
         const unsigned int composite_number = vm["simulate_shor"].as<unsigned int>();
         const unsigned int coprime = vm["simulate_shor_coprime"].as<unsigned int>();
+        const bool emulate = vm.count("simulate_shor_no_emulation") == 0;
         if (seed == 0) {
-            ddsim = std::make_unique<ShorSimulator>(composite_number, coprime, vm.count("verbose") > 0, step_fidelity < 1);
+            ddsim = std::make_unique<ShorSimulator>(composite_number, coprime, emulate, verbose, step_fidelity < 1);
         } else {
-            ddsim = std::make_unique<ShorSimulator>(composite_number, coprime, seed, vm.count("verbose") > 0, step_fidelity < 1);
+            ddsim = std::make_unique<ShorSimulator>(composite_number, coprime, seed, emulate, verbose, step_fidelity < 1);
         }
     } else if (vm.count("simulate_grover")) {
         const unsigned int n_qubits = vm["simulate_grover"].as<unsigned int>();
@@ -131,8 +133,9 @@ int main(int argc, char** argv) {
         // TargetFidelity
         ddsim->ApproximateByFidelity(1/100.0, false, false, true);
         ddsim->ApproximateByFidelity(2/100.0, false, false, true);
+        ddsim->ApproximateByFidelity(3/100.0, false, false, true);
         ddsim->ApproximateByFidelity(4/100.0, false, false, true);
-        for(int i=5; i <= 95; i+=5) {
+        for(int i=6; i <= 95; i+=2) {
             ddsim->ApproximateByFidelity(i/100.0, false, false, true);
         }
         ddsim->ApproximateByFidelity(96/100.0, false, false, true);
@@ -143,26 +146,26 @@ int main(int argc, char** argv) {
 
         // TargetFidelityPerLevel
         ddsim->ApproximateByFidelity(1/1000.0, true, false, true);
+        ddsim->ApproximateByFidelity(5/1000.0, true, false, true);
         ddsim->ApproximateByFidelity(10/1000.0, true, false, true);
         ddsim->ApproximateByFidelity(20/1000.0, true, false, true);
         ddsim->ApproximateByFidelity(30/1000.0, true, false, true);
         ddsim->ApproximateByFidelity(40/1000.0, true, false, true);
-        for(int i=50; i <= 950; i+=50) {
+        for(int i=50; i <= 950; i+=10) {
             ddsim->ApproximateByFidelity(i/1000.0, true, false, true);
         }
         ddsim->ApproximateByFidelity(960/1000.0, true, false, true);
         ddsim->ApproximateByFidelity(970/1000.0, true, false, true);
         ddsim->ApproximateByFidelity(980/1000.0, true, false, true);
+        ddsim->ApproximateByFidelity(985/1000.0, true, false, true);
         ddsim->ApproximateByFidelity(990/1000.0, true, false, true);
         ddsim->ApproximateByFidelity(995/1000.0, true, false, true);
         ddsim->ApproximateByFidelity(1000/1000.0, true, false, true);
 
         // Traversal
-        ddsim->ApproximateBySampling(1, 0, false, true);
-        ddsim->ApproximateBySampling(2, 0, false, true);
-        ddsim->ApproximateBySampling(4, 0, false, true);
-        ddsim->ApproximateBySampling(6, 0, false, true);
-        ddsim->ApproximateBySampling(8, 0, false, true);
+        for(int i=1; i < 10; i+=1) {
+            ddsim->ApproximateBySampling(i, 0, false, true);
+        }
         for(int i=10; i < 100; i+=10) {
             ddsim->ApproximateBySampling(i, 0, false, true);
         }
@@ -174,11 +177,9 @@ int main(int argc, char** argv) {
         }
 
         // Traversal+Threshold
-        ddsim->ApproximateBySampling(1000000, 1, false, true);
-        ddsim->ApproximateBySampling(1000000, 2, false, true);
-        ddsim->ApproximateBySampling(1000000, 4, false, true);
-        ddsim->ApproximateBySampling(1000000, 6, false, true);
-        ddsim->ApproximateBySampling(1000000, 8, false, true);
+        for(int i=1; i < 10; i+=1) {
+            ddsim->ApproximateBySampling(1000000, i, false, true);
+        }
         for(int i=10; i < 100; i+=10) {
             ddsim->ApproximateBySampling(1000000, i, false, true);
         }
@@ -240,7 +241,7 @@ int main(int argc, char** argv) {
         std::cout << "  \"statistics\": {\n"
                   << "    \"simulation_time\": " << std::fixed << duration_simulation.count() << std::defaultfloat << ",\n"
                   << "    \"benchmark\": \"" << ddsim->getName() << "\",\n"
-                  << "    \"shots\": " << vm["shots"].as<unsigned int>() << ",\n"
+                  << "    \"shots\": " << shots << ",\n"
                   << "    \"distinct_results\": " << m.size() << ",\n"
                   << "    \"n_qubits\": " << ddsim->getNumberOfQubits() << ",\n"
                   << "    \"applied_gates\": " << ddsim->getNumberOfOps() << ",\n"

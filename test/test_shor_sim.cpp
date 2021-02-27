@@ -8,7 +8,8 @@
  */
 
 TEST(ShorSimTest, Factorize15EmulationTest) {
-    ShorSimulator ddsim(15, 2, 3ull, true, true);
+    // add verbose = true for coverage
+    ShorSimulator ddsim(15, 2, 3ull, true, true, false);
 
     ASSERT_EQ(ddsim.getNumberOfOps(), 0);
     ASSERT_EQ(ddsim.getName(), "shor_15_2");
@@ -41,7 +42,7 @@ TEST(ShorSimTest, Factorize15NegTest) {
 }
 
 TEST(ShorSimTest, Factorize15WithoutEmulationTest) {
-    ShorSimulator ddsim(15, 2, 1ull, false);
+    ShorSimulator ddsim(15, 2, 1ull, false, false, false);
     ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getFactors().first, 3);
