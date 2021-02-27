@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13...3.19)
 
 project(ddsim
         LANGUAGES CXX
-        VERSION 1.1.0
+        VERSION 1.2.0
         DESCRIPTION "DDSIM - A JKQ quantum simulator based on decision diagrams"
         )
 
