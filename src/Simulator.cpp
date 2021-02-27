@@ -414,7 +414,7 @@ double Simulator::ApproximateByFidelity(double targetFidelity, bool allLevels, b
     }
 
     std::map<dd::NodePtr, dd::Edge> dag_edges;
-
+    std::cout << nodes_to_remove.size() << ", ";
     for (auto &it : nodes_to_remove) {
         dag_edges[it] = dd::Package::DDzero;
     }
@@ -426,7 +426,10 @@ double Simulator::ApproximateByFidelity(double targetFidelity, bool allLevels, b
     CN::div(c, newEdge.w, c);
     newEdge.w = dd->cn.lookup(c);
 
-    fp fidelity = dd->fidelity(root_edge, newEdge);
+    fp fidelity = 0;
+    if (root_edge.p->v == newEdge.p->v) {
+        fidelity = dd->fidelity(root_edge, newEdge);
+    }
 
     if (verbose) {
         const unsigned size_before = dd->size(root_edge);
@@ -511,11 +514,15 @@ double Simulator::ApproximateBySampling(unsigned int nSamples, unsigned int thre
     CN::div(c, newEdge.w, c);
     newEdge.w = dd->cn.lookup(c);
 
-    fp fidelity = dd->fidelity(root_edge, newEdge);
+
+    fp fidelity = 0;
+    if (root_edge.p->v == newEdge.p->v) {
+        fidelity = dd->fidelity(root_edge, newEdge);
+    }
 
     if (verbose) {
-        const unsigned size_before = dd->size(root_edge);
         const unsigned size_after = dd->size(newEdge);
+        const unsigned size_before = dd->size(root_edge);
         std::cout
                 << getName() << ","
                 << getNumberOfQubits() << ","
