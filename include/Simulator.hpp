@@ -50,7 +50,7 @@ public:
 
     unsigned long getNodeCount() const { return dd->activeNodeCount; }
     unsigned long getMaxNodeCount() const { return dd->maxActive; }
-    std::pair<dd::ComplexValue, std::string> getPathOfLeastResistance();
+    std::pair<dd::ComplexValue, std::string> getPathOfLeastResistance() const;
 
     std::string getSeed() const { return has_fixed_seed ? std::to_string(seed) : "-1"; }
 

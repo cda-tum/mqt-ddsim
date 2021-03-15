@@ -172,7 +172,10 @@ int main(int argc, char** argv) {
         for(int i=100; i < 1000; i+=100) {
             ddsim->ApproximateBySampling(i, 0, false, true);
         }
-        for(int i=1000; i <= 100000; i+=1000) {
+        for(int i=1000; i < 100000; i+=1000) {
+            ddsim->ApproximateBySampling(i, 0, false, true);
+        }
+        for(int i=100000; i <= 1000000; i+=10000) {
             ddsim->ApproximateBySampling(i, 0, false, true);
         }
 
