@@ -414,7 +414,6 @@ double Simulator::ApproximateByFidelity(double targetFidelity, bool allLevels, b
     }
 
     std::map<dd::NodePtr, dd::Edge> dag_edges;
-    std::cout << nodes_to_remove.size() << ", ";
     for (auto &it : nodes_to_remove) {
         dag_edges[it] = dd::Package::DDzero;
     }
@@ -504,7 +503,6 @@ double Simulator::ApproximateBySampling(unsigned int nSamples, unsigned int thre
     }
 
     std::map<dd::NodePtr, dd::Edge> dag_edges;
-
     for (auto it : visited_nodes2) {
         dag_edges[it] = dd::Package::DDzero;
     }
@@ -579,7 +577,7 @@ dd::Edge Simulator::RemoveNodes(dd::Edge e, std::map<dd::NodePtr, dd::Edge> &dag
     return r;
 }
 
-std::pair<dd::ComplexValue, std::string> Simulator::getPathOfLeastResistance() {
+std::pair<dd::ComplexValue, std::string> Simulator::getPathOfLeastResistance() const {
     if (std::abs(dd::ComplexNumbers::mag2(root_edge.w) - 1.0L) > epsilon) {
         if (CN::equalsZero(root_edge.w)) {
             throw std::runtime_error("Numerical instabilities led to a 0-vector! Abort simulation!");
