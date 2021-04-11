@@ -49,7 +49,7 @@ else()
 	endif ()
 endif()
 
-if(GENERATE_POSITION_INDEPENDENT_CODE OR BINDINGS)
+if(GENERATE_POSITION_INDEPENDENT_CODE)
 	include(CheckPIESupported)
 	check_pie_supported()
 	set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE TRUE)

@@ -164,6 +164,7 @@ std::map<int, bool> CircuitSimulator::single_shot(const bool ignore_nonunitaries
                 } else if (approx_info.approx_when == ApproximationInfo::MemoryDriven) {
                     const unsigned int size_before = dd->size(root_edge);
                     if (size_before > dd::GCLIMIT1) {
+
                         const double ap_fid = ApproximateByFidelity(approx_info.step_fidelity, false, true);
                         approximation_runs++;
                         final_fidelity *= ap_fid;
