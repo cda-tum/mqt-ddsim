@@ -77,6 +77,9 @@ class ShorSimulator : public Simulator {
     const bool emulate;
     const bool verbose;
     const bool approximate;
+    unsigned long long approximation_runs{0};
+    long double final_fidelity{1.0L};
+    double step_fidelity{0.9};
 
     dd::Edge limitStateVector(dd::Edge e);
     std::map<dd::NodePtr , dd::Edge> dag_edges;
@@ -132,6 +135,9 @@ public:
                 {"polr_result", polr_result},
                 {"polr_factor1", std::to_string(polr_factors.first)},
                 {"polr_factor2", std::to_string(polr_factors.second)},
+                {"approximation_runs", std::to_string(approximation_runs)},
+                {"step_fidelity", std::to_string(step_fidelity)},
+                {"final_fidelity", std::to_string(final_fidelity)},
         };
     }
 

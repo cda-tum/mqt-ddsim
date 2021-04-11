@@ -49,8 +49,6 @@ TEST(ShorSimTest, Factorize15WithoutEmulationTest) {
     ASSERT_EQ(ddsim.getFactors().second, 5);
 }
 
-
-
 TEST(ShorSimTest, Factorize55Test) {
     ShorSimulator ddsim(55, 2, 3ull);
     ddsim.Simulate(1);
@@ -58,3 +56,12 @@ TEST(ShorSimTest, Factorize55Test) {
     ASSERT_EQ(ddsim.getFactors().first, 11);
     ASSERT_EQ(ddsim.getFactors().second, 5);
 }
+
+TEST(ShorSimTest, Factorize55ApproximateTest) {
+    ShorSimulator ddsim(55, 2, 3ull, true, false, true);
+    ddsim.Simulate(1);
+
+    ASSERT_EQ(ddsim.getFactors().first, 11);
+    ASSERT_EQ(ddsim.getFactors().second, 5);
+}
+
