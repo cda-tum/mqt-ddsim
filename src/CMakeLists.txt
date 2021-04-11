@@ -38,9 +38,18 @@ if(MSVC)
 	target_compile_options(${PROJECT_NAME} PRIVATE "/W4" "/utf-8")
 else()
 	target_compile_options(${PROJECT_NAME} PRIVATE -Wall $<$<CONFIG:DEBUG>:-g3 -Og -Wextra -Wpedantic -pedantic> $<$<CONFIG:RELEASE>:-g0 -mtune=native -march=native>)
+
+	if (BINDINGS)
+		# adjust visibility settings for building Python bindings
+		target_compile_options(${PROJECT_NAME} PUBLIC -fvisibility=hidden)
+	endif()
+	if(NOT DEPLOY)
+		# only include machine-specific optimizations when building for the host machine
+		target_compile_options(${PROJECT_NAME} PUBLIC -mtune=native -march=native)
+	endif ()
 endif()
 
-if(GENERATE_POSITION_INDEPENDENT_CODE)
+if(GENERATE_POSITION_INDEPENDENT_CODE OR BINDINGS)
 	include(CheckPIESupported)
 	check_pie_supported()
 	set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
