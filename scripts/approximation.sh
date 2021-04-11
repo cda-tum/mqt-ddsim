@@ -85,7 +85,6 @@ sem -j 2 benchmark simfid69 --ps --step_fidelity 1.0 --simulate_shor 69 --simula
 sem -j 2 benchmark simfid55 --ps --step_fidelity 1.0 --simulate_shor 55 --simulate_shor_coprime 2
 sem -j 2 benchmark simfid33 --ps --step_fidelity 1.0 --simulate_shor 33 --simulate_shor_coprime 5
 
-
 sem -j 2 benchmark simfid629 --ps --step_fidelity 0.9 --simulate_shor 629 --simulate_shor_coprime 8
 sem -j 2 benchmark simfid323 --ps --step_fidelity 0.9 --simulate_shor 323 --simulate_shor_coprime 8
 sem -j 2 benchmark simfid221 --ps --step_fidelity 0.9 --simulate_shor 221 --simulate_shor_coprime 4
@@ -93,20 +92,7 @@ sem -j 2 benchmark simfid69 --ps --step_fidelity 0.9 --simulate_shor 69 --simula
 sem -j 2 benchmark simfid55 --ps --step_fidelity 0.9 --simulate_shor 55 --simulate_shor_coprime 2
 sem -j 2 benchmark simfid33 --ps --step_fidelity 0.9 --simulate_shor 33 --simulate_shor_coprime 5
 
-
-
-#sem -j 2 benchmark state-inst-5x5-10-0 --approx_state --simulate_file circuits/inst_5x5_10_0.txt
-#sem -j 2 benchmark state-inst-5x5-10-1 --approx_state --simulate_file circuits/inst_5x5_10_1.txt
 sem -j 2 benchmark state-shor-1157-8 --approx_state --simulate_shor 1157 --simulate_shor_coprime 8
-
-#for file in ./circuits/inst_5*.txt; do
-#  base="$(basename -s .txt "$file")"
-#  sem -j 2 benchmark simmem000"${base}" --ps --approx_when memory --step_fidelity 1.000 --simulate_file "${file}"
-#  sem -j 2 benchmark simmem990"${base}" --ps --approx_when memory --step_fidelity 0.990 --simulate_file "${file}"
-#  sem -j 2 benchmark simmem975"${base}" --ps --approx_when memory --step_fidelity 0.975 --simulate_file "${file}"
-#  sem -j 2 benchmark simmem950"${base}" --ps --approx_when memory --step_fidelity 0.950 --simulate_file "${file}"
-#  sem -j 2 benchmark simmem925"${base}" --ps --approx_when memory --step_fidelity 0.925 --simulate_file "${file}"
-#done
 
 sem -j 2 benchmark simfid1157 --ps --step_fidelity 0.9 --simulate_shor 1157 --simulate_shor_coprime 8
 sem -j 2 benchmark simfid1157 --ps --step_fidelity 1.0 --simulate_shor 1157 --simulate_shor_coprime 8
@@ -115,7 +101,6 @@ sem --wait
 
 printf "Finished running all simulations (%s)\n" "$(date "+%F %T")"
 printf "(Started running all simulations (%s))\n" "${START_TIME}"
-
 
 # post processing
 # jq --raw-output '.statistics | [.benchmark, .n_qubits, .max_nodes, .simulation_time, (.approximation_runs, .step_fidelity, .final_fidelity | tonumber)] | @csv'
