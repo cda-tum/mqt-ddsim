@@ -21,13 +21,13 @@ std::map<std::string, std::size_t> ShorFastSimulator::Simulate(unsigned int shot
         std::clog << " (requires " << +n_qubits << " qubits):\n";
     }
 
-    if(coprime_a != 0 && gcd(coprime_a, n) != 1) {
+    if (coprime_a != 0 && gcd(coprime_a, n) != 1) {
         std::clog << "Warning: gcd(a=" << coprime_a << ", n=" << n << ") != 1 --> choosing a new value for a\n";
         coprime_a = 0;
     }
 
-    if(coprime_a == 0) {
-        std::uniform_int_distribution<unsigned int> distribution(1, n-1); // range is inclusive
+    if (coprime_a == 0) {
+        std::uniform_int_distribution<unsigned int> distribution(1, n - 1); // range is inclusive
         do {
             coprime_a = distribution(mt);
         } while (gcd(coprime_a, n) != 1 || coprime_a == 1);
@@ -37,10 +37,10 @@ std::map<std::string, std::size_t> ShorFastSimulator::Simulate(unsigned int shot
         std::clog << "Find a coprime to N=" << n << ": " << coprime_a << "\n";
     }
 
-    auto* as = new unsigned long long[2*required_bits];
-    as[2*required_bits-1] = coprime_a;
+    auto *as = new unsigned long long[2 * required_bits];
+    as[2 * required_bits - 1] = coprime_a;
     unsigned long long new_a = coprime_a;
-    for(int i = 2*required_bits-2; i >= 0; i--) {
+    for (int i = 2 * required_bits - 2; i >= 0; i--) {
         new_a = new_a * new_a;
         new_a = new_a % n;
         as[i] = new_a;
@@ -48,7 +48,7 @@ std::map<std::string, std::size_t> ShorFastSimulator::Simulate(unsigned int shot
 
 
     auto t1 = std::chrono::steady_clock::now();
-    std::string measurements(2*required_bits, '0');
+    std::string measurements(2 * required_bits, '0');
 
     for (int i = 0; i < 2 * required_bits; i++) {
         ApplyGate(dd::Hmat, n_qubits - 1);
@@ -99,26 +99,26 @@ std::map<std::string, std::size_t> ShorFastSimulator::Simulate(unsigned int shot
     return {};
 }
 
-std::pair<unsigned int, unsigned int> ShorFastSimulator::post_processing(const std::string& sample) const {
+std::pair<unsigned int, unsigned int> ShorFastSimulator::post_processing(const std::string &sample) const {
     unsigned long long res = 0;
     if (verbose) {
         std::clog << "measurement: ";
     }
-    for(int i=0; i < 2*required_bits; i++) {
+    for (int i = 0; i < 2 * required_bits; i++) {
         if (verbose) {
-            std::clog << sample.at(2*required_bits -1- i);
+            std::clog << sample.at(2 * required_bits - 1 - i);
         }
-        res = (res << 1u) + (sample.at(2*required_bits -1- i) == '1');
+        res = (res << 1u) + (sample.at(2 * required_bits - 1 - i) == '1');
     }
 
     if (verbose) {
         std::clog << " = " << res << "\n";
     }
-    unsigned long long denom = 1ull << (2*required_bits);
+    unsigned long long denom = 1ull << (2 * required_bits);
 
     bool success = false;
     unsigned long long f1{0}, f2{0};
-    if(res == 0) {
+    if (res == 0) {
         if (verbose) {
             std::clog << "Factorization failed (measured 0)!\n";
         }
@@ -130,21 +130,22 @@ std::pair<unsigned int, unsigned int> ShorFastSimulator::post_processing(const s
 
         unsigned long long old_res = res;
         unsigned long long old_denom = denom;
-        while(res != 0) {
-            cf.push_back(denom/res);
+        while (res != 0) {
+            cf.push_back(denom / res);
             unsigned long long tmp = denom % res;
             denom = res;
             res = tmp;
         }
 
         if (verbose) {
-            for(const auto i : cf) {
+            for (const auto i : cf) {
                 std::clog << i << " ";
-            } std::clog << "\n";
+            }
+            std::clog << "\n";
         }
 
 
-        for(unsigned int i=0; i < cf.size(); i++) {
+        for (unsigned int i = 0; i < cf.size(); i++) {
             //determine candidate
             unsigned long long denominator = cf[i];
             unsigned long long numerator = 1;
@@ -184,7 +185,7 @@ std::pair<unsigned int, unsigned int> ShorFastSimulator::post_processing(const s
                             }
                         } else {
 
-                            f1 = modpow(coprime_a, (denominator * fact)/2, n);
+                            f1 = modpow(coprime_a, (denominator * fact) / 2, n);
                             f2 = (f1 + 1) % n;
                             f1 = (f1 == 0) ? n - 1 : f1 - 1;
                             f1 = gcd(f1, n);
@@ -192,13 +193,16 @@ std::pair<unsigned int, unsigned int> ShorFastSimulator::post_processing(const s
 
                             if (f1 == 1ull || f2 == 1ull) {
                                 if (verbose) {
-                                    std::clog << "Factorization failed: found trivial factors " << f1 << " and " << f2 << "\n";
+                                    std::clog << "Factorization failed: found trivial factors " << f1 << " and " << f2
+                                              << "\n";
                                 }
                             } else {
                                 if (verbose) {
                                     std::clog << "Factorization succeeded! Non-trivial factors are: \n"
-                                              << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)-1" << "," << n << ") = " << f1 << "\n"
-                                              << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)+1" << "," << n << ") = " << f2 << "\n";
+                                              << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)-1" << "," << n
+                                              << ") = " << f1 << "\n"
+                                              << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)+1" << "," << n
+                                              << ") = " << f2 << "\n";
                                 }
                                 success = true;
                             }
@@ -221,31 +225,31 @@ std::pair<unsigned int, unsigned int> ShorFastSimulator::post_processing(const s
     if (success) {
         return {f1, f2};
     } else {
-        return {0,0};
+        return {0, 0};
     }
 }
 
 dd::Package::mEdge ShorFastSimulator::limitTo(unsigned long long a) {
-    std::array<dd::Package::mEdge, 4> edges {
-        dd::Package::mEdge::zero, dd::Package::mEdge::zero,
-        dd::Package::mEdge::zero, dd::Package::mEdge::zero
+    std::array<dd::Package::mEdge, 4> edges{
+            dd::Package::mEdge::zero, dd::Package::mEdge::zero,
+            dd::Package::mEdge::zero, dd::Package::mEdge::zero
     };
 
-    if(a & 1u) {
+    if (a & 1u) {
         edges[0] = edges[3] = dd::Package::mEdge::one;
     } else {
-        edges[0]=dd::Package::mEdge::one;
+        edges[0] = dd::Package::mEdge::one;
     }
     dd::Edge f = dd->makeDDNode(0, edges, false);
 
-    edges[0]=edges[1]=edges[2]=edges[3]=dd::Package::mEdge::zero;
+    edges[0] = edges[1] = edges[2] = edges[3] = dd::Package::mEdge::zero;
 
-    for(dd::Qubit p=1; p < required_bits+1;p++) {
-        if((a>>p) & 1u) {
-            edges[0]=dd->makeIdent(0,p-1); 
-            edges[3]=f;
+    for (dd::Qubit p = 1; p < required_bits + 1; p++) {
+        if ((a >> p) & 1u) {
+            edges[0] = dd->makeIdent(0, p - 1);
+            edges[3] = f;
         } else {
-            edges[0]=f;
+            edges[0] = f;
         }
         f = dd->makeDDNode(p, edges, false);
         edges[3] = dd::Package::mEdge::zero;
@@ -257,30 +261,30 @@ dd::Package::mEdge ShorFastSimulator::limitTo(unsigned long long a) {
 dd::Package::mEdge ShorFastSimulator::addConst(unsigned long long a) {
 
     dd::Edge f = dd::Package::mEdge::one;
-    std::array<dd::Package::mEdge, 4> edges {
+    std::array<dd::Package::mEdge, 4> edges{
             dd::Package::mEdge::zero, dd::Package::mEdge::zero,
             dd::Package::mEdge::zero, dd::Package::mEdge::zero
     };
 
     dd::Qubit p = 0;
-    while(!((a >> p)  & 1u)) {
+    while (!((a >> p) & 1u)) {
         edges[0] = f;
         edges[3] = f;
         f = dd->makeDDNode(p, edges, false);
         p++;
     }
 
-    edges[0]=edges[1]=edges[2]=edges[3]=dd::Package::mEdge::zero;
-    edges[2]=f;
+    edges[0] = edges[1] = edges[2] = edges[3] = dd::Package::mEdge::zero;
+    edges[2] = f;
     dd::Edge left = dd->makeDDNode(p, edges, false);
-    edges[2]=dd::Package::mEdge::zero;
-    edges[1]=f;
+    edges[2] = dd::Package::mEdge::zero;
+    edges[1] = f;
     dd::Edge right = dd->makeDDNode(p, edges, false);
     p++;
 
-    for(;p < required_bits; p++) {
-        edges[0]=edges[1]=edges[2]=edges[3]=dd::Package::mEdge::zero;
-        if((a>>p) & 1u) {
+    for (; p < required_bits; p++) {
+        edges[0] = edges[1] = edges[2] = edges[3] = dd::Package::mEdge::zero;
+        if ((a >> p) & 1u) {
             edges[2] = left;
             dd::Edge new_left = dd->makeDDNode(p, edges, false);
             edges[2] = dd::Package::mEdge::zero;
@@ -317,9 +321,9 @@ dd::Package::mEdge ShorFastSimulator::addConstMod(unsigned long long a) {
 
     dd::Package::mEdge f2 = addConst(n);
 
-    dd::Package::mEdge f3 = limitTo(n-1);
+    dd::Package::mEdge f3 = limitTo(n - 1);
 
-    dd::Package::mEdge f4 = limitTo(n-1-a);
+    dd::Package::mEdge f4 = limitTo(n - 1 - a);
 
     f4.w = dd::ComplexNumbers::neg(f4.w);
     dd::Edge diff2 = dd->add(f3, f4);
@@ -336,7 +340,7 @@ void ShorFastSimulator::ApplyGate(dd::GateMatrix matrix, dd::Qubit target) {
     dd->incRef(tmp);
     dd->decRef(root_edge);
     root_edge = tmp;
-    
+
     dd->garbageCollect();
 }
 
@@ -344,32 +348,32 @@ void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
     const std::size_t cache_count_before = dd->cn.cacheCount();
     dag_edges.clear();
 
-    dd::Package::vEdge f=dd::Package::vEdge::one;
-    std::array<dd::Package::vEdge, dd::RADIX> edges {
-        dd::Package::vEdge::zero, dd::Package::vEdge::zero
+    dd::Package::vEdge f = dd::Package::vEdge::one;
+    std::array<dd::Package::vEdge, dd::RADIX> edges{
+            dd::Package::vEdge::zero, dd::Package::vEdge::zero
     };
 
     unsigned long long t = a;
-    for(dd::Qubit p=0; p < n_qubits-1; ++p) {
+    for (dd::Qubit p = 0; p < n_qubits - 1; ++p) {
         edges[0] = f;
         f = dd->makeDDNode(p, edges);
         ts[p] = t;
-        t = (2*t) % n;
+        t = (2 * t) % n;
     }
 
     dd->incRef(f);
 
-    for (auto& m : nodesOnLevel) {
-        m = std::map<dd::Package::vNode*, dd::Package::vEdge>();
+    for (auto &m : nodesOnLevel) {
+        m = std::map<dd::Package::vNode *, dd::Package::vEdge>();
     }
 
     u_a_emulate2_rec(root_edge.p->e[0]);
 
     //dd->setMode(dd::Matrix);
 
-    for(const auto & entry : nodesOnLevel.at(0)) {
+    for (const auto &entry : nodesOnLevel.at(0)) {
         dd::Package::vEdge left = f;
-        if(entry.first->e[0].w == dd::Complex::zero) {
+        if (entry.first->e[0].w == dd::Complex::zero) {
             left = dd::Package::vEdge::zero;
         } else {
             left.w = dd->cn.mulCached(left.w, entry.first->e[0].w);
@@ -377,7 +381,7 @@ void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
 
         dd::Package::vEdge right = dd->multiply(addConstMod(ts[entry.first->v]), f);
 
-        if(entry.first->e[1].w == dd::Complex::zero) {
+        if (entry.first->e[1].w == dd::Complex::zero) {
             right = dd::Package::vEdge::zero;
         } else {
             right.w = dd->cn.mulCached(right.w, entry.first->e[1].w);
@@ -385,10 +389,10 @@ void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
 
         dd::Package::vEdge result = dd->add(left, right);
 
-        if(left.w != dd::Complex::zero) {
+        if (left.w != dd::Complex::zero) {
             dd->cn.returnToCache(left.w);
         }
-        if(right.w != dd::Complex::zero) {
+        if (right.w != dd::Complex::zero) {
             dd->cn.returnToCache(right.w);
         }
 
@@ -398,27 +402,27 @@ void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
     }
 
 
-    for(int i=1; i < n_qubits-1; i++) {
+    for (int i = 1; i < n_qubits - 1; i++) {
         std::vector<dd::Package::vEdge> saveEdges;
-        for(auto it = nodesOnLevel.at(i).begin(); it != nodesOnLevel.at(i).end(); it++) {
+        for (auto it = nodesOnLevel.at(i).begin(); it != nodesOnLevel.at(i).end(); it++) {
             dd::Package::vEdge left = dd::Package::vEdge::zero;
-            if(it->first->e.at(0).w != dd::Complex::zero) {
-                left = nodesOnLevel.at(i-1)[it->first->e.at(0).p];
+            if (it->first->e.at(0).w != dd::Complex::zero) {
+                left = nodesOnLevel.at(i - 1)[it->first->e.at(0).p];
                 left.w = dd->cn.mulCached(left.w, it->first->e.at(0).w);
             }
 
             dd::Package::vEdge right = dd::Package::vEdge::zero;
-            if(it->first->e.at(1).w != dd::Complex::zero) {
-                right = dd->multiply(addConstMod(ts.at(it->first->v)), nodesOnLevel.at(i-1)[it->first->e.at(1).p]);
+            if (it->first->e.at(1).w != dd::Complex::zero) {
+                right = dd->multiply(addConstMod(ts.at(it->first->v)), nodesOnLevel.at(i - 1)[it->first->e.at(1).p]);
                 right.w = dd->cn.mulCached(right.w, it->first->e.at(1).w);
             }
 
             dd::Package::vEdge result = dd->add(left, right);
 
-            if(left.w != dd::Complex::zero) {
+            if (left.w != dd::Complex::zero) {
                 dd->cn.returnToCache(left.w);
             }
-            if(right.w != dd::Complex::zero) {
+            if (right.w != dd::Complex::zero) {
                 dd->cn.returnToCache(right.w);
             }
 
@@ -426,19 +430,19 @@ void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
             nodesOnLevel.at(i)[it->first] = result;
             saveEdges.push_back(result);
         }
-        for(auto & it : nodesOnLevel.at(i-1)) {
+        for (auto &it : nodesOnLevel.at(i - 1)) {
             dd->decRef(it.second);
         }
         dd->garbageCollect();
         saveEdges.push_back(root_edge);
-        nodesOnLevel.at(i-1).clear();
+        nodesOnLevel.at(i - 1).clear();
     }
 
-    if(nodesOnLevel.at(n_qubits-2).size() != 1) {
+    if (nodesOnLevel.at(n_qubits - 2).size() != 1) {
         throw std::runtime_error("error occurred");
     }
 
-    dd::Package::vEdge result = nodesOnLevel.at(n_qubits-2)[root_edge.p->e[0].p];
+    dd::Package::vEdge result = nodesOnLevel.at(n_qubits - 2)[root_edge.p->e[0].p];
 
     dd->decRef(result);
 
@@ -462,10 +466,10 @@ void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
 }
 
 void ShorFastSimulator::u_a_emulate2_rec(dd::Package::vEdge e) {
-    if(e.isTerminal() || nodesOnLevel.at(e.p->v).find(e.p) != nodesOnLevel.at(e.p->v).end()) {
+    if (e.isTerminal() || nodesOnLevel.at(e.p->v).find(e.p) != nodesOnLevel.at(e.p->v).end()) {
         return;
     }
-    nodesOnLevel.at(e.p->v)[e.p]=dd::Package::vEdge::zero;
+    nodesOnLevel.at(e.p->v)[e.p] = dd::Package::vEdge::zero;
     u_a_emulate2_rec(e.p->e[0]);
     u_a_emulate2_rec(e.p->e[1]);
 }

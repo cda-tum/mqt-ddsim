@@ -2,7 +2,7 @@
 #include <complex>
 #include <fstream>
 
-int main (int argc, char **argv) {
+int main(int argc, char **argv) {
     if (argc != 3) {
         std::cout << "Usage: " << argv[0] << " file1 file2\n"
                   << "Calculates the fidelity between two vectors given as file (one complex number per line).\n"
@@ -18,7 +18,7 @@ int main (int argc, char **argv) {
     std::ifstream v1_stream(vector1);
     std::ifstream v2_stream(vector2);
 
-    if(!v1_stream || !v2_stream) {
+    if (!v1_stream || !v2_stream) {
         std::cerr << "Failed to open either or both files.";
         return 2;
     }
@@ -30,7 +30,7 @@ int main (int argc, char **argv) {
         v1_stream >> ars >> ais;
         v2_stream >> brs >> bis;
 
-        if(!v1_stream || !v2_stream) {
+        if (!v1_stream || !v2_stream) {
             break;
         }
         // istreams cannot read doubles in hexfloat format so we have to use strtold

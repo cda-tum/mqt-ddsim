@@ -14,8 +14,7 @@ static unsigned long long gcd(unsigned long long a, unsigned long long b) {
     return b;
 }
 
-static bool is_prime(unsigned int number)
-{
+static bool is_prime(unsigned int number) {
     const unsigned int upper_limit = std::floor(std::sqrt(number));
 
     for (unsigned int a = 2; a <= upper_limit; a++) {
@@ -31,7 +30,7 @@ void output_coprimes(const unsigned int composite_number, const unsigned int len
     unsigned output_length = 0;
     unsigned current_number = 2;
 
-    while(output_length < length) {
+    while (output_length < length) {
         if (gcd(current_number, composite_number) == 1) {
             std::cout << current_number << "\n";
             output_length++;
@@ -44,8 +43,8 @@ void output_primes(const unsigned int composite_number, const unsigned int lengt
     unsigned output_length = 0;
     unsigned current_number = 2;
 
-    while(output_length < length) {
-        if(is_prime(current_number) && gcd(current_number, composite_number) == 1) {
+    while (output_length < length) {
+        if (is_prime(current_number) && gcd(current_number, composite_number) == 1) {
             std::cout << current_number << "\n";
             output_length++;
         }
@@ -53,13 +52,15 @@ void output_primes(const unsigned int composite_number, const unsigned int lengt
     }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
     namespace po = boost::program_options;
     po::options_description description("JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
     description.add_options()
             ("help,h", "produce help message")
-            ("composite_number,N", po::value<unsigned int>()->required(), "number of measurements on the final quantum state")
-            ("strategy,S", po::value<std::string>()->required(), "strategy for prime base generation (primes, coprimes)")
+            ("composite_number,N", po::value<unsigned int>()->required(),
+             "number of measurements on the final quantum state")
+            ("strategy,S", po::value<std::string>()->required(),
+             "strategy for prime base generation (primes, coprimes)")
             ("length,L", po::value<unsigned int>()->required(), "how many bases to generate");
     po::variables_map vm;
     try {

@@ -19,10 +19,10 @@ struct ApproximationInfo {
     };
 
     ApproximationInfo(double step_fidelity, unsigned int step_number, ApproximationWhen approx_when) :
-        step_fidelity(step_fidelity), step_number(step_number), approx_when(approx_when) {
+            step_fidelity(step_fidelity), step_number(step_number), approx_when(approx_when) {
     }
 
-    friend std::istream& operator>> (std::istream &in, ApproximationWhen &when) {
+    friend std::istream &operator>>(std::istream &in, ApproximationWhen &when) {
         std::string token;
         in >> token;
 
@@ -54,7 +54,8 @@ public:
         dd->resize(qc->getNqubits());
     }
 
-    CircuitSimulator(std::unique_ptr<qc::QuantumComputation> &qc, const ApproximationInfo approx_info, const unsigned long long seed)
+    CircuitSimulator(std::unique_ptr<qc::QuantumComputation> &qc, const ApproximationInfo approx_info,
+                     const unsigned long long seed)
             : Simulator(seed), qc(qc), approx_info(approx_info) {
     }
 
@@ -62,16 +63,18 @@ public:
 
     std::map<std::string, std::string> AdditionalStatistics() override {
         return {
-                {"step_fidelity",     std::to_string(approx_info.step_fidelity)},
-                {"approximation_runs",std::to_string(approximation_runs)},
-                {"final_fidelity",    std::to_string(final_fidelity)},
-                {"single_shots",      std::to_string(single_shots)},
+                {"step_fidelity",      std::to_string(approx_info.step_fidelity)},
+                {"approximation_runs", std::to_string(approximation_runs)},
+                {"final_fidelity",     std::to_string(final_fidelity)},
+                {"single_shots",       std::to_string(single_shots)},
         };
     };
 
 
     [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
+
     [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
+
     [[nodiscard]] std::string getName() const override { return qc->getName(); };
 
 private:

@@ -10,9 +10,11 @@
 class GroverSimulator : public Simulator {
 public:
     explicit GroverSimulator(const std::string &oracle, const unsigned long long seed) : Simulator(seed),
-                                                                                         oracle{oracle.rbegin(), oracle.rend()},
+                                                                                         oracle{oracle.rbegin(),
+                                                                                                oracle.rend()},
                                                                                          n_qubits(oracle.length()),
-                                                                                         iterations(CalculateIterations(n_qubits)) {
+                                                                                         iterations(CalculateIterations(
+                                                                                                 n_qubits)) {
     }
 
     explicit GroverSimulator(const std::string &oracle) : oracle{oracle.rbegin(), oracle.rend()},
@@ -22,7 +24,9 @@ public:
 
     explicit GroverSimulator(const dd::QubitCount n_qubits, const unsigned long long seed) : Simulator(seed),
                                                                                              n_qubits{n_qubits},
-                                                                                             iterations(CalculateIterations(n_qubits)) {
+                                                                                             iterations(
+                                                                                                     CalculateIterations(
+                                                                                                             n_qubits)) {
         std::uniform_int_distribution<int> dist(0, 1); // range is inclusive
         oracle = std::string(n_qubits, '0');
         for (dd::Qubit i = 0; i < n_qubits; i++) {

@@ -6,7 +6,7 @@
 
 TEST(CircuitSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-	quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
     CircuitSimulator ddsim(quantumComputation, ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
 
     ASSERT_EQ(ddsim.getNumberOfOps(), 1);
@@ -60,7 +60,7 @@ TEST(CircuitSimTest, ClassicControlledOp) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, 0, 0);
-    std::unique_ptr<qc::Operation> op (new qc::StandardOperation(2, 1, qc::X));
+    std::unique_ptr<qc::Operation> op(new qc::StandardOperation(2, 1, qc::X));
     quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, quantumComputation->getCregs().at("c"), 1);
 
     CircuitSimulator ddsim(quantumComputation, ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
@@ -103,7 +103,7 @@ TEST(CircuitSimTest, DestructiveMeasurementOne) {
     const char m = ddsim.MeasureOneCollapsing(0);
     const std::vector<dd::ComplexValue> v_after = ddsim.getVector();
 
-    if(m == '0') {
+    if (m == '0') {
         ASSERT_EQ(v_after[0], dd::complex_SQRT2_2);
         ASSERT_EQ(v_after[2], dd::complex_SQRT2_2);
         ASSERT_EQ(v_after[1], dd::complex_zero);

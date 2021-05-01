@@ -36,25 +36,35 @@ public:
     virtual std::map<std::string, std::string> AdditionalStatistics() { return {}; };
 
     std::string MeasureAll(bool collapse = false);
+
     std::map<std::string, std::size_t> MeasureAllNonCollapsing(unsigned int shots);
+
     char MeasureOneCollapsing(dd::Qubit index, bool assume_probability_normalization = true);
 
     [[nodiscard]] std::vector<dd::ComplexValue> getVector() const;
 
-    [[nodiscard]] std::size_t getActiveNodeCount() const {return dd->vUniqueTable.getActiveNodeCount();}
+    [[nodiscard]] std::size_t getActiveNodeCount() const { return dd->vUniqueTable.getActiveNodeCount(); }
+
     [[nodiscard]] std::size_t getMaxNodeCount() const { return dd->vUniqueTable.getMaxActiveNodes(); }
+
     [[nodiscard]] std::size_t countNodesFromRoot() const { return dd->size(root_edge); }
+
     [[nodiscard]] std::pair<dd::ComplexValue, std::string> getPathOfLeastResistance() const;
 
     [[nodiscard]] std::string getSeed() const { return has_fixed_seed ? std::to_string(seed) : "-1"; }
 
     [[nodiscard]] virtual dd::QubitCount getNumberOfQubits() const = 0;
+
     [[nodiscard]] virtual std::size_t getNumberOfOps() const = 0;
+
     [[nodiscard]] virtual std::string getName() const = 0;
 
-    double ApproximateByFidelity(double targetFidelity, bool allLevels, bool removeNodes, bool verbose=false);
-    double ApproximateBySampling(unsigned int nSamples, unsigned int threshold, bool removeNodes, bool verbose=false);
-    dd::Package::vEdge RemoveNodes(dd::Package::vEdge edge, std::map<dd::Package::vNode*, dd::Package::vEdge> &dag_edges);
+    double ApproximateByFidelity(double targetFidelity, bool allLevels, bool removeNodes, bool verbose = false);
+
+    double ApproximateBySampling(unsigned int nSamples, unsigned int threshold, bool removeNodes, bool verbose = false);
+
+    dd::Package::vEdge
+    RemoveNodes(dd::Package::vEdge edge, std::map<dd::Package::vNode *, dd::Package::vEdge> &dag_edges);
 
     std::unique_ptr<dd::Package> dd = std::make_unique<dd::Package>();
     dd::Package::vEdge root_edge{};
@@ -69,7 +79,7 @@ protected:
 
     static void NextPath(std::string &s);
 
-    double assign_probs(dd::Package::vEdge edge, std::unordered_map<dd::Package::vNode*, double> &probs);
+    double assign_probs(dd::Package::vEdge edge, std::unordered_map<dd::Package::vNode *, double> &probs);
 };
 
 

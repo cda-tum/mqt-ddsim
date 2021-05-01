@@ -11,14 +11,14 @@ std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int
             has_nonmeasurement_nonunitary = true;
         }
         if (op->getType() == qc::Measure) {
-            auto nu_op = dynamic_cast<qc::NonUnitaryOperation*>(op.get());
+            auto nu_op = dynamic_cast<qc::NonUnitaryOperation *>(op.get());
             if (nu_op == nullptr) {
                 throw std::runtime_error("Op with type Measurement could not be casted to NonUnitaryOperation");
             }
             has_measurements = true;
 
-            const auto& quantum = nu_op->getTargets();
-            const auto& classic = nu_op->getClassics();
+            const auto &quantum = nu_op->getTargets();
+            const auto &classic = nu_op->getClassics();
 
             if (quantum.size() != classic.size()) {
                 throw std::runtime_error("Measurement: Sizes of quantum and classic register mismatch.");
@@ -48,10 +48,10 @@ std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int
         const auto n_cbits = qc->getNcbits();
 
         // MeasureAllNonCollapsing returns a map from measurement over all qubits to the number of occurrences
-        for( const auto& item : MeasureAllNonCollapsing(shots)) {
+        for (const auto &item : MeasureAllNonCollapsing(shots)) {
             std::string result_string(qc->getNcbits(), '0');
 
-            for (auto const& m : measurement_map) {
+            for (auto const &m : measurement_map) {
                 // m.first is the qubit, m.second the classical bit
                 result_string[n_cbits - m.second - 1] = item.first[n_qubits - m.first - 1];
             }
@@ -72,7 +72,7 @@ std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int
         std::string result_string(qc->getNcbits(), '0');
 
         // result is a map from the cbit index to the Boolean value
-        for (const auto& r : result) {
+        for (const auto &r : result) {
             result_string[n_cbits - r.first - 1] = r.second ? '1' : '0';
         }
         m_counter[result_string]++;
@@ -81,7 +81,7 @@ std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int
     return m_counter;
 }
 
-std::map<std::size_t , bool> CircuitSimulator::single_shot(const bool ignore_nonunitaries) {
+std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonunitaries) {
     single_shots++;
     const dd::QubitCount n_qubits = qc->getNqubits();
 
@@ -150,7 +150,8 @@ std::map<std::size_t , bool> CircuitSimulator::single_shot(const bool ignore_non
             root_edge = tmp;
 
             if (approx_info.step_number > 0 && approx_info.step_fidelity < 1.0) {
-                if (approx_info.approx_when == ApproximationInfo::FidelityDriven && (op_num + 1) % approx_mod == 0 && approximation_runs < approx_info.step_number) {
+                if (approx_info.approx_when == ApproximationInfo::FidelityDriven && (op_num + 1) % approx_mod == 0 &&
+                    approximation_runs < approx_info.step_number) {
                     //const unsigned int size_before = dd->size(root_edge);
                     const double ap_fid = ApproximateByFidelity(approx_info.step_fidelity, false, true);
                     approximation_runs++;

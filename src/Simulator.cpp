@@ -109,16 +109,16 @@ void Simulator::NextPath(std::string &s) {
  * @return '1' or '0' depending on the measured value
  */
 char Simulator::MeasureOneCollapsing(const dd::Qubit index, const bool assume_probability_normalization) {
-    std::map<dd::Package::vNode*, dd::fp> probsMone;
-    std::set<dd::Package::vNode*> visited_nodes2;
-    std::queue<dd::Package::vNode*> q;
+    std::map<dd::Package::vNode *, dd::fp> probsMone;
+    std::set<dd::Package::vNode *> visited_nodes2;
+    std::queue<dd::Package::vNode *> q;
 
     probsMone[root_edge.p] = CN::mag2(root_edge.w);
     visited_nodes2.insert(root_edge.p);
     q.push(root_edge.p);
 
     while (q.front()->v != index) {
-        dd::Package::vNode* ptr = q.front();
+        dd::Package::vNode *ptr = q.front();
         q.pop();
         double prob = probsMone[ptr];
 
@@ -151,7 +151,7 @@ char Simulator::MeasureOneCollapsing(const dd::Qubit index, const bool assume_pr
 
     if (assume_probability_normalization) {
         while (!q.empty()) {
-            dd::Package::vNode* ptr = q.front();
+            dd::Package::vNode *ptr = q.front();
             q.pop();
 
             if (!ptr->e.at(0).w.approximatelyZero()) {
@@ -163,11 +163,11 @@ char Simulator::MeasureOneCollapsing(const dd::Qubit index, const bool assume_pr
             }
         }
     } else {
-        std::unordered_map<dd::Package::vNode*, double> probs;
+        std::unordered_map<dd::Package::vNode *, double> probs;
         assign_probs(root_edge, probs);
 
         while (!q.empty()) {
-            dd::Package::vNode* ptr = q.front();
+            dd::Package::vNode *ptr = q.front();
             q.pop();
 
             if (!ptr->e.at(0).w.approximatelyZero()) {
@@ -182,7 +182,8 @@ char Simulator::MeasureOneCollapsing(const dd::Qubit index, const bool assume_pr
 
     if (std::abs(pzero + pone - 1) > epsilon) {
         throw std::runtime_error("Numerical instability occurred during measurement: |alpha|^2 + |beta|^2 = "
-                                 + std::to_string(pzero) + " + " + std::to_string(pone) + " = " + std::to_string(pzero + pone) + ", but should be 1!");
+                                 + std::to_string(pzero) + " + " + std::to_string(pone) + " = " +
+                                 std::to_string(pzero + pone) + ", but should be 1!");
     }
 
     const dd::fp sum = pzero + pone;
@@ -223,15 +224,15 @@ char Simulator::MeasureOneCollapsing(const dd::Qubit index, const bool assume_pr
 }
 
 double Simulator::ApproximateByFidelity(double targetFidelity, bool allLevels, bool removeNodes, bool verbose) {
-    std::queue<dd::Package::vNode*> q;
-    std::map<dd::Package::vNode*, dd::fp> probsMone;
+    std::queue<dd::Package::vNode *> q;
+    std::map<dd::Package::vNode *, dd::fp> probsMone;
 
     probsMone[root_edge.p] = CN::mag2(root_edge.w);
 
     q.push(root_edge.p);
 
     while (!q.empty()) {
-        dd::Package::vNode* ptr = q.front();
+        dd::Package::vNode *ptr = q.front();
         q.pop();
         const dd::fp parent_prob = probsMone[ptr];
 
@@ -254,7 +255,8 @@ double Simulator::ApproximateByFidelity(double targetFidelity, bool allLevels, b
 
 
     std::vector<int> nodes(getNumberOfQubits(), 0);
-    std::vector<std::priority_queue<std::pair<double, dd::Package::vNode*>, std::vector<std::pair<double, dd::Package::vNode*>>>> qq(getNumberOfQubits());
+    std::vector<std::priority_queue<std::pair<double, dd::Package::vNode *>, std::vector<std::pair<double, dd::Package::vNode *>>>> qq(
+            getNumberOfQubits());
 
 
     for (auto &it : probsMone) {
@@ -266,13 +268,13 @@ double Simulator::ApproximateByFidelity(double targetFidelity, bool allLevels, b
     }
 
     probsMone.clear();
-    std::vector<dd::Package::vNode*> nodes_to_remove;
+    std::vector<dd::Package::vNode *> nodes_to_remove;
 
     int max_remove = 0;
     for (int i = 0; i < getNumberOfQubits(); i++) {
         double sum = 0.0;
         int remove = 0;
-        std::vector<dd::Package::vNode*> tmp;
+        std::vector<dd::Package::vNode *> tmp;
 
         while (!qq.at(i).empty()) {
             auto p = qq.at(i).top();
@@ -280,7 +282,7 @@ double Simulator::ApproximateByFidelity(double targetFidelity, bool allLevels, b
             sum += 1 - p.first;
             if (sum < 1 - targetFidelity) {
                 remove++;
-                if(allLevels) {
+                if (allLevels) {
                     nodes_to_remove.push_back(p.second);
                 } else {
                     tmp.push_back(p.second);
@@ -295,7 +297,7 @@ double Simulator::ApproximateByFidelity(double targetFidelity, bool allLevels, b
         }
     }
 
-    std::map<dd::Package::vNode*, dd::Package::vEdge> dag_edges;
+    std::map<dd::Package::vNode *, dd::Package::vEdge> dag_edges;
     for (auto &it : nodes_to_remove) {
         dag_edges[it] = dd::Package::vEdge::zero;
     }
@@ -338,7 +340,7 @@ double Simulator::ApproximateByFidelity(double targetFidelity, bool allLevels, b
 
 double Simulator::ApproximateBySampling(unsigned int nSamples, unsigned int threshold, bool removeNodes, bool verbose) {
     assert(nSamples > threshold);
-    std::map<dd::Package::vNode*, unsigned int> visited_nodes;
+    std::map<dd::Package::vNode *, unsigned int> visited_nodes;
     std::uniform_real_distribution<dd::fp> dist(0.0, 1.0L);
 
     for (unsigned int j = 0; j < nSamples; j++) {
@@ -358,13 +360,13 @@ double Simulator::ApproximateBySampling(unsigned int nSamples, unsigned int thre
         }
     }
 
-    std::set<dd::Package::vNode*> visited_nodes2;
+    std::set<dd::Package::vNode *> visited_nodes2;
     visited_nodes2.insert(root_edge.p);
-    std::queue<dd::Package::vNode*> q;
+    std::queue<dd::Package::vNode *> q;
     q.push(root_edge.p);
 
     while (!q.empty()) {
-        dd::Package::vNode* ptr = q.front();
+        dd::Package::vNode *ptr = q.front();
         q.pop();
 
         if (!ptr->e.at(0).w.approximatelyZero() && visited_nodes2.find(ptr->e.at(0).p) == visited_nodes2.end()) {
@@ -384,7 +386,7 @@ double Simulator::ApproximateBySampling(unsigned int nSamples, unsigned int thre
         }
     }
 
-    std::map<dd::Package::vNode*, dd::Package::vEdge> dag_edges;
+    std::map<dd::Package::vNode *, dd::Package::vEdge> dag_edges;
     for (auto it : visited_nodes2) {
         dag_edges[it] = dd::Package::vEdge::zero;
     }
@@ -426,7 +428,8 @@ double Simulator::ApproximateBySampling(unsigned int nSamples, unsigned int thre
     return fidelity;
 }
 
-dd::Package::vEdge Simulator::RemoveNodes(dd::Package::vEdge e, std::map<dd::Package::vNode*, dd::Package::vEdge> &dag_edges) {
+dd::Package::vEdge
+Simulator::RemoveNodes(dd::Package::vEdge e, std::map<dd::Package::vNode *, dd::Package::vEdge> &dag_edges) {
     if (e.isTerminal()) {
         return e;
     }
@@ -444,8 +447,8 @@ dd::Package::vEdge Simulator::RemoveNodes(dd::Package::vEdge e, std::map<dd::Pac
     }
 
     std::array<dd::Package::vEdge, dd::RADIX> edges{
-        RemoveNodes(e.p->e.at(0), dag_edges),
-        RemoveNodes(e.p->e.at(1), dag_edges)
+            RemoveNodes(e.p->e.at(0), dag_edges),
+            RemoveNodes(e.p->e.at(1), dag_edges)
     };
 
     dd::Package::vEdge r = dd->makeDDNode(e.p->v, edges, false);
@@ -488,10 +491,11 @@ std::pair<dd::ComplexValue, std::string> Simulator::getPathOfLeastResistance() c
         }
     }
 
-    return {{dd::CTEntry::val(path_value.r), dd::CTEntry::val(path_value.i)}, std::string{result.rbegin(), result.rend()}};
+    return {{dd::CTEntry::val(path_value.r), dd::CTEntry::val(path_value.i)},
+            std::string{result.rbegin(), result.rend()}};
 }
 
-double Simulator::assign_probs(dd::Package::vEdge edge, std::unordered_map<dd::Package::vNode*, double> &probs) {
+double Simulator::assign_probs(dd::Package::vEdge edge, std::unordered_map<dd::Package::vNode *, double> &probs) {
     auto it = probs.find(edge.p);
     if (it != probs.end()) {
         return CN::mag2(edge.w) * it->second;
@@ -503,7 +507,7 @@ double Simulator::assign_probs(dd::Package::vEdge edge, std::unordered_map<dd::P
         sum = assign_probs(edge.p->e.at(0), probs) + assign_probs(edge.p->e.at(1), probs);
     }
 
-    probs.insert(std::pair<dd::Package::vNode*, double>(edge.p, sum));
+    probs.insert(std::pair<dd::Package::vNode *, double>(edge.p, sum));
 
     return CN::mag2(edge.w) * sum;
 }
