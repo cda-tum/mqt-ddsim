@@ -1,22 +1,19 @@
-#include <QuantumComputation.hpp>
-#include <Simulator.hpp>
-#include <CircuitSimulator.hpp>
-
-#include <benchmark/benchmark.h>
+#include "CircuitSimulator.hpp"
+#include "QuantumComputation.hpp"
+#include "Simulator.hpp"
 
 #include <algorithm>
+#include <benchmark/benchmark.h>
 
-
-auto min_estimator = [](const std::vector<double> &v) -> double {
+auto min_estimator = [](const std::vector<double>& v) -> double {
     return *(std::min_element(std::begin(v), std::end(v)));
 };
 
-
-static void BM_sim_X(benchmark::State &state) {
+static void BM_sim_X(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::X);
     CircuitSimulator sim(qc);
-    for (auto _ : state) {
+    for (auto _: state) {
         sim.Simulate(1);
     }
     state.SetLabel("X");
@@ -24,11 +21,11 @@ static void BM_sim_X(benchmark::State &state) {
 
 BENCHMARK(BM_sim_X)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 
-static void BM_sim_H(benchmark::State &state) {
+static void BM_sim_H(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::H);
     CircuitSimulator sim(qc);
-    for (auto _ : state) {
+    for (auto _: state) {
         sim.Simulate(1);
     }
     state.SetLabel("H");
@@ -36,11 +33,11 @@ static void BM_sim_H(benchmark::State &state) {
 
 BENCHMARK(BM_sim_H)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 
-static void BM_sim_T(benchmark::State &state) {
+static void BM_sim_T(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::T);
     CircuitSimulator sim(qc);
-    for (auto _ : state) {
+    for (auto _: state) {
         sim.Simulate(1);
     }
     state.SetLabel("T");
@@ -48,11 +45,11 @@ static void BM_sim_T(benchmark::State &state) {
 
 BENCHMARK(BM_sim_T)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 
-static void BM_sim_CNOT(benchmark::State &state) {
+static void BM_sim_CNOT(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     qc->emplace_back<qc::StandardOperation>(state.range(0), dd::Control{0}, 1, qc::X);
     CircuitSimulator sim(qc);
-    for (auto _ : state) {
+    for (auto _: state) {
         sim.Simulate(1);
     }
     state.SetLabel("CNOT");
@@ -60,12 +57,12 @@ static void BM_sim_CNOT(benchmark::State &state) {
 
 BENCHMARK(BM_sim_CNOT)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 
-static void BM_sim_TOFFOLI(benchmark::State &state) {
+static void BM_sim_TOFFOLI(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
-    dd::Controls controls{dd::Control{0}, dd::Control{1}};
+    dd::Controls                            controls{dd::Control{0}, dd::Control{1}};
     qc->emplace_back<qc::StandardOperation>(state.range(0), controls, 2, qc::X);
     CircuitSimulator sim(qc);
-    for (auto _ : state) {
+    for (auto _: state) {
         sim.Simulate(1);
     }
     state.SetLabel("Toffoli");
@@ -84,10 +81,10 @@ BENCHMARK(BM_sim_TOFFOLI)->DenseRange(4, 25)->ComputeStatistics("min", min_estim
  *
  * @param state contains number of qubits
  */
-static void BM_sim_QCBM(benchmark::State &state) {
-    const unsigned int n_qubits = state.range(0);
-    const unsigned int depth = 9;
-    std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(n_qubits);
+static void BM_sim_QCBM(benchmark::State& state) {
+    const unsigned int                      n_qubits = state.range(0);
+    const unsigned int                      depth    = 9;
+    std::unique_ptr<qc::QuantumComputation> qc       = std::make_unique<qc::QuantumComputation>(n_qubits);
     // first rotation
     for (unsigned int i = 0; i < n_qubits; i++) {
         qc->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RX, 1.0);
@@ -119,7 +116,7 @@ static void BM_sim_QCBM(benchmark::State &state) {
         qc->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RX, 1.0);
     }
     CircuitSimulator sim(qc);
-    for (auto _ : state) {
+    for (auto _: state) {
         sim.Simulate(1);
     }
     state.SetLabel("QCBM");
@@ -128,11 +125,10 @@ static void BM_sim_QCBM(benchmark::State &state) {
 BENCHMARK(BM_sim_QCBM)->DenseRange(4, 21)->ComputeStatistics("min",
                                                              min_estimator); // on our compute server, the 22 qubit instance takes more than 48h
 
-static void BM_extra_QCBM_optimized(benchmark::State &state) {
-    const unsigned int n_qubits = state.range(0);
-    const unsigned int depth = 9;
-    std::unique_ptr<dd::Package> dd = std::make_unique<dd::Package>();
-
+static void BM_extra_QCBM_optimized(benchmark::State& state) {
+    const unsigned int           n_qubits = state.range(0);
+    const unsigned int           depth    = 9;
+    std::unique_ptr<dd::Package> dd       = std::make_unique<dd::Package>();
 
     std::unique_ptr<qc::QuantumComputation> qc_pre = std::make_unique<qc::QuantumComputation>(n_qubits);
     // first rotation
@@ -175,10 +171,10 @@ static void BM_extra_QCBM_optimized(benchmark::State &state) {
     dd->incRef(post);
     std::cout << "post=" << dd->size(post) << "\n";
 
-    for (auto _ : state) {
+    for (auto _: state) {
         dd::Edge qstate = dd->makeZeroState(n_qubits);
-        qstate = dd->multiply(pre, qstate);
-        qstate = dd->multiply(entangle, qstate);
+        qstate          = dd->multiply(pre, qstate);
+        qstate          = dd->multiply(entangle, qstate);
 
         for (unsigned int d = 0; d < depth - 1; d++) {
             qstate = dd->multiply(middle, qstate);

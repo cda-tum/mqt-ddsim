@@ -1,8 +1,8 @@
-#include <iostream>
 #include <complex>
 #include <fstream>
+#include <iostream>
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
     if (argc != 3) {
         std::cout << "Usage: " << argv[0] << " file1 file2\n"
                   << "Calculates the fidelity between two vectors given as file (one complex number per line).\n"
@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
         return 2;
     }
 
-    unsigned lines = 0;
+    unsigned                  lines = 0;
     std::complex<long double> sum{};
     while (!v1_stream.eof() && !v2_stream.eof()) {
         std::string ars, ais, brs, bis;

@@ -1,32 +1,35 @@
 #ifndef DDSIM_GROVERSIMULATOR_HPP
 #define DDSIM_GROVERSIMULATOR_HPP
 
-#include "Simulator.hpp"
 #include "QuantumComputation.hpp"
+#include "Simulator.hpp"
 
-#include <utility>
 #include <cmath>
+#include <utility>
 
-class GroverSimulator : public Simulator {
+class GroverSimulator: public Simulator {
 public:
-    explicit GroverSimulator(const std::string &oracle, const unsigned long long seed) : Simulator(seed),
-                                                                                         oracle{oracle.rbegin(),
-                                                                                                oracle.rend()},
-                                                                                         n_qubits(oracle.length()),
-                                                                                         iterations(CalculateIterations(
-                                                                                                 n_qubits)) {
+    explicit GroverSimulator(const std::string& oracle, const unsigned long long seed):
+        Simulator(seed),
+        oracle{oracle.rbegin(),
+               oracle.rend()},
+        n_qubits(oracle.length()),
+        iterations(CalculateIterations(
+                n_qubits)) {
     }
 
-    explicit GroverSimulator(const std::string &oracle) : oracle{oracle.rbegin(), oracle.rend()},
-                                                          n_qubits(oracle.length()),
-                                                          iterations(CalculateIterations(n_qubits)) {
+    explicit GroverSimulator(const std::string& oracle):
+        oracle{oracle.rbegin(), oracle.rend()},
+        n_qubits(oracle.length()),
+        iterations(CalculateIterations(n_qubits)) {
     }
 
-    explicit GroverSimulator(const dd::QubitCount n_qubits, const unsigned long long seed) : Simulator(seed),
-                                                                                             n_qubits{n_qubits},
-                                                                                             iterations(
-                                                                                                     CalculateIterations(
-                                                                                                             n_qubits)) {
+    explicit GroverSimulator(const dd::QubitCount n_qubits, const unsigned long long seed):
+        Simulator(seed),
+        n_qubits{n_qubits},
+        iterations(
+                CalculateIterations(
+                        n_qubits)) {
         std::uniform_int_distribution<int> dist(0, 1); // range is inclusive
         oracle = std::string(n_qubits, '0');
         for (dd::Qubit i = 0; i < n_qubits; i++) {
@@ -40,7 +43,7 @@ public:
 
     std::map<std::string, std::string> AdditionalStatistics() override {
         return {
-                {"oracle",     std::string(oracle.rbegin(), oracle.rend())},
+                {"oracle", std::string(oracle.rbegin(), oracle.rend())},
                 {"iterations", std::to_string(iterations)},
         };
     }
@@ -50,10 +53,9 @@ public:
         if (n_qubits <= 3) {
             return 1;
         } else {
-            return (unsigned long long) std::floor(PI_4 * std::pow(2.L, n_qubits / 2.0L));
+            return (unsigned long long)std::floor(PI_4 * std::pow(2.L, n_qubits / 2.0L));
         }
     }
-
 
     [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return n_qubits + 1; };
 
@@ -64,11 +66,10 @@ public:
     [[nodiscard]] std::string getOracle() const { return oracle; }
 
 protected:
-    std::string oracle; // due to how qubits and std::string are indexed, this is stored in *reversed* order
-    const unsigned short n_qubits;
-    const unsigned short n_anciallae = 1;
+    std::string              oracle; // due to how qubits and std::string are indexed, this is stored in *reversed* order
+    const unsigned short     n_qubits;
+    const unsigned short     n_anciallae = 1;
     const unsigned long long iterations;
 };
-
 
 #endif //DDSIM_GROVERSIMULATOR_HPP

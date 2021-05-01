@@ -35,7 +35,6 @@ TEST(ShorSimTest, Factorize15NegTest) {
     ASSERT_EQ(ddsim.getFactors().second, 0);
     ASSERT_EQ(ddsim.AdditionalStatistics().at("sim_result"), "FAILURE");
 
-
     ASSERT_EQ(ddsim.AdditionalStatistics().at("polr_factor1"), "3");
     ASSERT_EQ(ddsim.AdditionalStatistics().at("polr_factor2"), "5");
     ASSERT_EQ(ddsim.AdditionalStatistics().at("polr_result"), "SUCCESS(3*5)");
@@ -64,4 +63,3 @@ TEST(ShorSimTest, Factorize55ApproximateTest) {
     ASSERT_EQ(ddsim.getFactors().first, 11);
     ASSERT_EQ(ddsim.getFactors().second, 5);
 }
-

@@ -39,7 +39,6 @@ TEST(FastShorSimTest, Factorize55Test) {
     ASSERT_EQ(ddsim.getFactors().second, 5);
 }
 
-
 TEST(FastShorSimTest, Factorize221Test) {
     ShorFastSimulator ddsim(221, 2, 4ull);
     ddsim.Simulate(1);

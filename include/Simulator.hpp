@@ -3,27 +3,29 @@
 
 #include "dd/Package.hpp"
 
-#include <memory>
-#include <cstddef>
-#include <string>
-#include <array>
-#include <vector>
-#include <map>
-#include <unordered_map>
-#include <random>
-#include <utility>
 #include <algorithm>
+#include <array>
+#include <cstddef>
+#include <map>
+#include <memory>
+#include <random>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 class Simulator {
 public:
-    explicit Simulator(unsigned long long seed) : seed(seed), has_fixed_seed(true) {
+    explicit Simulator(unsigned long long seed):
+        seed(seed), has_fixed_seed(true) {
         mt.seed(seed);
     };
 
-    explicit Simulator() : seed(0), has_fixed_seed(false) {
+    explicit Simulator():
+        seed(0), has_fixed_seed(false) {
         // this is probably overkill but better safe than sorry
         std::array<std::mt19937_64::result_type, std::mt19937_64::state_size> random_data{};
-        std::random_device rd;
+        std::random_device                                                    rd;
         std::generate(std::begin(random_data), std::end(random_data), [&rd]() { return rd(); });
         std::seed_seq seeds(std::begin(random_data), std::end(random_data));
         mt.seed(seeds);
@@ -64,23 +66,21 @@ public:
     double ApproximateBySampling(unsigned int nSamples, unsigned int threshold, bool removeNodes, bool verbose = false);
 
     dd::Package::vEdge
-    RemoveNodes(dd::Package::vEdge edge, std::map<dd::Package::vNode *, dd::Package::vEdge> &dag_edges);
+    RemoveNodes(dd::Package::vEdge edge, std::map<dd::Package::vNode*, dd::Package::vEdge>& dag_edges);
 
     std::unique_ptr<dd::Package> dd = std::make_unique<dd::Package>();
-    dd::Package::vEdge root_edge{};
-
+    dd::Package::vEdge           root_edge{};
 
 protected:
     std::mt19937_64 mt;
 
     const unsigned long long seed;
-    const bool has_fixed_seed;
-    const dd::fp epsilon = 0.001L;
+    const bool               has_fixed_seed;
+    const dd::fp             epsilon = 0.001L;
 
-    static void NextPath(std::string &s);
+    static void NextPath(std::string& s);
 
-    double assign_probs(dd::Package::vEdge edge, std::unordered_map<dd::Package::vNode *, double> &probs);
+    double assign_probs(dd::Package::vEdge edge, std::unordered_map<dd::Package::vNode*, double>& probs);
 };
-
 
 #endif //DDSIMULATOR_H

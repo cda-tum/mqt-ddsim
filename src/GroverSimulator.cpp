@@ -1,5 +1,7 @@
 #include "GroverSimulator.hpp"
+
 #include "QuantumComputation.hpp"
+
 #include <chrono>
 
 std::map<std::string, std::size_t> GroverSimulator::Simulate(unsigned int shots) {
@@ -12,10 +14,9 @@ std::map<std::string, std::size_t> GroverSimulator::Simulate(unsigned int shots)
     //qc_setup.print();
     dd::Edge setup_op{qc_setup.buildFunctionality(dd)};
 
-
     // Build the oracle
     qc::QuantumComputation qc_oracle(n_qubits + n_anciallae);
-    dd::Controls controls{};
+    dd::Controls           controls{};
     for (dd::Qubit i = 0; i < n_qubits; ++i) {
         controls.emplace(dd::Control{i, oracle.at(i) == '1' ? dd::Control::Type::pos : dd::Control::Type::neg});
     }
@@ -74,13 +75,13 @@ std::map<std::string, std::size_t> GroverSimulator::Simulate(unsigned int shots)
     for (unsigned long long j = j_pre; j < iterations; j += 8) {
         //std::clog << "[INFO]  Iteration " << j+1 << " of " << iterations << " -- size:" << dd->size(root_edge)  << "\n";
         auto tmp = dd->multiply(full_iteration, root_edge);
-        tmp = dd->multiply(full_iteration, tmp);
-        tmp = dd->multiply(full_iteration, tmp);
-        tmp = dd->multiply(full_iteration, tmp);
-        tmp = dd->multiply(full_iteration, tmp);
-        tmp = dd->multiply(full_iteration, tmp);
-        tmp = dd->multiply(full_iteration, tmp);
-        tmp = dd->multiply(full_iteration, tmp);
+        tmp      = dd->multiply(full_iteration, tmp);
+        tmp      = dd->multiply(full_iteration, tmp);
+        tmp      = dd->multiply(full_iteration, tmp);
+        tmp      = dd->multiply(full_iteration, tmp);
+        tmp      = dd->multiply(full_iteration, tmp);
+        tmp      = dd->multiply(full_iteration, tmp);
+        tmp      = dd->multiply(full_iteration, tmp);
         dd->incRef(tmp);
         dd->decRef(root_edge);
         root_edge = tmp;

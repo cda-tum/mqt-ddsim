@@ -1,10 +1,10 @@
 #ifndef DDSIM_SHORFASTSIMULATOR_HPP
 #define DDSIM_SHORFASTSIMULATOR_HPP
 
-#include "Simulator.hpp"
 #include "QuantumComputation.hpp"
+#include "Simulator.hpp"
 
-class ShorFastSimulator : public Simulator {
+class ShorFastSimulator: public Simulator {
     static unsigned long long modpow(unsigned long long base, unsigned long long exp, unsigned long long modulus) {
         base %= modulus;
         unsigned long long result = 1ull;
@@ -38,12 +38,12 @@ class ShorFastSimulator : public Simulator {
 
     void u_a_emulate2_rec(dd::Package::vEdge e);
 
-    [[nodiscard]] std::pair<unsigned int, unsigned int> post_processing(const std::string &sample) const;
+    [[nodiscard]] std::pair<unsigned int, unsigned int> post_processing(const std::string& sample) const;
 
     void ApplyGate(dd::GateMatrix matrix, dd::Qubit target);
 
-    std::vector<unsigned long long> ts;
-    std::vector<std::map<dd::Package::vNode *, dd::Package::vEdge>> nodesOnLevel;
+    std::vector<unsigned long long>                                ts;
+    std::vector<std::map<dd::Package::vNode*, dd::Package::vEdge>> nodesOnLevel;
 
     dd::Package::mEdge addConst(unsigned long long a);
 
@@ -54,32 +54,32 @@ class ShorFastSimulator : public Simulator {
     /// composite number to be factored
     const unsigned int n;
     /// coprime number to `n`. Setting this to zero will randomly generate a suitable number
-    unsigned int coprime_a;
-    const std::size_t required_bits;
+    unsigned int         coprime_a;
+    const std::size_t    required_bits;
     const dd::QubitCount n_qubits;
 
-    std::string sim_result = "did not start";
+    std::string                   sim_result = "did not start";
     std::pair<unsigned, unsigned> sim_factors{0, 0};
 
     unsigned long number_of_operations{};
 
     const bool verbose;
 
-    std::map<dd::Package::vNode *, dd::Package::vEdge> dag_edges;
+    std::map<dd::Package::vNode*, dd::Package::vEdge> dag_edges;
 
 public:
-    ShorFastSimulator(int composite_number, int coprime_a, bool verbose = false) :
-            Simulator(), n(composite_number), coprime_a(coprime_a),
-            required_bits(std::ceil(std::log2(composite_number))), n_qubits(std::ceil(std::log2(n)) + 1),
-            verbose(verbose) {
+    ShorFastSimulator(int composite_number, int coprime_a, bool verbose = false):
+        Simulator(), n(composite_number), coprime_a(coprime_a),
+        required_bits(std::ceil(std::log2(composite_number))), n_qubits(std::ceil(std::log2(n)) + 1),
+        verbose(verbose) {
         ts.resize(n_qubits);
         nodesOnLevel.resize(n_qubits);
     };
 
-    ShorFastSimulator(int composite_number, int coprime_a, unsigned long long seed, bool verbose = false) :
-            Simulator(seed), n(composite_number), coprime_a(coprime_a),
-            required_bits(std::ceil(std::log2(composite_number))), n_qubits(std::ceil(std::log2(n)) + 1),
-            verbose(verbose) {
+    ShorFastSimulator(int composite_number, int coprime_a, unsigned long long seed, bool verbose = false):
+        Simulator(seed), n(composite_number), coprime_a(coprime_a),
+        required_bits(std::ceil(std::log2(composite_number))), n_qubits(std::ceil(std::log2(n)) + 1),
+        verbose(verbose) {
         ts.resize(n_qubits);
         nodesOnLevel.resize(n_qubits);
     };
@@ -105,14 +105,11 @@ public:
     std::map<std::string, std::string> AdditionalStatistics() override {
         return {
                 {"composite_number", std::to_string(n)},
-                {"coprime_a",        std::to_string(coprime_a)},
-                {"sim_result",       sim_result},
-                {"sim_factor1",      std::to_string(sim_factors.first)},
-                {"sim_factor2",      std::to_string(sim_factors.second)}
-        };
+                {"coprime_a", std::to_string(coprime_a)},
+                {"sim_result", sim_result},
+                {"sim_factor1", std::to_string(sim_factors.first)},
+                {"sim_factor2", std::to_string(sim_factors.second)}};
     }
-
 };
-
 
 #endif //DDSIM_SHORFASTSIMULATOR_HPP

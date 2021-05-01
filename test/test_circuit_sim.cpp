@@ -18,7 +18,6 @@ TEST(CircuitSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
     ASSERT_EQ("01", m);
 }
 
-
 TEST(CircuitSimTest, SingleOneQubitSingleShot) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
@@ -29,7 +28,6 @@ TEST(CircuitSimTest, SingleOneQubitSingleShot) {
     ddsim.Simulate(10);
     ASSERT_EQ("1", ddsim.AdditionalStatistics().at("single_shots"));
 }
-
 
 TEST(CircuitSimTest, SingleOneQubitSingleShot2) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
@@ -71,7 +69,6 @@ TEST(CircuitSimTest, ClassicControlledOp) {
     ASSERT_EQ("11", m);
 }
 
-
 TEST(CircuitSimTest, DestructiveMeasurementAll) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
@@ -79,15 +76,14 @@ TEST(CircuitSimTest, DestructiveMeasurementAll) {
     CircuitSimulator ddsim(quantumComputation, ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
     ddsim.Simulate(1);
 
-
     const std::vector<dd::ComplexValue> v_before = ddsim.getVector();
     ASSERT_EQ(v_before[0], v_before[1]);
     ASSERT_EQ(v_before[0], v_before[2]);
     ASSERT_EQ(v_before[0], v_before[3]);
 
-    const std::string m = ddsim.MeasureAll(true);
+    const std::string                   m       = ddsim.MeasureAll(true);
     const std::vector<dd::ComplexValue> v_after = ddsim.getVector();
-    const int i = std::stoi(m, nullptr, 2);
+    const int                           i       = std::stoi(m, nullptr, 2);
 
     ASSERT_EQ(v_after[i].r, 1.0);
     ASSERT_EQ(v_after[i].i, 0.0);
@@ -100,7 +96,7 @@ TEST(CircuitSimTest, DestructiveMeasurementOne) {
     CircuitSimulator ddsim(quantumComputation, ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
     ddsim.Simulate(1);
 
-    const char m = ddsim.MeasureOneCollapsing(0);
+    const char                          m       = ddsim.MeasureOneCollapsing(0);
     const std::vector<dd::ComplexValue> v_after = ddsim.getVector();
 
     if (m == '0') {
@@ -152,7 +148,7 @@ TEST(CircuitSimTest, ApproximateBySampling) {
 
 TEST(CircuitSimTest, ApproximationByMemoryInSimulator) {
     std::unique_ptr<qc::QuantumComputation> quantumComputation = std::make_unique<qc::Grover>(17, 0);
-    CircuitSimulator ddsim(quantumComputation, ApproximationInfo(0.3, 1, ApproximationInfo::MemoryDriven));
+    CircuitSimulator                        ddsim(quantumComputation, ApproximationInfo(0.3, 1, ApproximationInfo::MemoryDriven));
     ddsim.Simulate(1);
 
     // Memory driven approximation is triggered only on quite large DDs, unsuitable for testing
