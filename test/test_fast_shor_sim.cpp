@@ -22,6 +22,13 @@ TEST(FastShorSimTest, Factorize15BaseTest) {
     ASSERT_EQ(ddsim.AdditionalStatistics().at("sim_result"), "SUCCESS(3*5)");
 }
 
+TEST(FastShorSimTest, Factorize15BaseTestNoFixedCoPrime) {
+    ShorFastSimulator ddsim(15, 0, 1ull);
+    ddsim.Simulate(1);
+
+    SUCCEED() << "Successfully executed this path. Testing for values is flaky...";
+}
+
 TEST(FastShorSimTest, Factorize15NegTest) {
     ShorFastSimulator ddsim(15, 2, 1ull);
     ddsim.Simulate(1);
@@ -38,7 +45,6 @@ TEST(FastShorSimTest, Factorize55Test) {
     ASSERT_EQ(ddsim.getFactors().first, 11);
     ASSERT_EQ(ddsim.getFactors().second, 5);
 }
-
 
 TEST(FastShorSimTest, Factorize221Test) {
     ShorFastSimulator ddsim(221, 2, 4ull);

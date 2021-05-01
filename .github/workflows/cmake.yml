@@ -102,7 +102,7 @@ jobs:
         with:
           submodules: recursive
       - name: Configure CMake
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DBINDINGS=ON
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config Debug
       - name: Test
@@ -113,3 +113,15 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
+
+  codestyle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - uses: DoozyX/clang-format-lint-action@v0.12
+        with:
+          source:             'apps include src test'
+          extensions:         'h,hpp,c,cpp'
+          clangFormatVersion: 12

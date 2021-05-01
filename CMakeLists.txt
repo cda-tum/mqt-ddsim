@@ -2,13 +2,14 @@ cmake_minimum_required(VERSION 3.14...3.19)
 
 project(ddsim
         LANGUAGES CXX
-        VERSION 1.2.0
+        VERSION 1.3.0
         DESCRIPTION "DDSIM - A JKQ quantum simulator based on decision diagrams"
         )
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 option(COVERAGE "Configure for coverage report generation")
 option(GENERATE_POSITION_INDEPENDENT_CODE "Generate position independent code")
+option(TEST_WITH_SANITIZERS "Run test with ASAN and UBSAN")
 
 set(default_build_type "Release")
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -32,6 +33,7 @@ add_subdirectory(src)
 option(BUILD_TESTS "Also build tests for DDSIM project" OFF)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR BUILD_TESTS)
 	check_submodule_present(benchmark)
+
 
 	enable_testing()
 	include(GoogleTest)
