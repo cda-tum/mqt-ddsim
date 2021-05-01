@@ -411,8 +411,6 @@ dd::Package::mEdge ShorSimulator::limitStateVector(dd::Package::vEdge e) {
 }
 
 void ShorSimulator::u_a_emulate(unsigned long long a, int q) {
-    //dd->setMode(dd::Matrix);
-
     dd::Package::mEdge limit = dd->makeIdent(0, required_bits - 1);
 
     dd::Package::mEdge                f = dd::Package::mEdge::one;
@@ -485,8 +483,6 @@ void ShorSimulator::u_a_emulate(unsigned long long a, int q) {
         }
     }
 
-    //dd->setMode(dd::Vector);
-
     dd::Package::vEdge tmp = dd->multiply(e, root_edge);
     dd->incRef(tmp);
     dd->decRef(root_edge);
@@ -533,28 +529,17 @@ void ShorSimulator::add_phi(int a, int c1, int c2) {
 
         dd::Controls controls;
         if (c1 != std::numeric_limits<int>::min()) {
-            //line[(n_qubits-1)-c1] = 1;
             controls.emplace(dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - c1)});
         }
         if (c2 != std::numeric_limits<int>::min()) {
-            //line[(n_qubits-1)-c2] = 1;
             controls.emplace(dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - c2)});
         }
-        //line[(n_qubits-1)-(1+2*required_bits-i)] = 2;
 
         double         q_r = QMDDcos(fac, q);
         double         q_i = QMDDsin(fac, q);
         dd::GateMatrix Qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {q_r, q_i}};
 
         ApplyGate(Qm, (n_qubits - 1) - (1 + 2 * required_bits - i), controls);
-
-        //line[(n_qubits-1)-(1+2*required_bits-i)] = -1;
-        //if(c1 != std::numeric_limits<int>::min()) {
-        //    line[(n_qubits-1)-c1] = -1;
-        //}
-        //if(c2 != std::numeric_limits<int>::min()) {
-        //    line[(n_qubits-1)-c2] = -1;
-        //}
     }
 }
 
@@ -571,48 +556,29 @@ void ShorSimulator::add_phi_inv(int a, int c1, int c2) {
         }
         dd::Controls controls;
         if (c1 != std::numeric_limits<int>::min()) {
-            //line[(n_qubits-1)-c1] = 1;
             controls.emplace(dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - c1)});
         }
         if (c2 != std::numeric_limits<int>::min()) {
-            //line[(n_qubits-1)-c2] = 1;
             controls.emplace(dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - c2)});
         }
-        //line[(n_qubits-1)-(1+2*required_bits-i)] = 2;
 
         double         q_r = QMDDcos(fac, -q);
         double         q_i = QMDDsin(fac, -q);
         dd::GateMatrix Qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {q_r, q_i}};
         ApplyGate(Qm, (n_qubits - 1) - (1 + 2 * required_bits - i), controls);
-
-        //line[(n_qubits-1)-(1+2*required_bits-i)] = -1;
-        //if(c1 != std::numeric_limits<int>::min()) {
-        //    line[(n_qubits-1)-c1] = -1;
-        //}
-        //if(c2 != std::numeric_limits<int>::min()) {
-        //    line[(n_qubits-1)-c2] = -1;
-        //}
     }
 }
 
 void ShorSimulator::qft() {
     for (unsigned int i = required_bits + 1; i < 2 * required_bits + 2; i++) {
-        //line[(n_qubits-1)-i] = 2;
         ApplyGate(dd::Hmat, (n_qubits - 1) - i);
-        //line[(n_qubits-1)-i] = -1;
 
         double q = 2;
         for (unsigned int j = i + 1; j < 2 * required_bits + 2; j++) {
-            //line[(n_qubits-1)-j] = 1;
-            //line[(n_qubits-1)-i] = 2;
-
             double         q_r = QMDDcos(1, q);
             double         q_i = QMDDsin(1, q);
             dd::GateMatrix Qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {q_r, q_i}};
             ApplyGate(Qm, (n_qubits - 1) - i, dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - j)});
-
-            //line[(n_qubits-1)-j] = -1;
-            //line[(n_qubits-1)-i] = -1;
             q *= 2;
         }
     }
@@ -622,22 +588,13 @@ void ShorSimulator::qft_inv() {
     for (unsigned int i = 2 * required_bits + 1; i >= required_bits + 1; i--) {
         double q = 2;
         for (unsigned int j = i + 1; j < 2 * required_bits + 2; j++) {
-            //line[(n_qubits-1)-j] = 1;
-            //line[(n_qubits-1)-i] = 2;
-
             double         q_r = QMDDcos(1, -q);
             double         q_i = QMDDsin(1, -q);
             dd::GateMatrix Qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {q_r, q_i}};
-
             ApplyGate(Qm, (n_qubits - 1) - i, dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - j)});
-
-            //line[(n_qubits-1)-j] = -1;
-            //line[(n_qubits-1)-i] = -1;
             q *= 2;
         }
-        //line[(n_qubits-1)-i] = 2;
         ApplyGate(dd::Hmat, (n_qubits - 1) - i);
-        //line[(n_qubits-1)-i] = -1;
     }
 }
 
@@ -647,24 +604,16 @@ void ShorSimulator::mod_add_phi(int a, int N, int c1, int c2) {
 
     qft_inv();
 
-    //line[(n_qubits-1)-(required_bits+1)] = 1;
-    //line[(n_qubits-1)-(2*required_bits+2)] = 2;
     ApplyGate(dd::Xmat, (n_qubits - 1) - (2 * required_bits + 2),
               dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - (required_bits + 1))});
-    //line[(n_qubits-1)-(required_bits+1)] = -1;
-    //line[(n_qubits-1)-(2*required_bits+2)] = -1;
 
     qft();
     add_phi(N, 2 * required_bits + 2, std::numeric_limits<int>::min());
     add_phi_inv(a, c1, c2);
     qft_inv();
 
-    //line[(n_qubits-1)-(required_bits+1)] = 0;
-    //line[(n_qubits-1)-(2*required_bits+2)] = 2;
     ApplyGate(dd::Xmat, (n_qubits - 1) - (2 * required_bits + 2),
               dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - (required_bits + 1)), dd::Control::Type::neg});
-    //line[(n_qubits-1)-(required_bits+1)] = -1;
-    //line[(n_qubits-1)-(2*required_bits+2)] = -1;
 
     qft();
     add_phi(a, c1, c2);
@@ -674,24 +623,16 @@ void ShorSimulator::mod_add_phi_inv(int a, int N, int c1, int c2) {
     add_phi_inv(a, c1, c2);
     qft_inv();
 
-    //line[(n_qubits-1)-(required_bits+1)] = 0;
-    //line[(n_qubits-1)-(2*required_bits+2)] = 2;
     ApplyGate(dd::Xmat, (n_qubits - 1) - (2 * required_bits + 2),
               dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - (required_bits + 1)), dd::Control::Type::neg});
-    //line[(n_qubits-1)-(required_bits+1)] = -1;
-    //line[(n_qubits-1)-(2*required_bits+2)] = -1;
 
     qft();
     add_phi(a, c1, c2);
     add_phi_inv(N, 2 * required_bits + 2, std::numeric_limits<int>::min());
     qft_inv();
 
-    //line[(n_qubits-1)-(required_bits+1)] = 1;
-    //line[(n_qubits-1)-(2*required_bits+2)] = 2;
     ApplyGate(dd::Xmat, (n_qubits - 1) - (2 * required_bits + 2),
               dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - (required_bits + 1))});
-    //line[(n_qubits-1)-(required_bits+1)] = -1;
-    //line[(n_qubits-1)-(2*required_bits+2)] = -1;
 
     qft();
     add_phi(N, std::numeric_limits<int>::min(), std::numeric_limits<int>::min());
@@ -723,24 +664,13 @@ void ShorSimulator::u_a(unsigned long long a, int N, int c) {
     using namespace dd::literals;
     cmult(a, N, c);
     for (unsigned int i = 0; i < required_bits; i++) {
-        //line[(n_qubits-1)-(required_bits+2+i)] = 1;
-        //line[(n_qubits-1)-(i+1)] = 2;
         ApplyGate(dd::Xmat, (n_qubits - 1) - (i + 1),
                   dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - (required_bits + 2 + i))});
 
-        //line[(n_qubits-1)-(required_bits+2+i)] = 2;
-        //line[(n_qubits-1)-(i+1)] = 1;
-        //line[(n_qubits-1)-c] = 1;
         ApplyGate(dd::Xmat, (n_qubits - 1) - (required_bits + 2 + i), dd::Controls{{dd::Control{static_cast<dd::Qubit>(n_qubits - 1 - (i + 1))}, dd::Control{static_cast<dd::Qubit>(n_qubits - 1 - c)}}});
-        //line[(n_qubits-1)-(required_bits+2+i)] = 1;
-        //line[(n_qubits-1)-(i+1)] = 2;
-        //line[(n_qubits-1)-c] = -1;
 
         ApplyGate(dd::Xmat, (n_qubits - 1) - (i + 1),
                   dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - (required_bits + 2 + i))});
-
-        //line[(n_qubits-1)-(required_bits+2+i)] = -1;
-        //line[(n_qubits-1)-(i+1)] = -1;
     }
 
     cmult_inv(inverse_mod(a, N), N, c);
