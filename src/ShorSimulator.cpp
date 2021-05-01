@@ -5,8 +5,9 @@
 #include <cmath>
 #include <chrono>
 #include <limits>
+#include <dd/ComplexNumbers.hpp>
 
-std::map<std::string, unsigned int> ShorSimulator::Simulate(unsigned int shots) {
+std::map<std::string, std::size_t> ShorSimulator::Simulate(unsigned int shots) {
     if (verbose) {
         std::clog << "Simulate Shor's algorithm for n=" << n;
     }
@@ -17,9 +18,7 @@ std::map<std::string, unsigned int> ShorSimulator::Simulate(unsigned int shots) 
         dd->incRef(root_edge);
         //Initialize qubits
         //TODO: other init method where the initial value can be chosen
-        line[0] = 2;
-        ApplyGate(qc::Xmat);
-        line[0] = -1;
+        ApplyGate(dd::Xmat, 0);
         
 
     } else {
@@ -29,9 +28,7 @@ std::map<std::string, unsigned int> ShorSimulator::Simulate(unsigned int shots) 
         //Initialize qubits
         //TODO: other init method where the initial value can be chosen
 
-        line[n_qubits-1] = 2;
-        ApplyGate(qc::Xmat);
-        line[n_qubits-1] = -1;
+        ApplyGate(dd::Xmat, n_qubits-1);
 
     }
 
@@ -67,9 +64,7 @@ std::map<std::string, unsigned int> ShorSimulator::Simulate(unsigned int shots) 
 
 
     for(int i=0; i < 2*required_bits; i++) {
-        line[(n_qubits-1)-i] = 2;
-        ApplyGate(qc::Hmat);
-        line[(n_qubits-1)-i] = -1;
+        ApplyGate(dd::Hmat, (n_qubits-1)-i);
     }
     const int mod = std::ceil(2*required_bits / 6.0); // log_0.9(0.5) is about 6
     auto t1 = std::chrono::steady_clock::now();
@@ -97,22 +92,19 @@ std::map<std::string, unsigned int> ShorSimulator::Simulate(unsigned int shots) 
     }
 
     //EXACT QFT
-    for(int i=0; i < 2*required_bits; i++) {
+    for(dd::Qubit i=0; i < 2*required_bits; i++) {
         if(verbose) {
             std::clog << "[ " << i+1 << "/" << 2*required_bits << " ] QFT Pass. dd size=" << dd->size(root_edge) << "\n";
         }
-        line[(n_qubits-1)-(i)] = 2;
         double q = 2;
 
         for(int j =i-1; j >= 0; j--) {
 
-            line[(n_qubits-1)-(j)] = 1;
 
             double q_r = QMDDcos(1, -q);
             double q_i = QMDDsin(1, -q);
-            qc::GateMatrix Qm{qc::complex_one, qc::complex_zero, qc::complex_zero, {q_r, q_i}};
-            ApplyGate(Qm);
-            line[(n_qubits-1)-(j)] = -1;
+            dd::GateMatrix Qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {q_r, q_i}};
+            ApplyGate(Qm, n_qubits-1-i, dd::Control{static_cast<dd::Qubit>(n_qubits-1-j)});
             q *= 2;
         }
 
@@ -121,9 +113,7 @@ std::map<std::string, unsigned int> ShorSimulator::Simulate(unsigned int shots) 
             approximation_runs++;
         }
 
-        ApplyGate(qc::Hmat);
-
-        line[(n_qubits-1)-(i)] = -1;
+        ApplyGate(dd::Hmat, n_qubits-1-i);
     }
 
     delete[] as;
@@ -290,75 +280,84 @@ std::pair<unsigned int, unsigned int> ShorSimulator::post_processing(const std::
     }
 }
 
-dd::Edge ShorSimulator::limitTo(unsigned long long a) {
-    dd::Edge edges[4];
+dd::Package::mEdge ShorSimulator::limitTo(unsigned long long a) {
+    std::array<dd::Package::mEdge, 4> edges {
+        dd::Package::mEdge::zero,
+        dd::Package::mEdge::zero,
+        dd::Package::mEdge::zero,
+        dd::Package::mEdge::zero
+    };
 
-    edges[0]=edges[1]=edges[2]=edges[3]=dd->DDzero;
     if(a & 1u) {
-        edges[0] = edges[3] = dd->DDone;
+        edges[0] = edges[3] = dd::Package::mEdge::one;
     } else {
-        edges[0]=dd->DDone;
+        edges[0]=dd::Package::mEdge::one;
     }
-    dd::Edge f = dd->makeNonterminal(0, edges, false);
+    dd::Edge f = dd->makeDDNode(0, edges, false);
 
-    edges[0]=edges[1]=edges[2]=edges[3]=dd->DDzero;
-    for(int p=1; p < required_bits+1;p++) {
+    edges[0]=edges[1]=edges[2]=edges[3]=dd::Package::mEdge::zero;
+
+    for(dd::Qubit p=1; p < required_bits+1;p++) {
         if((a>>p) & 1u) {
             edges[0]=dd->makeIdent(0,p-1); 
             edges[3]=f;
         } else {
             edges[0]=f;
         }
-        f = dd->makeNonterminal(p, edges, false);
-        edges[3] = dd->DDzero;
+        f = dd->makeDDNode(p, edges, false);
+        edges[3] = dd::Package::mEdge::zero;
     }
 
     return f;
 }
 
-dd::Edge ShorSimulator::addConst(unsigned long long a) {
+dd::Package::mEdge ShorSimulator::addConst(unsigned long long a) {
 
-    dd::Edge f = dd->DDone;
-    dd::Edge edges[4];
-    edges[0]=edges[1]=edges[2]=edges[3]=dd->DDzero;
+    dd::Package::mEdge f = dd::Package::mEdge::one;
+    std::array<dd::Package::mEdge, 4> edges {
+            dd::Package::mEdge::zero,
+            dd::Package::mEdge::zero,
+            dd::Package::mEdge::zero,
+            dd::Package::mEdge::zero
+    };
 
-    int p = 0;
+    dd::Qubit p = 0;
     while(!((a >> p)  & 1u)) {
         edges[0] = f;
         edges[3] = f;
-        f = dd->makeNonterminal(p, edges, false);
+        f = dd->makeDDNode(p, edges, false);
         p++;
     }
 
-    dd::Edge right, left;
+    dd::Package::mEdge right, left;
 
-    edges[0]=edges[1]=edges[2]=edges[3]=dd->DDzero;
+    edges[0]=edges[1]=edges[2]=edges[3]=dd::Package::mEdge::zero;
     edges[2]=f;
-    left = dd->makeNonterminal(p, edges, false);
-    edges[2]=dd->DDzero;
+    left = dd->makeDDNode(p, edges, false);
+    edges[2]=dd::Package::mEdge::zero;
     edges[1]=f;
-    right = dd->makeNonterminal(p, edges, false);
+    right = dd->makeDDNode(p, edges, false);
     p++;
 
-    dd::Edge new_left, new_right;
+    dd::Package::mEdge new_left, new_right;
     for(;p < required_bits; p++) {
-        edges[0]=edges[1]=edges[2]=edges[3]=dd->DDzero;
+        edges[0]=edges[1]=edges[2]=edges[3]=dd::Package::mEdge::zero;
         if((a>>p) & 1u) {
             edges[2] = left;
-            new_left = dd->makeNonterminal(p, edges, false);
-            edges[2] = dd->DDzero;
+            new_left = dd->makeDDNode(p, edges, false);
+            edges[2] = dd::Package::mEdge::zero;
             edges[0] = right;
             edges[1] = left;
             edges[3] = right;
-            new_right = dd->makeNonterminal(p, edges, false);
+            new_right = dd->makeDDNode(p, edges, false);
         } else {
             edges[1] = right;
-            new_right = dd->makeNonterminal(p, edges, false);
-            edges[1] = dd->DDzero;
+            new_right = dd->makeDDNode(p, edges, false);
+            edges[1] = dd::Package::mEdge::zero;
             edges[0] = left;
             edges[2] = right;
             edges[3] = left;
-            new_left = dd->makeNonterminal(p, edges, false);
+            new_left = dd->makeDDNode(p, edges, false);
         }
         left = new_left;
         right = new_right;
@@ -369,11 +368,11 @@ dd::Edge ShorSimulator::addConst(unsigned long long a) {
     edges[2] = right;
     edges[3] = left;
 
-    return dd->makeNonterminal(p, edges, false);
+    return dd->makeDDNode(p, edges, false);
 
 }
 
-dd::Edge ShorSimulator::addConstMod(unsigned long long a) {
+dd::Package::mEdge ShorSimulator::addConstMod(unsigned long long a) {
     dd::Edge f = addConst(a);
 
     dd::Edge f2 = addConst(n);
@@ -382,21 +381,21 @@ dd::Edge ShorSimulator::addConstMod(unsigned long long a) {
 
     dd::Edge f4 = limitTo(n-1-a);
 
-    f4.w = CN::neg(f4.w);
+    f4.w = dd::ComplexNumbers::neg(f4.w);
     dd::Edge diff2 = dd->add(f3, f4);
-    f4.w = CN::neg(f4.w);
+    f4.w = dd::ComplexNumbers::neg(f4.w);
     dd::Edge tmp = dd->add(dd->multiply(f, f4), dd->multiply(dd->multiply(dd->transpose(f2), f), diff2));
 
     return tmp.p->e[0];
 }
 
 
-dd::Edge ShorSimulator::limitStateVector(dd::Edge e) {
-    if(e.p == dd->DDzero.p) {
-        if(e.w == CN::ZERO) {
-            return dd->DDzero;
+dd::Package::mEdge ShorSimulator::limitStateVector(dd::Package::vEdge e) {
+    if(e.p == dd::Package::vEdge::zero.p) {
+        if(e.w == dd::Complex::zero) {
+            return dd::Package::mEdge::zero;
         } else {
-            return dd->DDone;
+            return dd::Package::mEdge::one;
         }
     }
     auto it = dag_edges.find(e.p);
@@ -404,63 +403,68 @@ dd::Edge ShorSimulator::limitStateVector(dd::Edge e) {
         return it->second;
     }
 
-    dd::Edge edges[4];
-    edges[1]=edges[2]=dd->DDzero;
-    edges[0] = limitStateVector(e.p->e[0]);
-    edges[3] = limitStateVector(e.p->e[2]);
+    std::array<dd::Package::mEdge, 4> edges {
+        limitStateVector(e.p->e[0]),
+        dd::Package::mEdge::zero,
+        dd::Package::mEdge::zero,
+        limitStateVector(e.p->e[1])
+    };
 
-    dd::Edge result = dd->makeNonterminal(e.p->v, edges, false);
+    dd::Edge result = dd->makeDDNode(e.p->v, edges, false);
     dag_edges[e.p] = result;
     return result;
 }
 
 
 void ShorSimulator::u_a_emulate(unsigned long long a, int q) {
-    dd->setMode(dd::Matrix);
+    //dd->setMode(dd::Matrix);
 
-    dd::Edge limit = dd->makeIdent(0, required_bits-1);
-    auto t1 = std::chrono::high_resolution_clock::now();
+    dd::Package::mEdge limit = dd->makeIdent(0, required_bits-1);
+    auto t1 = std::chrono::steady_clock::now();
 
-    dd::Edge f=dd->DDone;
-    dd::Edge edges[4];
-
-    edges[0]=edges[1]=edges[2]=edges[3]=dd->DDzero;
+    dd::Package::mEdge f = dd::Package::mEdge::one;
+    std::array<dd::Package::mEdge, 4> edges {
+            dd::Package::mEdge::zero,
+            dd::Package::mEdge::zero,
+            dd::Package::mEdge::zero,
+            dd::Package::mEdge::zero
+    };
 
     for(int p=0; p < required_bits; ++p) {
         edges[0] = f;
         edges[1] = f;
-        f = dd->makeNonterminal(p, edges, false);
+        f = dd->makeDDNode(p, edges, false);
     }
 
     //TODO: limitTo?
 
     f = dd->multiply(f, limit);
 
-    edges[1] = dd->DDzero;
+    edges[1] = dd::Package::mEdge::zero;
 
     dd->incRef(f);
     dd->incRef(limit);
 
     unsigned long t = a;
 
-    for(int i = 0; i<required_bits;++i) {
-        dd::Edge active = dd->DDone;
-        for(int p = 0; p < required_bits; ++p) {
+    for(unsigned int i = 0; i < required_bits;++i) {
+        dd::Package::mEdge active = dd::Package::mEdge::one;
+        for(unsigned int p = 0; p < required_bits; ++p) {
             if(p == i) {
                 edges[3] = active;
-                edges[0] = dd->DDzero;
+                edges[0] = dd::Package::mEdge::zero;
             } else {
                 edges[0] = edges[3] = active;
             }
-            active = dd->makeNonterminal(p, edges, false);
+            active = dd->makeDDNode(p, edges, false);
         }
 
         active.w = dd->cn.lookup(-1, 0);
-        dd::Edge passive = dd->multiply(f, dd->add(limit, active));
-        active.w = CN::ONE;
+        dd::Package::mEdge passive = dd->multiply(f, dd->add(limit, active));
+        active.w = dd::Complex::one;
         active = dd->multiply(f, active);
 
-        dd::Edge tmp = addConstMod(t);
+        dd::Package::mEdge tmp = addConstMod(t);
         active = dd->multiply(tmp, active);
 
         dd->decRef(f);
@@ -474,24 +478,24 @@ void ShorSimulator::u_a_emulate(unsigned long long a, int q) {
     dd->decRef(limit);
     dd->decRef(f);
 
-    dd::Edge e = f;
+    dd::Package::mEdge e = f;
 
     for(int i = 2*required_bits-1; i >= 0; --i) {
         if(i == q) {
-            edges[1] = edges[2] = dd->DDzero;
+            edges[1] = edges[2] = dd::Package::mEdge::zero;
             edges[0] = dd->makeIdent(0, n_qubits - i - 2);
             edges[3] = e;
-            e = dd->makeNonterminal(n_qubits - 1 - i, edges, false);
+            e = dd->makeDDNode(n_qubits - 1 - i, edges, false);
         } else {
-            edges[1] = edges[2] = dd->DDzero;
+            edges[1] = edges[2] = dd::Package::mEdge::zero;
             edges[0] = edges[3] = e;
-            e = dd->makeNonterminal(n_qubits - 1 - i, edges, false);
+            e = dd->makeDDNode(n_qubits - 1 - i, edges, false);
         }
     }
 
-    dd->setMode(dd::Vector);
+    //dd->setMode(dd::Vector);
 
-    dd::Edge tmp = dd->multiply(e, root_edge);
+    dd::Package::vEdge tmp = dd->multiply(e, root_edge);
     dd->incRef(tmp);
     dd->decRef(root_edge);
     root_edge = tmp;
@@ -527,10 +531,6 @@ int ShorSimulator::inverse_mod(int a, int n) {
 
 
 void ShorSimulator::add_phi(int a, int c1, int c2) {
-    int controls = 0;
-    if(c1 != std::numeric_limits<int>::min()) controls++;
-    if(c2 != std::numeric_limits<int>::min()) controls++;
-
     for(int i = required_bits; i>= 0; --i) {
         double q = 1;
         unsigned int fac = 0;
@@ -541,35 +541,36 @@ void ShorSimulator::add_phi(int a, int c1, int c2) {
             fac *= 2;
             q *= 2;
         }
+
+        dd::Controls controls;
         if(c1 != std::numeric_limits<int>::min()) {
-            line[(n_qubits-1)-c1] = 1;
+            //line[(n_qubits-1)-c1] = 1;
+            controls.emplace(dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - c1)});
         }
         if(c2 != std::numeric_limits<int>::min()) {
-            line[(n_qubits-1)-c2] = 1;
+            //line[(n_qubits-1)-c2] = 1;
+            controls.emplace(dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - c2)});
         }
-        line[(n_qubits-1)-(1+2*required_bits-i)] = 2;
+        //line[(n_qubits-1)-(1+2*required_bits-i)] = 2;
 
 
         double q_r = QMDDcos(fac, q);
         double q_i = QMDDsin(fac, q);
-        qc::GateMatrix Qm{qc::complex_one, qc::complex_zero, qc::complex_zero, {q_r, q_i}};
+        dd::GateMatrix Qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {q_r, q_i}};
 
-        ApplyGate(Qm);
+        ApplyGate(Qm,(n_qubits-1)-(1+2*required_bits-i), controls);
 
-        line[(n_qubits-1)-(1+2*required_bits-i)] = -1;
-        if(c1 != std::numeric_limits<int>::min()) {
-            line[(n_qubits-1)-c1] = -1;
-        }
-        if(c2 != std::numeric_limits<int>::min()) {
-            line[(n_qubits-1)-c2] = -1;
-        }
+        //line[(n_qubits-1)-(1+2*required_bits-i)] = -1;
+        //if(c1 != std::numeric_limits<int>::min()) {
+        //    line[(n_qubits-1)-c1] = -1;
+        //}
+        //if(c2 != std::numeric_limits<int>::min()) {
+        //    line[(n_qubits-1)-c2] = -1;
+        //}
     }
 }
 
 void ShorSimulator::add_phi_inv(int a, int c1, int c2) {
-    int controls = 0;
-    if(c1 != std::numeric_limits<int>::min()) controls++;
-    if(c2 != std::numeric_limits<int>::min()) controls++;
     for(int i = required_bits; i>= 0; --i) {
         double q = 1;
         unsigned int fac = 0;
@@ -580,48 +581,50 @@ void ShorSimulator::add_phi_inv(int a, int c1, int c2) {
             fac *= 2;
             q *= 2;
         }
+        dd::Controls controls;
         if(c1 != std::numeric_limits<int>::min()) {
-            line[(n_qubits-1)-c1] = 1;
+            //line[(n_qubits-1)-c1] = 1;
+            controls.emplace(dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - c1)});
         }
         if(c2 != std::numeric_limits<int>::min()) {
-            line[(n_qubits-1)-c2] = 1;
+            //line[(n_qubits-1)-c2] = 1;
+            controls.emplace(dd::Control{static_cast<dd::Qubit>((n_qubits - 1) - c2)});
         }
-
-        line[(n_qubits-1)-(1+2*required_bits-i)] = 2;
+        //line[(n_qubits-1)-(1+2*required_bits-i)] = 2;
 
         double q_r = QMDDcos(fac, -q);
         double q_i = QMDDsin(fac, -q);
-        qc::GateMatrix Qm{qc::complex_one, qc::complex_zero, qc::complex_zero, {q_r, q_i}};
-        ApplyGate(Qm);
+        dd::GateMatrix Qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {q_r, q_i}};
+        ApplyGate(Qm, (n_qubits-1)-(1+2*required_bits-i), controls);
 
-        line[(n_qubits-1)-(1+2*required_bits-i)] = -1;
-        if(c1 != std::numeric_limits<int>::min()) {
-            line[(n_qubits-1)-c1] = -1;
-        }
-        if(c2 != std::numeric_limits<int>::min()) {
-            line[(n_qubits-1)-c2] = -1;
-        }
+        //line[(n_qubits-1)-(1+2*required_bits-i)] = -1;
+        //if(c1 != std::numeric_limits<int>::min()) {
+        //    line[(n_qubits-1)-c1] = -1;
+        //}
+        //if(c2 != std::numeric_limits<int>::min()) {
+        //    line[(n_qubits-1)-c2] = -1;
+        //}
     }
 }
 
 void ShorSimulator::qft() {
     for(int i = required_bits+1; i < 2*required_bits+2; i++) {
-        line[(n_qubits-1)-i] = 2;
-        ApplyGate(qc::Hmat);
-        line[(n_qubits-1)-i] = -1;
+        //line[(n_qubits-1)-i] = 2;
+        ApplyGate(dd::Hmat, (n_qubits-1)-i);
+        //line[(n_qubits-1)-i] = -1;
 
         double q = 2;
         for(int j = i+1; j < 2*required_bits+2; j++) {
-            line[(n_qubits-1)-j] = 1;
-            line[(n_qubits-1)-i] = 2;
+            //line[(n_qubits-1)-j] = 1;
+            //line[(n_qubits-1)-i] = 2;
 
             double q_r = QMDDcos(1, q);
             double q_i = QMDDsin(1, q);
-            qc::GateMatrix Qm{qc::complex_one, qc::complex_zero, qc::complex_zero, {q_r, q_i}};
-            ApplyGate(Qm);
+            dd::GateMatrix Qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {q_r, q_i}};
+            ApplyGate(Qm, (n_qubits-1)-i, dd::Control{static_cast<dd::Qubit>((n_qubits-1)-j)});
 
-            line[(n_qubits-1)-j] = -1;
-            line[(n_qubits-1)-i] = -1;
+            //line[(n_qubits-1)-j] = -1;
+            //line[(n_qubits-1)-i] = -1;
             q *= 2;
         }
     }
@@ -631,22 +634,22 @@ void ShorSimulator::qft_inv() {
     for(int i = 2*required_bits+1; i >= required_bits+1; i--) {
         double q = 2;
         for(int j = i+1; j < 2*required_bits+2; j++) {
-            line[(n_qubits-1)-j] = 1;
-            line[(n_qubits-1)-i] = 2;
+            //line[(n_qubits-1)-j] = 1;
+            //line[(n_qubits-1)-i] = 2;
 
             double q_r = QMDDcos(1, -q);
             double q_i = QMDDsin(1, -q);
-            qc::GateMatrix Qm{qc::complex_one, qc::complex_zero, qc::complex_zero, {q_r, q_i}};
+            dd::GateMatrix Qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {q_r, q_i}};
 
-            ApplyGate(Qm);
+            ApplyGate(Qm, (n_qubits-1)-i, dd::Control{static_cast<dd::Qubit>((n_qubits-1)-j)});
 
-            line[(n_qubits-1)-j] = -1;
-            line[(n_qubits-1)-i] = -1;
+            //line[(n_qubits-1)-j] = -1;
+            //line[(n_qubits-1)-i] = -1;
             q *= 2;
         }
-        line[(n_qubits-1)-i] = 2;
-        ApplyGate(qc::Hmat);
-        line[(n_qubits-1)-i] = -1;
+        //line[(n_qubits-1)-i] = 2;
+        ApplyGate(dd::Hmat, (n_qubits-1)-i);
+        //line[(n_qubits-1)-i] = -1;
     }
 }
 
@@ -656,24 +659,22 @@ void ShorSimulator::mod_add_phi(int a, int N, int c1, int c2) {
 
     qft_inv();
 
-    line[(n_qubits-1)-(required_bits+1)] = 1;
-    line[(n_qubits-1)-(2*required_bits+2)] = 2;
-
-    ApplyGate(qc::Xmat);
-
-    line[(n_qubits-1)-(required_bits+1)] = -1;
-    line[(n_qubits-1)-(2*required_bits+2)] = -1;
+    //line[(n_qubits-1)-(required_bits+1)] = 1;
+    //line[(n_qubits-1)-(2*required_bits+2)] = 2;
+    ApplyGate(dd::Xmat, (n_qubits-1)-(2*required_bits+2), dd::Control{static_cast<dd::Qubit>((n_qubits-1)-(required_bits+1))});
+    //line[(n_qubits-1)-(required_bits+1)] = -1;
+    //line[(n_qubits-1)-(2*required_bits+2)] = -1;
 
     qft();
     add_phi(N, 2*required_bits+2, std::numeric_limits<int>::min());
     add_phi_inv(a,c1,c2);
     qft_inv();
 
-    line[(n_qubits-1)-(required_bits+1)] = 0;
-    line[(n_qubits-1)-(2*required_bits+2)] = 2;
-    ApplyGate(qc::Xmat);
-    line[(n_qubits-1)-(required_bits+1)] = -1;
-    line[(n_qubits-1)-(2*required_bits+2)] = -1;
+    //line[(n_qubits-1)-(required_bits+1)] = 0;
+    //line[(n_qubits-1)-(2*required_bits+2)] = 2;
+    ApplyGate(dd::Xmat, (n_qubits-1)-(2*required_bits+2), dd::Control{static_cast<dd::Qubit>((n_qubits-1)-(required_bits+1)), dd::Control::Type::neg});
+    //line[(n_qubits-1)-(required_bits+1)] = -1;
+    //line[(n_qubits-1)-(2*required_bits+2)] = -1;
 
     qft();
     add_phi(a, c1, c2);
@@ -683,24 +684,22 @@ void ShorSimulator::mod_add_phi_inv(int a, int N, int c1, int c2) {
     add_phi_inv(a, c1, c2);
     qft_inv();
 
-    line[(n_qubits-1)-(required_bits+1)] = 0;
-    line[(n_qubits-1)-(2*required_bits+2)] = 2;
+    //line[(n_qubits-1)-(required_bits+1)] = 0;
+    //line[(n_qubits-1)-(2*required_bits+2)] = 2;
+    ApplyGate(dd::Xmat, (n_qubits-1)-(2*required_bits+2), dd::Control{static_cast<dd::Qubit>((n_qubits-1)-(required_bits+1)), dd::Control::Type::neg});
+    //line[(n_qubits-1)-(required_bits+1)] = -1;
+    //line[(n_qubits-1)-(2*required_bits+2)] = -1;
 
-    ApplyGate(qc::Xmat);
-
-    line[(n_qubits-1)-(required_bits+1)] = -1;
-    line[(n_qubits-1)-(2*required_bits+2)] = -1;
     qft();
     add_phi(a,c1,c2);
     add_phi_inv(N, 2*required_bits+2, std::numeric_limits<int>::min());
     qft_inv();
-    line[(n_qubits-1)-(required_bits+1)] = 1;
-    line[(n_qubits-1)-(2*required_bits+2)] = 2;
 
-    ApplyGate(qc::Xmat);
-
-    line[(n_qubits-1)-(required_bits+1)] = -1;
-    line[(n_qubits-1)-(2*required_bits+2)] = -1;
+    //line[(n_qubits-1)-(required_bits+1)] = 1;
+    //line[(n_qubits-1)-(2*required_bits+2)] = 2;
+    ApplyGate(dd::Xmat, (n_qubits-1)-(2*required_bits+2), dd::Control{static_cast<dd::Qubit>((n_qubits-1)-(required_bits+1))});
+    //line[(n_qubits-1)-(required_bits+1)] = -1;
+    //line[(n_qubits-1)-(2*required_bits+2)] = -1;
 
     qft();
     add_phi(N,std::numeric_limits<int>::min(),std::numeric_limits<int>::min());
@@ -730,37 +729,61 @@ void ShorSimulator::cmult_inv(int a, int N, int c) {
 }
 
 void ShorSimulator::u_a(unsigned long long a, int N, int c) {
+    using namespace dd::literals;
     cmult(a, N, c);
     for(int i = 0; i < required_bits; i++) {
-        line[(n_qubits-1)-(required_bits+2+i)] = 1;
-        line[(n_qubits-1)-(i+1)] = 2;
-        ApplyGate(qc::Xmat);
+        //line[(n_qubits-1)-(required_bits+2+i)] = 1;
+        //line[(n_qubits-1)-(i+1)] = 2;
+        ApplyGate(dd::Xmat, (n_qubits-1)-(i+1), dd::Control{static_cast<dd::Qubit>((n_qubits-1)-(required_bits+2+i))});
 
-        line[(n_qubits-1)-(required_bits+2+i)] = 2;
-        line[(n_qubits-1)-(i+1)] = 1;
-        line[(n_qubits-1)-c] = 1;
-        ApplyGate(qc::Xmat);
-        line[(n_qubits-1)-(required_bits+2+i)] = 1;
-        line[(n_qubits-1)-(i+1)] = 2;
-        line[(n_qubits-1)-c] = -1;
+        //line[(n_qubits-1)-(required_bits+2+i)] = 2;
+        //line[(n_qubits-1)-(i+1)] = 1;
+        //line[(n_qubits-1)-c] = 1;
+        ApplyGate(dd::Xmat, (n_qubits-1)-(required_bits+2+i), dd::Controls{{
+                dd::Control{static_cast<dd::Qubit>(n_qubits-1-(i+1))},
+                dd::Control{static_cast<dd::Qubit>(n_qubits-1-c)}
+        }});
+        //line[(n_qubits-1)-(required_bits+2+i)] = 1;
+        //line[(n_qubits-1)-(i+1)] = 2;
+        //line[(n_qubits-1)-c] = -1;
 
-        ApplyGate(qc::Xmat);
+        ApplyGate(dd::Xmat, (n_qubits-1)-(i+1), dd::Control{static_cast<dd::Qubit>((n_qubits-1)-(required_bits+2+i))});
 
-        line[(n_qubits-1)-(required_bits+2+i)] = -1;
-        line[(n_qubits-1)-(i+1)] = -1;
+        //line[(n_qubits-1)-(required_bits+2+i)] = -1;
+        //line[(n_qubits-1)-(i+1)] = -1;
     }
 
 
     cmult_inv(inverse_mod(a, N), N, c);
 }
 
-void ShorSimulator::ApplyGate(qc::GateMatrix matrix) {
-    dd::Edge gate = dd->makeGateDD(matrix, n_qubits, line);
+void ShorSimulator::ApplyGate(dd::GateMatrix matrix, dd::Qubit target) {
+    dd::Edge gate = dd->makeGateDD(matrix, n_qubits, target);
+    dd::Edge tmp = dd->multiply(gate, root_edge);
+    dd->incRef(tmp);
+    dd->decRef(root_edge);
+    root_edge = tmp;
+
+    dd->garbageCollect();
+}
+
+void ShorSimulator::ApplyGate(dd::GateMatrix matrix, dd::Qubit target, dd::Control control) {
+    dd::Edge gate = dd->makeGateDD(matrix, n_qubits, control, target);
     dd::Edge tmp = dd->multiply(gate, root_edge);
     dd->incRef(tmp);
     dd->decRef(root_edge);
     root_edge = tmp;
     
+    dd->garbageCollect();
+}
+
+void ShorSimulator::ApplyGate(dd::GateMatrix matrix, dd::Qubit target, const dd::Controls& controls) {
+    dd::Edge gate = dd->makeGateDD(matrix, n_qubits, controls, target);
+    dd::Edge tmp = dd->multiply(gate, root_edge);
+    dd->incRef(tmp);
+    dd->decRef(root_edge);
+    root_edge = tmp;
+
     dd->garbageCollect();
 }
 

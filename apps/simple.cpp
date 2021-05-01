@@ -118,9 +118,8 @@ int main(int argc, char** argv) {
         std::exit(1);
     }
 
-    if (quantumComputation && quantumComputation->getNqubits() > dd::MAXN) {
-        std::cerr << "Quantum computation contains to many qubits (limit is set to " << dd::MAXN << "). See documentation for details.\n";
-        std::exit(1);
+    if (quantumComputation && quantumComputation->getNqubits() > 100) {
+        std::clog << "[WARNING] Quantum computation contains quite a qubits. You're jumping into the deep end.\n";
     }
 
     auto t1 = std::chrono::high_resolution_clock::now();

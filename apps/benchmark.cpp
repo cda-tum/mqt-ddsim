@@ -45,7 +45,7 @@ BENCHMARK(BM_sim_T)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 
 static void BM_sim_CNOT(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
-    qc->emplace_back<qc::StandardOperation>(state.range(0), qc::Control{0}, 1, qc::X);
+    qc->emplace_back<qc::StandardOperation>(state.range(0), dd::Control{0}, 1, qc::X);
     CircuitSimulator sim(qc);
     for(auto _ : state) {
         sim.Simulate(1);
@@ -56,7 +56,7 @@ BENCHMARK(BM_sim_CNOT)->DenseRange(4, 25)->ComputeStatistics("min", min_estimato
 
 static void BM_sim_TOFFOLI(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
-    std::vector<qc::Control> controls{qc::Control(0), qc::Control(1)};
+    dd::Controls controls{dd::Control{0}, dd::Control{1}};
     qc->emplace_back<qc::StandardOperation>(state.range(0), controls, 2, qc::X);
     CircuitSimulator sim(qc);
     for(auto _ : state) {
@@ -89,7 +89,7 @@ static void BM_sim_QCBM(benchmark::State& state) {
 
     // entangling
     for (unsigned int i=0; i < n_qubits; i++) {
-        qc->emplace_back<qc::StandardOperation>(n_qubits, qc::Control(i), (i+1)%n_qubits, qc::X);
+        qc->emplace_back<qc::StandardOperation>(n_qubits, dd::Control{static_cast<dd::Qubit>(i)}, (i+1)%n_qubits, qc::X);
     }
     // middle part: rotations and entanglement
     for (unsigned int d=0; d < depth-1; d++) {
@@ -101,7 +101,7 @@ static void BM_sim_QCBM(benchmark::State& state) {
         }
         // entangling
         for (unsigned int i=0; i < n_qubits; i++) {
-            qc->emplace_back<qc::StandardOperation>(n_qubits, qc::Control(i), (i+1)%n_qubits, qc::X);
+            qc->emplace_back<qc::StandardOperation>(n_qubits, dd::Control{static_cast<dd::Qubit>(i)}, (i+1)%n_qubits, qc::X);
         }
     }
     // last rotation
@@ -137,7 +137,7 @@ static void BM_extra_QCBM_optimized(benchmark::State& state) {
     // entangling
     std::unique_ptr<qc::QuantumComputation> qc_entangle = std::make_unique<qc::QuantumComputation>(n_qubits);
     for (unsigned int i=0; i < n_qubits; i++) {
-        qc_entangle->emplace_back<qc::StandardOperation>(n_qubits, qc::Control(i), (i+1)%n_qubits, qc::X);
+        qc_entangle->emplace_back<qc::StandardOperation>(n_qubits, dd::Control{static_cast<dd::Qubit>(i)}, (i+1)%n_qubits, qc::X);
     }
     dd::Edge entangle{qc_entangle->buildFunctionality(dd)};
     dd->incRef(entangle);

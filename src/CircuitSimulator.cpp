@@ -1,6 +1,6 @@
 #include "CircuitSimulator.hpp"
 
-std::map<std::string, unsigned int> CircuitSimulator::Simulate(const unsigned int shots) {
+std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int shots) {
     bool has_nonmeasurement_nonunitary = false;
     bool has_measurements = false;
     bool measurements_last = true;
@@ -11,17 +11,21 @@ std::map<std::string, unsigned int> CircuitSimulator::Simulate(const unsigned in
             has_nonmeasurement_nonunitary = true;
         }
         if (op->getType() == qc::Measure) {
+            auto nu_op = dynamic_cast<qc::NonUnitaryOperation*>(op.get());
+            if (nu_op == nullptr) {
+                throw std::runtime_error("Op with type Measurement could not be casted to NonUnitaryOperation");
+            }
             has_measurements = true;
 
-            auto& quantum = op->getControls();
-            auto& classic = op->getTargets();
+            const auto& quantum = nu_op->getTargets();
+            const auto& classic = nu_op->getClassics();
 
             if (quantum.size() != classic.size()) {
                 throw std::runtime_error("Measurement: Sizes of quantum and classic register mismatch.");
             }
 
             for (unsigned int i = 0; i < quantum.size(); ++i) {
-                measurement_map[quantum[i].qubit] = classic[i];
+                measurement_map[quantum.at(i)] = classic.at(i);
             }
 
         }
@@ -39,7 +43,7 @@ std::map<std::string, unsigned int> CircuitSimulator::Simulate(const unsigned in
     // single shot is enough, but the sampling should only return actually measured qubits
     if (!has_nonmeasurement_nonunitary && measurements_last) {
         single_shot(true);
-        std::map<std::string, unsigned int> m_counter;
+        std::map<std::string, std::size_t> m_counter;
         const auto n_qubits = qc->getNqubits();
         const auto n_cbits = qc->getNcbits();
 
@@ -59,7 +63,7 @@ std::map<std::string, unsigned int> CircuitSimulator::Simulate(const unsigned in
     }
 
     // there are nonunitaries (or intermediate measurement_map) and we have to actually do multiple single_shots :(
-    std::map<std::string, unsigned int> m_counter;
+    std::map<std::string, std::size_t> m_counter;
 
     for (unsigned int i = 0; i < shots; i++) {
         const auto result = single_shot(false);
@@ -77,18 +81,15 @@ std::map<std::string, unsigned int> CircuitSimulator::Simulate(const unsigned in
     return m_counter;
 }
 
-std::map<int, bool> CircuitSimulator::single_shot(const bool ignore_nonunitaries) {
+std::map<std::size_t , bool> CircuitSimulator::single_shot(const bool ignore_nonunitaries) {
     single_shots++;
-    const unsigned short n_qubits = qc->getNqubits();
-
-    std::array<short, qc::MAX_QUBITS> line{};
-    line.fill(qc::LINE_DEFAULT);
+    const dd::QubitCount n_qubits = qc->getNqubits();
 
     root_edge = dd->makeZeroState(n_qubits);
     dd->incRef(root_edge);
 
-    unsigned long op_num = 0;
-    std::map<int, bool> classic_values;
+    std::size_t op_num = 0;
+    std::map<std::size_t, bool> classic_values;
 
     const int approx_mod = std::ceil(static_cast<double>(qc->getNops()) / (approx_info.step_number + 1));
 
@@ -99,15 +100,15 @@ std::map<int, bool> CircuitSimulator::single_shot(const bool ignore_nonunitaries
             }
             if (auto *nu_op = dynamic_cast<qc::NonUnitaryOperation *>(op.get())) {
                 if (op->getType() == qc::Measure) {
-                    auto quantum = nu_op->getControls();
-                    auto classic = nu_op->getTargets();
+                    auto quantum = nu_op->getTargets();
+                    auto classic = nu_op->getClassics();
 
                     assert(quantum.size() == classic.size()); // this should not happen do to check in Simulate
 
                     for (unsigned int i = 0; i < quantum.size(); ++i) {
-                        auto result = MeasureOneCollapsing(quantum[i].qubit);
+                        auto result = MeasureOneCollapsing(quantum.at(i));
                         assert(result == '0' || result == '1');
-                        classic_values[classic[i]] = (result == '1');
+                        classic_values[classic.at(i)] = (result == '1');
                     }
                 } else if (op->getType() == qc::Barrier) {
                     continue;
@@ -142,13 +143,13 @@ std::map<int, bool> CircuitSimulator::single_shot(const bool ignore_nonunitaries
                       << " #controls=" << op->getControls().size()
                       << " statesize=" << dd->size(root_edge) << "\n";//*/
 
-            auto dd_op = op->getDD(dd, line);
+            auto dd_op = op->getDD(dd);
             auto tmp = dd->multiply(dd_op, root_edge);
             dd->incRef(tmp);
             dd->decRef(root_edge);
             root_edge = tmp;
 
-            if (approx_info.step_fidelity < 1.0) {
+            if (approx_info.step_number > 0 && approx_info.step_fidelity < 1.0) {
                 if (approx_info.approx_when == ApproximationInfo::FidelityDriven && (op_num + 1) % approx_mod == 0 && approximation_runs < approx_info.step_number) {
                     //const unsigned int size_before = dd->size(root_edge);
                     const double ap_fid = ApproximateByFidelity(approx_info.step_fidelity, false, true);
@@ -163,7 +164,7 @@ std::map<int, bool> CircuitSimulator::single_shot(const bool ignore_nonunitaries
                               << "\n";//*/
                 } else if (approx_info.approx_when == ApproximationInfo::MemoryDriven) {
                     const unsigned int size_before = dd->size(root_edge);
-                    if (size_before > dd::GCLIMIT1) {
+                    if (dd->getUniqueTable<dd::Package::vNode>().possiblyNeedsCollection()) {
 
                         const double ap_fid = ApproximateByFidelity(approx_info.step_fidelity, false, true);
                         approximation_runs++;

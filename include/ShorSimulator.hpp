@@ -27,11 +27,11 @@ class ShorSimulator : public Simulator {
     }
 
     static double QMDDcos(double fac, double div) {
-        return std::cos((qc::PI * fac)/div);
+        return std::cos((dd::PI * fac)/div);
     }
 
     static double QMDDsin(double fac, double div) {
-        return std::sin((qc::PI * fac)/div);
+        return std::sin((dd::PI * fac)/div);
     }
 
     void u_a(unsigned long long a, int N, int c);
@@ -43,30 +43,28 @@ class ShorSimulator : public Simulator {
     void qft();
     void add_phi_inv(int a, int c1, int c2);
     void add_phi(int a, int c1, int c2);
-    int inverse_mod(int a, int n);
+    static int inverse_mod(int a, int n);
 
     void u_a_emulate(unsigned long long a, int q);
 
-    void ApplyGate(qc::GateMatrix matrix);
+    void ApplyGate(dd::GateMatrix matrix, dd::Qubit target, const dd::Controls& controls);
+    void ApplyGate(dd::GateMatrix matrix, dd::Qubit target, dd::Control control);
+    void ApplyGate(dd::GateMatrix matrix, dd::Qubit target);
 
-    unsigned long long ts[dd::MAXN]{};
+    std::vector<unsigned long long> ts;
 
-    dd::Edge addConst(unsigned long long a);
-    dd::Edge addConstMod(unsigned long long a);
-    dd::Edge limitTo(unsigned long long a);
+    dd::Package::mEdge addConst(unsigned long long a);
+    dd::Package::mEdge addConstMod(unsigned long long a);
+    dd::Package::mEdge limitTo(unsigned long long a);
 
-    std::pair<unsigned int, unsigned int> post_processing(const std::string& sample) const;
-
-
-
-    std::array<short, qc::MAX_QUBITS> line{};
+    [[nodiscard]] std::pair<unsigned int, unsigned int> post_processing(const std::string& sample) const;
 
     /// composite number to be factored
     const unsigned int n;
     /// coprime number to `n`. Setting this to zero will randomly generate a suitable number
     unsigned int coprime_a;
     const unsigned int required_bits;
-    unsigned int n_qubits{};
+    dd::QubitCount n_qubits{};
 
     std::string sim_result = "did not start";
     std::pair<unsigned, unsigned> sim_factors{0,0};
@@ -81,42 +79,41 @@ class ShorSimulator : public Simulator {
     long double final_fidelity{1.0L};
     double step_fidelity{0.9};
 
-    dd::Edge limitStateVector(dd::Edge e);
-    std::map<dd::NodePtr , dd::Edge> dag_edges;
+    dd::Package::mEdge limitStateVector(dd::Package::vEdge e);
+    std::map<dd::Package::vNode* , dd::Package::mEdge> dag_edges;
 
 public:
     ShorSimulator(int composite_number, int coprime_a) :
             Simulator(), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), emulate(true), verbose(false), approximate(false) {
-        line.fill(qc::LINE_DEFAULT);
+        ts.resize(n_qubits);
     };
 
     ShorSimulator(int composite_number, int coprime_a, unsigned long long seed) :
             Simulator(seed), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), emulate(true), verbose(false), approximate(false) {
-        line.fill(qc::LINE_DEFAULT);
+        ts.resize(n_qubits);
     };
 
 
     ShorSimulator(int composite_number, int coprime_a, bool emulate, bool verbose, bool approximate) :
     Simulator(), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), emulate(emulate), verbose(verbose), approximate(approximate) {
-        line.fill(qc::LINE_DEFAULT);
+        ts.resize(n_qubits);
     };
 
     ShorSimulator(int composite_number, int coprime_a, unsigned long long seed, bool emulate, bool verbose, bool approximate) :
     Simulator(seed), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), emulate(emulate), verbose(verbose), approximate(approximate) {
-        line.fill(qc::LINE_DEFAULT);
+        ts.resize(n_qubits);
     };
 
-    std::map<std::string, unsigned int> Simulate(unsigned int shots) override;
-    std::map<std::string, double> StochSimulate() override { return {}; };
+    std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
 
-    std::string getName() const override {
+    [[nodiscard]] std::string getName() const override {
         return "shor_"+std::to_string(n)+"_"+std::to_string(coprime_a);
     }
 
-    unsigned short getNumberOfQubits() const override {
+    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override {
         return n_qubits;
     }
-    unsigned long getNumberOfOps() const override {
+    [[nodiscard]] std::size_t getNumberOfOps() const override {
         return 0;
     }
 

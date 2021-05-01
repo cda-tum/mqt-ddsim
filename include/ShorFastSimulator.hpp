@@ -27,34 +27,32 @@ class ShorFastSimulator : public Simulator {
     }
 
     static double QMDDcos(double fac, double div) {
-        return std::cos((qc::PI * fac)/div);
+        return std::cos((dd::PI * fac)/div);
     }
 
     static double QMDDsin(double fac, double div) {
-        return std::sin((qc::PI * fac)/div);
+        return std::sin((dd::PI * fac)/div);
     }
 
     void u_a_emulate2(unsigned long long a);
-    void u_a_emulate2_rec(dd::Edge e);
+    void u_a_emulate2_rec(dd::Package::vEdge e);
 
-    std::pair<unsigned int, unsigned int> post_processing(const std::string& sample) const;
-    void ApplyGate(qc::GateMatrix matrix);
+    [[nodiscard]] std::pair<unsigned int, unsigned int> post_processing(const std::string& sample) const;
+    void ApplyGate(dd::GateMatrix matrix, dd::Qubit target);
 
-    unsigned long long ts[dd::MAXN]{};
-    std::map<dd::NodePtr , dd::Edge> nodesOnLevel[dd::MAXN];
+    std::vector<unsigned long long> ts;
+    std::vector<std::map<dd::Package::vNode* , dd::Package::vEdge>> nodesOnLevel;
 
-    dd::Edge addConst(unsigned long long a);
-    dd::Edge addConstMod(unsigned long long a);
-    dd::Edge limitTo(unsigned long long a);
-
-    std::array<short, qc::MAX_QUBITS> line{};
+    dd::Package::mEdge addConst(unsigned long long a);
+    dd::Package::mEdge addConstMod(unsigned long long a);
+    dd::Package::mEdge limitTo(unsigned long long a);
 
     /// composite number to be factored
     const unsigned int n;
     /// coprime number to `n`. Setting this to zero will randomly generate a suitable number
     unsigned int coprime_a;
-    const unsigned int required_bits;
-    const unsigned int n_qubits;
+    const std::size_t required_bits;
+    const dd::QubitCount n_qubits;
 
     std::string sim_result = "did not start";
     std::pair<unsigned, unsigned> sim_factors{0,0};
@@ -63,30 +61,31 @@ class ShorFastSimulator : public Simulator {
 
     const bool verbose;
 
-    std::map<dd::NodePtr , dd::Edge> dag_edges;
+    std::map<dd::Package::vNode* , dd::Package::vEdge> dag_edges;
 
 public:
     ShorFastSimulator(int composite_number, int coprime_a, bool verbose = false) :
     Simulator(), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), n_qubits(std::ceil(std::log2(n)) + 1), verbose(verbose) {
-        line.fill(qc::LINE_DEFAULT);
+        ts.resize(n_qubits);
+        nodesOnLevel.resize(n_qubits);
     };
 
     ShorFastSimulator(int composite_number, int coprime_a, unsigned long long seed, bool verbose = false) :
     Simulator(seed), n(composite_number), coprime_a(coprime_a), required_bits(std::ceil(std::log2(composite_number))), n_qubits(std::ceil(std::log2(n)) + 1), verbose(verbose) {
-        line.fill(qc::LINE_DEFAULT);
+        ts.resize(n_qubits);
+        nodesOnLevel.resize(n_qubits);
     };
 
-    std::map<std::string, unsigned int> Simulate(unsigned int shots) override;
-    std::map<std::string, double> StochSimulate() override { return {}; };
+    std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
 
-    std::string getName() const override {
+    [[nodiscard]] std::string getName() const override {
         return "fast_shor_"+std::to_string(n)+"_"+std::to_string(coprime_a);
     }
 
-    unsigned short getNumberOfQubits() const override {
+    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override {
         return n_qubits;
     }
-    unsigned long getNumberOfOps() const override {
+    [[nodiscard]] std::size_t getNumberOfOps() const override {
         return number_of_operations;
     }
 

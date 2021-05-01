@@ -20,20 +20,19 @@ public:
                                                           iterations(CalculateIterations(n_qubits)) {
     }
 
-    explicit GroverSimulator(const unsigned short n_qubits, const unsigned long long seed) : Simulator(seed),
+    explicit GroverSimulator(const dd::QubitCount n_qubits, const unsigned long long seed) : Simulator(seed),
                                                                                              n_qubits{n_qubits},
                                                                                              iterations(CalculateIterations(n_qubits)) {
-        std::uniform_int_distribution<int> dist(0, 1);
+        std::uniform_int_distribution<int> dist(0, 1); // range is inclusive
         oracle = std::string(n_qubits, '0');
-        for (unsigned short i = 0; i < n_qubits; i++) {
+        for (dd::Qubit i = 0; i < n_qubits; i++) {
             if (dist(mt) == 1) {
                 oracle[i] = '1';
             }
         }
     }
 
-    std::map<std::string, unsigned int> Simulate(unsigned int shots) override;
-    std::map<std::string, double> StochSimulate() override { return {}; };
+    std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
 
     std::map<std::string, std::string> AdditionalStatistics() override {
         return {
@@ -52,13 +51,13 @@ public:
     }
 
 
-    unsigned short getNumberOfQubits() const override { return n_qubits + 1; };
+    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return n_qubits + 1; };
 
-    unsigned long getNumberOfOps() const override { return 0; };
+    [[nodiscard]] std::size_t getNumberOfOps() const override { return 0; };
 
-    std::string getName() const override { return "emulated_grover_" + std::to_string(n_qubits); };
+    [[nodiscard]] std::string getName() const override { return "emulated_grover_" + std::to_string(n_qubits); };
 
-    std::string getOracle() const { return oracle; }
+    [[nodiscard]] std::string getOracle() const { return oracle; }
 
 protected:
     std::string oracle; // due to how qubits and std::string are indexed, this is stored in *reversed* order

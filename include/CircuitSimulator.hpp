@@ -3,7 +3,13 @@
 
 #include "Simulator.hpp"
 #include "QuantumComputation.hpp"
+
+#include <memory>
 #include <istream>
+#include <cstddef>
+#include <map>
+#include <string>
+#include <stdexcept>
 
 
 struct ApproximationInfo {
@@ -40,24 +46,19 @@ class CircuitSimulator : public Simulator {
 public:
     explicit CircuitSimulator(std::unique_ptr<qc::QuantumComputation> &qc)
             : qc(qc), approx_info(ApproximationInfo(1.0, 1, ApproximationInfo::FidelityDriven)) {
+        dd->resize(qc->getNqubits());
     }
 
     CircuitSimulator(std::unique_ptr<qc::QuantumComputation> &qc, const ApproximationInfo approx_info)
             : qc(qc), approx_info(approx_info) {
-        if (approx_info.step_number == 0) {
-            throw std::invalid_argument("step_number has to be greater than zero");
-        }
+        dd->resize(qc->getNqubits());
     }
 
     CircuitSimulator(std::unique_ptr<qc::QuantumComputation> &qc, const ApproximationInfo approx_info, const unsigned long long seed)
             : Simulator(seed), qc(qc), approx_info(approx_info) {
-        if (approx_info.step_number == 0) {
-            throw std::invalid_argument("step_number has to be greater than zero");
-        }
     }
 
-    std::map<std::string, unsigned int> Simulate(unsigned int shots) override;
-    std::map<std::string, double> StochSimulate() override {return {};};
+    std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
 
     std::map<std::string, std::string> AdditionalStatistics() override {
         return {
@@ -69,21 +70,21 @@ public:
     };
 
 
-    unsigned short getNumberOfQubits() const override { return qc->getNqubits(); };
-    unsigned long getNumberOfOps() const override { return qc->getNops(); };
-    std::string getName() const override { return qc->getName(); };
+    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
+    [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
+    [[nodiscard]] std::string getName() const override { return qc->getName(); };
 
 private:
     std::unique_ptr<qc::QuantumComputation> &qc;
-    unsigned int single_shots{0};
+    std::size_t single_shots{0};
 
 
     const ApproximationInfo approx_info;
-    unsigned long long approximation_runs{0};
+    std::size_t approximation_runs{0};
     long double final_fidelity{1.0L};
 
 
-    std::map<int, bool> single_shot(bool ignore_nonunitaries);
+    std::map<std::size_t, bool> single_shot(bool ignore_nonunitaries);
 };
 
 

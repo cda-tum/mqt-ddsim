@@ -2,7 +2,7 @@
 #include "QuantumComputation.hpp"
 #include <chrono>
 
-std::map<std::string, unsigned int> GroverSimulator::Simulate(unsigned int shots) {
+std::map<std::string, std::size_t> GroverSimulator::Simulate(unsigned int shots) {
     // Setup X on the last, Hadamard on all qubits
     qc::QuantumComputation qc_setup(n_qubits+n_anciallae);
     qc_setup.emplace_back<qc::StandardOperation>(n_qubits+n_anciallae, n_qubits, qc::X);
@@ -15,9 +15,9 @@ std::map<std::string, unsigned int> GroverSimulator::Simulate(unsigned int shots
 
     // Build the oracle
     qc::QuantumComputation qc_oracle(n_qubits+n_anciallae);
-    std::vector<qc::Control> controls{};
-    for (unsigned short i = 0; i < n_qubits; ++i) {
-        controls.emplace_back(i, oracle.at(i) == '1' ? qc::Control::pos : qc::Control::neg);
+    dd::Controls controls{};
+    for (dd::Qubit i = 0; i < n_qubits; ++i) {
+        controls.emplace(dd::Control{i, oracle.at(i) == '1' ? dd::Control::Type::pos : dd::Control::Type::neg});
     }
     qc_oracle.emplace_back<qc::StandardOperation>(n_qubits+n_anciallae, controls, n_qubits, qc::Z);
     //qc_oracle.print();
@@ -26,25 +26,27 @@ std::map<std::string, unsigned int> GroverSimulator::Simulate(unsigned int shots
     // Build the diffusion stage.
     qc::QuantumComputation qc_diffusion(n_qubits+n_anciallae);
 
-    for (unsigned short i = 0; i < n_qubits; ++i) {
+    for (dd::Qubit i = 0; i < n_qubits; ++i) {
         qc_diffusion.emplace_back<qc::StandardOperation>(n_qubits+n_anciallae, i, qc::H);
     }
-    for (unsigned short i = 0; i < n_qubits; ++i) {
+    for (dd::Qubit i = 0; i < n_qubits; ++i) {
         qc_diffusion.emplace_back<qc::StandardOperation>(n_qubits+n_anciallae, i, qc::X);
     }
 
     qc_diffusion.emplace_back<qc::StandardOperation>(n_qubits+n_anciallae, n_qubits-1, qc::H);
 
-    std::vector<qc::Control> diff_controls{};
-    for (unsigned short j = 0; j < n_qubits-1; ++j) {diff_controls.emplace_back(j);}
+    dd::Controls diff_controls{};
+    for (dd::Qubit j = 0; j < n_qubits-1; ++j) {
+        diff_controls.emplace(dd::Control{j});
+    }
     qc_diffusion.emplace_back<qc::StandardOperation>(n_qubits+n_anciallae, diff_controls, n_qubits-1);
 
     qc_diffusion.emplace_back<qc::StandardOperation>(n_qubits+n_anciallae, n_qubits-1, qc::H);
 
-    for (unsigned short i = 0; i < n_qubits; ++i) {
+    for (dd::Qubit i = 0; i < n_qubits; ++i) {
         qc_diffusion.emplace_back<qc::StandardOperation>(n_qubits+n_anciallae, i, qc::X);
     }
-    for (unsigned short i = 0; i < n_qubits; ++i) {
+    for (dd::Qubit i = 0; i < n_qubits; ++i) {
         qc_diffusion.emplace_back<qc::StandardOperation>(n_qubits+n_anciallae, i, qc::H);
     }
     //qc_diffusion.print();
