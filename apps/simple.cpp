@@ -187,7 +187,7 @@ int main(int argc, char** argv) {
     if (vm.count("benchmark")) {
         auto more_info = ddsim->AdditionalStatistics();
         std::cout << ddsim->getName() << ", "
-                  << ddsim->getNumberOfQubits() << ", "
+                  << +ddsim->getNumberOfQubits() << ", "
                   << std::fixed << duration_simulation.count() << std::defaultfloat << ", "
                   << more_info["single_shots"] << ","
                   << more_info["approximation_runs"] << ","
