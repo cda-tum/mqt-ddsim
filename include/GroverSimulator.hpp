@@ -49,11 +49,11 @@ public:
     }
 
     static unsigned long long CalculateIterations(const unsigned short n_qubits) {
-        constexpr long double PI_4 = 0.785398163397448309615660845819875721049292349843776455243L; // qc::PI_4 is of type fp and hence possibly smaller than long double
+        constexpr long double PI_4 = 0.785398163397448309615660845819875721049292349843776455243L; // dd::PI_4 is of type fp and hence possibly smaller than long double
         if (n_qubits <= 3) {
             return 1;
         } else {
-            return (unsigned long long)std::floor(PI_4 * std::pow(2.L, n_qubits / 2.0L));
+            return static_cast<unsigned long long>(std::floor(PI_4 * std::pow(2.L, n_qubits / 2.0L)));
         }
     }
 

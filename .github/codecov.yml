@@ -1,0 +1,14 @@
+ignore:
+  - "extern/**/*"
+  - "apps/*"
+
+coverage:
+  range:     60..95
+  precision: 1
+  status:
+    project:
+      default:
+        threshold: 0.5%
+    patch:
+      default:
+        threshold: 1%
