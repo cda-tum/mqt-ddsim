@@ -56,7 +56,7 @@ ObjCSpaceAfterProperty:                    false
 ObjCSpaceBeforeProtocolList:               true
 PointerAlignment:                          Left
 ReflowComments:                            false
-SortIncludes:                              CaseSensitive
+SortIncludes:                              true
 SpaceAfterCStyleCast:                      false
 SpaceAfterLogicalNot:                      false
 SpaceAfterTemplateKeyword:                 false
