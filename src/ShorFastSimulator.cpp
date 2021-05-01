@@ -7,7 +7,7 @@
 #include <limits>
 #include <random>
 
-std::map<std::string, std::size_t> ShorFastSimulator::Simulate(unsigned int shots) {
+std::map<std::string, std::size_t> ShorFastSimulator::Simulate([[maybe_unused]] unsigned int shots) {
     if (verbose) {
         std::clog << "Simulate Shor's algorithm for n=" << n;
     }
@@ -49,7 +49,7 @@ std::map<std::string, std::size_t> ShorFastSimulator::Simulate(unsigned int shot
     auto        t1 = std::chrono::steady_clock::now();
     std::string measurements(2 * required_bits, '0');
 
-    for (int i = 0; i < 2 * required_bits; i++) {
+    for (unsigned int i = 0; i < 2 * required_bits; i++) {
         ApplyGate(dd::Hmat, n_qubits - 1);
 
         if (verbose) {
@@ -103,7 +103,7 @@ std::pair<unsigned int, unsigned int> ShorFastSimulator::post_processing(const s
     if (verbose) {
         std::clog << "measurement: ";
     }
-    for (int i = 0; i < 2 * required_bits; i++) {
+    for (unsigned int i = 0; i < 2 * required_bits; i++) {
         if (verbose) {
             std::clog << sample.at(2 * required_bits - 1 - i);
         }
@@ -242,7 +242,7 @@ dd::Package::mEdge ShorFastSimulator::limitTo(unsigned long long a) {
 
     edges[0] = edges[1] = edges[2] = edges[3] = dd::Package::mEdge::zero;
 
-    for (dd::Qubit p = 1; p < required_bits + 1; p++) {
+    for (unsigned int p = 1; p < required_bits + 1; p++) {
         if ((a >> p) & 1u) {
             edges[0] = dd->makeIdent(0, p - 1);
             edges[3] = f;
@@ -262,7 +262,7 @@ dd::Package::mEdge ShorFastSimulator::addConst(unsigned long long a) {
             dd::Package::mEdge::zero, dd::Package::mEdge::zero,
             dd::Package::mEdge::zero, dd::Package::mEdge::zero};
 
-    dd::Qubit p = 0;
+    unsigned int p = 0;
     while (!((a >> p) & 1u)) {
         edges[0] = f;
         edges[3] = f;

@@ -163,7 +163,7 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
                               << "; #runs=" << approximation_runs
                               << "\n";//*/
                 } else if (approx_info.approx_when == ApproximationInfo::MemoryDriven) {
-                    const unsigned int size_before = dd->size(root_edge);
+                    [[maybe_unused]] const unsigned int size_before = dd->size(root_edge);
                     if (dd->getUniqueTable<dd::Package::vNode>().possiblyNeedsCollection()) {
                         const double ap_fid = ApproximateByFidelity(approx_info.step_fidelity, false, true);
                         approximation_runs++;
