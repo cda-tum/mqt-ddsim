@@ -57,7 +57,7 @@ TEST(ShorSimTest, Factorize55Test) {
 }
 
 TEST(ShorSimTest, Factorize55ApproximateTest) {
-    ShorSimulator ddsim(55, 2, 3ull, true, false, true);
+    ShorSimulator ddsim(55, 2, 3ull, true, true, true);
     ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getFactors().first, 11);
