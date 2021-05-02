@@ -33,7 +33,8 @@ public:
     }
 
     std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
-    std::map<std::string, double>      StochSimulate();
+
+    std::map<std::string, double> StochSimulate();
 
     std::map<std::string, std::string> AdditionalStatistics() override {
         return {
@@ -48,15 +49,18 @@ public:
     };
 
     [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
-    [[nodiscard]] std::size_t    getNumberOfOps() const override { return qc->getNops(); };
-    [[nodiscard]] std::string    getName() const override { return qc->getName(); };
+
+    [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
+
+    [[nodiscard]] std::string getName() const override { return qc->getName(); };
 
     dd::Package::vEdge MeasureOneCollapsingConcurrent(unsigned short index, const std::unique_ptr<dd::Package>& localDD,
                                                       dd::Package::vEdge local_root_edge,
                                                       std::mt19937_64&   generator,
                                                       char*              result,
                                                       bool               assume_probability_normalization = true);
-    void               setNoiseEffects(const char* cGateNoise) { strncpy(gate_noise, cGateNoise, 4); }
+
+    void setNoiseEffects(const std::string& cGateNoise) { gate_noise_types = cGateNoise; }
 
     double           noise_probability = 0.0;
     dd::ComplexValue sqrt_amplitude_damping_probability{};
@@ -78,7 +82,7 @@ public:
     std::vector<std::tuple<long, std::string>> recorded_properties;
     std::vector<std::vector<double>>           recorded_properties_per_instance;
 
-    char gate_noise[5] = {0};
+    std::string gate_noise_types;
 
     const unsigned int max_instances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
 
@@ -89,13 +93,14 @@ private:
     const double       step_fidelity;
     double             approximation_runs{0};
     long double        final_fidelity{1.0L};
-    float              perfect_run_time{0};
-    float              stoch_run_time{0};
-    double             mean_stoch_time{0};
+
+    float  perfect_run_time{0};
+    float  stoch_run_time{0};
+    double mean_stoch_time{0};
 
     void perfect_simulation_run();
 
-    void runStochSimulationForId(int                                         stochRun,
+    void runStochSimulationForId(unsigned int                                stochRun,
                                  int                                         n_qubits,
                                  dd::Package::vEdge                          rootEdgePerfectRun,
                                  std::vector<double>&                        recordedPropertiesStorage,
@@ -110,8 +115,8 @@ private:
                                               std::unique_ptr<dd::Package>&                localDD,
                                               dd::NoiseOperationTable<dd::Package::mEdge>& noiseOperationTable);
 
-    void applyNoiseOperation(dd::Qubit                                    target,
-                             dd::Controls&                                control_qubits,
+    void applyNoiseOperation(const qc::Targets&                           targets,
+                             const dd::Controls&                          control_qubits,
                              dd::Package::mEdge                           dd_op,
                              std::unique_ptr<dd::Package>&                localDD,
                              dd::NoiseOperationTable<dd::Package::mEdge>& noiseOperationTable,

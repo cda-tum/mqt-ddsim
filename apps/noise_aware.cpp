@@ -1,12 +1,14 @@
-#include "Simulator.hpp"
 #include "StochasticNoiseSimulator.hpp"
+#include "nlohmann/json.hpp"
 
-#include <algorithms/Grover.hpp>
 #include <boost/program_options.hpp>
 #include <chrono>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <string>
+
+namespace nl = nlohmann;
 
 int main(int argc, char** argv) {
     namespace po = boost::program_options;
@@ -16,24 +18,20 @@ int main(int argc, char** argv) {
     description.add_options()
             ("help,h", "produce help message")
             ("seed", po::value<unsigned long long>(&seed)->default_value(0), "seed for random number generator (default zero is possibly directly used as seed!)")
-            ("shots", po::value<unsigned int>()->default_value(0), "number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)")
-            ("display_vector", "display the state vector")
+            ("pm", "print measurements")
             ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
             ("verbose", "Causes some simulators to print additional information to STDERR")
-            ("benchmark", "print simulation stats in a single CSV style line (overrides --ps and suppresses most other output, please don't rely on the format across versions)")
 
             ("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")
             ("step_fidelity", po::value<double>()->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")
             ("steps", po::value<unsigned int>()->default_value(1), "number of approximation steps")
-
 
             ("noise_effects", po::value<std::string>()->default_value("APD"), "Noise effects (A (=amplitude damping),D (=depolarization),P (=phase flip)) in the form of a character string describing the noise effects (default=\"APD\")")
             ("noise_prob", po::value<double>()->default_value(0.001), "Probability for applying noise (default=0.001)")
             ("confidence", po::value<double>()->default_value(0.05), "Confidence in the error bound of the stochastic simulation (default= 0.05)")
             ("error_bound", po::value<double>()->default_value(0.1), "Error bound of the stochastic simulation (default=0.1)")
             ("stoch_runs", po::value<long>()->default_value(0), "Number of stochastic runs. When the value is 0 the value is calculated using the confidence, error_bound and number of tracked properties. (default = 0)")
-            ("properties", po::value<std::string>()->default_value("-3-1000"), R"(Comma separated list of tracked properties. Note that -1 is the fidelity and "-" can be used to specify a range.  (default="-3-1000"))")
-            ;
+            ("properties", po::value<std::string>()->default_value("-3-1000"), R"(Comma separated list of tracked properties. Note that -1 is the fidelity and "-" can be used to specify a range.  (default="-3-1000"))");
     po::variables_map vm;
     try {
         po::store(po::parse_command_line(argc, argv, description), vm);
@@ -43,18 +41,18 @@ int main(int argc, char** argv) {
             return 0;
         }
         po::notify(vm);
-    } catch (const po::error &e) {
+    } catch (const po::error& e) {
         std::cerr << "[ERROR] " << e.what() << "! Try option '--help' for available commandline options.\n";
         std::exit(1);
     }
 
-    std::unique_ptr<qc::QuantumComputation> quantumComputation;
+    std::unique_ptr<qc::QuantumComputation>   quantumComputation;
     std::unique_ptr<StochasticNoiseSimulator> ddsim{nullptr};
 
     if (vm.count("simulate_file")) {
         const std::string fname = vm["simulate_file"].as<std::string>();
-    	quantumComputation = std::make_unique<qc::QuantumComputation>(fname);
-        ddsim = std::make_unique<StochasticNoiseSimulator>(quantumComputation,
+        quantumComputation      = std::make_unique<qc::QuantumComputation>(fname);
+        ddsim                   = std::make_unique<StochasticNoiseSimulator>(quantumComputation,
                                                            vm["steps"].as<unsigned int>(),
                                                            vm["step_fidelity"].as<double>(),
                                                            seed);
@@ -65,66 +63,45 @@ int main(int argc, char** argv) {
     }
 
     if (quantumComputation && quantumComputation->getNqubits() > 100) {
-        std::clog << "[WARNING] Quantum computation contains quite a qubits. You're jumping into the deep end.\n";
+        std::clog << "[WARNING] Quantum computation contains quite many qubits. You're jumping into the deep end.\n";
     }
 
-    ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>().data());
+    ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>());
     ddsim->setAmplitudeDampingProbability(vm["noise_prob"].as<double>());
     ddsim->stoch_confidence = vm["confidence"].as<double>();
     ddsim->setRecordedProperties(vm["properties"].as<std::string>());
     ddsim->stoch_error_margin = vm["error_bound"].as<double>();
-    ddsim->stochastic_runs = vm["stoch_runs"].as<long>();
+    ddsim->stochastic_runs    = vm["stoch_runs"].as<long>();
 
     auto t1 = std::chrono::steady_clock::now();
+
     const std::map<std::string, double> measurement_results = ddsim->StochSimulate();
+
     auto t2 = std::chrono::steady_clock::now();
 
-    std::chrono::duration<float> duration_simulation = t2-t1;
+    std::chrono::duration<float> duration_simulation = t2 - t1;
 
-    if (vm.count("benchmark")) {
-        auto more_info = ddsim->AdditionalStatistics();
-        std::cout << ddsim->getName() << ", "
-                  << +ddsim->getNumberOfQubits() << ", "
-                  //<< vm["approximate"].as<float>() << ", "
-                  << std::fixed << duration_simulation.count() << std::defaultfloat << ", "
-                  //<< more_info["approximation_runs"] << ","
-                  //<< more_info["final_fidelity"] << ", "
-                  << more_info["coprime_a"] << ", "
-                  << more_info["sim_result"] << ", "
-                  << more_info["polr_result"] << ", "
-                  << ddsim->getSeed() << ", "
-                  << ddsim->getNumberOfOps() << ", "
-                  << ddsim->getMaxNodeCount()
-                  << "\n";
-        return 0;
-    }
-
-    std::cout << "{\n";
+    nl::json output_obj;
 
     if (vm.count("ps")) {
-        std::cout << "  \"statistics\": {\n"
-                  << "    \"simulation_time\": " << std::fixed << duration_simulation.count() << std::defaultfloat << ",\n"
-                  << "    \"benchmark\": \"" << ddsim->getName() << "\",\n"
-                  << "    \"stoch_runs\": " << ddsim->stochastic_runs << ",\n"
-                  << "    \"threads\": " << ddsim->max_instances << ",\n"
-                  //<< "    \"distinct_results\": " << m.size() << ",\n"
-                  << "    \"n_qubits\": " << ddsim->getNumberOfQubits() << ",\n"
-                  << "    \"applied_gates\": " << ddsim->getNumberOfOps() << ",\n"
-                  << "    \"max_nodes\": " << ddsim->getMaxNodeCount() << ",\n"
-                  ;
-        for(const auto& item : ddsim->AdditionalStatistics()) {
-            std::cout << "    \"" << item.first << "\": \"" << item.second << "\",\n";
-        }
-        std::cout << "    \"seed\": " << ddsim->getSeed() << "\n"
-                  << "  },\n";
-    }
-    bool first_element = true;
-    std::cout << "  \"measurement_results\": {";
-    for (const auto& elem : measurement_results) {
-        std::cout << (first_element ? "" : ",") << "\n    \"" << elem.first << "\": " << elem.second;
+        output_obj["statistics"] = {
+                {"simulation_time", duration_simulation.count()},
+                {"benchmark", ddsim->getName()},
+                {"stoch_runs", ddsim->stochastic_runs},
+                {"threads", ddsim->max_instances},
+                {"n_qubits", +ddsim->getNumberOfQubits()},
+                {"applied_gates", ddsim->getNumberOfOps()},
+                {"max_nodes", ddsim->getMaxNodeCount()},
+                {"seed", ddsim->getSeed()},
+        };
 
-        first_element = false;
+        for (const auto& item: ddsim->AdditionalStatistics()) {
+            output_obj["statistics"][item.first] = item.second;
+        }
     }
-    std::cout << "\n  },\n";
-    std::cout << "  \"dummy\": 0\n}\n"; // trailing element to make json printout easier
+
+    if (vm.count("pm")) {
+        output_obj["measurement_results"] = measurement_results;
+    }
+    std::cout << std::setw(2) << output_obj << std::endl;
 }
