@@ -179,7 +179,7 @@ void HybridSchroedingerFeynmanSimulator::SimulateParallelAmplitudes(dd::Qubit sp
 
     root_edge                             = qc::VectorDD::zero;
     const std::int64_t max_control        = 1 << ndecisions;
-    std::int64_t       nslices_on_one_cpu = std::min(64LL, static_cast<std::int64_t>(max_control / nthreads));
+    std::int64_t       nslices_on_one_cpu = std::min(static_cast<std::int64_t>(64), static_cast<std::int64_t>(max_control / nthreads));
     dd::QubitCount     nqubits            = getNumberOfQubits();
 
 #pragma omp parallel for schedule(dynamic, 1)
