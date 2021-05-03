@@ -9,6 +9,10 @@ add_library(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/ShorSimulator.cpp
         ${PROJECT_SOURCE_DIR}/include/ShorFastSimulator.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/ShorFastSimulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/SlicingSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/SlicingSimulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/HybridSchroedingerFeynmanSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/HybridSchroedingerFeynmanSimulator.cpp
         )
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)
 # set required C++ standard and disable compiler specific extensions
@@ -30,6 +34,17 @@ check_ipo_supported(RESULT ipo_supported)
 if (ipo_supported)
     set_target_properties(${PROJECT_NAME} PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
+
+find_package(OpenMP REQUIRED)
+if(NOT TARGET OpenMP::OpenMP_CXX)
+	add_library(OpenMP_TARGET INTERFACE)
+	add_library(OpenMP::OpenMP_CXX ALIAS OpenMP_TARGET)
+	target_compile_options(OpenMP_TARGET INTERFACE ${OpenMP_CXX_FLAGS})
+	find_package(Threads REQUIRED)
+	target_link_libraries(OpenMP_TARGET INTERFACE Threads::Threads)
+	target_link_libraries(OpenMP_TARGET INTERFACE ${OpenMP_CXX_FLAGS})
+endif()
+target_link_libraries(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
 
 # set compiler flags depending on compiler
 if (MSVC)

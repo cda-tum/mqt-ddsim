@@ -1,7 +1,7 @@
 [submodule "extern/qfr"]
 	path = extern/qfr
 	url = https://github.com/iic-jku/qfr.git
-    branch = master
+    branch = slicing_new_package
     shallow = true
 [submodule "extern/benchmark"]
 	path = extern/benchmark
