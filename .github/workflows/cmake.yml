@@ -41,15 +41,17 @@ jobs:
         with:
           submodules: recursive
       - name: Install boost dependency
-        run: brew install boost
+        run:  brew install boost
+      - name: Install OpenMP dependency
+        run:  brew install clang-omp
       - name: Configure CMake
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        run:  cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
       - name: Build
-        run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
-      - name: Test
+        run:  cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
+      - name:              Test
         working-directory: ${{github.workspace}}/build
-        shell: bash
-        run: ctest -C $BUILD_TYPE
+        shell:             bash
+        run:               ctest -C $BUILD_TYPE
 
   build-windows:
     name: Build on Windows

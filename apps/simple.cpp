@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
         const std::string fname = vm["simulate_file"].as<std::string>();
         quantumComputation      = std::make_unique<qc::QuantumComputation>(fname);
         ddsim                   = std::make_unique<CircuitSimulator>(quantumComputation, approx_info, seed);
-    } else if(vm.count("simulate_file_hybrid")) {
+    } else if (vm.count("simulate_file_hybrid")) {
         const std::string fname = vm["simulate_file_hybrid"].as<std::string>();
         quantumComputation      = std::make_unique<qc::QuantumComputation>(fname);
         ddsim                   = std::make_unique<HybridSchroedingerFeynmanSimulator>(quantumComputation, approx_info, seed, nthreads);
