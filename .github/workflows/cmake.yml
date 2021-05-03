@@ -93,7 +93,7 @@ jobs:
 
       - name:              Test
         working-directory: ${{github.workspace}}/build/test
-        run:               cd $BUILD_TYPE && ctest -C $BUILD_TYPE
+        run: cd $BUILD_TYPE && ./ddsim_test
 
   coverage:
     name: Coverage
