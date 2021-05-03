@@ -43,7 +43,7 @@ jobs:
       - name: Install boost dependency
         run:  brew install boost
       - name: Install OpenMP dependency
-        run:  brew install clang-omp
+        run: brew install libomp
       - name: Configure CMake
         run:  cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
       - name: Build
