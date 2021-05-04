@@ -13,7 +13,7 @@ TEST(ParallelSimTest, TrivialParallelTest) {
     quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I); // some dummy operations
     quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I);
 
-    HybridSchroedingerFeynmanSimulator ddsim(quantumComputation);
+    HybridSchroedingerFeynmanSimulator ddsim(quantumComputation, HybridSchroedingerFeynmanSimulator::Mode::DD);
     ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
