@@ -64,7 +64,11 @@ int main(int argc, char** argv) {
             }
         }
         quantumComputation = std::make_unique<qc::QuantumComputation>(fname);
-        ddsim              = std::make_unique<HybridSchrodingerFeynmanSimulator>(quantumComputation, approx_info, seed, mode, nthreads);
+        if (seed != 0) {
+            ddsim = std::make_unique<HybridSchrodingerFeynmanSimulator>(quantumComputation, approx_info, seed, mode, nthreads);
+        } else {
+            ddsim = std::make_unique<HybridSchrodingerFeynmanSimulator>(quantumComputation, mode, nthreads);
+        }
     } else if (vm.count("simulate_qft")) {
         const unsigned int n_qubits = vm["simulate_qft"].as<unsigned int>();
         quantumComputation          = std::make_unique<qc::QFT>(n_qubits);
