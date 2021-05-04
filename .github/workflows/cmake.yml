@@ -29,9 +29,9 @@ jobs:
         shell: bash
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
       - name: Test
-        working-directory: ${{github.workspace}}/build
+        working-directory: ${{github.workspace}}/build/test
         shell: bash
-        run: ctest -C $BUILD_TYPE
+        run:               ./ddsim_test
 
   build-macos:
     name: Build on MacOS
@@ -49,9 +49,9 @@ jobs:
       - name: Build
         run:  cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
       - name:              Test
-        working-directory: ${{github.workspace}}/build
+        working-directory: ${{github.workspace}}/build/test
         shell:             bash
-        run:               ctest -C $BUILD_TYPE
+        run:               ./ddsim_test
 
   build-windows:
     name: Build on Windows
