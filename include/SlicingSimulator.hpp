@@ -8,9 +8,6 @@ public:
     explicit SlicingSimulator(std::unique_ptr<qc::QuantumComputation>& qc):
         CircuitSimulator(qc) {}
 
-    SlicingSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const ApproximationInfo approx_info):
-        CircuitSimulator(qc, approx_info) {}
-
     SlicingSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const ApproximationInfo approx_info, const unsigned long long seed):
         CircuitSimulator(qc, approx_info, seed) {}
 

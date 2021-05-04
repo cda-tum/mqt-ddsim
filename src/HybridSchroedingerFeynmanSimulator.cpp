@@ -1,8 +1,24 @@
 #include "HybridSchroedingerFeynmanSimulator.hpp"
 std::map<std::string, std::size_t> HybridSchroedingerFeynmanSimulator::Simulate(unsigned int shots) {
-    dd::QubitCount nqubits = getNumberOfQubits();
-    SimulateParallel(static_cast<dd::Qubit>(nqubits / 2));
-    return MeasureAllNonCollapsing(shots);
+    auto nqubits    = getNumberOfQubits();
+    auto splitQubit = static_cast<dd::Qubit>(nqubits / 2);
+    if (mode == Mode::DD) {
+        SimulateParallel(splitQubit);
+        return MeasureAllNonCollapsing(shots);
+    } else {
+        SimulateParallelAmplitudes(splitQubit);
+
+        //        auto filename = qc->getName() + "_final.amps";
+        //        std::ofstream      init(filename);
+        //        std::ostringstream oss{};
+        //        for (const auto& amplitude: finalAmplitudes) {
+        //            amplitude.writeBinary(oss);
+        //        }
+        //        init << oss.str() << std::flush;
+        //        init.close();
+
+        return {};
+    }
 }
 
 void HybridSchroedingerFeynmanSimulator::addAmplitudes(std::unique_ptr<dd::Package>& dd, const std::string& filename1, const std::string& filename2, const std::string& resultfile, bool binary) {
@@ -170,7 +186,7 @@ void HybridSchroedingerFeynmanSimulator::SimulateParallel(dd::Qubit split_qubit)
     root_edge = dd->deserialize<dd::Package::vNode>("slice_" + std::to_string(ndecisions) + "_0.dd", true);
     dd->incRef(root_edge);
 }
-void HybridSchroedingerFeynmanSimulator::SimulateParallelAmplitudes(dd::Qubit split_qubit, const std::string& filename) {
+void HybridSchroedingerFeynmanSimulator::SimulateParallelAmplitudes(dd::Qubit split_qubit) {
     auto ndecisions = getNDecisions(split_qubit);
     omp_set_num_threads(static_cast<int>(nthreads));
 
@@ -211,12 +227,5 @@ void HybridSchroedingerFeynmanSimulator::SimulateParallelAmplitudes(dd::Qubit sp
         }
         old_increment = increment;
     }
-
-    std::ofstream      init(filename);
-    std::ostringstream oss{};
-    for (const auto& amplitude: amplitudes[0]) {
-        amplitude.writeBinary(oss);
-    }
-    init << oss.str() << std::flush;
-    init.close();
+    finalAmplitudes = std::move(amplitudes[0]);
 }

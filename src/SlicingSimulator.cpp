@@ -20,9 +20,11 @@ std::size_t SlicingSimulator::getNDecisions(dd::Qubit split_qubit) {
                 ndecisions++;
             }
         } else if (op->isCompoundOperation()) {
-            throw std::invalid_argument("Compound operations currently not supported in hybrid Schrödinger-Feynman simulation.");
+            throw std::invalid_argument("Compound operations currently not supported in hybrid Schrodinger-Feynman simulation.");
         } else if (op->isClassicControlledOperation()) {
-            throw std::invalid_argument("Classic-controlled operations currently not supported in hybrid Schrödinger-Feynman simulation.");
+            throw std::invalid_argument("Classic-controlled operations currently not supported in hybrid Schrodinger-Feynman simulation.");
+        } else if (op->getType() == qc::Measure || op->getType() == qc::Reset) {
+            throw std::invalid_argument("Non-unitary operations currently not supported in hybrid Schrodinger-Feynman simulation.");
         }
     }
     return ndecisions;
@@ -84,6 +86,10 @@ bool SlicingSimulator::Slice::apply(std::unique_ptr<dd::Package>& slice_dd, cons
         }
 
         if (target_in_other_split && !op_controls.empty()) { // control slice for split
+            if (op_controls.size() > 1) {
+                throw std::invalid_argument("Multiple controls in control slice of operation are not supported at the moment");
+            }
+
             is_split_op  = true;
             bool control = getNextControl();
             for (const auto& c: op_controls) {
@@ -99,7 +105,7 @@ bool SlicingSimulator::Slice::apply(std::unique_ptr<dd::Package>& slice_dd, cons
             slice_dd->incRef(edge);
         }
     } else {
-        throw std::invalid_argument("Other op than StandardOperation not yet supported");
+        throw std::invalid_argument("Only StandardOperations are supported for now.");
     }
     if (is_split_op) {
         nDecisionsExecuted++;
