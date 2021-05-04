@@ -4,21 +4,40 @@ std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator::Simulate(u
     auto splitQubit = static_cast<dd::Qubit>(nqubits / 2);
     if (mode == Mode::DD) {
         SimulateParallel(splitQubit);
-        dd::toDot(root_edge, std::cout, true, true, true);
         return MeasureAllNonCollapsing(shots);
     } else {
         SimulateParallelAmplitudes(splitQubit);
 
-        //        auto filename = qc->getName() + "_final.amps";
-        //        std::ofstream      init(filename);
-        //        std::ostringstream oss{};
-        //        for (const auto& amplitude: finalAmplitudes) {
-        //            amplitude.writeBinary(oss);
-        //        }
-        //        init << oss.str() << std::flush;
-        //        init.close();
+        if (shots > 0) {
+            // in-place prefix-sum calculation of probabilities
+            std::inclusive_scan(
+                    finalAmplitudes.begin(), finalAmplitudes.end(), finalAmplitudes.begin(),
+                    [](const dd::ComplexValue& prefix, const dd::ComplexValue& value) {
+                        return dd::ComplexValue{prefix.r + value.r * value.r + value.i * value.i, value.i};
+                    },
+                    dd::ComplexValue{0., 0.});
 
-        return {};
+            std::map<std::string, std::size_t>     results;
+            std::uniform_real_distribution<dd::fp> dist(0.0L, 1.0L);
+            for (unsigned int i = 0; i < shots; ++i) {
+                auto p = dist(mt);
+                // use binary search to find the first entry >= p
+                auto mit = std::upper_bound(finalAmplitudes.begin(), finalAmplitudes.end(), p, [](const dd::fp val, const dd::ComplexValue& c) { return val < c.r; });
+                auto m   = std::distance(finalAmplitudes.begin(), mit);
+
+                // construct basis state string
+                std::string basisState(getNumberOfQubits(), '0');
+                for (std::size_t j = 0; j < getNumberOfQubits(); ++j) {
+                    if (m & (1 << j))
+                        basisState[j] = '1';
+                }
+                results[basisState]++;
+            }
+            return results;
+        } else {
+            // in case no shots were requested, the final amplitudes remain untouched
+            return {};
+        }
     }
 }
 
