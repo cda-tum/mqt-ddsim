@@ -13,8 +13,8 @@ std::string Simulator::MeasureAll(const bool collapse) {
         if (root_edge.w.approximatelyZero()) {
             throw std::runtime_error("Numerical instabilities led to a 0-vector! Abort simulation!");
         }
-        std::cerr << "WARNING in MAll: numerical instability occurred during simulation: |alpha|^2 + |beta|^2 - 1 = "
-                  << 1.0L - dd::ComplexNumbers::mag2(root_edge.w) << ", but should be 1!\n";
+        std::cerr << "WARNING in MAll: numerical instability occurred during simulation: |alpha|^2 + |beta|^2 = "
+                  << dd::ComplexNumbers::mag2(root_edge.w) << ", but should be 1!\n";
     }
 
     dd::Edge cur = root_edge;
