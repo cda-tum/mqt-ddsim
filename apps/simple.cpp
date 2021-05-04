@@ -19,12 +19,13 @@ int main(int argc, char** argv) {
     // variables initialized by boost program_options default values
     unsigned long long seed;
     unsigned int       shots;
-    unsigned int                             nthreads;
-    HybridSchroedingerFeynmanSimulator::Mode mode = HybridSchroedingerFeynmanSimulator::Mode::Amplitude;
 
     unsigned int                         approx_steps;
     double                               step_fidelity;
     ApproximationInfo::ApproximationWhen approx_when;
+
+    HybridSchroedingerFeynmanSimulator::Mode mode = HybridSchroedingerFeynmanSimulator::Mode::Amplitude;
+    unsigned int                             nthreads;
 
     po::options_description description("JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
     description.add_options()("help,h", "produce help message")("seed", po::value<>(&seed)->default_value(0),
