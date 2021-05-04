@@ -13,7 +13,7 @@ std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator::Simulate(u
             std::inclusive_scan(
                     finalAmplitudes.begin(), finalAmplitudes.end(), finalAmplitudes.begin(),
                     [](const dd::ComplexValue& prefix, const dd::ComplexValue& value) {
-                        return dd::ComplexValue{prefix.r + value.r * value.r + value.i * value.i, value.i};
+                        return dd::ComplexValue{std::fma(value.r, value.r, std::fma(value.i, value.i, prefix.r)), value.i};
                     },
                     dd::ComplexValue{0., 0.});
 
