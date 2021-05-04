@@ -40,7 +40,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR BUILD_TESTS)
 	add_subdirectory(test)
 
 	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Skip gbenchmark self tests")
-	add_subdirectory(extern/benchmark)
+	add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr/extern/dd_package/extern/benchmark"
+	                 "extern/qfr/extern/dd_package/extern/benchmark" EXCLUDE_FROM_ALL)
 	add_subdirectory(apps)
 endif()
-

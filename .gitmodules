@@ -3,8 +3,3 @@
 	url = https://github.com/iic-jku/qfr.git
     branch = slicing_new_package
     shallow = true
-[submodule "extern/benchmark"]
-	path = extern/benchmark
-	url = https://github.com/google/benchmark.git
-	branch = master
-	shallow = true
