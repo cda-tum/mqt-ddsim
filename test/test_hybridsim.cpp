@@ -1,4 +1,4 @@
-#include "HybridSchroedingerFeynmanSimulator.hpp"
+#include "HybridSchrodingerFeynmanSimulator.hpp"
 
 #include <gtest/gtest.h>
 #include <memory>
@@ -13,16 +13,16 @@ TEST(ParallelSimTest, TrivialParallelTest) {
     quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I); // some dummy operations
     quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I);
 
-    HybridSchroedingerFeynmanSimulator ddsim(quantumComputation, HybridSchroedingerFeynmanSimulator::Mode::DD);
+    HybridSchrodingerFeynmanSimulator ddsim(quantumComputation, HybridSchrodingerFeynmanSimulator::Mode::DD);
     ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
 }
 
 TEST(ParallelSimTest, GRCSTestDD) {
-    auto                               quantumComputation = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
-    HybridSchroedingerFeynmanSimulator ddsim_hybrid_dd(quantumComputation, HybridSchroedingerFeynmanSimulator::Mode::DD);
-    CircuitSimulator                   ddsim(quantumComputation);
+    auto                              quantumComputation = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
+    HybridSchrodingerFeynmanSimulator ddsim_hybrid_dd(quantumComputation, HybridSchrodingerFeynmanSimulator::Mode::DD);
+    CircuitSimulator                  ddsim(quantumComputation);
 
     ddsim_hybrid_dd.Simulate(1);
     ddsim.Simulate(1);
@@ -51,9 +51,9 @@ TEST(ParallelSimTest, GRCSTestDD) {
 }
 
 TEST(ParallelSimTest, GRCSTestAmplitudes) {
-    auto                               quantumComputation = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
-    HybridSchroedingerFeynmanSimulator ddsim_hybrid_amp(quantumComputation, HybridSchroedingerFeynmanSimulator::Mode::Amplitude);
-    CircuitSimulator                   ddsim(quantumComputation);
+    auto                              quantumComputation = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
+    HybridSchrodingerFeynmanSimulator ddsim_hybrid_amp(quantumComputation, HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
+    CircuitSimulator                  ddsim(quantumComputation);
 
     ddsim_hybrid_amp.Simulate(1);
     ddsim.Simulate(1);

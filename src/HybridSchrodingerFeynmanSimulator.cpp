@@ -1,9 +1,10 @@
-#include "HybridSchroedingerFeynmanSimulator.hpp"
-std::map<std::string, std::size_t> HybridSchroedingerFeynmanSimulator::Simulate(unsigned int shots) {
+#include "HybridSchrodingerFeynmanSimulator.hpp"
+std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator::Simulate(unsigned int shots) {
     auto nqubits    = getNumberOfQubits();
     auto splitQubit = static_cast<dd::Qubit>(nqubits / 2);
     if (mode == Mode::DD) {
         SimulateParallel(splitQubit);
+        dd::toDot(root_edge, std::cout, true, true, true);
         return MeasureAllNonCollapsing(shots);
     } else {
         SimulateParallelAmplitudes(splitQubit);
@@ -21,7 +22,7 @@ std::map<std::string, std::size_t> HybridSchroedingerFeynmanSimulator::Simulate(
     }
 }
 
-void HybridSchroedingerFeynmanSimulator::addAmplitudes(std::unique_ptr<dd::Package>& dd, const std::string& filename1, const std::string& filename2, const std::string& resultfile, bool binary) {
+void HybridSchrodingerFeynmanSimulator::addAmplitudes(std::unique_ptr<dd::Package>& dd, const std::string& filename1, const std::string& filename2, const std::string& resultfile, bool binary) {
     std::string complex_real_regex = R"(([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?(?![ \d\.]*(?:[eE][+-])?\d*[iI]))?)";
     std::string complex_imag_regex = R"(( ?[+-]? ?(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)?[iI])?)";
     std::regex  complex_weight_regex(complex_real_regex + complex_imag_regex);
@@ -56,7 +57,7 @@ void HybridSchroedingerFeynmanSimulator::addAmplitudes(std::unique_ptr<dd::Packa
     init << oss.str() << std::flush;
     init.close();
 }
-void HybridSchroedingerFeynmanSimulator::addAmplitudes(std::unique_ptr<dd::Package>& dd, std::istream& ifs1, std::istream& ifs2, std::ostream& oss, bool binary) {
+void HybridSchrodingerFeynmanSimulator::addAmplitudes(std::unique_ptr<dd::Package>& dd, std::istream& ifs1, std::istream& ifs2, std::ostream& oss, bool binary) {
     if (binary) {
         dd::fp temp_r, temp_i;
         while (ifs1.read(reinterpret_cast<char*>(&temp_r), sizeof(temp_r))) {
@@ -98,14 +99,14 @@ void HybridSchroedingerFeynmanSimulator::addAmplitudes(std::unique_ptr<dd::Packa
         }
     }
 }
-void HybridSchroedingerFeynmanSimulator::addAmplitudes(std::vector<dd::ComplexValue>& amp1, std::vector<dd::ComplexValue>& amp2) {
+void HybridSchrodingerFeynmanSimulator::addAmplitudes(std::vector<dd::ComplexValue>& amp1, std::vector<dd::ComplexValue>& amp2) {
     for (std::size_t i = 0; i < amp1.size(); i++) {
         amp1[i].r += amp2[i].r;
         amp1[i].i += amp2[i].i;
     }
 }
 
-void HybridSchroedingerFeynmanSimulator::SimulateParallel(dd::Qubit split_qubit) {
+void HybridSchrodingerFeynmanSimulator::SimulateParallel(dd::Qubit split_qubit) {
     auto ndecisions = getNDecisions(split_qubit);
 
     omp_set_num_threads(static_cast<int>(nthreads));
@@ -186,7 +187,7 @@ void HybridSchroedingerFeynmanSimulator::SimulateParallel(dd::Qubit split_qubit)
     root_edge = dd->deserialize<dd::Package::vNode>("slice_" + std::to_string(ndecisions) + "_0.dd", true);
     dd->incRef(root_edge);
 }
-void HybridSchroedingerFeynmanSimulator::SimulateParallelAmplitudes(dd::Qubit split_qubit) {
+void HybridSchrodingerFeynmanSimulator::SimulateParallelAmplitudes(dd::Qubit split_qubit) {
     auto ndecisions = getNDecisions(split_qubit);
     omp_set_num_threads(static_cast<int>(nthreads));
 

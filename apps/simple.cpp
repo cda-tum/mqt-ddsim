@@ -1,6 +1,6 @@
 #include "CircuitSimulator.hpp"
 #include "GroverSimulator.hpp"
-#include "HybridSchroedingerFeynmanSimulator.hpp"
+#include "HybridSchrodingerFeynmanSimulator.hpp"
 #include "ShorFastSimulator.hpp"
 #include "ShorSimulator.hpp"
 #include "Simulator.hpp"
@@ -24,8 +24,8 @@ int main(int argc, char** argv) {
     double                               step_fidelity;
     ApproximationInfo::ApproximationWhen approx_when;
 
-    HybridSchroedingerFeynmanSimulator::Mode mode = HybridSchroedingerFeynmanSimulator::Mode::Amplitude;
-    unsigned int                             nthreads;
+    HybridSchrodingerFeynmanSimulator::Mode mode = HybridSchrodingerFeynmanSimulator::Mode::Amplitude;
+    unsigned int                            nthreads;
 
     po::options_description description("JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
     description.add_options()("help,h", "produce help message")("seed", po::value<>(&seed)->default_value(0),
@@ -58,13 +58,13 @@ int main(int argc, char** argv) {
         if (vm.count("hybrid_mode")) {
             const std::string mname = vm["hybrid_mode"].as<std::string>();
             if (mname == "amplitude") {
-                mode = HybridSchroedingerFeynmanSimulator::Mode::Amplitude;
+                mode = HybridSchrodingerFeynmanSimulator::Mode::Amplitude;
             } else if (mname == "dd") {
-                mode = HybridSchroedingerFeynmanSimulator::Mode::DD;
+                mode = HybridSchrodingerFeynmanSimulator::Mode::DD;
             }
         }
         quantumComputation = std::make_unique<qc::QuantumComputation>(fname);
-        ddsim              = std::make_unique<HybridSchroedingerFeynmanSimulator>(quantumComputation, approx_info, seed, mode, nthreads);
+        ddsim              = std::make_unique<HybridSchrodingerFeynmanSimulator>(quantumComputation, approx_info, seed, mode, nthreads);
     } else if (vm.count("simulate_qft")) {
         const unsigned int n_qubits = vm["simulate_qft"].as<unsigned int>();
         quantumComputation          = std::make_unique<qc::QFT>(n_qubits);
