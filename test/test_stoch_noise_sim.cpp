@@ -118,6 +118,7 @@ TEST(StochNoiseSimTest, Reordering) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::H);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(3, std::vector<dd::Qubit>{0,1,2}, qc::OpType::Barrier);
     quantumComputation->emplace_back<qc::StandardOperation>(3, dd::Controls{dd::Control{0}, dd::Control{1}}, 2, qc::X);
 
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
@@ -151,6 +152,8 @@ TEST(StochNoiseSimTest, SimulateAdder4TrackFidelityWithNoise) {
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.01, 30000, 1, 1, "-3-1000");
     auto                     m = ddsim.StochSimulate();
+
+    std::cout << ddsim.getName() << "\n";
 
     EXPECT_GE(m.find("1000")->second, 0.14);
     EXPECT_LE(m.find("1000")->second, 0.16);
@@ -239,6 +242,42 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateError) {
     quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 30000, 1, 1, "-1-1000");
+    auto                     m = ddsim.StochSimulate();
+
+    EXPECT_GE(m.find("0000")->second, 0.19);
+    EXPECT_LE(m.find("0000")->second, 0.23);
+    EXPECT_GE(m.find("0001")->second, 0.13);
+    EXPECT_LE(m.find("0001")->second, 0.15);
+    EXPECT_GE(m.find("0100")->second, 0.08);
+    EXPECT_LE(m.find("0100")->second, 0.10);
+}
+
+TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorSelectedProperties) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::T);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::T);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::T);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::Tdag);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{1}}, 2, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::Tdag);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::Tdag);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::Tdag);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::T);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 30000, 1, 1, "-3-500,501,502");
     auto                     m = ddsim.StochSimulate();
 
     EXPECT_GE(m.find("0000")->second, 0.19);

@@ -189,7 +189,7 @@ dd::Package::vEdge StochasticNoiseSimulator::RemoveNodesInPackage(std::unique_pt
     return r;
 }
 
-double StochasticNoiseSimulator::ApproximateEdgeByFidelity(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose) {
+double StochasticNoiseSimulator::ApproximateEdgeByFidelity(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes) {
     std::queue<dd::Package::vNode*>       q;
     std::map<dd::Package::vNode*, dd::fp> probsMone;
 
@@ -277,23 +277,6 @@ double StochasticNoiseSimulator::ApproximateEdgeByFidelity(std::unique_ptr<dd::P
     dd::fp fidelity = 0;
     if (edge.p->v == newEdge.p->v) {
         fidelity = localDD->fidelity(edge, newEdge);
-    }
-
-    if (verbose) {
-        const unsigned size_before = localDD->size(edge);
-        const unsigned size_after  = localDD->size(newEdge);
-        std::cout
-                << getName() << ","
-                << +getNumberOfQubits() << "," // unary plus for int promotion
-                << size_before << ","
-                << "fixed_fidelity"
-                << ","
-                << allLevels << ","
-                << targetFidelity << ","
-                << size_after << ","
-                << static_cast<double>(size_after) / static_cast<double>(size_before) << ","
-                << fidelity
-                << "\n";
     }
 
     if (removeNodes) {
@@ -401,7 +384,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                     throw;
                 }
                 if (step_fidelity < 1 && (op_count + 1) % approx_mod == 0) {
-                    ApproximateEdgeByFidelity(localDD, local_root_edge, step_fidelity, false, true, false);
+                    ApproximateEdgeByFidelity(localDD, local_root_edge, step_fidelity, false, true);
                     approx_count++;
                 }
                 //localDD->garbageCollect(false);
@@ -722,6 +705,7 @@ void StochasticNoiseSimulator::setRecordedProperties(const std::string& input) {
             subString  = "";
             list_begin = std::numeric_limits<decltype(list_begin)>::min();
             list_end   = std::numeric_limits<decltype(list_begin)>::min();
+            continue;
         }
         if (i == '-' && subString.length() > 0) {
             list_begin = std::stoi(subString);

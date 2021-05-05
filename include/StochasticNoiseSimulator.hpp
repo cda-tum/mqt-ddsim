@@ -59,7 +59,7 @@ public:
 
     [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
 
-    [[nodiscard]] std::string getName() const override { return qc->getName(); };
+    [[nodiscard]] std::string getName() const override { return "stoch_" + gate_noise_types + "_" + qc->getName(); };
 
     dd::Package::vEdge MeasureOneCollapsingConcurrent(unsigned short index, const std::unique_ptr<dd::Package>& localDD,
                                                       dd::Package::vEdge local_root_edge,
@@ -134,7 +134,7 @@ private:
 
     [[nodiscard]] std::string intToString(long target_number) const;
 
-    double ApproximateEdgeByFidelity(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose);
+    double ApproximateEdgeByFidelity(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes);
 
     dd::Package::vEdge RemoveNodesInPackage(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge e, std::map<dd::Package::vNode*, dd::Package::vEdge>& dag_edges);
 };
