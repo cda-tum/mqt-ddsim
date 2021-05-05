@@ -76,6 +76,55 @@ std::map<std::string, std::size_t> Simulator::MeasureAllNonCollapsing(unsigned i
     return results;
 }
 
+std::map<std::string, std::size_t> Simulator::SampleFromAmplitudeVector(const std::vector<dd::ComplexValue>& amplitudes, unsigned int shots) {
+    std::vector<dd::fp> prefixsum = std::vector<dd::fp>(amplitudes.size());
+    // prefix-sum calculation of probabilities
+    std::inclusive_scan(
+            amplitudes.begin(), amplitudes.end(), prefixsum.begin(),
+            [](const dd::fp& prefix, const dd::ComplexValue& value) {
+                return std::fma(value.r, value.r, std::fma(value.i, value.i, prefix));
+            },
+            0.0);
+
+    std::map<std::string, std::size_t>     results;
+    std::uniform_real_distribution<dd::fp> dist(0.0L, 1.0L);
+    for (unsigned int i = 0; i < shots; ++i) {
+        auto p = dist(mt);
+        // use binary search to find the first entry >= p
+        auto mit = std::upper_bound(prefixsum.begin(), prefixsum.end(), p);
+        auto m   = std::distance(prefixsum.begin(), mit);
+
+        // construct basis state string
+        auto basisState = Simulator::toBinaryString(m, getNumberOfQubits());
+        results[basisState]++;
+    }
+    return results;
+}
+
+std::map<std::string, std::size_t> Simulator::SampleFromAmplitudeVectorInPlace(std::vector<dd::ComplexValue>& amplitudes, unsigned int shots) {
+    // in-place prefix-sum calculation of probabilities
+    std::inclusive_scan(
+            amplitudes.begin(), amplitudes.end(), amplitudes.begin(),
+            [](const dd::ComplexValue& prefix, const dd::ComplexValue& value) {
+                return dd::ComplexValue{std::fma(value.r, value.r, std::fma(value.i, value.i, prefix.r)), value.i};
+            },
+            dd::ComplexValue{0., 0.});
+
+    std::map<std::string, std::size_t>     results;
+    std::uniform_real_distribution<dd::fp> dist(0.0L, 1.0L);
+    for (unsigned int i = 0; i < shots; ++i) {
+        auto p = dist(mt);
+        // use binary search to find the first entry >= p
+        auto mit = std::upper_bound(amplitudes.begin(), amplitudes.end(), p, [](const dd::fp val, const dd::ComplexValue& c) { return val < c.r; });
+        auto m   = std::distance(amplitudes.begin(), mit);
+
+        // construct basis state string
+        auto basisState = Simulator::toBinaryString(m, getNumberOfQubits());
+        results[basisState]++;
+    }
+    return results;
+}
+
 std::vector<dd::ComplexValue> Simulator::getVector() const {
     assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
     std::string                   path(getNumberOfQubits(), '0');

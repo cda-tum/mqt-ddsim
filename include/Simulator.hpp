@@ -43,6 +43,10 @@ public:
 
     char MeasureOneCollapsing(dd::Qubit index, bool assume_probability_normalization = true);
 
+    std::map<std::string, std::size_t> SampleFromAmplitudeVector(const std::vector<dd::ComplexValue>& amplitudes, unsigned int shots);
+
+    std::map<std::string, std::size_t> SampleFromAmplitudeVectorInPlace(std::vector<dd::ComplexValue>& amplitudes, unsigned int shots);
+
     [[nodiscard]] std::vector<dd::ComplexValue> getVector() const;
 
     [[nodiscard]] std::size_t getActiveNodeCount() const { return dd->vUniqueTable.getActiveNodeCount(); }
@@ -60,6 +64,15 @@ public:
     [[nodiscard]] virtual std::size_t getNumberOfOps() const = 0;
 
     [[nodiscard]] virtual std::string getName() const = 0;
+
+    [[nodiscard]] static inline std::string toBinaryString(std::size_t m, dd::QubitCount nq) {
+        std::string binary(nq, '0');
+        for (std::size_t j = 0; j < nq; ++j) {
+            if (m & (1 << j))
+                binary[j] = '1';
+        }
+        return binary;
+    }
 
     double ApproximateByFidelity(double targetFidelity, bool allLevels, bool removeNodes, bool verbose = false);
 

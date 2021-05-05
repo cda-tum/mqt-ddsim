@@ -9,31 +9,7 @@ std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator::Simulate(u
         SimulateParallelAmplitudes(splitQubit);
 
         if (shots > 0) {
-            // in-place prefix-sum calculation of probabilities
-            std::inclusive_scan(
-                    finalAmplitudes.begin(), finalAmplitudes.end(), finalAmplitudes.begin(),
-                    [](const dd::ComplexValue& prefix, const dd::ComplexValue& value) {
-                        return dd::ComplexValue{std::fma(value.r, value.r, std::fma(value.i, value.i, prefix.r)), value.i};
-                    },
-                    dd::ComplexValue{0., 0.});
-
-            std::map<std::string, std::size_t>     results;
-            std::uniform_real_distribution<dd::fp> dist(0.0L, 1.0L);
-            for (unsigned int i = 0; i < shots; ++i) {
-                auto p = dist(mt);
-                // use binary search to find the first entry >= p
-                auto mit = std::upper_bound(finalAmplitudes.begin(), finalAmplitudes.end(), p, [](const dd::fp val, const dd::ComplexValue& c) { return val < c.r; });
-                auto m   = std::distance(finalAmplitudes.begin(), mit);
-
-                // construct basis state string
-                std::string basisState(getNumberOfQubits(), '0');
-                for (std::size_t j = 0; j < getNumberOfQubits(); ++j) {
-                    if (m & (1 << j))
-                        basisState[j] = '1';
-                }
-                results[basisState]++;
-            }
-            return results;
+            return SampleFromAmplitudeVectorInPlace(finalAmplitudes, shots);
         } else {
             // in case no shots were requested, the final amplitudes remain untouched
             return {};

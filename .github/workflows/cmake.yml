@@ -107,9 +107,9 @@ jobs:
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DBINDINGS=ON
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config Debug
-      - name: Test
-        working-directory: ${{github.workspace}}/build
-        run: ctest -C Debug
+      - name:              Test
+        working-directory: ${{github.workspace}}/build/test
+        run:               ./ddsim_test
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
