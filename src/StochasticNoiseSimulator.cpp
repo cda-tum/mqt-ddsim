@@ -53,7 +53,7 @@ void StochasticNoiseSimulator::perfect_simulation_run() {
                 } else if (op->getType() == qc::Barrier) {
                     continue;
                 } else {
-                    throw std::runtime_error(std::string("Unsupported non-unitary functionality '") + op->getName() + "'." );
+                    throw std::runtime_error(std::string("Unsupported non-unitary functionality '") + op->getName() + "'.");
                 }
             } else {
                 throw std::runtime_error(std::string("Dynamic cast to NonUnitaryOperation failed for '") + op->getName() + "'.");
@@ -314,7 +314,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
     std::uniform_real_distribution<dd::fp> dist(0.0, 1.0L);
 
     const unsigned long numberOfRuns = stochastic_runs / max_instances + (stochRun < stochastic_runs % max_instances ? 1 : 0);
-    const int approx_mod = std::ceil(static_cast<double>(qc->getNops()) / (step_number + 1));
+    const int           approx_mod   = std::ceil(static_cast<double>(qc->getNops()) / (step_number + 1));
 
     //printf("Running %d times and using the dd at %p, using the cn object at %p\n", numberOfRuns, (void *) &localDD, (void *) &localDD->cn);
     for (unsigned long current_run = 0; current_run < numberOfRuns; current_run++) {
@@ -380,8 +380,8 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                             expValue = expValue >> 1u;
                         }
                     }
-                    dd_op   = classic_op->getOperation()->getDD(localDD);
-                    targets = classic_op->getOperation()->getTargets();
+                    dd_op    = classic_op->getOperation()->getDD(localDD);
+                    targets  = classic_op->getOperation()->getTargets();
                     controls = classic_op->getOperation()->getControls();
                     if (!execute_op) {
                         // applyNoiseOperation(targets.front(), controls, identity_DD, (std::unique_ptr<dd::Package> &) localDD, local_root_edge, generator, dist, line, identity_DD);
@@ -491,7 +491,7 @@ dd::Package::mEdge StochasticNoiseSimulator::generateNoiseOperation(bool        
                                                                     std::unique_ptr<dd::Package>&           localDD) {
     dd::NoiseOperationKind effect;
 
-    for (const char noise_type : gate_noise_types) {
+    for (const auto& noise_type: gate_noise_types) {
         if (noise_type != 'A') {
             effect = ReturnNoiseOperation(noise_type, distribution(engine));
         } else {
@@ -694,7 +694,7 @@ dd::NoiseOperationKind StochasticNoiseSimulator::ReturnNoiseOperation(char i, do
             }
         }
         default:
-           throw std::runtime_error(std::string{"Unknown noise effect '"} + i + "'");
+            throw std::runtime_error(std::string{"Unknown noise effect '"} + i + "'");
     }
 }
 

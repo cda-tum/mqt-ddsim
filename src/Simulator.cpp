@@ -210,7 +210,6 @@ char Simulator::MeasureOneCollapsing(const dd::Qubit index, const bool assume_pr
 
     dd::Package::vEdge e = dd->multiply(m_gate, root_edge);
 
-
     dd::Complex c = dd->cn.getTemporary(std::sqrt(1.0 / norm_factor), 0);
     CN::mul(c, e.w, c);
     e.w = dd->cn.lookup(c);

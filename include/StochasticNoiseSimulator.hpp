@@ -12,7 +12,6 @@
 #include <thread>
 #include <vector>
 
-
 class StochasticNoiseSimulator: public Simulator {
 public:
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity):
@@ -26,13 +25,14 @@ public:
     }
 
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
-                             const std::string& noise_effects,
-                             double noise_prob,
-                             long stoch_runs,
-                             unsigned int step_number,
-                             double step_fidelity,
-                             const std::string& recorded_properties):
-                    qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
+                             const std::string&                       noise_effects,
+                             double                                   noise_prob,
+                             long                                     stoch_runs,
+                             unsigned int                             step_number,
+                             double                                   step_fidelity,
+                             const std::string&                       recorded_properties):
+        qc(qc),
+        step_number(step_number), step_fidelity(step_fidelity) {
         setNoiseEffects(noise_effects);
         setRecordedProperties(recorded_properties);
         setAmplitudeDampingProbability(noise_prob);
@@ -114,21 +114,21 @@ private:
                                  std::vector<std::tuple<long, std::string>>& recordedPropertiesList,
                                  unsigned long long                          local_seed);
 
-    dd::Package::mEdge generateNoiseOperation(bool                                         amplitudeDamping,
-                                              dd::Qubit                                    target,
-                                              std::mt19937_64&                             engine,
-                                              std::uniform_real_distribution<dd::fp>&      distribution,
-                                              dd::Package::mEdge                           dd_operation,
-                                              std::unique_ptr<dd::Package>&                localDD);
+    dd::Package::mEdge generateNoiseOperation(bool                                    amplitudeDamping,
+                                              dd::Qubit                               target,
+                                              std::mt19937_64&                        engine,
+                                              std::uniform_real_distribution<dd::fp>& distribution,
+                                              dd::Package::mEdge                      dd_operation,
+                                              std::unique_ptr<dd::Package>&           localDD);
 
-    void applyNoiseOperation(const qc::Targets& targets,
-                             const dd::Controls& control_qubits,
-                             dd::Package::mEdge dd_op,
-                             std::unique_ptr<dd::Package>& localDD,
-                             dd::Package::vEdge& local_root_edge,
-                             std::mt19937_64& generator,
+    void applyNoiseOperation(const qc::Targets&                      targets,
+                             const dd::Controls&                     control_qubits,
+                             dd::Package::mEdge                      dd_op,
+                             std::unique_ptr<dd::Package>&           localDD,
+                             dd::Package::vEdge&                     local_root_edge,
+                             std::mt19937_64&                        generator,
                              std::uniform_real_distribution<dd::fp>& dist,
-                             dd::Package::mEdge identityDD);
+                             dd::Package::mEdge                      identityDD);
 
     [[nodiscard]] dd::NoiseOperationKind ReturnNoiseOperation(char i, double d) const;
 
