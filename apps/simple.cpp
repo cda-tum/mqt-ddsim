@@ -185,7 +185,7 @@ int main(int argc, char** argv) {
     if (vm.count("benchmark")) {
         auto more_info = ddsim->AdditionalStatistics();
         std::cout << ddsim->getName() << ", "
-                  << ddsim->getNumberOfQubits() << ", "
+                  << static_cast<std::size_t>(ddsim->getNumberOfQubits()) << ", "
                   << std::fixed << duration_simulation.count() << std::defaultfloat << ", "
                   << more_info["single_shots"] << ","
                   << more_info["approximation_runs"] << ","
@@ -237,7 +237,7 @@ int main(int argc, char** argv) {
                   << "    \"benchmark\": \"" << ddsim->getName() << "\",\n"
                   << "    \"shots\": " << shots << ",\n"
                   << "    \"distinct_results\": " << m.size() << ",\n"
-                  << "    \"n_qubits\": " << ddsim->getNumberOfQubits() << ",\n"
+                  << "    \"n_qubits\": " << static_cast<std::size_t>(ddsim->getNumberOfQubits()) << ",\n"
                   << "    \"applied_gates\": " << ddsim->getNumberOfOps() << ",\n"
                   << "    \"max_nodes\": " << ddsim->getMaxNodeCount() << ",\n";
         for (const auto& item: ddsim->AdditionalStatistics()) {
