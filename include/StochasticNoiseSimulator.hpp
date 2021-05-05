@@ -12,6 +12,7 @@
 #include <thread>
 #include <vector>
 
+
 class StochasticNoiseSimulator: public Simulator {
 public:
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity):
@@ -24,10 +25,16 @@ public:
         dd->resize(qc->getNqubits());
     }
 
-    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const std::string& noise_effects, double noise_prob, long stoch_runs, const unsigned int step_number, const double step_fidelity, const std::string& recorded_propeties):
-        qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
-        setNoiseEffects(noise_effects.data());
-        setRecordedProperties(recorded_propeties);
+    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
+                             const std::string& noise_effects,
+                             double noise_prob,
+                             long stoch_runs,
+                             unsigned int step_number,
+                             double step_fidelity,
+                             const std::string& recorded_properties):
+                    qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
+        setNoiseEffects(noise_effects);
+        setRecordedProperties(recorded_properties);
         setAmplitudeDampingProbability(noise_prob);
         stochastic_runs = stoch_runs;
     }
@@ -112,18 +119,16 @@ private:
                                               std::mt19937_64&                             engine,
                                               std::uniform_real_distribution<dd::fp>&      distribution,
                                               dd::Package::mEdge                           dd_operation,
-                                              std::unique_ptr<dd::Package>&                localDD,
-                                              dd::NoiseOperationTable<dd::Package::mEdge>& noiseOperationTable);
+                                              std::unique_ptr<dd::Package>&                localDD);
 
-    void applyNoiseOperation(const qc::Targets&                           targets,
-                             const dd::Controls&                          control_qubits,
-                             dd::Package::mEdge                           dd_op,
-                             std::unique_ptr<dd::Package>&                localDD,
-                             dd::NoiseOperationTable<dd::Package::mEdge>& noiseOperationTable,
-                             dd::Package::vEdge&                          local_root_edge,
-                             std::mt19937_64&                             generator,
-                             std::uniform_real_distribution<dd::fp>&      dist,
-                             dd::Package::mEdge                           identityDD);
+    void applyNoiseOperation(const qc::Targets& targets,
+                             const dd::Controls& control_qubits,
+                             dd::Package::mEdge dd_op,
+                             std::unique_ptr<dd::Package>& localDD,
+                             dd::Package::vEdge& local_root_edge,
+                             std::mt19937_64& generator,
+                             std::uniform_real_distribution<dd::fp>& dist,
+                             dd::Package::mEdge identityDD);
 
     [[nodiscard]] dd::NoiseOperationKind ReturnNoiseOperation(char i, double d) const;
 

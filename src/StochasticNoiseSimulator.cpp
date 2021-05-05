@@ -53,10 +53,10 @@ void StochasticNoiseSimulator::perfect_simulation_run() {
                 } else if (op->getType() == qc::Barrier) {
                     continue;
                 } else {
-                    throw std::runtime_error("Unsupported non-unitary functionality.");
+                    throw std::runtime_error(std::string("Unsupported non-unitary functionality '") + op->getName() + "'." );
                 }
             } else {
-                throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
+                throw std::runtime_error(std::string("Dynamic cast to NonUnitaryOperation failed for '") + op->getName() + "'.");
             }
             dd->garbageCollect();
         } else {
@@ -77,13 +77,9 @@ void StochasticNoiseSimulator::perfect_simulation_run() {
                         continue;
                     }
                 } else {
-                    throw std::runtime_error(" Dynamic cast to ClassicControlledOperation failed.");
+                    throw std::runtime_error("Dynamic cast to ClassicControlledOperation failed.");
                 }
             }
-            //const auto pre_op_size = dd->size(root_edge);
-            /*std::clog << "[INFO] op " << op_num << " is " << op->getName()
-                      << " #controls=" << op->getControls().size()
-                      << " statesize=" << dd->size(root_edge) << "\n";//*/
 
             auto dd_op = op->getDD(dd);
             auto tmp   = dd->multiply(dd_op, root_edge);
@@ -325,7 +321,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
         const auto t1 = std::chrono::steady_clock::now();
 
         std::unique_ptr<dd::Package> localDD = std::make_unique<dd::Package>(getNumberOfQubits());
-        dd::NoiseOperationTable<dd::Package::mEdge> noiseOperationTable(getNumberOfQubits());
+        //dd::NoiseOperationTable<dd::Package::mEdge> noiseOperationTable(getNumberOfQubits());
 
         dd::Package::mEdge identity_DD = localDD->makeIdent(n_qubits);
         localDD->incRef(identity_DD);
@@ -365,9 +361,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                 } else {
                     throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
                 }
-                if (localDD->garbageCollect(false)) {
-                    noiseOperationTable.clear();
-                }
+                localDD->garbageCollect(false);
             } else {
                 dd::Package::mEdge dd_op{};
                 qc::Targets        targets;
@@ -400,7 +394,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                 }
 
                 try {
-                    applyNoiseOperation(targets, controls, dd_op, localDD, noiseOperationTable, local_root_edge, generator, dist, identity_DD);
+                    applyNoiseOperation(targets, controls, dd_op, localDD, local_root_edge, generator, dist, identity_DD);
                 } catch (std::runtime_error& e) {
                     std::clog << "applyNoisyOperation failed on " << op->getName() << " op_count==" << op_count << " and current_run==" << current_run << "\n"
                               << std::flush;
@@ -410,13 +404,11 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                     ApproximateEdgeByFidelity(localDD, local_root_edge, step_fidelity, false, true, false);
                     approx_count++;
                 }
-                if (localDD->garbageCollect(false)) {
-                    noiseOperationTable.clear();
-                }
+                //localDD->garbageCollect(false);
             }
             op_count++;
         }
-        //localDD->decRef(local_root_edge);
+        localDD->decRef(local_root_edge);
         const auto t2 = std::chrono::steady_clock::now();
 
         for (unsigned long i = 0; i < recordedPropertiesStorage.size(); i++) {
@@ -437,33 +429,30 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
     }
 }
 
-void StochasticNoiseSimulator::applyNoiseOperation(const qc::Targets&                           targets,
-                                                   const dd::Controls&                          control_qubits,
-                                                   dd::Package::mEdge                           dd_op,
-                                                   std::unique_ptr<dd::Package>&                localDD,
-                                                   dd::NoiseOperationTable<dd::Package::mEdge>& noiseOperationTable,
-                                                   dd::Package::vEdge&                          local_root_edge,
-                                                   std::mt19937_64&                             generator,
-                                                   std::uniform_real_distribution<dd::fp>&      dist,
-                                                   dd::Package::mEdge                           identityDD) {
+void StochasticNoiseSimulator::applyNoiseOperation(const qc::Targets&                      targets,
+                                                   const dd::Controls&                     control_qubits,
+                                                   dd::Package::mEdge                      dd_op,
+                                                   std::unique_ptr<dd::Package>&           localDD,
+                                                   dd::Package::vEdge&                     local_root_edge,
+                                                   std::mt19937_64&                        generator,
+                                                   std::uniform_real_distribution<dd::fp>& dist,
+                                                   dd::Package::mEdge                      identityDD) {
     // TODO: Is this a meaningful way to handle multi-target operations?
     try {
         for (auto& target: targets) {
-            auto operation = generateNoiseOperation(false, target, generator, dist, dd_op, localDD, noiseOperationTable);
+            auto operation = generateNoiseOperation(false, target, generator, dist, dd_op, localDD);
             auto tmp       = localDD->multiply(operation, local_root_edge);
 
             if (dd::ComplexNumbers::mag2(tmp.w) < dist(generator)) {
-                operation = generateNoiseOperation(true, target, generator, dist, dd_op, localDD, noiseOperationTable);
+                operation = generateNoiseOperation(true, target, generator, dist, dd_op, localDD);
                 tmp       = localDD->multiply(operation, local_root_edge);
             }
 
             if (tmp.w != dd::Complex::one) {
-                dd::ComplexNumbers::incRef(tmp.w);
                 tmp.w = dd::Complex::one;
             }
-
-            localDD->decRef(local_root_edge);
             localDD->incRef(tmp);
+            localDD->decRef(local_root_edge);
             local_root_edge = tmp;
         }
     } catch (std::runtime_error& e) {
@@ -474,18 +463,17 @@ void StochasticNoiseSimulator::applyNoiseOperation(const qc::Targets&           
     // Apply noise to control qubits
     try {
         for (auto control: control_qubits) {
-            auto operation = generateNoiseOperation(false, control.qubit, generator, dist, identityDD, localDD, noiseOperationTable);
+            auto operation = generateNoiseOperation(false, control.qubit, generator, dist, identityDD, localDD);
             auto tmp       = localDD->multiply(operation, local_root_edge);
             if (dd::ComplexNumbers::mag2(tmp.w) < dist(generator)) {
-                operation = generateNoiseOperation(true, control.qubit, generator, dist, identityDD, localDD, noiseOperationTable);
+                operation = generateNoiseOperation(true, control.qubit, generator, dist, identityDD, localDD);
                 tmp       = localDD->multiply(operation, local_root_edge);
             }
             if (tmp.w != dd::Complex::one) {
-                dd::ComplexNumbers::incRef(tmp.w);
                 tmp.w = dd::Complex::one;
             }
-            localDD->decRef(local_root_edge);
             localDD->incRef(tmp);
+            localDD->decRef(local_root_edge);
             local_root_edge = tmp;
         }
     } catch (std::runtime_error& e) {
@@ -495,13 +483,12 @@ void StochasticNoiseSimulator::applyNoiseOperation(const qc::Targets&           
     }
 }
 
-dd::Package::mEdge StochasticNoiseSimulator::generateNoiseOperation(bool                                         amplitudeDamping,
-                                                                    dd::Qubit                                    target,
-                                                                    std::mt19937_64&                             engine,
-                                                                    std::uniform_real_distribution<dd::fp>&      distribution,
-                                                                    dd::Package::mEdge                           dd_operation,
-                                                                    std::unique_ptr<dd::Package>&                localDD,
-                                                                    dd::NoiseOperationTable<dd::Package::mEdge>& noiseOperationTable) {
+dd::Package::mEdge StochasticNoiseSimulator::generateNoiseOperation(bool                                    amplitudeDamping,
+                                                                    dd::Qubit                               target,
+                                                                    std::mt19937_64&                        engine,
+                                                                    std::uniform_real_distribution<dd::fp>& distribution,
+                                                                    dd::Package::mEdge                      dd_operation,
+                                                                    std::unique_ptr<dd::Package>&           localDD) {
     dd::NoiseOperationKind effect;
 
     for (const char noise_type : gate_noise_types) {
@@ -517,19 +504,19 @@ dd::Package::mEdge StochasticNoiseSimulator::generateNoiseOperation(bool        
         if (effect != dd::I) {
             switch (effect) {
                 case (dd::ATrue): {
-                    auto tmp_op = noiseOperationTable.lookup(getNumberOfQubits(), dd::ATrue, target);
+                    auto tmp_op = localDD->noiseOperationTable.lookup(getNumberOfQubits(), dd::ATrue, target);
                     if (tmp_op.p == nullptr) {
                         tmp_op = localDD->makeGateDD(dd::GateMatrix({dd::complex_zero, sqrt_amplitude_damping_probability, dd::complex_zero, dd::complex_zero}), getNumberOfQubits(), target);
-                        noiseOperationTable.insert(dd::ATrue, target, tmp_op);
+                        localDD->noiseOperationTable.insert(dd::ATrue, target, tmp_op);
                     }
                     dd_operation = localDD->multiply(tmp_op, dd_operation);
                     break;
                 }
                 case (dd::AFalse): {
-                    auto tmp_op = noiseOperationTable.lookup(getNumberOfQubits(), dd::AFalse, target);
+                    auto tmp_op = localDD->noiseOperationTable.lookup(getNumberOfQubits(), dd::AFalse, target);
                     if (tmp_op.p == nullptr) {
                         tmp_op = localDD->makeGateDD(dd::GateMatrix({dd::complex_one, dd::complex_zero, dd::complex_zero, one_minus_sqrt_amplitude_damping_probability}), getNumberOfQubits(), target);
-                        noiseOperationTable.insert(dd::AFalse, target, tmp_op);
+                        localDD->noiseOperationTable.insert(dd::AFalse, target, tmp_op);
                     }
                     dd_operation = localDD->multiply(tmp_op, dd_operation);
                     break;
