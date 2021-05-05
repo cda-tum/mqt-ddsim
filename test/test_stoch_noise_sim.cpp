@@ -96,7 +96,7 @@ TEST(StochNoiseSimTest, DestructiveMeasurementOneArbitraryNormalization) {
 
     const std::vector<dd::ComplexValue> v_after = ddsim.getVector();
 
-    for (auto const& e : v_after) {
+    for (auto const& e: v_after) {
         std::cout << e << " ";
     }
     std::cout << "\n";
