@@ -82,6 +82,40 @@ TEST(StochNoiseSimTest, DestructiveMeasurementOne) {
     }
 }
 
+TEST(StochNoiseSimTest, DestructiveMeasurementOneArbitraryNormalization) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
+    quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::H);
+    StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
+    ddsim.Simulate(1);
+
+    char            m = 'X';
+    std::mt19937_64 gen{};
+
+    ddsim.root_edge = ddsim.MeasureOneCollapsingConcurrent(0, ddsim.dd, ddsim.root_edge, gen, &m, false);
+
+    const std::vector<dd::ComplexValue> v_after = ddsim.getVector();
+
+    for (auto const& e : v_after) {
+        std::cout << e << " ";
+    }
+    std::cout << "\n";
+
+    if (m == '0') {
+        ASSERT_EQ(v_after[0], dd::complex_SQRT2_2);
+        ASSERT_EQ(v_after[2], dd::complex_SQRT2_2);
+        ASSERT_EQ(v_after[1], (dd::ComplexValue{0, 0}));
+        ASSERT_EQ(v_after[3], (dd::ComplexValue{0, 0}));
+    } else if (m == '1') {
+        ASSERT_EQ(v_after[0], (dd::ComplexValue{0, 0}));
+        ASSERT_EQ(v_after[2], (dd::ComplexValue{0, 0}));
+        ASSERT_EQ(v_after[1], dd::complex_SQRT2_2);
+        ASSERT_EQ(v_after[3], dd::complex_SQRT2_2);
+    } else {
+        FAIL() << "Measurement result not in {0,1}!";
+    }
+}
+
 TEST(StochNoiseSimTest, ApproximateByFidelity) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 0, qc::H);
@@ -257,6 +291,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorSelectedPropert
     quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(4, std::vector<dd::Qubit>{0, 1, 2}, qc::OpType::Barrier);
     quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::T);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::T);
@@ -277,7 +312,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorSelectedPropert
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
     quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 30000, 1, 1, "-3-500,501,502");
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 30000, 1, 1, " -3-500,501,502");
     auto                     m = ddsim.StochSimulate();
 
     EXPECT_GE(m.find("0000")->second, 0.19);

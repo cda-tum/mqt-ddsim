@@ -376,13 +376,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                     controls = op->getControls();
                 }
 
-                try {
-                    applyNoiseOperation(targets, controls, dd_op, localDD, local_root_edge, generator, dist, identity_DD);
-                } catch (std::runtime_error& e) {
-                    std::clog << "applyNoisyOperation failed on " << op->getName() << " op_count==" << op_count << " and current_run==" << current_run << "\n"
-                              << std::flush;
-                    throw;
-                }
+                applyNoiseOperation(targets, controls, dd_op, localDD, local_root_edge, generator, dist, identity_DD);
                 if (step_fidelity < 1 && (op_count + 1) % approx_mod == 0) {
                     ApproximateEdgeByFidelity(localDD, local_root_edge, step_fidelity, false, true);
                     approx_count++;
@@ -421,48 +415,36 @@ void StochasticNoiseSimulator::applyNoiseOperation(const qc::Targets&           
                                                    std::uniform_real_distribution<dd::fp>& dist,
                                                    dd::Package::mEdge                      identityDD) {
     // TODO: Is this a meaningful way to handle multi-target operations?
-    try {
-        for (auto& target: targets) {
-            auto operation = generateNoiseOperation(false, target, generator, dist, dd_op, localDD);
-            auto tmp       = localDD->multiply(operation, local_root_edge);
+    for (auto& target: targets) {
+        auto operation = generateNoiseOperation(false, target, generator, dist, dd_op, localDD);
+        auto tmp       = localDD->multiply(operation, local_root_edge);
 
-            if (dd::ComplexNumbers::mag2(tmp.w) < dist(generator)) {
-                operation = generateNoiseOperation(true, target, generator, dist, dd_op, localDD);
-                tmp       = localDD->multiply(operation, local_root_edge);
-            }
-
-            if (tmp.w != dd::Complex::one) {
-                tmp.w = dd::Complex::one;
-            }
-            localDD->incRef(tmp);
-            localDD->decRef(local_root_edge);
-            local_root_edge = tmp;
+        if (dd::ComplexNumbers::mag2(tmp.w) < dist(generator)) {
+            operation = generateNoiseOperation(true, target, generator, dist, dd_op, localDD);
+            tmp       = localDD->multiply(operation, local_root_edge);
         }
-    } catch (std::runtime_error& e) {
-        std::clog << "target handling failed\n"
-                  << std::flush;
-        throw;
+
+        if (tmp.w != dd::Complex::one) {
+            tmp.w = dd::Complex::one;
+        }
+        localDD->incRef(tmp);
+        localDD->decRef(local_root_edge);
+        local_root_edge = tmp;
     }
     // Apply noise to control qubits
-    try {
-        for (auto control: control_qubits) {
-            auto operation = generateNoiseOperation(false, control.qubit, generator, dist, identityDD, localDD);
-            auto tmp       = localDD->multiply(operation, local_root_edge);
-            if (dd::ComplexNumbers::mag2(tmp.w) < dist(generator)) {
-                operation = generateNoiseOperation(true, control.qubit, generator, dist, identityDD, localDD);
-                tmp       = localDD->multiply(operation, local_root_edge);
-            }
-            if (tmp.w != dd::Complex::one) {
-                tmp.w = dd::Complex::one;
-            }
-            localDD->incRef(tmp);
-            localDD->decRef(local_root_edge);
-            local_root_edge = tmp;
+    for (auto control: control_qubits) {
+        auto operation = generateNoiseOperation(false, control.qubit, generator, dist, identityDD, localDD);
+        auto tmp       = localDD->multiply(operation, local_root_edge);
+        if (dd::ComplexNumbers::mag2(tmp.w) < dist(generator)) {
+            operation = generateNoiseOperation(true, control.qubit, generator, dist, identityDD, localDD);
+            tmp       = localDD->multiply(operation, local_root_edge);
         }
-    } catch (std::runtime_error& e) {
-        std::clog << "control handling failed\n"
-                  << std::flush;
-        throw;
+        if (tmp.w != dd::Complex::one) {
+            tmp.w = dd::Complex::one;
+        }
+        localDD->incRef(tmp);
+        localDD->decRef(local_root_edge);
+        local_root_edge = tmp;
     }
 }
 
