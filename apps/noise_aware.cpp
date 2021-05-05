@@ -15,23 +15,26 @@ int main(int argc, char** argv) {
     unsigned long long seed;
 
     po::options_description description("JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
+    // clang-format off
     description.add_options()
-            ("help,h", "produce help message")
-            ("seed", po::value<unsigned long long>(&seed)->default_value(0), "seed for random number generator (default zero is possibly directly used as seed!)")
-            ("pm", "print measurements")
-            ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
-            ("verbose", "Causes some simulators to print additional information to STDERR")
+        ("help,h", "produce help message")
+        ("seed", po::value<unsigned long long>(&seed)->default_value(0), "seed for random number generator (default zero is possibly directly used as seed!)")
+        ("pm", "print measurements")
+        ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
+        ("verbose", "Causes some simulators to print additional information to STDERR")
 
-            ("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")
-            ("step_fidelity", po::value<double>()->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")
-            ("steps", po::value<unsigned int>()->default_value(1), "number of approximation steps")
+        ("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")
+        ("step_fidelity", po::value<double>()->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")
+        ("steps", po::value<unsigned int>()->default_value(1), "number of approximation steps")
 
-            ("noise_effects", po::value<std::string>()->default_value("APD"), "Noise effects (A (=amplitude damping),D (=depolarization),P (=phase flip)) in the form of a character string describing the noise effects (default=\"APD\")")
-            ("noise_prob", po::value<double>()->default_value(0.001), "Probability for applying noise (default=0.001)")
-            ("confidence", po::value<double>()->default_value(0.05), "Confidence in the error bound of the stochastic simulation (default= 0.05)")
-            ("error_bound", po::value<double>()->default_value(0.1), "Error bound of the stochastic simulation (default=0.1)")
-            ("stoch_runs", po::value<long>()->default_value(0), "Number of stochastic runs. When the value is 0 the value is calculated using the confidence, error_bound and number of tracked properties. (default = 0)")
-            ("properties", po::value<std::string>()->default_value("-3-1000"), R"(Comma separated list of tracked properties. Note that -1 is the fidelity and "-" can be used to specify a range.  (default="-3-1000"))");
+        ("noise_effects", po::value<std::string>()->default_value("APD"), "Noise effects (A (=amplitude damping),D (=depolarization),P (=phase flip)) in the form of a character string describing the noise effects (default=\"APD\")")
+        ("noise_prob", po::value<double>()->default_value(0.001), "Probability for applying noise (default=0.001)")
+        ("confidence", po::value<double>()->default_value(0.05), "Confidence in the error bound of the stochastic simulation (default= 0.05)")
+        ("error_bound", po::value<double>()->default_value(0.1), "Error bound of the stochastic simulation (default=0.1)")
+        ("stoch_runs", po::value<long>()->default_value(0), "Number of stochastic runs. When the value is 0 the value is calculated using the confidence, error_bound and number of tracked properties. (default = 0)")
+        ("properties", po::value<std::string>()->default_value("-3-1000"), R"(Comma separated list of tracked properties. Note that -1 is the fidelity and "-" can be used to specify a range.  (default="-3-1000"))")
+    ;
+    // clang-format on
     po::variables_map vm;
     try {
         po::store(po::parse_command_line(argc, argv, description), vm);
