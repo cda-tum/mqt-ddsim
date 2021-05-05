@@ -118,7 +118,7 @@ TEST(StochNoiseSimTest, Reordering) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::H);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(3, std::vector<dd::Qubit>{0,1,2}, qc::OpType::Barrier);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(3, std::vector<dd::Qubit>{0, 1, 2}, qc::OpType::Barrier);
     quantumComputation->emplace_back<qc::StandardOperation>(3, dd::Controls{dd::Control{0}, dd::Control{1}}, 2, qc::X);
 
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
