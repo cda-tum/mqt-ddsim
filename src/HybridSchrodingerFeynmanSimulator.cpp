@@ -102,13 +102,17 @@ void HybridSchrodingerFeynmanSimulator::addAmplitudes(std::vector<dd::ComplexVal
 }
 
 void HybridSchrodingerFeynmanSimulator::SimulateParallel(dd::Qubit split_qubit) {
-    auto ndecisions = getNDecisions(split_qubit);
+    auto               ndecisions  = getNDecisions(split_qubit);
+    const std::int64_t max_control = 1LL << ndecisions;
 
-    omp_set_num_threads(static_cast<int>(nthreads));
-    root_edge                          = qc::VectorDD::zero;
-    const std::int64_t max_control     = 1 << ndecisions;
-    std::int64_t       nslices_at_once = 16;
-    nslices_at_once                    = std::min(nslices_at_once, max_control / static_cast<std::int64_t>(nthreads));
+    int actuallyUsedThreads = static_cast<int>(nthreads);
+    if (static_cast<std::size_t>(max_control) < nthreads) {
+        actuallyUsedThreads = static_cast<int>(max_control);
+    }
+    omp_set_num_threads(actuallyUsedThreads);
+    root_edge                    = qc::VectorDD::zero;
+    std::int64_t nslices_at_once = 16;
+    nslices_at_once              = std::min(nslices_at_once, max_control / static_cast<std::int64_t>(actuallyUsedThreads));
     std::stack<std::pair<std::int64_t, std::int64_t>> stack{};
     for (auto i = max_control - 1; i >= 0; i -= nslices_at_once) {
         stack.emplace(0, i);
@@ -183,16 +187,21 @@ void HybridSchrodingerFeynmanSimulator::SimulateParallel(dd::Qubit split_qubit) 
     dd->incRef(root_edge);
 }
 void HybridSchrodingerFeynmanSimulator::SimulateParallelAmplitudes(dd::Qubit split_qubit) {
-    auto ndecisions = getNDecisions(split_qubit);
-    omp_set_num_threads(static_cast<int>(nthreads));
+    auto               ndecisions  = getNDecisions(split_qubit);
+    const std::int64_t max_control = 1LL << ndecisions;
 
-    std::vector<std::vector<dd::ComplexValue>> amplitudes(nthreads);
-    std::vector<bool>                          initialized(nthreads, false);
+    int actuallyUsedThreads = static_cast<int>(nthreads);
+    if (static_cast<std::size_t>(max_control) < nthreads) {
+        actuallyUsedThreads = static_cast<int>(max_control);
+    }
+    omp_set_num_threads(actuallyUsedThreads);
 
-    root_edge                             = qc::VectorDD::zero;
-    const std::int64_t max_control        = 1 << ndecisions;
-    std::int64_t       nslices_on_one_cpu = std::min(static_cast<std::int64_t>(64), static_cast<std::int64_t>(max_control / nthreads));
-    dd::QubitCount     nqubits            = getNumberOfQubits();
+    std::vector<std::vector<dd::ComplexValue>> amplitudes(actuallyUsedThreads);
+    std::vector<bool>                          initialized(actuallyUsedThreads, false);
+
+    root_edge                         = qc::VectorDD::zero;
+    std::int64_t   nslices_on_one_cpu = std::min(static_cast<std::int64_t>(64), static_cast<std::int64_t>(max_control / actuallyUsedThreads));
+    dd::QubitCount nqubits            = getNumberOfQubits();
 
 #pragma omp parallel for schedule(dynamic, 1)
     for (std::int64_t control = 0; control < max_control; control += nslices_on_one_cpu) {
@@ -216,9 +225,9 @@ void HybridSchrodingerFeynmanSimulator::SimulateParallelAmplitudes(dd::Qubit spl
     }
 
     std::size_t old_increment = 1;
-    for (unsigned short level = 0; level < static_cast<unsigned short>(std::log2(nthreads)); ++level) {
-        const std::size_t increment = 2UL << level;
-        for (std::size_t idx = 0; idx < nthreads; idx += increment) {
+    for (unsigned short level = 0; level < static_cast<unsigned short>(std::log2(actuallyUsedThreads)); ++level) {
+        const int increment = 2 << level;
+        for (int idx = 0; idx < actuallyUsedThreads; idx += increment) {
             addAmplitudes(amplitudes[idx], amplitudes[idx + old_increment]);
         }
         old_increment = increment;
