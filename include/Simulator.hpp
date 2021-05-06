@@ -45,6 +45,8 @@ public:
 
     [[nodiscard]] std::vector<dd::ComplexValue> getVector() const;
 
+    [[nodiscard]] std::vector<std::pair<dd::fp, dd::fp>> getVectorPair() const;
+
     [[nodiscard]] std::size_t getActiveNodeCount() const { return dd->vUniqueTable.getActiveNodeCount(); }
 
     [[nodiscard]] std::size_t getMaxNodeCount() const { return dd->vUniqueTable.getMaxActiveNodes(); }
