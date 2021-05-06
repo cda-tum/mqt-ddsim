@@ -84,6 +84,7 @@ int main(int argc, char** argv) {
         ddsim                   = std::make_unique<CircuitSimulator>(quantumComputation, approx_info, seed);
     } else if (vm.count("simulate_file_hybrid")) {
         const std::string fname = vm["simulate_file_hybrid"].as<std::string>();
+        quantumComputation      = std::make_unique<qc::QuantumComputation>(fname);
         if (vm.count("hybrid_mode")) {
             const std::string mname = vm["hybrid_mode"].as<std::string>();
             if (mname == "amplitude") {
@@ -92,7 +93,6 @@ int main(int argc, char** argv) {
                 mode = HybridSchrodingerFeynmanSimulator::Mode::DD;
             }
         }
-        quantumComputation = std::make_unique<qc::QuantumComputation>(fname);
         if (seed != 0) {
             ddsim = std::make_unique<HybridSchrodingerFeynmanSimulator>(quantumComputation, approx_info, seed, mode, nthreads);
         } else {
@@ -139,7 +139,7 @@ int main(int argc, char** argv) {
     }
 
     if (quantumComputation && quantumComputation->getNqubits() > 100) {
-        std::clog << "[WARNING] Quantum computation contains quite a qubits. You're jumping into the deep end.\n";
+        std::clog << "[WARNING] Quantum computation contains quite a few qubits. You're jumping into the deep end.\n";
     }
 
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -233,8 +233,8 @@ int main(int argc, char** argv) {
                 {"seed", ddsim->getSeed()},
         };
 
-        for (const auto& item: ddsim->AdditionalStatistics()) {
-            output_obj["statistics"][item.first] = item.second;
+        for (const auto& [stat, value]: ddsim->AdditionalStatistics()) {
+            output_obj["statistics"][stat] = value;
         }
     }
 
