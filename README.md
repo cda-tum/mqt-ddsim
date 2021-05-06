@@ -288,7 +288,9 @@ If you use our tool for your research, we will be thankful if you refer to it by
 
 
 <details open>
-<summary>[1] [A. Zulehner and R. Wille, “Advanced Simulation of Quantum Computations,” Transactions on CAD of Integrated Circuits and Systems (TCAD), vol. 38, no. 5, pp. 848–859, 2019](https://iic.jku.at/files/eda/2018_tcad_advanced_simulation_quantum_computation.pdf)</summary>
+<summary>
+  [1] <a href="https://iic.jku.at/files/eda/2018_tcad_advanced_simulation_quantum_computation.pdf">A. Zulehner and R. Wille, “Advanced Simulation of Quantum Computations,” Transactions on CAD of Integrated Circuits and Systems (TCAD), vol. 38, no. 5, pp. 848–859, 2019</a>
+</summary>
 
 ```bibtex
 @article{zulehner2019advanced,
@@ -305,7 +307,9 @@ If you use our tool for your research, we will be thankful if you refer to it by
 </details>
 
 <details open>
-<summary>[2] S. Hillmich, I. L. Markov, and R. Wille, “Just Like the Real Thing: Fast Weak Simulation of Quantum Computation,” in Design Automation Conference (DAC), 2020</summary>
+<summary>
+  [2] <a href="https://iic.jku.at/files/eda/2020_dac_weak_simulation_quantum_computation.pdf">S. Hillmich, I. L. Markov, and R. Wille, “Just Like the Real Thing: Fast Weak Simulation of Quantum Computation,” in Design Automation Conference (DAC), 2020</a>
+</summary>
 
 ```bibtex
 @inproceedings{DBLP:conf/dac/HillmichMW20,
@@ -323,7 +327,9 @@ If you use our tool for your research, we will be thankful if you refer to it by
 
 
 <details open>
-<summary>[3] T. Grurl, R. Kueng, J. Fuß, and R. Wille, “Stochastic Quantum Circuit Simulation Using Decision Diagrams,” in Design, Automation and Test in Europe (DATE), 2021</summary>
+<summary>
+  [3] <a href="https://iic.jku.at/files/eda/2021_stochastic_quantum_circuit_simulation_using_decision_diagrams.pdf">T. Grurl, R. Kueng, J. Fuß, and R. Wille, “Stochastic Quantum Circuit Simulation Using Decision Diagrams,” in Design, Automation and Test in Europe (DATE), 2021</a>
+</summary>
 
 ```bibtex
 @inproceedings{Grurl2020,
@@ -339,7 +345,9 @@ If you use our tool for your research, we will be thankful if you refer to it by
 
 
 <details open>
-<summary>[4]S. Hillmich, R. Kueng, I. L. Markov, and R. Wille, "As Accurate as Needed, as Efficient as Possible: Approximations in DD-based Quantum Circuit Simulation," in Design, Automation and Test in Europe (DATE), 2021</summary>
+<summary>
+  [4] <a href="https://iic.jku.at/files/eda/2021_date_approximations_dd_baed_quantum_circuit_simulation.pdf">S. Hillmich, R. Kueng, I. L. Markov, and R. Wille, "As Accurate as Needed, as Efficient as Possible: Approximations in DD-based Quantum Circuit Simulation," in Design, Automation and Test in Europe (DATE), 2021</a>
+</summary>
 
 ```bibtex
 @inproceedings{DBLP:conf/date/HillmichKMW21,
