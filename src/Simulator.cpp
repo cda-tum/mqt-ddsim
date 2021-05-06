@@ -1,5 +1,6 @@
 #include "Simulator.hpp"
 
+#include <cassert>
 #include <cmath>
 #include <iostream>
 #include <queue>
@@ -107,6 +108,20 @@ std::vector<dd::ComplexValue> Simulator::getVector() const {
     for (unsigned long long i = 0; i < 1ull << getNumberOfQubits(); ++i) {
         const std::string corrected_path{path.rbegin(), path.rend()};
         results[i] = dd->getValueByPath(root_edge, corrected_path);
+        NextPath(path);
+    }
+    return results;
+}
+
+std::vector<std::pair<dd::fp, dd::fp>> Simulator::getVectorPair() const {
+    assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
+    std::string                            path(getNumberOfQubits(), '0');
+    std::vector<std::pair<dd::fp, dd::fp>> results{1ull << getNumberOfQubits()};
+
+    for (unsigned long long i = 0; i < 1ull << getNumberOfQubits(); ++i) {
+        const std::string      corrected_path{path.rbegin(), path.rend()};
+        const dd::ComplexValue cv = dd->getValueByPath(root_edge, corrected_path);
+        results[i]                = std::make_pair(cv.r, cv.i);
         NextPath(path);
     }
     return results;
@@ -233,12 +248,12 @@ char Simulator::MeasureOneCollapsing(const dd::Qubit index, const bool assume_pr
     dd::Package::mEdge m_gate = dd->makeGateDD(measure_m, getNumberOfQubits(), index);
 
     dd::Package::vEdge e = dd->multiply(m_gate, root_edge);
-    dd->decRef(root_edge);
 
     dd::Complex c = dd->cn.getTemporary(std::sqrt(1.0 / norm_factor), 0);
     CN::mul(c, e.w, c);
     e.w = dd->cn.lookup(c);
     dd->incRef(e);
+    dd->decRef(root_edge);
     root_edge = e;
 
     return result;
