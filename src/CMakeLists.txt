@@ -9,8 +9,6 @@ add_library(${PROJECT_NAME}
             ${CMAKE_CURRENT_SOURCE_DIR}/ShorSimulator.cpp
             ${PROJECT_SOURCE_DIR}/include/ShorFastSimulator.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/ShorFastSimulator.cpp
-            ${PROJECT_SOURCE_DIR}/include/SlicingSimulator.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/SlicingSimulator.cpp
             ${PROJECT_SOURCE_DIR}/include/HybridSchrodingerFeynmanSimulator.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/HybridSchrodingerFeynmanSimulator.cpp
             )

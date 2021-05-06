@@ -1,12 +1,128 @@
 #include "HybridSchrodingerFeynmanSimulator.hpp"
+
+std::size_t HybridSchrodingerFeynmanSimulator::getNDecisions(dd::Qubit split_qubit) {
+    std::size_t ndecisions = 0;
+    // calculate number of decisions
+    for (const auto& op: *qc) {
+        if (dynamic_cast<qc::StandardOperation*>(op.get())) {
+            bool target_in_lower_slice = false, target_in_upper_slice = false;
+            bool control_in_lower_slice = false, control_in_upper_slice = false;
+            for (const auto& target: op->getTargets()) {
+                target_in_lower_slice = target_in_lower_slice || target < split_qubit;
+                target_in_upper_slice = target_in_upper_slice || target >= split_qubit;
+            }
+            for (const auto& control: op->getControls()) {
+                control_in_lower_slice = control_in_lower_slice || control.qubit < split_qubit;
+                control_in_upper_slice = control_in_upper_slice || control.qubit >= split_qubit;
+            }
+            if ((target_in_lower_slice && control_in_upper_slice) ||
+                (target_in_upper_slice && control_in_lower_slice)) {
+                ndecisions++;
+            }
+        } else if (op->isCompoundOperation()) {
+            throw std::invalid_argument("Compound operations currently not supported in hybrid Schrodinger-Feynman simulation.");
+        } else if (op->isClassicControlledOperation()) {
+            throw std::invalid_argument("Classic-controlled operations currently not supported in hybrid Schrodinger-Feynman simulation.");
+        } else if (op->getType() == qc::Measure || op->getType() == qc::Reset) {
+            throw std::invalid_argument("Non-unitary operations currently not supported in hybrid Schrodinger-Feynman simulation.");
+        }
+    }
+    return ndecisions;
+}
+
+qc::VectorDD HybridSchrodingerFeynmanSimulator::SimulateSlicing(std::unique_ptr<dd::Package>& slice_dd, dd::Qubit split_qubit, std::size_t controls) {
+    Slice lower(slice_dd, 0, static_cast<dd::Qubit>(split_qubit - 1), controls);
+    Slice upper(slice_dd, split_qubit, static_cast<dd::Qubit>(getNumberOfQubits() - 1), controls);
+
+    for (const auto& op: *qc) {
+        if (op->isUnitary()) {
+            [[maybe_unused]] auto l = lower.apply(slice_dd, op);
+            [[maybe_unused]] auto u = upper.apply(slice_dd, op);
+            assert(l == u);
+        }
+        slice_dd->garbageCollect();
+    }
+
+    auto result = slice_dd->kronecker(upper.edge, lower.edge, false);
+    slice_dd->incRef(result);
+
+    return result;
+}
+
+bool HybridSchrodingerFeynmanSimulator::Slice::apply(std::unique_ptr<dd::Package>& slice_dd, const std::unique_ptr<qc::Operation>& op) {
+    bool is_split_op = false;
+    if (reinterpret_cast<qc::StandardOperation*>(op.get())) { // TODO change control and target if wrong direction
+        qc::Targets  op_targets{};
+        dd::Controls op_controls{};
+
+        // check targets
+        bool target_in_split = false, target_in_other_split = false;
+        for (const auto& target: op->getTargets()) {
+            if (start <= target && target <= end) {
+                op_targets.push_back(target);
+                target_in_split = true;
+            } else {
+                target_in_other_split = true;
+            }
+        }
+
+        if (target_in_split && target_in_other_split && !op->getControls().empty()) {
+            throw std::invalid_argument("Multiple Targets that are in different slices are not supported at the moment");
+        }
+
+        // check controls
+        for (const auto& control: op->getControls()) {
+            if (start <= control.qubit && control.qubit <= end) {
+                op_controls.emplace(dd::Control{control.qubit, control.type});
+            } else { // other controls are set to the corresponding value
+                if (target_in_split) {
+                    is_split_op       = true;
+                    bool next_control = getNextControl();
+                    if ((control.type == dd::Control::Type::pos && !next_control) || // break if control is not activated
+                        (control.type == dd::Control::Type::neg && next_control)) {
+                        nDecisionsExecuted++;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        if (target_in_other_split && !op_controls.empty()) { // control slice for split
+            if (op_controls.size() > 1) {
+                throw std::invalid_argument("Multiple controls in control slice of operation are not supported at the moment");
+            }
+
+            is_split_op  = true;
+            bool control = getNextControl();
+            for (const auto& c: op_controls) {
+                slice_dd->decRef(edge); // TODO incref and decref could be integrated in delete edge
+                edge = slice_dd->deleteEdge(edge, c.qubit, control ? (c.type == dd::Control::Type::pos ? 0 : 1) : (c.type == dd::Control::Type::pos ? 1 : 0));
+                slice_dd->incRef(edge);
+            }
+        } else if (target_in_split) { // target slice for split or operation in split
+            const auto&           param = op->getParameter();
+            qc::StandardOperation new_op(nqubits, op_controls, op_targets, op->getType(), param[0], param[1], param[2], start);
+            slice_dd->decRef(edge);
+            edge = slice_dd->multiply(new_op.getDD(slice_dd), edge, start);
+            slice_dd->incRef(edge);
+        }
+    } else {
+        throw std::invalid_argument("Only StandardOperations are supported for now.");
+    }
+    if (is_split_op) {
+        nDecisionsExecuted++;
+    }
+    return is_split_op;
+}
+
 std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator::Simulate(unsigned int shots) {
     auto nqubits    = getNumberOfQubits();
     auto splitQubit = static_cast<dd::Qubit>(nqubits / 2);
     if (mode == Mode::DD) {
-        SimulateParallel(splitQubit);
+        SimulateHybrid(splitQubit);
         return MeasureAllNonCollapsing(shots);
     } else {
-        SimulateParallelAmplitudes(splitQubit);
+        SimulateHybridAmplitudes(splitQubit);
 
         if (shots > 0) {
             return SampleFromAmplitudeVectorInPlace(finalAmplitudes, shots);
@@ -17,7 +133,7 @@ std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator::Simulate(u
     }
 }
 
-void HybridSchrodingerFeynmanSimulator::SimulateParallel(dd::Qubit split_qubit) {
+void HybridSchrodingerFeynmanSimulator::SimulateHybrid(dd::Qubit split_qubit) {
     auto               ndecisions  = getNDecisions(split_qubit);
     const std::int64_t max_control = 1LL << ndecisions;
 
@@ -55,11 +171,11 @@ void HybridSchrodingerFeynmanSimulator::SimulateParallel(dd::Qubit split_qubit) 
                 qc::VectorDD                 edge{};
                 for (std::int64_t i = 0; i < nslices_at_once; i++) {
                     auto slice_dd = std::make_unique<dd::Package>(getNumberOfQubits());
-                    auto edges    = SimulateSlicing(slice_dd, split_qubit, current.second + i);
+                    auto result   = SimulateSlicing(slice_dd, split_qubit, current.second + i);
                     if (i > 0) {
-                        edge = slice_dd->add(slice_dd->transfer(edge), std::get<2>(edges));
+                        edge = slice_dd->add(slice_dd->transfer(edge), result);
                     } else {
-                        edge = std::get<2>(edges);
+                        edge = result;
                     }
                     old_dd = std::move(slice_dd);
                 }
@@ -102,7 +218,7 @@ void HybridSchrodingerFeynmanSimulator::SimulateParallel(dd::Qubit split_qubit) 
     root_edge = dd->deserialize<dd::Package::vNode>("slice_" + std::to_string(ndecisions) + "_0.dd", true);
     dd->incRef(root_edge);
 }
-void HybridSchrodingerFeynmanSimulator::SimulateParallelAmplitudes(dd::Qubit split_qubit) {
+void HybridSchrodingerFeynmanSimulator::SimulateHybridAmplitudes(dd::Qubit split_qubit) {
     auto               ndecisions  = getNDecisions(split_qubit);
     const std::int64_t max_control = 1LL << ndecisions;
 
@@ -127,15 +243,15 @@ void HybridSchrodingerFeynmanSimulator::SimulateParallelAmplitudes(dd::Qubit spl
         for (std::int64_t local_control = 0; local_control < nslices_on_one_cpu; local_control++) {
             std::int64_t                 total_control = control + local_control;
             std::unique_ptr<dd::Package> slice_dd      = std::make_unique<dd::Package>(getNumberOfQubits());
-            auto                         edges         = SimulateSlicing(slice_dd, split_qubit, total_control);
+            auto                         result        = SimulateSlicing(slice_dd, split_qubit, total_control);
 
             if (thread_initialized) {
-                slice_dd->addAmplitudes(std::get<2>(edges), thread_amplitudes, nqubits);
+                slice_dd->addAmplitudes(result, thread_amplitudes, nqubits);
             } else {
                 initialized[current_thread] = true;
                 thread_initialized          = true;
                 thread_amplitudes           = std::vector<dd::ComplexValue>(1 << nqubits);
-                slice_dd->exportAmplitudes(std::get<2>(edges), thread_amplitudes, nqubits);
+                slice_dd->exportAmplitudes(result, thread_amplitudes, nqubits);
             }
         }
     }
