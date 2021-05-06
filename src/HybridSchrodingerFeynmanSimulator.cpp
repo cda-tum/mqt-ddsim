@@ -19,12 +19,8 @@ std::size_t HybridSchrodingerFeynmanSimulator::getNDecisions(dd::Qubit split_qub
                 (target_in_upper_slice && control_in_lower_slice)) {
                 ndecisions++;
             }
-        } else if (op->isCompoundOperation()) {
-            throw std::invalid_argument("Compound operations currently not supported in hybrid Schrodinger-Feynman simulation.");
-        } else if (op->isClassicControlledOperation()) {
-            throw std::invalid_argument("Classic-controlled operations currently not supported in hybrid Schrodinger-Feynman simulation.");
-        } else if (op->getType() == qc::Measure || op->getType() == qc::Reset) {
-            throw std::invalid_argument("Non-unitary operations currently not supported in hybrid Schrodinger-Feynman simulation.");
+        } else {
+            throw std::invalid_argument("Only StandardOperations are supported for now.");
         }
     }
     return ndecisions;

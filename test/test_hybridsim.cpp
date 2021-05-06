@@ -5,7 +5,7 @@
 
 using namespace dd::literals;
 
-TEST(ParallelSimTest, TrivialParallelTest) {
+TEST(HybridSimTest, TrivialParallelTest) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::H);
@@ -36,7 +36,7 @@ TEST(ParallelSimTest, TrivialParallelTest) {
     EXPECT_NEAR(it->second, 2048, 128);
 }
 
-TEST(ParallelSimTest, GRCSTestDD) {
+TEST(HybridSimTest, GRCSTestDD) {
     auto                              quantumComputation = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
     HybridSchrodingerFeynmanSimulator ddsim_hybrid_dd(quantumComputation, HybridSchrodingerFeynmanSimulator::Mode::DD);
     CircuitSimulator                  ddsim(quantumComputation);
@@ -67,7 +67,7 @@ TEST(ParallelSimTest, GRCSTestDD) {
     EXPECT_TRUE(equal);
 }
 
-TEST(ParallelSimTest, GRCSTestAmplitudes) {
+TEST(HybridSimTest, GRCSTestAmplitudes) {
     auto                              quantumComputation = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
     HybridSchrodingerFeynmanSimulator ddsim_hybrid_amp(quantumComputation, HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
     CircuitSimulator                  ddsim(quantumComputation);
@@ -87,4 +87,13 @@ TEST(ParallelSimTest, GRCSTestAmplitudes) {
     }
 
     EXPECT_TRUE(equal);
+}
+
+TEST(HybridSimTest, NonStandardOperation) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(1);
+    quantumComputation->emplace_back<qc::StandardOperation>(1, 0, qc::H);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, 0, 0);
+
+    HybridSchrodingerFeynmanSimulator ddsim(quantumComputation);
+    EXPECT_THROW(ddsim.Simulate(0), std::invalid_argument);
 }
