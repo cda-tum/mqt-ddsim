@@ -4,15 +4,18 @@
 #include "ShorFastSimulator.hpp"
 #include "ShorSimulator.hpp"
 #include "Simulator.hpp"
+#include "algorithms/Entanglement.hpp"
+#include "algorithms/Grover.hpp"
+#include "algorithms/QFT.hpp"
+#include "nlohmann/json.hpp"
 
-#include <algorithms/Entanglement.hpp>
-#include <algorithms/Grover.hpp>
-#include <algorithms/QFT.hpp>
 #include <boost/program_options.hpp>
 #include <chrono>
 #include <iostream>
 #include <memory>
 #include <string>
+
+namespace nl = nlohmann;
 
 int main(int argc, char** argv) {
     namespace po = boost::program_options;
@@ -28,8 +31,34 @@ int main(int argc, char** argv) {
     unsigned int                            nthreads;
 
     po::options_description description("JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
-    description.add_options()("help,h", "produce help message")("seed", po::value<>(&seed)->default_value(0),
-                                                                "seed for random number generator (default zero is possibly directly used as seed!)")("shots", po::value<>(&shots)->default_value(0), "number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)")("display_vector", "display the state vector")("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")("verbose", "Causes some simulators to print additional information to STDERR")("benchmark", "print simulation stats in a single CSV style line (overrides --ps and suppresses most other output, please don't rely on the format across versions)")("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")("simulate_file_hybrid", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension) using the hybrid Schrodinger-Feynman simulator")("hybrid_mode", po::value<std::string>(), "mode used for hybrid Schrodinger-Feynman simulation (*amplitude*, dd)")("nthreads", po::value<>(&nthreads)->default_value(2), "#threads used for hybrid simulation")("simulate_qft", po::value<unsigned int>(), "simulate Quantum Fourier Transform for given number of qubits")("simulate_ghz", po::value<unsigned int>(), "simulate state preparation of GHZ state for given number of qubits")("step_fidelity", po::value<>(&step_fidelity)->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")("steps", po::value<>(&approx_steps)->default_value(1), "number of approximation steps")("approx_when", po::value<>(&approx_when)->default_value(ApproximationInfo::FidelityDriven), "approximation method ('fidelity' (default) or 'memory'")("approx_state", "do excessive approximation runs at the end of the simulation to see how the quantum state behaves")("simulate_grover", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle")("simulate_grover_emulated", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle and emulation")("simulate_grover_oracle_emulated", po::value<std::string>(), "simulate Grover's search for given number of qubits with given oracle and emulation")("simulate_shor", po::value<unsigned int>(), "simulate Shor's algorithm factoring this number")("simulate_shor_coprime", po::value<unsigned int>()->default_value(0), "coprime number to use with Shor's algorithm (zero randomly generates a coprime)")("simulate_shor_no_emulation", "Force Shor simulator to do modular exponentiation instead of using emulation (you'll usually want emulation)")("simulate_fast_shor", po::value<unsigned int>(), "simulate Shor's algorithm factoring this number with intermediate measurements")("simulate_fast_shor_coprime", po::value<unsigned int>()->default_value(0), "coprime number to use with Shor's algorithm (zero randomly generates a coprime)");
+    // clang-format off
+    description.add_options()
+        ("help,h", "produce help message")
+        ("seed", po::value<>(&seed)->default_value(0), "seed for random number generator (default zero is possibly directly used as seed!)")
+        ("shots", po::value<>(&shots)->default_value(0), "number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)")
+        ("pv", "display the state vector")
+        ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
+        ("pm", "print measurement results")
+        ("verbose", "Causes some simulators to print additional information to STDERR")
+        ("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")
+        ("simulate_file_hybrid", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension) using the hybrid Schrodinger-Feynman simulator")
+        ("hybrid_mode", po::value<std::string>(), "mode used for hybrid Schrodinger-Feynman simulation (*amplitude*, dd)")
+        ("nthreads", po::value<>(&nthreads)->default_value(2), "#threads used for hybrid simulation")
+        ("simulate_qft", po::value<unsigned int>(), "simulate Quantum Fourier Transform for given number of qubits")
+        ("simulate_ghz", po::value<unsigned int>(), "simulate state preparation of GHZ state for given number of qubits")
+        ("step_fidelity", po::value<>(&step_fidelity)->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")
+        ("steps", po::value<>(&approx_steps)->default_value(1), "number of approximation steps")
+        ("approx_when", po::value<>(&approx_when)->default_value(ApproximationInfo::FidelityDriven), "approximation method ('fidelity' (default) or 'memory'")
+        ("approx_state", "do excessive approximation runs at the end of the simulation to see how the quantum state behaves")
+        ("simulate_grover", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle")
+        ("simulate_grover_emulated", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle and emulation")
+        ("simulate_grover_oracle_emulated", po::value<std::string>(), "simulate Grover's search for given number of qubits with given oracle and emulation")
+        ("simulate_shor", po::value<unsigned int>(), "simulate Shor's algorithm factoring this number")
+        ("simulate_shor_coprime", po::value<unsigned int>()->default_value(0), "coprime number to use with Shor's algorithm (zero randomly generates a coprime)")
+        ("simulate_shor_no_emulation", "Force Shor simulator to do modular exponentiation instead of using emulation (you'll usually want emulation)")
+        ("simulate_fast_shor", po::value<unsigned int>(), "simulate Shor's algorithm factoring this number with intermediate measurements")
+        ("simulate_fast_shor_coprime", po::value<unsigned int>()->default_value(0),"coprime number to use with Shor's algorithm (zero randomly generates a coprime)");
+    // clang-format on
     po::variables_map vm;
     try {
         po::store(po::parse_command_line(argc, argv, description), vm);
@@ -182,69 +211,32 @@ int main(int argc, char** argv) {
         }
     }
 
-    if (vm.count("benchmark")) {
-        auto more_info = ddsim->AdditionalStatistics();
-        std::cout << ddsim->getName() << ", "
-                  << static_cast<std::size_t>(ddsim->getNumberOfQubits()) << ", "
-                  << std::fixed << duration_simulation.count() << std::defaultfloat << ", "
-                  << more_info["single_shots"] << ","
-                  << more_info["approximation_runs"] << ","
-                  << more_info["final_fidelity"] << ", "
-                  << more_info["coprime_a"] << ", "
-                  << more_info["sim_result"] << ", "
-                  << more_info["polr_result"] << ", "
-                  << ddsim->getSeed() << ", "
-                  << ddsim->getNumberOfOps() << ", "
-                  << ddsim->getMaxNodeCount()
-                  << "\n";
-        return 0;
+    nl::json output_obj;
+
+    if (vm.count("pm")) {
+        output_obj["measurement_results"] = m;
     }
 
-    std::cout << "{\n";
-
-    if (!m.empty()) {
-        std::cout << "  \"measurements\": {";
-        bool first_element = true;
-        for (const auto& element: m) {
-            std::cout << (first_element ? "" : ",") << "\n    \"" << element.first << "\": " << element.second;
-            first_element = false;
-        }
-        std::cout << "\n  },\n";
-    }
-    if (vm.count("display_vector")) {
-        std::cout << "  \"state_vector\": [";
-
-        bool               first_element    = true;
-        unsigned long long non_zero_entries = 0;
-        for (const auto& element: ddsim->getVector()) {
-            if (element.r != 0 || element.i != 0) {
-                non_zero_entries++;
-                std::cout << (first_element ? "" : ",") << "\n    " << std::showpos << element.r << element.i << "i"
-                          << std::noshowpos;
-            } else {
-                std::cout << (first_element ? "" : ",") << "\n    0";
-            }
-            first_element = false;
-        }
-        std::cout << "\n  ],\n";
-        std::cout << "  \"non_zero_entries\": " << non_zero_entries << ",\n";
+    if (vm.count("pv")) {
+        output_obj["state_vector"] = ddsim->getVectorPair();
     }
 
     if (vm.count("ps")) {
-        std::cout << "  \"statistics\": {\n"
-                  << "    \"simulation_time\": " << std::fixed << duration_simulation.count() << std::defaultfloat
-                  << ",\n"
-                  << "    \"benchmark\": \"" << ddsim->getName() << "\",\n"
-                  << "    \"shots\": " << shots << ",\n"
-                  << "    \"distinct_results\": " << m.size() << ",\n"
-                  << "    \"n_qubits\": " << static_cast<std::size_t>(ddsim->getNumberOfQubits()) << ",\n"
-                  << "    \"applied_gates\": " << ddsim->getNumberOfOps() << ",\n"
-                  << "    \"max_nodes\": " << ddsim->getMaxNodeCount() << ",\n";
+        output_obj["statistics"] = {
+                {"simulation_time", duration_simulation.count()},
+                {"benchmark", ddsim->getName()},
+                {"n_qubits", +ddsim->getNumberOfQubits()},
+                {"applied_gates", ddsim->getNumberOfOps()},
+                {"max_nodes", ddsim->getMaxNodeCount()},
+                {"shots", shots},
+                {"distinct_results", m.size()},
+                {"seed", ddsim->getSeed()},
+        };
+
         for (const auto& item: ddsim->AdditionalStatistics()) {
-            std::cout << "    \"" << item.first << "\": \"" << item.second << "\",\n";
+            output_obj["statistics"][item.first] = item.second;
         }
-        std::cout << "    \"seed\": " << ddsim->getSeed() << "\n"
-                  << "  },\n";
     }
-    std::cout << "  \"dummy\": 0\n}\n"; // trailing element to make json printout easier
+
+    std::cout << std::setw(2) << output_obj << std::endl;
 }

@@ -10,8 +10,6 @@
 A tool for quantum circuit simulation by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at)
 and a part of the [JKQ toolset](https://github.com/iic-jku/jkq).
 
-Developers: Stefan Hillmich, Lukas Burgholzer, Thomas Grurl, and Robert Wille.
-
 The tool builds upon [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git) which in turns builds on [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git).
 
 For more information, on our work on quantum circuit simulation please visit [iic.jku.at/eda/research/quantum_simulation](https://iic.jku.at/eda/research/quantum_simulation) or, for more information on our work on noise-aware quantum circuit simulation, please visit [iic.jku.at/eda/research/noise_aware_simulation](https://iic.jku.at/eda/research/noise_aware_simulation).
@@ -59,7 +57,7 @@ The following additional algorithms are integrated in [QFR](https://github.com/i
 
 For details on the available methods we refer to [iic.jku.at/eda/research/quantum_simulation](https://iic.jku.at/eda/research/quantum_simulation).
 
-The simulator is based on [[1]](https://iic.jku.at/files/eda/2018_tcad_advanced_simulation_quantum_computation.pdf) and can either be used as a **standalone executable** with command-line interface, or as a **library** for the incorporation in other projects.
+The simulator is based on the references listed below and can either be used as a **standalone executable** with command-line interface, or as a **library** for the incorporation in other projects.
 
 ## System Requirements
 
@@ -118,10 +116,10 @@ JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
 -h [ --help ]                         produce help message
 --seed arg (=0)                       seed for random number generator (default zero is possibly directly used as seed!)
 --shots arg (=0)                      number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)
---display_vector                      display the state vector
+--pv                                  display the state vector as list of pairs (real and imaginary parts)
 --ps                                  print simulation stats (applied gates, sim. time, and maximal size of the DD)
+--pm                                  print measurement results
 --verbose                             Causes some simulators to print additional information to STDERR
---benchmark                           print simulation stats in a single CSV style line (overrides --ps and  suppresses most other output, please don't rely on the format across versions)
 --simulate_file arg                   simulate a quantum circuit given by file (detection by the file extension)
 --simulate_file_hybrid arg            simulate a quantum circuit given by file (detection by the file extension) using the hybrid Schrodinger-Feynman simulator
 --hybrid_mode arg                     mode used for hybrid Schrodinger-Feynman simulation (*amplitude*, dd)
@@ -130,9 +128,6 @@ JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
 --simulate_ghz arg                    simulate state preparation of GHZ state for given number of qubits
 --step_fidelity arg (=1)              target fidelity for each approximation run (>=1 = disable approximation)
 --steps arg (=1)                      number of approximation steps
---initial_reorder arg (=0)            Try to find a good initial variable order (0=None, 1=Most affected qubits to the top, 2=Most affected targets to the top)
---dynamic_reorder arg (=0)            Apply reordering strategy during simulation (0=None, 1=Sifting, 2=Move2Top)
---post_reorder arg (=0)               Apply a reordering strategy after simulation (0=None, 1=Sifting)
 --simulate_grover arg                 simulate Grover's search for given number of qubits with random oracle
 --simulate_grover_emulated arg        simulate Grover's search for given number of qubits with random oracle and emulation
 --simulate_grover_oracle_emulated arg simulate Grover's search for given number of qubits with given oracle and emulation
@@ -149,42 +144,25 @@ The output is JSON-formatted as shown below (with hopefully intuitive naming).
 ```commandline
 $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
 $ cmake --build build --config Release --target ddsim_simple
-$ ./build/ddsim_simple --simulate_ghz 4 --display_vector --shots 1000 --ps
+$ ./build/ddsim_simple --simulate_ghz 4 --shots 1000 --ps --pm
 {
-  "measurements": {
+  "measurement_results": {
     "0000": 484,
     "1111": 516
   },
-  "state_vector": [
-    +0.707107+0i,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    +0.707107+0i
-  ],
-  "non_zero_entries": 2,
   "statistics": {
-    "simulation_time": 0.000104,
-    "measurement_time": 0.000104,
-    "benchmark": "",
-    "shots": 1000,
-    "distinct_results": 2,
-    "n_qubits": 4,
     "applied_gates": 4,
+    "approximation_runs": "0",
+    "benchmark": "entanglement_4",
+    "distinct_results": 2,
+    "final_fidelity": "1.000000",
     "max_nodes": 9,
-    "path_of_least_resistance": "1111",
-    "seed": 0
+    "n_qubits": 4,
+    "seed": "0",
+    "shots": 1000,
+    "simulation_time": 0.00013726699398830533,
+    "single_shots": "1",
+    "step_fidelity": "1.000000"
   }
 }
 ```
@@ -230,72 +208,50 @@ $ cmake --build build --config Release --target ddsim_noise_aware
 The simulator provides a help function which is called in the following way:
 
 ```commandline
-$ ./build/ddsim_noise_aware --help
+$ ./build/ddsim_noise_aware -h
 JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
   -h [ --help ]                         produce help message
-  --seed arg (=0)                       seed for random number generator 
-                                        (default zero is possibly directly used
-                                        as seed!)
-  --shots arg (=0)                      number of measurements (if the 
-                                        algorithm does not contain non-unitary 
-                                        gates, weak simulation is used)
-  --display_vector                      display the state vector
-  --ps                                  print simulation stats (applied gates, 
-                                        sim. time, and maximal size of the DD)
-  --verbose                             Causes some simulators to print 
-                                        additional information to STDERR
-  --benchmark                           print simulation stats in a single CSV 
-                                        style line (overrides --ps and 
-                                        suppresses most other output, please 
-                                        don't rely on the format across 
-                                        versions)
-  --simulate_file arg                   simulate a quantum circuit given by 
-                                        file (detection by the file extension)
-    .
-    .  
-    .
-  --noise_effects arg                   Noise effects (A (=amplitude damping),D
-                                        (=depolarization),P (=phase flip)) in 
-                                        the form of a character string 
-                                        describing the noise effects (default="
-                                        ")
-  --noise_prob arg                      Probability for applying noise 
-                                        (default=0.001)
-  --confidence arg                      Confidence in the error bound of the 
-                                        stochastic simulation (default= 0.05)
-  --error_bound arg                     Error bound of the stochastic 
-                                        simulation (default=0.1)
-  --stoch_runs arg (=0)                 Number of stochastic runs. When the 
-                                        value is 0 the value is calculated 
-                                        using the confidence, error_bound and 
-                                        number of tracked properties. (default 
-                                        = 0)
-  --properties arg                      Comma separated list of tracked 
-                                        properties. Note that -1 is the 
-                                        fidelity and "-" can be used to specify
-                                        a range.  (default="0-1000")
+  --seed arg (=0)                       seed for random number generator (default zero is possibly directly used as seed!)
+  --pm                                  print measurements
+  --ps                                  print simulation stats (applied gates, sim. time, and maximal size of the DD)
+  --verbose                             Causes some simulators to print additional information to STDERR
+  --simulate_file arg                   simulate a quantum circuit given by file (detection by the file extension)
+  --step_fidelity arg (=1)              target fidelity for each approximation run (>=1 = disable approximation)
+  --steps arg (=1)                      number of approximation steps
+  --noise_effects arg (=APD)            Noise effects (A (=amplitude damping),D (=depolarization),P (=phase flip)) in the form of a character string describing the noise effects
+  --noise_prob arg (=0.001)             Probability for applying noise
+  --confidence arg (=0.05)              Confidence in the error bound of the stochastic simulation
+  --error_bound arg (=0.1)              Error bound of the stochastic simulation
+  --stoch_runs arg (=0)                 Number of stochastic runs. When the value is 0 the value is calculated using the confidence, error_bound and number of tracked properties.
+  --properties arg (=-3-1000)           Comma separated list of tracked properties. Note that -1 is the fidelity and "-" can be used to specify a range.
+
+Process finished with exit code 0
+
 ```
 
 An example run, with amplitude damping, phase flip, and depolarization error (each with a probability of 0.1% whenever a gate is applied) looks like this:
 
 ```commandline
-$ ./build/ddsim_noise_aware --noise_effects APD --stoch_runs 10000 --noise_prob 0.001 --simulate_file /home/user/adder4.qasm
-Conducting perfect run ...
-Conducting 10000 runs using 4 cores ...
-Starting 4 threads
-Calculating amplitudes from all runs ...
-Probabilities are ... (probabilities < 0.001 are omitted)
-state=|0000> proba=0.00975488
-state=|0001> proba=0.00784512
-state=|0100> proba=0.00175135
-state=|0101> proba=0.00194865
-state=|0110> proba=0.00404999
-state=|1000> proba=0.0229565
-state=|1001> proba=0.937243
-state=|1011> proba=0.00229939
-state=|1100> proba=0.00215185
-state=|1101> proba=0.00284815
-state=|1110> proba=0.00505003
+$ ./build/ddsim_noise_aware --ps --noise_effects APD --stoch_runs 10000 --noise_prob 0.001 --simulate_file adder4.qasm
+{
+  "statistics": {
+    "applied_gates": 23,
+    "approximation_runs": "0.000000",
+    "benchmark": "stoch_APD_adder_n4",
+    "final_fidelity": "0.937343",
+    "max_nodes": 10,
+    "mean_stoch_run_time": "0.015796",
+    "n_qubits": 4,
+    "parallel_instances": "28",
+    "perfect_run_time": "0.000066",
+    "seed": "0",
+    "simulation_time": 5.911194324493408,
+    "step_fidelity": "1.000000",
+    "stoch_runs": 10000,
+    "stoch_wall_time": "5.911118",
+    "threads": 28
+  }
+}
 ```
 
 ## Running Tests
@@ -333,7 +289,9 @@ If you use our tool for your research, we will be thankful if you refer to it by
 
 
 <details open>
-<summary>[1] A. Zulehner and R. Wille, “Advanced Simulation of Quantum Computations,” Transactions on CAD of Integrated Circuits and Systems (TCAD), vol. 38, no. 5, pp. 848–859, 2019</summary>
+<summary>
+  [1] <a href="https://iic.jku.at/files/eda/2018_tcad_advanced_simulation_quantum_computation.pdf">A. Zulehner and R. Wille, “Advanced Simulation of Quantum Computations,” Transactions on CAD of Integrated Circuits and Systems (TCAD), vol. 38, no. 5, pp. 848–859, 2019</a>
+</summary>
 
 ```bibtex
 @article{zulehner2019advanced,
@@ -350,7 +308,29 @@ If you use our tool for your research, we will be thankful if you refer to it by
 </details>
 
 <details open>
-<summary>[2] T. Grurl, R. Kueng, J. Fuß, and R. Wille, “Stochastic Quantum Circuit Simulation Using Decision Diagrams,” in Design, Automation and Test in Europe (DATE), 2021</summary>
+<summary>
+  [2] <a href="https://iic.jku.at/files/eda/2020_dac_weak_simulation_quantum_computation.pdf">S. Hillmich, I. L. Markov, and R. Wille, “Just Like the Real Thing: Fast Weak Simulation of Quantum Computation,” in Design Automation Conference (DAC), 2020</a>
+</summary>
+
+```bibtex
+@inproceedings{DBLP:conf/dac/HillmichMW20,
+  author    = {Stefan Hillmich and
+               Igor L. Markov and
+               Robert Wille},
+  title     = {Just Like the Real Thing: {F}ast Weak Simulation of Quantum Computation},
+  booktitle = {Design Automation Conference},
+  publisher = {{IEEE}},
+  year      = {2020}
+}
+```
+</details>
+
+
+
+<details open>
+<summary>
+  [3] <a href="https://iic.jku.at/files/eda/2021_stochastic_quantum_circuit_simulation_using_decision_diagrams.pdf">T. Grurl, R. Kueng, J. Fuß, and R. Wille, “Stochastic Quantum Circuit Simulation Using Decision Diagrams,” in Design, Automation and Test in Europe (DATE), 2021</a>
+</summary>
 
 ```bibtex
 @inproceedings{Grurl2020,
@@ -361,5 +341,24 @@ If you use our tool for your research, we will be thankful if you refer to it by
     year = {2021}
 }
 
+```
+</details>
+
+
+<details open>
+<summary>
+  [4] <a href="https://iic.jku.at/files/eda/2021_date_approximations_dd_baed_quantum_circuit_simulation.pdf">S. Hillmich, R. Kueng, I. L. Markov, and R. Wille, "As Accurate as Needed, as Efficient as Possible: Approximations in DD-based Quantum Circuit Simulation," in Design, Automation and Test in Europe (DATE), 2021</a>
+</summary>
+
+```bibtex
+@inproceedings{DBLP:conf/date/HillmichKMW21,
+  author    = {Stefan Hillmich and
+               Richard Kueng and
+               Igor L. Markov and
+               Robert Wille},
+  title     = {As Accurate as Needed, as Efficient as Possible: Approximations in DD-based Quantum Circuit Simulation},
+  booktitle = {Design, Automation and Test in Europe},
+  year      = {2021}
+}
 ```
 </details>
