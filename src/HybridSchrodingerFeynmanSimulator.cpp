@@ -17,90 +17,6 @@ std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator::Simulate(u
     }
 }
 
-void HybridSchrodingerFeynmanSimulator::addAmplitudes(std::unique_ptr<dd::Package>& dd, const std::string& filename1, const std::string& filename2, const std::string& resultfile, bool binary) {
-    std::string complex_real_regex = R"(([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?(?![ \d\.]*(?:[eE][+-])?\d*[iI]))?)";
-    std::string complex_imag_regex = R"(( ?[+-]? ?(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)?[iI])?)";
-    std::regex  complex_weight_regex(complex_real_regex + complex_imag_regex);
-    std::smatch m;
-
-    auto ifs1 = std::ifstream(filename1);
-    if (!ifs1.good()) {
-        std::cerr << "Cannot open amplitude file: " << filename1 << std::endl;
-        exit(1);
-    }
-
-    auto ifs2 = std::ifstream(filename2);
-    if (!ifs2.good()) {
-        std::cerr << "Cannot open amplitude file: " << filename2 << std::endl;
-        exit(1);
-    }
-
-    if (ifs1.peek() == std::ifstream::traits_type::eof()) {
-        rename(filename2.c_str(), resultfile.c_str());
-        return;
-    }
-
-    if (ifs2.peek() == std::ifstream::traits_type::eof()) {
-        rename(filename1.c_str(), resultfile.c_str());
-        return;
-    }
-
-    std::ostringstream oss{};
-    addAmplitudes(dd, ifs1, ifs2, oss, binary);
-
-    std::ofstream init(resultfile);
-    init << oss.str() << std::flush;
-    init.close();
-}
-void HybridSchrodingerFeynmanSimulator::addAmplitudes(std::unique_ptr<dd::Package>& dd, std::istream& ifs1, std::istream& ifs2, std::ostream& oss, bool binary) {
-    if (binary) {
-        dd::fp temp_r, temp_i;
-        while (ifs1.read(reinterpret_cast<char*>(&temp_r), sizeof(temp_r))) {
-            ifs1.read(reinterpret_cast<char*>(&temp_i), sizeof(temp_i));
-
-            dd::ComplexValue amplitude1{temp_r, temp_i};
-            dd::ComplexValue amplitude2{};
-            amplitude2.readBinary(ifs2);
-
-            auto temp = dd->cn.addCached(dd->cn.lookup(amplitude1), dd->cn.lookup(amplitude2));
-            temp.writeBinary(oss);
-            dd->cn.returnToCache(temp);
-        }
-    } else {
-        std::string complex_real_regex = R"(([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?(?![ \d\.]*(?:[eE][+-])?\d*[iI]))?)";
-        std::string complex_imag_regex = R"(( ?[+-]? ?(?:(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?)?[iI])?)";
-        std::regex  complex_weight_regex(complex_real_regex + complex_imag_regex);
-        std::smatch m;
-        std::string line1, line2;
-
-        while (std::getline(ifs1, line1)) {
-            if (!std::getline(ifs2, line2)) {
-                throw std::runtime_error("Too few lines in second stream");
-            }
-
-            std::regex_match(line1, m, complex_weight_regex);
-            dd::ComplexValue amplitude1{};
-            amplitude1.from_string(m.str(1), m.str(2));
-            std::regex_match(line2, m, complex_weight_regex);
-            dd::ComplexValue amplitude2{};
-            amplitude2.from_string(m.str(1), m.str(2));
-
-            dd::Complex temp = dd->cn.addCached(dd->cn.lookup(amplitude1), dd->cn.lookup(amplitude2));
-            oss << temp.toString(false, 16) << "\n";
-            dd->cn.returnToCache(temp);
-        }
-        if (std::getline(ifs2, line2)) {
-            throw std::runtime_error("Too few lines in first stream");
-        }
-    }
-}
-void HybridSchrodingerFeynmanSimulator::addAmplitudes(std::vector<dd::ComplexValue>& amp1, std::vector<dd::ComplexValue>& amp2) {
-    for (std::size_t i = 0; i < amp1.size(); i++) {
-        amp1[i].r += amp2[i].r;
-        amp1[i].i += amp2[i].i;
-    }
-}
-
 void HybridSchrodingerFeynmanSimulator::SimulateParallel(dd::Qubit split_qubit) {
     auto               ndecisions  = getNDecisions(split_qubit);
     const std::int64_t max_control = 1LL << ndecisions;
@@ -228,7 +144,11 @@ void HybridSchrodingerFeynmanSimulator::SimulateParallelAmplitudes(dd::Qubit spl
     for (unsigned short level = 0; level < static_cast<unsigned short>(std::log2(actuallyUsedThreads)); ++level) {
         const int increment = 2 << level;
         for (int idx = 0; idx < actuallyUsedThreads; idx += increment) {
-            addAmplitudes(amplitudes[idx], amplitudes[idx + old_increment]);
+            // in-place addition of amplitudes
+            std::transform(amplitudes[idx].begin(), amplitudes[idx].end(),
+                           amplitudes[idx + old_increment].begin(),
+                           amplitudes[idx].begin(),
+                           std::plus<>());
         }
         old_increment = increment;
     }
