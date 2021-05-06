@@ -63,10 +63,11 @@ The simulator is based on [[1]](https://iic.jku.at/files/eda/2018_tcad_advanced_
 
 ## System Requirements
 
-Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). 
-However, the implementation should be compatible with any current C++ compiler supporting C++17 and a minimum CMake version of 3.14.
+Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). However, the implementation should be compatible
+with any current C++ compiler supporting C++17 and a minimum CMake version of 3.14.
 
-`boost/program_options >= 1.50` is required for building the the commandline interface for `ddsim_simple` and `ddsim_noise_aware`. The `ddsim_noise_aware` further requires `Threads::Threads`.
+`OpenMP >= 4.0` is required for building the `ddsim` library. Additionally, `boost/program_options >= 1.50` is required for building the commandline interface for `ddsim_simple` and `ddsim_noise_aware`. The `ddsim_noise_aware` further
+requires `Threads::Threads`.
 
 ## Clone, Build, and Run
 
@@ -122,6 +123,9 @@ JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
 --verbose                             Causes some simulators to print additional information to STDERR
 --benchmark                           print simulation stats in a single CSV style line (overrides --ps and  suppresses most other output, please don't rely on the format across versions)
 --simulate_file arg                   simulate a quantum circuit given by file (detection by the file extension)
+--simulate_file_hybrid arg            simulate a quantum circuit given by file (detection by the file extension) using the hybrid Schrodinger-Feynman simulator
+--hybrid_mode arg                     mode used for hybrid Schrodinger-Feynman simulation (*amplitude*, dd)
+--nthreads arg (=2)                   #threads used for hybrid simulation
 --simulate_qft arg                    simulate Quantum Fourier Transform for given number of qubits
 --simulate_ghz arg                    simulate state preparation of GHZ state for given number of qubits
 --step_fidelity arg (=1)              target fidelity for each approximation run (>=1 = disable approximation)
@@ -359,6 +363,3 @@ If you use our tool for your research, we will be thankful if you refer to it by
 
 ```
 </details>
-
-
-
