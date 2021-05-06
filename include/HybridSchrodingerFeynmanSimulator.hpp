@@ -29,8 +29,8 @@ private:
     std::size_t                   nthreads = 2;
     std::vector<dd::ComplexValue> finalAmplitudes{};
 
-    void        SimulateParallel(dd::Qubit split_qubit);
-    void        SimulateParallelAmplitudes(dd::Qubit split_qubit);
+    void SimulateParallel(dd::Qubit split_qubit);
+    void SimulateParallelAmplitudes(dd::Qubit split_qubit);
 };
 
 #endif //DDSIM_HYBRIDSCHRODINGERFEYNMANSIMULATOR_HPP
