@@ -1,5 +1,6 @@
 #include "Simulator.hpp"
 
+#include <cassert>
 #include <cmath>
 #include <iostream>
 #include <queue>
@@ -90,13 +91,13 @@ std::vector<dd::ComplexValue> Simulator::getVector() const {
 
 std::vector<std::pair<dd::fp, dd::fp>> Simulator::getVectorPair() const {
     assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
-    std::string                   path(getNumberOfQubits(), '0');
+    std::string                            path(getNumberOfQubits(), '0');
     std::vector<std::pair<dd::fp, dd::fp>> results{1ull << getNumberOfQubits()};
 
     for (unsigned long long i = 0; i < 1ull << getNumberOfQubits(); ++i) {
-        const std::string corrected_path{path.rbegin(), path.rend()};
+        const std::string      corrected_path{path.rbegin(), path.rend()};
         const dd::ComplexValue cv = dd->getValueByPath(root_edge, corrected_path);
-        results[i] = std::make_pair(cv.r, cv.i);
+        results[i]                = std::make_pair(cv.r, cv.i);
         NextPath(path);
     }
     return results;
