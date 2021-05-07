@@ -9,7 +9,6 @@ project(ddsim
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 option(COVERAGE "Configure for coverage report generation")
 option(GENERATE_POSITION_INDEPENDENT_CODE "Generate position independent code")
-option(TEST_WITH_SANITIZERS "Run test with ASAN and UBSAN")
 
 set(default_build_type "Release")
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -38,8 +37,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR BUILD_TESTS)
 
 	if (NOT TARGET benchmark::benchmark_main)
 		set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Skip gbenchmark self tests")
-		add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr/extern/dd_package/extern/benchmark"
-		                 "extern/qfr/extern/dd_package/extern/benchmark" EXCLUDE_FROM_ALL)
+		add_subdirectory("extern/qfr/extern/dd_package/extern/benchmark" EXCLUDE_FROM_ALL)
 	endif ()
 	add_subdirectory(apps)
 endif()

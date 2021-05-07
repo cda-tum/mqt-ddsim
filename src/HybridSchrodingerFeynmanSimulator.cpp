@@ -149,7 +149,7 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybrid(dd::Qubit split_qubit) {
 
     omp_lock_t stacklock;
     omp_init_lock(&stacklock);
-#pragma omp parallel
+#pragma omp parallel // NOLINT(openmp-use-default-none)
     {
         bool                                  isempty;
         std::pair<std::int64_t, std::int64_t> current{};
@@ -231,7 +231,7 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridAmplitudes(dd::Qubit split
     std::int64_t   nslices_on_one_cpu = std::min(static_cast<std::int64_t>(64), static_cast<std::int64_t>(max_control / actuallyUsedThreads));
     dd::QubitCount nqubits            = getNumberOfQubits();
 
-#pragma omp parallel for schedule(dynamic, 1)
+#pragma omp parallel for schedule(dynamic, 1) // NOLINT(openmp-use-default-none)
     for (std::int64_t control = 0; control < max_control; control += nslices_on_one_cpu) {
         auto                           current_thread     = omp_get_thread_num();
         std::vector<dd::ComplexValue>& thread_amplitudes  = amplitudes[current_thread];
