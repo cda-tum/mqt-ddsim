@@ -362,3 +362,22 @@ If you use our tool for your research, we will be thankful if you refer to it by
 }
 ```
 </details>
+
+<details open>
+<summary>
+  [5] <a href="">L. Burgholzer, H. Bauer, and R. Wille, "Hybrid Schrödinger-Feynman Simulation of Quantum Circuits With Decision Diagrams," arXiv:XXXX.YYYYY, 2021</a>
+</summary>
+
+```bibtex
+@misc{burgholzer2021hybrid,
+      author={Lukas Burgholzer and
+               Hartwig Bauer and
+               Robert Wille},
+      title={Hybrid Schrödinger-Feynman Simulation of Quantum Circuits With Decision Diagrams},
+      year={2021},
+      eprint={XXXX.YYYYY},
+      archivePrefix={arXiv},
+      primaryClass={quant-ph}
+}
+```
+</details>
