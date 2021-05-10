@@ -29,7 +29,9 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDApplySequential) {
     quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3, dd::Control::Type::pos}}, 0, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
     DeterministicNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.01, -2, 1, 1, "-1-1000");
+
     auto m = ddsim.DeterministicSimulate();
+
     EXPECT_LT(abs(m.find("0000")->second - 0.0616548), 0.00001);
     EXPECT_LT(abs(m.find("0001")->second - 0.0570879), 0.00001);
     EXPECT_LT(abs(m.find("0100")->second - 0.0155602), 0.00001);
@@ -69,7 +71,9 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4Track_A) {
     quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3, dd::Control::Type::pos}}, 0, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
     DeterministicNoiseSimulator ddsim(quantumComputation, std::string("A"), 0.01, -1, 1, 1, "-1-1000");
+
     auto m = ddsim.DeterministicSimulate();
+
     EXPECT_LT(abs(m.find("0000")->second - 0.0496435), 0.00001);
     EXPECT_LT(abs(m.find("0001")->second - 0.0454906), 0.00001);
     EXPECT_LT(abs(m.find("0100")->second - 0.0107246), 0.00001);
@@ -107,7 +111,9 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPD) {
     quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3, dd::Control::Type::pos}}, 0, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
     DeterministicNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.01, -1, 1, 1, "-1-1000");
+
     auto m = ddsim.DeterministicSimulate();
+
     EXPECT_LT(abs(m.find("0000")->second - 0.0616548), 0.00001);
     EXPECT_LT(abs(m.find("0001")->second - 0.0570879), 0.00001);
     EXPECT_LT(abs(m.find("0100")->second - 0.0155602), 0.00001);
@@ -147,7 +153,9 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4Track_D) {
     quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3, dd::Control::Type::pos}}, 0, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
     DeterministicNoiseSimulator ddsim(quantumComputation, std::string("D"), 0.01, -1, 1, 1, "-1-1000");
+
     auto m = ddsim.DeterministicSimulate();
+
     EXPECT_LT(abs(m.find("0000")->second - 0.020155),  0.00001);
     EXPECT_LT(abs(m.find("0001")->second - 0.0199196), 0.00001);
     EXPECT_LT(abs(m.find("1000")->second - 0.0482997), 0.00001);

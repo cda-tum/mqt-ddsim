@@ -11,16 +11,15 @@ dd::Package::mEdge DeterministicNoiseSimulator::makeZeroDensityOperator(dd::Qubi
 }
 
 std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate() {
-    const unsigned short n_qubits = qc->getNqubits();
+    const unsigned short         n_qubits = qc->getNqubits();
     std::map<unsigned int, bool> classic_values;
 
     density_root_edge = makeZeroDensityOperator(n_qubits);
     dd->incRef(density_root_edge);
 
-
-    for (auto const &op : *qc) {
+    for (auto const& op: *qc) {
         if (!op->isUnitary() && !(op->isClassicControlledOperation())) {
-            if (auto *nu_op = dynamic_cast<qc::NonUnitaryOperation *>(op.get())) {
+            if (auto* nu_op = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
                 if (nu_op->getName()[0] == 'M') {
                     auto quantum = nu_op->getTargets();
                     auto classic = nu_op->getClassics();
@@ -55,13 +54,13 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
             dd->garbageCollect();
         } else {
             dd::Package::mEdge dd_op = {};
-            qc::Targets targets;
-            dd::Controls controls;
+            qc::Targets        targets;
+            dd::Controls       controls;
             if (op->isClassicControlledOperation()) {
                 // Check if the operation is controlled by a classical register
-                auto *classic_op = dynamic_cast<qc::ClassicControlledOperation *>(op.get());
-                bool conditionTrue = true;
-                auto expValue = classic_op->getExpectedValue();
+                auto* classic_op    = dynamic_cast<qc::ClassicControlledOperation*>(op.get());
+                bool  conditionTrue = true;
+                auto  expValue      = classic_op->getExpectedValue();
 
                 for (unsigned int i = classic_op->getControlRegister().first;
                      i < classic_op->getControlRegister().second; i++) {
@@ -72,7 +71,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                         expValue = expValue >> 1u;
                     }
                 }
-                dd_op = classic_op->getOperation()->getDD(dd);
+                dd_op   = classic_op->getOperation()->getDD(dd);
                 targets = classic_op->getOperation()->getTargets();
                 assert(targets.size() == 1);
                 controls = classic_op->getOperation()->getControls();
@@ -80,7 +79,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                     continue;
                 }
             } else {
-                dd_op = op->getDD(dd);
+                dd_op   = op->getDD(dd);
                 targets = op->getTargets();
                 assert(targets.size() == 1);
                 controls = op->getControls();
@@ -95,7 +94,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                 [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
 
                 auto seq_targets = targets;
-                for( auto const& control : controls) {
+                for (auto const& control: controls) {
                     targets.push_back(control.qubit);
                 }
                 apply_det_noise_sequential(seq_targets);
@@ -103,9 +102,9 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                 [[maybe_unused]] auto cache_size_after = dd->cn.cacheCount();
                 assert(cache_size_after == cache_size_before);
             } else {
-                auto maxDepth = op->getTargets().front();
+                auto maxDepth       = op->getTargets().front();
                 auto control_qubits = op->getControls();
-                for (auto &control : control_qubits) {
+                for (auto& control: control_qubits) {
                     if (control.qubit < maxDepth) {
                         maxDepth = control.qubit;
                     }
@@ -185,7 +184,7 @@ dd::Package::mEdge DeterministicNoiseSimulator::ApplyNoiseEffects(dd::Package::m
     //if (line[density_op.p->v] > 0) {
     if (op->actsOn(density_op.p->v)) {
         //todo when A and D noise is active and prob is 0, I lose cached variables
-        for (auto const& type : gate_noise_types) {
+        for (auto const& type: gate_noise_types) {
             switch (type) {
                 case 'A':
                     ApplyAmplitudeDampingToNode(new_edges);
@@ -215,7 +214,7 @@ dd::Package::mEdge DeterministicNoiseSimulator::ApplyNoiseEffects(dd::Package::m
 }
 
 void DeterministicNoiseSimulator::ApplyPhaseFlipToNode(std::array<dd::Package::mEdge, 4>& e) {
-    double probability = noise_probability;
+    double      probability  = noise_probability;
     dd::Complex complex_prob = dd->cn.getCached();
 
     //e[0] = e[0]
@@ -242,8 +241,8 @@ void DeterministicNoiseSimulator::ApplyPhaseFlipToNode(std::array<dd::Package::m
 }
 
 void DeterministicNoiseSimulator::ApplyAmplitudeDampingToNode(std::array<dd::Package::mEdge, 4>& e) {
-    double probability = noise_probability * 2;
-    dd::Complex complex_prob = dd->cn.getCached();
+    double             probability  = noise_probability * 2;
+    dd::Complex        complex_prob = dd->cn.getCached();
     dd::Package::mEdge helper_edge[1];
     helper_edge[0].w = dd->cn.getCached();
 
@@ -254,7 +253,7 @@ void DeterministicNoiseSimulator::ApplyAmplitudeDampingToNode(std::array<dd::Pac
         if (!e[0].w.approximatelyZero()) {
             CN::mul(helper_edge[0].w, complex_prob, e[3].w);
             helper_edge[0].p = e[3].p;
-            dd::Edge tmp = dd->add(e[0], helper_edge[0]); // was dd->add2(...)
+            dd::Edge tmp     = dd->add(e[0], helper_edge[0]); // was dd->add2(...)
             if (!e[0].w.approximatelyZero()) {
                 dd->cn.returnToCache(e[0].w);
             }
@@ -282,7 +281,6 @@ void DeterministicNoiseSimulator::ApplyAmplitudeDampingToNode(std::array<dd::Pac
         CN::mul(e[2].w, complex_prob, e[2].w);
     }
 
-
     //e[3] = (1-p)*e[3]
     if (!e[3].w.approximatelyZero()) {
         complex_prob.r->value = 1 - probability;
@@ -293,12 +291,11 @@ void DeterministicNoiseSimulator::ApplyAmplitudeDampingToNode(std::array<dd::Pac
     dd->cn.returnToCache(complex_prob);
 }
 
-
 void DeterministicNoiseSimulator::ApplyDepolaritationToNode(std::array<dd::Package::mEdge, 4>& e) {
-    double probability = noise_probability;
+    double             probability = noise_probability;
     dd::Package::mEdge helper_edge[2];
-    helper_edge[0].w = dd->cn.getCached();
-    helper_edge[1].w = dd->cn.getCached();
+    helper_edge[0].w         = dd->cn.getCached();
+    helper_edge[1].w         = dd->cn.getCached();
     dd::Complex complex_prob = dd->cn.getCached();
 
     //todo I don't have to save all edges
@@ -321,7 +318,7 @@ void DeterministicNoiseSimulator::ApplyDepolaritationToNode(std::array<dd::Packa
             CN::mul(e[0].w, complex_prob, old_edges[0].w);
             e[0].p = old_edges[0].p;
         } else if (old_edges[0].w.approximatelyZero() && !old_edges[3].w.approximatelyZero()) {
-            e[0].w = dd->cn.getCached();
+            e[0].w                = dd->cn.getCached();
             complex_prob.r->value = probability * 0.5;
             CN::mul(e[0].w, complex_prob, old_edges[3].w);
             e[0].p = old_edges[3].p;
@@ -352,7 +349,7 @@ void DeterministicNoiseSimulator::ApplyDepolaritationToNode(std::array<dd::Packa
     //e[3] = 0.5*((2-p)*e[3] + p*e[0])
     if (!old_edges[0].w.approximatelyZero() || !old_edges[3].w.approximatelyZero()) {
         if (!old_edges[0].w.approximatelyZero() && old_edges[3].w.approximatelyZero()) {
-            e[3].w = dd->cn.getCached();
+            e[3].w                = dd->cn.getCached();
             complex_prob.r->value = probability * 0.5;
             CN::mul(e[3].w, complex_prob, old_edges[0].w);
             e[3].p = old_edges[0].p;
@@ -371,12 +368,12 @@ void DeterministicNoiseSimulator::ApplyDepolaritationToNode(std::array<dd::Packa
             e[3] = dd->add(helper_edge[0], helper_edge[1]); // was dd->add2(...)
         }
     }
-    for (auto &old_edge : old_edges) {
+    for (auto& old_edge: old_edges) {
         if (!old_edge.w.approximatelyZero()) {
             dd->cn.returnToCache(old_edge.w);
         }
     }
-//    helper_edge[0].w.r->next->next->next->next->next->next = ComplexCache_Avail;
+    //    helper_edge[0].w.r->next->next->next->next->next->next = ComplexCache_Avail;
     dd->cn.returnToCache(helper_edge[0].w);
     dd->cn.returnToCache(helper_edge[1].w);
     dd->cn.returnToCache(complex_prob);
@@ -384,20 +381,20 @@ void DeterministicNoiseSimulator::ApplyDepolaritationToNode(std::array<dd::Packa
 
 std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(int nr_qubits) {
     std::map<std::string, double> measure_result = {};
-    double p0, p1, imaginary;
-    double long global_probability;
+    double                        p0, p1, imaginary;
+    double long                   global_probability;
 
     dd::Edge original_state = root_edge;
     for (int m = 0; m < pow(2, nr_qubits); m++) {
-        int current_result = m;
-        global_probability = dd::CTEntry::val(root_edge.w.r);
+        int current_result        = m;
+        global_probability        = dd::CTEntry::val(root_edge.w.r);
         std::string result_string = intToString(m, '1');
-        dd::Edge cur = root_edge;
+        dd::Edge    cur           = root_edge;
         for (int i = 0; i < nr_qubits; ++i) {
             if (cur.p->v != -1) {
                 imaginary = dd::CTEntry::val(cur.p->e[0].w.i) + dd::CTEntry::val(cur.p->e[3].w.i);
-                p0 = dd::CTEntry::val(cur.p->e[0].w.r);
-                p1 = dd::CTEntry::val(cur.p->e[3].w.r);
+                p0        = dd::CTEntry::val(cur.p->e[0].w.r);
+                p1        = dd::CTEntry::val(cur.p->e[3].w.r);
             } else {
                 global_probability = 0;
                 break;
@@ -421,9 +418,9 @@ std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(int nr_q
     return measure_result;
 }
 
-void DeterministicNoiseSimulator::generate_gate(dd::Package::mEdge *pointer_for_matrices, char noise_type, dd::Qubit target) {
+void DeterministicNoiseSimulator::generate_gate(dd::Package::mEdge* pointer_for_matrices, char noise_type, dd::Qubit target) {
     std::array<dd::GateMatrix, 4> idle_noise_gate{};
-    dd::ComplexValue tmp = {};
+    dd::ComplexValue              tmp = {};
 
     double probability = noise_probability;
 
@@ -432,27 +429,26 @@ void DeterministicNoiseSimulator::generate_gate(dd::Package::mEdge *pointer_for_
         //      (sqrt(1-probability)    0           )       (0      sqrt(probability))
         //  e0= (0            sqrt(1-probability)   ), e1=  (sqrt(probability)      0)
         case 'B': {
-            tmp.r = std::sqrt(1 - probability) * dd::complex_one.r;
+            tmp.r                 = std::sqrt(1 - probability) * dd::complex_one.r;
             idle_noise_gate[0][0] = idle_noise_gate[0][3] = tmp;
             idle_noise_gate[0][1] = idle_noise_gate[0][2] = dd::complex_zero;
-            tmp.r = std::sqrt(probability) * dd::complex_one.r;
+            tmp.r                                         = std::sqrt(probability) * dd::complex_one.r;
             idle_noise_gate[1][1] = idle_noise_gate[1][2] = tmp;
             idle_noise_gate[1][0] = idle_noise_gate[1][3] = dd::complex_zero;
 
             pointer_for_matrices[0] = dd->makeGateDD(idle_noise_gate[0], getNumberOfQubits(), target);
             pointer_for_matrices[1] = dd->makeGateDD(idle_noise_gate[1], getNumberOfQubits(), target);
             break;
-
         }
             // phase flip
             //      (sqrt(1-probability)    0           )       (sqrt(probability)      0)
             //  e0= (0            sqrt(1-probability)   ), e1=  (0      -sqrt(probability))
         case 'P': {
-            tmp.r = std::sqrt(1 - probability) * dd::complex_one.r;
+            tmp.r                 = std::sqrt(1 - probability) * dd::complex_one.r;
             idle_noise_gate[0][0] = idle_noise_gate[0][3] = tmp;
             idle_noise_gate[0][1] = idle_noise_gate[0][2] = dd::complex_zero;
-            tmp.r = std::sqrt(probability) * dd::complex_one.r;
-            idle_noise_gate[1][0] = tmp;
+            tmp.r                                         = std::sqrt(probability) * dd::complex_one.r;
+            idle_noise_gate[1][0]                         = tmp;
             tmp.r *= -1;
             idle_noise_gate[1][3] = tmp;
             idle_noise_gate[1][1] = idle_noise_gate[1][2] = dd::complex_zero;
@@ -460,22 +456,20 @@ void DeterministicNoiseSimulator::generate_gate(dd::Package::mEdge *pointer_for_
             pointer_for_matrices[0] = dd->makeGateDD(idle_noise_gate[0], getNumberOfQubits(), target);
             pointer_for_matrices[1] = dd->makeGateDD(idle_noise_gate[1], getNumberOfQubits(), target);
 
-
             break;
         }
             // amplitude damping
             //      (1      0           )       (0      sqrt(probability))
             //  e0= (0      sqrt(1-probability)   ), e1=  (0      0      )
         case 'A': {
-            tmp.r = std::sqrt(1 - probability * 2) * dd::complex_one.r;
+            tmp.r                 = std::sqrt(1 - probability * 2) * dd::complex_one.r;
             idle_noise_gate[0][0] = dd::complex_one;
             idle_noise_gate[0][1] = idle_noise_gate[0][2] = dd::complex_zero;
-            idle_noise_gate[0][3] = tmp;
+            idle_noise_gate[0][3]                         = tmp;
 
-
-            tmp.r = std::sqrt(probability * 2) * dd::complex_one.r;
+            tmp.r                 = std::sqrt(probability * 2) * dd::complex_one.r;
             idle_noise_gate[1][0] = idle_noise_gate[1][3] = idle_noise_gate[1][2] = dd::complex_zero;
-            idle_noise_gate[1][1] = tmp;
+            idle_noise_gate[1][1]                                                 = tmp;
 
             pointer_for_matrices[0] = dd->makeGateDD(idle_noise_gate[0], getNumberOfQubits(), target);
             pointer_for_matrices[1] = dd->makeGateDD(idle_noise_gate[1], getNumberOfQubits(), target);
@@ -493,7 +487,7 @@ void DeterministicNoiseSimulator::generate_gate(dd::Package::mEdge *pointer_for_
 
             //            (0 1)
             // sqrt(probability/4))*(1 0)
-            tmp.r = std::sqrt(probability / 4) * dd::complex_one.r;
+            tmp.r                 = std::sqrt(probability / 4) * dd::complex_one.r;
             idle_noise_gate[1][1] = idle_noise_gate[1][2] = tmp;
             idle_noise_gate[1][0] = idle_noise_gate[1][3] = dd::complex_zero;
 
@@ -501,9 +495,9 @@ void DeterministicNoiseSimulator::generate_gate(dd::Package::mEdge *pointer_for_
 
             //            (1 0)
             // sqrt(probability/4))*(0 -1)
-            tmp.r = std::sqrt(probability / 4) * dd::complex_one.r;
+            tmp.r                 = std::sqrt(probability / 4) * dd::complex_one.r;
             idle_noise_gate[2][0] = tmp;
-            tmp.r = tmp.r * -1;
+            tmp.r                 = tmp.r * -1;
             idle_noise_gate[2][3] = tmp;
             idle_noise_gate[2][1] = idle_noise_gate[2][2] = dd::complex_zero;
 
@@ -511,10 +505,10 @@ void DeterministicNoiseSimulator::generate_gate(dd::Package::mEdge *pointer_for_
 
             //            (0 -i)
             // sqrt(probability/4))*(i 0)
-            tmp.r = dd::complex_zero.r;
-            tmp.i = std::sqrt(probability / 4) * 1;
+            tmp.r                 = dd::complex_zero.r;
+            tmp.i                 = std::sqrt(probability / 4) * 1;
             idle_noise_gate[3][2] = tmp;
-            tmp.i = tmp.i * -1;
+            tmp.i                 = tmp.i * -1;
             idle_noise_gate[3][1] = tmp;
             idle_noise_gate[3][0] = idle_noise_gate[3][3] = dd::complex_zero;
 
@@ -527,13 +521,13 @@ void DeterministicNoiseSimulator::generate_gate(dd::Package::mEdge *pointer_for_
 }
 
 void DeterministicNoiseSimulator::apply_det_noise_sequential(const qc::Targets& targets) {
-    dd::Package::mEdge tmp = {};
+    dd::Package::mEdge tmp              = {};
     dd::Package::mEdge ancillary_edge_1 = {};
     dd::Package::mEdge idle_operation[4];
 
     // Iterate over qubits and check if the qubit had been used
-    for (auto target_qubit : targets) {
-        for (auto const& type : gate_noise_types) {
+    for (auto target_qubit: targets) {
+        for (auto const& type: gate_noise_types) {
             generate_gate(idle_operation, type, target_qubit);
             tmp.p = nullptr;
             //Apply all noise matrices of the current noise effect
@@ -557,9 +551,9 @@ std::string DeterministicNoiseSimulator::intToString(long target_number, char va
         assert(target_number == -1);
         return (std::string("F"));
     }
-    auto qubits = getNumberOfQubits();
+    auto        qubits = getNumberOfQubits();
     std::string path(qubits, '0');
-    auto number = (unsigned long) target_number;
+    auto        number = (unsigned long)target_number;
     for (int i = 1; i <= qubits; i++) {
         if (number % 2) {
             path[qubits - i] = value;
@@ -573,22 +567,22 @@ std::string DeterministicNoiseSimulator::intToString(long target_number, char va
 // TODO get rid of the line parameter
 //
 
-void DeterministicNoiseSimulator::noiseInsert(const dd::Package::mEdge &a, const short *line, const dd::Package::mEdge &r, unsigned short nQubits) {
-    dd::ComplexValue aw{dd::CTEntry::val(a.w.r), dd::CTEntry::val(a.w.i)};
+void DeterministicNoiseSimulator::noiseInsert(const dd::Package::mEdge& a, const short* line, const dd::Package::mEdge& r, unsigned short nQubits) {
+    dd::ComplexValue    aw{dd::CTEntry::val(a.w.r), dd::CTEntry::val(a.w.i)};
     const unsigned long i = noiseHash(a.p, aw, line, nQubits);
 
-    assert(((std::uintptr_t) r.w.r & 1u) == 0 && ((std::uintptr_t) r.w.i & 1u) == 0);
+    assert(((std::uintptr_t)r.w.r & 1u) == 0 && ((std::uintptr_t)r.w.i & 1u) == 0);
 
     std::memcpy(NoiseTable[i].line, line, (nQubits) * sizeof(short));
 
-    NoiseTable[i].a = a.p;
-    NoiseTable[i].aw = aw;
-    NoiseTable[i].r = r.p;
+    NoiseTable[i].a    = a.p;
+    NoiseTable[i].aw   = aw;
+    NoiseTable[i].r    = r.p;
     NoiseTable[i].rw.r = r.w.r->value;
     NoiseTable[i].rw.i = r.w.i->value;
 }
 
-dd::Package::mEdge DeterministicNoiseSimulator::noiseLookup(const dd::Package::mEdge &a, const short *line, unsigned short nQubits) {
+dd::Package::mEdge DeterministicNoiseSimulator::noiseLookup(const dd::Package::mEdge& a, const short* line, unsigned short nQubits) {
     // Lookup a computation in the compute table
     // return NULL if not a match else returns result of prior computation
     dd::Package::mEdge r{nullptr, {nullptr, nullptr}};
@@ -598,7 +592,7 @@ dd::Package::mEdge DeterministicNoiseSimulator::noiseLookup(const dd::Package::m
     const unsigned long i = noiseHash(a.p, aw, line, nQubits);
 
     if (NoiseTable[i].a != a.p || NoiseTable[i].aw != aw) return r;
-    if (std::memcmp(&NoiseTable[i].line[a.p->v], &line[a.p->v], (nQubits-a.p->v) * sizeof(short)) != 0) {
+    if (std::memcmp(&NoiseTable[i].line[a.p->v], &line[a.p->v], (nQubits - a.p->v) * sizeof(short)) != 0) {
         return r;
     }
 
@@ -612,18 +606,18 @@ dd::Package::mEdge DeterministicNoiseSimulator::noiseLookup(const dd::Package::m
     return r;
 }
 
-unsigned long DeterministicNoiseSimulator::noiseHash(dd::Package::mNode* a, const dd::ComplexValue &aw, const short *line, unsigned short nQubits) {
+unsigned long DeterministicNoiseSimulator::noiseHash(dd::Package::mNode* a, const dd::ComplexValue& aw, const short* line, unsigned short nQubits) {
     unsigned long i = 0;
     for (unsigned short j = 0; j <= nQubits; j++) {
-//            i = (i << 5u) + (4 * j) + (line[j] * 4);
+        //            i = (i << 5u) + (4 * j) + (line[j] * 4);
         i = (i << 3U) + i * j + line[j];
     }
     i += (reinterpret_cast<std::uintptr_t>(a)) + static_cast<unsigned long>(aw.r * 1000000 + aw.i * 2000000);
-//        i += (reinterpret_cast<std::uintptr_t>(a)) + static_cast<unsigned long>(aw.r * 100 + aw.i * 200);
-//        if ((i & NoiseMASK) == 16279) {
-//            printf("\n");
-//            volatile int ii = 1;
-//        }
+    //        i += (reinterpret_cast<std::uintptr_t>(a)) + static_cast<unsigned long>(aw.r * 100 + aw.i * 200);
+    //        if ((i & NoiseMASK) == 16279) {
+    //            printf("\n");
+    //            volatile int ii = 1;
+    //        }
 
     return i & NoiseMASK;
 }
