@@ -58,7 +58,7 @@ public:
 
     [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
 
-    [[nodiscard]] unsigned long getNumberOfOps() const override { return qc->getNops(); };
+    [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
 
     [[nodiscard]] std::string getName() const override { return qc->getName(); };
 
