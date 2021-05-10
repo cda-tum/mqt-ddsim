@@ -11,6 +11,8 @@ add_library(${PROJECT_NAME}
         ${CMAKE_CURRENT_SOURCE_DIR}/ShorFastSimulator.cpp
         ${PROJECT_SOURCE_DIR}/include/StochasticNoiseSimulator.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/StochasticNoiseSimulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/DeterministicNoiseSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/DeterministicNoiseSimulator.cpp
         )
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)
 # set required C++ standard and disable compiler specific extensions
