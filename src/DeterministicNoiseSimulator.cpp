@@ -110,7 +110,6 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                     }
                 }
                 [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
-
                 auto tmp2 = ApplyNoiseEffects(density_root_edge, op, 0);
                 if (!tmp2.w.approximatelyZero()) {
                     dd::Complex c = dd->cn.lookup(tmp2.w);
@@ -253,7 +252,7 @@ void DeterministicNoiseSimulator::ApplyAmplitudeDampingToNode(std::array<dd::Pac
         if (!e[0].w.approximatelyZero()) {
             CN::mul(helper_edge[0].w, complex_prob, e[3].w);
             helper_edge[0].p = e[3].p;
-            dd::Edge tmp     = dd->add(e[0], helper_edge[0]); // was dd->add2(...)
+            dd::Edge tmp     = dd->add2(e[0], helper_edge[0]);
             if (!e[0].w.approximatelyZero()) {
                 dd->cn.returnToCache(e[0].w);
             }
@@ -330,7 +329,7 @@ void DeterministicNoiseSimulator::ApplyDepolaritationToNode(std::array<dd::Packa
             helper_edge[0].p = old_edges[0].p;
             helper_edge[1].p = old_edges[3].p;
             dd->cn.returnToCache(e[0].w);
-            e[0] = dd->add(helper_edge[0], helper_edge[1]); // was dd->add2(...)
+            e[0] = dd->add2(helper_edge[0], helper_edge[1]);
         }
     }
     //e[1]=1-p*e[1]
@@ -365,7 +364,7 @@ void DeterministicNoiseSimulator::ApplyDepolaritationToNode(std::array<dd::Packa
             helper_edge[0].p = old_edges[0].p;
             helper_edge[1].p = old_edges[3].p;
             dd->cn.returnToCache(e[3].w);
-            e[3] = dd->add(helper_edge[0], helper_edge[1]); // was dd->add2(...)
+            e[3] = dd->add2(helper_edge[0], helper_edge[1]);
         }
     }
     for (auto& old_edge: old_edges) {
@@ -384,12 +383,12 @@ std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(int nr_q
     double                        p0, p1, imaginary;
     double long                   global_probability;
 
-    dd::Edge original_state = root_edge;
+    dd::Edge original_state = density_root_edge;
     for (int m = 0; m < pow(2, nr_qubits); m++) {
         int current_result        = m;
-        global_probability        = dd::CTEntry::val(root_edge.w.r);
+        global_probability        = dd::CTEntry::val(density_root_edge.w.r);
         std::string result_string = intToString(m, '1');
-        dd::Edge    cur           = root_edge;
+        dd::Edge    cur           = density_root_edge;
         for (int i = 0; i < nr_qubits; ++i) {
             if (cur.p->v != -1) {
                 imaginary = dd::CTEntry::val(cur.p->e[0].w.i) + dd::CTEntry::val(cur.p->e[3].w.i);
