@@ -25,8 +25,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                     auto classic = nu_op->getClassics();
 
                     if (quantum.size() != classic.size()) {
-                        std::cerr << "[ERROR] Measurement: Sizes of quantum and classic register mismatch.\n";
-                        std::exit(1);
+                        throw std::runtime_error("Measurement: Sizes of quantum and classic register mismatch.");
                     }
 
                     for (unsigned int i = 0; i < quantum.size(); ++i) {
@@ -36,22 +35,20 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                     }
                 } else if (strcmp(nu_op->getName(), "Rst") == 0) {
                     // Reset qubit
-                    printf("Warning: Reset is currently not supported");
-                    continue;
+                    throw std::runtime_error("Reset is currently not supported");
                 } else {
                     //Skipping barrier
                     if ((strcmp(nu_op->getName(), "Barr") == 0)) {
                         continue;
                     }
-                    std::cerr << "[ERROR] Unsupported non-unitary functionality: \"" << nu_op->getName() << "\""
-                              << std::endl;
-                    std::exit(1);
+                    throw std::runtime_error(std::string{"Unsupported non-unitary functionality: \""} + nu_op->getName() + "\"");
                 }
             } else {
-                std::cerr << "[ERROR] Dynamic cast to NonUnitaryOperation failed." << std::endl;
-                std::exit(1);
+                throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
             }
-            dd->garbageCollect();
+            if (dd->garbageCollect()) {
+                NoiseTable.fill({});
+            }
         } else {
             dd::Package::mEdge dd_op = {};
             qc::Targets        targets;
@@ -110,7 +107,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                     }
                 }
                 [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
-                auto tmp2 = ApplyNoiseEffects(density_root_edge, op, 0);
+                auto                  tmp2              = ApplyNoiseEffects(density_root_edge, op, 0);
                 if (!tmp2.w.approximatelyZero()) {
                     dd::Complex c = dd->cn.lookup(tmp2.w);
                     dd->cn.returnToCache(tmp2.w);
@@ -126,7 +123,9 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
             }
         }
     }
-    dd->garbageCollect();
+    if (dd->garbageCollect()) {
+        NoiseTable.fill({});
+    }
     return AnalyseState(n_qubits);
 }
 
@@ -266,7 +265,7 @@ void DeterministicNoiseSimulator::ApplyAmplitudeDampingToNode(std::array<dd::Pac
 
     //e[1] = sqrt(1-p)*e[1]
     if (!e[1].w.approximatelyZero()) {
-        complex_prob.r->value = sqrt(1 - probability);
+        complex_prob.r->value = std::sqrt(1 - probability);
         complex_prob.i->value = 0;
         CN::mul(e[1].w, complex_prob, e[1].w);
     }
@@ -274,7 +273,7 @@ void DeterministicNoiseSimulator::ApplyAmplitudeDampingToNode(std::array<dd::Pac
     //e[2] = sqrt(1-p)*e[2]
     if (!e[2].w.approximatelyZero()) {
         if (e[1].w.approximatelyZero()) {
-            complex_prob.r->value = sqrt(1 - probability);
+            complex_prob.r->value = std::sqrt(1 - probability);
             complex_prob.i->value = 0;
         }
         CN::mul(e[2].w, complex_prob, e[2].w);
@@ -380,37 +379,35 @@ void DeterministicNoiseSimulator::ApplyDepolaritationToNode(std::array<dd::Packa
 
 std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(int nr_qubits) {
     std::map<std::string, double> measure_result = {};
-    double                        p0, p1, imaginary;
-    double long                   global_probability;
 
-    dd::Edge original_state = density_root_edge;
+    double p0, p1, imaginary;
+
+    double long global_probability;
+
+    dd::Package::mEdge original_state = density_root_edge;
     for (int m = 0; m < pow(2, nr_qubits); m++) {
-        int current_result        = m;
-        global_probability        = dd::CTEntry::val(density_root_edge.w.r);
-        std::string result_string = intToString(m, '1');
-        dd::Edge    cur           = density_root_edge;
+        int current_result               = m;
+        global_probability               = dd::CTEntry::val(density_root_edge.w.r);
+        std::string        result_string = intToString(m, '1');
+        dd::Package::mEdge cur           = density_root_edge;
         for (int i = 0; i < nr_qubits; ++i) {
             if (cur.p->v != -1) {
-                imaginary = dd::CTEntry::val(cur.p->e[0].w.i) + dd::CTEntry::val(cur.p->e[3].w.i);
-                p0        = dd::CTEntry::val(cur.p->e[0].w.r);
-                p1        = dd::CTEntry::val(cur.p->e[3].w.r);
+                imaginary = dd::CTEntry::val(cur.p->e.at(0).w.i) + dd::CTEntry::val(cur.p->e[3].w.i);
+                p0        = dd::CTEntry::val(cur.p->e.at(0).w.r);
+                p1        = dd::CTEntry::val(cur.p->e.at(3).w.r);
             } else {
                 global_probability = 0;
                 break;
             }
 
             if (current_result % 2 == 0) {
-                cur = cur.p->e[0];
+                cur = cur.p->e.at(0);
                 global_probability *= p0;
             } else {
-                cur = cur.p->e[3];
+                cur = cur.p->e.at(3);
                 global_probability *= p1;
             }
             current_result = current_result >> 1;
-        }
-        if (global_probability > 0.01) {
-            std::cout << "Measured state=|" << result_string << "> probability=" << global_probability << "\n"
-                      << std::flush;
         }
         measure_result.insert({result_string, global_probability});
     }
@@ -572,7 +569,7 @@ void DeterministicNoiseSimulator::noiseInsert(const dd::Package::mEdge& a, const
 
     assert(((std::uintptr_t)r.w.r & 1u) == 0 && ((std::uintptr_t)r.w.i & 1u) == 0);
 
-    std::memcpy(NoiseTable[i].line, line, (nQubits) * sizeof(short));
+    std::memcpy(NoiseTable[i].line, line, nQubits * sizeof(short));
 
     NoiseTable[i].a    = a.p;
     NoiseTable[i].aw   = aw;
