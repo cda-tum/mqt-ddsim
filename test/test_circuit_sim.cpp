@@ -81,9 +81,9 @@ TEST(CircuitSimTest, DestructiveMeasurementAll) {
     ASSERT_EQ(v_before[0], v_before[2]);
     ASSERT_EQ(v_before[0], v_before[3]);
 
-    const std::string                   m       = ddsim.MeasureAll(true);
-    const std::vector<dd::ComplexValue> v_after = ddsim.getVector();
-    const int                           i       = std::stoi(m, nullptr, 2);
+    const std::string m       = ddsim.MeasureAll(true);
+    const auto        v_after = ddsim.getVector();
+    const int         i       = std::stoi(m, nullptr, 2);
 
     ASSERT_EQ(v_after[i].r, 1.0);
     ASSERT_EQ(v_after[i].i, 0.0);
@@ -116,7 +116,7 @@ TEST(CircuitSimTest, DestructiveMeasurementOne) {
     const auto v_after_pairs = ddsim.getVectorPair();
     const auto v_after_compl = ddsim.getVectorComplex();
 
-    assert (v_after_pairs.size() == v_after_compl.size());
+    assert(v_after_pairs.size() == v_after_compl.size());
     for (std::size_t i = 0; i < v_after_pairs.size(); i++) {
         ASSERT_EQ(v_after_pairs.at(i).first, v_after_compl.at(i).real());
         ASSERT_EQ(v_after_pairs.at(i).second, v_after_compl.at(i).imag());
