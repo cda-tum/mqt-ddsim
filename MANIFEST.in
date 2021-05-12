@@ -13,7 +13,10 @@ include extern/qfr/extern/dd_package/CMakeLists.txt
 graft   extern/qfr/extern/dd_package/include
 
 # Include necessary files from nlohmann and pybind11 (especially don't include the docs)
+include extern/qfr/extern/json/CMakeLists.txt
 graft   extern/qfr/extern/json/single_include
+include extern/qfr/extern/pybind11/CMakeLists.txt
 graft   extern/qfr/extern/pybind11/include
 graft   extern/qfr/extern/pybind11/pybind11
+include extern/qfr/extern/pybind11_json/CMakeLists.txt
 graft   extern/qfr/extern/pybind11_json/include
