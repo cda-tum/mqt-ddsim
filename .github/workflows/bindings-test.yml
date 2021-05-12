@@ -62,7 +62,8 @@ jobs:
         with:
           path: dist/*.tar.gz
 
-  upload_pypi:
+  upload_pypi_test:
+    name: Upload dists to PyPi Test
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
     steps:
