@@ -9,6 +9,8 @@ project(ddsim
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 option(COVERAGE "Configure for coverage report generation")
 option(GENERATE_POSITION_INDEPENDENT_CODE "Generate position independent code")
+option(BINDINGS "Configure for building Python bindings")
+option(DEPLOY "Configure for deployment")
 
 set(default_build_type "Release")
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -41,5 +43,10 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR BUILD_TESTS)
 	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Skip gbenchmark self tests")
 	add_subdirectory(extern/benchmark)
 	add_subdirectory(apps)
+endif()
+
+# add Python binding code
+if(BINDINGS)
+	add_subdirectory(jkq/ddsim)
 endif()
 

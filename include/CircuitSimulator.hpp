@@ -43,20 +43,20 @@ struct ApproximationInfo {
 
 class CircuitSimulator: public Simulator {
 public:
-    explicit CircuitSimulator(std::unique_ptr<qc::QuantumComputation>& qc):
-        qc(qc), approx_info(ApproximationInfo(1.0, 1, ApproximationInfo::FidelityDriven)) {
+    explicit CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_):
+        qc(std::move(qc_)), approx_info(ApproximationInfo(1.0, 1, ApproximationInfo::FidelityDriven)) {
         dd->resize(qc->getNqubits());
     }
 
-    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const ApproximationInfo approx_info):
-        qc(qc), approx_info(approx_info) {
+    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info):
+        qc(std::move(qc_)), approx_info(approx_info) {
         dd->resize(qc->getNqubits());
     }
 
-    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const ApproximationInfo approx_info,
+    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info,
                      const unsigned long long seed):
         Simulator(seed),
-        qc(qc), approx_info(approx_info) {
+        qc(std::move(qc_)), approx_info(approx_info) {
     }
 
     std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
@@ -77,8 +77,8 @@ public:
     [[nodiscard]] std::string getName() const override { return qc->getName(); };
 
 private:
-    std::unique_ptr<qc::QuantumComputation>& qc;
-    std::size_t                              single_shots{0};
+    std::unique_ptr<qc::QuantumComputation> qc;
+    std::size_t                             single_shots{0};
 
     const ApproximationInfo approx_info;
     std::size_t             approximation_runs{0};

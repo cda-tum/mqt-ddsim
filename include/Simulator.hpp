@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <complex>
 #include <cstddef>
 #include <map>
 #include <memory>
@@ -46,6 +47,8 @@ public:
     [[nodiscard]] std::vector<dd::ComplexValue> getVector() const;
 
     [[nodiscard]] std::vector<std::pair<dd::fp, dd::fp>> getVectorPair() const;
+
+    [[nodiscard]] std::vector<std::complex<dd::fp>> getVectorComplex() const;
 
     [[nodiscard]] std::size_t getActiveNodeCount() const { return dd->vUniqueTable.getActiveNodeCount(); }
 
