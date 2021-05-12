@@ -21,19 +21,14 @@ namespace nl = nlohmann;
 
 
 std::unique_ptr<CircuitSimulator> create_circuit_simulator(const py::object& circ) {
-    std::cout << "Creating qc" << std::endl;
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>();
 
     if(py::isinstance<py::str>(circ)) {
         auto&& file1 = circ.cast<std::string>();
-        std::cout << "Reading file " << file1 << std::endl;
         qc->import(file1);
     } else {
-        std::cout << "Reading circuit from qiskit representation" << std::endl;
         import(*qc, circ);
     }
-
-    std::cout << "Creating Circuit Simulator" << std::endl;
 
     return std::make_unique<CircuitSimulator>(std::move(qc));
 }

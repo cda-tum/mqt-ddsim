@@ -46,7 +46,7 @@ class CircuitSimulator(BackendV1):
     def _default_options(cls) -> Options:
         return Options(
             shots=None,
-            return_statevector=False
+            return_statevector=True
         )
 
     def __init__(self, configuration=None, provider=None):
@@ -101,7 +101,7 @@ class CircuitSimulator(BackendV1):
                        },
                        'success': True
                        }
-        if options.get('return_statevector', False):
+        if options.get('return_statevector', True):
             result_dict['data']['statevector'] = sim.get_vector()
         return result_dict
 

@@ -19,10 +19,14 @@ provider = jkq.ddsim.JKQProvider()
 
 backend = provider.get_backend('circuit_simulator')
 
-job = execute(circ, backend, shots=10000, return_statevector=True)
+# execute(circ, backend, shots=10000, return_statevector=False) ## this deactivates getting the vector from the DD
+job = execute(circ, backend, shots=10000)
 result = job.result()
 outputstate = result.get_statevector(circ, decimals=3)
 print(outputstate)
 
 counts = result.get_counts(circ)
 print(counts)
+
+sim = jkq.ddsim.pyddsim.CircuitSimulator(circ)
+print(sim.simulate(1000))
