@@ -3,7 +3,6 @@ include src/*
 include include/*
 include apps/*
 graft jkq/*
-include extern/benchmark/CMakeLists.txt
 include extern/qfr/CMakeLists.txt
 graft   extern/qfr/include
 graft   extern/qfr/src

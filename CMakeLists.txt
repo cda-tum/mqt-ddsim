@@ -31,17 +31,18 @@ check_submodule_present(qfr)
 
 add_subdirectory(src)
 
-option(BUILD_TESTS "Also build tests for DDSIM project" OFF)
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR BUILD_TESTS)
+option(BUILD_DDSIM_TESTS "Also build tests and benchmarks for DDSIM project" OFF)
+if(BUILD_DDSIM_TESTS)
 	check_submodule_present(benchmark)
-
 
 	enable_testing()
 	include(GoogleTest)
-	add_subdirectory(test)
-
 	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Skip gbenchmark self tests")
 	add_subdirectory(extern/benchmark)
+	add_subdirectory(test)
+endif()
+
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 	add_subdirectory(apps)
 endif()
 

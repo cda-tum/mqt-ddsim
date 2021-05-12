@@ -34,7 +34,6 @@ if(Boost_FOUND)
 else ()
     message(WARNING "Did not find Boost! Commandline interface will not be an available target!")
 endif ()
-add_sim_executable(benchmark benchmark::benchmark_main)
 add_sim_executable(vectors)
 
 
