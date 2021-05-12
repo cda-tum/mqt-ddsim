@@ -73,7 +73,7 @@ TEST(CircuitSimTest, DestructiveMeasurementAll) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::H);
-    CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
+    CircuitSimulator ddsim(std::move(quantumComputation));
     ddsim.Simulate(1);
 
     const std::vector<dd::ComplexValue> v_before = ddsim.getVector();
@@ -96,8 +96,8 @@ TEST(CircuitSimTest, DestructiveMeasurementOne) {
     CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
     ddsim.Simulate(1);
 
-    const char                          m       = ddsim.MeasureOneCollapsing(0);
-    const std::vector<dd::ComplexValue> v_after = ddsim.getVector();
+    const char m       = ddsim.MeasureOneCollapsing(0);
+    const auto v_after = ddsim.getVector();
 
     if (m == '0') {
         ASSERT_EQ(v_after[0], dd::complex_SQRT2_2);
@@ -111,6 +111,15 @@ TEST(CircuitSimTest, DestructiveMeasurementOne) {
         ASSERT_EQ(v_after[3], dd::complex_SQRT2_2);
     } else {
         FAIL() << "Measurement result not in {0,1}!";
+    }
+
+    const auto v_after_pairs = ddsim.getVectorPair();
+    const auto v_after_compl = ddsim.getVectorComplex();
+
+    assert (v_after_pairs.size() == v_after_compl.size());
+    for (std::size_t i = 0; i < v_after_pairs.size(); i++) {
+        ASSERT_EQ(v_after_pairs.at(i).first, v_after_compl.at(i).real());
+        ASSERT_EQ(v_after_pairs.at(i).second, v_after_compl.at(i).imag());
     }
 }
 
