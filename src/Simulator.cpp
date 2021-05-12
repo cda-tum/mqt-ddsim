@@ -105,7 +105,7 @@ std::vector<std::pair<dd::fp, dd::fp>> Simulator::getVectorPair() const {
 
 std::vector<std::complex<dd::fp>> Simulator::getVectorComplex() const {
     assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
-    std::string                            path(getNumberOfQubits(), '0');
+    std::string                       path(getNumberOfQubits(), '0');
     std::vector<std::complex<dd::fp>> results(1ull << getNumberOfQubits());
 
     for (unsigned long long i = 0; i < 1ull << getNumberOfQubits(); ++i) {
@@ -116,7 +116,6 @@ std::vector<std::complex<dd::fp>> Simulator::getVectorComplex() const {
     }
     return results;
 }
-
 
 void Simulator::NextPath(std::string& s) {
     std::string::reverse_iterator iter = s.rbegin(), end = s.rend();

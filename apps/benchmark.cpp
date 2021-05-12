@@ -12,7 +12,7 @@ auto min_estimator = [](const std::vector<double>& v) -> double {
 static void BM_sim_X(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::X);
-    CircuitSimulator sim(qc);
+    CircuitSimulator sim(std::move(qc));
     for (auto _: state) {
         sim.Simulate(1);
     }
@@ -24,7 +24,7 @@ BENCHMARK(BM_sim_X)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 static void BM_sim_H(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::H);
-    CircuitSimulator sim(qc);
+    CircuitSimulator sim(std::move(qc));
     for (auto _: state) {
         sim.Simulate(1);
     }
@@ -36,7 +36,7 @@ BENCHMARK(BM_sim_H)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 static void BM_sim_T(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::T);
-    CircuitSimulator sim(qc);
+    CircuitSimulator sim(std::move(qc));
     for (auto _: state) {
         sim.Simulate(1);
     }
@@ -48,7 +48,7 @@ BENCHMARK(BM_sim_T)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator);
 static void BM_sim_CNOT(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     qc->emplace_back<qc::StandardOperation>(state.range(0), dd::Control{0}, 1, qc::X);
-    CircuitSimulator sim(qc);
+    CircuitSimulator sim(std::move(qc));
     for (auto _: state) {
         sim.Simulate(1);
     }
@@ -61,7 +61,7 @@ static void BM_sim_TOFFOLI(benchmark::State& state) {
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     dd::Controls                            controls{dd::Control{0}, dd::Control{1}};
     qc->emplace_back<qc::StandardOperation>(state.range(0), controls, 2, qc::X);
-    CircuitSimulator sim(qc);
+    CircuitSimulator sim(std::move(qc));
     for (auto _: state) {
         sim.Simulate(1);
     }
@@ -115,7 +115,7 @@ static void BM_sim_QCBM(benchmark::State& state) {
         qc->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RZ, 1.0);
         qc->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RX, 1.0);
     }
-    CircuitSimulator sim(qc);
+    CircuitSimulator sim(std::move(qc));
     for (auto _: state) {
         sim.Simulate(1);
     }
