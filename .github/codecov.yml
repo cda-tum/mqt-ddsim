@@ -2,7 +2,7 @@ ignore:
   - "extern/**/*"
   - "apps/*"
   - "test/benchmark.cpp"
-  - "jkq/*"
+  - "jkq/**/*"
 
 coverage:
   range:     60..95
