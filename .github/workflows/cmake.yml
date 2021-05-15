@@ -15,6 +15,18 @@ defaults:
     shell: bash
 
 jobs:
+  codestyle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - uses: DoozyX/clang-format-lint-action@v0.12
+        with:
+          source: 'apps include src test'
+          extensions: 'h,hpp,c,cpp'
+          clangFormatVersion: 12
+
   build-ubuntu:
     name: Build on Ubuntu
     runs-on: ubuntu-latest
@@ -35,6 +47,7 @@ jobs:
 
   build-macos:
     name: Build on MacOS
+    needs: [ build-ubuntu, codestyle ]
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
@@ -53,6 +66,7 @@ jobs:
 
   build-windows:
     name: Build on Windows
+    needs: [ build-ubuntu, codestyle ]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -91,11 +105,11 @@ jobs:
 
       - name: Test
         working-directory: ${{github.workspace}}/build
-        run: ctest -C $BUILD_TYPE
+        run: ctest -C $BUILD_TYPE -E StochNoiseSimTest.SimulateAdder4
 
   coverage:
     name: Coverage
-    needs: [ build-ubuntu, build-macos ]
+    needs: [ build-ubuntu, codestyle ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -113,15 +127,3 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
-
-  codestyle:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - uses: DoozyX/clang-format-lint-action@v0.12
-        with:
-          source:             'apps include src test'
-          extensions:         'h,hpp,c,cpp'
-          clangFormatVersion: 12

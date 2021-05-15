@@ -47,7 +47,7 @@ jobs:
 
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
-    needs: [build_sdist]
+    needs: [ build_sdist ]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
@@ -66,9 +66,9 @@ jobs:
         with:
           path: ./wheelhouse/*.whl
 
-  upload_pypi_test:
+  upload_pypi:
     name: Upload dists to PyPi Test
-    needs: [build_wheels, build_sdist]
+    needs: [ build_wheels, build_sdist ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v2
