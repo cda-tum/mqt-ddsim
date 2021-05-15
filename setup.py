@@ -64,7 +64,7 @@ with open(README_PATH, encoding="utf8") as readme_file:
 
 setup(
     name='jkq.ddsim',
-    version='1.4.3',
+    version='1.4.4',
     author='Stefan Hillmich',
     author_email='stefan.hillmich@jku.at',
     description='JKQ DDSIM - A quantum simulator based on decision diagrams written in C++',

@@ -41,6 +41,7 @@ PYBIND11_MODULE(pyddsim, m) {
             .def("get_number_of_qubits", &CircuitSimulator::getNumberOfQubits)
             .def("get_name", &CircuitSimulator::getName)
             .def("simulate", &CircuitSimulator::Simulate)
+            .def("statistics", &CircuitSimulator::AdditionalStatistics)
             .def("get_vector", &CircuitSimulator::getVectorComplex);
 
 
