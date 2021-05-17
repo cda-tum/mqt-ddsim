@@ -5,11 +5,8 @@
 
 using namespace dd::literals;
 
-
-
-
 TEST(HybridSimTest, TrivialParallelTest) {
-    auto quantumComputation = []{
+    auto quantumComputation = [] {
         auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
         quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::H);
         quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::H);
@@ -18,7 +15,6 @@ TEST(HybridSimTest, TrivialParallelTest) {
         quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I);
         return quantumComputation;
     };
-
 
     HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::DD);
     ddsim.Simulate(1);

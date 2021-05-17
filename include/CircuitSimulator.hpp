@@ -76,7 +76,6 @@ public:
 
     [[nodiscard]] std::string getName() const override { return qc->getName(); };
 
-
 protected:
     std::unique_ptr<qc::QuantumComputation> qc;
     std::size_t                             single_shots{0};
