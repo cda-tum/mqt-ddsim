@@ -67,7 +67,7 @@ jobs:
           path: ./wheelhouse/*.whl
 
   upload_pypi:
-    name: Upload dists to PyPi Test
+    name: Upload dists to PyPi
     needs: [ build_wheels, build_sdist ]
     runs-on: ubuntu-latest
     steps:
