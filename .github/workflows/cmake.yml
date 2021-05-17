@@ -99,7 +99,7 @@ jobs:
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --parallel 8
       - name: Test
-        working-directory: ${{github.workspace}}/build
+        working-directory: ${{github.workspace}}/build/test
         run: ctest -C $BUILD_TYPE --output-on-failure -E StochNoiseSimTest.SimulateAdder4
 
   coverage:
