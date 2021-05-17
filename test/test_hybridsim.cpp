@@ -40,8 +40,11 @@ TEST(HybridSimTest, TrivialParallelTest) {
 }
 
 TEST(HybridSimTest, GRCSTestDD) {
-    HybridSchrodingerFeynmanSimulator ddsim_hybrid_dd(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt"), HybridSchrodingerFeynmanSimulator::Mode::DD);
-    CircuitSimulator                  ddsim(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt"));
+    auto qc1 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
+    auto qc2 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
+
+    HybridSchrodingerFeynmanSimulator ddsim_hybrid_dd(std::move(qc1), HybridSchrodingerFeynmanSimulator::Mode::DD);
+    CircuitSimulator                  ddsim(std::move(qc2));
 
     ddsim_hybrid_dd.Simulate(1);
     ddsim.Simulate(1);
@@ -70,8 +73,11 @@ TEST(HybridSimTest, GRCSTestDD) {
 }
 
 TEST(HybridSimTest, GRCSTestAmplitudes) {
-    HybridSchrodingerFeynmanSimulator ddsim_hybrid_amp(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt"), HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
-    CircuitSimulator                  ddsim(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt"));
+    auto qc1 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
+    auto qc2 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
+
+    HybridSchrodingerFeynmanSimulator ddsim_hybrid_amp(std::move(qc1), HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
+    CircuitSimulator                  ddsim(std::move(qc2));
 
     ddsim_hybrid_amp.Simulate(0);
     ddsim.Simulate(0);
