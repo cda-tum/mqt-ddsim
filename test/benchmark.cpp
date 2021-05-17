@@ -2,7 +2,10 @@
 #include "QuantumComputation.hpp"
 #include "Simulator.hpp"
 
+// clang format wants to put the following include to the top of the file
+// clang-format off
 #include "benchmark/benchmark.h"
+// clang-format on
 
 #include <algorithm>
 #include <chrono>
