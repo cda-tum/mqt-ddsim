@@ -64,7 +64,7 @@ with open(README_PATH, encoding="utf8") as readme_file:
 
 setup(
     name='jkq.ddsim',
-    version='1.4.5',
+    version='1.5.0',
     author='Stefan Hillmich',
     author_email='stefan.hillmich@jku.at',
     description='JKQ DDSIM - A quantum simulator based on decision diagrams written in C++',
@@ -77,7 +77,7 @@ setup(
     zip_safe=False,
     packages=find_namespace_packages(include=['jkq.*']),
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Programming Language :: Python :: 3',
         'Programming Language :: C++',
         'License :: OSI Approved :: MIT License',

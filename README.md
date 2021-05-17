@@ -65,7 +65,7 @@ The backend for Qiskit is available via PyPi. The following code gives an exampl
 
 ```python
 from qiskit import *
-import jkq.ddsim
+from jkq import ddsim
 
 circ = QuantumCircuit(3)
 circ.h(0)
@@ -74,14 +74,12 @@ circ.cx(0, 2)
 
 print(circ.draw(fold=-1))
 
-provider = jkq.ddsim.JKQProvider()
+provider = ddsim.JKQProvider()
 
-backend = provider.get_backend('circuit_simulator')
+backend = provider.get_backend('qasm_simulator')
 
 job = execute(circ, backend, shots=10000)
 result = job.result()
-outputstate = result.get_statevector(circ, decimals=3)
-print(outputstate)
 
 counts = result.get_counts(circ)
 print(counts)
@@ -91,7 +89,7 @@ The simulator may be used in a more stand-alone fashion:
 
 ```python
 ...
-sim = jkq.ddsim.pyddsim.CircuitSimulator(circ)
+sim = ddsim.CircuitSimulator(circ)
 print(sim.simulate(1000))
 ```
 

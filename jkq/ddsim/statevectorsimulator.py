@@ -12,43 +12,46 @@ from qiskit.result import Result
 from .jkqjob import JKQJob
 from .jkqerror import JKQSimulatorError
 
-from jkq.ddsim import pyddsim
+from jkq import ddsim
 
 logger = logging.getLogger(__name__)
 
 
-class CircuitSimulator(BackendV1):
+class StatevectorSimulator(BackendV1):
     """Python interface to JKQ DDSIM"""
 
     @classmethod
     def _default_options(cls) -> Options:
-        return Options(
-            shots=None,
-            return_statevector=True
-        )
+        return Options(shots=None)
 
     def __init__(self, configuration=None, provider=None):
         conf = {
-            'backend_name': 'qasm_simulator',
-            'backend_version': '1.4.3',
+            'backend_name': 'statevector_simulator',
+            'backend_version': '1.5.0',
             'url': 'https://github.com/iic-jku/ddsim',
             'simulator': True,
             'local': True,
             'description': 'JKQ DDSIM C++ simulator',
-            'basis_gates': ['id', 'u0', 'u1', 'u2', 'u3', 'cx', 'x', 'y', 'z', 'h', 's', 't', 'snapshot'],
+            'basis_gates': ['id', 'u0', 'u1', 'u2', 'u3', 'cu3',
+                            'x', 'cx', 'ccx', 'mcx_gray', 'mcx_recursive', 'mcx_vchain',
+                            'y', 'cy',
+                            'z', 'cz',
+                            'h', 'ch',
+                            's', 'sdg', 't', 'tdg',
+                            'rx', 'crx', 'mcrx',
+                            'ry', 'cry', 'mcry',
+                            'rz', 'crz', 'mcrz',
+                            'p', 'cp', 'cu1', 'mcphase',
+                            'sx', 'csx', 'sxdg',
+                            'swap', 'cswap', 'iswap',
+                            'snapshot'],
             'memory': False,
             'n_qubits': 64,
             'coupling_map': None,
             'conditional': False,
-            'max_shots': 1000000,
+            'max_shots': 1,
             'open_pulse': False,
-            'gates': [
-                {
-                    'name': 'TODO',
-                    'parameters': [],
-                    'qasm_def': 'TODO'
-                }
-            ]
+            'gates': []
         }
         if configuration:
             conf.update(configuration)
@@ -81,22 +84,19 @@ class CircuitSimulator(BackendV1):
     def run_experiment(self, quantum_circuit, **options):
         start_time = time.time()
 
-        sim = pyddsim.CircuitSimulator(quantum_circuit)
-        counts = sim.simulate(options['shots'])
+        sim = ddsim.CircuitSimulator(quantum_circuit)
+        counts = sim.simulate(1)
         end_time = time.time()
 
-        result_dict = {'header': {'name': quantum_circuit.name},
-                       'name': quantum_circuit.name,
-                       'status': 'DONE',
-                       'time_taken': end_time - start_time,
-                       'seed': options['shots'],
-                       'shots': 1,
-                       'data': {'counts': counts},
-                       'success': True
-                       }
-        if options.get('return_statevector', True):
-            result_dict['data']['statevector'] = sim.get_vector()
-        return result_dict
+        return {'header': {'name': quantum_circuit.name},
+                'name': quantum_circuit.name,
+                'status': 'DONE',
+                'time_taken': end_time - start_time,
+                'seed': options['shots'],
+                'shots': 1,
+                'data': {'statevector': sim.get_vector()},
+                'success': True
+                }
 
     def _validate(self, quantum_circuit):
         return

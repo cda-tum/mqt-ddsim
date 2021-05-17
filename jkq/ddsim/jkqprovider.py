@@ -1,7 +1,8 @@
 from qiskit.providers import ProviderV1 as Provider
 from qiskit.providers.providerutils import filter_backends
 
-from .circuitsimulator import CircuitSimulator
+from .qasmsimulator import QasmSimulator
+from .statevectorsimulator import StatevectorSimulator
 
 
 class JKQProvider(Provider):
@@ -10,7 +11,8 @@ class JKQProvider(Provider):
     def __init__(self):
         if JKQProvider._BACKENDS is None:
             JKQProvider._BACKENDS = [
-                ('circuit_simulator', CircuitSimulator, None, None),
+                ('qasm_simulator', QasmSimulator, None, None),
+                ('statevector_simulator', StatevectorSimulator, None, None),
             ]
 
     def get_backend(self, name=None, **kwargs):
