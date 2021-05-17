@@ -92,7 +92,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
 
                 auto seq_targets = targets;
                 for (auto const& control: controls) {
-                    targets.push_back(control.qubit);
+                    seq_targets.push_back(control.qubit);
                 }
                 apply_det_noise_sequential(seq_targets);
 
