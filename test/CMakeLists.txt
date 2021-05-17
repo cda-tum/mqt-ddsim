@@ -36,3 +36,12 @@ add_custom_command(TARGET ${PROJECT_NAME}_test
         COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE_DIR:${PROJECT_NAME}_test>/circuits ${CMAKE_BINARY_DIR}/circuits
         COMMENT "Copying circuits and creating symlinks for ${PROJECT_NAME}_test"
         VERBATIM)
+
+add_executable(ddsim_benchmark ${CMAKE_CURRENT_SOURCE_DIR}/benchmark.cpp)
+target_link_libraries(ddsim_benchmark PUBLIC ddsim benchmark::benchmark_main)
+set_target_properties(ddsim_benchmark PROPERTIES EXPORT_NAME ddsim_benchmark)
+
+add_custom_command(TARGET ${PROJECT_NAME}_benchmark
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE_DIR:${PROJECT_NAME}_test>/${PROJECT_NAME}_benchmark ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_benchmark
+        VERBATIM)
