@@ -45,40 +45,43 @@ jobs:
         with:
           path: dist/*.tar.gz
 
-  build_wheels:
-    name: Build wheels on ${{ matrix.os }}
-    needs: [ build_sdist ]
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-
-      - name: Build wheels
-        uses: joerick/cibuildwheel@v1.11.0
-
-      - uses: actions/upload-artifact@v2
-        with:
-          path: ./wheelhouse/*.whl
+###
+### The following jobs should be used to more thoroughly test changes explicitly targeting the python bindings
+###
+#  build_wheels:
+#    name: Build wheels on ${{ matrix.os }}
+#    needs: [ build_sdist ]
+#    runs-on: ${{ matrix.os }}
+#    strategy:
+#      fail-fast: true
+#      matrix:
+#        os: [ubuntu-latest, windows-latest, macos-latest]
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#        with:
+#          submodules: recursive
+#
+#      - name: Build wheels
+#        uses: joerick/cibuildwheel@v1.11.0
+#
+#      - uses: actions/upload-artifact@v2
+#        with:
+#          path: ./wheelhouse/*.whl
 
 # Upload wheels to pypi test before uploading to production?
-  upload_pypi_test:
-    name: Upload dists to PyPi Test
-    needs: [ build_wheels, build_sdist ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v2
-        with:
-          name: artifact
-          path: dist
-
-      - uses: pypa/gh-action-pypi-publish@master
-        with:
-          user: __token__
-          password: ${{ secrets.PYPYI_TEST_TOKEN }}
-          repository_url: https://test.pypi.org/legacy/
+#  upload_pypi_test:
+#    name: Upload dists to PyPi Test
+#    needs: [ build_wheels, build_sdist ]
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/download-artifact@v2
+#        with:
+#          name: artifact
+#          path: dist
+#
+#      - uses: pypa/gh-action-pypi-publish@master
+#        with:
+#          user: __token__
+#          password: ${{ secrets.PYPYI_TEST_TOKEN }}
+#          repository_url: https://test.pypi.org/legacy/

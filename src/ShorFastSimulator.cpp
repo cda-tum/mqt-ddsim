@@ -340,7 +340,7 @@ void ShorFastSimulator::ApplyGate(dd::GateMatrix matrix, dd::Qubit target) {
 }
 
 void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
-    const std::size_t cache_count_before = dd->cn.cacheCount();
+    [[maybe_unused]] const std::size_t cache_count_before = dd->cn.cacheCount();
     dag_edges.clear();
 
     dd::Package::vEdge                        f = dd::Package::vEdge::one;
