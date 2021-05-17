@@ -5,20 +5,27 @@
 
 using namespace dd::literals;
 
-TEST(HybridSimTest, TrivialParallelTest) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{2_pc, 1_pc}, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I); // some dummy operations
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I);
 
-    HybridSchrodingerFeynmanSimulator ddsim(quantumComputation, HybridSchrodingerFeynmanSimulator::Mode::DD);
+
+
+TEST(HybridSimTest, TrivialParallelTest) {
+    auto quantumComputation = []{
+        auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
+        quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::H);
+        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::H);
+        quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{2_pc, 1_pc}, 0, qc::X);
+        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I); // some dummy operations
+        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I);
+        return quantumComputation;
+    };
+
+
+    HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::DD);
     ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
 
-    HybridSchrodingerFeynmanSimulator ddsim2(quantumComputation, HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
+    HybridSchrodingerFeynmanSimulator ddsim2(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
     auto                              result = ddsim2.Simulate(8192);
 
     EXPECT_EQ(result.size(), 4);
@@ -37,9 +44,8 @@ TEST(HybridSimTest, TrivialParallelTest) {
 }
 
 TEST(HybridSimTest, GRCSTestDD) {
-    auto                              quantumComputation = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
-    HybridSchrodingerFeynmanSimulator ddsim_hybrid_dd(quantumComputation, HybridSchrodingerFeynmanSimulator::Mode::DD);
-    CircuitSimulator                  ddsim(quantumComputation);
+    HybridSchrodingerFeynmanSimulator ddsim_hybrid_dd(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt"), HybridSchrodingerFeynmanSimulator::Mode::DD);
+    CircuitSimulator                  ddsim(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt"));
 
     ddsim_hybrid_dd.Simulate(1);
     ddsim.Simulate(1);
@@ -47,7 +53,7 @@ TEST(HybridSimTest, GRCSTestDD) {
     dd::serialize(ddsim_hybrid_dd.root_edge, "result_parallel.dd", true);
     dd::serialize(ddsim.root_edge, "result.dd", true);
 
-    auto dd     = std::make_unique<dd::Package>(quantumComputation->getNqubits());
+    auto dd     = std::make_unique<dd::Package>(ddsim.getNumberOfQubits());
     auto result = dd->deserialize<dd::Package::vNode>("result_parallel.dd", true);
     auto ref    = dd->deserialize<dd::Package::vNode>("result.dd", true);
 
@@ -68,9 +74,8 @@ TEST(HybridSimTest, GRCSTestDD) {
 }
 
 TEST(HybridSimTest, GRCSTestAmplitudes) {
-    auto                              quantumComputation = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
-    HybridSchrodingerFeynmanSimulator ddsim_hybrid_amp(quantumComputation, HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
-    CircuitSimulator                  ddsim(quantumComputation);
+    HybridSchrodingerFeynmanSimulator ddsim_hybrid_amp(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt"), HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
+    CircuitSimulator                  ddsim(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt"));
 
     ddsim_hybrid_amp.Simulate(0);
     ddsim.Simulate(0);
@@ -94,6 +99,6 @@ TEST(HybridSimTest, NonStandardOperation) {
     quantumComputation->emplace_back<qc::StandardOperation>(1, 0, qc::H);
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, 0, 0);
 
-    HybridSchrodingerFeynmanSimulator ddsim(quantumComputation);
+    HybridSchrodingerFeynmanSimulator ddsim(std::move(quantumComputation));
     EXPECT_THROW(ddsim.Simulate(0), std::invalid_argument);
 }

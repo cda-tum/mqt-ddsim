@@ -1,0 +1,25 @@
+include README.md LICENSE CMakeLists.txt
+include src/*
+include include/*
+include apps/*
+graft jkq/*
+
+# Include relevant files from other JKQ projects
+include extern/qfr/CMakeLists.txt
+graft   extern/qfr/include
+graft   extern/qfr/src
+graft   extern/qfr/jkq/qfr
+include extern/qfr/extern/dd_package/CMakeLists.txt
+graft   extern/qfr/extern/dd_package/include
+
+# Include necessary files from nlohmann and pybind11 (especially don't include the docs)
+graft   extern/qfr/extern/json
+prune   extern/qfr/extern/json/doc
+prune   extern/qfr/extern/json/test
+
+graft   extern/qfr/extern/pybind11
+prune   extern/qfr/extern/pybind11/docs
+prune   extern/qfr/extern/pybind11/tests
+
+graft   extern/qfr/extern/pybind11_json
+prune   extern/qfr/extern/pybind11_json/test

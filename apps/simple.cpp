@@ -81,7 +81,7 @@ int main(int argc, char** argv) {
     if (vm.count("simulate_file")) {
         const std::string fname = vm["simulate_file"].as<std::string>();
         quantumComputation      = std::make_unique<qc::QuantumComputation>(fname);
-        ddsim                   = std::make_unique<CircuitSimulator>(quantumComputation, approx_info, seed);
+        ddsim                   = std::make_unique<CircuitSimulator>(std::move(quantumComputation), approx_info, seed);
     } else if (vm.count("simulate_file_hybrid")) {
         const std::string fname = vm["simulate_file_hybrid"].as<std::string>();
         quantumComputation      = std::make_unique<qc::QuantumComputation>(fname);
@@ -94,14 +94,14 @@ int main(int argc, char** argv) {
             }
         }
         if (seed != 0) {
-            ddsim = std::make_unique<HybridSchrodingerFeynmanSimulator>(quantumComputation, approx_info, seed, mode, nthreads);
+            ddsim = std::make_unique<HybridSchrodingerFeynmanSimulator>(std::move(quantumComputation), approx_info, seed, mode, nthreads);
         } else {
-            ddsim = std::make_unique<HybridSchrodingerFeynmanSimulator>(quantumComputation, mode, nthreads);
+            ddsim = std::make_unique<HybridSchrodingerFeynmanSimulator>(std::move(quantumComputation), mode, nthreads);
         }
     } else if (vm.count("simulate_qft")) {
         const unsigned int n_qubits = vm["simulate_qft"].as<unsigned int>();
         quantumComputation          = std::make_unique<qc::QFT>(n_qubits);
-        ddsim                       = std::make_unique<CircuitSimulator>(quantumComputation, approx_info, seed);
+        ddsim                       = std::make_unique<CircuitSimulator>(std::move(quantumComputation), approx_info, seed);
     } else if (vm.count("simulate_fast_shor")) {
         const unsigned int composite_number = vm["simulate_fast_shor"].as<unsigned int>();
         const unsigned int coprime          = vm["simulate_fast_shor_coprime"].as<unsigned int>();
@@ -123,7 +123,7 @@ int main(int argc, char** argv) {
     } else if (vm.count("simulate_grover")) {
         const unsigned int n_qubits = vm["simulate_grover"].as<unsigned int>();
         quantumComputation          = std::make_unique<qc::Grover>(n_qubits, seed);
-        ddsim                       = std::make_unique<CircuitSimulator>(quantumComputation, approx_info, seed);
+        ddsim                       = std::make_unique<CircuitSimulator>(std::move(quantumComputation), approx_info, seed);
     } else if (vm.count("simulate_grover_emulated")) {
         ddsim = std::make_unique<GroverSimulator>(vm["simulate_grover_emulated"].as<unsigned int>(), seed);
     } else if (vm.count("simulate_grover_oracle_emulated")) {
@@ -131,7 +131,7 @@ int main(int argc, char** argv) {
     } else if (vm.count("simulate_ghz")) {
         const unsigned int n_qubits = vm["simulate_ghz"].as<unsigned int>();
         quantumComputation          = std::make_unique<qc::Entanglement>(n_qubits);
-        ddsim                       = std::make_unique<CircuitSimulator>(quantumComputation, approx_info, seed);
+        ddsim                       = std::make_unique<CircuitSimulator>(std::move(quantumComputation), approx_info, seed);
     } else {
         std::cerr << "Did not find anything to simulate. See help below.\n"
                   << description << "\n";

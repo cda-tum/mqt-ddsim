@@ -2,9 +2,12 @@
 #define DDSIM_HYBRIDSCHRODINGERFEYNMANSIMULATOR_HPP
 
 #include "CircuitSimulator.hpp"
+#include "QuantumComputation.hpp"
 #include "dd/Export.hpp"
+#include "dd/Package.hpp"
 
 #include <cmath>
+#include <memory>
 #include <omp.h>
 
 class HybridSchrodingerFeynmanSimulator: public CircuitSimulator {
@@ -14,11 +17,11 @@ public:
         Amplitude
     };
 
-    explicit HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>& qc, Mode mode = Mode::Amplitude, const std::size_t nthreads = 2):
-        CircuitSimulator(qc), mode(mode), nthreads(nthreads) {}
+    explicit HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Amplitude, const std::size_t nthreads = 2):
+        CircuitSimulator(std::move(qc)), mode(mode), nthreads(nthreads) {}
 
-    HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const ApproximationInfo approx_info, const unsigned long long seed, Mode mode = Mode::Amplitude, const std::size_t nthreads = 2):
-        CircuitSimulator(qc, approx_info, seed), mode(mode), nthreads(nthreads) {}
+    HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, const ApproximationInfo approx_info, const unsigned long long seed, Mode mode = Mode::Amplitude, const std::size_t nthreads = 2):
+        CircuitSimulator(std::move(qc), approx_info, seed), mode(mode), nthreads(nthreads) {}
 
     std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
 

@@ -2,9 +2,9 @@ name: continuous integration
 
 on:
   push:
-    branches: [master]
+    branches: [ master ]
   pull_request:
-    branches: [master]
+    branches: [ master ]
   workflow_dispatch:
 
 env:
@@ -15,6 +15,18 @@ defaults:
     shell: bash
 
 jobs:
+  codestyle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - uses: DoozyX/clang-format-lint-action@v0.12
+        with:
+          source: 'apps include src test'
+          extensions: 'h,hpp,c,cpp'
+          clangFormatVersion: 12
+
   build-ubuntu:
     name: Build on Ubuntu
     runs-on: ubuntu-latest
@@ -24,106 +36,89 @@ jobs:
           submodules: recursive
       - name: Configure CMake
         shell: bash
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBOOST_ROOT=${BOOST_ROOT_1_72_0} -DBINDINGS=ON
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBINDINGS=ON -DBUILD_DDSIM_TESTS=ON -DBOOST_ROOT=${BOOST_ROOT_1_72_0}
       - name: Build
         shell: bash
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
       - name: Test
         working-directory: ${{github.workspace}}/build/test
         shell: bash
-        run:               ./ddsim_test
+        run: ctest -C $BUILD_TYPE
 
   build-macos:
     name: Build on MacOS
+    needs: [ build-ubuntu, codestyle ]
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
       - name: Install boost dependency
-        run:  brew install boost
+        run: brew install boost
       - name: Install OpenMP dependency
         run: brew install libomp
       - name: Configure CMake
-        run:  cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_DDSIM_TESTS=ON
       - name: Build
-        run:  cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
-      - name:              Test
+        run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
+      - name: Test
         working-directory: ${{github.workspace}}/build/test
-        shell:             bash
-        run:               ./ddsim_test
+        shell: bash
+        run: ctest -C $BUILD_TYPE
 
   build-windows:
     name: Build on Windows
+    needs: [ build-ubuntu, codestyle ]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-
       - name: Cache Boost
-        id:   cache-boost
+        id: cache-boost
         uses: actions/cache@v2
         with:
           path: ${{github.workspace}}/boost_1_70_0
-          key:  ${{ runner.OS }}-boost
-
+          key: ${{ runner.OS }}-boost
       - name: Download boost
-        if:   steps.cache-boost.outputs.cache-hit != 'true'
+        if: steps.cache-boost.outputs.cache-hit != 'true'
         shell: cmd
-        run:  |
-              C:\msys64\usr\bin\wget.exe https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.7z --no-check-certificate
-
+        run: |
+          C:\msys64\usr\bin\wget.exe https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.7z --no-check-certificate
       - uses: ilammy/msvc-dev-cmd@v1
-
-      - name:  Building boost
-        if:    steps.cache-boost.outputs.cache-hit != 'true'
+      - name: Building boost
+        if: steps.cache-boost.outputs.cache-hit != 'true'
         shell: bash
-        run:   |
-               "/c/Program Files/7-Zip/7z.exe" x boost_1_70_0.7z "-o${{github.workspace}}"
-               cd boost_1_70_0
-               ./bootstrap.bat
-               ./b2.exe -j8 address-model=64 link=static threading=multi runtime-link=shared variant=release --build-type=minimal --with-program_options
-
+        run: |
+          "/c/Program Files/7-Zip/7z.exe" x boost_1_70_0.7z "-o${{github.workspace}}"
+          cd boost_1_70_0
+          ./bootstrap.bat
+          ./b2.exe -j8 address-model=64 link=static threading=multi runtime-link=shared variant=release --build-type=minimal --with-program_options
       - name: Configure CMake
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -T "ClangCl" -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_MULTITHREADED=ON -DBoost_USE_STATIC_RUNTIME=OFF -DBOOST_ROOT="${{github.workspace}}\boost_1_70_0" -DBOOST_INCLUDEDIR="${{github.workspace}}\boost_1_70_0\include" -DBOOST_LIBRARYDIR="${{github.workspace}}\boost_1_70_0\lib"
-
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_DDSIM_TESTS=ON -T "ClangCl" -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_MULTITHREADED=ON -DBoost_USE_STATIC_RUNTIME=OFF -DBOOST_ROOT="${{github.workspace}}\boost_1_70_0" -DBOOST_INCLUDEDIR="${{github.workspace}}\boost_1_70_0\include" -DBOOST_LIBRARYDIR="${{github.workspace}}\boost_1_70_0\lib"
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --parallel 8
-
-      - name:              Test
-        working-directory: ${{github.workspace}}/build/test
-        run: cd $BUILD_TYPE && ./ddsim_test
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: ctest -C $BUILD_TYPE -E StochNoiseSimTest.SimulateAdder4
 
   coverage:
     name: Coverage
-    needs: [ build-ubuntu, build-macos ]
+    needs: [ build-ubuntu, codestyle ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
       - name: Configure CMake
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DBINDINGS=ON
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DBUILD_DDSIM_TESTS=ON -DBINDINGS=ON
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config Debug
-      - name:              Test
+      - name: Test
         working-directory: ${{github.workspace}}/build/test
-        run:               ./ddsim_test
+        run: ./ddsim_test
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
-
-  codestyle:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - uses: DoozyX/clang-format-lint-action@v0.12
-        with:
-          source:             'apps include src test'
-          extensions:         'h,hpp,c,cpp'
-          clangFormatVersion: 12
