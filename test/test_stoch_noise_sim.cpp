@@ -275,7 +275,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateError) {
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
     quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 30000, 1, 1, "-1-1000");
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 30000, 1, 1, "-3-1000");
     auto                     m = ddsim.StochSimulate();
 
     EXPECT_GE(m.find("0000")->second, 0.19);

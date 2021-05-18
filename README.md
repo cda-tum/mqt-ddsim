@@ -59,6 +59,40 @@ For details on the available methods we refer to [iic.jku.at/eda/research/quantu
 
 The simulator is based on the references listed below and can either be used as a **standalone executable** with command-line interface, or as a **library** for the incorporation in other projects.
 
+## Using the Python Bindings / Backend for Qiskit
+
+The backend for Qiskit is available via PyPi. The following code gives an example on the usage:
+
+```python
+from qiskit import *
+from jkq import ddsim
+
+circ = QuantumCircuit(3)
+circ.h(0)
+circ.cx(0, 1)
+circ.cx(0, 2)
+
+print(circ.draw(fold=-1))
+
+provider = ddsim.JKQProvider()
+
+backend = provider.get_backend('qasm_simulator')
+
+job = execute(circ, backend, shots=10000)
+result = job.result()
+
+counts = result.get_counts(circ)
+print(counts)
+```
+
+The simulator may be used in a more stand-alone fashion:
+
+```python
+...
+sim = ddsim.CircuitSimulator(circ)
+print(sim.simulate(1000))
+```
+
 ## System Requirements
 
 Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). 

@@ -2,9 +2,9 @@ name: continuous integration
 
 on:
   push:
-    branches: [master]
+    branches: [ master ]
   pull_request:
-    branches: [master]
+    branches: [ master ]
   workflow_dispatch:
 
 env:
@@ -15,6 +15,18 @@ defaults:
     shell: bash
 
 jobs:
+  codestyle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - uses: DoozyX/clang-format-lint-action@v0.12
+        with:
+          source: 'apps include src test'
+          extensions: 'h,hpp,c,cpp'
+          clangFormatVersion: 12
+
   build-ubuntu:
     name: Build on Ubuntu
     runs-on: ubuntu-latest
@@ -24,7 +36,7 @@ jobs:
           submodules: recursive
       - name: Configure CMake
         shell: bash
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBOOST_ROOT=${BOOST_ROOT_1_72_0}
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBINDINGS=ON -DBUILD_DDSIM_TESTS=ON -DBOOST_ROOT=${BOOST_ROOT_1_72_0}
       - name: Build
         shell: bash
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
@@ -35,6 +47,7 @@ jobs:
 
   build-macos:
     name: Build on MacOS
+    needs: [ build-ubuntu, codestyle ]
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
@@ -43,7 +56,7 @@ jobs:
       - name: Install boost dependency
         run: brew install boost
       - name: Configure CMake
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_DDSIM_TESTS=ON
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
       - name: Test
@@ -53,6 +66,7 @@ jobs:
 
   build-windows:
     name: Build on Windows
+    needs: [ build-ubuntu, codestyle ]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
@@ -84,7 +98,7 @@ jobs:
                ./b2.exe -j8 address-model=64 link=static threading=multi runtime-link=shared variant=release --build-type=minimal --with-program_options
 
       - name: Configure CMake
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -T "ClangCl" -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_MULTITHREADED=ON -DBoost_USE_STATIC_RUNTIME=OFF -DBOOST_ROOT="${{github.workspace}}\boost_1_70_0" -DBOOST_INCLUDEDIR="${{github.workspace}}\boost_1_70_0\include" -DBOOST_LIBRARYDIR="${{github.workspace}}\boost_1_70_0\lib"
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_DDSIM_TESTS=ON -T "ClangCl" -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_MULTITHREADED=ON -DBoost_USE_STATIC_RUNTIME=OFF -DBOOST_ROOT="${{github.workspace}}\boost_1_70_0" -DBOOST_INCLUDEDIR="${{github.workspace}}\boost_1_70_0\include" -DBOOST_LIBRARYDIR="${{github.workspace}}\boost_1_70_0\lib"
 
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --parallel 8
@@ -93,16 +107,17 @@ jobs:
         working-directory: ${{github.workspace}}/build
         run: ctest --output-on-failure -C $BUILD_TYPE
 
+
   coverage:
     name: Coverage
-    needs: [ build-ubuntu, build-macos ]
+    needs: [ build-ubuntu, codestyle ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
       - name: Configure CMake
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DBINDINGS=ON
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DBUILD_DDSIM_TESTS=ON -DBINDINGS=ON
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config Debug
       - name: Test
@@ -113,15 +128,3 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
-
-  codestyle:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: recursive
-      - uses: DoozyX/clang-format-lint-action@v0.12
-        with:
-          source:             'apps include src test'
-          extensions:         'h,hpp,c,cpp'
-          clangFormatVersion: 12

@@ -1,3 +1,7 @@
 /build*
 /cmake-build-*
 .idea
+venv/
+*.egg-info/
+__pycache__/
+*.so
