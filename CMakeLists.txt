@@ -37,8 +37,10 @@ if(BUILD_DDSIM_TESTS)
 
 	enable_testing()
 	include(GoogleTest)
-	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Skip gbenchmark self tests")
-	add_subdirectory("extern/qfr/extern/dd_package/extern/benchmark" EXCLUDE_FROM_ALL)
+	if (NOT TARGET benchmark::benchmark_main)
+		set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Skip gbenchmark self tests")
+		add_subdirectory("extern/qfr/extern/dd_package/extern/benchmark" EXCLUDE_FROM_ALL)
+	endif ()
 	add_subdirectory(test)
 endif()
 
