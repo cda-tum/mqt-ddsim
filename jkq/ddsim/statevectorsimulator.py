@@ -27,7 +27,7 @@ class StatevectorSimulator(BackendV1):
     def __init__(self, configuration=None, provider=None):
         conf = {
             'backend_name': 'statevector_simulator',
-            'backend_version': '1.6.0',
+            'backend_version': ddsim.__version__,
             'url': 'https://github.com/iic-jku/ddsim',
             'simulator': True,
             'local': True,

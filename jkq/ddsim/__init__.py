@@ -1,2 +1,2 @@
 from .jkqprovider import JKQProvider
-from .pyddsim import CircuitSimulator
+from .pyddsim import CircuitSimulator, __version__
