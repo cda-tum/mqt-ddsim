@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![toolset: JKQ](https://img.shields.io/badge/toolset-JKQ-blue)](https://github.com/iic-jku/jkq)
 
-# JKQ DDSIM - A quantum simulator based on decision diagrams written in C++
+# JKQ DDSIM - A quantum circuit simulator based on decision diagrams written in C++
 
 A tool for quantum circuit simulation by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at)
 and a part of the [JKQ toolset](https://github.com/iic-jku/jkq).
@@ -19,6 +19,7 @@ If you have any questions, feel free to contact us via [iic-quantum@jku.at](mail
 # Table of contents
 <!--ts-->
 - [Usage](#usage)
+- [Using the Python Bindings / Backend for Qiskit](#using-the-python-bindings--backend-for-qiskit) 
 - [System Requirements](#system-requirements)
 - [Build and Run](#build-and-run)
     * [Library](#library)
@@ -85,13 +86,7 @@ counts = result.get_counts(circ)
 print(counts)
 ```
 
-The simulator may be used in a more stand-alone fashion:
-
-```python
-...
-sim = ddsim.CircuitSimulator(circ)
-print(sim.simulate(1000))
-```
+A slightly more elaborate example can be found in the notebook [ddsim.ipynb](ddsim.ipynb).
 
 ## System Requirements
 
