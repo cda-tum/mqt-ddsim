@@ -50,7 +50,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
 if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE "/W4" "/utf-8")
 else ()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall $<$<CONFIG:DEBUG>:-g3 -Og -Wextra -Wpedantic -pedantic> $<$<CONFIG:RELEASE>:-g0 -mtune=native -march=native>)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic $<$<CONFIG:DEBUG>:-Og>)
 
     if (BINDINGS)
         # adjust visibility settings for building Python bindings
