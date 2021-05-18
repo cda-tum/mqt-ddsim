@@ -15,6 +15,7 @@ env:
   CIBW_TEST_REQUIRES: qiskit-terra
   CIBW_TEST_COMMAND: "python -c \"from jkq import ddsim\""
   CIBW_BEFORE_BUILD: "pip install cmake"
+  CIBW_BEFORE_BUILD_MACOS: "brew install libomp"
 
 jobs:
   build_sdist:
