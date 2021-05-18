@@ -8,7 +8,6 @@ project(ddsim
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 option(COVERAGE "Configure for coverage report generation")
-option(GENERATE_POSITION_INDEPENDENT_CODE "Generate position independent code")
 option(BINDINGS "Configure for building Python bindings")
 option(DEPLOY "Configure for deployment")
 

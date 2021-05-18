@@ -54,6 +54,8 @@ else ()
 
     if (BINDINGS)
         # adjust visibility settings for building Python bindings
+        include(CheckPIESupported)
+        check_pie_supported()
         set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
         target_compile_options(${PROJECT_NAME} PUBLIC -fvisibility=hidden)
     endif ()
@@ -61,12 +63,6 @@ else ()
         # only include machine-specific optimizations when building for the host machine
         target_compile_options(${PROJECT_NAME} PUBLIC -mtune=native -march=native)
     endif ()
-endif ()
-
-if (GENERATE_POSITION_INDEPENDENT_CODE)
-    include(CheckPIESupported)
-    check_pie_supported()
-    set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 endif ()
 
 add_library(JKQ::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
