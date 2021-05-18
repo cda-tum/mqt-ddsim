@@ -100,7 +100,7 @@ jobs:
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --parallel 8
       - name:              Test
         working-directory: ${{github.workspace}}/build/test
-        run:               cd $BUILD_TYPE && ./ddsim_test --gtest_filter=*StochNoiseSimTest.SimulateAdder4*
+        run: cd $BUILD_TYPE && ./ddsim_test --gtest_filter=-*StochNoiseSimTest.SimulateAdder4*
 
   coverage:
     name: Coverage
