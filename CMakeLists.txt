@@ -2,13 +2,12 @@ cmake_minimum_required(VERSION 3.14...3.19)
 
 project(ddsim
         LANGUAGES CXX
-        VERSION 1.5.0
+        VERSION 1.6.0
         DESCRIPTION "DDSIM - A JKQ quantum simulator based on decision diagrams"
         )
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 option(COVERAGE "Configure for coverage report generation")
-option(GENERATE_POSITION_INDEPENDENT_CODE "Generate position independent code")
 option(BINDINGS "Configure for building Python bindings")
 option(DEPLOY "Configure for deployment")
 
@@ -33,12 +32,14 @@ add_subdirectory(src)
 
 option(BUILD_DDSIM_TESTS "Also build tests and benchmarks for DDSIM project" OFF)
 if(BUILD_DDSIM_TESTS)
-	check_submodule_present(benchmark)
+	check_submodule_present(qfr/extern/dd_package/extern/benchmark)
 
 	enable_testing()
 	include(GoogleTest)
-	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Skip gbenchmark self tests")
-	add_subdirectory(extern/benchmark)
+	if (NOT TARGET benchmark::benchmark_main)
+		set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Skip gbenchmark self tests")
+		add_subdirectory("extern/qfr/extern/dd_package/extern/benchmark" EXCLUDE_FROM_ALL)
+	endif ()
 	add_subdirectory(test)
 endif()
 
@@ -50,4 +51,3 @@ endif()
 if(BINDINGS)
 	add_subdirectory(jkq/ddsim)
 endif()
-

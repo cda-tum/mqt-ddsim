@@ -22,12 +22,13 @@ macro(package_add_test TESTNAME)
 endmacro()
 
 package_add_test(${PROJECT_NAME}_test
-        ${CMAKE_CURRENT_SOURCE_DIR}/test_circuit_sim.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/test_shor_sim.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/test_fast_shor_sim.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/test_grover_sim.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/test_stoch_noise_sim.cpp
-        )
+                 ${CMAKE_CURRENT_SOURCE_DIR}/test_circuit_sim.cpp
+                 ${CMAKE_CURRENT_SOURCE_DIR}/test_shor_sim.cpp
+                 ${CMAKE_CURRENT_SOURCE_DIR}/test_fast_shor_sim.cpp
+                 ${CMAKE_CURRENT_SOURCE_DIR}/test_grover_sim.cpp
+                 ${CMAKE_CURRENT_SOURCE_DIR}/test_hybridsim.cpp
+                 ${CMAKE_CURRENT_SOURCE_DIR}/test_stoch_noise_sim.cpp
+                 )
 
 add_custom_command(TARGET ${PROJECT_NAME}_test
         POST_BUILD

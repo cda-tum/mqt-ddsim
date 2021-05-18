@@ -95,10 +95,11 @@ print(sim.simulate(1000))
 
 ## System Requirements
 
-Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). 
-However, the implementation should be compatible with any current C++ compiler supporting C++17 and a minimum CMake version of 3.14.
+Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). However, the implementation should be compatible
+with any current C++ compiler supporting C++17 and a minimum CMake version of 3.14.
 
-`boost/program_options >= 1.50` is required for building the the commandline interface for `ddsim_simple` and `ddsim_noise_aware`. The `ddsim_noise_aware` further requires `Threads::Threads`.
+`OpenMP >= 4.0` is required for building the `ddsim` library. Additionally, `boost/program_options >= 1.50` is required for building the commandline interface for `ddsim_simple` and `ddsim_noise_aware`. The `ddsim_noise_aware` further
+requires `Threads::Threads`.
 
 ## Clone, Build, and Run
 
@@ -146,26 +147,29 @@ The standalone executable is launched in the following way, showing available op
 ```commandline
 $ ./ddsim_simple --help
 JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
-  -h [ --help ]                         produce help message
-  --seed arg (=0)                       seed for random number generator (default zero is possibly directly used as seed!)
-  --shots arg (=0)                      number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)
-  --pv                                  display the state vector as list of pairs (real and imaginary parts)
-  --ps                                  print simulation stats (applied gates, sim. time, and maximal size of the DD)
-  --pm                                  print measurement results
-  --verbose                             Causes some simulators to print additional information to STDERR
-  --simulate_file arg                   simulate a quantum circuit given by file (detection by the file extension)
-  --simulate_qft arg                    simulate Quantum Fourier Transform for given number of qubits
-  --simulate_ghz arg                    simulate state preparation of GHZ state for given number of qubits
-  --step_fidelity arg (=1)              target fidelity for each approximation run (>=1 = disable approximation)
-  --steps arg (=1)                      number of approximation steps
-  --simulate_grover arg                 simulate Grover's search for given number of qubits with random oracle
-  --simulate_grover_emulated arg        simulate Grover's search for given number of qubits with random oracle and emulation
-  --simulate_grover_oracle_emulated arg simulate Grover's search for given number of qubits with given oracle and emulation
-  --simulate_shor arg                   simulate Shor's algorithm factoring this number
-  --simulate_shor_coprime arg (=0)      coprime number to use with Shor's algorithm (zero randomly generates a coprime)
-  --simulate_shor_no_emulation          Force Shor simulator to do modular exponentiation instead of using emulation (you'll usually want emulation)
-  --simulate_fast_shor arg              simulate Shor's algorithm factoring this number with intermediate measurements
-  --simulate_fast_shor_coprime arg (=0) coprime number to use with Shor's algorithm (zero randomly generates a coprime)
+-h [ --help ]                         produce help message
+--seed arg (=0)                       seed for random number generator (default zero is possibly directly used as seed!)
+--shots arg (=0)                      number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)
+--pv                                  display the state vector as list of pairs (real and imaginary parts)
+--ps                                  print simulation stats (applied gates, sim. time, and maximal size of the DD)
+--pm                                  print measurement results
+--verbose                             Causes some simulators to print additional information to STDERR
+--simulate_file arg                   simulate a quantum circuit given by file (detection by the file extension)
+--simulate_file_hybrid arg            simulate a quantum circuit given by file (detection by the file extension) using the hybrid Schrodinger-Feynman simulator
+--hybrid_mode arg                     mode used for hybrid Schrodinger-Feynman simulation (*amplitude*, dd)
+--nthreads arg (=2)                   #threads used for hybrid simulation
+--simulate_qft arg                    simulate Quantum Fourier Transform for given number of qubits
+--simulate_ghz arg                    simulate state preparation of GHZ state for given number of qubits
+--step_fidelity arg (=1)              target fidelity for each approximation run (>=1 = disable approximation)
+--steps arg (=1)                      number of approximation steps
+--simulate_grover arg                 simulate Grover's search for given number of qubits with random oracle
+--simulate_grover_emulated arg        simulate Grover's search for given number of qubits with random oracle and emulation
+--simulate_grover_oracle_emulated arg simulate Grover's search for given number of qubits with given oracle and emulation
+--simulate_shor arg                   simulate Shor's algorithm factoring this number
+--simulate_shor_coprime arg (=0)      coprime number to use with Shor's algorithm (zero randomly generates a coprime)
+--simulate_shor_no_emulation          Force Shor simulator to do modular exponentiation instead of using emulation (you'll usually want emulation)
+--simulate_fast_shor arg              simulate Shor's algorithm factoring this number with intermediate measurements
+--simulate_fast_shor_coprime arg (=0) coprime number to use with Shor's algorithm (zero randomly generates a coprime)
 ```
 
 
@@ -393,6 +397,21 @@ If you use our tool for your research, we will be thankful if you refer to it by
 ```
 </details>
 
+<details open>
+<summary>
+  [5] <a href="">L. Burgholzer, H. Bauer, and R. Wille, "Hybrid Schrödinger-Feynman Simulation of Quantum Circuits With Decision Diagrams," arXiv:2105.07045, 2021</a>
+</summary>
 
-
-
+```bibtex
+@misc{burgholzer2021hybrid,
+      author={Lukas Burgholzer and
+               Hartwig Bauer and
+               Robert Wille},
+      title={Hybrid Schrödinger-Feynman Simulation of Quantum Circuits With Decision Diagrams},
+      year={2021},
+      eprint={2105.07045},
+      archivePrefix={arXiv},
+      primaryClass={quant-ph}
+}
+```
+</details>

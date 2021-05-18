@@ -27,7 +27,7 @@ class StatevectorSimulator(BackendV1):
     def __init__(self, configuration=None, provider=None):
         conf = {
             'backend_name': 'statevector_simulator',
-            'backend_version': '1.5.0',
+            'backend_version': ddsim.__version__,
             'url': 'https://github.com/iic-jku/ddsim',
             'simulator': True,
             'local': True,
@@ -67,6 +67,9 @@ class StatevectorSimulator(BackendV1):
 
     def _run_job(self, job_id, experiments, **options):
         self._validate(experiments)
+
+        if not isinstance(experiments, list):
+            experiments = [experiments]
 
         start = time.time()
         result_list = [self.run_experiment(quantum_circuit, **options) for quantum_circuit in experiments]
