@@ -28,25 +28,24 @@ jobs:
           clangFormatVersion: 12
 
   build-ubuntu:
-    name: Build on Ubuntu
+    name: Build and Test on Ubuntu
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
+      - name: Install boost program-options
+        run: sudo apt install libboost-program-options-dev
       - name: Configure CMake
-        shell: bash
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBINDINGS=ON -DBUILD_DDSIM_TESTS=ON -DBOOST_ROOT=${BOOST_ROOT_1_72_0}
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBINDINGS=ON -DBUILD_DDSIM_TESTS=ON
       - name: Build
-        shell: bash
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
       - name: Test
         working-directory: ${{github.workspace}}/build/test
-        shell: bash
         run: ctest -C $BUILD_TYPE --output-on-failure
 
   build-macos:
-    name: Build on MacOS
+    name: Build and Test on MacOS
     needs: [ build-ubuntu, codestyle ]
     runs-on: macos-latest
     steps:
@@ -67,7 +66,7 @@ jobs:
         run: ctest -C $BUILD_TYPE --output-on-failure
 
   build-windows:
-    name: Build on Windows
+    name: Build and Test on Windows
     needs: [ build-ubuntu, codestyle ]
     runs-on: windows-latest
     steps:
@@ -88,7 +87,6 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Building boost
         if: steps.cache-boost.outputs.cache-hit != 'true'
-        shell: bash
         run: |
           "/c/Program Files/7-Zip/7z.exe" x boost_1_70_0.7z "-o${{github.workspace}}"
           cd boost_1_70_0
