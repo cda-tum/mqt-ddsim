@@ -1,5 +1,6 @@
 #include "CircuitSimulator.hpp"
 #include "GroverSimulator.hpp"
+#include "HybridSchrodingerFeynmanSimulator.hpp"
 #include "ShorFastSimulator.hpp"
 #include "ShorSimulator.hpp"
 #include "Simulator.hpp"
@@ -26,6 +27,9 @@ int main(int argc, char** argv) {
     double                               step_fidelity;
     ApproximationInfo::ApproximationWhen approx_when;
 
+    HybridSchrodingerFeynmanSimulator::Mode mode = HybridSchrodingerFeynmanSimulator::Mode::Amplitude;
+    unsigned int                            nthreads;
+
     po::options_description description("JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
     // clang-format off
     description.add_options()
@@ -37,6 +41,9 @@ int main(int argc, char** argv) {
         ("pm", "print measurement results")
         ("verbose", "Causes some simulators to print additional information to STDERR")
         ("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")
+        ("simulate_file_hybrid", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension) using the hybrid Schrodinger-Feynman simulator")
+        ("hybrid_mode", po::value<std::string>(), "mode used for hybrid Schrodinger-Feynman simulation (*amplitude*, dd)")
+        ("nthreads", po::value<>(&nthreads)->default_value(2), "#threads used for hybrid simulation")
         ("simulate_qft", po::value<unsigned int>(), "simulate Quantum Fourier Transform for given number of qubits")
         ("simulate_ghz", po::value<unsigned int>(), "simulate state preparation of GHZ state for given number of qubits")
         ("step_fidelity", po::value<>(&step_fidelity)->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")
@@ -75,6 +82,22 @@ int main(int argc, char** argv) {
         const std::string fname = vm["simulate_file"].as<std::string>();
         quantumComputation      = std::make_unique<qc::QuantumComputation>(fname);
         ddsim                   = std::make_unique<CircuitSimulator>(std::move(quantumComputation), approx_info, seed);
+    } else if (vm.count("simulate_file_hybrid")) {
+        const std::string fname = vm["simulate_file_hybrid"].as<std::string>();
+        quantumComputation      = std::make_unique<qc::QuantumComputation>(fname);
+        if (vm.count("hybrid_mode")) {
+            const std::string mname = vm["hybrid_mode"].as<std::string>();
+            if (mname == "amplitude") {
+                mode = HybridSchrodingerFeynmanSimulator::Mode::Amplitude;
+            } else if (mname == "dd") {
+                mode = HybridSchrodingerFeynmanSimulator::Mode::DD;
+            }
+        }
+        if (seed != 0) {
+            ddsim = std::make_unique<HybridSchrodingerFeynmanSimulator>(std::move(quantumComputation), approx_info, seed, mode, nthreads);
+        } else {
+            ddsim = std::make_unique<HybridSchrodingerFeynmanSimulator>(std::move(quantumComputation), mode, nthreads);
+        }
     } else if (vm.count("simulate_qft")) {
         const unsigned int n_qubits = vm["simulate_qft"].as<unsigned int>();
         quantumComputation          = std::make_unique<qc::QFT>(n_qubits);
@@ -116,7 +139,7 @@ int main(int argc, char** argv) {
     }
 
     if (quantumComputation && quantumComputation->getNqubits() > 100) {
-        std::clog << "[WARNING] Quantum computation contains quite a qubits. You're jumping into the deep end.\n";
+        std::clog << "[WARNING] Quantum computation contains quite a few qubits. You're jumping into the deep end.\n";
     }
 
     auto t1 = std::chrono::high_resolution_clock::now();
@@ -210,8 +233,8 @@ int main(int argc, char** argv) {
                 {"seed", ddsim->getSeed()},
         };
 
-        for (const auto& item: ddsim->AdditionalStatistics()) {
-            output_obj["statistics"][item.first] = item.second;
+        for (const auto& [stat, value]: ddsim->AdditionalStatistics()) {
+            output_obj["statistics"][stat] = value;
         }
     }
 

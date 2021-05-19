@@ -27,7 +27,7 @@ class QasmSimulator(BackendV1):
     def __init__(self, configuration=None, provider=None):
         conf = {
             'backend_name': 'qasm_simulator',
-            'backend_version': '1.5.0',
+            'backend_version': ddsim.__version__,
             'url': 'https://github.com/iic-jku/ddsim',
             'simulator': True,
             'local': True,
@@ -85,7 +85,6 @@ class QasmSimulator(BackendV1):
         return Result.from_dict(result)
 
     def run_experiment(self, quantum_circuit, **options):
-        print(quantum_circuit)
         start_time = time.time()
 
         sim = ddsim.CircuitSimulator(quantum_circuit)

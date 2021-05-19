@@ -14,8 +14,8 @@ std::string Simulator::MeasureAll(const bool collapse) {
         if (root_edge.w.approximatelyZero()) {
             throw std::runtime_error("Numerical instabilities led to a 0-vector! Abort simulation!");
         }
-        std::cerr << "WARNING in MAll: numerical instability occurred during simulation: |alpha|^2 + |beta|^2 - 1 = "
-                  << 1.0L - dd::ComplexNumbers::mag2(root_edge.w) << ", but should be 1!\n";
+        std::cerr << "WARNING in MAll: numerical instability occurred during simulation: |alpha|^2 + |beta|^2 = "
+                  << dd::ComplexNumbers::mag2(root_edge.w) << ", but should be 1!\n";
     }
 
     dd::Edge cur = root_edge;
@@ -73,6 +73,30 @@ std::map<std::string, std::size_t> Simulator::MeasureAllNonCollapsing(unsigned i
     for (unsigned int i = 0; i < shots; i++) {
         const auto m = MeasureAll(false);
         results[m]++;
+    }
+    return results;
+}
+
+std::map<std::string, std::size_t> Simulator::SampleFromAmplitudeVectorInPlace(std::vector<dd::ComplexValue>& amplitudes, unsigned int shots) {
+    // in-place prefix-sum calculation of probabilities
+    std::inclusive_scan(
+            amplitudes.begin(), amplitudes.end(), amplitudes.begin(),
+            [](const dd::ComplexValue& prefix, const dd::ComplexValue& value) {
+                return dd::ComplexValue{std::fma(value.r, value.r, std::fma(value.i, value.i, prefix.r)), value.i};
+            },
+            dd::ComplexValue{0., 0.});
+
+    std::map<std::string, std::size_t>     results;
+    std::uniform_real_distribution<dd::fp> dist(0.0L, 1.0L);
+    for (unsigned int i = 0; i < shots; ++i) {
+        auto p = dist(mt);
+        // use binary search to find the first entry >= p
+        auto mit = std::upper_bound(amplitudes.begin(), amplitudes.end(), p, [](const dd::fp val, const dd::ComplexValue& c) { return val < c.r; });
+        auto m   = std::distance(amplitudes.begin(), mit);
+
+        // construct basis state string
+        auto basisState = Simulator::toBinaryString(m, getNumberOfQubits());
+        results[basisState]++;
     }
     return results;
 }

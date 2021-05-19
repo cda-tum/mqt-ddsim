@@ -13,6 +13,7 @@ env:
   CIBW_TEST_REQUIRES: qiskit-terra
   CIBW_TEST_COMMAND: "python -c \"from jkq import ddsim\""
   CIBW_BEFORE_BUILD: "pip install cmake"
+  CIBW_BEFORE_BUILD_MACOS: "brew install libomp"
 
 jobs:
   build_sdist:
@@ -59,6 +60,8 @@ jobs:
         with:
           submodules: recursive
 
+      - uses: ilammy/msvc-dev-cmd@v1
+
       - name: Build wheels
         uses: joerick/cibuildwheel@v1.11.0
 
@@ -67,7 +70,7 @@ jobs:
           path: ./wheelhouse/*.whl
 
   upload_pypi:
-    name: Upload dists to PyPi Test
+    name: Upload dists to PyPi
     needs: [ build_wheels, build_sdist ]
     runs-on: ubuntu-latest
     steps:
