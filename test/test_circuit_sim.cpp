@@ -179,3 +179,24 @@ TEST(CircuitSimTest, ApproximationByFidelityInSimulator) {
     ASSERT_EQ(ddsim.getActiveNodeCount(), 4);
     ASSERT_LE(std::stod(ddsim.AdditionalStatistics()["final_fidelity"]), 0.75); // the least contributing path has .25
 }
+
+TEST(CircuitSimTest, GRCS4x4Test) {
+    {
+        CircuitSimulator ddsim(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt"));
+        auto             m = ddsim.Simulate(100);
+        EXPECT_GT(m.size(), 0);
+        ddsim.dd->cn.complexTable.printStatistics();
+    }
+    {
+        CircuitSimulator ddsim(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_1.txt"));
+        auto             m = ddsim.Simulate(100);
+        EXPECT_GT(m.size(), 0);
+        ddsim.dd->cn.complexTable.printStatistics();
+    }
+    {
+        CircuitSimulator ddsim(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_2.txt"));
+        auto             m = ddsim.Simulate(100);
+        EXPECT_GT(m.size(), 0);
+        ddsim.dd->cn.complexTable.printStatistics();
+    }
+}

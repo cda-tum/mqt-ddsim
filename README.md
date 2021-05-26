@@ -148,6 +148,7 @@ JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
 --pv                                  display the state vector as list of pairs (real and imaginary parts)
 --ps                                  print simulation stats (applied gates, sim. time, and maximal size of the DD)
 --pm                                  print measurement results
+--pcomplex                            print print additional statistics on complex numbers
 --verbose                             Causes some simulators to print additional information to STDERR
 --simulate_file arg                   simulate a quantum circuit given by file (detection by the file extension)
 --simulate_file_hybrid arg            simulate a quantum circuit given by file (detection by the file extension) using the hybrid Schrodinger-Feynman simulator
