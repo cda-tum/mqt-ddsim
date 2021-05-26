@@ -10,8 +10,6 @@ from qiskit.providers.models import BackendConfiguration, BackendStatus
 from qiskit.result import Result
 
 from .jkqjob import JKQJob
-from .jkqerror import JKQSimulatorError
-
 from jkq import ddsim
 
 logger = logging.getLogger(__name__)
@@ -88,7 +86,7 @@ class StatevectorSimulator(BackendV1):
         start_time = time.time()
 
         sim = ddsim.CircuitSimulator(quantum_circuit)
-        counts = sim.simulate(1)
+        sim.simulate(1)
         end_time = time.time()
 
         return {'header': {'name': quantum_circuit.name},

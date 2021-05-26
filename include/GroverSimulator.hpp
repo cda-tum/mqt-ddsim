@@ -11,11 +11,9 @@ class GroverSimulator: public Simulator {
 public:
     explicit GroverSimulator(const std::string& oracle, const unsigned long long seed):
         Simulator(seed),
-        oracle{oracle.rbegin(),
-               oracle.rend()},
+        oracle{oracle.rbegin(), oracle.rend()},
         n_qubits(oracle.length()),
-        iterations(CalculateIterations(
-                n_qubits)) {
+        iterations(CalculateIterations(n_qubits)) {
     }
 
     explicit GroverSimulator(const std::string& oracle):
@@ -27,9 +25,7 @@ public:
     explicit GroverSimulator(const dd::QubitCount n_qubits, const unsigned long long seed):
         Simulator(seed),
         n_qubits{n_qubits},
-        iterations(
-                CalculateIterations(
-                        n_qubits)) {
+        iterations(CalculateIterations(n_qubits)) {
         std::uniform_int_distribution<int> dist(0, 1); // range is inclusive
         oracle = std::string(n_qubits, '0');
         for (dd::Qubit i = 0; i < n_qubits; i++) {
@@ -66,10 +62,10 @@ public:
     [[nodiscard]] std::string getOracle() const { return oracle; }
 
 protected:
-    std::string              oracle; // due to how qubits and std::string are indexed, this is stored in *reversed* order
-    const unsigned short     n_qubits;
-    const unsigned short     n_anciallae = 1;
-    const unsigned long long iterations;
+    std::string          oracle; // due to how qubits and std::string are indexed, this is stored in *reversed* order
+    const dd::QubitCount n_qubits;
+    const dd::QubitCount n_anciallae = 1;
+    const std::size_t    iterations;
 };
 
 #endif //DDSIM_GROVERSIMULATOR_HPP
