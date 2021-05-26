@@ -25,7 +25,7 @@ extraction:
         - cmake -S . -B build -DBUILD_DDSIM_TESTS=ON -DBUILD_QFR_TESTS=ON -DBUILD_DD_PACKAGE_TESTS=ON -DBINDINGS=ON
     index:
       build_command:
-        - cmake --build build --parallel 4
+        - cmake --build build --parallel 2
   python:
     python_setup:
       version: 3
