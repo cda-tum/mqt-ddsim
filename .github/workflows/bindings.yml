@@ -36,11 +36,16 @@ jobs:
       - name: Build sdist
         run: python setup.py sdist
 
-      - name: Test sdist
+      - name: Install sdist
         run: pip install --verbose dist/*.tar.gz
         env:
           CC: "gcc-10"
           CXX: "g++-10"
+      - name: Test sdist
+        run: |
+             pip install -U pip pytest
+             pip install -r requirements-test.txt
+             pytest
 
       - uses: actions/upload-artifact@v2
         with:
