@@ -42,7 +42,7 @@ jobs:
         run: |
           pip install pytest
           pip install -r requirements-test.txt
-          pytest
+          pytest test/python
       - uses: actions/upload-artifact@v2
         with:
           path: dist/*.tar.gz
