@@ -86,16 +86,19 @@ class StatevectorSimulator(BackendV1):
         start_time = time.time()
 
         sim = ddsim.CircuitSimulator(quantum_circuit)
-        sim.simulate(1)
+        counts = sim.simulate(options['shots'])
         end_time = time.time()
 
         return {'header': {'name': quantum_circuit.name},
                 'name': quantum_circuit.name,
                 'status': 'DONE',
                 'time_taken': end_time - start_time,
-                'seed': options['shots'],
-                'shots': 1,
-                'data': {'statevector': sim.get_vector()},
+                'seed': 1,
+                'shots': options['shots'],
+                'data': {
+                    'statevector': sim.get_vector(),
+                    'counts': counts
+                },
                 'success': True
                 }
 

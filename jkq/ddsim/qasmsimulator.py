@@ -93,8 +93,8 @@ class QasmSimulator(BackendV1):
                 'name': quantum_circuit.name,
                 'status': 'DONE',
                 'time_taken': end_time - start_time,
-                'seed': options['shots'],
-                'shots': 1,
+                'seed': 1,
+                'shots': options['shots'],
                 'data': {'counts': counts},
                 'success': True
                 }

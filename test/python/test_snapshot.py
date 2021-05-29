@@ -5,11 +5,8 @@ from qiskit import execute
 from jkq.ddsim.statevectorsimulator import StatevectorSimulator
 
 
-class JKUSnapshotTest(unittest.TestCase):
-    """Test JKU's statevector return capatbilities."""
-
+class JKQSnapshotTest(unittest.TestCase):
     def setUp(self):
-        super().setUp()
         self.backend = StatevectorSimulator()
         qr = QuantumRegister(2)
         self.q_circuit = QuantumCircuit(qr)
