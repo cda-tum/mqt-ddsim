@@ -1,9 +1,10 @@
 #include "CircuitSimulator.hpp"
 
 std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int shots) {
-    bool                                 has_nonmeasurement_nonunitary = false;
-    bool                                 has_measurements              = false;
-    bool                                 measurements_last             = true;
+    bool has_nonmeasurement_nonunitary = false;
+    bool has_measurements              = false;
+    bool measurements_last             = true;
+
     std::map<unsigned int, unsigned int> measurement_map;
 
     for (auto& op: *qc) {
