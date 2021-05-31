@@ -36,11 +36,12 @@ std::unique_ptr<qc::QuantumComputation> getAdder4Circuit() {
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDApplySequential) {
-    auto                        quantumComputation = getAdder4Circuit();
-    DeterministicNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.01, -2, 1, 1, "-1-1000");
-    ddsim.weird_value_i_dont_understand_but_something_with_sequential = true;
+    auto                                         quantumComputation = getAdder4Circuit();
+    std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
+    ddsim                                                              = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("APD"), 0.01, -2, 1, 1, "-1-1000");
+    ddsim->weird_value_i_dont_understand_but_something_with_sequential = true;
 
-    auto m = ddsim.DeterministicSimulate();
+    auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
     EXPECT_LT(abs(m.find("0000")->second - 0.0616548), 0.00001);
@@ -57,10 +58,11 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDApplySequential) {
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4Track_A) {
-    auto                        quantumComputation = getAdder4Circuit();
-    DeterministicNoiseSimulator ddsim(quantumComputation, std::string("A"), 0.01, -1, 1, 1, "-1-1000");
+    auto                                         quantumComputation = getAdder4Circuit();
+    std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
+    ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("A"), 0.01, -1, 1, 1, "-1-1000");
 
-    auto m = ddsim.DeterministicSimulate();
+    auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
     EXPECT_LT(abs(m.find("0000")->second - 0.0496435), 0.00001);
@@ -75,10 +77,11 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4Track_A) {
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPD) {
-    auto                        quantumComputation = getAdder4Circuit();
-    DeterministicNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.01, -1, 1, 1, "-1-1000");
+    auto                                         quantumComputation = getAdder4Circuit();
+    std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
+    ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("APD"), 0.01, -1, 1, 1, "-1-1000");
 
-    auto m = ddsim.DeterministicSimulate();
+    auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
     EXPECT_LT(abs(m.find("0000")->second - 0.0616548), 0.00001);
@@ -95,10 +98,11 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPD) {
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4Track_D) {
-    auto                        quantumComputation = getAdder4Circuit();
-    DeterministicNoiseSimulator ddsim(quantumComputation, std::string("D"), 0.01, -1, 1, 1, "-1-1000");
+    auto                                         quantumComputation = getAdder4Circuit();
+    std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
+    ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("D"), 0.01, -1, 1, 1, "-1-1000");
 
-    auto m = ddsim.DeterministicSimulate();
+    auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
     EXPECT_LT(abs(m.find("0000")->second - 0.020155), 0.00001);
