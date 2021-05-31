@@ -10,8 +10,6 @@ from qiskit.providers.models import BackendConfiguration, BackendStatus
 from qiskit.result import Result
 
 from .jkqjob import JKQJob
-from .jkqerror import JKQSimulatorError
-
 from jkq import ddsim
 
 logger = logging.getLogger(__name__)

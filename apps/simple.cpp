@@ -39,6 +39,7 @@ int main(int argc, char** argv) {
         ("pv", "display the state vector")
         ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
         ("pm", "print measurement results")
+        ("pcomplex", "print additional statistics on complex numbers")
         ("verbose", "Causes some simulators to print additional information to STDERR")
         ("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")
         ("simulate_file_hybrid", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension) using the hybrid Schrodinger-Feynman simulator")
@@ -236,6 +237,10 @@ int main(int argc, char** argv) {
         for (const auto& [stat, value]: ddsim->AdditionalStatistics()) {
             output_obj["statistics"][stat] = value;
         }
+    }
+
+    if (vm.count("pcomplex")) {
+        output_obj["complex_stats"] = ddsim->dd->cn.complexTable.getStatistics();
     }
 
     std::cout << std::setw(2) << output_obj << std::endl;

@@ -234,3 +234,19 @@ static void BM_extra_QCBM_optimized(benchmark::State& state) {
 }
 
 BENCHMARK(BM_extra_QCBM_optimized)->DenseRange(4, 18)->ComputeStatistics("min", min_estimator);
+
+static void BM_extra_inst4x4_10_0(benchmark::State& state) {
+    auto             qc = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
+    CircuitSimulator sim(std::move(qc));
+    for (auto _: state) {
+        const auto start = std::chrono::steady_clock::now();
+        sim.Simulate(1);
+        const auto end = std::chrono::steady_clock::now();
+        sim.dd->reset();
+        auto elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+        state.SetIterationTime(elapsed_seconds.count());
+    }
+    state.SetLabel("inst4x4-10-0");
+}
+
+BENCHMARK(BM_extra_inst4x4_10_0)->ComputeStatistics("min", min_estimator);
