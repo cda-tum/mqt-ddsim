@@ -82,8 +82,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                 controls = op->getControls();
             }
             // Applying the operation to the density matrix
-            dd::Package::mEdge tmp0 = dd->multiply( density_root_edge, dd->conjugateTranspose(dd_op)); //todo change me back
-//            dd::Package::mEdge tmp0 = dd->multiply(dd->multiply(dd_op, density_root_edge), dd->conjugateTranspose(dd_op));
+            dd::Package::mEdge tmp0 = dd->multiply(dd->multiply(dd_op, density_root_edge), dd->conjugateTranspose(dd_op));
             dd->incRef(tmp0);
             dd->decRef(density_root_edge);
             density_root_edge = tmp0;

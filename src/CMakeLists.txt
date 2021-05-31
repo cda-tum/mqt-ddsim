@@ -1,19 +1,21 @@
 add_library(${PROJECT_NAME}
-            ${PROJECT_SOURCE_DIR}/include/Simulator.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/Simulator.cpp
-            ${PROJECT_SOURCE_DIR}/include/CircuitSimulator.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/CircuitSimulator.cpp
-            ${PROJECT_SOURCE_DIR}/include/GroverSimulator.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/GroverSimulator.cpp
-            ${PROJECT_SOURCE_DIR}/include/ShorSimulator.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/ShorSimulator.cpp
-            ${PROJECT_SOURCE_DIR}/include/ShorFastSimulator.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/ShorFastSimulator.cpp
-            ${PROJECT_SOURCE_DIR}/include/StochasticNoiseSimulator.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/StochasticNoiseSimulator.cpp
-            ${PROJECT_SOURCE_DIR}/include/HybridSchrodingerFeynmanSimulator.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/HybridSchrodingerFeynmanSimulator.cpp
-            )
+        ${PROJECT_SOURCE_DIR}/include/Simulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Simulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/CircuitSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/CircuitSimulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/GroverSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/GroverSimulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/ShorSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ShorSimulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/ShorFastSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ShorFastSimulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/StochasticNoiseSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/StochasticNoiseSimulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/DeterministicNoiseSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/DeterministicNoiseSimulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/HybridSchrodingerFeynmanSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/HybridSchrodingerFeynmanSimulator.cpp
+        )
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)
 # set required C++ standard and disable compiler specific extensions
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
@@ -36,14 +38,14 @@ if (ipo_supported)
 endif ()
 
 find_package(OpenMP REQUIRED)
-if(NOT TARGET OpenMP::OpenMP_CXX)
-	add_library(OpenMP_TARGET INTERFACE)
-	add_library(OpenMP::OpenMP_CXX ALIAS OpenMP_TARGET)
-	target_compile_options(OpenMP_TARGET INTERFACE ${OpenMP_CXX_FLAGS})
-	find_package(Threads REQUIRED)
-	target_link_libraries(OpenMP_TARGET INTERFACE Threads::Threads)
-	target_link_libraries(OpenMP_TARGET INTERFACE ${OpenMP_CXX_FLAGS})
-endif()
+if (NOT TARGET OpenMP::OpenMP_CXX)
+    add_library(OpenMP_TARGET INTERFACE)
+    add_library(OpenMP::OpenMP_CXX ALIAS OpenMP_TARGET)
+    target_compile_options(OpenMP_TARGET INTERFACE ${OpenMP_CXX_FLAGS})
+    find_package(Threads REQUIRED)
+    target_link_libraries(OpenMP_TARGET INTERFACE Threads::Threads)
+    target_link_libraries(OpenMP_TARGET INTERFACE ${OpenMP_CXX_FLAGS})
+endif ()
 target_link_libraries(${PROJECT_NAME} PUBLIC OpenMP::OpenMP_CXX)
 
 # set compiler flags depending on compiler
