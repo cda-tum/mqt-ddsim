@@ -20,6 +20,8 @@ logger = logging.getLogger(__name__)
 class QasmSimulator(BackendV1):
     """Python interface to JKQ DDSIM"""
 
+    SHOW_STATE_VECTOR = False
+
     @classmethod
     def _default_options(cls) -> Options:
         return Options(shots=None)
@@ -53,9 +55,7 @@ class QasmSimulator(BackendV1):
             'open_pulse': False,
             'gates': []
         }
-        if configuration:
-            conf.update(configuration)
-        super().__init__(configuration=BackendConfiguration.from_dict(conf), provider=provider)
+        super().__init__(configuration=configuration or BackendConfiguration.from_dict(conf), provider=provider)
 
     def run(self, quantum_circuits, **options):
         if isinstance(quantum_circuits, qobj.QasmQobj) or isinstance(quantum_circuits, qobj.PulseQobj):
@@ -106,15 +106,19 @@ class QasmSimulator(BackendV1):
         counts = sim.simulate(options['shots'])
         end_time = time.time()
         counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
-        return {'header': experiment.header.to_dict(),
-                'name': experiment.header.name,
-                'status': 'DONE',
-                'time_taken': end_time - start_time,
-                'seed': 1,
-                'shots': options['shots'],
-                'data': {'counts': counts_hex},
-                'success': True,
-                }
+
+        result = {'header': experiment.header.to_dict(),
+                  'name': experiment.header.name,
+                  'status': 'DONE',
+                  'time_taken': end_time - start_time,
+                  'seed': 1,
+                  'shots': options['shots'],
+                  'data': {'counts': counts_hex},
+                  'success': True,
+                  }
+        if self.SHOW_STATE_VECTOR:
+            result['data']['statevector'] = sim.get_vector()
+        return result
 
     def _validate(self, quantum_circuit):
         return

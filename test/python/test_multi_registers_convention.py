@@ -33,7 +33,7 @@ class TestCircuitMultiRegs(unittest.TestCase):
         result = execute(qc, backend_sim).result()
         counts = result.get_counts(qc)
 
-        target = {'0110': 1024}
+        target = {'01 10': 1024}
 
         result = execute(circ, backend_sim).result()
         state = result.get_statevector(circ)
