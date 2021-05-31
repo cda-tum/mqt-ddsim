@@ -1,7 +1,7 @@
-[>> Quickstart Guide](#quickstart-guide)
-
 [![Build Status](https://github.com/iic-jku/ddsim/workflows/continuous%20integration/badge.svg)](https://github.com/iic-jku/ddsim/actions)
 [![codecov](https://codecov.io/gh/iic-jku/ddsim/branch/master/graph/badge.svg)](https://codecov.io/gh/iic-jku/ddsim)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/iic-jku/ddsim.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/iic-jku/ddsim/context:python)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/iic-jku/ddsim.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/iic-jku/ddsim/context:cpp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![toolset: JKQ](https://img.shields.io/badge/toolset-JKQ-blue)](https://github.com/iic-jku/jkq)
 
@@ -148,6 +148,7 @@ JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
 --pv                                  display the state vector as list of pairs (real and imaginary parts)
 --ps                                  print simulation stats (applied gates, sim. time, and maximal size of the DD)
 --pm                                  print measurement results
+--pcomplex                            print print additional statistics on complex numbers
 --verbose                             Causes some simulators to print additional information to STDERR
 --simulate_file arg                   simulate a quantum circuit given by file (detection by the file extension)
 --simulate_file_hybrid arg            simulate a quantum circuit given by file (detection by the file extension) using the hybrid Schrodinger-Feynman simulator
