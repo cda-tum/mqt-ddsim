@@ -1,15 +1,9 @@
 """Backend for DDSIM."""
 
 import logging
-import time
-import uuid
 
-from qiskit.providers import Options
-from qiskit import qobj, QiskitError
-from qiskit.providers.models import BackendConfiguration, BackendStatus
-from qiskit.result import Result
+from qiskit.providers.models import BackendConfiguration
 
-from .jkqjob import JKQJob
 from jkq import ddsim
 from jkq.ddsim.qasmsimulator import QasmSimulator
 
