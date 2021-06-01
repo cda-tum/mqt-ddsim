@@ -1,7 +1,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![toolset: JKQ](https://img.shields.io/badge/toolset-JKQ-blue)](https://github.com/iic-jku/jkq)
-[![PyPI](https://img.shields.io/pypi/v/jkq.ddsim)](https://pypi.org/project/jkq.ddsim/)
-[![Build Status](https://github.com/iic-jku/ddsim/workflows/CI/badge.svg)](https://github.com/iic-jku/ddsim/actions)
+[![PyPI](https://img.shields.io/pypi/v/jkq.ddsim?logo=pypi)](https://pypi.org/project/jkq.ddsim/)
+[![CI](https://github.com/iic-jku/ddsim/actions/workflows/cmake.yml/badge.svg)](https://github.com/iic-jku/ddsim/actions/workflows/cmake.yml)
 [![codecov](https://codecov.io/gh/iic-jku/ddsim/branch/master/graph/badge.svg)](https://codecov.io/gh/iic-jku/ddsim)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/github/iic-jku/ddsim?label=python&logo=lgtm)](https://lgtm.com/projects/g/iic-jku/ddsim/context:python)
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/github/iic-jku/ddsim?label=c%2B%2B&logo=lgtm)](https://lgtm.com/projects/g/iic-jku/ddsim/context:cpp)
@@ -68,10 +68,15 @@ The simulator is based on the references listed below and can either be used as 
 ## Using the Python Bindings / Backend for Qiskit
 
 The backend for Qiskit is available via [PyPi](https://pypi.org/project/jkq.ddsim/) as wheel for Linux, Windows and MacOS. 
+Install with the following command. (We strongly recommend using a [virtual environment](https://docs.python.org/3/tutorial/venv.html).)
+
+```console
+(venv) $ pip install jkq.ddsim
+```
 
 The following code gives an example on the usage:
 
-```python
+```python3
 from qiskit import *
 from jkq import ddsim
 
@@ -121,14 +126,14 @@ There are two ways to do this:
 
 For building the library alone the CMake target `ddsim` is available.
 In CMake from version 3.13 you can use the following commands:
-```commandline
+```console
 $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
 $ cmake --build build --config Release --target ddsim
 ```
 
 Windows users need to configure CMake by calling
 
-```commandline
+```console
 $ cmake -A x64 -DCMAKE_BUILD_TYPE=Release -S . -B build
 $ cmake --build build --config Release --target ddsim
 ```
@@ -151,7 +156,7 @@ auto samples = sim.MeasureAllNonCollapsing(1000);
 To build the executable simulator, build the `ddsim_simple` CMake target (which requires `boost/program_options`) and run the resulting executable with options according to your needs.
 
 The standalone executable is launched in the following way, showing available options:
-```commandline
+```console
 $ ./ddsim_simple --help
 JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
 -h [ --help ]                         produce help message
@@ -183,7 +188,7 @@ JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
 
 The output is JSON-formatted as shown below (with hopefully intuitive naming).
 
-```commandline
+```console
 $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
 $ cmake --build build --config Release --target ddsim_simple
 $ ./build/ddsim_simple --simulate_ghz 4 --shots 1000 --ps --pm
@@ -213,7 +218,7 @@ $ ./build/ddsim_simple --simulate_ghz 4 --shots 1000 --ps --pm
 
 Execute the following lines to get the simulator running in no time:
 
-```commandline
+```console
 $ git clone --recurse-submodules https://github.com/iic-jku/ddsim/
 [...]
 
@@ -242,14 +247,14 @@ The tool also supports noise-aware quantum circuit simulation, based on a stocha
 
 Building the simulator requires `boost/program_options` and `Threads::Threads`. It can be built by executing
 
-```commandline
+```console
 $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
 $ cmake --build build --config Release --target ddsim_noise_aware
 ```
 
 The simulator provides a help function which is called in the following way:
 
-```commandline
+```console
 $ ./build/ddsim_noise_aware -h
 JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
   -h [ --help ]                         produce help message
@@ -273,7 +278,7 @@ Process finished with exit code 0
 
 An example run, with amplitude damping, phase flip, and depolarization error (each with a probability of 0.1% whenever a gate is applied) looks like this:
 
-```commandline
+```console
 $ ./build/ddsim_noise_aware --ps --noise_effects APD --stoch_runs 10000 --noise_prob 0.001 --simulate_file adder4.qasm
 {
   "statistics": {
@@ -298,7 +303,7 @@ $ ./build/ddsim_noise_aware --ps --noise_effects APD --stoch_runs 10000 --noise_
 
 ## Running Tests
 The repository also includes some (rudimentary) unit tests (using GoogleTest), which aim to ensure the correct behavior of the tool. They can be built and executed in the following way:
-```commandline
+```console
 $ cmake --build build/ --config Release
 $ ./build/test/ddsim_test
 [...]
@@ -318,7 +323,7 @@ Under Ubuntu you can simply install [`libboost-program-options-dev`](https://pac
 **Why does generation step of CMake fail?**
 
 If you see the following error message
-```
+```console
 $ cmake -S . -B <build target directory>
 CMake Error at CMakeLists.txt:27 (message):
 qfr was not found.  Please init/update submodules (git submodule update --init --recursive) and try again.
