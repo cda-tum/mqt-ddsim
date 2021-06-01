@@ -299,11 +299,12 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
     const unsigned long numberOfRuns = stochastic_runs / max_instances + (stochRun < stochastic_runs % max_instances ? 1 : 0);
     const int           approx_mod   = std::ceil(static_cast<double>(qc->getNops()) / (step_number + 1));
 
+    std::unique_ptr<dd::Package> localDD = std::make_unique<dd::Package>(getNumberOfQubits());
+
     //printf("Running %d times and using the dd at %p, using the cn object at %p\n", numberOfRuns, (void *) &localDD, (void *) &localDD->cn);
     for (unsigned long current_run = 0; current_run < numberOfRuns; current_run++) {
         const auto t1 = std::chrono::steady_clock::now();
 
-        std::unique_ptr<dd::Package> localDD = std::make_unique<dd::Package>(getNumberOfQubits());
         //dd::NoiseOperationTable<dd::Package::mEdge> noiseOperationTable(getNumberOfQubits());
 
         dd::Package::mEdge identity_DD = localDD->makeIdent(n_qubits);
