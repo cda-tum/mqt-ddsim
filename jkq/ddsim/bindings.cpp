@@ -47,7 +47,6 @@ std::unique_ptr<CircuitSimulator> create_circuit_simulator_without_seed(const py
     return create_circuit_simulator(circ, -1);
 }
 
-
 PYBIND11_MODULE(pyddsim, m) {
     m.doc() = "Python interface for the JKQ DDSIM quantum circuit simulator";
 
