@@ -54,6 +54,19 @@ TEST(CircuitSimTest, SingleOneQubitMultiShots) {
     ASSERT_EQ("10", ddsim.AdditionalStatistics().at("single_shots"));
 }
 
+TEST(CircuitSimTest, BarrierStatement) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(1);
+    quantumComputation->emplace_back<qc::StandardOperation>(1, 0, qc::H);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, std::vector<dd::Qubit>{0}, qc::Barrier);
+    quantumComputation->emplace_back<qc::StandardOperation>(1, 0, qc::H);
+    CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo());
+
+    ASSERT_EQ(ddsim.getNumberOfOps(), 3);
+
+    ddsim.Simulate(10);
+    ASSERT_EQ("1", ddsim.AdditionalStatistics().at("single_shots"));
+}
+
 TEST(CircuitSimTest, ClassicControlledOp) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
@@ -67,6 +80,21 @@ TEST(CircuitSimTest, ClassicControlledOp) {
     auto m = ddsim.MeasureAll(false);
 
     ASSERT_EQ("11", m);
+}
+
+TEST(CircuitSimTest, ClassicControlledOpAsNop) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, 0, 0);
+    std::unique_ptr<qc::Operation> op(new qc::StandardOperation(2, 1, qc::X));
+    quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, quantumComputation->getCregs().at("c"), 0);
+
+    CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
+    ddsim.Simulate(1);
+
+    auto m = ddsim.MeasureAll(false);
+
+    ASSERT_EQ("01", m);
 }
 
 TEST(CircuitSimTest, DestructiveMeasurementAll) {
