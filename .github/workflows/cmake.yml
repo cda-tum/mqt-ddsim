@@ -10,6 +10,7 @@ on:
 env:
   BUILD_TYPE: Release
   MAKEFLAGS: "-j2"
+  CTEST_PARALLEL_LEVEL: 2
 
 defaults:
   run:
@@ -115,7 +116,7 @@ jobs:
         run: cmake --build "${{github.workspace}}/build" --config Debug
       - name: Test
         working-directory: ${{github.workspace}}/build/test
-        run: ./ddsim_test
+        run: ctest -C $BUILD_TYPE --output-on-failure
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
