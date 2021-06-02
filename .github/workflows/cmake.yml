@@ -10,7 +10,6 @@ on:
 env:
   BUILD_TYPE: Release
   MAKEFLAGS: "-j2"
-  CTEST_PARALLEL_LEVEL: 2
 
 defaults:
   run:
