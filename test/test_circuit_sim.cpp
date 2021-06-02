@@ -33,7 +33,7 @@ TEST(CircuitSimTest, SingleOneQubitSingleShot2) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, 0, 0);
-    CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
+    CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo(), 1337);
 
     ASSERT_EQ(ddsim.getNumberOfOps(), 2);
 

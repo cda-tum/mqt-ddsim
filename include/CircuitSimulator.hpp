@@ -17,6 +17,11 @@ struct ApproximationInfo {
         MemoryDriven
     };
 
+    /* Default to no approximation */
+    ApproximationInfo():
+            step_fidelity(1), step_number(1), approx_when(ApproximationWhen::FidelityDriven) {
+    }
+
     ApproximationInfo(double step_fidelity, unsigned int step_number, ApproximationWhen approx_when):
         step_fidelity(step_fidelity), step_number(step_number), approx_when(approx_when) {
     }
