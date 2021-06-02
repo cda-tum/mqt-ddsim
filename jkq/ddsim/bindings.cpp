@@ -4,7 +4,9 @@
  */
 #include "CircuitSimulator.hpp"
 
-#include "QiskitImport.hpp"
+#include "qiskit/QasmQobjExperiment.hpp"
+#include "qiskit/QuantumCircuit.hpp"
+
 
 #include "nlohmann/json.hpp"
 
@@ -20,17 +22,27 @@ namespace py = pybind11;
 namespace nl = nlohmann;
 
 
-std::unique_ptr<CircuitSimulator> create_circuit_simulator(const py::object& circ) {
+std::unique_ptr<CircuitSimulator> create_circuit_simulator(const py::object& circ, const long long int seed = -1) {
+    py::object QuantumCircuit       = py::module::import("qiskit").attr("QuantumCircuit");
+    py::object pyQasmQobjExperiment = py::module::import("qiskit.qobj").attr("QasmQobjExperiment");
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>();
 
     if(py::isinstance<py::str>(circ)) {
         auto&& file1 = circ.cast<std::string>();
         qc->import(file1);
+    } else if (py::isinstance(circ, QuantumCircuit)) {
+        qc::qiskit::QuantumCircuit::import(*qc, circ);
+    } else if (py::isinstance(circ, pyQasmQobjExperiment)) {
+        qc::qiskit::QasmQobjExperiment::import(*qc, circ);
     } else {
-        import(*qc, circ);
+        throw std::runtime_error("PyObject is neither py::str, QuantumCircuit, nor QasmQobjExperiment");
+    }
+    if (seed < 0) {
+        return std::make_unique<CircuitSimulator>(std::move(qc));
+    } else {
+        return std::make_unique<CircuitSimulator>(std::move(qc), ApproximationInfo{1, 1, ApproximationInfo::ApproximationWhen::FidelityDriven}, seed);
     }
 
-    return std::make_unique<CircuitSimulator>(std::move(qc));
 }
 
 PYBIND11_MODULE(pyddsim, m) {

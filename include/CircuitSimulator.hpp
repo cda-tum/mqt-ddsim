@@ -53,8 +53,7 @@ public:
         dd->resize(qc->getNqubits());
     }
 
-    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info,
-                     const unsigned long long seed):
+    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info, const unsigned long long seed):
         Simulator(seed),
         qc(std::move(qc_)), approx_info(approx_info) {
     }

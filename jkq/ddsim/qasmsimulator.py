@@ -4,10 +4,12 @@ import logging
 import time
 import uuid
 import warnings
+from typing import Union, List
 
 from qiskit.providers import BackendV1, Options
-from qiskit import qobj, QiskitError
+from qiskit import QiskitError, QuantumCircuit
 from qiskit.providers.models import BackendConfiguration, BackendStatus
+from qiskit.qobj import QasmQobjExperiment, Qobj, QasmQobj, PulseQobj
 from qiskit.result import Result
 from qiskit.compiler import assemble
 
@@ -24,7 +26,11 @@ class QasmSimulator(BackendV1):
 
     @classmethod
     def _default_options(cls) -> Options:
-        return Options(shots=None)
+        return Options(
+            shots=None,
+            parameter_binds=None,
+            simulator_seed=None,
+        )
 
     def __init__(self, configuration=None, provider=None):
         conf = {
@@ -57,8 +63,8 @@ class QasmSimulator(BackendV1):
         }
         super().__init__(configuration=configuration or BackendConfiguration.from_dict(conf), provider=provider)
 
-    def run(self, quantum_circuits, **options):
-        if isinstance(quantum_circuits, qobj.QasmQobj) or isinstance(quantum_circuits, qobj.PulseQobj):
+    def run(self, quantum_circuits: Union[QuantumCircuit, List[QuantumCircuit]], **options):
+        if isinstance(quantum_circuits, QasmQobj) or isinstance(quantum_circuits, PulseQobj):
             raise QiskitError('QasmQobj and PulseQobj are not supported.')
 
         if not isinstance(quantum_circuits, list):
@@ -67,51 +73,47 @@ class QasmSimulator(BackendV1):
         out_options = {}
         for key in options:
             if not hasattr(self.options, key):
-                warnings.warn(
-                    "Option %s is not used by this backend" % key, UserWarning, stacklevel=2
-                )
+                warnings.warn("Option %s is not used by this backend" % key, UserWarning, stacklevel=2)
             else:
                 out_options[key] = options[key]
         circuit_qobj = assemble(quantum_circuits, self, **out_options)
 
         job_id = str(uuid.uuid4())
-        local_job = JKQJob(self, job_id, self._run_job, quantum_circuits, circuit_qobj, **options)
+        local_job = JKQJob(self, job_id, self._run_job, circuit_qobj, **options)
         local_job.submit()
         return local_job
 
-    def _run_job(self, job_id, quantum_circuits, qobj, **options):
-        self._validate(qobj)
+    def _run_job(self, job_id, qobj_instance: Qobj, **options):
+        self._validate(qobj_instance)
 
         start = time.time()
-        result_list = []
-        for circ, exp in zip(quantum_circuits, qobj.experiments):
-            result_list.append(self.run_experiment(circ, exp, **options))
+        result_list = [self.run_experiment(qobj_exp, **options) for qobj_exp in qobj_instance.experiments]
         end = time.time()
+
         result = {'backend_name': self.configuration().backend_name,
                   'backend_version': self.configuration().backend_version,
-                  'qobj_id': qobj.qobj_id,
+                  'qobj_id': qobj_instance.qobj_id,
                   'job_id': job_id,
                   'results': result_list,
                   'status': 'COMPLETED',
                   'success': True,
                   'time_taken': (end - start),
-                  'header': qobj.header.to_dict()
+                  'header': qobj_instance.header.to_dict()
                   }
         return Result.from_dict(result)
 
-    def run_experiment(self, circuit, experiment, **options):
+    def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options):
         start_time = time.time()
-
-        sim = ddsim.CircuitSimulator(circuit)
+        sim = ddsim.CircuitSimulator(qobj_experiment, options.get('seed', -1))
         counts = sim.simulate(options['shots'])
         end_time = time.time()
         counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
 
-        result = {'header': experiment.header.to_dict(),
-                  'name': experiment.header.name,
+        result = {'header': qobj_experiment.header.to_dict(),
+                  'name': qobj_experiment.header.name,
                   'status': 'DONE',
                   'time_taken': end_time - start_time,
-                  'seed': 1,
+                  'seed': options.get('seed', -1),
                   'shots': options['shots'],
                   'data': {'counts': counts_hex},
                   'success': True,

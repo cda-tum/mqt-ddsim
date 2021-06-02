@@ -33,11 +33,10 @@ class JKQJob(Job):
 
     _executor = futures.ThreadPoolExecutor(max_workers=1)
 
-    def __init__(self, backend, job_id, fn, quantum_circuits, qobj, **args):
+    def __init__(self, backend, job_id, fn, qobj_experiment, **args):
         super().__init__(backend, job_id)
         self._fn = fn
-        self._quantum_circuits = quantum_circuits
-        self.qobj = qobj
+        self.qobj_experiment = qobj_experiment
         self._args = args
         self._future = None
 
@@ -53,8 +52,7 @@ class JKQJob(Job):
 
         self._future = self._executor.submit(self._fn,
                                              self._job_id,
-                                             self._quantum_circuits,
-                                             self.qobj,
+                                             self.qobj_experiment,
                                              **self._args)
 
     @requires_submit
