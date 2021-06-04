@@ -1,4 +1,4 @@
-name: continuous integration
+name: CI
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
           submodules: recursive
       - uses: DoozyX/clang-format-lint-action@v0.12
         with:
-          source: 'apps include src test'
+          source: 'apps include jkq src test'
           extensions: 'h,hpp,c,cpp'
           clangFormatVersion: 12
 
@@ -115,7 +115,7 @@ jobs:
         run: cmake --build "${{github.workspace}}/build" --config Debug
       - name: Test
         working-directory: ${{github.workspace}}/build/test
-        run: ./ddsim_test
+        run: ctest -C Debug --output-on-failure
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
