@@ -51,11 +51,11 @@ TEST(DeterministicNoiseSimTest, TestingResetGate) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, std::vector<dd::Qubit>(0), qc::Reset);
     std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
-    ddsim  = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("A"), 0, -1, 1, 1, "-1-1000");
+    ddsim                  = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("A"), 0, -1, 1, 1, "-1-1000");
     bool occurredException = false;
     try {
         auto m = ddsim->DeterministicSimulate();
-    } catch (const std::runtime_error& ex){
+    } catch (const std::runtime_error& ex) {
         occurredException = true;
     }
     ASSERT_EQ(occurredException, true);
