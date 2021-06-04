@@ -17,9 +17,12 @@ struct ApproximationInfo {
         MemoryDriven
     };
 
+    /* Default to no approximation */
+    ApproximationInfo():
+        step_fidelity(1), step_number(1), approx_when(ApproximationWhen::FidelityDriven) {}
+
     ApproximationInfo(double step_fidelity, unsigned int step_number, ApproximationWhen approx_when):
-        step_fidelity(step_fidelity), step_number(step_number), approx_when(approx_when) {
-    }
+        step_fidelity(step_fidelity), step_number(step_number), approx_when(approx_when) {}
 
     friend std::istream& operator>>(std::istream& in, ApproximationWhen& when) {
         std::string token;
@@ -53,8 +56,7 @@ public:
         dd->resize(qc->getNqubits());
     }
 
-    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info,
-                     const unsigned long long seed):
+    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info, const unsigned long long seed):
         Simulator(seed),
         qc(std::move(qc_)), approx_info(approx_info) {
     }

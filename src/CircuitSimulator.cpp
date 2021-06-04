@@ -1,13 +1,14 @@
 #include "CircuitSimulator.hpp"
 
 std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int shots) {
-    bool                                 has_nonmeasurement_nonunitary = false;
-    bool                                 has_measurements              = false;
-    bool                                 measurements_last             = true;
+    bool has_nonmeasurement_nonunitary = false;
+    bool has_measurements              = false;
+    bool measurements_last             = true;
+
     std::map<unsigned int, unsigned int> measurement_map;
 
     for (auto& op: *qc) {
-        if (op->isClassicControlledOperation() || (op->isNonUnitaryOperation() && op->getType() != qc::Measure)) {
+        if (op->isClassicControlledOperation() || (op->isNonUnitaryOperation() && op->getType() != qc::Measure && op->getType() != qc::Barrier)) {
             has_nonmeasurement_nonunitary = true;
         }
         if (op->getType() == qc::Measure) {
@@ -135,7 +136,7 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
                         continue;
                     }
                 } else {
-                    throw std::runtime_error(" Dynamic cast to ClassicControlledOperation failed.");
+                    throw std::runtime_error("Dynamic cast to ClassicControlledOperation failed.");
                 }
             }
             /*std::clog << "[INFO] op " << op_num << " is " << op->getName() << " on " << op->getTargets().at(0)
