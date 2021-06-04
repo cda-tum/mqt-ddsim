@@ -1,9 +1,11 @@
-[![Build Status](https://github.com/iic-jku/ddsim/workflows/continuous%20integration/badge.svg)](https://github.com/iic-jku/ddsim/actions)
-[![codecov](https://codecov.io/gh/iic-jku/ddsim/branch/master/graph/badge.svg)](https://codecov.io/gh/iic-jku/ddsim)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/iic-jku/ddsim.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/iic-jku/ddsim/context:python)
-[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/iic-jku/ddsim.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/iic-jku/ddsim/context:cpp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![toolset: JKQ](https://img.shields.io/badge/toolset-JKQ-blue)](https://github.com/iic-jku/jkq)
+[![PyPI](https://img.shields.io/pypi/v/jkq.ddsim?logo=pypi)](https://pypi.org/project/jkq.ddsim/)
+[![CI](https://github.com/iic-jku/ddsim/actions/workflows/cmake.yml/badge.svg)](https://github.com/iic-jku/ddsim/actions/workflows/cmake.yml)
+[![codecov](https://codecov.io/gh/iic-jku/ddsim/branch/master/graph/badge.svg)](https://codecov.io/gh/iic-jku/ddsim)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/github/iic-jku/ddsim?label=python&logo=lgtm)](https://lgtm.com/projects/g/iic-jku/ddsim/context:python)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/github/iic-jku/ddsim?label=c%2B%2B&logo=lgtm)](https://lgtm.com/projects/g/iic-jku/ddsim/context:cpp)
+
 
 # JKQ DDSIM - A quantum circuit simulator based on decision diagrams written in C++
 
@@ -27,7 +29,7 @@ If you have any questions, feel free to contact us via [iic-quantum@jku.at](mail
     * [Executable Noise-aware Simulator](#executable-noise-aware-simulator)
 - [Running Tests](#running-tests)
 - [Frequently Asked Questions](#frequently-asked-questions) 
-- [Reference](#reference)
+- [References](#references)
 <!--te-->
 
 
@@ -45,6 +47,9 @@ This tool can be used for simulating quantum circuits provided in any of the fol
   * [GRCS Repo](https://github.com/sboixo/GRCS)
 * `TFC`
   * [Reversible Logic Synthesis Benchmarks Page](http://webhome.cs.uvic.ca/~dmaslov/mach-read.html)
+* Qiskit QuantumCircuits
+  * As a backend for qiskit
+  * "Standalone" by directly passing the quantum circuit
 
 
 The format is automatically detected through the file extension.
@@ -62,9 +67,16 @@ The simulator is based on the references listed below and can either be used as 
 
 ## Using the Python Bindings / Backend for Qiskit
 
-The backend for Qiskit is available via PyPi. The following code gives an example on the usage:
+The backend for Qiskit is available via [PyPi](https://pypi.org/project/jkq.ddsim/) as wheel for Linux, Windows and MacOS. 
+Install with the following command. (We strongly recommend using a [virtual environment](https://docs.python.org/3/tutorial/venv.html).)
 
-```python
+```console
+(venv) $ pip install jkq.ddsim
+```
+
+The following code gives an example on the usage:
+
+```python3
 from qiskit import *
 from jkq import ddsim
 
@@ -85,6 +97,11 @@ result = job.result()
 counts = result.get_counts(circ)
 print(counts)
 ```
+
+The provider currently has two backends:
+
+* `qasm_simulator` which simulates the circuit and returns the requested number of shots
+* `statevector_simulator` which also simulates the circuite and returns the statevector along the requested number of shots
 
 A slightly more elaborate example can be found in the notebook [ddsim.ipynb](ddsim.ipynb).
 
@@ -109,14 +126,14 @@ There are two ways to do this:
 
 For building the library alone the CMake target `ddsim` is available.
 In CMake from version 3.13 you can use the following commands:
-```commandline
+```console
 $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
 $ cmake --build build --config Release --target ddsim
 ```
 
 Windows users need to configure CMake by calling
 
-```commandline
+```console
 $ cmake -A x64 -DCMAKE_BUILD_TYPE=Release -S . -B build
 $ cmake --build build --config Release --target ddsim
 ```
@@ -139,7 +156,7 @@ auto samples = sim.MeasureAllNonCollapsing(1000);
 To build the executable simulator, build the `ddsim_simple` CMake target (which requires `boost/program_options`) and run the resulting executable with options according to your needs.
 
 The standalone executable is launched in the following way, showing available options:
-```commandline
+```console
 $ ./ddsim_simple --help
 JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
 -h [ --help ]                         produce help message
@@ -171,7 +188,7 @@ JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
 
 The output is JSON-formatted as shown below (with hopefully intuitive naming).
 
-```commandline
+```console
 $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
 $ cmake --build build --config Release --target ddsim_simple
 $ ./build/ddsim_simple --simulate_ghz 4 --shots 1000 --ps --pm
@@ -201,7 +218,7 @@ $ ./build/ddsim_simple --simulate_ghz 4 --shots 1000 --ps --pm
 
 Execute the following lines to get the simulator running in no time:
 
-```commandline
+```console
 $ git clone --recurse-submodules https://github.com/iic-jku/ddsim/
 [...]
 
@@ -230,14 +247,14 @@ The tool also supports noise-aware quantum circuit simulation, based on a stocha
 
 Building the simulator requires `boost/program_options` and `Threads::Threads`. It can be built by executing
 
-```commandline
+```console
 $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
 $ cmake --build build --config Release --target ddsim_noise_aware
 ```
 
 The simulator provides a help function which is called in the following way:
 
-```commandline
+```console
 $ ./build/ddsim_noise_aware -h
 JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
   -h [ --help ]                         produce help message
@@ -261,7 +278,7 @@ Process finished with exit code 0
 
 An example run, with amplitude damping, phase flip, and depolarization error (each with a probability of 0.1% whenever a gate is applied) looks like this:
 
-```commandline
+```console
 $ ./build/ddsim_noise_aware --ps --noise_effects APD --stoch_runs 10000 --noise_prob 0.001 --simulate_file adder4.qasm
 {
   "statistics": {
@@ -286,7 +303,7 @@ $ ./build/ddsim_noise_aware --ps --noise_effects APD --stoch_runs 10000 --noise_
 
 ## Running Tests
 The repository also includes some (rudimentary) unit tests (using GoogleTest), which aim to ensure the correct behavior of the tool. They can be built and executed in the following way:
-```commandline
+```console
 $ cmake -DBUILD_DDSIM_TESTS=ON -DCMAKE_BUILD_TYPE=Release -S . -B build
 $ cmake --build build/ --config Release
 $ ./build/test/ddsim_test
@@ -307,7 +324,7 @@ Under Ubuntu you can simply install [`libboost-program-options-dev`](https://pac
 **Why does generation step of CMake fail?**
 
 If you see the following error message
-```
+```console
 $ cmake -S . -B <build target directory>
 CMake Error at CMakeLists.txt:27 (message):
 qfr was not found.  Please init/update submodules (git submodule update --init --recursive) and try again.
@@ -337,9 +354,9 @@ Configure the simulator again and add the parameter `-DBINDINGS=ON`
 If you use our tool for your research, we will be thankful if you refer to it by citing the appropriate publication:
 
 
-<details open>
+<details>
 <summary>
-  [1] <a href="https://iic.jku.at/files/eda/2018_tcad_advanced_simulation_quantum_computation.pdf">A. Zulehner and R. Wille, “Advanced Simulation of Quantum Computations,” Transactions on CAD of Integrated Circuits and Systems (TCAD), vol. 38, no. 5, pp. 848–859, 2019</a>
+  [1] A. Zulehner and R. Wille, “<a href="https://iic.jku.at/files/eda/2018_tcad_advanced_simulation_quantum_computation.pdf">Advanced Simulation of Quantum Computations</a>,” Transactions on CAD of Integrated Circuits and Systems (TCAD), vol. 38, no. 5, pp. 848–859, 2019
 </summary>
 
 ```bibtex
@@ -356,9 +373,9 @@ If you use our tool for your research, we will be thankful if you refer to it by
 ```
 </details>
 
-<details open>
+<details>
 <summary>
-  [2] <a href="https://iic.jku.at/files/eda/2020_dac_weak_simulation_quantum_computation.pdf">S. Hillmich, I. L. Markov, and R. Wille, “Just Like the Real Thing: Fast Weak Simulation of Quantum Computation,” in Design Automation Conference (DAC), 2020</a>
+  [2] S. Hillmich, I.L. Markov, and R. Wille, “<a href="https://iic.jku.at/files/eda/2020_dac_weak_simulation_quantum_computation.pdf">Just Like the Real Thing: Fast Weak Simulation of Quantum Computation</a>,” in Design Automation Conference (DAC), 2020
 </summary>
 
 ```bibtex
@@ -376,9 +393,9 @@ If you use our tool for your research, we will be thankful if you refer to it by
 
 
 
-<details open>
+<details>
 <summary>
-  [3] <a href="https://iic.jku.at/files/eda/2021_stochastic_quantum_circuit_simulation_using_decision_diagrams.pdf">T. Grurl, R. Kueng, J. Fuß, and R. Wille, “Stochastic Quantum Circuit Simulation Using Decision Diagrams,” in Design, Automation and Test in Europe (DATE), 2021</a>
+  [3] T. Grurl, R. Kueng, J. Fuß, and R. Wille, “<a href="https://iic.jku.at/files/eda/2021_stochastic_quantum_circuit_simulation_using_decision_diagrams.pdf">Stochastic Quantum Circuit Simulation Using Decision Diagrams</a>,” in Design, Automation and Test in Europe (DATE), 2021
 </summary>
 
 ```bibtex
@@ -394,9 +411,9 @@ If you use our tool for your research, we will be thankful if you refer to it by
 </details>
 
 
-<details open>
+<details>
 <summary>
-  [4] <a href="https://iic.jku.at/files/eda/2021_date_approximations_dd_baed_quantum_circuit_simulation.pdf">S. Hillmich, R. Kueng, I. L. Markov, and R. Wille, "As Accurate as Needed, as Efficient as Possible: Approximations in DD-based Quantum Circuit Simulation," in Design, Automation and Test in Europe (DATE), 2021</a>
+  [4] S. Hillmich, R. Kueng, I. L. Markov, and R. Wille, "<a href="https://iic.jku.at/files/eda/2021_date_approximations_dd_baed_quantum_circuit_simulation.pdf">As Accurate as Needed, as Efficient as Possible: Approximations in DD-based Quantum Circuit Simulation</a>," in Design, Automation and Test in Europe (DATE), 2021
 </summary>
 
 ```bibtex
@@ -412,9 +429,9 @@ If you use our tool for your research, we will be thankful if you refer to it by
 ```
 </details>
 
-<details open>
+<details>
 <summary>
-  [5] <a href="">L. Burgholzer, H. Bauer, and R. Wille, "Hybrid Schrödinger-Feynman Simulation of Quantum Circuits With Decision Diagrams," arXiv:2105.07045, 2021</a>
+  [5] L. Burgholzer, H. Bauer, and R. Wille, "<a href="https://arxiv.org/pdf/2105.07045.pdf">Hybrid Schrödinger-Feynman Simulation of Quantum Circuits With Decision Diagrams</a>," arXiv:2105.07045, 2021
 </summary>
 
 ```bibtex
