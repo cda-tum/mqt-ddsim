@@ -112,10 +112,7 @@ int main(int argc, char** argv) {
         std::cout << std::setw(2) << output_obj << std::endl;
     } else if (vm["stoch_runs"].as<long>() < 0) {
         std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
-        ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation,
-                                                              vm["steps"].as<unsigned int>(),
-                                                              vm["step_fidelity"].as<double>(),
-                                                              seed);
+        ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, seed);
 
         ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>());
         ddsim->setAmplitudeDampingProbability(vm["noise_prob"].as<double>());

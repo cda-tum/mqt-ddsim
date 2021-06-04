@@ -20,18 +20,12 @@ public:
     //        }
     //    }
 
-    //    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity, unsigned long long seed):
-    //        Simulator(seed), qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
-    //        if (step_number == 0) {
-    //            throw std::invalid_argument("step_number has to be greater than zero");
-    //        }
-    //    }
+    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, unsigned long long seed):
+        Simulator(seed), qc(qc) {
+    }
 
-    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const std::string& noise_effects, double noise_prob, const unsigned int step_number, const double step_fidelity):
-        qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
-        if (step_number == 0) {
-            throw std::invalid_argument("step_number has to be greater than zero");
-        }
+    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const std::string& noise_effects, double noise_prob):
+        qc(qc) {
         setNoiseEffects(noise_effects);
         setAmplitudeDampingProbability(noise_prob);
     }
@@ -101,10 +95,10 @@ private:
 
     std::array<NoiseEntry, NoiseSLOTS> NoiseTable{};
 
-    const unsigned int step_number;
-    const double       step_fidelity;
-    unsigned long long approximation_runs{0};
-    long double        final_fidelity{1.0L};
+    //    const unsigned int step_number;
+    //    const double       step_fidelity;
+    //    unsigned long long approximation_runs{0};
+    //    long double        final_fidelity{1.0L};
 
     void ApplyAmplitudeDampingToNode(std::array<dd::Package::mEdge, 4>& e);
 
