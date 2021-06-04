@@ -89,7 +89,7 @@ jobs:
     name: Upload dists to PyPi
     needs: [ build_wheels, build_sdist ]
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'created'
+    if: github.event_name == 'release' && github.event.action == 'published'
     steps:
       - uses: actions/download-artifact@v2
         with:
