@@ -35,6 +35,43 @@ std::unique_ptr<qc::QuantumComputation> getAdder4Circuit() {
     return quantumComputation;
 }
 
+TEST(DeterministicNoiseSimTest, TestingBarrierGate) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, std::vector<dd::Qubit>(0), qc::Barrier);
+    std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
+    ddsim  = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("A"), 0, -1, 1, 1, "-1-1000");
+    auto m = ddsim->DeterministicSimulate();
+
+    ASSERT_EQ(ddsim->getNumberOfOps(), 2);
+    ASSERT_EQ(m.find("10")->second, 1);
+}
+
+TEST(DeterministicNoiseSimTest, TestingResetGate) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, std::vector<dd::Qubit>(0), qc::Reset);
+    std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
+    ddsim  = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("A"), 0, -1, 1, 1, "-1-1000");
+    bool occurredException = false;
+    try {
+        auto m = ddsim->DeterministicSimulate();
+    } catch (const std::runtime_error& ex){
+        occurredException = true;
+    }
+    ASSERT_EQ(occurredException, true);
+}
+
+TEST(DeterministicNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
+    std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
+    ddsim  = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("A"), 0, -1, 1, 1, "-1-1000");
+    auto m = ddsim->DeterministicSimulate();
+
+    ASSERT_EQ(ddsim->getNumberOfOps(), 1);
+    ASSERT_EQ(m.find("10")->second, 1);
+}
+
 TEST(DeterministicNoiseSimTest, ClassicControlledOp) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
