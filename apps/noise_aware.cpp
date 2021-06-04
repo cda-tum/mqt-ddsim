@@ -1,5 +1,5 @@
-#include "StochasticNoiseSimulator.hpp"
 #include "DeterministicNoiseSimulator.hpp"
+#include "StochasticNoiseSimulator.hpp"
 #include "nlohmann/json.hpp"
 
 #include <boost/program_options.hpp>
@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
         std::exit(1);
     }
 
-    std::unique_ptr<qc::QuantumComputation>   quantumComputation;
+    std::unique_ptr<qc::QuantumComputation> quantumComputation;
 
     if (vm.count("simulate_file")) {
         const std::string fname = vm["simulate_file"].as<std::string>();
@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
         std::clog << "[WARNING] Quantum computation contains quite many qubits. You're jumping into the deep end.\n";
     }
 
-    if (vm["stoch_runs"].as<long>() >=0) {
+    if (vm["stoch_runs"].as<long>() >= 0) {
         std::unique_ptr<StochasticNoiseSimulator> ddsim{nullptr};
         ddsim = std::make_unique<StochasticNoiseSimulator>(quantumComputation,
                                                            vm["steps"].as<unsigned int>(),
@@ -110,12 +110,12 @@ int main(int argc, char** argv) {
             output_obj["measurement_results"] = measurement_results;
         }
         std::cout << std::setw(2) << output_obj << std::endl;
-    } else if (vm["stoch_runs"].as<long>() < 0){
+    } else if (vm["stoch_runs"].as<long>() < 0) {
         std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
         ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation,
-                                                           vm["steps"].as<unsigned int>(),
-                                                           vm["step_fidelity"].as<double>(),
-                                                           seed);
+                                                              vm["steps"].as<unsigned int>(),
+                                                              vm["step_fidelity"].as<double>(),
+                                                              seed);
 
         ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>());
         ddsim->setAmplitudeDampingProbability(vm["noise_prob"].as<double>());
