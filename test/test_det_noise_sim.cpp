@@ -35,6 +35,23 @@ std::unique_ptr<qc::QuantumComputation> getAdder4Circuit() {
     return quantumComputation;
 }
 
+TEST(DeterministicNoiseSimTest, ClassicControlledOp) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, 0, 0);
+    std::unique_ptr<qc::Operation> op(new qc::StandardOperation(2, 1, qc::X));
+    auto                           classical_register = std::make_pair<unsigned short, unsigned short>(0, 1);
+    quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classical_register, 1);
+
+    std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
+    ddsim  = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("A"), 0, -1, 1, 1, "-1-1000");
+    auto m = ddsim->DeterministicSimulate();
+
+    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+
+    EXPECT_LT(abs(m.find("11")->second - 1), 0.00001);
+}
+
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDApplySequential) {
     auto                                         quantumComputation = getAdder4Circuit();
     std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};

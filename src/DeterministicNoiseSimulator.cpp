@@ -1,5 +1,7 @@
 #include "DeterministicNoiseSimulator.hpp"
 
+#include "dd/Export.hpp"
+
 using CN = dd::ComplexNumbers;
 
 dd::Package::mEdge DeterministicNoiseSimulator::makeZeroDensityOperator(dd::QubitCount n) {
@@ -8,6 +10,79 @@ dd::Package::mEdge DeterministicNoiseSimulator::makeZeroDensityOperator(dd::Qubi
         f = dd->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, dd::Package::mEdge::zero, dd::Package::mEdge::zero, dd::Package::mEdge::zero});
     }
     return f;
+}
+
+dd::fp DeterministicNoiseSimulator::probForIndexToBeZero(dd::Package::mEdge e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob) {
+    if (e.w.approximatelyZero()) {
+        return 0;
+    }
+    if (e.isTerminal()) {
+        return pathProb;
+    }
+
+    pathProb = pathProb * dd::CTEntry::val(e.w.r);
+
+    global_prob += probForIndexToBeZero(e.p->e[0], index, pathProb, global_prob);
+
+    if (e.p->v != index) {
+        global_prob += probForIndexToBeZero(e.p->e[3], index, pathProb, global_prob);
+    }
+
+    return global_prob;
+}
+
+char DeterministicNoiseSimulator::MeasureOneCollapsing(dd::Qubit index) {
+    char                                   result   = 'n';
+    auto                                   f        = dd::Package::mEdge::one;
+    auto                                   n_qubits = getNumberOfQubits();
+    std::uniform_real_distribution<dd::fp> dist(0.0, 1.0L);
+    dd::fp                                 n = dist(mt);
+
+    auto prob_zero = probForIndexToBeZero(density_root_edge, index, 1, 0);
+
+    //    dd->printMatrix(density_root_edge);
+
+    for (std::size_t p = 0; p < n_qubits; p++) {
+        if (static_cast<dd::Qubit>(p) == index) {
+            if (prob_zero >= n) {
+                // Build the operation that it sets index to 0
+                result = '0';
+                f      = dd->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, f, dd::Package::mEdge::zero, dd::Package::mEdge::zero});
+                //                f = dd->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, dd::Package::mEdge::zero, dd::Package::mEdge::zero, dd::Package::mEdge::zero});
+            } else {
+                result = '1';
+                // Build the operation that it sets index to 1
+                f = dd->makeDDNode(static_cast<dd::Qubit>(p), std::array{dd::Package::mEdge::zero, dd::Package::mEdge::zero, f, f});
+                //                f = dd->makeDDNode(static_cast<dd::Qubit>(p), std::array{dd::Package::mEdge::zero, dd::Package::mEdge::zero, dd::Package::mEdge::zero, f});
+            }
+        } else {
+            f = dd->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, dd::Package::mEdge::zero, dd::Package::mEdge::zero, f});
+        }
+    }
+    //    dd::export2Dot(f, "/home/user/Pictures/1f0.dot", true, true);
+    //    dd::export2Dot(density_root_edge, "/home/user/Pictures/2density_root_edge.dot", true, true);
+    //    dd->printMatrix(density_root_edge);
+
+    dd::Package::mEdge tmp0 = dd->multiply(dd->multiply(f, density_root_edge), dd->conjugateTranspose(f));
+    dd->decRef(density_root_edge);
+    dd->incRef(tmp0);
+    density_root_edge = tmp0;
+
+    //    dd->printMatrix(tmp0);
+    //    dd::export2Dot(tmp0, "/home/user/Pictures/3density_root_edge.dot", true, true);
+
+    // Normalize the density matrix
+    auto trace = dd->trace(density_root_edge);
+    assert(trace.i == 0);
+    auto tmp_complex = dd->cn.getTemporary(1 / trace.r, 0);
+    dd::ComplexNumbers::mul(tmp_complex, density_root_edge.w, tmp_complex);
+    dd::ComplexNumbers::decRef(density_root_edge.w);
+    density_root_edge.w = dd->cn.lookup(tmp_complex);
+
+    //    dd->printMatrix(density_root_edge);
+    //    dd::export2Dot(density_root_edge, "/home/user/Pictures/4density_root_edge.dot", true, true);
+
+    return result;
 }
 
 std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate() {
@@ -20,7 +95,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
     for (auto const& op: *qc) {
         if (!op->isUnitary() && !(op->isClassicControlledOperation())) {
             if (auto* nu_op = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
-                if (nu_op->getName()[0] == 'M') {
+                if (op->getType() == qc::Measure) {
                     auto quantum = nu_op->getTargets();
                     auto classic = nu_op->getClassics();
 
@@ -29,9 +104,9 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                     }
 
                     for (unsigned int i = 0; i < quantum.size(); ++i) {
-                        auto result = MeasureOneCollapsing(quantum[i]);
+                        auto result = MeasureOneCollapsing(quantum.at(i));
                         assert(result == '0' || result == '1');
-                        classic_values[classic[i]] = result == '1';
+                        classic_values[classic.at(i)] = (result == '1');
                     }
                 } else if (strcmp(nu_op->getName(), "Rst") == 0) {
                     // Reset qubit
@@ -99,8 +174,8 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                 [[maybe_unused]] auto cache_size_after = dd->cn.cacheCount();
                 assert(cache_size_after == cache_size_before);
             } else {
-                auto maxDepth       = op->getTargets().front();
-                auto control_qubits = op->getControls();
+                signed char maxDepth       = targets[0];
+                auto        control_qubits = op->getControls();
                 for (auto& control: control_qubits) {
                     if (control.qubit < maxDepth) {
                         maxDepth = control.qubit;
@@ -421,21 +496,21 @@ void DeterministicNoiseSimulator::generate_gate(dd::Package::mEdge* pointer_for_
     double probability = noise_probability;
 
     switch (noise_type) {
-        // bitflip
-        //      (sqrt(1-probability)    0           )       (0      sqrt(probability))
-        //  e0= (0            sqrt(1-probability)   ), e1=  (sqrt(probability)      0)
-        case 'B': {
-            tmp.r                 = std::sqrt(1 - probability) * dd::complex_one.r;
-            idle_noise_gate[0][0] = idle_noise_gate[0][3] = tmp;
-            idle_noise_gate[0][1] = idle_noise_gate[0][2] = dd::complex_zero;
-            tmp.r                                         = std::sqrt(probability) * dd::complex_one.r;
-            idle_noise_gate[1][1] = idle_noise_gate[1][2] = tmp;
-            idle_noise_gate[1][0] = idle_noise_gate[1][3] = dd::complex_zero;
-
-            pointer_for_matrices[0] = dd->makeGateDD(idle_noise_gate[0], getNumberOfQubits(), target);
-            pointer_for_matrices[1] = dd->makeGateDD(idle_noise_gate[1], getNumberOfQubits(), target);
-            break;
-        }
+            // bitflip
+            //      (sqrt(1-probability)    0           )       (0      sqrt(probability))
+            //  e0= (0            sqrt(1-probability)   ), e1=  (sqrt(probability)      0)
+            //        case 'B': {
+            //            tmp.r                 = std::sqrt(1 - probability) * dd::complex_one.r;
+            //            idle_noise_gate[0][0] = idle_noise_gate[0][3] = tmp;
+            //            idle_noise_gate[0][1] = idle_noise_gate[0][2] = dd::complex_zero;
+            //            tmp.r                                         = std::sqrt(probability) * dd::complex_one.r;
+            //            idle_noise_gate[1][1] = idle_noise_gate[1][2] = tmp;
+            //            idle_noise_gate[1][0] = idle_noise_gate[1][3] = dd::complex_zero;
+            //
+            //            pointer_for_matrices[0] = dd->makeGateDD(idle_noise_gate[0], getNumberOfQubits(), target);
+            //            pointer_for_matrices[1] = dd->makeGateDD(idle_noise_gate[1], getNumberOfQubits(), target);
+            //            break;
+            //        }
             // phase flip
             //      (sqrt(1-probability)    0           )       (sqrt(probability)      0)
             //  e0= (0            sqrt(1-probability)   ), e1=  (0      -sqrt(probability))

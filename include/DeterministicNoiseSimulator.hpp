@@ -4,6 +4,13 @@
 #include "QuantumComputation.hpp"
 #include "Simulator.hpp"
 
+#include <cstddef>
+#include <map>
+#include <memory>
+#include <random>
+#include <string>
+#include <vector>
+
 class DeterministicNoiseSimulator: public Simulator {
 public:
     DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity):
@@ -76,6 +83,7 @@ public:
     dd::Package::mEdge density_root_edge;
 
     bool weird_value_i_dont_understand_but_something_with_sequential = false;
+    char MeasureOneCollapsing(dd::Qubit index);
 
 private:
     static constexpr unsigned short NoiseSLOTS = 16384;
@@ -112,6 +120,7 @@ private:
     unsigned long      noiseHash(dd::Package::mNode* a, const dd::ComplexValue& aw, const short* line, unsigned short nQubits);
     dd::Package::mEdge noiseLookup(const dd::Package::mEdge& a, const short* line, unsigned short nQubits);
     void               noiseInsert(const dd::Package::mEdge& a, const short* line, const dd::Package::mEdge& r, unsigned short nQubits);
+    dd::fp             probForIndexToBeZero(dd::Package::mEdge e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob);
 };
 
 #endif //DDSIM_DETERMINISTICNOISESIMULATOR_HPP
