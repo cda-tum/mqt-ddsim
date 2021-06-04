@@ -13,21 +13,21 @@
 
 class DeterministicNoiseSimulator: public Simulator {
 public:
-    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity):
-        qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
-        if (step_number == 0) {
-            throw std::invalid_argument("step_number has to be greater than zero");
-        }
-    }
+    //    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity):
+    //        qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
+    //        if (step_number == 0) {
+    //            throw std::invalid_argument("step_number has to be greater than zero");
+    //        }
+    //    }
 
-    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity, unsigned long long seed):
-        Simulator(seed), qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
-        if (step_number == 0) {
-            throw std::invalid_argument("step_number has to be greater than zero");
-        }
-    }
+    //    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity, unsigned long long seed):
+    //        Simulator(seed), qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
+    //        if (step_number == 0) {
+    //            throw std::invalid_argument("step_number has to be greater than zero");
+    //        }
+    //    }
 
-    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const std::string& noise_effects, double noise_prob, long stoch_runs, const unsigned int step_number, const double step_fidelity, std::string recorded_propeteis):
+    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const std::string& noise_effects, double noise_prob, const unsigned int step_number, const double step_fidelity):
         qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
         if (step_number == 0) {
             throw std::invalid_argument("step_number has to be greater than zero");
@@ -47,13 +47,13 @@ public:
 
     std::map<std::string, double> DeterministicSimulate();
 
-    std::map<std::string, std::string> AdditionalStatistics() override {
-        return {
-                {"step_fidelity", std::to_string(step_fidelity)},
-                {"approximation_runs", std::to_string(approximation_runs)},
-                {"final_fidelity", std::to_string(final_fidelity)},
-        };
-    };
+    //    std::map<std::string, std::string> AdditionalStatistics() override {
+    //        return {
+    //                {"step_fidelity", std::to_string(step_fidelity)},
+    //                {"approximation_runs", std::to_string(approximation_runs)},
+    //                {"final_fidelity", std::to_string(final_fidelity)},
+    //        };
+    //    };
 
     [[nodiscard]] std::string intToString(long target_number, char value) const;
 

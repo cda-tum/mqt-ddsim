@@ -592,8 +592,8 @@ void DeterministicNoiseSimulator::generate_gate(dd::Package::mEdge* pointer_for_
 }
 
 void DeterministicNoiseSimulator::apply_det_noise_sequential(const qc::Targets& targets) {
-    dd::Package::mEdge tmp              = {};
-    dd::Package::mEdge ancillary_edge_1 = {};
+    dd::Package::mEdge tmp = {};
+    //    dd::Package::mEdge ancillary_edge_1 = {};
     dd::Package::mEdge idle_operation[4];
 
     // Iterate over qubits and check if the qubit had been used
