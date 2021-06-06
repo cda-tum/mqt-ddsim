@@ -45,6 +45,23 @@ jobs:
         working-directory: ${{github.workspace}}/build/test
         run: ctest -C $BUILD_TYPE --output-on-failure
 
+  build-ubuntu-ninja:
+    name: Build and Test on Ubuntu using Ninja
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Install boost program-options and ninja-build
+        run: sudo apt install libboost-program-options-dev ninja
+      - name: Configure CMake
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -G Ninja -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBINDINGS=ON -DBUILD_DDSIM_TESTS=ON
+      - name: Build
+        run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
+      - name: Test
+        working-directory: ${{github.workspace}}/build/test
+        run: ctest -C $BUILD_TYPE --output-on-failure
+
   build-macos:
     name: Build and Test on MacOS
     needs: [ build-ubuntu, codestyle ]
