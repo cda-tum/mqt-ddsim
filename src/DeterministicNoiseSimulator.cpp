@@ -201,7 +201,8 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
     if (dd->garbageCollect()) {
         NoiseTable.fill({});
     }
-    return AnalyseState(n_qubits);
+
+    return AnalyseState(n_qubits, false);
 }
 
 dd::Package::mEdge DeterministicNoiseSimulator::ApplyNoiseEffects(dd::Package::mEdge density_op, const std::unique_ptr<qc::Operation>& op, unsigned char maxDepth) {
@@ -452,15 +453,21 @@ void DeterministicNoiseSimulator::ApplyDepolaritationToNode(std::array<dd::Packa
     dd->cn.returnToCache(complex_prob);
 }
 
-std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(int nr_qubits) {
+std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(int nr_qubits, bool full_state) {
     std::map<std::string, double> measure_result = {};
 
     double p0, p1, imaginary;
 
     double long global_probability;
 
+    double measure_states = std::min((double)256, pow(2, nr_qubits));
+
+    if (full_state == true){
+        measure_states = pow(2, nr_qubits);
+    }
+
     dd::Package::mEdge original_state = density_root_edge;
-    for (int m = 0; m < pow(2, nr_qubits); m++) {
+    for (int m = 0; m < measure_states; m++) {
         int current_result               = m;
         global_probability               = dd::CTEntry::val(density_root_edge.w.r);
         std::string        result_string = intToString(m, '1');

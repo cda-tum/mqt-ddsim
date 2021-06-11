@@ -53,7 +53,7 @@ public:
 
     void apply_det_noise_sequential(const qc::Targets& targets);
 
-    std::map<std::string, double> AnalyseState(int nr_qubits);
+    std::map<std::string, double> AnalyseState(int nr_qubits, bool full_state);
 
     void setNoiseEffects(const std::string& cGateNoise) { gate_noise_types = cGateNoise; }
 
