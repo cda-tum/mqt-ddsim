@@ -114,6 +114,11 @@ int main(int argc, char** argv) {
         std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
         ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, seed);
 
+        if (vm["stoch_runs"].as<long>() == -2){
+            ddsim->weird_value_i_dont_understand_but_something_with_sequential = true;
+        }
+
+
         ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>());
         ddsim->setAmplitudeDampingProbability(vm["noise_prob"].as<double>());
 
@@ -135,6 +140,7 @@ int main(int argc, char** argv) {
                     {"applied_gates", ddsim->getNumberOfOps()},
                     {"max_nodes", ddsim->getMaxNodeCount()},
                     {"seed", ddsim->getSeed()},
+                    {"active_nodes", ddsim->getActiveNodeCount()},
             };
 
             for (const auto& item: ddsim->AdditionalStatistics()) {
