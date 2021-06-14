@@ -77,21 +77,21 @@ std::map<std::string, std::size_t> Simulator::MeasureAllNonCollapsing(unsigned i
     return results;
 }
 
-std::map<std::string, std::size_t> Simulator::SampleFromAmplitudeVectorInPlace(std::vector<dd::ComplexValue>& amplitudes, unsigned int shots) {
+std::map<std::string, std::size_t> Simulator::SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, unsigned int shots) {
     // in-place prefix-sum calculation of probabilities
     std::inclusive_scan(
             amplitudes.begin(), amplitudes.end(), amplitudes.begin(),
-            [](const dd::ComplexValue& prefix, const dd::ComplexValue& value) {
-                return dd::ComplexValue{std::fma(value.r, value.r, std::fma(value.i, value.i, prefix.r)), value.i};
+            [](const std::complex<dd::fp>& prefix, const std::complex<dd::fp>& value) {
+                return std::complex<dd::fp>{std::fma(value.real(), value.real(), std::fma(value.imag(), value.imag(), prefix.real())), value.imag()};
             },
-            dd::ComplexValue{0., 0.});
+            std::complex<dd::fp>{0., 0.});
 
     std::map<std::string, std::size_t>     results;
     std::uniform_real_distribution<dd::fp> dist(0.0L, 1.0L);
     for (unsigned int i = 0; i < shots; ++i) {
         auto p = dist(mt);
         // use binary search to find the first entry >= p
-        auto mit = std::upper_bound(amplitudes.begin(), amplitudes.end(), p, [](const dd::fp val, const dd::ComplexValue& c) { return val < c.r; });
+        auto mit = std::upper_bound(amplitudes.begin(), amplitudes.end(), p, [](const dd::fp val, const std::complex<dd::fp>& c) { return val < c.real(); });
         auto m   = std::distance(amplitudes.begin(), mit);
 
         // construct basis state string

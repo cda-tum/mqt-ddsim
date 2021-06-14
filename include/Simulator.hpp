@@ -44,7 +44,7 @@ public:
 
     char MeasureOneCollapsing(dd::Qubit index, bool assume_probability_normalization = true);
 
-    std::map<std::string, std::size_t> SampleFromAmplitudeVectorInPlace(std::vector<dd::ComplexValue>& amplitudes, unsigned int shots);
+    std::map<std::string, std::size_t> SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, unsigned int shots);
 
     [[nodiscard]] std::vector<dd::ComplexValue> getVector() const;
 

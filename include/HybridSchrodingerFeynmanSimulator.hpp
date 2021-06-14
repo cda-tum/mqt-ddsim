@@ -25,15 +25,15 @@ public:
 
     std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
 
-    Mode                                               mode = Mode::Amplitude;
-    [[nodiscard]] const std::vector<dd::ComplexValue>& getFinalAmplitudes() const { return finalAmplitudes; }
+    Mode                                                   mode = Mode::Amplitude;
+    [[nodiscard]] const std::vector<std::complex<dd::fp>>& getFinalAmplitudes() const { return finalAmplitudes; }
 
     //  Get # of decisions for given split_qubit, so that lower slice: q0 < i < qubit; upper slice: qubit <= i < nqubits
     std::size_t getNDecisions(dd::Qubit split_qubit);
 
 private:
-    std::size_t                   nthreads = 2;
-    std::vector<dd::ComplexValue> finalAmplitudes{};
+    std::size_t                       nthreads = 2;
+    std::vector<std::complex<dd::fp>> finalAmplitudes{};
 
     void SimulateHybrid(dd::Qubit split_qubit);
     void SimulateHybridAmplitudes(dd::Qubit split_qubit);
