@@ -63,7 +63,7 @@ TEST(HybridSimTest, GRCSTestDD) {
         auto resultAmplitudes = dd->getVector(result);
         equal                 = true;
         for (std::size_t i = 0; i < refAmplitudes.size(); ++i) {
-            if (std::abs(refAmplitudes[i].r - resultAmplitudes[i].r) > 1e-6 || std::abs(refAmplitudes[i].i - resultAmplitudes[i].i) > 1e-6) {
+            if (std::abs(refAmplitudes[i].real() - resultAmplitudes[i].real()) > 1e-6 || std::abs(refAmplitudes[i].imag() - resultAmplitudes[i].imag()) > 1e-6) {
                 equal = false;
                 break;
             }
@@ -98,6 +98,8 @@ TEST(HybridSimTest, GRCSTestAmplitudes) {
 
 TEST(HybridSimTest, NonStandardOperation) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(1);
+    quantumComputation->emplace_back<qc::StandardOperation>(1, 0, qc::H);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, 0, 0);
     quantumComputation->emplace_back<qc::StandardOperation>(1, 0, qc::H);
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, 0, 0);
 
