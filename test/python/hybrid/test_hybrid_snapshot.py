@@ -5,7 +5,7 @@ from qiskit import execute
 from jkq.ddsim.hybridstatevectorsimulator import HybridStatevectorSimulator
 
 
-class JKQSnapshotTest(unittest.TestCase):
+class JKQHybridSnapshotTest(unittest.TestCase):
     def setUp(self):
         self.backend = HybridStatevectorSimulator()
         qr = QuantumRegister(2)
@@ -18,6 +18,8 @@ class JKQSnapshotTest(unittest.TestCase):
         result = execute(self.q_circuit, backend=self.backend, shots=0).result()
         self.assertEqual(result.success, True)
         actual = result.get_statevector(self.q_circuit)
+
+        self.assertEqual(len(actual), 4)
 
         # state is 1/sqrt(2)|00> + 1/sqrt(2)|11>, up to a global phase
         self.assertAlmostEqual((abs(actual[0])) ** 2, 1 / 2, places=5)
