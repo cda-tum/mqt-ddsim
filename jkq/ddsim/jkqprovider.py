@@ -3,6 +3,8 @@ from qiskit.providers.providerutils import filter_backends
 
 from .qasmsimulator import QasmSimulator
 from .statevectorsimulator import StatevectorSimulator
+from .hybridqasmsimulator import HybridQasmSimulator
+from .hybridstatevectorsimulator import HybridStatevectorSimulator
 
 
 class JKQProvider(Provider):
@@ -13,6 +15,8 @@ class JKQProvider(Provider):
             JKQProvider._BACKENDS = [
                 ('qasm_simulator', QasmSimulator, None, None),
                 ('statevector_simulator', StatevectorSimulator, None, None),
+                ('hybrid_qasm_simulator', HybridQasmSimulator, None, None),
+                ('hybrid_statevector_simulator', HybridStatevectorSimulator, None, None),
             ]
 
     def get_backend(self, name=None, **kwargs):
