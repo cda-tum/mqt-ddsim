@@ -19,6 +19,8 @@ std::size_t HybridSchrodingerFeynmanSimulator::getNDecisions(dd::Qubit split_qub
                 (target_in_upper_slice && control_in_lower_slice)) {
                 ndecisions++;
             }
+        } else if (op->getType() == qc::Barrier || op->getType() == qc::Snapshot || op->getType() == qc::ShowProbabilities) {
+            continue;
         } else {
             throw std::invalid_argument("Only StandardOperations are supported for now.");
         }

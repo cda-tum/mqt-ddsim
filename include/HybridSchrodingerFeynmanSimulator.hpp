@@ -1,12 +1,14 @@
 #ifndef DDSIM_HYBRIDSCHRODINGERFEYNMANSIMULATOR_HPP
 #define DDSIM_HYBRIDSCHRODINGERFEYNMANSIMULATOR_HPP
 
+#include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
 #include "QuantumComputation.hpp"
 #include "dd/Export.hpp"
 #include "dd/Package.hpp"
 
 #include <cmath>
+#include <complex>
 #include <memory>
 #include <omp.h>
 
@@ -18,10 +20,16 @@ public:
     };
 
     explicit HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Amplitude, const std::size_t nthreads = 2):
-        CircuitSimulator(std::move(qc)), mode(mode), nthreads(nthreads) {}
+        CircuitSimulator(std::move(qc)), mode(mode), nthreads(nthreads) {
+        // remove final measurements
+        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
+    }
 
     HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, const ApproximationInfo approx_info, const unsigned long long seed, Mode mode = Mode::Amplitude, const std::size_t nthreads = 2):
-        CircuitSimulator(std::move(qc), approx_info, seed), mode(mode), nthreads(nthreads) {}
+        CircuitSimulator(std::move(qc), approx_info, seed), mode(mode), nthreads(nthreads) {
+        // remove final measurements
+        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
+    }
 
     std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
 
@@ -30,6 +38,8 @@ public:
 
     //  Get # of decisions for given split_qubit, so that lower slice: q0 < i < qubit; upper slice: qubit <= i < nqubits
     std::size_t getNDecisions(dd::Qubit split_qubit);
+
+    [[nodiscard]] Mode getMode() const { return mode; }
 
 private:
     std::size_t                       nthreads = 2;
