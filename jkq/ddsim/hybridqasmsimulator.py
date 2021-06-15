@@ -31,7 +31,7 @@ class HybridQasmSimulator(BackendV1):
             shots=None,
             parameter_binds=None,
             simulator_seed=None,
-            mode=ddsim.HybridMode.amplitude,
+            mode="amplitude",
             nthreads=2
         )
 
@@ -108,9 +108,16 @@ class HybridQasmSimulator(BackendV1):
     def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options):
         start_time = time.time()
         seed = options.get('seed', -1)
-        mode = options.get('mode', ddsim.HybridMode.amplitude)
+        mode = options.get('mode', 'amplitude')
+        if mode == 'amplitude':
+            hybrid_mode = ddsim.HybridMode.amplitude
+        elif mode == 'dd':
+            hybrid_mode = ddsim.HybridMode.DD
+        else:
+            raise JKQSimulatorError('Simulation mode', mode, 'not supported by JKQ hybrid simulator. Available modes are \'amplitude\' and \'dd\'')
+
         nthreads = options.get('nthreads', 2)
-        sim = ddsim.HybridCircuitSimulator(qobj_experiment, seed, mode, nthreads)
+        sim = ddsim.HybridCircuitSimulator(qobj_experiment, seed, hybrid_mode, nthreads)
         shots = options['shots']
         counts = sim.simulate(shots)
         end_time = time.time()

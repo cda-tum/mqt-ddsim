@@ -3,7 +3,6 @@ import unittest
 from qiskit import QuantumCircuit, BasicAer, QuantumRegister
 from jkq.ddsim.hybridqasmsimulator import HybridQasmSimulator
 from qiskit import execute
-from jkq.ddsim import HybridMode
 
 
 class JKQHybridQasmSimulatorTest(unittest.TestCase):
@@ -86,7 +85,7 @@ class JKQHybridQasmSimulatorTest(unittest.TestCase):
         circ.measure_all(inplace=True)
         print(circ.draw(fold=-1))
         self.circuit = circ
-        result = execute(self.circuit, self.backend, mode=HybridMode.DD).result()
+        result = execute(self.circuit, self.backend, mode='dd').result()
         self.assertEqual(result.success, True)
         return result
 
@@ -100,6 +99,6 @@ class JKQHybridQasmSimulatorTest(unittest.TestCase):
         circ.measure_all(inplace=True)
         print(circ.draw(fold=-1))
         self.circuit = circ
-        result = execute(self.circuit, self.backend, mode=HybridMode.amplitude).result()
+        result = execute(self.circuit, self.backend, mode='amplitude').result()
         self.assertEqual(result.success, True)
         return result
