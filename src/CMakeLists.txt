@@ -13,6 +13,8 @@ add_library(${PROJECT_NAME}
             ${CMAKE_CURRENT_SOURCE_DIR}/StochasticNoiseSimulator.cpp
             ${PROJECT_SOURCE_DIR}/include/HybridSchrodingerFeynmanSimulator.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/HybridSchrodingerFeynmanSimulator.cpp
+            ${PROJECT_SOURCE_DIR}/include/UnitarySimulator.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/UnitarySimulator.cpp
             )
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)
 # set required C++ standard and disable compiler specific extensions

@@ -54,7 +54,7 @@ public:
 
     [[nodiscard]] std::size_t getActiveNodeCount() const { return dd->vUniqueTable.getActiveNodeCount(); }
 
-    [[nodiscard]] std::size_t getMaxNodeCount() const { return dd->vUniqueTable.getMaxActiveNodes(); }
+    [[nodiscard]] virtual std::size_t getMaxNodeCount() const { return dd->vUniqueTable.getMaxActiveNodes(); }
 
     [[nodiscard]] std::size_t countNodesFromRoot() const { return dd->size(root_edge); }
 
