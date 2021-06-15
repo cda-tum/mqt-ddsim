@@ -96,6 +96,31 @@ TEST(HybridSimTest, GRCSTestAmplitudes) {
     EXPECT_TRUE(equal);
 }
 
+TEST(HybridSimTest, GRCSTestFixedSeed) {
+    auto qc1 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
+    auto qc2 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
+
+    HybridSchrodingerFeynmanSimulator ddsim_hybrid_amp(std::move(qc1), ApproximationInfo{}, 42);
+    EXPECT_TRUE(ddsim_hybrid_amp.getMode() == HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
+    CircuitSimulator ddsim(std::move(qc2));
+
+    ddsim_hybrid_amp.Simulate(0);
+    ddsim.Simulate(0);
+
+    // if edges are not equal -> compare amplitudes
+    auto  refAmplitudes    = ddsim.getVector();
+    auto& resultAmplitudes = ddsim_hybrid_amp.getFinalAmplitudes();
+    bool  equal            = true;
+    for (std::size_t i = 0; i < refAmplitudes.size(); ++i) {
+        if (std::abs(refAmplitudes[i].r - resultAmplitudes[i].real()) > 1e-6 || std::abs(refAmplitudes[i].i - resultAmplitudes[i].imag()) > 1e-6) {
+            equal = false;
+            break;
+        }
+    }
+
+    EXPECT_TRUE(equal);
+}
+
 TEST(HybridSimTest, NonStandardOperation) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(1);
     quantumComputation->emplace_back<qc::StandardOperation>(1, 0, qc::H);
