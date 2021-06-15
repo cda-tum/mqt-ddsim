@@ -20,7 +20,7 @@ class JKQStandaloneHybridSimulatorTest(unittest.TestCase):
         result = sim.simulate(2048)
         self.assertEqual(len(result.keys()), 16)
 
-    def test_standalone_with_seed_amplitude_mode(self):
+    def test_standalone_amplitude_mode_with_seed(self):
         sim = ddsim.HybridCircuitSimulator(self.circuit, seed=1337, mode=ddsim.HybridMode.amplitude)
         result = sim.simulate(2048)
         self.assertEqual(len(result.keys()), 16)
@@ -30,7 +30,7 @@ class JKQStandaloneHybridSimulatorTest(unittest.TestCase):
         result = sim.simulate(2048)
         self.assertEqual(len(result.keys()), 16)
 
-    def test_standalone_with_seed_dd_mode(self):
+    def test_standalone_dd_mode_with_seed(self):
         sim = ddsim.HybridCircuitSimulator(self.circuit, seed=1337, mode=ddsim.HybridMode.DD)
         result = sim.simulate(2048)
         self.assertEqual(len(result.keys()), 16)
