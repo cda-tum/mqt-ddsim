@@ -5,8 +5,8 @@ from jkq.ddsim.qasmsimulator import QasmSimulator
 from qiskit import execute
 
 
-class TestQasmSimulatorJKQBasic(unittest.TestCase):
-    """Runs the Basic qasm_simulator tests from Terra on JKU."""
+class JKQQasmSimulatorTest(unittest.TestCase):
+    """Runs backend checks and the Basic qasm_simulator tests from Qiskit Terra."""
 
     def setUp(self):
         self.backend = QasmSimulator()

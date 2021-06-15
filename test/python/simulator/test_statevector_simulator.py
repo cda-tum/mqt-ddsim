@@ -5,7 +5,7 @@ from qiskit import execute
 from jkq.ddsim.statevectorsimulator import StatevectorSimulator
 
 
-class JKQSnapshotTest(unittest.TestCase):
+class JKQStatevectorSimulatorTest(unittest.TestCase):
     def setUp(self):
         self.backend = StatevectorSimulator()
         qr = QuantumRegister(2)

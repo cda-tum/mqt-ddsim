@@ -6,7 +6,7 @@ from qiskit import execute
 from jkq.ddsim import HybridMode
 
 
-class TestHybridQasmSimulator(unittest.TestCase):
+class JKQHybridQasmSimulatorTest(unittest.TestCase):
     """Runs backend checks, the Basic qasm_simulator tests from Qiskit Terra, and some additional tests for the Hybrid JKQ QasmSimulator."""
 
     def setUp(self):
