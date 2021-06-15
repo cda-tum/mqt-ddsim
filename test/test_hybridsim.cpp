@@ -125,6 +125,7 @@ TEST(HybridSimTest, NonStandardOperation) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(1);
     quantumComputation->emplace_back<qc::StandardOperation>(1, 0, qc::H);
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, 0, 0);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, 0, qc::Barrier);
     quantumComputation->emplace_back<qc::StandardOperation>(1, 0, qc::H);
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, 0, 0);
 
