@@ -1,16 +1,15 @@
 import unittest
 
 from qiskit import QuantumCircuit, BasicAer
-from jkq.ddsim.hybridqasmsimulator import HybridQasmSimulator
+from jkq.ddsim.qasmsimulator import QasmSimulator
 from qiskit import execute
-from jkq.ddsim import HybridMode
 
 
 class TestQasmSimulatorJKQBasic(unittest.TestCase):
     """Runs the Basic qasm_simulator tests from Terra on JKU."""
 
     def setUp(self):
-        self.backend = HybridQasmSimulator()
+        self.backend = QasmSimulator()
         self.circuit = QuantumCircuit.from_qasm_str('''OPENQASM 2.0;
             include "qelib1.inc";
             qreg q[3];
@@ -23,6 +22,21 @@ class TestQasmSimulatorJKQBasic(unittest.TestCase):
             measure q->c;
             measure r->d;''')
         self.circuit.name = 'test'
+
+    def test_configuration(self):
+        """Test backend.configuration()."""
+        configuration = self.backend.configuration()
+        return configuration
+
+    def test_properties(self):
+        """Test backend.properties()."""
+        properties = self.backend.properties()
+        self.assertEqual(properties, None)
+
+    def test_status(self):
+        """Test backend.status()."""
+        status = self.backend.status()
+        return status
 
     def test_qasm_simulator_single_shot(self):
         """Test single shot run."""

@@ -5,13 +5,30 @@ from qiskit import execute
 from jkq.ddsim.hybridstatevectorsimulator import HybridStatevectorSimulator
 
 
-class JKQHybridSnapshotTest(unittest.TestCase):
+class JKQHybridStatevectorSimulatorTest(unittest.TestCase):
+    """Runs backend checks and some very basic functionality tests"""
+
     def setUp(self):
         self.backend = HybridStatevectorSimulator()
         qr = QuantumRegister(2)
         self.q_circuit = QuantumCircuit(qr)
         self.q_circuit.h(qr[0])
         self.q_circuit.cx(qr[0], qr[1])
+
+    def test_configuration(self):
+        """Test backend.configuration()."""
+        configuration = self.backend.configuration()
+        return configuration
+
+    def test_properties(self):
+        """Test backend.properties()."""
+        properties = self.backend.properties()
+        self.assertEqual(properties, None)
+
+    def test_status(self):
+        """Test backend.status()."""
+        status = self.backend.status()
+        return status
 
     def test_statevector_output(self):
         """Test final state vector for single circuit run."""

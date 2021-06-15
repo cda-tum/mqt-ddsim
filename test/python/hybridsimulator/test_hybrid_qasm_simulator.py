@@ -1,15 +1,16 @@
 import unittest
 
-from qiskit import QuantumCircuit, BasicAer
-from jkq.ddsim.qasmsimulator import QasmSimulator
+from qiskit import QuantumCircuit, BasicAer, QuantumRegister
+from jkq.ddsim.hybridqasmsimulator import HybridQasmSimulator
 from qiskit import execute
+from jkq.ddsim import HybridMode
 
 
-class TestQasmSimulatorJKQBasic(unittest.TestCase):
-    """Runs the Basic qasm_simulator tests from Terra on JKU."""
+class TestHybridQasmSimulator(unittest.TestCase):
+    """Runs backend checks, the Basic qasm_simulator tests from Qiskit Terra, and some additional tests for the Hybrid JKQ QasmSimulator."""
 
     def setUp(self):
-        self.backend = QasmSimulator()
+        self.backend = HybridQasmSimulator()
         self.circuit = QuantumCircuit.from_qasm_str('''OPENQASM 2.0;
             include "qelib1.inc";
             qreg q[3];
@@ -22,6 +23,21 @@ class TestQasmSimulatorJKQBasic(unittest.TestCase):
             measure q->c;
             measure r->d;''')
         self.circuit.name = 'test'
+
+    def test_configuration(self):
+        """Test backend.configuration()."""
+        configuration = self.backend.configuration()
+        return configuration
+
+    def test_properties(self):
+        """Test backend.properties()."""
+        properties = self.backend.properties()
+        self.assertEqual(properties, None)
+
+    def test_status(self):
+        """Test backend.status()."""
+        status = self.backend.status()
+        return status
 
     def test_qasm_simulator_single_shot(self):
         """Test single shot run."""
@@ -59,3 +75,31 @@ class TestQasmSimulatorJKQBasic(unittest.TestCase):
         for key in target.keys():
             self.assertIn(key, counts)
             self.assertLess(abs(target[key] - counts[key]), threshold)
+
+    def test_dd_mode_simulation(self):
+        """Test running a single circuit."""
+        q = QuantumRegister(4)
+        circ = QuantumCircuit(q)
+        circ.h(q)
+        circ.cz(3, 1)
+        circ.cz(2, 0)
+        circ.measure_all(inplace=True)
+        print(circ.draw(fold=-1))
+        self.circuit = circ
+        result = execute(self.circuit, self.backend, mode=HybridMode.DD).result()
+        self.assertEqual(result.success, True)
+        return result
+
+    def test_amplitude_mode_simulation(self):
+        """Test running a single circuit."""
+        q = QuantumRegister(4)
+        circ = QuantumCircuit(q)
+        circ.h(q)
+        circ.cz(3, 1)
+        circ.cz(2, 0)
+        circ.measure_all(inplace=True)
+        print(circ.draw(fold=-1))
+        self.circuit = circ
+        result = execute(self.circuit, self.backend, mode=HybridMode.amplitude).result()
+        self.assertEqual(result.success, True)
+        return result
