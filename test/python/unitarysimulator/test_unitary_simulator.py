@@ -1,8 +1,10 @@
 import unittest
 
-from qiskit import QuantumCircuit, QuantumRegister
+from qiskit import QuantumCircuit
 from jkq.ddsim.unitarysimulator import UnitarySimulator
 from qiskit import execute
+
+import numpy as np
 
 
 class JKQUnitarySimulatorTest(unittest.TestCase):
@@ -35,10 +37,12 @@ class JKQUnitarySimulatorTest(unittest.TestCase):
         result = execute(self.circuit, self.backend, mode='sequential').result()
         self.assertEqual(result.success, True)
         print(result.get_unitary('test'))
+        self.assertEqual(np.count_nonzero(result.get_unitary('test')), 16)
         return result
 
     def test_unitary_simulator_recursive_mode(self):
         result = execute(self.circuit, self.backend, mode='recursive').result()
         self.assertEqual(result.success, True)
         print(result.data('test'))
+        self.assertEqual(np.count_nonzero(result.get_unitary('test')), 16)
         return result

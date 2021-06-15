@@ -22,7 +22,7 @@ class JKQStandaloneUnitarySimulatorTests(unittest.TestCase):
 
         ddsim.get_matrix(sim, self.unitary)
         print(self.unitary)
-        self.assertEqual()
+        self.assertEqual(np.count_nonzero(self.unitary), 16)
 
     def test_standalone_sequential_mode_with_seed(self):
         sim = ddsim.UnitarySimulator(self.circuit, 1337, mode=ddsim.ConstructionMode.sequential)
@@ -30,6 +30,7 @@ class JKQStandaloneUnitarySimulatorTests(unittest.TestCase):
 
         ddsim.get_matrix(sim, self.unitary)
         print(self.unitary)
+        self.assertEqual(np.count_nonzero(self.unitary), 16)
 
     def test_standalone_recursive_mode(self):
         sim = ddsim.UnitarySimulator(self.circuit, mode=ddsim.ConstructionMode.recursive)
@@ -37,6 +38,7 @@ class JKQStandaloneUnitarySimulatorTests(unittest.TestCase):
 
         ddsim.get_matrix(sim, self.unitary)
         print(self.unitary)
+        self.assertEqual(np.count_nonzero(self.unitary), 16)
 
     def test_standalone_recursive_mode_with_seed(self):
         sim = ddsim.UnitarySimulator(self.circuit, 1337, mode=ddsim.ConstructionMode.recursive)
@@ -44,3 +46,4 @@ class JKQStandaloneUnitarySimulatorTests(unittest.TestCase):
 
         ddsim.get_matrix(sim, self.unitary)
         print(self.unitary)
+        self.assertEqual(np.count_nonzero(self.unitary), 16)
