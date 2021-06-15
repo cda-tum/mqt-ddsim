@@ -7,6 +7,7 @@
 #include "dd/Export.hpp"
 #include "dd/Package.hpp"
 
+#include <chrono>
 #include <cmath>
 #include <complex>
 #include <memory>
