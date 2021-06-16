@@ -126,7 +126,12 @@ class HybridQasmSimulator(BackendV1):
             raise JKQSimulatorError('Simulation mode', mode, 'not supported by JKQ hybrid simulator. Available modes are \'amplitude\' and \'dd\'')
 
         sim = ddsim.HybridCircuitSimulator(qobj_experiment, seed, hybrid_mode, nthreads)
+
         shots = options['shots']
+        if self.SHOW_STATE_VECTOR and shots > 0:
+            logger.info('Statevector can only be shown if shots == 0 when using the amplitude hybrid simulation mode. Setting shots=1.')
+            shots = 0
+
         counts = sim.simulate(shots)
         end_time = time.time()
         counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
@@ -146,8 +151,6 @@ class HybridQasmSimulator(BackendV1):
             if sim.get_mode() == ddsim.HybridMode.DD:
                 result['data']['statevector'] = sim.get_vector()
             else:
-                if options['shots'] > 0:
-                    raise JKQSimulatorError('Statevector can only be shown if shots == 0 when using the amplitude hybrid simulation mode.')
                 result['data']['statevector'] = sim.get_final_amplitudes()
 
         return result

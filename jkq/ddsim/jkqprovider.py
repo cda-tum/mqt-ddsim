@@ -5,7 +5,7 @@ from .qasmsimulator import QasmSimulator
 from .statevectorsimulator import StatevectorSimulator
 from .hybridqasmsimulator import HybridQasmSimulator
 from .hybridstatevectorsimulator import HybridStatevectorSimulator
-
+from .unitarysimulator import UnitarySimulator
 
 class JKQProvider(Provider):
     _BACKENDS = None
@@ -17,6 +17,7 @@ class JKQProvider(Provider):
                 ('statevector_simulator', StatevectorSimulator, None, None),
                 ('hybrid_qasm_simulator', HybridQasmSimulator, None, None),
                 ('hybrid_statevector_simulator', HybridStatevectorSimulator, None, None),
+                ('unitary_simulator', UnitarySimulator, None, None)
             ]
 
     def get_backend(self, name=None, **kwargs):
