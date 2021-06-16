@@ -111,7 +111,7 @@ class HybridQasmSimulator(BackendV1):
         start_time = time.time()
         seed = options.get('seed', -1)
         mode = options.get('mode', 'amplitude')
-        nthreads = int(options.get('nthreads', local_hardware_info()['memory']))
+        nthreads = int(options.get('nthreads', local_hardware_info()['cpus']))
         if mode == 'amplitude':
             hybrid_mode = ddsim.HybridMode.amplitude
             max_qubits = int(log2(local_hardware_info()['memory'] * (1024 ** 3) / 16))
