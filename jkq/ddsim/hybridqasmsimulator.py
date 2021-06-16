@@ -34,7 +34,7 @@ class HybridQasmSimulator(BackendV1):
             parameter_binds=None,
             simulator_seed=None,
             mode="amplitude",
-            nthreads=local_hardware_info()['memory']
+            nthreads=local_hardware_info()['cpus']
         )
 
     def __init__(self, configuration=None, provider=None):
@@ -129,7 +129,7 @@ class HybridQasmSimulator(BackendV1):
 
         shots = options['shots']
         if self.SHOW_STATE_VECTOR and shots > 0:
-            logger.info('Statevector can only be shown if shots == 0 when using the amplitude hybrid simulation mode. Setting shots=1.')
+            logger.info('Statevector can only be shown if shots == 0 when using the amplitude hybrid simulation mode. Setting shots=0.')
             shots = 0
 
         counts = sim.simulate(shots)

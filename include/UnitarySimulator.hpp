@@ -4,12 +4,8 @@
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
 #include "QuantumComputation.hpp"
-#include "dd/Export.hpp"
 #include "dd/Package.hpp"
 
-#include <chrono>
-#include <cmath>
-#include <complex>
 #include <memory>
 
 class UnitarySimulator: public CircuitSimulator {
