@@ -27,38 +27,35 @@ logger = logging.getLogger(__name__)
 class UnitarySimulator(BackendV1):
     """Decision diagram-based unitary simulator."""
 
-    MAX_QUBITS_MEMORY = int(log2(sqrt(local_hardware_info()['memory'] * (1024 ** 3) / 16)))
-
-    DEFAULT_CONFIGURATION = {
-        'backend_name': 'unitary_simulator',
-        'backend_version': ddsim.__version__,
-        'n_qubits': min(24, MAX_QUBITS_MEMORY),
-        'url': 'https://github.com/iic-jku/ddsim',
-        'simulator': True,
-        'local': True,
-        'conditional': False,
-        'open_pulse': False,
-        'memory': False,
-        'max_shots': 1000000000,
-        'coupling_map': None,
-        'description': 'JKQ DDSIM C++ Unitary Simulator',
-        'basis_gates': ['id', 'u0', 'u1', 'u2', 'u3', 'cu3',
-                        'x', 'cx', 'ccx', 'mcx_gray', 'mcx_recursive', 'mcx_vchain',
-                        'y', 'cy',
-                        'z', 'cz',
-                        'h', 'ch',
-                        's', 'sdg', 't', 'tdg',
-                        'rx', 'crx', 'mcrx',
-                        'ry', 'cry', 'mcry',
-                        'rz', 'crz', 'mcrz',
-                        'p', 'cp', 'cu1', 'mcphase',
-                        'sx', 'csx', 'sxdg',
-                        'swap', 'cswap', 'iswap'],
-        'gates': []
-    }
-
     def __init__(self, configuration=None, provider=None, **fields):
-        super().__init__(configuration=(configuration or QasmBackendConfiguration.from_dict(self.DEFAULT_CONFIGURATION)), provider=provider, **fields)
+        conf = {
+            'backend_name': 'unitary_simulator',
+            'backend_version': ddsim.__version__,
+            'n_qubits': min(24, int(log2(sqrt(local_hardware_info()['memory'] * (1024 ** 3) / 16)))),
+            'url': 'https://github.com/iic-jku/ddsim',
+            'simulator': True,
+            'local': True,
+            'conditional': False,
+            'open_pulse': False,
+            'memory': False,
+            'max_shots': 1000000000,
+            'coupling_map': None,
+            'description': 'JKQ DDSIM C++ Unitary Simulator',
+            'basis_gates': ['id', 'u0', 'u1', 'u2', 'u3', 'cu3',
+                            'x', 'cx', 'ccx', 'mcx_gray', 'mcx_recursive', 'mcx_vchain',
+                            'y', 'cy',
+                            'z', 'cz',
+                            'h', 'ch',
+                            's', 'sdg', 't', 'tdg',
+                            'rx', 'crx', 'mcrx',
+                            'ry', 'cry', 'mcry',
+                            'rz', 'crz', 'mcrz',
+                            'p', 'cp', 'cu1', 'mcphase',
+                            'sx', 'csx', 'sxdg',
+                            'swap', 'cswap', 'iswap'],
+            'gates': []
+        }
+        super().__init__(configuration=(configuration or QasmBackendConfiguration.from_dict(conf)), provider=provider, **fields)
 
     @classmethod
     def _default_options(cls):
