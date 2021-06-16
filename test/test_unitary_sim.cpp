@@ -15,6 +15,11 @@ TEST(UnitarySimTest, ConstructSimpleCircuitSequential) {
     const auto& e = ddsim.getConstructedDD();
     EXPECT_TRUE(e.p->e[0].p->ident);
     EXPECT_TRUE(e.p->e[1].p->ident);
+    auto finalNodes = ddsim.getFinalNodeCount();
+    EXPECT_EQ(finalNodes, 6);
+    auto maxNodes         = ddsim.getMaxNodeCount();
+    auto constructionTime = ddsim.getConstructionTime();
+    std::cout << "Construction took " << constructionTime << "s, requiring a maximum of " << maxNodes << " nodes" << std::endl;
 }
 
 TEST(UnitarySimTest, ConstructSimpleCircuitRecursive) {
@@ -27,6 +32,11 @@ TEST(UnitarySimTest, ConstructSimpleCircuitRecursive) {
     const auto& e = ddsim.getConstructedDD();
     EXPECT_TRUE(e.p->e[0].p->ident);
     EXPECT_TRUE(e.p->e[1].p->ident);
+    auto finalNodes = ddsim.getFinalNodeCount();
+    EXPECT_EQ(finalNodes, 6);
+    auto maxNodes         = ddsim.getMaxNodeCount();
+    auto constructionTime = ddsim.getConstructionTime();
+    std::cout << "Construction took " << constructionTime << "s, requiring a maximum of " << maxNodes << " nodes" << std::endl;
 }
 
 TEST(UnitarySimTest, ConstructSimpleCircuitRecursiveWithSeed) {
