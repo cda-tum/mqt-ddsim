@@ -1,8 +1,10 @@
 """Backend for DDSIM Hybrid Schrodinger-Feynman Simulator."""
 
 import logging
+from math import log2
 
 from qiskit.providers.models import BackendConfiguration
+from qiskit.utils.multiprocessing import local_hardware_info
 
 from jkq import ddsim
 from jkq.ddsim.hybridqasmsimulator import HybridQasmSimulator
@@ -37,7 +39,7 @@ class HybridStatevectorSimulator(HybridQasmSimulator):
                             # 'swap', 'cswap', 'iswap',
                             'snapshot'],
             'memory': False,
-            'n_qubits': 64,
+            'n_qubits': int(log2(local_hardware_info()['memory'] * (1024 ** 3) / 16)),
             'coupling_map': None,
             'conditional': False,
             'max_shots': 1000000000,

@@ -3,6 +3,7 @@
 import logging
 import time
 import uuid
+from math import log2
 import warnings
 from typing import Union, List
 
@@ -12,6 +13,7 @@ from qiskit.providers.models import BackendConfiguration, BackendStatus
 from qiskit.qobj import QasmQobjExperiment, Qobj, QasmQobj, PulseQobj
 from qiskit.result import Result
 from qiskit.compiler import assemble
+from qiskit.utils.multiprocessing import local_hardware_info
 
 from .jkqjob import JKQJob
 from .jkqerror import JKQSimulatorError
@@ -32,7 +34,7 @@ class HybridQasmSimulator(BackendV1):
             parameter_binds=None,
             simulator_seed=None,
             mode="amplitude",
-            nthreads=2
+            nthreads=local_hardware_info()['memory']
         )
 
     def __init__(self, configuration=None, provider=None):
@@ -57,7 +59,7 @@ class HybridQasmSimulator(BackendV1):
                             # 'swap', 'cswap', 'iswap',
                             'snapshot'],
             'memory': False,
-            'n_qubits': 64,
+            'n_qubits': 128,
             'coupling_map': None,
             'conditional': False,
             'max_shots': 1000000000,
@@ -109,14 +111,20 @@ class HybridQasmSimulator(BackendV1):
         start_time = time.time()
         seed = options.get('seed', -1)
         mode = options.get('mode', 'amplitude')
+        nthreads = int(options.get('nthreads', local_hardware_info()['memory']))
         if mode == 'amplitude':
             hybrid_mode = ddsim.HybridMode.amplitude
+            max_qubits = int(log2(local_hardware_info()['memory'] * (1024 ** 3) / 16))
+            algorithm_qubits = qobj_experiment.header.n_qubits
+            if algorithm_qubits > max_qubits:
+                raise JKQSimulatorError('Not enough memory available to simulate the circuit even on a single thread')
+            qubit_diff = max_qubits - algorithm_qubits
+            nthreads = int(min(2 ** qubit_diff, nthreads))
         elif mode == 'dd':
             hybrid_mode = ddsim.HybridMode.DD
         else:
             raise JKQSimulatorError('Simulation mode', mode, 'not supported by JKQ hybrid simulator. Available modes are \'amplitude\' and \'dd\'')
 
-        nthreads = options.get('nthreads', 2)
         sim = ddsim.HybridCircuitSimulator(qobj_experiment, seed, hybrid_mode, nthreads)
         shots = options['shots']
         counts = sim.simulate(shots)
