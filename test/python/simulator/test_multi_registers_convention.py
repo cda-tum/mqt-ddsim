@@ -6,7 +6,7 @@ from jkq.ddsim.statevectorsimulator import StatevectorSimulator
 import unittest
 
 
-class TestCircuitMultiRegs(unittest.TestCase):
+class CircuitMultiRegsTest(unittest.TestCase):
     """QuantumCircuit Qasm tests."""
 
     def test_circuit_multi(self):

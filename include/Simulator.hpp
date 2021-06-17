@@ -44,7 +44,7 @@ public:
 
     char MeasureOneCollapsing(dd::Qubit index, bool assume_probability_normalization = true);
 
-    std::map<std::string, std::size_t> SampleFromAmplitudeVectorInPlace(std::vector<dd::ComplexValue>& amplitudes, unsigned int shots);
+    std::map<std::string, std::size_t> SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, unsigned int shots);
 
     [[nodiscard]] std::vector<dd::ComplexValue> getVector() const;
 
@@ -54,7 +54,7 @@ public:
 
     [[nodiscard]] std::size_t getActiveNodeCount() const { return dd->vUniqueTable.getActiveNodeCount(); }
 
-    [[nodiscard]] std::size_t getMaxNodeCount() const { return dd->vUniqueTable.getMaxActiveNodes(); }
+    [[nodiscard]] virtual std::size_t getMaxNodeCount() const { return dd->vUniqueTable.getMaxActiveNodes(); }
 
     [[nodiscard]] std::size_t countNodesFromRoot() const { return dd->size(root_edge); }
 

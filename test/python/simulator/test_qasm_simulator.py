@@ -5,8 +5,8 @@ from jkq.ddsim.qasmsimulator import QasmSimulator
 from qiskit import execute
 
 
-class TestQasmSimulatorJKQBasic(unittest.TestCase):
-    """Runs the Basic qasm_simulator tests from Terra on JKU."""
+class JKQQasmSimulatorTest(unittest.TestCase):
+    """Runs backend checks and the Basic qasm_simulator tests from Qiskit Terra."""
 
     def setUp(self):
         self.backend = QasmSimulator()
@@ -22,6 +22,21 @@ class TestQasmSimulatorJKQBasic(unittest.TestCase):
             measure q->c;
             measure r->d;''')
         self.circuit.name = 'test'
+
+    def test_configuration(self):
+        """Test backend.configuration()."""
+        configuration = self.backend.configuration()
+        return configuration
+
+    def test_properties(self):
+        """Test backend.properties()."""
+        properties = self.backend.properties()
+        self.assertEqual(properties, None)
+
+    def test_status(self):
+        """Test backend.status()."""
+        status = self.backend.status()
+        return status
 
     def test_qasm_simulator_single_shot(self):
         """Test single shot run."""

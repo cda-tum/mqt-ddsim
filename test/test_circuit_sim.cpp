@@ -13,6 +13,8 @@ TEST(CircuitSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
 
     ddsim.Simulate(1);
 
+    EXPECT_EQ(ddsim.getMaxNodeCount(), 4);
+
     auto m = ddsim.MeasureAll(false);
 
     ASSERT_EQ("01", m);
