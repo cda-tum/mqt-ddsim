@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
         ("confidence", po::value<double>()->default_value(0.05), "Confidence in the error bound of the stochastic simulation (default= 0.05)")
         ("error_bound", po::value<double>()->default_value(0.1), "Error bound of the stochastic simulation (default=0.1)")
         ("stoch_runs", po::value<long>()->default_value(0), "Number of stochastic runs. When the value is 0 the value is calculated using the confidence, error_bound and number of tracked properties. When the value is -1, the determinstic simulator is started (default = 0)")
-        ("properties", po::value<std::string>()->default_value("-1-1000"), R"(Comma separated list of tracked properties. Note that -1 is the fidelity and "-" can be used to specify a range.  (default="-3-1000"))")
+        ("properties", po::value<std::string>()->default_value("-3-1000"), R"(Comma separated list of tracked properties. Note that -1 is the fidelity and "-" can be used to specify a range.  (default="-3-1000"))")
     ;
     // clang-format on
     po::variables_map vm;
@@ -66,11 +66,10 @@ int main(int argc, char** argv) {
     }
 
     if (vm["stoch_runs"].as<long>() >= 0) {
-        std::unique_ptr<StochasticNoiseSimulator> ddsim{nullptr};
-        ddsim = std::make_unique<StochasticNoiseSimulator>(quantumComputation,
-                                                           vm["steps"].as<unsigned int>(),
-                                                           vm["step_fidelity"].as<double>(),
-                                                           seed);
+        std::unique_ptr<StochasticNoiseSimulator> ddsim = std::make_unique<StochasticNoiseSimulator>(quantumComputation,
+                                                                                                     vm["steps"].as<unsigned int>(),
+                                                                                                     vm["step_fidelity"].as<double>(),
+                                                                                                     seed);
 
         ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>());
         ddsim->setAmplitudeDampingProbability(vm["noise_prob"].as<double>());
@@ -111,13 +110,11 @@ int main(int argc, char** argv) {
         }
         std::cout << std::setw(2) << output_obj << std::endl;
     } else if (vm["stoch_runs"].as<long>() < 0) {
-        std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
-        ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, seed);
+        std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, seed);
 
-        if (vm["stoch_runs"].as<long>() == -2){
+        if (vm["stoch_runs"].as<long>() == -2) {
             ddsim->weird_value_i_dont_understand_but_something_with_sequential = true;
         }
-
 
         ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>());
         ddsim->setAmplitudeDampingProbability(vm["noise_prob"].as<double>());

@@ -86,7 +86,7 @@ private:
         dd::Package::mNode *   a, *r; // a is the argument, r is the result
         dd::ComplexValue       aw, rw;
         dd::NoiseOperationKind which; // type of operation
-        short                  line[std::numeric_limits<dd::Qubit>::max() + 1];
+        signed char            usedQubits[std::numeric_limits<dd::Qubit>::max() + 1];
     };
 
     std::unique_ptr<qc::QuantumComputation>& qc;
@@ -110,11 +110,11 @@ private:
 
     dd::Package::mEdge makeZeroDensityOperator(dd::QubitCount n);
 
-    dd::Package::mEdge ApplyNoiseEffects(dd::Package::mEdge density_op, const std::unique_ptr<qc::Operation>& op, unsigned char maxDepth);
-    unsigned long      noiseHash(dd::Package::mNode* a, const dd::ComplexValue& aw, const short* line, unsigned short nQubits);
-    dd::Package::mEdge noiseLookup(const dd::Package::mEdge& a, const short* line, unsigned short nQubits);
-    void               noiseInsert(const dd::Package::mEdge& a, const short* line, const dd::Package::mEdge& r, unsigned short nQubits);
-    dd::fp             probForIndexToBeZero(dd::Package::mEdge e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob);
+    dd::Package::mEdge   ApplyNoiseEffects(dd::Package::mEdge density_op, const std::unique_ptr<qc::Operation>& op, unsigned char maxDepth);
+    static unsigned long noiseHash(dd::Package::mNode* a, const dd::ComplexValue& aw, const std::vector<signed char>& usedQubits);
+    dd::Package::mEdge   noiseLookup(const dd::Package::mEdge& a, const std::vector<signed char>& usedQubits);
+    void                 noiseInsert(const dd::Package::mEdge& a, const std::vector<signed char>& usedQubits, const dd::Package::mEdge& r);
+    dd::fp               probForIndexToBeZero(dd::Package::mEdge e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob);
 };
 
 #endif //DDSIM_DETERMINISTICNOISESIMULATOR_HPP

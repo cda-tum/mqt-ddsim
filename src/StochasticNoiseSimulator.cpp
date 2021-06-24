@@ -345,7 +345,6 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                 } else {
                     throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
                 }
-                localDD->garbageCollect(false);
             } else {
                 dd::Package::mEdge dd_op{};
                 qc::Targets        targets;
@@ -382,8 +381,8 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                     ApproximateEdgeByFidelity(localDD, local_root_edge, step_fidelity, false, true);
                     approx_count++;
                 }
-                //localDD->garbageCollect(false);
             }
+            localDD->garbageCollect(false);
             op_count++;
         }
         localDD->decRef(local_root_edge);
@@ -415,8 +414,12 @@ void StochasticNoiseSimulator::applyNoiseOperation(const qc::Targets&           
                                                    std::mt19937_64&                        generator,
                                                    std::uniform_real_distribution<dd::fp>& dist,
                                                    dd::Package::mEdge                      identityDD) {
-    // TODO: Is this a meaningful way to handle multi-target operations?
-    for (auto& target: targets) {
+    std::vector used_qubits = targets;
+    for (auto control: control_qubits) {
+        used_qubits.push_back(control.qubit);
+    }
+
+    for (auto& target: used_qubits) {
         auto operation = generateNoiseOperation(false, target, generator, dist, dd_op, localDD);
         auto tmp       = localDD->multiply(operation, local_root_edge);
 
@@ -431,21 +434,9 @@ void StochasticNoiseSimulator::applyNoiseOperation(const qc::Targets&           
         localDD->incRef(tmp);
         localDD->decRef(local_root_edge);
         local_root_edge = tmp;
-    }
-    // Apply noise to control qubits
-    for (auto control: control_qubits) {
-        auto operation = generateNoiseOperation(false, control.qubit, generator, dist, identityDD, localDD);
-        auto tmp       = localDD->multiply(operation, local_root_edge);
-        if (dd::ComplexNumbers::mag2(tmp.w) < dist(generator)) {
-            operation = generateNoiseOperation(true, control.qubit, generator, dist, identityDD, localDD);
-            tmp       = localDD->multiply(operation, local_root_edge);
-        }
-        if (tmp.w != dd::Complex::one) {
-            tmp.w = dd::Complex::one;
-        }
-        localDD->incRef(tmp);
-        localDD->decRef(local_root_edge);
-        local_root_edge = tmp;
+
+        // I only need to apply the operations once
+        dd_op = identityDD;
     }
 }
 
