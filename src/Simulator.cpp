@@ -86,13 +86,13 @@ void Simulator::NextPath(std::string& s) {
         s.insert(0, "1");
 }
 
-double Simulator::ApproximateByFidelity(double targetFidelity, bool allLevels, bool removeNodes, bool verbose) {
+double Simulator::ApproximateByFidelity(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose) {
     std::queue<dd::Package::vNode*>       q;
     std::map<dd::Package::vNode*, dd::fp> probsMone;
 
-    probsMone[root_edge.p] = CN::mag2(root_edge.w);
+    probsMone[edge.p] = CN::mag2(edge.w);
 
-    q.push(root_edge.p);
+    q.push(edge.p);
 
     while (!q.empty()) {
         dd::Package::vNode* ptr = q.front();
@@ -116,9 +116,9 @@ double Simulator::ApproximateByFidelity(double targetFidelity, bool allLevels, b
         }
     }
 
-    std::vector<int>                                                                                                              nodes(getNumberOfQubits(), 0);
-    std::vector<std::priority_queue<std::pair<double, dd::Package::vNode*>, std::vector<std::pair<double, dd::Package::vNode*>>>> qq(
-            getNumberOfQubits());
+    std::vector<int> nodes(getNumberOfQubits(), 0);
+
+    std::vector<std::priority_queue<std::pair<double, dd::Package::vNode*>, std::vector<std::pair<double, dd::Package::vNode*>>>> qq(getNumberOfQubits());
 
     for (auto& it: probsMone) {
         if (it.first->v < 0) {
@@ -163,21 +163,21 @@ double Simulator::ApproximateByFidelity(double targetFidelity, bool allLevels, b
         dag_edges[it] = dd::Package::vEdge::zero;
     }
 
-    dd::Package::vEdge newEdge = RemoveNodes(root_edge, dag_edges);
-    assert(!std::isnan(dd::CTEntry::val(root_edge.w.r)));
-    assert(!std::isnan(dd::CTEntry::val(root_edge.w.i)));
-    dd::Complex c = dd->cn.getCached(std::sqrt(CN::mag2(newEdge.w)), 0);
+    dd::Package::vEdge newEdge = RemoveNodes(localDD, edge, dag_edges);
+    assert(!std::isnan(dd::CTEntry::val(edge.w.r)));
+    assert(!std::isnan(dd::CTEntry::val(edge.w.i)));
+    dd::Complex c = localDD->cn.getCached(std::sqrt(CN::mag2(newEdge.w)), 0);
     CN::div(c, newEdge.w, c);
-    newEdge.w = dd->cn.lookup(c);
+    newEdge.w = localDD->cn.lookup(c);
 
     dd::fp fidelity = 0;
-    if (root_edge.p->v == newEdge.p->v) {
-        fidelity = dd->fidelity(root_edge, newEdge);
+    if (edge.p->v == newEdge.p->v) {
+        fidelity = localDD->fidelity(edge, newEdge);
     }
 
     if (verbose) {
-        const unsigned size_before = dd->size(root_edge);
-        const unsigned size_after  = dd->size(newEdge);
+        const unsigned size_before = localDD->size(edge);
+        const unsigned size_after  = localDD->size(newEdge);
         std::cout
                 << getName() << ","
                 << +getNumberOfQubits() << "," // unary plus for int promotion
@@ -193,22 +193,22 @@ double Simulator::ApproximateByFidelity(double targetFidelity, bool allLevels, b
     }
 
     if (removeNodes) {
-        dd->decRef(root_edge);
-        dd->incRef(newEdge);
-        root_edge = newEdge;
+        localDD->decRef(edge);
+        localDD->incRef(newEdge);
+        edge = newEdge;
     }
     return fidelity;
 }
 
-double Simulator::ApproximateBySampling(unsigned int nSamples, unsigned int threshold, bool removeNodes, bool verbose) {
+double Simulator::ApproximateBySampling(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, std::size_t nSamples, std::size_t threshold, bool removeNodes, bool verbose) {
     assert(nSamples > threshold);
     std::map<dd::Package::vNode*, unsigned int> visited_nodes;
     std::uniform_real_distribution<dd::fp>      dist(0.0, 1.0L);
 
     for (unsigned int j = 0; j < nSamples; j++) {
-        dd::Edge cur = root_edge;
+        dd::Edge cur = edge;
 
-        for (dd::Qubit i = root_edge.p->v; i >= 0; --i) {
+        for (dd::Qubit i = edge.p->v; i >= 0; --i) {
             visited_nodes[cur.p]++;
 
             dd::fp p0 = CN::mag2(cur.p->e.at(0).w);
@@ -223,9 +223,9 @@ double Simulator::ApproximateBySampling(unsigned int nSamples, unsigned int thre
     }
 
     std::set<dd::Package::vNode*> visited_nodes2;
-    visited_nodes2.insert(root_edge.p);
+    visited_nodes2.insert(edge.p);
     std::queue<dd::Package::vNode*> q;
-    q.push(root_edge.p);
+    q.push(edge.p);
 
     while (!q.empty()) {
         dd::Package::vNode* ptr = q.front();
@@ -253,19 +253,19 @@ double Simulator::ApproximateBySampling(unsigned int nSamples, unsigned int thre
         dag_edges[it] = dd::Package::vEdge::zero;
     }
 
-    dd::Package::vEdge newEdge = RemoveNodes(root_edge, dag_edges);
-    dd::Complex        c       = dd->cn.getCached(std::sqrt(CN::mag2(newEdge.w)), 0);
+    dd::Package::vEdge newEdge = RemoveNodes(localDD, edge, dag_edges);
+    dd::Complex        c       = localDD->cn.getCached(std::sqrt(CN::mag2(newEdge.w)), 0);
     CN::div(c, newEdge.w, c);
-    newEdge.w = dd->cn.lookup(c);
+    newEdge.w = localDD->cn.lookup(c);
 
     dd::fp fidelity = 0;
-    if (root_edge.p->v == newEdge.p->v) {
-        fidelity = dd->fidelity(root_edge, newEdge);
+    if (edge.p->v == newEdge.p->v) {
+        fidelity = localDD->fidelity(edge, newEdge);
     }
 
     if (verbose) {
-        const unsigned size_after  = dd->size(newEdge);
-        const unsigned size_before = dd->size(root_edge);
+        const unsigned size_after  = localDD->size(newEdge);
+        const unsigned size_before = localDD->size(edge);
         std::cout
                 << getName() << ","
                 << +getNumberOfQubits() << "," // unary plus for int promotion
@@ -281,17 +281,16 @@ double Simulator::ApproximateBySampling(unsigned int nSamples, unsigned int thre
     }
 
     if (removeNodes) {
-        dd->decRef(root_edge);
-        dd->incRef(newEdge);
-        root_edge = newEdge;
-        dd->garbageCollect();
+        localDD->decRef(edge);
+        localDD->incRef(newEdge);
+        edge = newEdge;
+        localDD->garbageCollect();
     }
 
     return fidelity;
 }
 
-dd::Package::vEdge
-Simulator::RemoveNodes(dd::Package::vEdge e, std::map<dd::Package::vNode*, dd::Package::vEdge>& dag_edges) {
+dd::Package::vEdge Simulator::RemoveNodes(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge e, std::map<dd::Package::vNode*, dd::Package::vEdge>& dag_edges) {
     if (e.isTerminal()) {
         return e;
     }
@@ -302,21 +301,21 @@ Simulator::RemoveNodes(dd::Package::vEdge e, std::map<dd::Package::vNode*, dd::P
         if (r.w.approximatelyZero()) {
             return dd::Package::vEdge::zero;
         }
-        dd::Complex c = dd->cn.getTemporary();
+        dd::Complex c = localDD->cn.getTemporary();
         dd::ComplexNumbers::mul(c, e.w, r.w);
-        r.w = dd->cn.lookup(c);
+        r.w = localDD->cn.lookup(c);
         return r;
     }
 
     std::array<dd::Package::vEdge, dd::RADIX> edges{
-            RemoveNodes(e.p->e.at(0), dag_edges),
-            RemoveNodes(e.p->e.at(1), dag_edges)};
+            RemoveNodes(localDD, e.p->e.at(0), dag_edges),
+            RemoveNodes(localDD, e.p->e.at(1), dag_edges)};
 
-    dd::Package::vEdge r = dd->makeDDNode(e.p->v, edges, false);
+    dd::Package::vEdge r = localDD->makeDDNode(e.p->v, edges, false);
     dag_edges[e.p]       = r;
-    dd::Complex c        = dd->cn.getCached();
+    dd::Complex c        = localDD->cn.getCached();
     CN::mul(c, e.w, r.w);
-    r.w = dd->cn.lookup(c);
+    r.w = localDD->cn.lookup(c);
     return r;
 }
 
@@ -354,21 +353,4 @@ std::pair<dd::ComplexValue, std::string> Simulator::getPathOfLeastResistance() c
 
     return {{dd::CTEntry::val(path_value.r), dd::CTEntry::val(path_value.i)},
             std::string{result.rbegin(), result.rend()}};
-}
-
-double Simulator::assign_probs(dd::Package::vEdge edge, std::unordered_map<dd::Package::vNode*, double>& probs) {
-    auto it = probs.find(edge.p);
-    if (it != probs.end()) {
-        return CN::mag2(edge.w) * it->second;
-    }
-    double sum;
-    if (edge.isTerminal()) {
-        sum = 1.0;
-    } else {
-        sum = assign_probs(edge.p->e.at(0), probs) + assign_probs(edge.p->e.at(1), probs);
-    }
-
-    probs.insert(std::pair<dd::Package::vNode*, double>(edge.p, sum));
-
-    return CN::mag2(edge.w) * sum;
 }
