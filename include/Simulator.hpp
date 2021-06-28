@@ -107,7 +107,7 @@ protected:
 
     static void NextPath(std::string& s);
 
-     /** DEPRECATED */
+    /** DEPRECATED */
     double assign_probs(dd::Package::vEdge edge, std::unordered_map<dd::Package::vNode*, double>& probs);
 };
 

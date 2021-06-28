@@ -9,7 +9,6 @@
 
 using CN = dd::ComplexNumbers;
 
-
 std::map<std::string, std::size_t> Simulator::SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, unsigned int shots) {
     // in-place prefix-sum calculation of probabilities
     std::inclusive_scan(
@@ -86,7 +85,6 @@ void Simulator::NextPath(std::string& s) {
     if (carry)
         s.insert(0, "1");
 }
-
 
 double Simulator::ApproximateByFidelity(double targetFidelity, bool allLevels, bool removeNodes, bool verbose) {
     std::queue<dd::Package::vNode*>       q;

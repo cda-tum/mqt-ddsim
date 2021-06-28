@@ -1,4 +1,5 @@
 #include "CircuitSimulator.hpp"
+
 #include "dd/Export.hpp"
 
 std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int shots) {
