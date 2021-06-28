@@ -158,9 +158,9 @@ std::pair<unsigned int, unsigned int> ShorSimulator::post_processing(const std::
     }
     for (unsigned int i = 0; i < 2 * required_bits; i++) {
         if (verbose) {
-            std::clog << sample[required_bits + i];
+            std::clog << sample.at(required_bits + i);
         }
-        res = (res << 1u) + (sample[required_bits + i] == '1');
+        res = (res << 1u) + (sample.at(required_bits + i) == '1');
     }
 
     if (verbose) {
