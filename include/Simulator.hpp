@@ -38,11 +38,22 @@ public:
 
     virtual std::map<std::string, std::string> AdditionalStatistics() { return {}; };
 
-    std::string MeasureAll(bool collapse = false);
+    std::string MeasureAll(bool collapse = false) {
+        return dd->measureAll(root_edge, collapse, mt, epsilon);
+    }
 
-    std::map<std::string, std::size_t> MeasureAllNonCollapsing(unsigned int shots);
+    std::map<std::string, std::size_t> MeasureAllNonCollapsing(unsigned int shots) {
+        std::map<std::string, std::size_t> results;
+        for (unsigned int i = 0; i < shots; i++) {
+            const auto m = MeasureAll(false);
+            results[m]++;
+        }
+        return results;
+    }
 
-    char MeasureOneCollapsing(dd::Qubit index, bool assume_probability_normalization = true);
+    char MeasureOneCollapsing(dd::Qubit index, bool assume_probability_normalization = true) {
+        return dd->measureOneCollapsing(root_edge, index, assume_probability_normalization, mt, epsilon);
+    }
 
     std::map<std::string, std::size_t> SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, unsigned int shots);
 
@@ -96,6 +107,7 @@ protected:
 
     static void NextPath(std::string& s);
 
+     /** DEPRECATED */
     double assign_probs(dd::Package::vEdge edge, std::unordered_map<dd::Package::vNode*, double>& probs);
 };
 

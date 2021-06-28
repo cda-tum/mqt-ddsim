@@ -1,4 +1,5 @@
 #include "CircuitSimulator.hpp"
+#include "dd/Export.hpp"
 
 std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int shots) {
     bool has_nonmeasurement_nonunitary = false;
@@ -139,7 +140,7 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
                     throw std::runtime_error("Dynamic cast to ClassicControlledOperation failed.");
                 }
             }
-            /*std::clog << "[INFO] op " << op_num << " is " << op->getName() << " on " << op->getTargets().at(0)
+            /*std::clog << "[INFO] op " << op_num << " is " << op->getName() << " on " << +op->getTargets().at(0)
                       << " #controls=" << op->getControls().size()
                       << " statesize=" << dd->size(root_edge) << "\n";//*/
 
