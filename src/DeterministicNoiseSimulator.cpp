@@ -6,8 +6,9 @@ using CN = dd::ComplexNumbers;
 
 dd::Package::mEdge DeterministicNoiseSimulator::makeZeroDensityOperator(dd::QubitCount n) {
     auto f = dd::Package::mEdge::one;
-    for (std::size_t p = 0; p < n; p++) {
-        f = dd->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, dd::Package::mEdge::zero, dd::Package::mEdge::zero, dd::Package::mEdge::zero});
+    assert((signed char)n == n);
+    for (dd::Qubit p = 0; p < (signed char)n; p++) {
+        f = dd->makeDDNode(p, std::array{f, dd::Package::mEdge::zero, dd::Package::mEdge::zero, dd::Package::mEdge::zero});
     }
     return f;
 }
