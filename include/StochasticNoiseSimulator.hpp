@@ -137,6 +137,7 @@ private:
     double ApproximateEdgeByFidelity(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes);
 
     dd::Package::vEdge RemoveNodesInPackage(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge e, std::map<dd::Package::vNode*, dd::Package::vEdge>& dag_edges);
+    void               setMeasuredQubitToZero(signed char& at, dd::Package::vEdge& e, std::unique_ptr<dd::Package>& localDD);
 };
 
 #endif //DDSIM_STOCHASTICNOISESIMULATOR_HPP
