@@ -44,7 +44,7 @@ char DeterministicNoiseSimulator::MeasureOneCollapsing(dd::Qubit index) {
             if (prob_zero >= n) {
                 // Build the operation that it sets index to 0
                 result = '0';
-                f = dd->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, dd::Package::mEdge::zero, dd::Package::mEdge::zero, dd::Package::mEdge::zero});
+                f      = dd->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, dd::Package::mEdge::zero, dd::Package::mEdge::zero, dd::Package::mEdge::zero});
             } else {
                 result = '1';
                 // Build the operation that it sets index to 1
@@ -445,7 +445,6 @@ std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(int nr_q
         measure_states = pow(2, nr_qubits);
     }
 
-    dd::Package::mEdge original_state = density_root_edge;
     for (int m = 0; m < measure_states; m++) {
         int current_result               = m;
         global_probability               = dd::CTEntry::val(density_root_edge.w.r);
@@ -454,8 +453,8 @@ std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(int nr_q
         for (int i = 0; i < nr_qubits; ++i) {
             if (cur.p->v != -1) {
                 assert(dd::CTEntry::val(cur.p->e.at(0).w.i) + dd::CTEntry::val(cur.p->e[3].w.i) == 0);
-                p0        = dd::CTEntry::val(cur.p->e.at(0).w.r);
-                p1        = dd::CTEntry::val(cur.p->e.at(3).w.r);
+                p0 = dd::CTEntry::val(cur.p->e.at(0).w.r);
+                p1 = dd::CTEntry::val(cur.p->e.at(3).w.r);
             } else {
                 global_probability = 0;
                 break;
