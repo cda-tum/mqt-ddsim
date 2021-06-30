@@ -100,13 +100,12 @@ TEST(DeterministicNoiseSimTest, ClassicControlledOp) {
     auto                           classical_register = std::make_pair<unsigned short, unsigned short>(0, 1);
     quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classical_register, 1);
 
-    std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
-    ddsim  = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("A"), 0);
-    auto m = ddsim->DeterministicSimulate();
+    std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, 0);
+    auto                                         m     = ddsim->DeterministicSimulate();
 
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    EXPECT_LT(abs(m.find("11")->second - 1), 0.00001);
+    EXPECT_NEAR(m.find("11")->second, 1, 0.00001);
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDApplySequential) {
@@ -118,17 +117,17 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDApplySequential) {
     auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    EXPECT_LT(abs(m.find("0000")->second - 0.0616548), 0.00001);
-    EXPECT_LT(abs(m.find("0001")->second - 0.0570879), 0.00001);
-    EXPECT_LT(abs(m.find("0100")->second - 0.0155602), 0.00001);
-    EXPECT_LT(abs(m.find("0101")->second - 0.0157508), 0.00001);
-    EXPECT_LT(abs(m.find("0110")->second - 0.0301652), 0.00001);
-    EXPECT_LT(abs(m.find("1000")->second - 0.1487735), 0.00001);
-    EXPECT_LT(abs(m.find("1001")->second - 0.551925), 0.00001);
-    EXPECT_LT(abs(m.find("1011")->second - 0.0132641), 0.00001);
-    EXPECT_LT(abs(m.find("1100")->second - 0.0166178), 0.00001);
-    EXPECT_LT(abs(m.find("1101")->second - 0.0187341), 0.00001);
-    EXPECT_LT(abs(m.find("1110")->second - 0.0301853), 0.00001);
+    EXPECT_NEAR(m.find("0000")->second, 0.0616548, 0.00001);
+    EXPECT_NEAR(m.find("0001")->second, 0.0570879, 0.00001);
+    EXPECT_NEAR(m.find("0100")->second, 0.0155602, 0.00001);
+    EXPECT_NEAR(m.find("0101")->second, 0.0157508, 0.00001);
+    EXPECT_NEAR(m.find("0110")->second, 0.0301652, 0.00001);
+    EXPECT_NEAR(m.find("1000")->second, 0.1487735, 0.00001);
+    EXPECT_NEAR(m.find("1001")->second, 0.551925, 0.00001);
+    EXPECT_NEAR(m.find("1011")->second, 0.0132641, 0.00001);
+    EXPECT_NEAR(m.find("1100")->second, 0.0166178, 0.00001);
+    EXPECT_NEAR(m.find("1101")->second, 0.0187341, 0.00001);
+    EXPECT_NEAR(m.find("1110")->second, 0.0301853, 0.00001);
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4Track_A) {
@@ -139,15 +138,15 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4Track_A) {
     auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    EXPECT_LT(abs(m.find("0000")->second - 0.0496435), 0.00001);
-    EXPECT_LT(abs(m.find("0001")->second - 0.0454906), 0.00001);
-    EXPECT_LT(abs(m.find("0100")->second - 0.0107246), 0.00001);
-    EXPECT_LT(abs(m.find("0101")->second - 0.0108673), 0.00001);
-    EXPECT_LT(abs(m.find("0110")->second - 0.031149), 0.00001);
-    EXPECT_LT(abs(m.find("1000")->second - 0.0355728), 0.00001);
-    EXPECT_LT(abs(m.find("1001")->second - 0.7588863), 0.00001);
-    EXPECT_LT(abs(m.find("1101")->second - 0.0101381), 0.00001);
-    EXPECT_LT(abs(m.find("1110")->second - 0.0287471), 0.00001);
+    EXPECT_NEAR(m.find("0000")->second, 0.0496435, 0.00001);
+    EXPECT_NEAR(m.find("0001")->second, 0.0454906, 0.00001);
+    EXPECT_NEAR(m.find("0100")->second, 0.0107246, 0.00001);
+    EXPECT_NEAR(m.find("0101")->second, 0.0108673, 0.00001);
+    EXPECT_NEAR(m.find("0110")->second, 0.031149, 0.00001);
+    EXPECT_NEAR(m.find("1000")->second, 0.0355728, 0.00001);
+    EXPECT_NEAR(m.find("1001")->second, 0.7588863, 0.00001);
+    EXPECT_NEAR(m.find("1101")->second, 0.0101381, 0.00001);
+    EXPECT_NEAR(m.find("1110")->second, 0.0287471, 0.00001);
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPD) {
@@ -158,17 +157,17 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPD) {
     auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    EXPECT_LT(abs(m.find("0000")->second - 0.0616548), 0.00001);
-    EXPECT_LT(abs(m.find("0001")->second - 0.0570879), 0.00001);
-    EXPECT_LT(abs(m.find("0100")->second - 0.0155602), 0.00001);
-    EXPECT_LT(abs(m.find("0101")->second - 0.0157508), 0.00001);
-    EXPECT_LT(abs(m.find("0110")->second - 0.0301652), 0.00001);
-    EXPECT_LT(abs(m.find("1000")->second - 0.1487735), 0.00001);
-    EXPECT_LT(abs(m.find("1001")->second - 0.551925), 0.00001);
-    EXPECT_LT(abs(m.find("1011")->second - 0.0132641), 0.00001);
-    EXPECT_LT(abs(m.find("1100")->second - 0.0166178), 0.00001);
-    EXPECT_LT(abs(m.find("1101")->second - 0.0187341), 0.00001);
-    EXPECT_LT(abs(m.find("1110")->second - 0.0301853), 0.00001);
+    EXPECT_NEAR(m.find("0000")->second, 0.0616548, 0.00001);
+    EXPECT_NEAR(m.find("0001")->second, 0.0570879, 0.00001);
+    EXPECT_NEAR(m.find("0100")->second, 0.0155602, 0.00001);
+    EXPECT_NEAR(m.find("0101")->second, 0.0157508, 0.00001);
+    EXPECT_NEAR(m.find("0110")->second, 0.0301652, 0.00001);
+    EXPECT_NEAR(m.find("1000")->second, 0.1487735, 0.00001);
+    EXPECT_NEAR(m.find("1001")->second, 0.551925, 0.00001);
+    EXPECT_NEAR(m.find("1011")->second, 0.0132641, 0.00001);
+    EXPECT_NEAR(m.find("1100")->second, 0.0166178, 0.00001);
+    EXPECT_NEAR(m.find("1101")->second, 0.0187341, 0.00001);
+    EXPECT_NEAR(m.find("1110")->second, 0.0301853, 0.00001);
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4Track_D) {
@@ -179,11 +178,11 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4Track_D) {
     auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    EXPECT_LT(abs(m.find("0000")->second - 0.020155), 0.00001);
-    EXPECT_LT(abs(m.find("0001")->second - 0.0199196), 0.00001);
-    EXPECT_LT(abs(m.find("1000")->second - 0.0482997), 0.00001);
-    EXPECT_LT(abs(m.find("1001")->second - 0.8264367), 0.00001);
-    EXPECT_LT(abs(m.find("1011")->second - 0.0172063), 0.00001);
-    EXPECT_LT(abs(m.find("1101")->second - 0.011233), 0.00001);
-    EXPECT_LT(abs(m.find("1110")->second - 0.0129619), 0.00001);
+    EXPECT_NEAR(m.find("0000")->second, 0.020155, 0.00001);
+    EXPECT_NEAR(m.find("0001")->second, 0.0199196, 0.00001);
+    EXPECT_NEAR(m.find("1000")->second, 0.0482997, 0.00001);
+    EXPECT_NEAR(m.find("1001")->second, 0.8264367, 0.00001);
+    EXPECT_NEAR(m.find("1011")->second, 0.0172063, 0.00001);
+    EXPECT_NEAR(m.find("1101")->second, 0.011233, 0.00001);
+    EXPECT_NEAR(m.find("1110")->second, 0.0129619, 0.00001);
 }
