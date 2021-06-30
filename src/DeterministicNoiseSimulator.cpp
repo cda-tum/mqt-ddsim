@@ -453,7 +453,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(int nr_q
         dd::Package::mEdge cur           = density_root_edge;
         for (int i = 0; i < nr_qubits; ++i) {
             if (cur.p->v != -1) {
-                imaginary = dd::CTEntry::val(cur.p->e.at(0).w.i) + dd::CTEntry::val(cur.p->e[3].w.i);
+                assert(dd::CTEntry::val(cur.p->e.at(0).w.i) + dd::CTEntry::val(cur.p->e[3].w.i) == 0);
                 p0        = dd::CTEntry::val(cur.p->e.at(0).w.r);
                 p1        = dd::CTEntry::val(cur.p->e.at(3).w.r);
             } else {
