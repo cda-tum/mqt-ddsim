@@ -35,6 +35,25 @@ std::unique_ptr<qc::QuantumComputation> getAdder4Circuit() {
     return quantumComputation;
 }
 
+TEST(DeterministicNoiseSimTest, MeasurementOne) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
+    quantumComputation->emplace_back<qc::StandardOperation>(2, dd::Controls{dd::Control{0}}, 1, qc::X);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, 0, qc::Measure);
+
+    {
+        std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, 5);
+        auto                                         m     = ddsim->DeterministicSimulate();
+        ASSERT_EQ(m.find("11")->second, 1);
+    }
+
+    {
+        std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, 1);
+        auto                                         m     = ddsim->DeterministicSimulate();
+        ASSERT_EQ(m.find("00")->second, 1);
+    }
+}
+
 TEST(DeterministicNoiseSimTest, TestingBarrierGate) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
