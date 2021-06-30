@@ -433,7 +433,7 @@ void DeterministicNoiseSimulator::ApplyDepolaritationToNode(std::array<dd::Packa
     dd->cn.returnToCache(complex_prob);
 }
 
-std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(dd::QubitCount nr_qubits, bool full_state){
+std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(dd::QubitCount nr_qubits, bool full_state) {
     std::map<std::string, double> measure_result = {};
 
     double p0, p1, imaginary;

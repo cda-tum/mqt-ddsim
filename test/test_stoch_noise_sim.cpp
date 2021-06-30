@@ -7,8 +7,6 @@
  * These tests may have to be adjusted if something about the random-number generation changes.
  */
 
-
-
 TEST(StochNoiseSimTest, Reset) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
@@ -24,8 +22,6 @@ TEST(StochNoiseSimTest, Reset) {
     ddsim2.Simulate(1);
     auto m2 = ddsim2.MeasureAll(false);
     ASSERT_EQ("10", m2);
-
-
 }
 
 TEST(StochNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
