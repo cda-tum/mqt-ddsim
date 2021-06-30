@@ -40,8 +40,8 @@ char DeterministicNoiseSimulator::MeasureOneCollapsing(dd::Qubit index) {
 
     auto prob_zero = probForIndexToBeZero(density_root_edge, index, 1, 0);
 
-    for (std::size_t p = 0; p < n_qubits; p++) {
-        if (static_cast<dd::Qubit>(p) == index) {
+    for (dd::Qubit p = 0; p < (signed char) n_qubits; p++) {
+        if (p == index) {
             if (prob_zero >= n) {
                 // Build the operation that it sets index to 0
                 result = '0';
