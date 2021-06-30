@@ -56,8 +56,8 @@ char DeterministicNoiseSimulator::MeasureOneCollapsing(dd::Qubit index) {
         }
     }
     dd::Package::mEdge tmp0 = dd->multiply(dd->multiply(f, density_root_edge), dd->conjugateTranspose(f));
-    dd->decRef(density_root_edge);
     dd->incRef(tmp0);
+    dd->decRef(density_root_edge);
     density_root_edge = tmp0;
 
     // Normalize the density matrix
@@ -433,7 +433,7 @@ void DeterministicNoiseSimulator::ApplyDepolaritationToNode(std::array<dd::Packa
     dd->cn.returnToCache(complex_prob);
 }
 
-std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(dd::QubitCount nr_qubits, bool full_state) {
+std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(dd::QubitCount nr_qubits, bool full_state) const {
     std::map<std::string, double> measure_result = {};
 
     double p0, p1, imaginary;
@@ -598,8 +598,8 @@ void DeterministicNoiseSimulator::apply_det_noise_sequential(const qc::Targets& 
                     tmp = dd->add(tmp0, tmp);
                 }
             }
-            dd->decRef(density_root_edge);
             dd->incRef(tmp);
+            dd->decRef(density_root_edge);
             density_root_edge = tmp;
         }
     }
