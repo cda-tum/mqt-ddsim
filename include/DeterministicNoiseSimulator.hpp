@@ -80,6 +80,7 @@ public:
     char MeasureOneCollapsing(dd::Qubit index);
 
 private:
+    // TODO integrate the NoiseCacheTable into the ddPackage
     static constexpr unsigned short NoiseSLOTS = 16384;
     static constexpr unsigned short NoiseMASK  = NoiseSLOTS - 1;
     struct NoiseEntry {
