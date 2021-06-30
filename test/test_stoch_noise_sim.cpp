@@ -106,10 +106,9 @@ TEST(StochNoiseSimTest, DestructiveMeasurementOneArbitraryNormalization) {
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
     ddsim.Simulate(1);
 
-    char            m = 'X';
     std::mt19937_64 gen{};
 
-    ddsim.root_edge = ddsim.MeasureOneCollapsingConcurrent(0, ddsim.dd, ddsim.root_edge, gen, &m, false);
+    char m = ddsim.dd->measureOneCollapsing(ddsim.root_edge, 0, false, gen);
 
     const std::vector<dd::ComplexValue> v_after = ddsim.getVector();
 

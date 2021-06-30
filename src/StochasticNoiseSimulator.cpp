@@ -169,133 +169,6 @@ std::map<std::string, double> StochasticNoiseSimulator::StochSimulate() {
     return measure_result;
 }
 
-dd::Package::vEdge StochasticNoiseSimulator::RemoveNodesInPackage(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge e, std::map<dd::Package::vNode*, dd::Package::vEdge>& dag_edges) {
-    if (e.isTerminal()) {
-        return e;
-    }
-
-    const auto it = dag_edges.find(e.p);
-    if (it != dag_edges.end()) {
-        dd::Package::vEdge r = it->second;
-        if (r.w.approximatelyZero()) {
-            return dd::Package::vEdge::zero;
-        }
-        dd::Complex c = localDD->cn.getTemporary();
-        dd::ComplexNumbers::mul(c, e.w, r.w);
-        r.w = localDD->cn.lookup(c);
-        return r;
-    }
-
-    std::array<dd::Package::vEdge, dd::RADIX> edges{
-            RemoveNodesInPackage(localDD, e.p->e.at(0), dag_edges),
-            RemoveNodesInPackage(localDD, e.p->e.at(1), dag_edges)};
-
-    dd::Package::vEdge r = localDD->makeDDNode(e.p->v, edges, false);
-    dag_edges[e.p]       = r;
-    dd::Complex c        = localDD->cn.getCached();
-    dd::ComplexNumbers::mul(c, e.w, r.w);
-    r.w = localDD->cn.lookup(c);
-    return r;
-}
-
-double StochasticNoiseSimulator::ApproximateEdgeByFidelity(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes) {
-    std::queue<dd::Package::vNode*>       q;
-    std::map<dd::Package::vNode*, dd::fp> probsMone;
-
-    probsMone[edge.p] = dd::ComplexNumbers::mag2(edge.w);
-
-    q.push(edge.p);
-
-    while (!q.empty()) {
-        dd::Package::vNode* ptr = q.front();
-        q.pop();
-        const dd::fp parent_prob = probsMone[ptr];
-
-        if (ptr->e.at(0).w != dd::Complex::zero) {
-            if (probsMone.find(ptr->e.at(0).p) == probsMone.end()) {
-                q.push(ptr->e.at(0).p);
-                probsMone[ptr->e.at(0).p] = 0;
-            }
-            probsMone[ptr->e.at(0).p] = probsMone.at(ptr->e.at(0).p) + parent_prob * dd::ComplexNumbers::mag2(ptr->e.at(0).w);
-        }
-
-        if (ptr->e.at(1).w != dd::Complex::zero) {
-            if (probsMone.find(ptr->e.at(1).p) == probsMone.end()) {
-                q.push(ptr->e.at(1).p);
-                probsMone[ptr->e.at(1).p] = 0;
-            }
-            probsMone[ptr->e.at(1).p] = probsMone.at(ptr->e.at(1).p) + parent_prob * dd::ComplexNumbers::mag2(ptr->e.at(1).w);
-        }
-    }
-
-    std::vector<int> nodes(getNumberOfQubits(), 0);
-
-    std::vector<std::priority_queue<std::pair<double, dd::Package::vNode*>, std::vector<std::pair<double, dd::Package::vNode*>>>> qq(
-            getNumberOfQubits());
-
-    for (auto& it: probsMone) {
-        if (it.first->v < 0) {
-            continue; // ignore the terminal node which has v == -1
-        }
-        nodes.at(it.first->v)++;
-        qq.at(it.first->v).emplace(1 - it.second, it.first);
-    }
-
-    probsMone.clear();
-    std::vector<dd::Package::vNode*> nodes_to_remove;
-
-    int max_remove = 0;
-    for (int i = 0; i < getNumberOfQubits(); i++) {
-        double                           sum    = 0.0;
-        int                              remove = 0;
-        std::vector<dd::Package::vNode*> tmp;
-
-        while (!qq.at(i).empty()) {
-            auto p = qq.at(i).top();
-            qq.at(i).pop();
-            sum += 1 - p.first;
-            if (sum < 1 - targetFidelity) {
-                remove++;
-                if (allLevels) {
-                    nodes_to_remove.push_back(p.second);
-                } else {
-                    tmp.push_back(p.second);
-                }
-            } else {
-                break;
-            }
-        }
-        if (!allLevels && remove * i > max_remove) {
-            max_remove      = remove * i;
-            nodes_to_remove = tmp;
-        }
-    }
-
-    std::map<dd::Package::vNode*, dd::Package::vEdge> dag_edges;
-    for (auto& it: nodes_to_remove) {
-        dag_edges[it] = dd::Package::vEdge::zero;
-    }
-
-    dd::Package::vEdge newEdge = RemoveNodesInPackage(localDD, edge, dag_edges);
-    assert(!std::isnan(dd::CTEntry::val(edge.w.r)));
-    assert(!std::isnan(dd::CTEntry::val(edge.w.i)));
-    dd::Complex c = localDD->cn.getCached(std::sqrt(dd::ComplexNumbers::mag2(newEdge.w)), 0);
-    dd::ComplexNumbers::div(c, newEdge.w, c);
-    newEdge.w = localDD->cn.lookup(c);
-
-    dd::fp fidelity = 0;
-    if (edge.p->v == newEdge.p->v) {
-        fidelity = localDD->fidelity(edge, newEdge);
-    }
-
-    if (removeNodes) {
-        localDD->decRef(edge);
-        localDD->incRef(newEdge);
-        edge = newEdge;
-    }
-    return fidelity;
-}
-
 void StochasticNoiseSimulator::runStochSimulationForId(unsigned int                                stochRun,
                                                        int                                         n_qubits,
                                                        dd::Package::vEdge                          rootEdgePerfectRun,
@@ -336,8 +209,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                         assert(quantum.size() == classic.size()); // this should not happen do to check in Simulate
 
                         for (unsigned int i = 0; i < quantum.size(); ++i) {
-                            char result;
-                            local_root_edge = MeasureOneCollapsingConcurrent(quantum.at(i), localDD, local_root_edge, generator, &result);
+                            char result = localDD->measureOneCollapsing(local_root_edge, quantum.at(i), true, generator);
                             assert(result == '0' || result == '1');
                             classic_values[classic.at(i)] = (result == '1');
                         }
@@ -387,7 +259,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
 
                 applyNoiseOperation(targets, controls, dd_op, localDD, local_root_edge, generator, dist, identity_DD);
                 if (step_fidelity < 1 && (op_count + 1) % approx_mod == 0) {
-                    ApproximateEdgeByFidelity(localDD, local_root_edge, step_fidelity, false, true);
+                    ApproximateByFidelity(localDD, local_root_edge, step_fidelity, false, true);
                     approx_count++;
                 }
             }
@@ -506,123 +378,6 @@ dd::Package::mEdge StochasticNoiseSimulator::generateNoiseOperation(bool        
         }
     }
     return dd_operation;
-}
-
-dd::Package::vEdge StochasticNoiseSimulator::MeasureOneCollapsingConcurrent(unsigned short                      index,
-                                                                            const std::unique_ptr<dd::Package>& localDD,
-                                                                            dd::Package::vEdge                  local_root_edge,
-                                                                            std::mt19937_64&                    generator,
-                                                                            char*                               result,
-                                                                            bool                                assume_probability_normalization) {
-    //todo merge the function with MeasureOneCollapsing
-    std::map<dd::Package::vNode*, dd::fp> probsMone;
-    std::set<dd::Package::vNode*>         visited_nodes2;
-    std::queue<dd::Package::vNode*>       q;
-
-    probsMone[local_root_edge.p] = dd::ComplexNumbers::mag2(local_root_edge.w);
-    visited_nodes2.insert(local_root_edge.p);
-    q.push(local_root_edge.p);
-
-    while (q.front()->v != index) {
-        dd::Package::vNode* ptr = q.front();
-        q.pop();
-        double prob = probsMone[ptr];
-
-        if (!ptr->e.at(0).w.approximatelyZero()) {
-            const dd::fp tmp1 = prob * dd::ComplexNumbers::mag2(ptr->e.at(0).w);
-
-            if (visited_nodes2.find(ptr->e.at(0).p) != visited_nodes2.end()) {
-                probsMone[ptr->e.at(0).p] = probsMone[ptr->e.at(0).p] + tmp1;
-            } else {
-                probsMone[ptr->e.at(0).p] = tmp1;
-                visited_nodes2.insert(ptr->e.at(0).p);
-                q.push(ptr->e.at(0).p);
-            }
-        }
-
-        if (!ptr->e.at(1).w.approximatelyZero()) {
-            const dd::fp tmp1 = prob * dd::ComplexNumbers::mag2(ptr->e.at(1).w);
-
-            if (visited_nodes2.find(ptr->e.at(1).p) != visited_nodes2.end()) {
-                probsMone[ptr->e.at(1).p] = probsMone[ptr->e.at(1).p] + tmp1;
-            } else {
-                probsMone[ptr->e.at(1).p] = tmp1;
-                visited_nodes2.insert(ptr->e.at(1).p);
-                q.push(ptr->e.at(1).p);
-            }
-        }
-    }
-
-    dd::fp pzero{0}, pone{0};
-
-    if (assume_probability_normalization) {
-        while (!q.empty()) {
-            dd::Package::vNode* ptr = q.front();
-            q.pop();
-
-            if (!ptr->e.at(0).w.approximatelyZero()) {
-                pzero += probsMone[ptr] * dd::ComplexNumbers::mag2(ptr->e.at(0).w);
-            }
-
-            if (!ptr->e.at(1).w.approximatelyZero()) {
-                pone += probsMone[ptr] * dd::ComplexNumbers::mag2(ptr->e.at(1).w);
-            }
-        }
-    } else {
-        std::unordered_map<dd::Package::vNode*, double> probs;
-        assign_probs(root_edge, probs);
-
-        while (!q.empty()) {
-            dd::Package::vNode* ptr = q.front();
-            q.pop();
-
-            if (!ptr->e.at(0).w.approximatelyZero()) {
-                pzero += probsMone[ptr] * probs[ptr->e.at(0).p] * dd::ComplexNumbers::mag2(ptr->e.at(0).w);
-            }
-
-            if (!ptr->e.at(1).w.approximatelyZero()) {
-                pone += probsMone[ptr] * probs[ptr->e.at(1).p] * dd::ComplexNumbers::mag2(ptr->e.at(1).w);
-            }
-        }
-    }
-
-    if (std::abs(pzero + pone - 1) > epsilon) {
-        throw std::runtime_error("Numerical instability occurred during measurement: |alpha|^2 + |beta|^2 = " + std::to_string(pzero) + " + " + std::to_string(pone) + " = " + std::to_string(pzero + pone) + ", but should be 1!");
-    }
-
-    const dd::fp sum = pzero + pone;
-
-    //std::pair<fp, fp> probs = std::make_pair(pzero, pone);
-    dd::GateMatrix measure_m{
-            dd::complex_zero, dd::complex_zero,
-            dd::complex_zero, dd::complex_zero};
-
-    std::uniform_real_distribution<dd::fp> dist(0.0, 1.0L);
-
-    dd::fp n = dist(generator);
-    dd::fp norm_factor;
-
-    if (n < pzero / sum) {
-        measure_m[0] = dd::complex_one;
-        norm_factor  = pzero;
-        *result      = '0';
-    } else {
-        measure_m[3] = dd::complex_one;
-        norm_factor  = pone;
-        *result      = '1';
-    }
-    dd::Edge m_gate = localDD->makeGateDD(measure_m, getNumberOfQubits(), index);
-
-    dd::Edge e = localDD->multiply(m_gate, local_root_edge);
-
-    dd::Complex c = localDD->cn.getTemporary(std::sqrt(1 / norm_factor), 0);
-    dd::ComplexNumbers::mul(c, e.w, c);
-    e.w = localDD->cn.lookup(c);
-    localDD->incRef(e);
-    localDD->decRef(local_root_edge);
-    local_root_edge = e;
-
-    return local_root_edge;
 }
 
 dd::NoiseOperationKind StochasticNoiseSimulator::ReturnNoiseOperation(char i, double prob) const {

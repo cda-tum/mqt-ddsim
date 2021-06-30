@@ -41,6 +41,7 @@ TEST(ShorSimTest, Factorize15NegTest) {
 }
 
 TEST(ShorSimTest, Factorize15WithoutEmulationTest) {
+    GTEST_SKIP() << "Skipping test due to https://github.com/iic-jku/ddsim/issues/26";
     ShorSimulator ddsim(15, 2, 1ull, false, false, false);
     ddsim.Simulate(1);
 

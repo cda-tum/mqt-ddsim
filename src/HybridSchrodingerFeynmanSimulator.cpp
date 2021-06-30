@@ -4,7 +4,7 @@ std::size_t HybridSchrodingerFeynmanSimulator::getNDecisions(dd::Qubit split_qub
     std::size_t ndecisions = 0;
     // calculate number of decisions
     for (const auto& op: *qc) {
-        if (dynamic_cast<qc::StandardOperation*>(op.get())) {
+        if (op->isStandardOperation()) {
             bool target_in_lower_slice = false, target_in_upper_slice = false;
             bool control_in_lower_slice = false, control_in_upper_slice = false;
             for (const auto& target: op->getTargets()) {
@@ -19,6 +19,8 @@ std::size_t HybridSchrodingerFeynmanSimulator::getNDecisions(dd::Qubit split_qub
                 (target_in_upper_slice && control_in_lower_slice)) {
                 ndecisions++;
             }
+        } else if (op->getType() == qc::Barrier || op->getType() == qc::Snapshot || op->getType() == qc::ShowProbabilities) {
+            continue;
         } else {
             throw std::invalid_argument("Only StandardOperations are supported for now.");
         }
@@ -224,8 +226,8 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridAmplitudes(dd::Qubit split
     }
     omp_set_num_threads(actuallyUsedThreads);
 
-    std::vector<std::vector<dd::ComplexValue>> amplitudes(actuallyUsedThreads);
-    std::vector<bool>                          initialized(actuallyUsedThreads, false);
+    std::vector<std::vector<std::complex<dd::fp>>> amplitudes(actuallyUsedThreads);
+    std::vector<bool>                              initialized(actuallyUsedThreads, false);
 
     root_edge                         = qc::VectorDD::zero;
     std::int64_t   nslices_on_one_cpu = std::min(static_cast<std::int64_t>(64), static_cast<std::int64_t>(max_control / actuallyUsedThreads));
@@ -233,9 +235,9 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridAmplitudes(dd::Qubit split
 
 #pragma omp parallel for schedule(dynamic, 1) // NOLINT(openmp-use-default-none)
     for (std::int64_t control = 0; control < max_control; control += nslices_on_one_cpu) {
-        auto                           current_thread     = omp_get_thread_num();
-        std::vector<dd::ComplexValue>& thread_amplitudes  = amplitudes[current_thread];
-        bool                           thread_initialized = initialized[current_thread];
+        auto                               current_thread     = omp_get_thread_num();
+        std::vector<std::complex<dd::fp>>& thread_amplitudes  = amplitudes[current_thread];
+        bool                               thread_initialized = initialized[current_thread];
         for (std::int64_t local_control = 0; local_control < nslices_on_one_cpu; local_control++) {
             std::int64_t                 total_control = control + local_control;
             std::unique_ptr<dd::Package> slice_dd      = std::make_unique<dd::Package>(getNumberOfQubits());
@@ -246,7 +248,7 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridAmplitudes(dd::Qubit split
             } else {
                 initialized[current_thread] = true;
                 thread_initialized          = true;
-                thread_amplitudes           = std::vector<dd::ComplexValue>(1 << nqubits);
+                thread_amplitudes           = std::vector<std::complex<dd::fp>>(1 << nqubits);
                 slice_dd->exportAmplitudes(result, thread_amplitudes, nqubits);
             }
         }

@@ -98,10 +98,13 @@ counts = result.get_counts(circ)
 print(counts)
 ```
 
-The provider currently has two backends:
+The provider currently has five backends:
 
 * `qasm_simulator` which simulates the circuit and returns the requested number of shots
-* `statevector_simulator` which also simulates the circuite and returns the statevector along the requested number of shots
+* `statevector_simulator` which also simulates the circuit and returns the statevector along the requested number of shots
+* `hybrid_qasm_simulator` which simulates the circuit in parallel using a hybrid Schrodinger-Feynman technique and returns the requested number of shots
+* `hybrid_statevector_simulator` which also simulates the circuit in parallel using a hybrid Schrodinger-Feynman technique and returns the statevector
+* `unitary_simulator` which constructs the unitary functionality of a circuit and returns the corresponding unitary matrix
 
 A slightly more elaborate example can be found in the notebook [ddsim.ipynb](ddsim.ipynb).
 
@@ -110,8 +113,8 @@ A slightly more elaborate example can be found in the notebook [ddsim.ipynb](dds
 Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). However, the implementation should be compatible
 with any current C++ compiler supporting C++17 and a minimum CMake version of 3.14.
 
-`OpenMP >= 4.0` is required for building the `ddsim` library. Additionally, `boost/program_options >= 1.50` is required for building the commandline interface for `ddsim_simple` and `ddsim_noise_aware`. The `ddsim_noise_aware` further
-requires `Threads::Threads`.
+`OpenMP >= 4.0` is required for building the `ddsim` library. Additionally, `boost/program_options >= 1.50` is required for building the commandline interface for `ddsim_simple` and `ddsim_noise_aware`. The `ddsim_noise_aware` simulator
+further requires `Threads::Threads`.
 
 ## Clone, Build, and Run
 

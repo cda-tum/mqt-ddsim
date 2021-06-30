@@ -61,12 +61,6 @@ public:
 
     [[nodiscard]] std::string getName() const override { return "stoch_" + gate_noise_types + "_" + qc->getName(); };
 
-    dd::Package::vEdge MeasureOneCollapsingConcurrent(unsigned short index, const std::unique_ptr<dd::Package>& localDD,
-                                                      dd::Package::vEdge local_root_edge,
-                                                      std::mt19937_64&   generator,
-                                                      char*              result,
-                                                      bool               assume_probability_normalization = true);
-
     void setNoiseEffects(const std::string& cGateNoise) { gate_noise_types = cGateNoise; }
 
     double           noise_probability = 0.0;

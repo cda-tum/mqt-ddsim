@@ -7,10 +7,12 @@
 #include "algorithms/Entanglement.hpp"
 #include "algorithms/Grover.hpp"
 #include "algorithms/QFT.hpp"
+#include "dd/Export.hpp"
 #include "nlohmann/json.hpp"
 
 #include <boost/program_options.hpp>
 #include <chrono>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -40,6 +42,7 @@ int main(int argc, char** argv) {
         ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
         ("pm", "print measurement results")
         ("pcomplex", "print additional statistics on complex numbers")
+        ("dump_complex", po::value<std::string>(), "dump edge weights in final state DD to file")
         ("verbose", "Causes some simulators to print additional information to STDERR")
         ("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")
         ("simulate_file_hybrid", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension) using the hybrid Schrodinger-Feynman simulator")
@@ -139,7 +142,7 @@ int main(int argc, char** argv) {
         std::exit(1);
     }
 
-    if (quantumComputation && quantumComputation->getNqubits() > 100) {
+    if (ddsim->getNumberOfQubits() > 100) {
         std::clog << "[WARNING] Quantum computation contains quite a few qubits. You're jumping into the deep end.\n";
     }
 
@@ -241,6 +244,12 @@ int main(int argc, char** argv) {
 
     if (vm.count("pcomplex")) {
         output_obj["complex_stats"] = ddsim->dd->cn.complexTable.getStatistics();
+    }
+
+    if (vm.count("dump_complex")) {
+        auto filename = vm["dump_complex"].as<std::string>();
+        auto ostream  = std::fstream(filename, std::fstream::out);
+        dd::exportEdgeWeights(ddsim->root_edge, ostream);
     }
 
     std::cout << std::setw(2) << output_obj << std::endl;

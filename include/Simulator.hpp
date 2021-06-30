@@ -38,13 +38,24 @@ public:
 
     virtual std::map<std::string, std::string> AdditionalStatistics() { return {}; };
 
-    std::string MeasureAll(bool collapse = false);
+    std::string MeasureAll(bool collapse = false) {
+        return dd->measureAll(root_edge, collapse, mt, epsilon);
+    }
 
-    std::map<std::string, std::size_t> MeasureAllNonCollapsing(unsigned int shots);
+    std::map<std::string, std::size_t> MeasureAllNonCollapsing(unsigned int shots) {
+        std::map<std::string, std::size_t> results;
+        for (unsigned int i = 0; i < shots; i++) {
+            const auto m = MeasureAll(false);
+            results[m]++;
+        }
+        return results;
+    }
 
-    char MeasureOneCollapsing(dd::Qubit index, bool assume_probability_normalization = true);
+    char MeasureOneCollapsing(dd::Qubit index, bool assume_probability_normalization = true) {
+        return dd->measureOneCollapsing(root_edge, index, assume_probability_normalization, mt, epsilon);
+    }
 
-    std::map<std::string, std::size_t> SampleFromAmplitudeVectorInPlace(std::vector<dd::ComplexValue>& amplitudes, unsigned int shots);
+    std::map<std::string, std::size_t> SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, unsigned int shots);
 
     [[nodiscard]] std::vector<dd::ComplexValue> getVector() const;
 
@@ -54,7 +65,7 @@ public:
 
     [[nodiscard]] std::size_t getActiveNodeCount() const { return dd->vUniqueTable.getActiveNodeCount(); }
 
-    [[nodiscard]] std::size_t getMaxNodeCount() const { return dd->vUniqueTable.getMaxActiveNodes(); }
+    [[nodiscard]] virtual std::size_t getMaxNodeCount() const { return dd->vUniqueTable.getMaxActiveNodes(); }
 
     [[nodiscard]] std::size_t countNodesFromRoot() const { return dd->size(root_edge); }
 
@@ -77,12 +88,17 @@ public:
         return binary;
     }
 
-    double ApproximateByFidelity(double targetFidelity, bool allLevels, bool removeNodes, bool verbose = false);
+    double ApproximateByFidelity(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose = false);
+    double ApproximateByFidelity(double targetFidelity, bool allLevels, bool removeNodes, bool verbose = false) {
+        return ApproximateByFidelity(dd, root_edge, targetFidelity, allLevels, removeNodes, verbose);
+    }
 
-    double ApproximateBySampling(unsigned int nSamples, unsigned int threshold, bool removeNodes, bool verbose = false);
+    double ApproximateBySampling(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, std::size_t nSamples, std::size_t threshold, bool removeNodes, bool verbose = false);
+    double ApproximateBySampling(std::size_t nSamples, std::size_t threshold, bool removeNodes, bool verbose = false) {
+        return ApproximateBySampling(dd, root_edge, nSamples, threshold, removeNodes, verbose);
+    }
 
-    dd::Package::vEdge
-    RemoveNodes(dd::Package::vEdge edge, std::map<dd::Package::vNode*, dd::Package::vEdge>& dag_edges);
+    dd::Package::vEdge static RemoveNodes(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge edge, std::map<dd::Package::vNode*, dd::Package::vEdge>& dag_edges);
 
     std::unique_ptr<dd::Package> dd = std::make_unique<dd::Package>();
     dd::Package::vEdge           root_edge{};
@@ -95,8 +111,6 @@ protected:
     const dd::fp             epsilon = 0.001L;
 
     static void NextPath(std::string& s);
-
-    double assign_probs(dd::Package::vEdge edge, std::unordered_map<dd::Package::vNode*, double>& probs);
 };
 
 #endif //DDSIMULATOR_H
