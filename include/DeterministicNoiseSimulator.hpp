@@ -53,7 +53,7 @@ public:
 
     void applyDetNoiseSequential(const qc::Targets& targets);
 
-    std::map<std::string, double> AnalyseState(dd::QubitCount nr_qubits, bool full_state) const;
+    [[nodiscard]] std::map<std::string, double> AnalyseState(dd::QubitCount nr_qubits, bool full_state) const;
 
     void setNoiseEffects(const std::string& cGateNoise) { gateNoiseTypes = cGateNoise; }
 
@@ -74,7 +74,8 @@ public:
     dd::ComplexValue sqrt_amplitude_damping_probability{};
     dd::ComplexValue one_minus_sqrt_amplitude_damping_probability{};
 
-    qc::MatrixDD density_root_edge;
+    //todo implement a new structure for density matrices
+    qc::MatrixDD density_root_edge{};
 
     bool noiseApplicationWithKrausMatrices = false;
     char MeasureOneCollapsing(dd::Qubit index);
@@ -88,6 +89,7 @@ private:
         dd::ComplexValue       aw, rw;
         dd::NoiseOperationKind which; // type of operation
         signed char            usedQubits[std::numeric_limits<dd::Qubit>::max() + 1];
+        // TODO change to a more compact data structure
     };
 
     std::unique_ptr<qc::QuantumComputation>& qc;
