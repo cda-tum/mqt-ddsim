@@ -97,9 +97,10 @@ jobs:
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_DDSIM_TESTS=ON -T "ClangCl" -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_MULTITHREADED=ON -DBoost_USE_STATIC_RUNTIME=OFF -DBOOST_ROOT="${{github.workspace}}\boost_1_70_0" -DBOOST_INCLUDEDIR="${{github.workspace}}\boost_1_70_0\include" -DBOOST_LIBRARYDIR="${{github.workspace}}\boost_1_70_0\lib"
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --parallel 8
-      - name:              Test
+      - name: Test
         working-directory: ${{github.workspace}}/build/test
-        run: cd $BUILD_TYPE && ./ddsim_test --gtest_filter=-*StochNoiseSimTest.SimulateAdder4*
+        run: cd $BUILD_TYPE && ./ddsim_test
+
 
   coverage:
     name: Coverage

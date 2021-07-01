@@ -106,7 +106,7 @@ private:
                                  dd::Package::vEdge                          rootEdgePerfectRun,
                                  std::vector<double>&                        recordedPropertiesStorage,
                                  std::vector<std::tuple<long, std::string>>& recordedPropertiesList,
-                                 unsigned long long                          local_seed);
+                                 unsigned long long                          localSeed);
 
     dd::Package::mEdge generateNoiseOperation(bool                                    amplitudeDamping,
                                               dd::Qubit                               target,
@@ -119,7 +119,7 @@ private:
                              const dd::Controls&                     control_qubits,
                              dd::Package::mEdge                      dd_op,
                              std::unique_ptr<dd::Package>&           localDD,
-                             dd::Package::vEdge&                     local_root_edge,
+                             dd::Package::vEdge&                     localRootEdge,
                              std::mt19937_64&                        generator,
                              std::uniform_real_distribution<dd::fp>& dist,
                              dd::Package::mEdge                      identityDD);
@@ -127,6 +127,11 @@ private:
     [[nodiscard]] dd::NoiseOperationKind ReturnNoiseOperation(char i, double d) const;
 
     [[nodiscard]] std::string intToString(long target_number) const;
+
+    //    double ApproximateEdgeByFidelity(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes);
+    //
+    //    dd::Package::vEdge RemoveNodesInPackage(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge e, std::map<dd::Package::vNode*, dd::Package::vEdge>& dag_edges);
+    void setMeasuredQubitToZero(signed char& at, dd::Package::vEdge& e, std::unique_ptr<dd::Package>& localDD);
 };
 
 #endif //DDSIM_STOCHASTICNOISESIMULATOR_HPP
