@@ -10,11 +10,11 @@ using namespace dd::literals;
 TEST(ParallelSimTest, TrivialParallelCircuit){
     auto quantumComputation = [] {
         auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
-        quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::H);
-        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::H);
-        quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{2_pc, 1_pc}, 0, qc::X);
-        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I); // some dummy operations
-        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I);
+        quantumComputation->h(2);
+        quantumComputation->h(1);
+        quantumComputation->x(0, dd::Controls{1_pc, 2_pc});
+        quantumComputation->i(1); // some dummy operations
+        quantumComputation->i(1);
         return quantumComputation;
     };
 
