@@ -15,6 +15,10 @@ add_library(${PROJECT_NAME}
             ${CMAKE_CURRENT_SOURCE_DIR}/HybridSchrodingerFeynmanSimulator.cpp
             ${PROJECT_SOURCE_DIR}/include/UnitarySimulator.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/UnitarySimulator.cpp
+            ${PROJECT_SOURCE_DIR}/include/ParallelizationSimulator.hpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/ParallelizationSimulator.cpp
+            ${PROJECT_SOURCE_DIR}/include/function_pool.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/function_pool.cpp
             )
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)
 # set required C++ standard and disable compiler specific extensions
