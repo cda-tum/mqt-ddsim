@@ -1,5 +1,4 @@
 #include "ParallelizationSimulator.hpp"
-#include "function_pool.h"
 #include <thread>
 #include <chrono>
 #include <string>
@@ -8,8 +7,6 @@
 #include <functional>
 #include <vector>
 using namespace dd::literals;
-//Function_pool func_pool;
-
 
 std::map<std::string, std::size_t> ParallelizationSimulator::Simulate(unsigned int shots){
     std::thread first (&ParallelizationSimulator::SimulateMatrixVector, this);
