@@ -2,6 +2,7 @@
 // Created by alexander on 01.07.21.
 //
 #include "ParallelizationSimulator.hpp"
+#include "algorithms/Grover.hpp"
 
 #include <gtest/gtest.h>
 #include <memory>
@@ -22,6 +23,9 @@ TEST(ParallelSimTest, TrivialParallelCircuit){
     ddsim.Simulate(1);
 }
 
-TEST(ParallelSimTest, Placeholder){
-
+TEST(ParallelSimTest, Grover) {
+    dd::QubitCount                          nq     = 4;
+    std::unique_ptr<qc::QuantumComputation> grover = std::make_unique<qc::Grover>(nq);
+    ParallelizationSimulator                ddsim(std::move(grover));
+    ddsim.Simulate(1);
 }
