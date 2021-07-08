@@ -24,8 +24,9 @@ public:
 
 protected:
     // declare any methods that are used internally in the simulator here
-    static qc::VectorDD simulateMatrixVectorBasic(const std::unique_ptr<qc::QuantumComputation>& qc, const qc::VectorDD& initialState, std::unique_ptr<dd::Package>& ddPackage);
-
+    static __gnu_cxx::__normal_iterator<const std::unique_ptr<qc::Operation>*, std::vector<std::unique_ptr<qc::Operation>>> getWarmUpDepth(const std::unique_ptr<qc::QuantumComputation>& qc, std::unique_ptr<dd::Package>& ddPackage);
+    static qc::VectorDD simulateMatrixVectorBasic(const std::unique_ptr<qc::QuantumComputation>& qc, const qc::VectorDD& initialState, std::unique_ptr<dd::Package>& ddPackage, __gnu_cxx::__normal_iterator<const std::unique_ptr<qc::Operation>*, std::vector<std::unique_ptr<qc::Operation>>> iter);
+    static qc::MatrixDD simulateMatrixMatrixBasic(const std::unique_ptr<qc::QuantumComputation>& qc, const qc::MatrixDD& initialMatrix, std::unique_ptr<dd::Package>& ddPackage, __gnu_cxx::__normal_iterator<const std::unique_ptr<qc::Operation>*, std::vector<std::unique_ptr<qc::Operation>>> iter);
     // declare any member needed by the simulator here
     // such as the (potentially synchronized) queue for the computation, or the thread pool for the simulation
 };
