@@ -8,6 +8,7 @@
 #include "algorithms/Grover.hpp"
 #include "algorithms/QFT.hpp"
 #include "nlohmann/json.hpp"
+#include "ParallelizationSimulator.hpp"
 
 #include <boost/program_options.hpp>
 #include <chrono>
@@ -42,17 +43,21 @@ int main(int argc, char** argv) {
         ("pcomplex", "print additional statistics on complex numbers")
         ("verbose", "Causes some simulators to print additional information to STDERR")
         ("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")
+        ("simulate_file_parallel", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension) using the parallelization simulator")
         ("simulate_file_hybrid", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension) using the hybrid Schrodinger-Feynman simulator")
         ("hybrid_mode", po::value<std::string>(), "mode used for hybrid Schrodinger-Feynman simulation (*amplitude*, dd)")
         ("nthreads", po::value<>(&nthreads)->default_value(2), "#threads used for hybrid simulation")
         ("simulate_qft", po::value<unsigned int>(), "simulate Quantum Fourier Transform for given number of qubits")
+        ("simulate_qft_parallel", po::value<unsigned int>(), "simulate Quantum Fourier Transform for a given number of qubits in parallized form")
         ("simulate_ghz", po::value<unsigned int>(), "simulate state preparation of GHZ state for given number of qubits")
+        ("simulate_ghz_parallel", po::value<unsigned int>(), "simulate state preparation of GHZ for a given number of qubits in parallized form")
         ("step_fidelity", po::value<>(&step_fidelity)->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")
         ("steps", po::value<>(&approx_steps)->default_value(1), "number of approximation steps")
         ("approx_when", po::value<>(&approx_when)->default_value(ApproximationInfo::FidelityDriven), "approximation method ('fidelity' (default) or 'memory'")
         ("approx_state", "do excessive approximation runs at the end of the simulation to see how the quantum state behaves")
         ("simulate_grover", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle")
         ("simulate_grover_emulated", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle and emulation")
+        ("simulate_grover_parallel", po::value<unsigned int>(), "simulate Grover's search for a given number of qubits in parallized form")
         ("simulate_grover_oracle_emulated", po::value<std::string>(), "simulate Grover's search for given number of qubits with given oracle and emulation")
         ("simulate_shor", po::value<unsigned int>(), "simulate Shor's algorithm factoring this number")
         ("simulate_shor_coprime", po::value<unsigned int>()->default_value(0), "coprime number to use with Shor's algorithm (zero randomly generates a coprime)")
@@ -99,10 +104,18 @@ int main(int argc, char** argv) {
         } else {
             ddsim = std::make_unique<HybridSchrodingerFeynmanSimulator>(std::move(quantumComputation), mode, nthreads);
         }
+    } else if (vm.count("simulate_file_parallel")){
+        const std::string fname = vm["simulate_file_parallel"].as<std::string>();
+        quantumComputation = std::make_unique<qc::QuantumComputation>(fname);
+        ddsim = std::make_unique<ParallelizationSimulator>(std::move(quantumComputation));
     } else if (vm.count("simulate_qft")) {
         const unsigned int n_qubits = vm["simulate_qft"].as<unsigned int>();
         quantumComputation          = std::make_unique<qc::QFT>(n_qubits);
         ddsim                       = std::make_unique<CircuitSimulator>(std::move(quantumComputation), approx_info, seed);
+    } else if (vm.count("simulate_qft_parallel")) {
+        const unsigned int n_qubits = vm["simulate_qft_parallel"].as<unsigned int>();
+        std::unique_ptr<qc::QuantumComputation> qft = std::make_unique<qc::QFT>(n_qubits);
+        ddsim                       = std::make_unique<ParallelizationSimulator>(std::move(qft));
     } else if (vm.count("simulate_fast_shor")) {
         const unsigned int composite_number = vm["simulate_fast_shor"].as<unsigned int>();
         const unsigned int coprime          = vm["simulate_fast_shor_coprime"].as<unsigned int>();
@@ -125,6 +138,11 @@ int main(int argc, char** argv) {
         const unsigned int n_qubits = vm["simulate_grover"].as<unsigned int>();
         quantumComputation          = std::make_unique<qc::Grover>(n_qubits, seed);
         ddsim                       = std::make_unique<CircuitSimulator>(std::move(quantumComputation), approx_info, seed);
+    } else if (vm.count("simulate_grover_parallel")) {
+        const unsigned int n_qubits = vm["simulate_grover_parallel"].as<unsigned int>();
+
+        std::unique_ptr<qc::QuantumComputation> grover = std::make_unique<qc::Grover>(n_qubits);
+        ddsim                       = std::make_unique<ParallelizationSimulator>(std::move(grover));
     } else if (vm.count("simulate_grover_emulated")) {
         ddsim = std::make_unique<GroverSimulator>(vm["simulate_grover_emulated"].as<unsigned int>(), seed);
     } else if (vm.count("simulate_grover_oracle_emulated")) {
@@ -133,6 +151,10 @@ int main(int argc, char** argv) {
         const unsigned int n_qubits = vm["simulate_ghz"].as<unsigned int>();
         quantumComputation          = std::make_unique<qc::Entanglement>(n_qubits);
         ddsim                       = std::make_unique<CircuitSimulator>(std::move(quantumComputation), approx_info, seed);
+    } else if (vm.count("simulate_ghz_parallel")) {
+        const unsigned int n_qubits = vm["simulate_ghz_parallel"].as<unsigned int>();
+        std::unique_ptr<qc::QuantumComputation> ghz = std::make_unique<qc::Entanglement>(n_qubits);
+        ddsim                       = std::make_unique<ParallelizationSimulator>(std::move(ghz));
     } else {
         std::cerr << "Did not find anything to simulate. See help below.\n"
                   << description << "\n";

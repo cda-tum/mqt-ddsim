@@ -4,11 +4,44 @@
 #include "ParallelizationSimulator.hpp"
 #include "algorithms/Grover.hpp"
 
+#include <algorithms/Entanglement.hpp>
+#include <algorithms/QFT.hpp>
 #include <gtest/gtest.h>
 #include <memory>
 using namespace dd::literals;
 
-TEST(ParallelSimTest, TrivialParallelCircuit){
+class ParallelSimTestParameterized : public ::testing::TestWithParam<int>{
+protected:
+    ParallelizationSimulator testingSimulator(std::unique_ptr<qc::QuantumComputation>&& qc);
+
+};
+
+TEST_P(ParallelSimTestParameterized, Grover){
+    int nqubits = GetParam();
+    std::unique_ptr<qc::QuantumComputation> grover = std::make_unique<qc::Grover>(nqubits);
+    ParallelizationSimulator ddsim(std::move(grover));
+    ddsim.Simulate(1);
+
+}
+
+TEST_P(ParallelSimTestParameterized, QFT){
+    int nqubits = GetParam();
+    std::unique_ptr<qc::QuantumComputation> qft = std::make_unique<qc::QFT>(nqubits);
+    ParallelizationSimulator ddsim(std::move(qft));
+    ddsim.Simulate(1);
+}
+
+TEST_P(ParallelSimTestParameterized, Entanglement){
+    int nqubits = GetParam();
+    std::unique_ptr<qc::QuantumComputation> ghz = std::make_unique<qc::Entanglement>(nqubits);
+    ParallelizationSimulator ddsim(std::move(ghz));
+    ddsim.Simulate(1);
+}
+
+INSTANTIATE_TEST_CASE_P(ParallelSimTest,ParallelSimTestParameterized, ::testing::Range(2,10));
+
+
+/*TEST(ParallelSimTest, TrivialParallelCircuit){
     auto quantumComputation = [] {
         auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
         quantumComputation->h(2);
@@ -29,3 +62,4 @@ TEST(ParallelSimTest, Grover) {
     ParallelizationSimulator                ddsim(std::move(grover));
     ddsim.Simulate(1);
 }
+*/
