@@ -257,7 +257,19 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                     controls = op->getControls();
                 }
 
+                std::string noise_effects = gate_noise_types;
+
+                gate_noise_types = std::string("\0\0");
+
                 applyNoiseOperation(targets, controls, dd_op, localDD, localRootEdge, generator, dist, identity_DD);
+                for (const auto& noise_type: noise_effects) {
+                    gate_noise_types = noise_type;
+                    applyNoiseOperation(targets, controls, identity_DD, localDD, localRootEdge, generator, dist, identity_DD);
+                }
+                gate_noise_types = noise_effects;
+
+
+
                 if (step_fidelity < 1 && (op_count + 1) % approx_mod == 0) {
                     ApproximateByFidelity(localDD, localRootEdge, step_fidelity, false, true);
                     approx_count++;

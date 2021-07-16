@@ -370,7 +370,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceError) {
     EXPECT_GE(m.find("0000")->second, 0.78);
     EXPECT_LE(m.find("0000")->second, 0.80);
     EXPECT_GE(m.find("0001")->second, 0.18);
-    EXPECT_LE(m.find("0001")->second, 0.20);
+    EXPECT_LE(m.find("0001")->second, 0.21);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDepolarizationError) {
