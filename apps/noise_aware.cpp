@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
         ("step_fidelity", po::value<double>()->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")
         ("steps", po::value<unsigned int>()->default_value(1), "number of approximation steps")
 
-        ("noiseEffects", po::value<std::string>()->default_value("APD"), "Noise effects (A (=amplitude damping),D (=depolarization),P (=phase flip)) in the form of a character string describing the noise effects (default=\"APD\")")
+        ("noise_effects", po::value<std::string>()->default_value("APD"), "Noise effects (A (=amplitude damping),D (=depolarization),P (=phase flip)) in the form of a character string describing the noise effects (default=\"APD\")")
         ("noise_prob", po::value<double>()->default_value(0.001), "Probability for applying noise (default=0.001)")
         ("confidence", po::value<double>()->default_value(0.05), "Confidence in the error bound of the stochastic simulation (default= 0.05)")
         ("error_bound", po::value<double>()->default_value(0.1), "Error bound of the stochastic simulation (default=0.1)")
@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
                                                                                                      vm["step_fidelity"].as<double>(),
                                                                                                      seed);
 
-        ddsim->setNoiseEffects(vm["noiseEffects"].as<std::string>());
+        ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>());
         ddsim->setAmplitudeDampingProbability(vm["noise_prob"].as<double>());
         ddsim->stoch_confidence = vm["confidence"].as<double>();
         ddsim->setRecordedProperties(vm["properties"].as<std::string>());
@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
             ddsim->noiseApplicationWithKrausMatrices = true;
         }
 
-        ddsim->setNoiseEffects(vm["noiseEffects"].as<std::string>());
+        ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>());
         ddsim->setAmplitudeDampingProbability(vm["noise_prob"].as<double>());
 
         auto t1 = std::chrono::steady_clock::now();
