@@ -108,21 +108,9 @@ private:
                                  std::vector<std::tuple<long, std::string>>& recordedPropertiesList,
                                  unsigned long long                          localSeed);
 
-    dd::Package::mEdge generateNoiseOperation(bool                                    amplitudeDamping,
-                                              dd::Qubit                               target,
-                                              std::mt19937_64&                        engine,
-                                              std::uniform_real_distribution<dd::fp>& distribution,
-                                              dd::Package::mEdge                      dd_operation,
-                                              std::unique_ptr<dd::Package>&           localDD);
+    dd::Package::mEdge generateNoiseOperation(bool amplitudeDamping, signed char target, std::mt19937_64& engine, std::uniform_real_distribution<dd::fp>& distribution, dd::Package::mEdge dd_operation, std::unique_ptr<dd::Package>& localDD, const char i);
 
-    void applyNoiseOperation(const qc::Targets&                      targets,
-                             const dd::Controls&                     control_qubits,
-                             dd::Package::mEdge                      dd_op,
-                             std::unique_ptr<dd::Package>&           localDD,
-                             dd::Package::vEdge&                     localRootEdge,
-                             std::mt19937_64&                        generator,
-                             std::uniform_real_distribution<dd::fp>& dist,
-                             dd::Package::mEdge                      identityDD);
+    void applyNoiseOperation(const qc::Targets& targets, const dd::Controls& control_qubits, dd::Package::mEdge dd_op, std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& localRootEdge, std::mt19937_64& generator, std::uniform_real_distribution<dd::fp>& dist, dd::Package::mEdge identityDD, const char i);
 
     [[nodiscard]] dd::NoiseOperationKind ReturnNoiseOperation(char i, double d) const;
 
