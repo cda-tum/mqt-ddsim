@@ -1,4 +1,5 @@
 #include "CircuitSimulator.hpp"
+#include "dd/Export.hpp"
 
 std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int shots) {
     bool has_nonmeasurement_nonunitary = false;
@@ -77,7 +78,6 @@ std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int
         }
         m_counter[result_string]++;
     }
-
     return m_counter;
 }
 
@@ -182,5 +182,6 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
         }
         op_num++;
     }
+    dd::export2Dot(root_edge, "result_without_parallel.dot", true, true);
     return classic_values;
 }

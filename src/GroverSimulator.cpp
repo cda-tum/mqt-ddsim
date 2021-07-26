@@ -1,7 +1,6 @@
 #include "GroverSimulator.hpp"
 
 #include "QuantumComputation.hpp"
-
 #include <chrono>
 
 std::map<std::string, std::size_t> GroverSimulator::Simulate(unsigned int shots) {
@@ -87,6 +86,5 @@ std::map<std::string, std::size_t> GroverSimulator::Simulate(unsigned int shots)
         root_edge = tmp;
         dd->garbageCollect();
     }
-
     return MeasureAllNonCollapsing(shots);
 }

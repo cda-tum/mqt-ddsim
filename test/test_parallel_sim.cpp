@@ -2,6 +2,7 @@
 // Created by alexander on 01.07.21.
 //
 #include "ParallelizationSimulator.hpp"
+#include "GroverSimulator.hpp"
 #include "algorithms/Grover.hpp"
 
 #include <algorithms/Entanglement.hpp>
@@ -18,9 +19,15 @@ protected:
 
 TEST_P(ParallelSimTestParameterized, Grover){
     int nqubits = GetParam();
-    std::unique_ptr<qc::QuantumComputation> grover = std::make_unique<qc::Grover>(nqubits);
+
+    std::unique_ptr<qc::QuantumComputation> grover = std::make_unique<qc::Grover>(nqubits,1);
     ParallelizationSimulator ddsim(std::move(grover));
+
+    std::unique_ptr<qc::QuantumComputation> grover2 = std::make_unique<qc::Grover>(nqubits,1);
+    CircuitSimulator ddsim1(std::move(grover2));
     ddsim.Simulate(1);
+    ddsim1.Simulate(1);
+
 
 }
 
@@ -38,7 +45,7 @@ TEST_P(ParallelSimTestParameterized, Entanglement){
     ddsim.Simulate(1);
 }
 
-INSTANTIATE_TEST_CASE_P(ParallelSimTest,ParallelSimTestParameterized, ::testing::Range(2,10));
+INSTANTIATE_TEST_CASE_P(ParallelSimTest,ParallelSimTestParameterized, ::testing::Range(2,3));
 
 
 /*TEST(ParallelSimTest, TrivialParallelCircuit){
