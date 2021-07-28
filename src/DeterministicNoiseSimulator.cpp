@@ -147,39 +147,41 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
             dd->decRef(density_root_edge);
             density_root_edge = tmp0;
 
-            if (noiseApplicationWithKrausMatrices) { // was `stochastic_runs == -2`
-                [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
+            if (noiseProbability > 0) {
+                if (sequentialApplyNoise) { // was `stochastic_runs == -2`
+                    [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
 
-                auto seq_targets = targets;
-                for (auto const& control: controls) {
-                    seq_targets.push_back(control.qubit);
-                }
-                applyDetNoiseSequential(seq_targets);
-
-                [[maybe_unused]] auto cache_size_after = dd->cn.cacheCount();
-                assert(cache_size_after == cache_size_before);
-            } else {
-                signed char maxDepth       = targets[0];
-                auto        control_qubits = op->getControls();
-                for (auto& control: control_qubits) {
-                    if (control.qubit < maxDepth) {
-                        maxDepth = control.qubit;
+                    auto seq_targets = targets;
+                    for (auto const& control: controls) {
+                        seq_targets.push_back(control.qubit);
                     }
-                }
-                [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
-                auto                  tmp2              = ApplyNoiseEffects(density_root_edge, op, 0);
-                if (!tmp2.w.approximatelyZero()) {
-                    dd::Complex c = dd->cn.lookup(tmp2.w);
-                    dd->cn.returnToCache(tmp2.w);
-                    tmp2.w = c;
-                }
+                    applyDetNoiseSequential(seq_targets);
 
-                [[maybe_unused]] auto cache_size_after = dd->cn.cacheCount();
-                assert(cache_size_after == cache_size_before);
+                    [[maybe_unused]] auto cache_size_after = dd->cn.cacheCount();
+                    assert(cache_size_after == cache_size_before);
+                } else {
+                    signed char maxDepth       = targets[0];
+                    auto        control_qubits = op->getControls();
+                    for (auto& control: control_qubits) {
+                        if (control.qubit < maxDepth) {
+                            maxDepth = control.qubit;
+                        }
+                    }
+                    [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
+                    auto                  tmp2              = ApplyNoiseEffects(density_root_edge, op, 0);
+                    if (!tmp2.w.approximatelyZero()) {
+                        dd::Complex c = dd->cn.lookup(tmp2.w);
+                        dd->cn.returnToCache(tmp2.w);
+                        tmp2.w = c;
+                    }
 
-                dd->incRef(tmp2);
-                dd->decRef(density_root_edge);
-                density_root_edge = tmp2;
+                    [[maybe_unused]] auto cache_size_after = dd->cn.cacheCount();
+                    assert(cache_size_after == cache_size_before);
+
+                    dd->incRef(tmp2);
+                    dd->decRef(density_root_edge);
+                    density_root_edge = tmp2;
+                }
             }
         }
     }

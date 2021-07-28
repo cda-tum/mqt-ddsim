@@ -77,7 +77,7 @@ public:
     //todo implement a new structure for density matrices
     qc::MatrixDD density_root_edge{};
 
-    bool noiseApplicationWithKrausMatrices = false;
+    bool sequentialApplyNoise = false;
     char MeasureOneCollapsing(dd::Qubit index);
 
 private:

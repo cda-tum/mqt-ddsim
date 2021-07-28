@@ -4,6 +4,7 @@
 
 #include <boost/program_options.hpp>
 #include <chrono>
+#include <dd/Export.hpp>
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -97,6 +98,7 @@ int main(int argc, char** argv) {
                     {"n_qubits", +ddsim->getNumberOfQubits()},
                     {"applied_gates", ddsim->getNumberOfOps()},
                     {"max_nodes", ddsim->getMaxNodeCount()},
+                    {"max_Matrix_nodes", ddsim->getMaxMatrixNodeCount()},
                     {"seed", ddsim->getSeed()},
             };
 
@@ -113,7 +115,7 @@ int main(int argc, char** argv) {
         std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, seed);
 
         if (vm["stoch_runs"].as<long>() == -2) {
-            ddsim->noiseApplicationWithKrausMatrices = true;
+            ddsim->sequentialApplyNoise = true;
         }
 
         ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>());
@@ -135,7 +137,9 @@ int main(int argc, char** argv) {
                     {"benchmark", ddsim->getName()},
                     {"n_qubits", +ddsim->getNumberOfQubits()},
                     {"applied_gates", ddsim->getNumberOfOps()},
-                    {"max_nodes", ddsim->getMaxNodeCount()},
+                    //                    {"max_nodes", ddsim->getMaxNodeCount()},
+                    {"max_Matrix_nodes", ddsim->getMaxMatrixNodeCount()},
+                    {"active_Matrix_nodes", ddsim->getMatrixActiveNodeCount()},
                     {"seed", ddsim->getSeed()},
                     {"active_nodes", ddsim->getActiveNodeCount()},
             };
