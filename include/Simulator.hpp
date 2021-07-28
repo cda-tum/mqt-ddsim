@@ -67,6 +67,10 @@ public:
 
     [[nodiscard]] virtual std::size_t getMaxNodeCount() const { return dd->vUniqueTable.getMaxActiveNodes(); }
 
+    [[nodiscard]] virtual std::size_t getMaxMatrixNodeCount() const { return dd->mUniqueTable.getMaxActiveNodes(); }
+
+    [[nodiscard]] std::size_t getMatrixActiveNodeCount() const { return dd->mUniqueTable.getActiveNodeCount(); }
+
     [[nodiscard]] std::size_t countNodesFromRoot() const { return dd->size(root_edge); }
 
     [[nodiscard]] std::pair<dd::ComplexValue, std::string> getPathOfLeastResistance() const;
