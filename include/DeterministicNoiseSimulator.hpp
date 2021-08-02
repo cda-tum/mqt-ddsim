@@ -12,6 +12,8 @@
 #include <vector>
 
 class DeterministicNoiseSimulator: public Simulator {
+    using CN = dd::ComplexNumbers;
+
 public:
     //    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity):
     //        qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
@@ -32,9 +34,21 @@ public:
 
     void setAmplitudeDampingProbability(double cGateNoiseProbability) {
         //The probability of amplitude damping (t1) often is double the probability , of phase flip, which is why I double it here
-        noiseProbability                             = cGateNoiseProbability;
-        sqrt_amplitude_damping_probability           = {sqrt(noiseProbability * 2), 0};
-        one_minus_sqrt_amplitude_damping_probability = {sqrt(1 - noiseProbability * 2), 0};
+        noiseProbability   = cGateNoiseProbability;
+        noiseProbFromTable = dd->cn.lookup(noiseProbability, 0);
+        CN::incRef(noiseProbFromTable);
+        noiseProbFromTableAmp = dd->cn.lookup(noiseProbability * 2, 0);
+        CN::incRef(noiseProbFromTableAmp);
+        oneMinusNoiseProbFromTableAmp = dd->cn.lookup(1 - noiseProbability * 2, 0);
+        CN::incRef(oneMinusNoiseProbFromTableAmp);
+        sqrtOneMinusNoiseProbFromTableAmp = dd->cn.lookup(std::sqrt(1 - noiseProbability * 2), 0);
+        CN::incRef(sqrtOneMinusNoiseProbFromTableAmp);
+        oneMinusNoiseTwoProbFromTable = dd->cn.lookup(1 - noiseProbability * 2, 0);
+        CN::incRef(oneMinusNoiseTwoProbFromTable);
+        twoMinusNoiseProbFromTable = dd->cn.lookup(2 - noiseProbability, 0);
+        CN::incRef(twoMinusNoiseProbFromTable);
+        oneMinusNoiseProbFromTable = dd->cn.lookup(1 - noiseProbability, 0);
+        CN::incRef(oneMinusNoiseProbFromTable);
     }
 
     std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override{};
@@ -70,9 +84,14 @@ public:
             {'D', 4}, //Depolarisation
     };
 
-    double           noiseProbability = 0.0;
-    dd::ComplexValue sqrt_amplitude_damping_probability{};
-    dd::ComplexValue one_minus_sqrt_amplitude_damping_probability{};
+    double      noiseProbability                  = 0.0;
+    dd::Complex noiseProbFromTable                = {};
+    dd::Complex noiseProbFromTableAmp             = {};
+    dd::Complex oneMinusNoiseProbFromTableAmp     = {};
+    dd::Complex sqrtOneMinusNoiseProbFromTableAmp = {};
+    dd::Complex oneMinusNoiseTwoProbFromTable     = {};
+    dd::Complex twoMinusNoiseProbFromTable     = {};
+    dd::Complex oneMinusNoiseProbFromTable     = {};
 
     //todo implement a new structure for density matrices
     qc::MatrixDD density_root_edge{};
