@@ -114,6 +114,7 @@ private:
     std::unique_ptr<qc::QuantumComputation>& qc;
 
     std::string gateNoiseTypes;
+    long calls = 0;
 
     std::array<NoiseEntry, NoiseSLOTS> NoiseTable{};
 

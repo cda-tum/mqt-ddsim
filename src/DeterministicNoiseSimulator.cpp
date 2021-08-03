@@ -77,8 +77,6 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
     density_root_edge = makeZeroDensityOperator(n_qubits);
     dd->incRef(density_root_edge);
 
-    int op_count = 0;
-
     for (auto const& op: *qc) {
         if (!op->isUnitary() && !(op->isClassicControlledOperation())) {
             if (auto* nu_op = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
@@ -149,7 +147,6 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
             dd->decRef(density_root_edge);
             density_root_edge = tmp0;
 
-//            dd->printMatrix(density_root_edge);
             if (noiseProbability > 0) {
                 if (sequentialApplyNoise) { // was `stochastic_runs == -2`
                     [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
@@ -172,7 +169,13 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                     }
                     [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
                     auto                  tmp2              = ApplyNoiseEffects(density_root_edge, op, 0);
-                    [[maybe_unused]] auto cache_size_after  = dd->cn.cacheCount();
+                    if (!tmp2.w.approximatelyZero()) {
+                        dd::Complex c = dd->cn.lookup(tmp2.w);
+                        dd->cn.returnToCache(tmp2.w);
+                        tmp2.w = c;
+                    }
+
+                    [[maybe_unused]] auto cache_size_after = dd->cn.cacheCount();
                     assert(cache_size_after == cache_size_before);
 
                     dd->incRef(tmp2);
@@ -180,13 +183,12 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                     density_root_edge = tmp2;
                 }
             }
-            op_count += 1;
         }
     }
     if (dd->garbageCollect()) {
         NoiseTable.fill({});
     }
-    //    dd->printMatrix(density_root_edge);
+    dd->densityNoiseOperations.printStatistics();
     return AnalyseState(n_qubits, false);
 }
 
@@ -194,8 +196,7 @@ qc::MatrixDD DeterministicNoiseSimulator::ApplyNoiseEffects(qc::MatrixDD density
     if (density_op.p->v < maxDepth || density_op.isTerminal()) {
         qc::MatrixDD tmp{};
         if (!density_op.w.approximatelyZero()) {
-            //            tmp.w = dd->cn.getCached(dd::CTEntry::val(density_op.w.r), dd::CTEntry::val(density_op.w.i));
-            tmp.w = dd->cn.lookup(dd::CTEntry::val(density_op.w.r), dd::CTEntry::val(density_op.w.i));
+            tmp.w = dd->cn.getCached(dd::CTEntry::val(density_op.w.r), dd::CTEntry::val(density_op.w.i));
         } else {
             tmp.w = dd::Complex::zero;
         }
@@ -216,28 +217,32 @@ qc::MatrixDD DeterministicNoiseSimulator::ApplyNoiseEffects(qc::MatrixDD density
     std::array<qc::MatrixDD, 4> new_edges{};
     for (int i = 0; i < 4; i++) {
         if (density_op.p->e[i].w.approximatelyZero()) {
-            // applyNoiseEffects2 returns a pointer to the terminal node with edge weight 0
             new_edges[i] = qc::MatrixDD::terminal(density_op.p->e[i].w);
             continue;
         }
 
         // Check if the target of the current edge is in the Compute table. Note that I check for the target node of
         // the current edge if noise needs to be applied or not
-        qc::MatrixDD tmp = dd->noiseOperations.lookup(density_op.p->e[i], used_qubits);
 
+        qc::MatrixDD tmp = dd->densityNoiseOperations.lookup(density_op.p->e[i], dd->cn.getTemporary(), used_qubits);
+        //        qc::MatrixDD tmp = noiseLookup(density_op.p->e[i], used_qubits);
         if (tmp.p != nullptr) {
+            if (tmp.w.approximatelyZero()) {
+                tmp = qc::MatrixDD::zero;
+            } else {
+                tmp.w = dd->cn.getCached(tmp.w.r->value, tmp.w.i->value);
+            }
             new_edges[i] = tmp;
             continue;
         }
 
         new_edges[i] = ApplyNoiseEffects(density_op.p->e[i], op, maxDepth);
 
-
         // Adding the operation to the operation table
-        dd->noiseOperations.insert(density_op.p->e[i], new_edges[i], used_qubits);
+        dd->densityNoiseOperations.insert(density_op.p->e[i], new_edges[i], used_qubits);
+        //        noiseInsert(density_op.p->e[i], used_qubits, new_edges[i]);
     }
 
-    [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
     if (op->actsOn(density_op.p->v)) {
         for (auto const& type: gateNoiseTypes) {
             switch (type) {
@@ -247,9 +252,6 @@ qc::MatrixDD DeterministicNoiseSimulator::ApplyNoiseEffects(qc::MatrixDD density
                 case 'P':
                     ApplyPhaseFlipToNode(new_edges);
                     break;
-                    //case 'B':
-                    //    applyBitFlipToNode(new_edges);
-                    //    break;
                 case 'D':
                     ApplyDepolaritationToNode(new_edges);
                     break;
@@ -258,133 +260,180 @@ qc::MatrixDD DeterministicNoiseSimulator::ApplyNoiseEffects(qc::MatrixDD density
             }
         }
     }
-    [[maybe_unused]] auto cache_size_after = dd->cn.cacheCount();
-    assert(cache_size_after == cache_size_before);
 
-    qc::MatrixDD tmp = dd->makeDDNode(density_op.p->v, new_edges, false);
+    qc::MatrixDD tmp = dd->makeDDNode(density_op.p->v, new_edges, true);
 
     // Multiplying the old edge weight with the new one
     if (!tmp.w.approximatelyZero()) {
-        auto tmp1 = dd->cn.getTemporary();
-        CN::mul(tmp1, tmp.w, density_op.w);
-        tmp.w = dd->cn.lookup(tmp1);
-    } else {
-        tmp.w = dd->cn.lookup(tmp.w);
+        CN::mul(tmp.w, tmp.w, density_op.w);
     }
     return tmp;
 }
 
 void DeterministicNoiseSimulator::ApplyPhaseFlipToNode(std::array<qc::MatrixDD, 4>& e) {
+    double      probability  = noiseProbability;
+    dd::Complex complex_prob = dd->cn.getCached();
+
     //e[0] = e[0]
 
     //e[1] = (1-2p)*e[1]
     if (!e[1].w.approximatelyZero()) {
-        auto tmp = dd->cn.getTemporary();
-        CN::mul(tmp, oneMinusNoiseTwoProbFromTable, e[1].w);
-        e[1].w = dd->cn.lookup(tmp);
+        complex_prob.r->value = 1 - 2 * probability;
+        complex_prob.i->value = 0;
+        CN::mul(e[1].w, complex_prob, e[1].w);
     }
 
     //e[2] = (1-2p)*e[2]
     if (!e[2].w.approximatelyZero()) {
-        auto tmp = dd->cn.getTemporary();
-        CN::mul(tmp, oneMinusNoiseTwoProbFromTable, e[2].w);
-        e[2].w = dd->cn.lookup(tmp);
+        if (e[1].w.approximatelyZero()) {
+            complex_prob.r->value = 1 - 2 * probability;
+            complex_prob.i->value = 0;
+        }
+        CN::mul(e[2].w, complex_prob, e[2].w);
     }
 
     //e[3] = e[3]
+
+    dd->cn.returnToCache(complex_prob);
 }
 
 void DeterministicNoiseSimulator::ApplyAmplitudeDampingToNode(std::array<qc::MatrixDD, 4>& e) {
+    double       probability  = noiseProbability * 2;
+    dd::Complex  complex_prob = dd->cn.getCached();
+    qc::MatrixDD helper_edge[1];
+    helper_edge[0].w = dd->cn.getCached();
+
     // e[0] = e[0] + p*e[3]
     if (!e[3].w.approximatelyZero()) {
+        complex_prob.r->value = probability;
+        complex_prob.i->value = 0;
         if (!e[0].w.approximatelyZero()) {
-            auto tmp_edge = e[3];
-            tmp_edge.w    = dd->cn.mulCached(noiseProbFromTableAmp, tmp_edge.w);
-            dd::Edge tmp  = dd->add2(e[0], tmp_edge);
-            dd->cn.returnToCache(tmp_edge.w);
-            e[0].w = dd->cn.lookup(tmp.w);
-            dd->cn.returnToCache(tmp.w);
-            e[0].p = tmp.p;
+            CN::mul(helper_edge[0].w, complex_prob, e[3].w);
+            helper_edge[0].p = e[3].p;
+            dd::Edge tmp     = dd->add2(e[0], helper_edge[0]);
+            if (!e[0].w.approximatelyZero()) {
+                dd->cn.returnToCache(e[0].w);
+            }
+            e[0] = tmp;
         } else {
-            auto tmp = dd->cn.getTemporary();
-            CN::mul(tmp, noiseProbFromTableAmp, e[3].w);
-            e[0].w = dd->cn.lookup(tmp);
+            e[0].w = dd->cn.getCached();
+            CN::mul(e[0].w, complex_prob, e[3].w);
             e[0].p = e[3].p;
         }
     }
 
     //e[1] = sqrt(1-p)*e[1]
     if (!e[1].w.approximatelyZero()) {
-        //        CN::mul(e[1].w, complex_prob, e[1].w);
-        auto tmp = dd->cn.getTemporary();
-        CN::mul(tmp, sqrtOneMinusNoiseProbFromTableAmp, e[1].w);
-        e[1].w = dd->cn.lookup(tmp);
+        complex_prob.r->value = std::sqrt(1 - probability);
+        complex_prob.i->value = 0;
+        CN::mul(e[1].w, complex_prob, e[1].w);
     }
 
     //e[2] = sqrt(1-p)*e[2]
     if (!e[2].w.approximatelyZero()) {
-        auto tmp = dd->cn.getTemporary();
-        CN::mul(tmp, sqrtOneMinusNoiseProbFromTableAmp, e[2].w);
-        e[2].w = dd->cn.lookup(tmp);
+        if (e[1].w.approximatelyZero()) {
+            complex_prob.r->value = std::sqrt(1 - probability);
+            complex_prob.i->value = 0;
+        }
+        CN::mul(e[2].w, complex_prob, e[2].w);
     }
 
     //e[3] = (1-p)*e[3]
     if (!e[3].w.approximatelyZero()) {
-        auto tmp = dd->cn.getTemporary();
-        CN::mul(tmp, oneMinusNoiseProbFromTableAmp, e[3].w);
-        e[3].w = dd->cn.lookup(tmp);
+        complex_prob.r->value = 1 - probability;
+        CN::mul(e[3].w, complex_prob, e[3].w);
     }
+
+    dd->cn.returnToCache(helper_edge[0].w);
+    dd->cn.returnToCache(complex_prob);
 }
 
 void DeterministicNoiseSimulator::ApplyDepolaritationToNode(std::array<qc::MatrixDD, 4>& e) {
-    dd::Edge old_edges_0 = e[0];
-    dd::Edge old_edges_3 = e[3];
+    double       probability = noiseProbability;
+    qc::MatrixDD helper_edge[2];
+    helper_edge[0].w         = dd->cn.getCached();
+    helper_edge[1].w         = dd->cn.getCached();
+    dd::Complex complex_prob = dd->cn.getCached();
+
+    //todo I don't have to save all edges
+    qc::MatrixDD old_edges[4];
+    for (int i = 0; i < 4; i++) {
+        if (!e[i].w.approximatelyZero()) {
+            old_edges[i].w = dd->cn.getCached(dd::CTEntry::val(e[i].w.r), dd::CTEntry::val(e[i].w.i));
+            old_edges[i].p = e[i].p;
+        } else {
+            old_edges[i] = e[i];
+        }
+    }
 
     //e[0] = 0.5*((2-p)*e[0] + p*e[3])
-    if (!old_edges_0.w.approximatelyZero()) {
-        auto tmp = dd->cn.getTemporary();
-        CN::mul(tmp, twoMinusNoiseProbFromTable, e[0].w);
-        e[0].w = dd->cn.lookup(tmp);
+    complex_prob.i->value = 0;
+    // first check if e[0] or e[1] != 0
+    if (!old_edges[0].w.approximatelyZero() || !old_edges[3].w.approximatelyZero()) {
+        if (!old_edges[0].w.approximatelyZero() && old_edges[3].w.approximatelyZero()) {
+            complex_prob.r->value = (2 - probability) * 0.5;
+            CN::mul(e[0].w, complex_prob, old_edges[0].w);
+            e[0].p = old_edges[0].p;
+        } else if (old_edges[0].w.approximatelyZero() && !old_edges[3].w.approximatelyZero()) {
+            e[0].w                = dd->cn.getCached();
+            complex_prob.r->value = probability * 0.5;
+            CN::mul(e[0].w, complex_prob, old_edges[3].w);
+            e[0].p = old_edges[3].p;
+        } else {
+            complex_prob.r->value = (2 - probability) * 0.5;
+            CN::mul(helper_edge[0].w, complex_prob, old_edges[0].w);
+            complex_prob.r->value = probability * 0.5;
+            CN::mul(helper_edge[1].w, complex_prob, old_edges[3].w);
+            helper_edge[0].p = old_edges[0].p;
+            helper_edge[1].p = old_edges[3].p;
+            dd->cn.returnToCache(e[0].w);
+            e[0] = dd->add2(helper_edge[0], helper_edge[1]);
+        }
     }
-    if (!old_edges_3.w.approximatelyZero()) {
-        auto tmp = dd->cn.getTemporary();
-        CN::mul(tmp, noiseProbFromTable, e[3].w);
-        e[3].w = dd->cn.lookup(tmp);
-    }
-    e[0]      = dd->add(e[0], e[3]);
-    auto tmp1 = dd->cn.getTemporary(0.5, 0);
-    CN::mul(tmp1, tmp1, e[0].w);
-    e[0].w = dd->cn.lookup(tmp1);
-
-    //e[1]=(1-p)*e[1]
+    //e[1]=1-p*e[1]
     if (!e[1].w.approximatelyZero()) {
-        auto tmp = dd->cn.getTemporary();
-        CN::mul(tmp, oneMinusNoiseProbFromTable, e[1].w);
-        e[1].w = dd->cn.lookup(tmp);
+        complex_prob.r->value = 1 - probability;
+        CN::mul(e[1].w, e[1].w, complex_prob);
     }
-    //e[2]=(1-p)*e[2]
+    //e[2]=1-p*e[2]
     if (!e[2].w.approximatelyZero()) {
-        auto tmp = dd->cn.getTemporary();
-        CN::mul(tmp, oneMinusNoiseProbFromTable, e[2].w);
-        e[2].w = dd->cn.lookup(tmp);
+        if (e[1].w.approximatelyZero()) {
+            complex_prob.r->value = 1 - probability;
+        }
+        CN::mul(e[2].w, e[2].w, complex_prob);
     }
 
     //e[3] = 0.5*((2-p)*e[3] + p*e[0])
-    if (!old_edges_3.w.approximatelyZero()) {
-        auto tmp = dd->cn.getTemporary();
-        CN::mul(tmp, twoMinusNoiseProbFromTable, old_edges_3.w);
-        e[3].w = dd->cn.lookup(tmp);
+    if (!old_edges[0].w.approximatelyZero() || !old_edges[3].w.approximatelyZero()) {
+        if (!old_edges[0].w.approximatelyZero() && old_edges[3].w.approximatelyZero()) {
+            e[3].w                = dd->cn.getCached();
+            complex_prob.r->value = probability * 0.5;
+            CN::mul(e[3].w, complex_prob, old_edges[0].w);
+            e[3].p = old_edges[0].p;
+        } else if (old_edges[0].w.approximatelyZero() && !old_edges[3].w.approximatelyZero()) {
+            complex_prob.r->value = (2 - probability) * 0.5;
+            CN::mul(e[3].w, complex_prob, old_edges[3].w);
+            e[3].p = old_edges[3].p;
+        } else {
+            complex_prob.r->value = probability * 0.5;
+            CN::mul(helper_edge[0].w, complex_prob, old_edges[0].w);
+            complex_prob.r->value = (2 - probability) * 0.5;
+            CN::mul(helper_edge[1].w, complex_prob, old_edges[3].w);
+            helper_edge[0].p = old_edges[0].p;
+            helper_edge[1].p = old_edges[3].p;
+            dd->cn.returnToCache(e[3].w);
+            e[3] = dd->add2(helper_edge[0], helper_edge[1]);
+        }
     }
-
-    if (!old_edges_0.w.approximatelyZero()) {
-        auto tmp = dd->cn.getTemporary();
-        CN::mul(tmp, noiseProbFromTable, old_edges_0.w);
-        old_edges_0.w = dd->cn.lookup(tmp);
+    for (auto& old_edge: old_edges) {
+        if (!old_edge.w.approximatelyZero()) {
+            dd->cn.returnToCache(old_edge.w);
+        }
     }
-    e[3]      = dd->add(old_edges_0, e[3]);
-    auto tmp2 = dd->cn.getTemporary(0.5, 0);
-    CN::mul(tmp2, tmp2, e[3].w);
-    e[3].w = dd->cn.lookup(tmp2);
+    //    helper_edge[0].w.r->next->next->next->next->next->next = ComplexCache_Avail;
+    dd->cn.returnToCache(helper_edge[0].w);
+    dd->cn.returnToCache(helper_edge[1].w);
+    dd->cn.returnToCache(complex_prob);
 }
 
 std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(dd::QubitCount nr_qubits, bool full_state) const {
@@ -393,8 +442,6 @@ std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(dd::Qubi
     double p0, p1, imaginary;
 
     double long global_probability;
-
-    auto delMe = dd::QubitCount();
 
     double measure_states = std::min((double)256, pow(2, nr_qubits));
 
@@ -609,7 +656,7 @@ qc::MatrixDD DeterministicNoiseSimulator::noiseLookup(const qc::MatrixDD& a, con
     if (std::abs(NoiseTable[i].rw.r) < dd::ComplexTable<>::tolerance() && std::fabs(NoiseTable[i].rw.i) < dd::ComplexTable<>::tolerance()) {
         return qc::MatrixDD::zero;
     } else {
-        r.w = dd->cn.lookup(NoiseTable[i].rw.r, NoiseTable[i].rw.i);
+        r.w = dd->cn.getCached(NoiseTable[i].rw.r, NoiseTable[i].rw.i);
     }
     return r;
 }
