@@ -106,9 +106,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
             } else {
                 throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
             }
-            if (dd->garbageCollect()) {
-                NoiseTable.fill({});
-            }
+            dd->garbageCollect();
         } else {
             qc::MatrixDD dd_op = {};
             qc::Targets  targets;
@@ -147,6 +145,9 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
             dd->decRef(density_root_edge);
             density_root_edge = tmp0;
 
+//            dd->printMatrix(density_root_edge, true);
+//            dd::export2Dot(density_root_edge, "/home/user/Desktop/dds/after_op.dot", false, true, false, false);
+
             if (noiseProbability > 0) {
                 if (sequentialApplyNoise) { // was `stochastic_runs == -2`
                     [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
@@ -168,7 +169,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                         }
                     }
                     [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
-                    auto                  tmp2              = ApplyNoiseEffects(density_root_edge, op, 0);
+                    auto                  tmp2              = ApplyNoiseEffects(&density_root_edge, op, 0);
                     if (!tmp2.w.approximatelyZero()) {
                         dd::Complex c = dd->cn.lookup(tmp2.w);
                         dd->cn.returnToCache(tmp2.w);
@@ -185,25 +186,28 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
             }
         }
     }
-    if (dd->garbageCollect()) {
-        NoiseTable.fill({});
-    }
+    dd->garbageCollect();
+
+//    dd::export2Dot(density_root_edge, "/home/user/Desktop/dds/final.dot", false, true, false, false);
+    dd->printMatrix(density_root_edge, true);
+    dd->printMatrix(density_root_edge, false);
+    dd->printMatrix(density_root_edge, true);
     dd->densityNoiseOperations.printStatistics();
     return AnalyseState(n_qubits, false);
 }
 
-qc::MatrixDD DeterministicNoiseSimulator::ApplyNoiseEffects(qc::MatrixDD density_op, const std::unique_ptr<qc::Operation>& op, unsigned char maxDepth) {
-    if (density_op.p->v < maxDepth || density_op.isTerminal()) {
+qc::MatrixDD DeterministicNoiseSimulator::ApplyNoiseEffects(qc::MatrixDD* density_op, const std::unique_ptr<qc::Operation>& op, unsigned char maxDepth) {
+    if (density_op->p->v < maxDepth || density_op->isTerminal()) {
         qc::MatrixDD tmp{};
-        if (!density_op.w.approximatelyZero()) {
-            tmp.w = dd->cn.getCached(dd::CTEntry::val(density_op.w.r), dd::CTEntry::val(density_op.w.i));
+        if (!density_op->w.approximatelyZero()) {
+            tmp.w = dd->cn.getCached(dd::CTEntry::val(density_op->w.r), dd::CTEntry::val(density_op->w.i));
         } else {
             tmp.w = dd::Complex::zero;
         }
-        if (density_op.isTerminal()) {
+        if (density_op->isTerminal()) {
             return qc::MatrixDD::terminal(tmp.w);
         } else {
-            tmp.p = density_op.p;
+            tmp.p = density_op->p;
             return tmp;
         }
     }
@@ -216,15 +220,15 @@ qc::MatrixDD DeterministicNoiseSimulator::ApplyNoiseEffects(qc::MatrixDD density
 
     std::array<qc::MatrixDD, 4> new_edges{};
     for (int i = 0; i < 4; i++) {
-        if (density_op.p->e[i].w.approximatelyZero()) {
-            new_edges[i] = qc::MatrixDD::terminal(density_op.p->e[i].w);
+        if (density_op->p->e[i].w.approximatelyZero()) {
+            new_edges[i] = qc::MatrixDD::terminal(density_op->p->e[i].w);
             continue;
         }
 
         // Check if the target of the current edge is in the Compute table. Note that I check for the target node of
         // the current edge if noise needs to be applied or not
 
-        qc::MatrixDD tmp = dd->densityNoiseOperations.lookup(density_op.p->e[i], dd->cn.getTemporary(), used_qubits);
+        qc::MatrixDD tmp = dd->densityNoiseOperations.lookup(density_op->p->e[i], dd->cn.getTemporary(), used_qubits);
         //        qc::MatrixDD tmp = noiseLookup(density_op.p->e[i], used_qubits);
         if (tmp.p != nullptr) {
             if (tmp.w.approximatelyZero()) {
@@ -236,14 +240,15 @@ qc::MatrixDD DeterministicNoiseSimulator::ApplyNoiseEffects(qc::MatrixDD density
             continue;
         }
 
-        new_edges[i] = ApplyNoiseEffects(density_op.p->e[i], op, maxDepth);
+//        new_edges[i] = ApplyNoiseEffects(&density_op->p->e[i], op, maxDepth);
+        new_edges[i] = ApplyNoiseEffects(dd->getAlignedDensityEdgeModifySubEdges(&density_op->p->e[i]), op, maxDepth);
 
         // Adding the operation to the operation table
-        dd->densityNoiseOperations.insert(density_op.p->e[i], new_edges[i], used_qubits);
+        dd->densityNoiseOperations.insert(density_op->p->e[i], new_edges[i], used_qubits);
         //        noiseInsert(density_op.p->e[i], used_qubits, new_edges[i]);
     }
 
-    if (op->actsOn(density_op.p->v)) {
+    if (op->actsOn(density_op->p->v)) {
         for (auto const& type: gateNoiseTypes) {
             switch (type) {
                 case 'A':
@@ -261,11 +266,12 @@ qc::MatrixDD DeterministicNoiseSimulator::ApplyNoiseEffects(qc::MatrixDD density
         }
     }
 
-    qc::MatrixDD tmp = dd->makeDDNode(density_op.p->v, new_edges, true);
+//    qc::MatrixDD tmp = dd->makeDDNode(density_op->p->v, new_edges, true, true);
+    qc::MatrixDD tmp = dd->makeDDNode(density_op->p->v, new_edges, true);
 
     // Multiplying the old edge weight with the new one
     if (!tmp.w.approximatelyZero()) {
-        CN::mul(tmp.w, tmp.w, density_op.w);
+        CN::mul(tmp.w, tmp.w, density_op->w);
     }
     return tmp;
 }
@@ -621,52 +627,4 @@ std::string DeterministicNoiseSimulator::intToString(long target_number, char va
         number = number >> 1u;
     }
     return path;
-}
-
-void DeterministicNoiseSimulator::noiseInsert(const qc::MatrixDD& a, const std::vector<signed char>& usedQubits, const qc::MatrixDD& r) {
-    dd::ComplexValue    aw{dd::CTEntry::val(a.w.r), dd::CTEntry::val(a.w.i)};
-    const unsigned long i = noiseHash(a.p, aw, usedQubits);
-
-    assert(((std::uintptr_t)r.w.r & 1u) == 0 && ((std::uintptr_t)r.w.i & 1u) == 0);
-
-    std::copy(usedQubits.begin(), usedQubits.end(), NoiseTable[i].usedQubits);
-    NoiseTable[i].a    = a.p;
-    NoiseTable[i].aw   = aw;
-    NoiseTable[i].r    = r.p;
-    NoiseTable[i].rw.r = r.w.r->value;
-    NoiseTable[i].rw.i = r.w.i->value;
-}
-
-qc::MatrixDD DeterministicNoiseSimulator::noiseLookup(const qc::MatrixDD& a, const std::vector<signed char>& usedQubits) {
-    // Lookup a computation in the compute table
-    // return NULL if not a match else returns result of prior computation
-    qc::MatrixDD r{nullptr, {nullptr, nullptr}};
-
-    dd::ComplexValue aw{dd::CTEntry::val(a.w.r), dd::CTEntry::val(a.w.i)};
-
-    const unsigned long i = noiseHash(a.p, aw, usedQubits);
-
-    if (NoiseTable[i].a != a.p || NoiseTable[i].aw != aw) return r;
-    if (!std::equal(usedQubits.begin(), usedQubits.end(), std::begin(NoiseTable[i].usedQubits))) {
-        return r;
-    }
-
-    r.p = NoiseTable[i].r;
-
-    if (std::abs(NoiseTable[i].rw.r) < dd::ComplexTable<>::tolerance() && std::fabs(NoiseTable[i].rw.i) < dd::ComplexTable<>::tolerance()) {
-        return qc::MatrixDD::zero;
-    } else {
-        r.w = dd->cn.getCached(NoiseTable[i].rw.r, NoiseTable[i].rw.i);
-    }
-    return r;
-}
-
-unsigned long DeterministicNoiseSimulator::noiseHash(dd::Package::mNode* a, const dd::ComplexValue& aw, const std::vector<signed char>& usedQubits) {
-    unsigned long i = 0;
-
-    for (auto qubit: usedQubits) {
-        i = (i << 3U) + i * qubit + qubit;
-    }
-    i += (reinterpret_cast<std::uintptr_t>(a)) + static_cast<unsigned long>(aw.r * 1000000 + aw.i * 2000000);
-    return i & NoiseMASK;
 }
