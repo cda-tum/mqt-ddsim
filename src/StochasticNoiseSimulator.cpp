@@ -181,7 +181,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
     const unsigned long numberOfRuns = stochastic_runs / max_instances + (stochRun < stochastic_runs % max_instances ? 1 : 0);
     const int           approx_mod   = std::ceil(static_cast<double>(qc->getNops()) / (step_number + 1));
 
-    //        dd::NoiseOperationTable<dd::Package::mEdge> noiseOperationTable(getNumberOfQubits());
+    //        dd::NoiseOperationTable<dd::Package::mEdge> stochasticNoiseTable(getNumberOfQubits());
 
     //printf("Running %d times and using the dd at %p, using the cn object at %p\n", numberOfRuns, (void *) &localDD, (void *) &localDD->cn);
     for (unsigned long current_run = 0; current_run < numberOfRuns; current_run++) {
@@ -342,19 +342,19 @@ dd::Package::mEdge StochasticNoiseSimulator::generateNoiseOperation(bool        
         if (effect != dd::I) {
             switch (effect) {
                 case (dd::ATrue): {
-                    auto tmp_op = localDD->noiseOperationTable.lookup(getNumberOfQubits(), dd::ATrue, target);
+                    auto tmp_op = localDD->stochasticNoiseTable.lookup(getNumberOfQubits(), dd::ATrue, target);
                     if (tmp_op.p == nullptr) {
                         tmp_op = localDD->makeGateDD(dd::GateMatrix({dd::complex_zero, sqrt_amplitude_damping_probability, dd::complex_zero, dd::complex_zero}), getNumberOfQubits(), target);
-                        localDD->noiseOperationTable.insert(dd::ATrue, target, tmp_op);
+                        localDD->stochasticNoiseTable.insert(dd::ATrue, target, tmp_op);
                     }
                     dd_operation = localDD->multiply(tmp_op, dd_operation);
                     break;
                 }
                 case (dd::AFalse): {
-                    auto tmp_op = localDD->noiseOperationTable.lookup(getNumberOfQubits(), dd::AFalse, target);
+                    auto tmp_op = localDD->stochasticNoiseTable.lookup(getNumberOfQubits(), dd::AFalse, target);
                     if (tmp_op.p == nullptr) {
                         tmp_op = localDD->makeGateDD(dd::GateMatrix({dd::complex_one, dd::complex_zero, dd::complex_zero, one_minus_sqrt_amplitude_damping_probability}), getNumberOfQubits(), target);
-                        localDD->noiseOperationTable.insert(dd::AFalse, target, tmp_op);
+                        localDD->stochasticNoiseTable.insert(dd::AFalse, target, tmp_op);
                     }
                     dd_operation = localDD->multiply(tmp_op, dd_operation);
                     break;
