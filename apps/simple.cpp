@@ -140,8 +140,7 @@ int main(int argc, char** argv) {
         ddsim                       = std::make_unique<CircuitSimulator>(std::move(quantumComputation), approx_info, seed);
     } else if (vm.count("simulate_grover_parallel")) {
         const unsigned int n_qubits = vm["simulate_grover_parallel"].as<unsigned int>();
-
-        std::unique_ptr<qc::QuantumComputation> grover = std::make_unique<qc::Grover>(n_qubits);
+        std::unique_ptr<qc::QuantumComputation> grover = std::make_unique<qc::Grover>(n_qubits, seed);
         ddsim                       = std::make_unique<ParallelizationSimulator>(std::move(grover));
     } else if (vm.count("simulate_grover_emulated")) {
         ddsim = std::make_unique<GroverSimulator>(vm["simulate_grover_emulated"].as<unsigned int>(), seed);
@@ -251,6 +250,7 @@ int main(int argc, char** argv) {
                 {"n_qubits", +ddsim->getNumberOfQubits()},
                 {"applied_gates", ddsim->getNumberOfOps()},
                 {"max_nodes", ddsim->getMaxNodeCount()},
+                {"active", ddsim->getActiveNodeCount()},
                 {"shots", shots},
                 {"distinct_results", m.size()},
                 {"seed", ddsim->getSeed()},

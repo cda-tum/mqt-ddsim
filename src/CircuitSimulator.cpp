@@ -1,5 +1,6 @@
 #include "CircuitSimulator.hpp"
 #include "dd/Export.hpp"
+#include <unistd.h>
 
 std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int shots) {
     bool has_nonmeasurement_nonunitary = false;
@@ -87,7 +88,7 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
 
     root_edge = dd->makeZeroState(n_qubits);
     dd->incRef(root_edge);
-
+    std::size_t                 test=1;
     std::size_t                 op_num = 0;
     std::map<std::size_t, bool> classic_values;
 
@@ -148,7 +149,12 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
             dd->incRef(tmp);
             dd->decRef(root_edge);
             root_edge = tmp;
-
+            /*
+            if (op_num > 1 && op_num%200 ==0){
+                std::string var = std::to_string(op_num);
+                dd::export2Dot(root_edge, "result_without_parallel"+var+".dot", true, true);
+                sleep(2);
+            }*/
             if (approx_info.step_number > 0 && approx_info.step_fidelity < 1.0) {
                 if (approx_info.approx_when == ApproximationInfo::FidelityDriven && (op_num + 1) % approx_mod == 0 &&
                     approximation_runs < approx_info.step_number) {
@@ -182,6 +188,7 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
         }
         op_num++;
     }
+    //qc->print(std::cout);std::cout<<std::endl;
     dd::export2Dot(root_edge, "result_without_parallel.dot", true, true);
     return classic_values;
 }

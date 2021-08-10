@@ -22,7 +22,6 @@ TEST_P(ParallelSimTestParameterized, Grover){
 
     std::unique_ptr<qc::QuantumComputation> grover = std::make_unique<qc::Grover>(nqubits,1);
     ParallelizationSimulator ddsim(std::move(grover));
-
     std::unique_ptr<qc::QuantumComputation> grover2 = std::make_unique<qc::Grover>(nqubits,1);
     CircuitSimulator ddsim1(std::move(grover2));
     ddsim.Simulate(1);
@@ -45,7 +44,7 @@ TEST_P(ParallelSimTestParameterized, Entanglement){
     ddsim.Simulate(1);
 }
 
-INSTANTIATE_TEST_CASE_P(ParallelSimTest,ParallelSimTestParameterized, ::testing::Range(2,3));
+INSTANTIATE_TEST_CASE_P(ParallelSimTest,ParallelSimTestParameterized, ::testing::Range(12,13));
 
 
 /*TEST(ParallelSimTest, TrivialParallelCircuit){
