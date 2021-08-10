@@ -90,8 +90,8 @@ public:
     dd::Complex oneMinusNoiseProbFromTableAmp     = {};
     dd::Complex sqrtOneMinusNoiseProbFromTableAmp = {};
     dd::Complex oneMinusNoiseTwoProbFromTable     = {};
-    dd::Complex twoMinusNoiseProbFromTable     = {};
-    dd::Complex oneMinusNoiseProbFromTable     = {};
+    dd::Complex twoMinusNoiseProbFromTable        = {};
+    dd::Complex oneMinusNoiseProbFromTable        = {};
 
     //todo implement a new structure for density matrices
     qc::MatrixDD density_root_edge{};
@@ -103,7 +103,7 @@ private:
     std::unique_ptr<qc::QuantumComputation>& qc;
 
     std::string gateNoiseTypes;
-    long calls = 0;
+    long        calls = 0;
 
     //    const unsigned int step_number;Q
     //    const double       step_fidelity;

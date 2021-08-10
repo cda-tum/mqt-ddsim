@@ -145,8 +145,8 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
             dd->decRef(density_root_edge);
             density_root_edge = tmp0;
 
-//            dd->printMatrix(density_root_edge, true);
-//            dd::export2Dot(density_root_edge, "/home/user/Desktop/dds/after_op.dot", false, true, false, false);
+            //            dd->printMatrix(density_root_edge, true);
+            //            dd::export2Dot(density_root_edge, "/home/user/Desktop/dds/after_op.dot", false, true, false, false);
 
             if (noiseProbability > 0) {
                 if (sequentialApplyNoise) { // was `stochastic_runs == -2`
@@ -188,11 +188,13 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
     }
     dd->garbageCollect();
 
-//    dd::export2Dot(density_root_edge, "/home/user/Desktop/dds/final.dot", false, true, false, false);
+    dd::export2Dot(density_root_edge, "/home/user/Desktop/dds/final.dot", false, true, false, false);
+    //    dd->printMatrix(density_root_edge, true);
+//    dd->printMatrix(density_root_edge, false);
+    printf("\n\n");
     dd->printMatrix(density_root_edge, true);
-    dd->printMatrix(density_root_edge, false);
-    dd->printMatrix(density_root_edge, true);
-    dd->densityNoiseOperations.printStatistics();
+//    dd->printMatrix(density_root_edge, false);
+//    dd->densityNoiseOperations.printStatistics();
     return AnalyseState(n_qubits, false);
 }
 
@@ -240,8 +242,8 @@ qc::MatrixDD DeterministicNoiseSimulator::ApplyNoiseEffects(qc::MatrixDD* densit
             continue;
         }
 
-//        new_edges[i] = ApplyNoiseEffects(&density_op->p->e[i], op, maxDepth);
-        new_edges[i] = ApplyNoiseEffects(dd->getAlignedDensityEdgeModifySubEdges(&density_op->p->e[i]), op, maxDepth);
+        new_edges[i] = ApplyNoiseEffects(&density_op->p->e[i], op, maxDepth);
+        //        new_edges[i] = ApplyNoiseEffects(dd->getAlignedDensityEdgeModifySubEdges(&density_op->p->e[i]), op, maxDepth);
 
         // Adding the operation to the operation table
         dd->densityNoiseOperations.insert(density_op->p->e[i], new_edges[i], used_qubits);
@@ -266,7 +268,7 @@ qc::MatrixDD DeterministicNoiseSimulator::ApplyNoiseEffects(qc::MatrixDD* densit
         }
     }
 
-//    qc::MatrixDD tmp = dd->makeDDNode(density_op->p->v, new_edges, true, true);
+    //    qc::MatrixDD tmp = dd->makeDDNode(density_op->p->v, new_edges, true, true);
     qc::MatrixDD tmp = dd->makeDDNode(density_op->p->v, new_edges, true);
 
     // Multiplying the old edge weight with the new one
