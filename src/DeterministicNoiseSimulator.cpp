@@ -140,10 +140,10 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                 controls = op->getControls();
             }
             // Applying the operation to the density matrix
-            qc::MatrixDD tmp0 = dd->multiply(dd->multiply(dd_op, density_root_edge), dd->conjugateTranspose(dd_op));
+            dd::Package::dEdge tmp0 = dd->applyOperationToDensityMatrix(dd_op, reinterpret_cast<dd::Package::dEdge&>(density_root_edge));
             dd->incRef(tmp0);
             dd->decRef(density_root_edge);
-            density_root_edge = tmp0;
+            density_root_edge = reinterpret_cast<dd::Package::mEdge&>(tmp0);
 
             //            dd->printMatrix(density_root_edge, true);
             //            dd::export2Dot(density_root_edge, "/home/user/Desktop/dds/after_op.dot", false, true, false, false);
@@ -188,13 +188,13 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
     }
     dd->garbageCollect();
 
-    dd::export2Dot(density_root_edge, "/home/user/Desktop/dds/final.dot", false, true, false, false);
+    //    dd::export2Dot(density_root_edge, "/home/user/Desktop/dds/final.dot", false, true, false, false);
     //    dd->printMatrix(density_root_edge, true);
-//    dd->printMatrix(density_root_edge, false);
+    dd->printMatrix(density_root_edge, false);
     printf("\n\n");
     dd->printMatrix(density_root_edge, true);
-//    dd->printMatrix(density_root_edge, false);
-//    dd->densityNoiseOperations.printStatistics();
+    //    dd->printMatrix(density_root_edge, false);
+    //    dd->densityNoiseOperations.printStatistics();
     return AnalyseState(n_qubits, false);
 }
 

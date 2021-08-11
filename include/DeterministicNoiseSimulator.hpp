@@ -95,6 +95,7 @@ public:
 
     //todo implement a new structure for density matrices
     qc::MatrixDD density_root_edge{};
+//    dd::Package::dEdge density_root_edge{};
 
     bool sequentialApplyNoise = false;
     char MeasureOneCollapsing(dd::Qubit index);
