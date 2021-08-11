@@ -3,3 +3,6 @@
 	url = https://github.com/iic-jku/qfr.git
     branch = master
     shallow = true
+[submodule "extern/taskflow"]
+	path = extern/taskflow
+	url = https://github.com/taskflow/taskflow.git
