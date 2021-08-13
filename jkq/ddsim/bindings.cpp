@@ -5,6 +5,7 @@
 // clang-format off
 #include "CircuitSimulator.hpp"
 #include "HybridSchrodingerFeynmanSimulator.hpp"
+#include "TaskBasedSimulator.hpp"
 #include "UnitarySimulator.hpp"
 #include "qiskit/QasmQobjExperiment.hpp"
 #include "qiskit/QuantumCircuit.hpp"
@@ -126,6 +127,23 @@ PYBIND11_MODULE(pyddsim, m) {
             .def("get_vector", &CircuitSimulator::getVectorComplex)
             .def("get_mode", &HybridSchrodingerFeynmanSimulator::getMode)
             .def("get_final_amplitudes", &HybridSchrodingerFeynmanSimulator::getFinalAmplitudes);
+
+    // TODO: Add new strategies here
+    py::enum_<TaskBasedSimulator::Mode>(m, "TaskBasedMode")
+            .value("sequential", TaskBasedSimulator::Mode::Sequential)
+            .value("pairwise_recursive", TaskBasedSimulator::Mode::PairwiseRecursiveGrouping)
+            .export_values();
+
+    py::class_<TaskBasedSimulator>(m, "TaskBasedCircuitSimulator")
+            .def(py::init<>(&create_simulator<TaskBasedSimulator, TaskBasedSimulator::Mode&, const std::size_t&>),
+                 "circ"_a, "seed"_a, "mode"_a = TaskBasedSimulator::Mode::Sequential, "nthreads"_a = 1)
+            .def(py::init<>(&create_simulator_without_seed<TaskBasedSimulator, TaskBasedSimulator::Mode&, const std::size_t&>),
+                 "circ"_a, "mode"_a = TaskBasedSimulator::Mode::Sequential, "nthreads"_a = 1)
+            .def("get_number_of_qubits", &CircuitSimulator::getNumberOfQubits)
+            .def("get_name", &CircuitSimulator::getName)
+            .def("simulate", &TaskBasedSimulator::Simulate, "shots"_a)
+            .def("statistics", &CircuitSimulator::AdditionalStatistics)
+            .def("get_vector", &CircuitSimulator::getVectorComplex);
 
     py::enum_<UnitarySimulator::Mode>(m, "ConstructionMode")
             .value("recursive", UnitarySimulator::Mode::Recursive)

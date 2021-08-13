@@ -57,7 +57,7 @@ void TaskBasedSimulator::generateSequentialContractionPlan() {
     setContractionPlan(path);
 }
 
-void TaskBasedSimulator::generatePairwiseGroupingContractionPlan() {
+void TaskBasedSimulator::generatePairwiseRecursiveGroupingContractionPlan() {
     ContractionPlan::Path path{};
     path.reserve(qc->getNops());
 

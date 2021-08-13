@@ -5,6 +5,7 @@
 #ifndef DDSIM_TASKBASEDSIMULATOR_HPP
 #define DDSIM_TASKBASEDSIMULATOR_HPP
 
+#include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
 
 #include <future>
@@ -19,6 +20,12 @@
 
 class TaskBasedSimulator: public CircuitSimulator {
 public:
+    // TODO: Add new strategies here
+    enum class Mode {
+        Sequential,
+        PairwiseRecursiveGrouping
+    };
+
     struct ContractionPlan {
         struct Step {
             std::size_t                         id;
@@ -42,8 +49,37 @@ public:
         std::size_t nleaves{};
     };
 
-    explicit TaskBasedSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, std::size_t nthreads = std::thread::hardware_concurrency()):
-        CircuitSimulator(std::move(qc)), executor(nthreads) {}
+    explicit TaskBasedSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Sequential, std::size_t nthreads = std::thread::hardware_concurrency()):
+        CircuitSimulator(std::move(qc)), executor(nthreads) {
+        // remove final measurements TODO: implement measurement support for task-based simulation
+        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
+        // TODO: Add new strategies here
+        switch (mode) {
+            case Mode::PairwiseRecursiveGrouping:
+                generatePairwiseRecursiveGroupingContractionPlan();
+                break;
+            case Mode::Sequential:
+            default:
+                generateSequentialContractionPlan();
+                break;
+        }
+    }
+
+    TaskBasedSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, const ApproximationInfo approx_info, const unsigned long long seed, Mode mode = Mode::Sequential, const std::size_t nthreads = 1):
+        CircuitSimulator(std::move(qc), approx_info, seed), executor(nthreads) {
+        // remove final measurements TODO: implement measurement support for task-based simulation
+        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
+        // TODO: Add new strategies here
+        switch (mode) {
+            case Mode::PairwiseRecursiveGrouping:
+                generatePairwiseRecursiveGroupingContractionPlan();
+                break;
+            case Mode::Sequential:
+            default:
+                generateSequentialContractionPlan();
+                break;
+        }
+    }
 
     std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
 
@@ -57,9 +93,9 @@ public:
         contractionPlan = ContractionPlan(qc->getNops() + 1, path);
     }
 
+    // TODO: Add new strategies here
     void generateSequentialContractionPlan();
-    void generatePairwiseGroupingContractionPlan();
-    /// TODO: define further contraction plans here
+    void generatePairwiseRecursiveGroupingContractionPlan();
 
 private:
     std::unordered_map<std::size_t, tf::Task>                                 tasks{};
