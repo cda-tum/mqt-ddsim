@@ -58,7 +58,6 @@ TEST(HybridSimTest, GRCSTestDD) {
 
     bool equal = (result == ref);
     if (!equal) {
-
         // if edges are not equal -> compare amplitudes
         auto refAmplitudes    = dd->getVector(ref);
         auto resultAmplitudes = dd->getVector(result);
