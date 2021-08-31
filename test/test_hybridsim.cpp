@@ -24,6 +24,10 @@ TEST(HybridSimTest, TrivialParallelTest) {
     HybridSchrodingerFeynmanSimulator ddsim2(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
     auto                              result = ddsim2.Simulate(8192);
 
+    for (const auto& entry : result) {
+        std::clog << "result[" << entry.first << "] = " << entry.second << "\n";
+    }
+
     EXPECT_EQ(result.size(), 4);
     auto it = result.find("0000");
     ASSERT_TRUE(it != result.end());
