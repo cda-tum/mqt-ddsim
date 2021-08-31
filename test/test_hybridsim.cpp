@@ -21,8 +21,9 @@ TEST(HybridSimTest, TrivialParallelTest) {
 
     ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
 
-    HybridSchrodingerFeynmanSimulator ddsim2(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
-    auto                              result = ddsim2.Simulate(8192);
+    HybridSchrodingerFeynmanSimulator ddsim2(std::move(quantumComputation()), HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
+
+    auto result = ddsim2.Simulate(8192);
 
     for (const auto& entry: result) {
         std::clog << "result[" << entry.first << "] = " << entry.second << "\n";
