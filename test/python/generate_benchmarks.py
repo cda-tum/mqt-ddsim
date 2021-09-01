@@ -1,6 +1,7 @@
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, AncillaRegister
 from qiskit.circuit.library import QFT, GraphState, GroverOperator
 import numpy as np
+import random
 from qiskit.qasm import pi
 
 import networkx as nx
@@ -108,4 +109,70 @@ def shor(N: int, a: int = 2, include_measurements: bool = True):
     from qiskit.algorithms.factorizers import Shor
     qc = Shor().construct_circuit(N, a, include_measurements)
     qc.name = "shor_" + str(N) + '_' + str(a)
+    return qc
+
+
+def qpe_exact(n: int, include_measurements: bool = True):
+    q = QuantumRegister(n, 'q')
+    psi = QuantumRegister(1, 'psi')
+    c = ClassicalRegister(n + 1, 'c')
+    qc = QuantumCircuit(q, psi, c, name="qpe")
+
+    # get random n-bit string as target phase
+    theta = 0
+    while theta == 0:
+        theta = random.getrandbits(n)
+    lam = 0.
+    # print("theta : ", theta, "correspond to", theta / (1 << n), "bin: ")
+    for i in range(n):
+        if theta & (1 << (n - i - 1)):
+            lam += 1. / (1 << i)
+
+    qc.x(psi)
+    qc.h(q)
+
+    for i in range(n):
+        phase = np.remainder(((1 << i) * lam * np.pi), 2 * np.pi)
+        if phase > np.pi:
+            phase -= (2 * np.pi)
+        qc.cp(phase, psi, q[i])
+
+    qc.compose(QFT(num_qubits=n, inverse=True), inplace=True, qubits=list(range(n)))
+
+    if include_measurements:
+        measure(qc, q, c)
+
+    return qc
+
+
+def qpe_inexact(n: int, include_measurements: bool = True):
+    q = QuantumRegister(n, 'q')
+    psi = QuantumRegister(1, 'psi')
+    c = ClassicalRegister(n + 1, 'c')
+    qc = QuantumCircuit(q, psi, c, name="qpe")
+
+    # get random n+1-bit string as target phase
+    theta = 0
+    while theta == 0 or (theta & 1) == 0:
+        theta = random.getrandbits(n + 1)
+    lam = 0.
+    # print("theta : ", theta, "correspond to", theta / (1 << (n+1)), "bin: ")
+    for i in range(n + 1):
+        if theta & (1 << (n - i)):
+            lam += 1. / (1 << i)
+
+    qc.x(psi)
+    qc.h(q)
+
+    for i in range(n):
+        phase = np.remainder(((1 << i) * lam * np.pi), 2 * np.pi)
+        if phase > np.pi:
+            phase -= (2 * np.pi)
+        qc.cp(phase, psi, q[i])
+
+    qc.compose(QFT(num_qubits=n, inverse=True), inplace=True, qubits=list(range(n)))
+
+    if include_measurements:
+        measure(qc, q, c)
+
     return qc

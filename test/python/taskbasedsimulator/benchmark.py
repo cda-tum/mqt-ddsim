@@ -1,6 +1,6 @@
 import time
 from jkq.ddsim.taskbasedqasmsimulator import TaskBasedQasmSimulator
-from qiskit import QuantumCircuit, execute
+from qiskit import execute
 
 from test.python.generate_benchmarks import *
 
@@ -57,5 +57,15 @@ if __name__ == '__main__':
 
     # for [i, j] in [[15, 7], [21, 2], [35, 3], [51, 2], [65, 2], [129, 2]]:
     #     qc = shor(i, j)
+    #     execute_circuit(qc, backend, shots)
+    #     execute_circuit(qc, backend, shots, 'pairwise_recursive')
+
+    # for n in range(1, 33):
+    #     qc = qpe_exact(n)
+    #     execute_circuit(qc, backend, shots)
+    #     execute_circuit(qc, backend, shots, 'pairwise_recursive')
+
+    # for n in range(1, 33):
+    #     qc = qpe_inexact(n)
     #     execute_circuit(qc, backend, shots)
     #     execute_circuit(qc, backend, shots, 'pairwise_recursive')
