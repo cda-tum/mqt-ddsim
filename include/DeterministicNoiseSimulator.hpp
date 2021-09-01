@@ -37,7 +37,9 @@ public:
         one_minus_sqrt_amplitude_damping_probability = {sqrt(1 - noiseProbability * 2), 0};
     }
 
-    std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override{};
+    std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override {
+        return {};
+    };
 
     std::map<std::string, double> DeterministicSimulate();
 

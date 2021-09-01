@@ -59,6 +59,7 @@ public:
     CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info, const unsigned long long seed):
         Simulator(seed),
         qc(std::move(qc_)), approx_info(approx_info) {
+        dd->resize(qc->getNqubits());
     }
 
     std::map<std::string, std::size_t> Simulate(unsigned int shots) override;

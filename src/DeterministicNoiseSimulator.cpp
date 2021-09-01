@@ -436,11 +436,9 @@ void DeterministicNoiseSimulator::ApplyDepolaritationToNode(std::array<qc::Matri
 std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(dd::QubitCount nr_qubits, bool full_state) const {
     std::map<std::string, double> measure_result = {};
 
-    double p0, p1, imaginary;
+    double p0, p1;
 
     double long global_probability;
-
-    auto delMe = dd::QubitCount();
 
     double measure_states = std::min((double)256, pow(2, nr_qubits));
 
