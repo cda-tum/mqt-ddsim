@@ -2,7 +2,7 @@ import time
 from jkq.ddsim.taskbasedqasmsimulator import TaskBasedQasmSimulator
 from qiskit import QuantumCircuit, execute
 
-from test.python.generate_benchmarks import ghz
+from test.python.generate_benchmarks import *
 
 
 def execute_circuit(qc: QuantumCircuit, backend, shots: int, mode: str = 'sequential'):
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     #     execute_circuit(qc, backend, shots)
     #     execute_circuit(qc, backend, shots, 'pairwise_recursive')
 
-    # for [i, j] in [[15, 7], [35, 3]]:
+    # for [i, j] in [[15, 7], [21, 2], [35, 3], [51, 2], [65, 2], [129, 2]]:
     #     qc = shor(i, j)
     #     execute_circuit(qc, backend, shots)
     #     execute_circuit(qc, backend, shots, 'pairwise_recursive')
