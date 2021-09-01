@@ -225,33 +225,23 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridAmplitudes(dd::Qubit split
         actuallyUsedThreads = static_cast<int>(max_control);
     }
     omp_set_num_threads(actuallyUsedThreads);
+    root_edge = qc::VectorDD::zero;
 
-    std::vector<std::vector<std::complex<dd::fp>>> amplitudes(actuallyUsedThreads);
-    std::vector<bool>                              initialized(actuallyUsedThreads, false);
-
-    root_edge                               = qc::VectorDD::zero;
     const std::int64_t   nslices_on_one_cpu = std::min(static_cast<std::int64_t>(64), static_cast<std::int64_t>(max_control / actuallyUsedThreads));
     const dd::QubitCount nqubits            = getNumberOfQubits();
 
+    std::vector<std::vector<std::complex<dd::fp>>> amplitudes(actuallyUsedThreads, std::vector<std::complex<dd::fp>>(1u << nqubits));
+
 #pragma omp parallel for schedule(dynamic, 1) // NOLINT(openmp-use-default-none)
     for (std::int64_t control = 0; control < max_control; control += nslices_on_one_cpu) {
-        const auto                         current_thread     = omp_get_thread_num();
-        std::vector<std::complex<dd::fp>>& thread_amplitudes  = amplitudes.at(current_thread);
-        bool                               thread_initialized = initialized.at(current_thread);
+        const auto                         current_thread    = omp_get_thread_num();
+        std::vector<std::complex<dd::fp>>& thread_amplitudes = amplitudes.at(current_thread);
 
         for (std::int64_t local_control = 0; local_control < nslices_on_one_cpu; local_control++) {
             const std::int64_t           total_control = control + local_control;
             std::unique_ptr<dd::Package> slice_dd      = std::make_unique<dd::Package>(getNumberOfQubits());
             auto                         result        = SimulateSlicing(slice_dd, split_qubit, total_control);
-
-            if (thread_initialized) {
-                slice_dd->addAmplitudes(result, thread_amplitudes, nqubits);
-            } else {
-                initialized[current_thread] = true;
-                thread_initialized          = true;
-                thread_amplitudes           = std::vector<std::complex<dd::fp>>(1 << nqubits);
-                slice_dd->exportAmplitudes(result, thread_amplitudes, nqubits);
-            }
+            slice_dd->addAmplitudes(result, thread_amplitudes, nqubits);
         }
     }
 

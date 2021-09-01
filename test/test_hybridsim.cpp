@@ -5,7 +5,7 @@
 
 using namespace dd::literals;
 
-TEST(HybridSimTest, TrivialParallelTest) {
+TEST(HybridSimTest, TrivialParallelDD) {
     auto quantumComputation = [] {
         auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
         quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::H);
@@ -17,7 +17,8 @@ TEST(HybridSimTest, TrivialParallelTest) {
     };
 
     HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::DD);
-    auto                              resultDD = ddsim.Simulate(8192);
+
+    auto resultDD = ddsim.Simulate(8192);
     for (const auto& entry: resultDD) {
         std::clog << "resultDD[" << entry.first << "] = " << entry.second << "\n";
     }
@@ -36,17 +37,28 @@ TEST(HybridSimTest, TrivialParallelTest) {
     it = resultDD.find("0111");
     ASSERT_TRUE(it != resultDD.end());
     EXPECT_NEAR(it->second, 2048, 128);
+}
 
-    HybridSchrodingerFeynmanSimulator ddsim2(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
+TEST(HybridSimTest, TrivialParallelAmplitude) {
+    auto quantumComputation = [] {
+        auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
+        quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::H);
+        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::H);
+        quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{2_pc, 1_pc}, 0, qc::X);
+        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I); // some dummy operations
+        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I);
+        return quantumComputation;
+    };
 
-    auto resultAmp = ddsim2.Simulate(8192);
+    HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
 
+    auto resultAmp = ddsim.Simulate(8192);
     for (const auto& entry: resultAmp) {
         std::clog << "resultAmp[" << entry.first << "] = " << entry.second << "\n";
     }
 
     ASSERT_EQ(resultAmp.size(), 4);
-    it = resultAmp.find("0000");
+    auto it = resultAmp.find("0000");
     ASSERT_TRUE(it != resultAmp.end());
     EXPECT_NEAR(it->second, 2048, 128);
     it = resultAmp.find("0010");
