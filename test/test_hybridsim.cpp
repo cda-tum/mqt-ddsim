@@ -17,30 +17,46 @@ TEST(HybridSimTest, TrivialParallelTest) {
     };
 
     HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::DD);
-    ddsim.Simulate(1);
-
-    ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
-
-    HybridSchrodingerFeynmanSimulator ddsim2(std::move(quantumComputation()), HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
-
-    auto result = ddsim2.Simulate(8192);
-
-    for (const auto& entry: result) {
-        std::clog << "result[" << entry.first << "] = " << entry.second << "\n";
+    auto resultDD = ddsim.Simulate(8192);
+    for (const auto& entry: resultDD) {
+        std::clog << "resultDD[" << entry.first << "] = " << entry.second << "\n";
     }
 
-    EXPECT_EQ(result.size(), 4);
-    auto it = result.find("0000");
-    ASSERT_TRUE(it != result.end());
+    ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
+    ASSERT_EQ(resultDD.size(), 4);
+    auto it = resultDD.find("0000");
+    ASSERT_TRUE(it != resultDD.end());
     EXPECT_NEAR(it->second, 2048, 128);
-    it = result.find("0010");
-    ASSERT_TRUE(it != result.end());
+    it = resultDD.find("0010");
+    ASSERT_TRUE(it != resultDD.end());
     EXPECT_NEAR(it->second, 2048, 128);
-    it = result.find("0100");
-    ASSERT_TRUE(it != result.end());
+    it = resultDD.find("0100");
+    ASSERT_TRUE(it != resultDD.end());
     EXPECT_NEAR(it->second, 2048, 128);
-    it = result.find("1110");
-    ASSERT_TRUE(it != result.end());
+    it = resultDD.find("0111");
+    ASSERT_TRUE(it != resultDD.end());
+    EXPECT_NEAR(it->second, 2048, 128);
+
+    HybridSchrodingerFeynmanSimulator ddsim2(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
+
+    auto resultAmp = ddsim2.Simulate(8192);
+
+    for (const auto& entry: resultAmp) {
+        std::clog << "resultAmp[" << entry.first << "] = " << entry.second << "\n";
+    }
+
+    ASSERT_EQ(resultAmp.size(), 4);
+    it = resultAmp.find("0000");
+    ASSERT_TRUE(it != resultAmp.end());
+    EXPECT_NEAR(it->second, 2048, 128);
+    it = resultAmp.find("0010");
+    ASSERT_TRUE(it != resultAmp.end());
+    EXPECT_NEAR(it->second, 2048, 128);
+    it = resultAmp.find("0100");
+    ASSERT_TRUE(it != resultAmp.end());
+    EXPECT_NEAR(it->second, 2048, 128);
+    it = resultAmp.find("1110");
+    ASSERT_TRUE(it != resultAmp.end());
     EXPECT_NEAR(it->second, 2048, 128);
 }
 
