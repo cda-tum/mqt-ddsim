@@ -17,7 +17,7 @@ TEST(HybridSimTest, TrivialParallelTest) {
     };
 
     HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::DD);
-    auto resultDD = ddsim.Simulate(8192);
+    auto                              resultDD = ddsim.Simulate(8192);
     for (const auto& entry: resultDD) {
         std::clog << "resultDD[" << entry.first << "] = " << entry.second << "\n";
     }
