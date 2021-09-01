@@ -111,8 +111,8 @@ TEST(DeterministicNoiseSimTest, ClassicControlledOp) {
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDApplySequential) {
     auto                                         quantumComputation = getAdder4Circuit();
     std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
-    ddsim                                    = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("APD"), 0.01);
-    ddsim->sequentialApplyNoise              = true;
+    ddsim                       = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("APD"), 0.01);
+    ddsim->sequentialApplyNoise = true;
 
     auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";

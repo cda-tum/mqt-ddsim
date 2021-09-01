@@ -13,6 +13,7 @@
 
 class DeterministicNoiseSimulator: public Simulator {
     using CN = dd::ComplexNumbers;
+    using dEdge = dd::Package::dEdge;
 
 public:
     //    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity):
@@ -94,8 +95,8 @@ public:
     dd::Complex oneMinusNoiseProbFromTable        = {};
 
     //todo implement a new structure for density matrices
-    qc::MatrixDD density_root_edge{};
-//    dd::Package::dEdge density_root_edge{};
+    //    qc::MatrixDD density_root_edge{};
+    dd::Package::dEdge density_root_edge{};
 
     bool sequentialApplyNoise = false;
     char MeasureOneCollapsing(dd::Qubit index);
@@ -111,21 +112,18 @@ private:
     //    unsigned long long approximation_runs{0};
     //    long double        final_fidelity{1.0L};
 
-    void ApplyAmplitudeDampingToNode(std::array<qc::MatrixDD, 4>& e);
+    void ApplyAmplitudeDampingToNode(std::array<dEdge, 4>& e);
 
-    void ApplyPhaseFlipToNode(std::array<qc::MatrixDD, 4>& e);
+    void ApplyPhaseFlipToNode(std::array<dEdge, 4>& e);
 
-    void ApplyDepolaritationToNode(std::array<qc::MatrixDD, 4>& e);
+    void ApplyDepolaritationToNode(std::array<dEdge, 4>& e);
 
     void generateGate(qc::MatrixDD* pointer_for_matrices, char noise_type, dd::Qubit target);
 
-    qc::MatrixDD makeZeroDensityOperator(dd::QubitCount n);
+    dd::Package::dEdge makeZeroDensityOperator(dd::QubitCount n);
 
-    qc::MatrixDD         ApplyNoiseEffects(qc::MatrixDD* density_op, const std::unique_ptr<qc::Operation>& op, unsigned char maxDepth);
-    static unsigned long noiseHash(dd::Package::mNode* a, const dd::ComplexValue& aw, const std::vector<signed char>& usedQubits);
-    qc::MatrixDD         noiseLookup(const qc::MatrixDD& a, const std::vector<signed char>& usedQubits);
-    void                 noiseInsert(const qc::MatrixDD& a, const std::vector<signed char>& usedQubits, const qc::MatrixDD& r);
-    dd::fp               probForIndexToBeZero(qc::MatrixDD e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob);
+    dd::Package::dEdge ApplyNoiseEffects(dd::Package::dEdge &density_op, const std::unique_ptr<qc::Operation>& op, unsigned char maxDepth);
+    dd::fp probForIndexToBeZero(dd::Package::dEdge e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob);
 };
 
 #endif //DDSIM_DETERMINISTICNOISESIMULATOR_HPP
