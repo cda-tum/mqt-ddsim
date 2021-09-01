@@ -205,12 +205,12 @@ TEST(StochNoiseSimTest, SimulateAdder4TrackFidelityWithNoise) {
 
     std::cout << ddsim.getName() << "\n";
 
-    EXPECT_GE(m.find("1000")->second, 0.14);
-    EXPECT_LE(m.find("1000")->second, 0.16);
-    EXPECT_GE(m.find("1001")->second, 0.54);
-    EXPECT_LE(m.find("1001")->second, 0.56);
-    EXPECT_GE(std::stod(ddsim.AdditionalStatistics().at("final_fidelity")), 0.54);
-    EXPECT_LE(std::stod(ddsim.AdditionalStatistics().at("final_fidelity")), 0.56);
+    EXPECT_GE(m.find("1000")->second, 0.13);
+    EXPECT_LE(m.find("1000")->second, 0.17);
+    EXPECT_GE(m.find("1001")->second, 0.53);
+    EXPECT_LE(m.find("1001")->second, 0.57);
+    EXPECT_GE(std::stod(ddsim.AdditionalStatistics().at("final_fidelity")), 0.53);
+    EXPECT_LE(std::stod(ddsim.AdditionalStatistics().at("final_fidelity")), 0.57);
 }
 
 TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
@@ -225,14 +225,14 @@ TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.02, 30000, 1, 1, "-1-1000");
     auto                     m = ddsim.StochSimulate();
 
-    EXPECT_GE(m.find("00")->second, 0.03);
-    EXPECT_LE(m.find("00")->second, 0.06);
-    EXPECT_GE(m.find("01")->second, 0.46);
-    EXPECT_LE(m.find("01")->second, 0.48);
-    EXPECT_GE(m.find("10")->second, 0.03);
-    EXPECT_LE(m.find("10")->second, 0.05);
-    EXPECT_GE(m.find("11")->second, 0.42);
-    EXPECT_LE(m.find("11")->second, 0.44);
+    EXPECT_GE(m.find("00")->second, 0.02);
+    EXPECT_LE(m.find("00")->second, 0.07);
+    EXPECT_GE(m.find("01")->second, 0.45);
+    EXPECT_LE(m.find("01")->second, 0.49);
+    EXPECT_GE(m.find("10")->second, 0.02);
+    EXPECT_LE(m.find("10")->second, 0.06);
+    EXPECT_GE(m.find("11")->second, 0.41);
+    EXPECT_LE(m.find("11")->second, 0.45);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithoutNoise) {
@@ -294,12 +294,12 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateError) {
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 30000, 1, 1, "-3-1000");
     auto                     m = ddsim.StochSimulate();
 
-    EXPECT_GE(m.find("0000")->second, 0.19);
-    EXPECT_LE(m.find("0000")->second, 0.23);
-    EXPECT_GE(m.find("0001")->second, 0.13);
-    EXPECT_LE(m.find("0001")->second, 0.15);
-    EXPECT_GE(m.find("0100")->second, 0.08);
-    EXPECT_LE(m.find("0100")->second, 0.10);
+    EXPECT_GE(m.find("0000")->second, 0.18);
+    EXPECT_LE(m.find("0000")->second, 0.24);
+    EXPECT_GE(m.find("0001")->second, 0.12);
+    EXPECT_LE(m.find("0001")->second, 0.16);
+    EXPECT_GE(m.find("0100")->second, 0.07);
+    EXPECT_LE(m.find("0100")->second, 0.11);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorSelectedProperties) {
@@ -331,12 +331,12 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorSelectedPropert
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 30000, 1, 1, " -3-500,501,502");
     auto                     m = ddsim.StochSimulate();
 
-    EXPECT_GE(m.find("0000")->second, 0.19);
-    EXPECT_LE(m.find("0000")->second, 0.23);
-    EXPECT_GE(m.find("0001")->second, 0.13);
-    EXPECT_LE(m.find("0001")->second, 0.15);
-    EXPECT_GE(m.find("0100")->second, 0.08);
-    EXPECT_LE(m.find("0100")->second, 0.10);
+    EXPECT_GE(m.find("0000")->second, 0.18);
+    EXPECT_LE(m.find("0000")->second, 0.24);
+    EXPECT_GE(m.find("0001")->second, 0.12);
+    EXPECT_LE(m.find("0001")->second, 0.16);
+    EXPECT_GE(m.find("0100")->second, 0.07);
+    EXPECT_LE(m.find("0100")->second, 0.11);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceError) {
@@ -367,10 +367,10 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceError) {
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("AP"), 0.3, 30000, 1, 1, "0-1000");
     auto                     m = ddsim.StochSimulate();
 
-    EXPECT_GE(m.find("0000")->second, 0.78);
-    EXPECT_LE(m.find("0000")->second, 0.80);
-    EXPECT_GE(m.find("0001")->second, 0.18);
-    EXPECT_LE(m.find("0001")->second, 0.20);
+    EXPECT_GE(m.find("0000")->second, 0.77);
+    EXPECT_LE(m.find("0000")->second, 0.81);
+    EXPECT_GE(m.find("0001")->second, 0.17);
+    EXPECT_LE(m.find("0001")->second, 0.21);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDepolarizationError) {
@@ -401,10 +401,10 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDepolarizationError) {
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("D"), 0.01, 30000, 1, 1, "0-1000");
     auto                     m = ddsim.StochSimulate();
 
-    EXPECT_GE(m.find("1001")->second, 0.81);
-    EXPECT_LE(m.find("1001")->second, 0.84);
+    EXPECT_GE(m.find("1001")->second, 0.80);
+    EXPECT_LE(m.find("1001")->second, 0.85);
     EXPECT_GE(m.find("0000")->second, 0.01);
-    EXPECT_LE(m.find("0000")->second, 0.03);
+    EXPECT_LE(m.find("0000")->second, 0.04);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithNoiseAndApproximation) {
