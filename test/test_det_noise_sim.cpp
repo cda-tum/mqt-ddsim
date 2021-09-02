@@ -45,6 +45,7 @@ TEST(DeterministicNoiseSimTest, MeasurementOne) {
         std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, 5);
         auto                                         m     = ddsim->DeterministicSimulate();
         ASSERT_EQ(m.find("11")->second, 1);
+        ASSERT_EQ(ddsim->Simulate(1).size(), 0);
     }
 
     {

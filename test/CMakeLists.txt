@@ -42,7 +42,7 @@ add_custom_command(TARGET ${PROJECT_NAME}_test
         VERBATIM)
 
 add_executable(ddsim_benchmark ${CMAKE_CURRENT_SOURCE_DIR}/benchmark.cpp)
-target_link_libraries(ddsim_benchmark PUBLIC ddsim benchmark::benchmark_main)
+target_link_libraries(ddsim_benchmark PRIVATE ${PROJECT_NAME} benchmark::benchmark_main)
 set_target_properties(ddsim_benchmark PROPERTIES EXPORT_NAME ddsim_benchmark)
 
 add_custom_command(TARGET ${PROJECT_NAME}_benchmark
