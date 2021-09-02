@@ -146,7 +146,7 @@ TEST(CircuitSimTest, DestructiveMeasurementOne) {
     const auto v_after_pairs = ddsim.getVectorPair();
     const auto v_after_compl = ddsim.getVectorComplex();
 
-    assert(v_after_pairs.size() == v_after_compl.size());
+    ASSERT_EQ(v_after_pairs.size(), v_after_compl.size());
     for (std::size_t i = 0; i < v_after_pairs.size(); i++) {
         ASSERT_EQ(v_after_pairs.at(i).first, v_after_compl.at(i).real());
         ASSERT_EQ(v_after_pairs.at(i).second, v_after_compl.at(i).imag());

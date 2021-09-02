@@ -1,7 +1,7 @@
 ignore:
   - "extern/**/*"
   - "apps/*"
-  - "test/benchmark.cpp"
+  - "test/*.cpp"
   - "jkq/**/*"
 
 coverage:
