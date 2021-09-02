@@ -20,7 +20,7 @@ TEST(HybridSimTest, TrivialParallelDD) {
 
     auto resultDD = ddsim.Simulate(8192);
     for (const auto& entry: resultDD) {
-        std::clog << "resultDD[" << entry.first << "] = " << entry.second << "\n";
+        std::cout << "resultDD[" << entry.first << "] = " << entry.second << "\n";
     }
 
     ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
@@ -54,7 +54,7 @@ TEST(HybridSimTest, TrivialParallelAmplitude) {
 
     auto resultAmp = ddsim.Simulate(8192);
     for (const auto& entry: resultAmp) {
-        std::clog << "resultAmp[" << entry.first << "] = " << entry.second << "\n";
+        std::cout << "resultAmp[" << entry.first << "] = " << entry.second << "\n";
     }
 
     ASSERT_EQ(resultAmp.size(), 4);
