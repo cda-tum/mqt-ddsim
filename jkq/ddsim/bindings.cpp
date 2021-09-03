@@ -98,6 +98,25 @@ void getNumpyMatrix(UnitarySimulator& sim, py::array_t<std::complex<dd::fp>>& ma
     getNumpyMatrixRec(e, std::complex<dd::fp>{1.0, 0.0}, 0, 0, dim, dataPtr);
 }
 
+void dump_tensor_network(const py::object& circ, const std::string& filename) {
+    py::object QuantumCircuit       = py::module::import("qiskit").attr("QuantumCircuit");
+    py::object pyQasmQobjExperiment = py::module::import("qiskit.qobj").attr("QasmQobjExperiment");
+
+    if (py::isinstance<py::str>(circ)) {
+        auto&&                                  file1 = circ.cast<std::string>();
+        std::unique_ptr<qc::QuantumComputation> qc    = std::make_unique<qc::QuantumComputation>();
+        std::ofstream                           ofs(filename);
+        qc->import(file1);
+        qc->dump(ofs, qc::Tensor);
+    } else if (py::isinstance(circ, QuantumCircuit)) {
+        qc::qiskit::QuantumCircuit::dumpTensorNetwork(circ, filename);
+    } else if (py::isinstance(circ, pyQasmQobjExperiment)) {
+        qc::qiskit::QasmQobjExperiment::dumpTensorNetwork(circ, filename);
+    } else {
+        throw std::runtime_error("PyObject is neither py::str, QuantumCircuit, nor QasmQobjExperiment");
+    }
+}
+
 PYBIND11_MODULE(pyddsim, m) {
     m.doc() = "Python interface for the JKQ DDSIM quantum circuit simulator";
 
@@ -164,6 +183,10 @@ PYBIND11_MODULE(pyddsim, m) {
             .def("get_max_node_count", &UnitarySimulator::getMaxNodeCount);
 
     m.def("get_matrix", &getNumpyMatrix, "sim"_a, "mat"_a);
+
+    m.def("dump_tensor_network", &dump_tensor_network, "dump a tensor network representation of the given circuit",
+          "circ"_a, "filename"_a);
+
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
 #else
