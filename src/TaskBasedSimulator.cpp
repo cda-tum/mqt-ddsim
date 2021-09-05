@@ -177,14 +177,25 @@ void TaskBasedSimulator::addContractionTask(std::size_t leftID, std::size_t righ
         //            std::cout << "Executing " << leftID << " " << rightID << " -> " << resultID << std::endl;
         const auto& leftDD  = results.at(leftID);
         const auto& rightDD = results.at(rightID);
-        if (auto vector = std::get_if<qc::VectorDD>(&leftDD)) {
-            auto& matrix   = std::get<qc::MatrixDD>(rightDD);
-            auto  resultDD = dd->multiply(matrix, *vector);
+
+        const auto leftIsVector  = std::holds_alternative<qc::VectorDD>(leftDD);
+        const auto rightIsVector = std::holds_alternative<qc::VectorDD>(rightDD);
+
+        if (leftIsVector && rightIsVector) {
+            throw std::runtime_error("Both elements in a contraction are a vector. This should not happen!");
+        }
+
+        if (leftIsVector || rightIsVector) {
+            // matrix-vector multiplication
+            const auto& vector   = std::get<qc::VectorDD>(leftIsVector ? leftDD : rightDD);
+            const auto& matrix   = std::get<qc::MatrixDD>(leftIsVector ? rightDD : leftDD);
+            auto        resultDD = dd->multiply(matrix, vector);
             dd->incRef(resultDD);
-            dd->decRef(*vector);
+            dd->decRef(vector);
             dd->decRef(matrix);
             results.emplace(resultID, resultDD);
         } else {
+            // matrix-matrix multiplication
             const auto& leftMatrix  = std::get<qc::MatrixDD>(leftDD);
             const auto& rightMatrix = std::get<qc::MatrixDD>(rightDD);
             auto        resultDD    = dd->multiply(rightMatrix, leftMatrix);

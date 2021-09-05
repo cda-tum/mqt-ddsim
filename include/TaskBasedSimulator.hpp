@@ -23,7 +23,8 @@ public:
     // TODO: Add new strategies here
     enum class Mode {
         Sequential,
-        PairwiseRecursiveGrouping
+        PairwiseRecursiveGrouping,
+        Cotengra
     };
 
     struct ContractionPlan {
@@ -58,6 +59,9 @@ public:
             case Mode::PairwiseRecursiveGrouping:
                 generatePairwiseRecursiveGroupingContractionPlan();
                 break;
+            case Mode::Cotengra:
+                // in this case the contraction plan is explicitly set
+                break;
             case Mode::Sequential:
             default:
                 generateSequentialContractionPlan();
@@ -73,6 +77,9 @@ public:
         switch (mode) {
             case Mode::PairwiseRecursiveGrouping:
                 generatePairwiseRecursiveGroupingContractionPlan();
+                break;
+            case Mode::Cotengra:
+                // in this case the contraction plan is explicitly set
                 break;
             case Mode::Sequential:
             default:

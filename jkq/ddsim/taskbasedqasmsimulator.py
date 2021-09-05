@@ -1,6 +1,8 @@
 """Backend for DDSIM Task-Based Simulator."""
 
 import logging
+import os
+
 import time
 import uuid
 import warnings
@@ -20,6 +22,92 @@ from jkq import ddsim
 logger = logging.getLogger(__name__)
 
 
+def read_tensor_network_file(filename):
+    import pandas as pd
+    import numpy as np
+    import quimb.tensor as qtn
+
+    df = pd.read_json(filename)
+    tensors = []
+
+    for i in range(len(df['tensors'])):
+        tens_data = [complex(real, imag) for [real, imag] in df['tensors'][i][3]]
+        tens_shape = df['tensors'][i][2]
+        data = np.array(tens_data).reshape(tens_shape)
+        inds = df['tensors'][i][1]
+        tags = df['tensors'][i][0]
+        tensors.append(qtn.Tensor(data, inds, tags, left_inds=inds[:len(inds) // 2]))
+    return tensors
+
+
+def create_tensor_network(qc):
+    import quimb.tensor as qtn
+    import sparse
+    from jkq.ddsim import dump_tensor_network
+
+    if isinstance(qc, QuantumCircuit):
+        filename = qc.name + '_' + str(qc.num_qubits) + ".tensor"
+        nqubits = qc.num_qubits
+    else:
+        filename = 'tensor.tensor'
+        nqubits = qc.header.n_qubits
+
+    dump_tensor_network(qc, filename)
+    tensors = read_tensor_network_file(filename)
+    os.remove(filename)
+
+    # add the zero state tensor |0...0> at the beginning
+    shape = [2] * nqubits
+    data = sparse.COO(coords=[[0], [0]], data=1, shape=(2 ** nqubits, 1))
+    inds = ['q' + str(i) + '_0' for i in range(nqubits)]
+    tags = ['Q' + str(i) for i in range(nqubits)]
+    tensors.insert(0, qtn.Tensor(data=data.reshape(shape), inds=inds, tags=tags))
+
+    # using the following lines instead would allow much greater flexibility,
+    # but is not supported for DD-based simulation at the moment
+
+    # add the zero state tensor |0>...|0> at the beginning
+    # shape = [2]
+    # data = np.zeros(2)
+    # data[0] = 1.0
+    # for i in range(qc.num_qubits):
+    #     inds = ['q'+str(i)+'_0']
+    #     tags = ['Q'+str(i)]
+    #     tensors.insert(0, qtn.Tensor(data=data.reshape(shape), inds=inds, tags=tags))
+
+    return qtn.TensorNetwork(tensors)
+
+
+def get_contraction_path(qc, max_time: int = 60, max_repeats: int = 1024, dump_path: bool = True, plot_ring: bool = False):
+    import cotengra as ctg
+    from opt_einsum.paths import linear_to_ssa
+
+    tn = create_tensor_network(qc)
+
+    opt = ctg.HyperOptimizer(methods=['greedy', 'walktrap', 'spinglass', 'labels'],  # , 'kahypar'],
+                             max_time=max_time,
+                             max_repeats=max_repeats,
+                             progbar=True,
+                             minimize='flops',
+                             parallel=True)
+    info = tn.contract(all, get='path-info', optimize=opt)
+    path = linear_to_ssa(info.path)
+
+    if dump_path:
+        if isinstance(qc, QuantumCircuit):
+            filename = qc.name + '_' + str(qc.num_qubits) + ".path"
+        else:
+            filename = 'contraction.path'
+        with open(filename, 'w') as file:
+            file.write(str(path))
+
+    if plot_ring:
+        fig = opt.get_tree().plot_ring(return_fig=True)
+        fig.savefig("contraction_ring.svg", bbox_inches='tight')
+
+    return path
+
+
 class TaskBasedQasmSimulator(BackendV1):
     """Python interface to JKQ DDSIM Task-Based Simulator"""
 
@@ -32,6 +120,10 @@ class TaskBasedQasmSimulator(BackendV1):
             parameter_binds=None,
             simulator_seed=None,
             mode="sequential",
+            cotengra_max_time=60,
+            cotengra_max_repeats=1024,
+            cotengra_plot_ring=False,
+            cotengra_dump_path=True,
             nthreads=1  # local_hardware_info()['cpus']
         )
 
@@ -44,7 +136,7 @@ class TaskBasedQasmSimulator(BackendV1):
             'local': True,
             'description': 'JKQ DDSIM Task-Based C++ simulator',
             'basis_gates': ['id', 'u0', 'u1', 'u2', 'u3', 'cu3',
-                            'x', 'cx', 'ccx', 'mcx_gray', 'mcx_recursive', 'mcx_vchain',
+                            'x', 'cx', 'ccx', 'mcx_gray', 'mcx_recursive', 'mcx_vchain', 'mcx',
                             'y', 'cy',
                             'z', 'cz',
                             'h', 'ch',
@@ -115,12 +207,24 @@ class TaskBasedQasmSimulator(BackendV1):
             task_based_mode = ddsim.TaskBasedMode.sequential
         elif mode == 'pairwise_recursive':
             task_based_mode = ddsim.TaskBasedMode.pairwise_recursive
+        elif mode == 'cotengra':
+            task_based_mode = ddsim.TaskBasedMode.cotengra
         else:
             raise JKQSimulatorError('Simulation mode', mode, 'not supported by JKQ task-based simulator. Available modes are \'sequential\' and \'pairwise_recursive\'')
 
         sim = ddsim.TaskBasedCircuitSimulator(qobj_experiment, seed, task_based_mode, nthreads)
 
+        # determine the contraction path using cotengra in case this is requested
+        if mode == 'cotengra':
+            max_time = options.get('cotengra_max_time', 60)
+            max_repeats = options.get('cotengra_max_repeats', 1024)
+            dump_path = options.get('cotengra_dump_path', True)
+            plot_ring = options.get('cotengra_plot_ring', False)
+            path = get_contraction_path(qobj_experiment, max_time=max_time, max_repeats=max_repeats, dump_path=dump_path, plot_ring=plot_ring)
+            sim.set_contraction_path(path)
+
         shots = options['shots']
+        setup_time = time.time()
 
         counts = sim.simulate(shots)
         end_time = time.time()
@@ -130,6 +234,8 @@ class TaskBasedQasmSimulator(BackendV1):
                   'name': qobj_experiment.header.name,
                   'status': 'DONE',
                   'time_taken': end_time - start_time,
+                  'time_setup': setup_time - start_time,
+                  'time_sim': end_time - setup_time,
                   'seed': seed,
                   'mode': mode,
                   'nthreads': nthreads,

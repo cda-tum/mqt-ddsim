@@ -24,7 +24,7 @@ class TaskBasedStatevectorSimulator(TaskBasedQasmSimulator):
             'local': True,
             'description': 'JKQ DDSIM C++ simulator',
             'basis_gates': ['id', 'u0', 'u1', 'u2', 'u3', 'cu3',
-                            'x', 'cx', 'ccx', 'mcx_gray', 'mcx_recursive', 'mcx_vchain',
+                            'x', 'cx', 'ccx', 'mcx_gray', 'mcx_recursive', 'mcx_vchain', 'mcx',
                             'y', 'cy',
                             'z', 'cz',
                             'h', 'ch',
