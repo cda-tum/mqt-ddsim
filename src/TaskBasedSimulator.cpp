@@ -28,15 +28,15 @@ TaskBasedSimulator::ContractionPlan::ContractionPlan(std::size_t nleaves, TaskBa
         rightStep.parent           = resultID;
 
         std::set<std::size_t> operations{};
-        const auto&           leftOps = leftStep.operations;
-        for (const auto& op: leftOps) {
-            operations.emplace(op);
-        }
-        const auto& rightOps = rightStep.operations;
-        for (const auto& op: rightOps) {
-            operations.emplace(op);
-        }
         if (!assumeCorrectOrder) {
+            const auto& leftOps = leftStep.operations;
+            for (const auto& op: leftOps) {
+                operations.emplace(op);
+            }
+            const auto& rightOps = rightStep.operations;
+            for (const auto& op: rightOps) {
+                operations.emplace(op);
+            }
             // consider each operation from the left and check whether any operation from the right must precede it
             bool leftIsActuallyLeft = true;
             //        std::cout << "Checking whether ID " << leftID << " is actually left of ID " << rightID << std::endl;
