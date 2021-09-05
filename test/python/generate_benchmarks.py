@@ -116,7 +116,7 @@ def qpe_exact(n: int, include_measurements: bool = True):
     q = QuantumRegister(n, 'q')
     psi = QuantumRegister(1, 'psi')
     c = ClassicalRegister(n + 1, 'c')
-    qc = QuantumCircuit(q, psi, c, name="qpe")
+    qc = QuantumCircuit(q, psi, c, name="qpe_exact")
 
     # get random n-bit string as target phase
     theta = 0
@@ -150,7 +150,7 @@ def qpe_inexact(n: int, include_measurements: bool = True):
     q = QuantumRegister(n, 'q')
     psi = QuantumRegister(1, 'psi')
     c = ClassicalRegister(n + 1, 'c')
-    qc = QuantumCircuit(q, psi, c, name="qpe")
+    qc = QuantumCircuit(q, psi, c, name="qpe_inexact")
 
     # get random n+1-bit string as target phase
     theta = 0
