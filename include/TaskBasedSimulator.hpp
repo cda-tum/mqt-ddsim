@@ -44,7 +44,7 @@ public:
         using Steps = std::vector<Step>;
 
         ContractionPlan() = default;
-        ContractionPlan(std::size_t nleaves, Path path, const qc::QuantumComputation* qc);
+        ContractionPlan(std::size_t nleaves, Path path, const qc::QuantumComputation* qc, bool assumeCorrectOrder = false);
 
         Path        path{};
         Steps       steps{};
@@ -98,8 +98,8 @@ public:
     void setContractionPlan(const ContractionPlan& plan) {
         contractionPlan = plan;
     }
-    void setContractionPlan(const ContractionPlan::Path& path) {
-        contractionPlan = ContractionPlan(qc->getNops() + 1, path, qc.get());
+    void setContractionPlan(const ContractionPlan::Path& path, bool assumeCorrectOrder = false) {
+        contractionPlan = ContractionPlan(qc->getNops() + 1, path, qc.get(), assumeCorrectOrder);
     }
 
     // TODO: Add new strategies here

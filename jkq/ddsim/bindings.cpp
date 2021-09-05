@@ -159,7 +159,7 @@ PYBIND11_MODULE(pyddsim, m) {
                  "circ"_a, "seed"_a, "mode"_a = TaskBasedSimulator::Mode::Sequential, "nthreads"_a = 1)
             .def(py::init<>(&create_simulator_without_seed<TaskBasedSimulator, TaskBasedSimulator::Mode&, const std::size_t&>),
                  "circ"_a, "mode"_a = TaskBasedSimulator::Mode::Sequential, "nthreads"_a = 1)
-            .def("set_contraction_path", py::overload_cast<const TaskBasedSimulator::ContractionPlan::Path&>(&TaskBasedSimulator::setContractionPlan))
+            .def("set_contraction_path", py::overload_cast<const TaskBasedSimulator::ContractionPlan::Path&, bool>(&TaskBasedSimulator::setContractionPlan))
             .def("get_number_of_qubits", &CircuitSimulator::getNumberOfQubits)
             .def("get_name", &CircuitSimulator::getName)
             .def("simulate", &TaskBasedSimulator::Simulate, "shots"_a)
