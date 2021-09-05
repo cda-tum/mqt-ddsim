@@ -55,7 +55,7 @@ public:
     explicit TaskBasedSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Sequential, std::size_t nthreads = std::thread::hardware_concurrency()):
         CircuitSimulator(std::move(qc)), executor(nthreads) {
         // remove final measurements TODO: implement measurement support for task-based simulation
-        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
+        //        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
         // TODO: Add new strategies here
         switch (mode) {
             case Mode::PairwiseRecursiveGrouping:
@@ -74,7 +74,7 @@ public:
     TaskBasedSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, const ApproximationInfo approx_info, const unsigned long long seed, Mode mode = Mode::Sequential, const std::size_t nthreads = 1):
         CircuitSimulator(std::move(qc), approx_info, seed), executor(nthreads) {
         // remove final measurements TODO: implement measurement support for task-based simulation
-        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
+        //      qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
         // TODO: Add new strategies here
         switch (mode) {
             case Mode::PairwiseRecursiveGrouping:
