@@ -30,11 +30,12 @@ public:
     struct ContractionPlan {
         struct Step {
             std::size_t                         id;
+            std::set<std::size_t>               operations;
             std::size_t                         parent;
             std::pair<std::size_t, std::size_t> children;
 
-            explicit Step(std::size_t id, std::size_t parent = UNKNOWN, std::pair<std::size_t, std::size_t> children = {UNKNOWN, UNKNOWN}):
-                id(id), parent(parent), children(std::move(children)){};
+            explicit Step(std::size_t id, std::set<std::size_t> operations = {}, std::size_t parent = UNKNOWN, std::pair<std::size_t, std::size_t> children = {UNKNOWN, UNKNOWN}):
+                id(id), operations(std::move(operations)), parent(parent), children(std::move(children)){};
 
             static constexpr size_t UNKNOWN = std::numeric_limits<size_t>::max();
         };
@@ -43,11 +44,12 @@ public:
         using Steps = std::vector<Step>;
 
         ContractionPlan() = default;
-        ContractionPlan(std::size_t nleaves, const Path& path);
+        ContractionPlan(std::size_t nleaves, Path path, const qc::QuantumComputation* qc);
 
         Path        path{};
         Steps       steps{};
-        std::size_t nleaves{};
+        std::size_t                   nleaves{};
+        const qc::QuantumComputation* qc{};
     };
 
     explicit TaskBasedSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Sequential, std::size_t nthreads = std::thread::hardware_concurrency()):
@@ -97,7 +99,7 @@ public:
         contractionPlan = plan;
     }
     void setContractionPlan(const ContractionPlan::Path& path) {
-        contractionPlan = ContractionPlan(qc->getNops() + 1, path);
+        contractionPlan = ContractionPlan(qc->getNops() + 1, path, qc.get());
     }
 
     // TODO: Add new strategies here

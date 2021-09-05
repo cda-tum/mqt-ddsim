@@ -135,7 +135,8 @@ def qpe_exact(n: int, include_measurements: bool = True):
         phase = np.remainder(((1 << i) * lam * np.pi), 2 * np.pi)
         if phase > np.pi:
             phase -= (2 * np.pi)
-        qc.cp(phase, psi, q[i])
+        if not np.isclose(phase, 0.):
+            qc.cp(phase, psi, q[i])
 
     qc.compose(QFT(num_qubits=n, inverse=True), inplace=True, qubits=list(range(n)))
 
@@ -168,7 +169,8 @@ def qpe_inexact(n: int, include_measurements: bool = True):
         phase = np.remainder(((1 << i) * lam * np.pi), 2 * np.pi)
         if phase > np.pi:
             phase -= (2 * np.pi)
-        qc.cp(phase, psi, q[i])
+        if not np.isclose(phase, 0.):
+            qc.cp(phase, psi, q[i])
 
     qc.compose(QFT(num_qubits=n, inverse=True), inplace=True, qubits=list(range(n)))
 

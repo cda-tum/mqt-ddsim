@@ -4,15 +4,17 @@
 
 #include "TaskBasedSimulator.hpp"
 
-TaskBasedSimulator::ContractionPlan::ContractionPlan(std::size_t nleaves, const TaskBasedSimulator::ContractionPlan::Path& path):
-    path(path), nleaves(nleaves) {
+#include <utility>
+
+TaskBasedSimulator::ContractionPlan::ContractionPlan(std::size_t nleaves, TaskBasedSimulator::ContractionPlan::Path path, const qc::QuantumComputation* qc):
+    path(std::move(path)), nleaves(nleaves), qc(qc) {
     steps.reserve(nleaves);
     // create empty vector of steps
     for (std::size_t id = 0; id < nleaves; ++id) {
-        steps.emplace_back(id);
+        steps.emplace_back(id, std::set{id});
     }
 
-    for (const auto& [leftID, rightID]: path) {
+    for (auto& [leftID, rightID]: this->path) {
         if (leftID >= steps.size())
             throw std::runtime_error("Left contraction path index out of range.");
         if (rightID >= steps.size())
@@ -25,7 +27,72 @@ TaskBasedSimulator::ContractionPlan::ContractionPlan(std::size_t nleaves, const 
         leftStep.parent            = resultID;
         rightStep.parent           = resultID;
 
-        steps.emplace_back(resultID, Step::UNKNOWN, std::pair{leftID, rightID});
+        const auto& leftOps  = leftStep.operations;
+        const auto& rightOps = rightStep.operations;
+
+        // consider each operation from the left and check whether any operation from the right must precede it
+        bool leftIsActuallyLeft = true;
+        //        std::cout << "Checking whether ID " << leftID << " is actually left of ID " << rightID << std::endl;
+        for (const auto& leftOpID: leftOps) {
+            // if the initial state is included in the left, this has to be left
+            if (leftOpID == 0) {
+                //                std::cout << "Left contains initial state, so it has to be left" << std::endl;
+                break;
+            }
+            const auto& leftOp = qc->at(leftOpID - 1);
+
+            for (const auto& rightOpID: rightOps) {
+                // if the initial state is included in the right, the right side should be left
+                if (rightOpID == 0) {
+                    //                    std::cout << "Right contains initial state, so it has to be left" << std::endl;
+                    leftIsActuallyLeft = false;
+                    break;
+                }
+
+                // in case the left ID is smaller than the right ID, everything is in order
+                if (leftOpID < rightOpID) {
+                    //                    std::cout << "Operation IDs " << leftOpID << " and " << rightOpID << " are in order." << std::endl;
+                    continue;
+                }
+
+                const auto& rightOp = qc->at(rightOpID - 1);
+
+                // operation on the right occurs before operation on the left in qc
+                // if they share any qubits, then right should actually be left
+                std::set<dd::Qubit> qubits{};
+                for (const auto& target: leftOp->getTargets())
+                    qubits.emplace(target);
+                for (const auto& control: leftOp->getControls())
+                    qubits.emplace(control.qubit);
+
+                for (const auto& qubit: qubits) {
+                    if (rightOp->actsOn(qubit)) {
+                        //                        std::cout << "Right operation ID " << rightOpID << " must precede left ID " << leftOpID << std::endl;
+                        leftIsActuallyLeft = false;
+                        break;
+                    }
+                }
+                if (!leftIsActuallyLeft)
+                    break;
+                //                std::cout << "Right operation ID " << rightOpID << " does not conflict with left ID " << leftOpID << std::endl;
+            }
+            if (!leftIsActuallyLeft)
+                break;
+        }
+
+        std::set<std::size_t> operations{};
+        for (const auto& op: leftOps) {
+            operations.emplace(op);
+        }
+        for (const auto& op: rightOps) {
+            operations.emplace(op);
+        }
+
+        if (!leftIsActuallyLeft) {
+            std::swap(leftID, rightID);
+        }
+        //        std::cout << "Concluded that the right order is: [" << leftID << ", " << rightID << "] -> " << resultID << std::endl;
+        steps.emplace_back(resultID, operations, Step::UNKNOWN, std::pair{leftID, rightID});
     }
 }
 
@@ -181,14 +248,14 @@ void TaskBasedSimulator::addContractionTask(std::size_t leftID, std::size_t righ
         const auto leftIsVector  = std::holds_alternative<qc::VectorDD>(leftDD);
         const auto rightIsVector = std::holds_alternative<qc::VectorDD>(rightDD);
 
-        if (leftIsVector && rightIsVector) {
-            throw std::runtime_error("Both elements in a contraction are a vector. This should not happen!");
+        if (rightIsVector) {
+            throw std::runtime_error("Right element in contraction is a vector. This should not happen!");
         }
 
-        if (leftIsVector || rightIsVector) {
+        if (leftIsVector) {
             // matrix-vector multiplication
-            const auto& vector   = std::get<qc::VectorDD>(leftIsVector ? leftDD : rightDD);
-            const auto& matrix   = std::get<qc::MatrixDD>(leftIsVector ? rightDD : leftDD);
+            const auto& vector   = std::get<qc::VectorDD>(leftDD);
+            const auto& matrix   = std::get<qc::MatrixDD>(rightDD);
             auto        resultDD = dd->multiply(matrix, vector);
             dd->incRef(resultDD);
             dd->decRef(vector);
