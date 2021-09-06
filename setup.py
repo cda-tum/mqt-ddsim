@@ -47,7 +47,10 @@ class CMakeBuild(build_ext):
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-            build_args += ['--', '-j2']
+            cpus = os.cpu_count()
+            if cpus is None:
+                cpus = 2
+            build_args += ['--', '-j' + str(cpus)]
 
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
@@ -95,5 +98,18 @@ setup(
         'Research': 'https://iic.jku.at/eda/research/quantum_simulation/',
     },
     python_requires='>=3.6',
-    setup_requires=['cmake>=3.14']
+    setup_requires=['cmake>=3.14'],
+    install_requires=[
+        'numpy>=1.20,<1.21',
+        'networkx>=2.6.2',
+        'qiskit-terra>=0.18.1',
+        'opt_einsum>=3.3',
+        'quimb>=1.3',
+        'autoray>=0.2.5',
+        'kahypar>=1.1.6',
+        'sparse>=0.13',
+        'python-igraph>=0.9.6',
+        'nevergrad>=0.4.3',
+        'cotengra @ https://github.com/jcmgray/cotengra/archive/refs/heads/master.zip'
+    ]
 )
