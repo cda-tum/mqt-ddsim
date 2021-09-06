@@ -30,11 +30,11 @@ public:
     struct ContractionPlan {
         struct Step {
             std::size_t                         id;
-            std::set<std::size_t>               operations;
+            std::vector<std::size_t>            operations;
             std::size_t                         parent;
             std::pair<std::size_t, std::size_t> children;
 
-            explicit Step(std::size_t id, std::set<std::size_t> operations = {}, std::size_t parent = UNKNOWN, std::pair<std::size_t, std::size_t> children = {UNKNOWN, UNKNOWN}):
+            explicit Step(std::size_t id, std::vector<std::size_t> operations = {}, std::size_t parent = UNKNOWN, std::pair<std::size_t, std::size_t> children = {UNKNOWN, UNKNOWN}):
                 id(id), operations(std::move(operations)), parent(parent), children(std::move(children)){};
 
             static constexpr size_t UNKNOWN = std::numeric_limits<size_t>::max();
@@ -46,8 +46,8 @@ public:
         ContractionPlan() = default;
         ContractionPlan(std::size_t nleaves, Path path, const qc::QuantumComputation* qc, bool assumeCorrectOrder = false);
 
-        Path        path{};
-        Steps       steps{};
+        Path                          path{};
+        Steps                         steps{};
         std::size_t                   nleaves{};
         const qc::QuantumComputation* qc{};
     };

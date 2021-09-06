@@ -4,6 +4,7 @@
 
 #include "TaskBasedSimulator.hpp"
 
+#include <iterator>
 #include <utility>
 
 TaskBasedSimulator::ContractionPlan::ContractionPlan(std::size_t nleaves, TaskBasedSimulator::ContractionPlan::Path path, const qc::QuantumComputation* qc, bool assumeCorrectOrder):
@@ -11,7 +12,7 @@ TaskBasedSimulator::ContractionPlan::ContractionPlan(std::size_t nleaves, TaskBa
     steps.reserve(nleaves);
     // create empty vector of steps
     for (std::size_t id = 0; id < nleaves; ++id) {
-        steps.emplace_back(id, std::set{id});
+        steps.emplace_back(id, std::vector{id});
     }
 
     for (auto& [leftID, rightID]: this->path) {
@@ -27,16 +28,17 @@ TaskBasedSimulator::ContractionPlan::ContractionPlan(std::size_t nleaves, TaskBa
         leftStep.parent            = resultID;
         rightStep.parent           = resultID;
 
-        std::set<std::size_t> operations{};
+        std::vector<std::size_t> operations{};
         if (!assumeCorrectOrder) {
-            const auto& leftOps = leftStep.operations;
-            for (const auto& op: leftOps) {
-                operations.emplace(op);
-            }
-            const auto& rightOps = rightStep.operations;
-            for (const auto& op: rightOps) {
-                operations.emplace(op);
-            }
+            // move all operations from the left and the right to this result
+            auto& leftOps  = leftStep.operations;
+            auto& rightOps = rightStep.operations;
+            operations.reserve(leftOps.size() + rightOps.size());
+            operations.insert(operations.end(), std::make_move_iterator(leftOps.begin()), std::make_move_iterator(leftOps.end()));
+            leftOps = {};
+            operations.insert(operations.end(), std::make_move_iterator(rightOps.begin()), std::make_move_iterator(rightOps.end()));
+            rightOps = {};
+
             // consider each operation from the left and check whether any operation from the right must precede it
             bool leftIsActuallyLeft = true;
             //        std::cout << "Checking whether ID " << leftID << " is actually left of ID " << rightID << std::endl;
@@ -92,7 +94,7 @@ TaskBasedSimulator::ContractionPlan::ContractionPlan(std::size_t nleaves, TaskBa
             }
         }
         //        std::cout << "Concluded that the right order is: [" << leftID << ", " << rightID << "] -> " << resultID << std::endl;
-        steps.emplace_back(resultID, operations, Step::UNKNOWN, std::pair{leftID, rightID});
+        steps.emplace_back(resultID, std::move(operations), Step::UNKNOWN, std::pair{leftID, rightID});
     }
 }
 
