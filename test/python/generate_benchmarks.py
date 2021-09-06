@@ -3,6 +3,7 @@ from qiskit.circuit.library import QFT, GraphState, GroverOperator
 import numpy as np
 import random
 from qiskit.qasm import pi
+from fractions import Fraction
 
 import networkx as nx
 
@@ -122,21 +123,21 @@ def qpe_exact(n: int, include_measurements: bool = True):
     theta = 0
     while theta == 0:
         theta = random.getrandbits(n)
-    lam = 0.
+    lam = Fraction(0, 1)
     # print("theta : ", theta, "correspond to", theta / (1 << n), "bin: ")
     for i in range(n):
         if theta & (1 << (n - i - 1)):
-            lam += 1. / (1 << i)
+            lam += Fraction(1, (1 << i))
 
     qc.x(psi)
     qc.h(q)
 
     for i in range(n):
-        phase = np.remainder(((1 << i) * lam * np.pi), 2 * np.pi)
-        if phase > np.pi:
-            phase -= (2 * np.pi)
-        if not np.isclose(phase, 0.):
-            qc.cp(phase, psi, q[i])
+        angle = (lam * (1 << i)) % 2
+        if angle > 1:
+            angle -= 2
+        if angle != 0:
+            qc.cp(angle * np.pi, psi, q[i])
 
     qc.compose(QFT(num_qubits=n, inverse=True), inplace=True, qubits=list(range(n)))
 
@@ -156,21 +157,21 @@ def qpe_inexact(n: int, include_measurements: bool = True):
     theta = 0
     while theta == 0 or (theta & 1) == 0:
         theta = random.getrandbits(n + 1)
-    lam = 0.
+    lam = Fraction(0, 1)
     # print("theta : ", theta, "correspond to", theta / (1 << (n+1)), "bin: ")
     for i in range(n + 1):
         if theta & (1 << (n - i)):
-            lam += 1. / (1 << i)
+            lam += Fraction(1, (1 << i))
 
     qc.x(psi)
     qc.h(q)
 
     for i in range(n):
-        phase = np.remainder(((1 << i) * lam * np.pi), 2 * np.pi)
-        if phase > np.pi:
-            phase -= (2 * np.pi)
-        if not np.isclose(phase, 0.):
-            qc.cp(phase, psi, q[i])
+        angle = (lam * (1 << i)) % 2
+        if angle > 1:
+            angle -= 2
+        if angle != 0:
+            qc.cp(angle * np.pi, psi, q[i])
 
     qc.compose(QFT(num_qubits=n, inverse=True), inplace=True, qubits=list(range(n)))
 
