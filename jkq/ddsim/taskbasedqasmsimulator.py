@@ -84,12 +84,13 @@ def get_contraction_path(qc, max_time: int = 60, max_repeats: int = 1024, dump_p
 
     tn = create_tensor_network(qc)
 
-    opt = ctg.HyperOptimizer(methods=['greedy', 'walktrap', 'spinglass', 'labels'],  # , 'kahypar'],
+    opt = ctg.HyperOptimizer(methods=['kahypar', 'greedy', 'walktrap', 'spinglass'],
                              max_time=max_time,
                              max_repeats=max_repeats,
                              progbar=True,
                              minimize='flops',
-                             parallel=True)
+                             parallel=True,
+                             score_compression=0.5)
     info = tn.contract(all, get='path-info', optimize=opt)
     path = linear_to_ssa(info.path)
 
@@ -221,7 +222,7 @@ class TaskBasedQasmSimulator(BackendV1):
             dump_path = options.get('cotengra_dump_path', True)
             plot_ring = options.get('cotengra_plot_ring', False)
             path = get_contraction_path(qobj_experiment, max_time=max_time, max_repeats=max_repeats, dump_path=dump_path, plot_ring=plot_ring)
-            sim.set_contraction_path(path)
+            sim.set_contraction_path(path, False)
 
         shots = options['shots']
         setup_time = time.time()
