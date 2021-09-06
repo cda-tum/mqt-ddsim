@@ -84,13 +84,10 @@ def get_contraction_path(qc, max_time: int = 60, max_repeats: int = 1024, dump_p
 
     tn = create_tensor_network(qc)
 
-    opt = ctg.HyperOptimizer(methods=['kahypar', 'greedy', 'walktrap', 'spinglass'],
-                             max_time=max_time,
+    opt = ctg.HyperOptimizer(max_time=max_time,
                              max_repeats=max_repeats,
                              progbar=True,
-                             minimize='flops',
-                             parallel=True,
-                             score_compression=0.5)
+                             parallel=True)
     info = tn.contract(all, get='path-info', optimize=opt)
     path = linear_to_ssa(info.path)
 

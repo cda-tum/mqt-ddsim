@@ -110,7 +110,7 @@ setup(
         'kahypar>=1.1.6',
         'sparse>=0.13',
         'python-igraph>=0.9.6',
-        'nevergrad>=0.4.3',
+        'optuna>=2.9.1',
         'cotengra @ https://github.com/jcmgray/cotengra/archive/refs/heads/master.zip'
     ]
 )
