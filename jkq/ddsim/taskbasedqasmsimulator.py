@@ -58,10 +58,10 @@ def create_tensor_network(qc):
 
     # add the zero state tensor |0...0> at the beginning
     shape = [2] * nqubits
-    data = sparse.COO(coords=[[0], [0]], data=1, shape=(2 ** nqubits, 1))
+    data = sparse.COO(coords=[[0]] * nqubits, data=1, shape=shape, sorted=True, has_duplicates=False)
     inds = ['q' + str(i) + '_0' for i in range(nqubits)]
     tags = ['Q' + str(i) for i in range(nqubits)]
-    tensors.insert(0, qtn.Tensor(data=data.reshape(shape), inds=inds, tags=tags))
+    tensors.insert(0, qtn.Tensor(data=data, inds=inds, tags=tags))
 
     # using the following lines instead would allow much greater flexibility,
     # but is not supported for DD-based simulation at the moment
