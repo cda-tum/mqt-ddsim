@@ -101,6 +101,7 @@ setup(
     setup_requires=['cmake>=3.14'],
     install_requires=[
         'numpy>=1.20,<1.21',
+        'pandas>=1.3.2',
         'networkx>=2.6.2',
         'qiskit-terra>=0.18.1',
         'opt_einsum>=3.3',
