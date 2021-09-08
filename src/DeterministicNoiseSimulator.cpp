@@ -84,12 +84,15 @@ char DeterministicNoiseSimulator::MeasureOneCollapsing(dd::Qubit index) {
 std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate() {
     const unsigned short         n_qubits = qc->getNqubits();
     std::map<unsigned int, bool> classic_values;
+    int                          opCount = 0;
 
     density_root_edge = makeZeroDensityOperator(n_qubits);
 
     dd->incRef(density_root_edge);
 
     for (auto const& op: *qc) {
+        dd->garbageCollect(true); //todo remove the true flag after debugging
+        opCount++;
         if (!op->isUnitary() && !(op->isClassicControlledOperation())) {
             if (auto* nu_op = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
                 if (op->getType() == qc::Measure) {
@@ -155,23 +158,37 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
             auto tmp0 = dd->conjugateTranspose(dd_op);
             auto tmp1 = dd->multiply(density_root_edge, reinterpret_cast<dEdge&>(tmp0), 0, false);
 
-            dd->printMatrix(reinterpret_cast<dd::Package::mEdge&>(density_root_edge), false);
+            //            printf("\n\nMid operation\n");
+            //            dd->printMatrix(reinterpret_cast<dd::Package::mEdge&>(tmp1));
+            //            dd->printMatrix(reinterpret_cast<dd::Package::mEdge&>(tmp1));
+            //            dd::export2Dot(reinterpret_cast<dd::Package::mEdge&>(tmp1), "/home/toor/dds/ddMidOp.dot", false, true, false, false);
+            //            dd::export2Dot(reinterpret_cast<dd::Package::mEdge&>(dd_op), "/home/toor/dds/dd_op.dot", false, true, false, false);
+            //
+            //            printf("Matrix: (%.5lf + %.5lfI) * (%.5lf + %.5lfI) * (%.5lf + %.5lfI) \n", dd::CTEntry::val(tmp1.w.r), dd::CTEntry::val(tmp1.w.i),
+            //                   dd::CTEntry::val(tmp1.p->e[1].w.r), dd::CTEntry::val(tmp1.p->e[1].w.i),
+            //                   dd::CTEntry::val(tmp1.p->e[1].p->e[2].w.r), dd::CTEntry::val(tmp1.p->e[1].p->e[2].w.i));
+            //
+            //            printf("Operation: (%.5lf + %.5lfI) * (%.5lf + %.5lfI) * (%.5lf + %.5lfI) \n", dd::CTEntry::val(dd_op.w.r), dd::CTEntry::val(dd_op.w.i),
+            //                   dd::CTEntry::val(dd_op.p->e[0].w.r), dd::CTEntry::val(dd_op.p->e[0].w.i),
+            //                   dd::CTEntry::val(dd_op.p->e[0].p->e[3].w.r), dd::CTEntry::val(dd_op.p->e[0].p->e[3].w.i));
 
-            auto tmp2 = dd->multiply(reinterpret_cast<dEdge&>(dd_op), tmp1, 0, true);
-
-            dd->printMatrix(reinterpret_cast<dd::Package::mEdge&>(density_root_edge), false);
-            printf("\n\n");
-
+            auto tmp2 = dd->multiply(reinterpret_cast<dEdge&>(dd_op), tmp1, 0, use_density_matrix_type);
             dd->incRef(tmp2);
-
             density_root_edge.p = Edge::getAlignedDensityNode(density_root_edge.p);
             dd->decRef(density_root_edge);
             density_root_edge = tmp2;
 
-            density_root_edge.p = Edge::setDensityMatrixTrue(density_root_edge.p);
+            if (use_density_matrix_type) {
+                density_root_edge.p = Edge::setDensityMatrixTrue(density_root_edge.p);
+            }
 
-            //            dd->printMatrix(density_root_edge, true);
-            //            dd::export2Dot(density_root_edge, "/home/user/Desktop/dds/after_op.dot", false, true, false, false);
+            //            printf("\n\nAfter op\n");
+            //            dd->printMatrix(reinterpret_cast<dd::Package::mEdge&>(density_root_edge));
+            //                        dd::export2Dot(reinterpret_cast<dd::Package::mEdge&>(tmp2), "/home/toor/dds/ddAfterOp.dot", false, true, false, false);
+            //
+            //            printf("Matrix: (%.5lf + %.5lfI) * (%.5lf + %.5lfI) * (%.5lf + %.5lfI) \n", dd::CTEntry::val(tmp1.w.r), dd::CTEntry::val(tmp1.w.i),
+            //                   dd::CTEntry::val(tmp1.p->e[0].w.r), dd::CTEntry::val(tmp1.p->e[0].w.i),
+            //                   dd::CTEntry::val(tmp1.p->e[0].p->e[1].w.r), dd::CTEntry::val(tmp1.p->e[0].p->e[1].w.i));
 
             if (noiseProbability > 0) {
                 if (sequentialApplyNoise) { // was `stochastic_runs == -2`
@@ -196,6 +213,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                     [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
                     auto                  tmp3              = ApplyNoiseEffects(density_root_edge, op, 0);
                     if (!tmp3.w.approximatelyZero()) {
+                        //                    if (!(tmp3.w != dd::Complex::zero)) {
                         dd::Complex c = dd->cn.lookup(tmp3.w);
                         dd->cn.returnToCache(tmp3.w);
                         tmp3.w = c;
@@ -205,22 +223,33 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                     assert(cache_size_after == cache_size_before);
 
                     dd->incRef(tmp3);
+
+                    density_root_edge.p = Edge::getAlignedDensityNode(density_root_edge.p);
                     dd->decRef(density_root_edge);
                     density_root_edge = tmp3;
+                    if (use_density_matrix_type) {
+                        density_root_edge.p = Edge::setDensityMatrixTrue(density_root_edge.p);
+                    }
                 }
+                //                printf("\n\nAfter Noise op\n");
+                //                dd->printMatrix(reinterpret_cast<dd::Package::mEdge&>(density_root_edge));
             }
         }
     }
-    dd->garbageCollect();
+    dd->garbageCollect(true);
+    //    density_root_edge.p = Edge::setDensityMatrixTrue(density_root_edge.p);
+    //    if (!use_density_matrix_type) {
+    //        dd::export2Dot(reinterpret_cast<dd::Package::mEdge&>(density_root_edge), "/home/toor/dds/ddFinal.dot", false, true, false, false);
+    //    }
 
-    //    dd::export2Dot(density_root_edge, "/home/user/Desktop/dds/final.dot", false, true, false, false);
     //    dd->printMatrix(density_root_edge, true);
-//    dd->printMatrix(reinterpret_cast<dd::Package::mEdge&>(density_root_edge), false);
-//    printf("\n\n");
-//    dd->printMatrix(reinterpret_cast<dd::Package::mEdge&>(density_root_edge), true);
+    //    printf("Final result\n");
+    //    dd->printMatrix(reinterpret_cast<dd::Package::mEdge&>(density_root_edge));
     //    dd->printMatrix(density_root_edge, false);
     //    dd->densityNoiseOperations.printStatistics();
+
     return AnalyseState(n_qubits, false);
+    //    return {};
 }
 
 dEdge DeterministicNoiseSimulator::ApplyNoiseEffects(dEdge& originalEdge, const std::unique_ptr<qc::Operation>& op, unsigned char maxDepth) {
@@ -254,10 +283,10 @@ dEdge DeterministicNoiseSimulator::ApplyNoiseEffects(dEdge& originalEdge, const 
 
     std::array<dEdge, 4> new_edges{};
     for (int i = 0; i < 4; i++) {
-        if (alignedEdge.p->e[i].w.approximatelyZero()) {
-            new_edges[i] = dEdge::terminal(alignedEdge.p->e[i].w);
-            continue;
-        }
+        //        if (alignedEdge.p->e[i].w.approximatelyZero()) {
+        //            new_edges[i] = dEdge::terminal(alignedEdge.p->e[i].w);
+        //            continue;
+        //        }
 
         // Check if the target of the current edge is in the Compute table. Note that I check for the target node of
         // the current edge if noise needs to be applied or not
@@ -300,6 +329,11 @@ dEdge DeterministicNoiseSimulator::ApplyNoiseEffects(dEdge& originalEdge, const 
         }
     }
 
+    if (use_density_matrix_type && !Edge::isFirstEdgeDensityPath(originalEdge.p)) {
+        new_edges[2].p          = new_edges[1].p;
+        new_edges[2].w.r->value = dd::CTEntry::val(new_edges[1].w.r);
+        new_edges[2].w.i->value = dd::CTEntry::val(new_edges[1].w.i);
+    }
 
     //    qc::MatrixDD tmp = dd->makeDDNode(alignedEdge.p->v, new_edges, true, true);
     auto tmp = dd->makeDDNode(alignedEdge.p->v, new_edges, true);
@@ -477,20 +511,21 @@ void DeterministicNoiseSimulator::ApplyDepolaritationToNode(std::array<dEdge, 4>
     dd->cn.returnToCache(complex_prob);
 }
 
-std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(dd::QubitCount nr_qubits, bool full_state) const {
-    std::map<std::string, double> measure_result = {};
+std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(dd::QubitCount nr_qubits, bool full_state) {
+    std::map<std::string, double> measuredResult = {};
+    double                        p0, p1;
+    double long                   global_probability;
+    double                        statesToMeasure;
 
-    double p0, p1, imaginary;
-
-    double long global_probability;
-
-    double measure_states = std::min((double)256, pow(2, nr_qubits));
+    density_root_edge.p = Edge::getAlignedDensityNode(density_root_edge.p);
 
     if (full_state) {
-        measure_states = pow(2, nr_qubits);
+        statesToMeasure = pow(2, nr_qubits);
+    } else {
+        statesToMeasure = std::min((double)256, pow(2, nr_qubits));
     }
 
-    for (int m = 0; m < measure_states; m++) {
+    for (int m = 0; m < statesToMeasure; m++) {
         int current_result         = m;
         global_probability         = dd::CTEntry::val(density_root_edge.w.r);
         std::string  result_string = intToString(m, '1');
@@ -514,9 +549,11 @@ std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(dd::Qubi
             }
             current_result = current_result >> 1;
         }
-        measure_result.insert({result_string, global_probability});
+        if (global_probability > 0.01) {
+            measuredResult.insert({result_string, global_probability});
+        }
     }
-    return measure_result;
+    return measuredResult;
 }
 
 void DeterministicNoiseSimulator::generateGate(qc::MatrixDD* pointer_for_matrices, char noise_type, dd::Qubit target) {

@@ -24,11 +24,11 @@ public:
     //    }
 
     DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, unsigned long long seed):
-        Simulator(seed), qc(qc) {
+            Simulator(seed), qc(qc) {
     }
 
     DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const std::string& noise_effects, double noise_prob):
-        qc(qc) {
+            qc(qc) {
         setNoiseEffects(noise_effects);
         setAmplitudeDampingProbability(noise_prob);
     }
@@ -68,7 +68,7 @@ public:
 
     void applyDetNoiseSequential(const qc::Targets& targets);
 
-    [[nodiscard]] std::map<std::string, double> AnalyseState(dd::QubitCount nr_qubits, bool full_state) const;
+    [[nodiscard]] std::map<std::string, double> AnalyseState(dd::QubitCount nr_qubits, bool full_state);
 
     void setNoiseEffects(const std::string& cGateNoise) { gateNoiseTypes = cGateNoise; }
 
@@ -99,6 +99,7 @@ public:
     dd::Package::dEdge density_root_edge{};
 
     bool sequentialApplyNoise = false;
+    bool use_density_matrix_type = true;
     char MeasureOneCollapsing(dd::Qubit index);
 
 private:

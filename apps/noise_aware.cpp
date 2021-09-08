@@ -35,6 +35,7 @@ int main(int argc, char** argv) {
         ("error_bound", po::value<double>()->default_value(0.1), "Error bound of the stochastic simulation (default=0.1)")
         ("stoch_runs", po::value<long>()->default_value(0), "Number of stochastic runs. When the value is 0 the value is calculated using the confidence, error_bound and number of tracked properties. When the value is -1, the deterministic simulator is started. When the value is -2 the old method for deterministic noise application is used) (default = 0)")
         ("properties", po::value<std::string>()->default_value("-3-1000"), R"(Comma separated list of tracked properties. Note that -1 is the fidelity and "-" can be used to specify a range.  (default="-3-1000"))")
+        ("dm", "Don't use the density matrix data type for simulating with density matrices")
     ;
     // clang-format on
     po::variables_map vm;
@@ -116,6 +117,9 @@ int main(int argc, char** argv) {
 
         if (vm["stoch_runs"].as<long>() == -2) {
             ddsim->sequentialApplyNoise = true;
+        }
+        if (vm.count("dm")) {
+            ddsim->use_density_matrix_type = false;
         }
 
         ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>());
