@@ -152,6 +152,12 @@ PYBIND11_MODULE(pyddsim, m) {
             .value("sequential", TaskBasedSimulator::Mode::Sequential)
             .value("pairwise_recursive", TaskBasedSimulator::Mode::PairwiseRecursiveGrouping)
             .value("cotengra", TaskBasedSimulator::Mode::Cotengra)
+            .value("bracket3", TaskBasedSimulator::Mode::BracketGrouping3)
+            .value("bracket7", TaskBasedSimulator::Mode::BracketGrouping7)
+            .value("qftentangled", TaskBasedSimulator::Mode::QFTEntangled)
+            .value("grover", TaskBasedSimulator::Mode::Grover)
+            .value("bestcase", TaskBasedSimulator::Mode::BestCase)
+            .value("avgcase", TaskBasedSimulator::Mode::AvgCase)
             .export_values();
 
     py::class_<TaskBasedSimulator>(m, "TaskBasedCircuitSimulator")

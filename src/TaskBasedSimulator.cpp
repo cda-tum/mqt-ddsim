@@ -102,7 +102,7 @@ TaskBasedSimulator::ContractionPlan::ContractionPlan(std::size_t nleaves, TaskBa
 std::map<std::string, std::size_t> TaskBasedSimulator::Simulate(unsigned int shots) {
     // build task graph from contraction plan
     constructTaskGraph();
-
+    //std::cout<< *qc << std::endl;
     /// Enable the following statements to generate a .dot file of the resulting taskflow
     //        std::ofstream ofs("taskflow.dot");
     //        taskflow.dump(ofs);
@@ -173,6 +173,195 @@ void TaskBasedSimulator::generatePairwiseRecursiveGroupingContractionPlan() {
     }
     setContractionPlan(path, true);
 }
+
+void TaskBasedSimulator::generateBracketContractionPlan(std::size_t bracketSize){
+    ContractionPlan::Path path{};
+    path.reserve(qc->getNops());
+    bool        rightSingle = false;
+    std::size_t startElemBracket = bracketSize+1;
+    std::size_t strayElem   = 0;
+    std::size_t memoryLeft  = 0;
+    std::size_t memoryRight = 0;
+    std::size_t bracketMemory = 0;
+    std::size_t opMemory = 0;
+    //std::cout << warmupDepth << std::endl;
+    for (std::size_t i = 0; i < bracketSize; i++) {
+        if (i == 0)
+            path.emplace_back(0, 1);
+        else{
+            //std::cout << qc->getNops() + i << " " << 1+i << std::endl;
+            path.emplace_back(qc->getNops() + i, 1 + i);
+        }
+    }
+    memoryLeft = qc->getNops() + bracketSize;
+    while (!rightSingle){
+        for (auto i = 0; i < bracketSize-1; i++){
+            if (startElemBracket == qc->getNops()){
+                rightSingle = true;
+                strayElem = startElemBracket;
+                break;
+            }
+            if (i==0){
+                //std::cout << startElemBracket << " " << startElemBracket+1 << std::endl;
+                path.emplace_back(startElemBracket, startElemBracket+1);
+                opMemory++;
+                if (startElemBracket+1 == qc->getNops()){
+                    strayElem = qc->getNops() + bracketSize+1+(bracketSize*bracketMemory-bracketMemory);
+                    rightSingle = true;
+                    break;
+                }
+            }
+            else{
+                //  std::cout << qc->getNops() + warmupDepth+i+(bracketSize*bracketMemory-bracketMemory) << " " << startElemBracket+1+i << std::endl;
+                path.emplace_back(qc->getNops()+bracketSize+i+(bracketSize*bracketMemory-bracketMemory), startElemBracket+1+i);
+                opMemory++;
+                if (startElemBracket+1+i >= qc->getNops()){
+                    strayElem = qc->getNops()+bracketSize+i+(bracketSize*bracketMemory-bracketMemory)+1;
+                    rightSingle = true;
+                    break;
+                }
+            }
+        }
+        if (rightSingle){
+            break;
+        }
+        opMemory = 0;
+        startElemBracket += bracketSize;
+        bracketMemory ++;
+    }
+    for (auto i = 0; i<bracketMemory; i++){
+        if (i==0){
+            //std::cout << memoryLeft << " " << memoryLeft+(bracketSize-1) << std::endl;
+            path.emplace_back(memoryLeft, memoryLeft +(bracketSize-1));
+        }
+        else{
+            //std::cout << memoryLeft + (bracketSize-1)*bracketMemory+opMemory +i << " " << memoryLeft+(bracketSize-1)*(i+1) << std::endl;
+            path.emplace_back(memoryLeft + (bracketSize-1)*bracketMemory+opMemory +i, memoryLeft+(bracketSize-1)*(i+1));
+        }
+    }
+    if (rightSingle){
+        //std::cout << memoryLeft + (bracketSize)*bracketMemory+opMemory << " " << strayElem << std::endl;
+        path.emplace_back(memoryLeft + (bracketSize)*bracketMemory+opMemory, strayElem);
+    }
+    setContractionPlan(path, true);
+}
+
+void TaskBasedSimulator::generateGroverContractionPlan(std::size_t bracketSize){
+    ContractionPlan::Path path{};
+    path.reserve(qc->getNops());
+    bool        itFlag = false;
+    std::size_t groverBracket = 4*(bracketSize-1)+3;
+    std::size_t startElemBracket = bracketSize+1;
+    std::size_t strayElem   = 0;
+    std::size_t memoryLeft  = 0;
+    std::queue<std::size_t> memoryRight;
+    std::size_t bracketMemory = 0;
+    std::size_t opMemory = 0;
+    //std::cout << warmupDepth << std::endl;
+    for (std::size_t i = 0; i < bracketSize; i++) {
+        if (i == 0){
+            //std::cout << 0 << " " << 1 << std::endl;
+            path.emplace_back(0, 1);
+        }
+        else{
+            //std::cout << qc->getNops() + i << " " << 1+i << std::endl;
+            path.emplace_back(qc->getNops() + i, 1 + i);
+        }
+    }
+    memoryLeft = qc->getNops() + bracketSize;
+    //std::cout << sqrt(bracketSize) << std::endl;
+    for (std::size_t j = 0; j < sqrt(bracketSize); j++){
+        itFlag = false;
+        for (std::size_t i = 0; i<groverBracket; i++){
+            if (j!=0 && !itFlag){
+                startElemBracket = strayElem;
+                itFlag = true;
+            }
+            if (i==0){
+                //          std::cout << startElemBracket << " " << startElemBracket+1 << std::endl;
+                path.emplace_back(startElemBracket,startElemBracket+1);
+            }
+            else{
+                //std::cout << qc->getNops() + startElemBracket+i-bracketMemory-1-j << " " << startElemBracket+1+i << std::endl;
+                path.emplace_back(qc->getNops()+startElemBracket+i-bracketMemory-1-j, startElemBracket+1+i);
+            }
+            opMemory = qc->getNops()+startElemBracket+i-bracketMemory-j;
+            strayElem = startElemBracket+2+i;
+        }
+        //std::cout << opMemory << std::endl;
+        memoryRight.push(opMemory);
+    }
+    //std::cout << strayElem << std::endl;
+    int count = 0;
+    while(!memoryRight.empty()){
+        count ++;
+        //  std::cout << memoryLeft << " " << memoryRight.front() << std::endl;
+        path.emplace_back(memoryLeft,memoryRight.front());
+        memoryRight.pop();
+        memoryLeft = memoryRight.back()+count;
+    }
+    for (std::size_t i = 0; i<= qc->getNops() - strayElem; i++){
+        // std::cout << memoryLeft << " " << strayElem+i << std::endl;
+        path.emplace_back(memoryLeft,strayElem+i);
+        memoryLeft ++;
+    }
+    setContractionPlan(path, true);
+}
+
+void TaskBasedSimulator::generateQFTEntangledContractionPlan(std::size_t bracketSize){
+    ContractionPlan::Path path{};
+    path.reserve(qc->getNops());
+    bool        rightSingle = false;
+    std::size_t startElemBracket = bracketSize+1;
+    std::size_t strayElem   = 0;
+    std::size_t memoryLeft  = 0;
+    std::queue<std::size_t> memoryRight;
+    std::size_t bracketMemory = 0;
+    std::size_t opMemory = 0;
+    //std::cout << warmupDepth << std::endl;
+    for (std::size_t i = 0; i < bracketSize; i++) {
+        if (i == 0)
+            path.emplace_back(0, 1);
+        else{
+            //std::cout << qc->getNops() + i << " " << 1+i << std::endl;
+            path.emplace_back(qc->getNops() + i, 1 + i);
+        }
+    }
+    memoryLeft = qc->getNops() + bracketSize;
+    for (std::size_t i = bracketSize; i>1; i--){
+        for (std::size_t j = 0; j < i-1; j++){
+            if (j==0){
+                //std::cout << startElemBracket << " " << startElemBracket+1 << std::endl;
+                path.emplace_back(startElemBracket,startElemBracket+1);
+                strayElem= startElemBracket+2;
+            }
+            else{
+                //std::cout << qc->getNops() + startElemBracket+j-1-bracketMemory << " " << startElemBracket+1+j << std::endl;
+                path.emplace_back(qc->getNops()+startElemBracket+j-1-bracketMemory, startElemBracket+1+j);
+            }
+        }
+        //std::cout << qc->getNops()+startElemBracket+i-2-bracketMemory << std::endl;
+        memoryRight.push(qc->getNops()+startElemBracket+i-2-bracketMemory);
+        startElemBracket = startElemBracket+i;
+        bracketMemory ++;
+    }
+    //std::cout << strayElem << std::endl;
+    int count = 0;
+    while(!memoryRight.empty()){
+        count ++;
+        //std::cout << memoryLeft << " " << memoryRight.front() << std::endl;
+        path.emplace_back(memoryLeft,memoryRight.front());
+        memoryRight.pop();
+        memoryLeft = memoryRight.back()+count;
+    }
+    for (std::size_t i = 0; i<= qc->getNops() - strayElem; i++){
+        //std::cout << memoryLeft << " " << strayElem+i << std::endl;
+        path.emplace_back(memoryLeft,strayElem+i);
+        memoryLeft ++;
+    }
+    setContractionPlan(path, true);
+}
+
 
 void TaskBasedSimulator::constructTaskGraph() {
     const auto& path  = contractionPlan.path;

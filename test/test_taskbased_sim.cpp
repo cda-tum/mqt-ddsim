@@ -4,6 +4,9 @@
 
 #include "TaskBasedSimulator.hpp"
 #include "algorithms/Grover.hpp"
+#include "algorithms/Entanglement.hpp"
+#include "algorithms/QFT.hpp"
+#include "algorithms/QFTEntanglement.hpp"
 #include "dd/Export.hpp"
 
 #include <gtest/gtest.h>
@@ -30,13 +33,13 @@ TEST(TaskBasedSimTest, SimpleCircuitSingleThreaded) {
     }
 }
 
-TEST(TaskBasedSimTest, GroverCircuitSingleThreaded) {
-    std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(5, 12345);
+TEST(TaskBasedSimTest, GroverCircuitBracket) {
+    std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(4, 12345);
     auto                                    grover      = dynamic_cast<qc::Grover*>(qc.get());
     auto                                    targetValue = grover->targetValue;
 
     // construct simulator and generate sequential contraction plan
-    TaskBasedSimulator tbs(std::move(qc), TaskBasedSimulator::Mode::Sequential, 1);
+    TaskBasedSimulator tbs(std::move(qc), TaskBasedSimulator::Mode::BracketGrouping, 1);
 
     // simulate circuit
     auto counts = tbs.Simulate(4096);
@@ -45,7 +48,51 @@ TEST(TaskBasedSimTest, GroverCircuitSingleThreaded) {
     auto prob = c.r * c.r + c.i * c.i;
     EXPECT_GT(prob, 0.9);
 
-    dd::export2Dot(tbs.root_edge, "result_sequential.dot", true, true);
+    dd::export2Dot(tbs.root_edge, "result_grover.dot", true, true);
+
+    for (const auto& [state, count]: counts) {
+        std::cout << state << ": " << count << std::endl;
+    }
+}
+
+TEST(TaskBasedSimTest, QFTEntangledCircuitBracket) {
+    std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::QFT>(12);
+    // construct simulator and generate sequential contraction plan
+    //auto qftent = dynamic_cast<qc::QFT*>(qc.get());
+    //qftent->print(std::cout);
+    TaskBasedSimulator tbs(std::move(qc), TaskBasedSimulator::Mode::QFTEntangled, 1);
+
+    // simulate circuit
+    auto counts = tbs.Simulate(4096);
+
+    //auto c    = tbs.dd->getValueByPath(tbs.root_edge, targetValue);
+    //auto prob = c.r * c.r + c.i * c.i;
+    //EXPECT_GT(prob, 0.9);
+
+    //dd::export2Dot(tbs.root_edge, "result_qftentangled.dot", true, true);
+
+    for (const auto& [state, count]: counts) {
+        std::cout << state << ": " << count << std::endl;
+    }
+}
+
+
+TEST(TaskBasedSimTest, GroverCircuitSingleThreaded) {
+    std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(19, 12345);
+    auto                                    grover      = dynamic_cast<qc::Grover*>(qc.get());
+    auto                                    targetValue = grover->targetValue;
+    //grover->print(std::cout);
+    // construct simulator and generate sequential contraction plan
+    TaskBasedSimulator tbs(std::move(qc), TaskBasedSimulator::Mode::Grover, 1);
+
+    // simulate circuit
+    auto counts = tbs.Simulate(4096);
+
+    auto c    = tbs.dd->getValueByPath(tbs.root_edge, targetValue);
+    auto prob = c.r * c.r + c.i * c.i;
+    EXPECT_GT(prob, 0.9);
+
+    //dd::export2Dot(tbs.root_edge, "result_sequential.dot", true, true);
 
     for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;
@@ -53,7 +100,7 @@ TEST(TaskBasedSimTest, GroverCircuitSingleThreaded) {
 }
 
 TEST(TaskBasedSimTest, GroverCircuitPairwiseGroupingSingleThreaded) {
-    std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(5, 12345);
+    std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(4, 12345);
     auto                                    grover      = dynamic_cast<qc::Grover*>(qc.get());
     auto                                    targetValue = grover->targetValue;
     grover->print(std::cout);
@@ -75,7 +122,7 @@ TEST(TaskBasedSimTest, GroverCircuitPairwiseGroupingSingleThreaded) {
     }
 }
 
-TEST(TaskBasedSimTest, GroverCircuitTest) {
+/*TEST(TaskBasedSimTest, GroverCircuitTest) {
     std::size_t nq   = 2U;
     std::size_t seed = 12345U;
 
@@ -113,7 +160,7 @@ TEST(TaskBasedSimTest, GroverCircuitTest) {
 
     dd::export2Dot(tbs2.root_edge, "result_grouping.dot", true, true);
 }
-
+*/
 TEST(TaskBasedSimTest, MWEAccuracy) {
     std::size_t nq = 1U;
 

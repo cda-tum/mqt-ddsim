@@ -24,6 +24,12 @@ public:
     enum class Mode {
         Sequential,
         PairwiseRecursiveGrouping,
+        BracketGrouping3,
+        BracketGrouping7,
+        QFTEntangled,
+        BestCase,
+        AvgCase,
+        Grover,
         Cotengra
     };
 
@@ -58,10 +64,24 @@ public:
         //        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
         // TODO: Add new strategies here
         switch (mode) {
+            case Mode::BracketGrouping3:
+                generateBracketContractionPlan(3);
+                break;
+            case Mode::BracketGrouping7:
+                generateBracketContractionPlan(7);
+                break;
+            case Mode::Grover:
+                generateGroverContractionPlan(this->qc->getNqubits());
+                break;
+            case Mode::QFTEntangled:
+                generateQFTEntangledContractionPlan(this->qc->getNqubits());
+                break;
             case Mode::PairwiseRecursiveGrouping:
                 generatePairwiseRecursiveGroupingContractionPlan();
                 break;
             case Mode::Cotengra:
+            case Mode::AvgCase:
+            case Mode::BestCase:
                 // in this case the contraction plan is explicitly set
                 break;
             case Mode::Sequential:
@@ -77,10 +97,24 @@ public:
         //      qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
         // TODO: Add new strategies here
         switch (mode) {
+            case Mode::BracketGrouping3:
+                generateBracketContractionPlan(3);
+                break;
+            case Mode::BracketGrouping7:
+                generateBracketContractionPlan(7);
+                break;
+            case Mode::Grover:
+                generateGroverContractionPlan(this->qc->getNqubits());
+                break;
+            case Mode::QFTEntangled:
+                generateQFTEntangledContractionPlan(this->qc->getNqubits());
+                break;
             case Mode::PairwiseRecursiveGrouping:
                 generatePairwiseRecursiveGroupingContractionPlan();
                 break;
             case Mode::Cotengra:
+            case Mode::AvgCase:
+            case Mode::BestCase:
                 // in this case the contraction plan is explicitly set
                 break;
             case Mode::Sequential:
@@ -105,6 +139,9 @@ public:
     // TODO: Add new strategies here
     void generateSequentialContractionPlan();
     void generatePairwiseRecursiveGroupingContractionPlan();
+    void generateBracketContractionPlan(std::size_t bracketSize);
+    void generateQFTEntangledContractionPlan(std::size_t bracketSize);
+    void generateGroverContractionPlan(std::size_t bracketSize);
 
 private:
     std::unordered_map<std::size_t, tf::Task>                                 tasks{};

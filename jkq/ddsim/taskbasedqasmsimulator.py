@@ -118,6 +118,8 @@ class TaskBasedQasmSimulator(BackendV1):
             parameter_binds=None,
             simulator_seed=None,
             mode="sequential",
+            nGatesQC1=0,
+            nGatesQC2=0,
             cotengra_max_time=60,
             cotengra_max_repeats=1024,
             cotengra_plot_ring=False,
@@ -143,7 +145,8 @@ class TaskBasedQasmSimulator(BackendV1):
                             'ry', 'cry', 'mcry',
                             'rz', 'crz', 'mcrz',
                             'p', 'cp', 'cu1', 'mcphase',
-                            'sx', 'csx', 'sxdg',
+                            'sx', 'csx',
+                            'sxdg',
                             'swap', 'cswap', 'iswap',
                             'snapshot'],
             'memory': False,
@@ -207,11 +210,106 @@ class TaskBasedQasmSimulator(BackendV1):
             task_based_mode = ddsim.TaskBasedMode.pairwise_recursive
         elif mode == 'cotengra':
             task_based_mode = ddsim.TaskBasedMode.cotengra
+        elif mode == 'bracket3':
+            task_based_mode = ddsim.TaskBasedMode.bracket3
+        elif mode == 'bracket7':
+            task_based_mode = ddsim.TaskBasedMode.bracket7
+        elif mode == 'qftentangled':
+            task_based_mode = ddsim.TaskBasedMode.qftentangled
+        elif mode == 'grover':
+            task_based_mode = ddsim.TaskBasedMode.grover
+        elif mode == 'bestcase':
+            task_based_mode = ddsim.TaskBasedMode.bestcase
+        elif mode == 'avgcase':
+            task_based_mode = ddsim.TaskBasedMode.avgcase
         else:
             raise JKQSimulatorError('Simulation mode', mode, 'not supported by JKQ task-based simulator. Available modes are \'sequential\' and \'pairwise_recursive\'')
 
-        sim = ddsim.TaskBasedCircuitSimulator(qobj_experiment, seed, task_based_mode, nthreads)
 
+
+        sim = ddsim.TaskBasedCircuitSimulator(qobj_experiment, seed, task_based_mode, nthreads)
+        # determine the best case contraction path for verification purposes
+        if mode == 'bestcase':
+            nGatesQC1 = options.get('nGatesQC1', 0)
+            nGatesQC2 = options.get('nGatesQC2', 0)
+            leftId=nGatesQC1
+            rightId=nGatesQC1+1
+            runId=nGatesQC1+nGatesQC2+1
+            path = []
+            # todo create contraction path
+            for i in range(nGatesQC1):
+                if (i==0):
+                    path.append((leftId,rightId))
+                else:
+                    leftId=leftId-1
+                    rightId=rightId+1
+                    path.append((leftId,runId))
+                    runId=runId+1
+                    path.append((runId,rightId))
+                    runId=runId+1
+                    if rightId == nGatesQC1+nGatesQC2:
+                        path.append((0,runId))
+                        break
+            #print(path)
+            #print(nGatesQC1, nGatesQC2)
+            sim.set_contraction_path(path, True)
+        # determine the avg case contraction path for verification purpose
+        if mode == 'avgcase':
+            nGatesQC1 = options.get('nGatesQC1', 0)
+            nGatesQC2 = options.get('nGatesQC2', 0)
+            #print(nGatesQC1, nGatesQC2)
+            leftId=nGatesQC1
+            rightId=nGatesQC1+1
+            runId=nGatesQC1+nGatesQC2+1
+            path = []
+            print(qobj_experiment.instructions[leftId].name)
+            #print(leftId, rightId, runId)
+            # todo create contraction path, determine right hand side strategie
+            for i in range(nGatesQC1):
+                if (i==0):
+                    path.append((leftId,rightId))
+                else:
+                    leftId=leftId-1
+                    path.append((leftId,runId))
+                    runId=runId+1
+                    if leftId==1:
+                        leftId=leftId-1
+                        path.append((leftId,runId))
+                        runId=runId+1
+                        while(rightId!=nGatesQC1+nGatesQC2):
+                            rightId=rightId+1
+                            #print(runId, rightId)
+                            path.append((runId, rightId))
+                            runId=runId+1
+                            if(rightId==nGatesQC1+nGatesQC2):
+                                break
+                    #print("step left", leftId, runId)
+                    if(leftId==0 and rightId == nGatesQC1+nGatesQC2):
+                        #print("end values reached, breaking out")
+                        break
+                    for j in range(1,3,1):
+                        rightId=rightId+1
+                        path.append((runId,rightId))
+                        runId=runId+1
+                        #print("step right", leftId, rightId, runId)
+                        if rightId == nGatesQC1+nGatesQC2:
+                            while(leftId!=0):
+                                leftId=leftId-1
+                                path.append((leftId, runId))
+                                runId=runId+1
+                                #print("step left", leftId, rightId, runId)
+                                if leftId==0:
+                                    #print("breaking out")
+                                    break
+                        if(leftId==0):
+                            #print("breaking out once more")
+                            break
+                if(leftId==0):
+                    #print("breaking out once more")
+                    break
+            #print(path)
+            #print(nGatesQC1, nGatesQC2)
+            sim.set_contraction_path(path, True)
         # determine the contraction path using cotengra in case this is requested
         if mode == 'cotengra':
             max_time = options.get('cotengra_max_time', 60)
