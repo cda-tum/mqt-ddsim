@@ -22,8 +22,9 @@ def execute_circuit(qc: QuantumCircuit, backend, shots: int, mode: str = 'sequen
     print(qc.name, qc.num_qubits, mode, run_results['time_taken'], run_results['time_setup'], run_results['time_sim'],
           sep=';')
 
+
 # todo write function to create the transpile map for two sets of gates
-#def create_transpile_map(qc:: QuantumCircuit, basis_gates: list, basis_gates_elementary: list)
+# def create_transpile_map(qc:: QuantumCircuit, basis_gates: list, basis_gates_elementary: list)
 
 
 def execute_verification(qc: QuantumCircuit, backend, shots: int, mode: str = 'sequential', **options):
