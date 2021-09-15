@@ -3,8 +3,8 @@
 //
 
 #include "TaskBasedSimulator.hpp"
-#include "algorithms/Grover.hpp"
 #include "algorithms/Entanglement.hpp"
+#include "algorithms/Grover.hpp"
 #include "algorithms/QFT.hpp"
 #include "algorithms/QFTEntanglement.hpp"
 #include "dd/Export.hpp"
@@ -56,7 +56,7 @@ TEST(TaskBasedSimTest, GroverCircuitBracket) {
 }
 
 TEST(TaskBasedSimTest, QFTEntangledCircuitBracket) {
-    std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::QFT>(12);
+    std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QFT>(12);
     // construct simulator and generate sequential contraction plan
     //auto qftent = dynamic_cast<qc::QFT*>(qc.get());
     //qftent->print(std::cout);
@@ -75,7 +75,6 @@ TEST(TaskBasedSimTest, QFTEntangledCircuitBracket) {
         std::cout << state << ": " << count << std::endl;
     }
 }
-
 
 TEST(TaskBasedSimTest, GroverCircuitSingleThreaded) {
     std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(19, 12345);
