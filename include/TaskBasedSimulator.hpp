@@ -26,10 +26,8 @@ public:
         PairwiseRecursiveGrouping,
         BracketGrouping3,
         BracketGrouping7,
-        QFTEntangled,
         BestCase,
         AvgCase,
-        Grover,
         Cotengra
     };
 
@@ -70,12 +68,6 @@ public:
             case Mode::BracketGrouping7:
                 generateBracketContractionPlan(7);
                 break;
-            case Mode::Grover:
-                generateGroverContractionPlan(this->qc->getNqubits());
-                break;
-            case Mode::QFTEntangled:
-                generateQFTEntangledContractionPlan(this->qc->getNqubits());
-                break;
             case Mode::PairwiseRecursiveGrouping:
                 generatePairwiseRecursiveGroupingContractionPlan();
                 break;
@@ -102,12 +94,6 @@ public:
                 break;
             case Mode::BracketGrouping7:
                 generateBracketContractionPlan(7);
-                break;
-            case Mode::Grover:
-                generateGroverContractionPlan(this->qc->getNqubits());
-                break;
-            case Mode::QFTEntangled:
-                generateQFTEntangledContractionPlan(this->qc->getNqubits());
                 break;
             case Mode::PairwiseRecursiveGrouping:
                 generatePairwiseRecursiveGroupingContractionPlan();
@@ -140,8 +126,6 @@ public:
     void generateSequentialContractionPlan();
     void generatePairwiseRecursiveGroupingContractionPlan();
     void generateBracketContractionPlan(std::size_t bracketSize);
-    void generateQFTEntangledContractionPlan(std::size_t bracketSize);
-    void generateGroverContractionPlan(std::size_t bracketSize);
 
 private:
     std::unordered_map<std::size_t, tf::Task>                                 tasks{};

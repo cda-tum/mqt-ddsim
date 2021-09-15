@@ -215,10 +215,6 @@ class TaskBasedQasmSimulator(BackendV1):
             task_based_mode = ddsim.TaskBasedMode.bracket3
         elif mode == 'bracket7':
             task_based_mode = ddsim.TaskBasedMode.bracket7
-        elif mode == 'qftentangled':
-            task_based_mode = ddsim.TaskBasedMode.qftentangled
-        elif mode == 'grover':
-            task_based_mode = ddsim.TaskBasedMode.grover
         elif mode == 'bestcase':
             task_based_mode = ddsim.TaskBasedMode.bestcase
         elif mode == 'avgcase':
