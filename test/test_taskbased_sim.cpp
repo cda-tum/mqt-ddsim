@@ -6,7 +6,6 @@
 #include "algorithms/Entanglement.hpp"
 #include "algorithms/Grover.hpp"
 #include "algorithms/QFT.hpp"
-#include "algorithms/QFTEntanglement.hpp"
 #include "dd/Export.hpp"
 
 #include <gtest/gtest.h>
@@ -39,7 +38,7 @@ TEST(TaskBasedSimTest, GroverCircuitBracket) {
     auto                                    targetValue = grover->targetValue;
 
     // construct simulator and generate sequential contraction plan
-    TaskBasedSimulator tbs(std::move(qc), TaskBasedSimulator::Mode::BracketGrouping, 1);
+    TaskBasedSimulator tbs(std::move(qc), TaskBasedSimulator::Mode::BracketGrouping3, 1);
 
     // simulate circuit
     auto counts = tbs.Simulate(4096);

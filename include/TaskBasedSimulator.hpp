@@ -20,7 +20,7 @@
 
 class TaskBasedSimulator: public CircuitSimulator {
 public:
-    // TODO: Add new strategies here
+    // Add new strategies here
     enum class Mode {
         Sequential,
         PairwiseRecursiveGrouping,
@@ -60,9 +60,9 @@ public:
 
     explicit TaskBasedSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Sequential, std::size_t nthreads = std::thread::hardware_concurrency()):
         CircuitSimulator(std::move(qc)), executor(nthreads) {
-        // remove final measurements TODO: implement measurement support for task-based simulation
+        // remove final measurements implement measurement support for task-based simulation
         //        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
-        // TODO: Add new strategies here
+        // Add new strategies here
         switch (mode) {
             case Mode::BracketGrouping3:
                 generateBracketContractionPlan(3);
@@ -93,9 +93,9 @@ public:
 
     TaskBasedSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, const ApproximationInfo approx_info, const unsigned long long seed, Mode mode = Mode::Sequential, const std::size_t nthreads = 1):
         CircuitSimulator(std::move(qc), approx_info, seed), executor(nthreads) {
-        // remove final measurements TODO: implement measurement support for task-based simulation
+        // remove final measurements implement measurement support for task-based simulation
         //      qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
-        // TODO: Add new strategies here
+        // Add new strategies here
         switch (mode) {
             case Mode::BracketGrouping3:
                 generateBracketContractionPlan(3);
@@ -136,7 +136,7 @@ public:
         contractionPlan = ContractionPlan(qc->getNops() + 1, path, qc.get(), assumeCorrectOrder);
     }
 
-    // TODO: Add new strategies here
+    // Add new strategies here
     void generateSequentialContractionPlan();
     void generatePairwiseRecursiveGroupingContractionPlan();
     void generateBracketContractionPlan(std::size_t bracketSize);
