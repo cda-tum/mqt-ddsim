@@ -53,7 +53,6 @@ TEST(TaskBasedSimTest, GroverCircuitBracket) {
     }
 }
 
-
 TEST(TaskBasedSimTest, GroverCircuitPairwiseGroupingSingleThreaded) {
     std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(4, 12345);
     auto                                    grover      = dynamic_cast<qc::Grover*>(qc.get());

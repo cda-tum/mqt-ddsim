@@ -244,7 +244,6 @@ void TaskBasedSimulator::generateBracketContractionPlan(std::size_t bracketSize)
     setContractionPlan(path, true);
 }
 
-
 void TaskBasedSimulator::constructTaskGraph() {
     const auto& path  = contractionPlan.path;
     const auto& steps = contractionPlan.steps;
