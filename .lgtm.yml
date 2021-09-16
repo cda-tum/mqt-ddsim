@@ -4,6 +4,7 @@ path_classifiers:
     - scripts
   library:
     - extern/qfr
+    - extern/taskflow
 
 extraction:
   cpp:
