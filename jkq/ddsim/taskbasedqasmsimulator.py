@@ -78,7 +78,8 @@ def create_tensor_network(qc):
     return qtn.TensorNetwork(tensors)
 
 
-def get_contraction_path(qc, max_time: int = 60, max_repeats: int = 1024, dump_path: bool = True, plot_ring: bool = False):
+def get_contraction_path(qc, max_time: int = 60, max_repeats: int = 1024, dump_path: bool = True,
+                         plot_ring: bool = False):
     import cotengra as ctg
     from opt_einsum.paths import linear_to_ssa
 
@@ -220,7 +221,8 @@ class TaskBasedQasmSimulator(BackendV1):
         elif mode == 'avgcase':
             task_based_mode = ddsim.TaskBasedMode.avgcase
         else:
-            raise JKQSimulatorError('Simulation mode', mode, 'not supported by JKQ task-based simulator. Available modes are \'sequential\' and \'pairwise_recursive\'')
+            raise JKQSimulatorError('Simulation mode', mode,
+                                    'not supported by JKQ task-based simulator. Available modes are \'sequential\' and \'pairwise_recursive\'')
 
         sim = ddsim.TaskBasedCircuitSimulator(qobj_experiment, seed, task_based_mode, nthreads)
 
@@ -228,26 +230,26 @@ class TaskBasedQasmSimulator(BackendV1):
         if mode == 'bestcase':
             nGatesQC1 = options.get('nGatesQC1', 0)
             nGatesQC2 = options.get('nGatesQC2', 0)
-            leftId=nGatesQC1
-            rightId=nGatesQC1+1
-            runId=nGatesQC1+nGatesQC2+1
+            leftId = nGatesQC1
+            rightId = nGatesQC1 + 1
+            runId = nGatesQC1 + nGatesQC2 + 1
             path = []
             # todo create contraction path
             for i in range(nGatesQC1):
-                if (i==0):
-                    path.append((leftId,rightId))
+                if (i == 0):
+                    path.append((leftId, rightId))
                 else:
-                    leftId=leftId-1
-                    rightId=rightId+1
-                    path.append((leftId,runId))
-                    runId=runId+1
-                    path.append((runId,rightId))
-                    runId=runId+1
-                    if rightId == nGatesQC1+nGatesQC2:
-                        path.append((0,runId))
+                    leftId = leftId - 1
+                    rightId = rightId + 1
+                    path.append((leftId, runId))
+                    runId = runId + 1
+                    path.append((runId, rightId))
+                    runId = runId + 1
+                    if rightId == nGatesQC1 + nGatesQC2:
+                        path.append((0, runId))
                         break
-            #print(path)
-            #print(nGatesQC1, nGatesQC2)
+            # print(path)
+            # print(nGatesQC1, nGatesQC2)
             sim.set_contraction_path(path, True)
 
         # determine the avg case contraction path for verification purpose
@@ -313,12 +315,12 @@ class TaskBasedQasmSimulator(BackendV1):
             max_repeats = options.get('cotengra_max_repeats', 1024)
             dump_path = options.get('cotengra_dump_path', False)
             plot_ring = options.get('cotengra_plot_ring', False)
-            path = get_contraction_path(qobj_experiment, max_time=max_time, max_repeats=max_repeats, dump_path=dump_path, plot_ring=plot_ring)
+            path = get_contraction_path(qobj_experiment, max_time=max_time, max_repeats=max_repeats,
+                                        dump_path=dump_path, plot_ring=plot_ring)
             sim.set_contraction_path(path, False)
 
         shots = options['shots']
         setup_time = time.time()
-
         counts = sim.simulate(shots)
         end_time = time.time()
         counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
