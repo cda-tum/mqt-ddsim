@@ -102,7 +102,7 @@ setup(
     install_requires=[
         'numpy>=1.19,<1.21',
         'pandas>=1.3.2',
-        'networkx>=2.6.2',
+        'networkx>=2.5',
         'qiskit-terra>=0.18.1',
         'opt_einsum>=3.3',
         'quimb>=1.3',
