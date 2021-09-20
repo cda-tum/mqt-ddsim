@@ -3,8 +3,7 @@ path_classifiers:
     - test
     - scripts
   library:
-    - extern/qfr
-    - extern/taskflow
+    - extern
 
 extraction:
   cpp:
