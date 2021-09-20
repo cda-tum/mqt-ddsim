@@ -20,6 +20,7 @@ env:
   CIBW_BEFORE_BUILD: "pip install cmake"
   CIBW_BEFORE_BUILD_MACOS: "brew install libomp"
   CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=11.0"
+  CIBW_TEST_SKIP_MACOS: "*"
 
 jobs:
   test_bindings:
@@ -75,7 +76,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-11 ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
     steps:
       - uses: actions/checkout@v2
         with:
