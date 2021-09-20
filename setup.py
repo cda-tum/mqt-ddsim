@@ -107,7 +107,7 @@ setup(
         'opt_einsum>=3.3',
         'quimb>=1.3',
         'autoray>=0.2.5',
-        'kahypar @ https://github.com/kahypar/kahypar/archive/refs/tags/1.1.0.zip',
+        'kahypar >= 1.1.6',
         'sparse>=0.13',
         'python-igraph>=0.9.6',
         'optuna>=2.9.1',
