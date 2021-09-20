@@ -63,6 +63,7 @@ jobs:
         env:
           CC: "gcc-10"
           CXX: "g++-10"
+          MACOSX_DEPLOYMENT_TARGET: 10.15
       - uses: actions/upload-artifact@v2
         with:
           path: dist/*.tar.gz
@@ -85,8 +86,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl
-        env:
-          MACOSX_DEPLOYMENT_TARGET: 10.15
+
 
   upload_pypi:
     name: Upload dists to PyPi
