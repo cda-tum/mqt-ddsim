@@ -104,12 +104,8 @@ setup(
         'pandas>=1.1.4',
         'networkx>=2.5',
         'qiskit-terra>=0.18.1',
-        'opt_einsum>=3.3',
         'quimb>=1.3',
-        'autoray>=0.2.5',
         'sparse>=0.13',
-        'python-igraph>=0.9.6',
-        'optuna>=2.9.1',
         'cotengra @ https://github.com/jcmgray/cotengra/archive/refs/heads/master.zip'
     ]
 )
