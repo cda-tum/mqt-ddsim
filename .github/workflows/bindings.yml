@@ -19,6 +19,7 @@ env:
   CIBW_TEST_COMMAND: "python -c \"from jkq import ddsim\""
   CIBW_BEFORE_BUILD: "pip install cmake"
   CIBW_BEFORE_BUILD_MACOS: "brew install libomp"
+  CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=11.0"
 
 jobs:
   test_bindings:
@@ -63,7 +64,6 @@ jobs:
         env:
           CC: "gcc-10"
           CXX: "g++-10"
-          MACOSX_DEPLOYMENT_TARGET: 10.15
       - uses: actions/upload-artifact@v2
         with:
           path: dist/*.tar.gz
