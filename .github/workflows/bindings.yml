@@ -13,14 +13,14 @@ env:
   CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
   CIBW_BUILD: cp3?-*
   CIBW_ARCHS_MACOS: "x86_64"
-  CIBW_SKIP: "*-win32 *-manylinux_i686"
-  CIBW_BUILD_VERBOSITY: 0
+  CIBW_SKIP: "cp36-macos* *-win32 *-manylinux_i686"
+  CIBW_BUILD_VERBOSITY: 1
   CIBW_TEST_REQUIRES: qiskit-terra
   CIBW_TEST_COMMAND: "python -c \"from jkq import ddsim\""
   CIBW_BEFORE_BUILD: "pip install cmake"
   CIBW_BEFORE_BUILD_MACOS: "brew install libomp"
   CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=11.0"
-  CIBW_TEST_SKIP: "*"
+  CIBW_TEST_SKIP: "*-macos*" 
 
 jobs:
   test_bindings:
@@ -74,16 +74,16 @@ jobs:
     needs: [ test_bindings, build_sdist ]
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-latest, windows-latest, macos-11 ]
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.1.1
+        uses: pypa/cibuildwheel@v2.1.2
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl
