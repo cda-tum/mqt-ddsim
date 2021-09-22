@@ -77,14 +77,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-11 ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.1.2
+        uses: pypa/cibuildwheel@v2.1.1
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl
