@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  CIBW_BEFORE_ALL: "rm -rf {project}/build"
+  CIBW_BEFORE_ALL: "rm -rf jkq.ddsim/build"
   CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
   CIBW_BUILD: cp3?-*
   CIBW_ARCHS_MACOS: "x86_64"
