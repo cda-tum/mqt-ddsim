@@ -47,10 +47,10 @@ class CMakeBuild(build_ext):
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-            cpus = os.cpu_count()
-            if cpus is None:
-                cpus = 2
-            build_args += ['--', '-j' + str(cpus)]
+            # cpus = os.cpu_count()
+            # if cpus is None:
+            #    cpus = 2
+            build_args += ['--', '-j2']  # + str(cpus)]
 
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
@@ -99,13 +99,13 @@ setup(
     },
     python_requires='>=3.6',
     setup_requires=['cmake>=3.14'],
-    install_requires=[
-        'numpy>=1.19,<1.21',
-        'pandas>=1.1.4',
-        'networkx>=2.5',
-        'qiskit-terra>=0.18.1',
-        'quimb>=1.3',
-        'sparse>=0.13',
-        'cotengra @ https://github.com/jcmgray/cotengra/archive/refs/heads/master.zip'
-    ]
+    # install_requires=[
+    #    'numpy>=1.19,<1.21',
+    #    'pandas>=1.1.4',
+    #    'networkx>=2.5',
+    #    'qiskit-terra>=0.18.1',
+    #    'quimb>=1.3',
+    #    'sparse>=0.13',
+    #    'cotengra @ https://github.com/jcmgray/cotengra/archive/refs/heads/master.zip'
+    # ]
 )
