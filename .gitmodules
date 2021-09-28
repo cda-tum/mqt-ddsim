@@ -5,4 +5,4 @@
     shallow = true
 [submodule "extern/taskflow"]
 	path = extern/taskflow
-	url = https://github.com/taskflow/taskflow.git
+	url = https://github.com/burgholzer/taskflow.git
