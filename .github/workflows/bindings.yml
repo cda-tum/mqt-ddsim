@@ -37,7 +37,7 @@ jobs:
       - name: Install package
         run:  |
               pip install -U pip setuptools wheel
-          pip install .
+              pip install .
       - name: Test package
         run: |
           pip install pytest
