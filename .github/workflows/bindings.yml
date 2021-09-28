@@ -17,7 +17,7 @@ env:
   CIBW_BUILD_VERBOSITY:        1
   CIBW_TEST_COMMAND:           "python -c \"from jkq import ddsim\""
   CIBW_BEFORE_BUILD_MACOS:     "brew install libomp"
-  CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=10.15"
+  CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=10.13"
 
 jobs:
   test_bindings:
