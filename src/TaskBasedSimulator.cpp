@@ -181,7 +181,6 @@ void TaskBasedSimulator::generateBracketContractionPlan(std::size_t bracketSize)
     std::size_t startElemBracket = bracketSize + 1;
     std::size_t strayElem        = 0;
     std::size_t memoryLeft       = 0;
-    std::size_t memoryRight      = 0;
     std::size_t bracketMemory    = 0;
     std::size_t opMemory         = 0;
     //std::cout << warmupDepth << std::endl;
@@ -195,7 +194,7 @@ void TaskBasedSimulator::generateBracketContractionPlan(std::size_t bracketSize)
     }
     memoryLeft = qc->getNops() + bracketSize;
     while (!rightSingle) {
-        for (auto i = 0; i < bracketSize - 1; i++) {
+        for (auto i = 0U; i < bracketSize - 1; i++) {
             if (startElemBracket == qc->getNops()) {
                 rightSingle = true;
                 strayElem   = startElemBracket;
@@ -228,7 +227,7 @@ void TaskBasedSimulator::generateBracketContractionPlan(std::size_t bracketSize)
         startElemBracket += bracketSize;
         bracketMemory++;
     }
-    for (auto i = 0; i < bracketMemory; i++) {
+    for (auto i = 0U; i < bracketMemory; i++) {
         if (i == 0) {
             //std::cout << memoryLeft << " " << memoryLeft+(bracketSize-1) << std::endl;
             path.emplace_back(memoryLeft, memoryLeft + (bracketSize - 1));
