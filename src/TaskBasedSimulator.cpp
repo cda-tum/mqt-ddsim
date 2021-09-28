@@ -301,7 +301,11 @@ void TaskBasedSimulator::constructTaskGraph() {
         // add final task for storing the result
         if (i == path.size() - 1) {
             const auto runner = [this, resultStep]() {
-                root_edge = std::get<qc::VectorDD>(results.at(resultStep.id));
+                if (auto res = std::get_if<qc::VectorDD>(&results.at(resultStep.id))) {
+                    root_edge = *res;
+                } else {
+                    throw std::runtime_error("Expected vector DD as result.");
+                }
             };
             auto storeResultTask = taskflow.emplace(runner).name("store result");
             auto preceedingTask  = tasks.at(resultStep.id);
@@ -326,8 +330,8 @@ void TaskBasedSimulator::addContractionTask(std::size_t leftID, std::size_t righ
 
         if (leftIsVector) {
             // matrix-vector multiplication
-            const auto& vector   = std::get<qc::VectorDD>(leftDD);
-            const auto& matrix   = std::get<qc::MatrixDD>(rightDD);
+            const auto& vector   = *std::get_if<qc::VectorDD>(&leftDD);
+            const auto& matrix   = *std::get_if<qc::MatrixDD>(&rightDD);
             auto        resultDD = dd->multiply(matrix, vector);
             dd->incRef(resultDD);
             dd->decRef(vector);
@@ -335,8 +339,8 @@ void TaskBasedSimulator::addContractionTask(std::size_t leftID, std::size_t righ
             results.emplace(resultID, resultDD);
         } else {
             // matrix-matrix multiplication
-            const auto& leftMatrix  = std::get<qc::MatrixDD>(leftDD);
-            const auto& rightMatrix = std::get<qc::MatrixDD>(rightDD);
+            const auto& leftMatrix  = *std::get_if<qc::MatrixDD>(&leftDD);
+            const auto& rightMatrix = *std::get_if<qc::MatrixDD>(&rightDD);
             auto        resultDD    = dd->multiply(rightMatrix, leftMatrix);
             dd->incRef(resultDD);
             dd->decRef(leftMatrix);
