@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
         ("step_fidelity", po::value<double>()->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")
         ("steps", po::value<unsigned int>()->default_value(1), "number of approximation steps")
 
-        ("noise_effects", po::value<std::string>()->default_value("APD"), "Noise effects (A (=amplitude damping),D (=depolarization),P (=phase flip)) in the form of a character string describing the noise effects (default=\"APD\")")
+        ("noise_effects", po::value<std::string>()->default_value("APD"), "Noise effects (A (=amplitude damping), D (=depolarization),P (=phase flip)) in the form of a character string describing the noise effects (default=\"APD\")")
         ("noise_prob", po::value<double>()->default_value(0.001), "Probability for applying noise (default=0.001)")
         ("confidence", po::value<double>()->default_value(0.05), "Confidence in the error bound of the stochastic simulation (default= 0.05)")
         ("error_bound", po::value<double>()->default_value(0.1), "Error bound of the stochastic simulation (default=0.1)")
