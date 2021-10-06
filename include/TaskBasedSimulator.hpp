@@ -23,6 +23,7 @@ public:
     // Add new strategies here
     enum class Mode {
         Sequential,
+        SequentialFalse,
         PairwiseRecursiveGrouping,
         BracketGrouping3,
         BracketGrouping7,
@@ -68,6 +69,9 @@ public:
             case Mode::PairwiseRecursiveGrouping:
                 generatePairwiseRecursiveGroupingContractionPlan();
                 break;
+            case Mode::SequentialFalse:
+                generateSequentialContractionPlanFalseOrder();
+                break;
             case Mode::Cotengra:
             case Mode::AvgCase:
             case Mode::BestCase:
@@ -91,6 +95,9 @@ public:
                 break;
             case Mode::PairwiseRecursiveGrouping:
                 generatePairwiseRecursiveGroupingContractionPlan();
+                break;
+            case Mode::SequentialFalse:
+                generateSequentialContractionPlanFalseOrder();
                 break;
             case Mode::Cotengra:
             case Mode::AvgCase:
@@ -118,6 +125,7 @@ public:
 
     // Add new strategies here
     void generateSequentialContractionPlan();
+    void generateSequentialContractionPlanFalseOrder();
     void generatePairwiseRecursiveGroupingContractionPlan();
     void generateBracketContractionPlan(std::size_t bracketSize);
 

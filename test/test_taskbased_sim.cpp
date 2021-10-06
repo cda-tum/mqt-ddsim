@@ -31,6 +31,25 @@ TEST(TaskBasedSimTest, SimpleCircuitSingleThreaded) {
     }
 }
 
+TEST(TaskBasedSimTest, SimpleCircuitSingleThreadedContractionPlanOrderFalse) {
+    auto qc = std::make_unique<qc::QuantumComputation>(2);
+    qc->h(1U);
+    qc->x(0U, 1_pc);
+
+    // construct simulator and generate sequential contraction plan
+    TaskBasedSimulator tbs(std::move(qc), TaskBasedSimulator::Mode::SequentialFalse, 1);
+
+    // simulate circuit
+    auto counts = tbs.Simulate(1024);
+
+    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.root_edge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
+    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.root_edge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
+
+    for (const auto& [state, count]: counts) {
+        std::cout << state << ": " << count << std::endl;
+    }
+}
+
 TEST(TaskBasedSimTest, SimpleCircuitSingleThreadedApproximateInfo) {
     auto qc = std::make_unique<qc::QuantumComputation>(2);
     qc->h(1U);
@@ -38,6 +57,25 @@ TEST(TaskBasedSimTest, SimpleCircuitSingleThreadedApproximateInfo) {
 
     // construct simulator and generate sequential contraction plan
     TaskBasedSimulator tbs(std::move(qc), ApproximationInfo(), 1, TaskBasedSimulator::Mode::Sequential, 1);
+
+    // simulate circuit
+    auto counts = tbs.Simulate(1024);
+
+    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.root_edge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
+    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.root_edge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
+
+    for (const auto& [state, count]: counts) {
+        std::cout << state << ": " << count << std::endl;
+    }
+}
+
+TEST(TaskBasedSimTest, SimpleCircuitSingleThreadedApproximateInfoFalseOrder) {
+    auto qc = std::make_unique<qc::QuantumComputation>(2);
+    qc->h(1U);
+    qc->x(0U, 1_pc);
+
+    // construct simulator and generate sequential contraction plan
+    TaskBasedSimulator tbs(std::move(qc), ApproximationInfo(), 1, TaskBasedSimulator::Mode::SequentialFalse, 1);
 
     // simulate circuit
     auto counts = tbs.Simulate(1024);

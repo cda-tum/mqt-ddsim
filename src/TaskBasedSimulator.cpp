@@ -127,6 +127,19 @@ void TaskBasedSimulator::generateSequentialContractionPlan() {
     setContractionPlan(path, true);
 }
 
+void TaskBasedSimulator::generateSequentialContractionPlanFalseOrder() {
+    ContractionPlan::Path path{};
+    path.reserve(qc->getNops());
+
+    for (std::size_t i = 0; i < qc->getNops(); ++i) {
+        if (i == 0)
+            path.emplace_back(0, 1);
+        else
+            path.emplace_back(qc->getNops() + i, i + 1);
+    }
+    setContractionPlan(path, false);
+}
+
 void TaskBasedSimulator::generatePairwiseRecursiveGroupingContractionPlan() {
     ContractionPlan::Path path{};
     path.reserve(qc->getNops());
