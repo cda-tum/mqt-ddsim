@@ -65,9 +65,6 @@ public:
             case Mode::BracketGrouping3:
                 generateBracketContractionPlan(3);
                 break;
-            case Mode::BracketGrouping7:
-                generateBracketContractionPlan(7);
-                break;
             case Mode::PairwiseRecursiveGrouping:
                 generatePairwiseRecursiveGroupingContractionPlan();
                 break;
@@ -91,9 +88,6 @@ public:
         switch (mode) {
             case Mode::BracketGrouping3:
                 generateBracketContractionPlan(3);
-                break;
-            case Mode::BracketGrouping7:
-                generateBracketContractionPlan(7);
                 break;
             case Mode::PairwiseRecursiveGrouping:
                 generatePairwiseRecursiveGroupingContractionPlan();
