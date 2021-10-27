@@ -12,7 +12,7 @@ class JKQStandaloneSimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.TaskBasedCircuitSimulator(circ)
+        sim = ddsim.PathCircuitSimulator(circ)
         result = sim.simulate(1000)
         self.assertEqual(len(result.keys()), 2)
         self.assertIn('000', result.keys())
@@ -24,7 +24,7 @@ class JKQStandaloneSimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.TaskBasedCircuitSimulator(circ, 1337)
+        sim = ddsim.PathCircuitSimulator(circ, 1337)
         result = sim.simulate(1000)
         self.assertEqual(len(result.keys()), 2)
         self.assertIn('000', result.keys())
@@ -36,7 +36,7 @@ class JKQStandaloneSimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.TaskBasedCircuitSimulator(circ, mode=ddsim.TaskBasedMode.pairwise_recursive)
+        sim = ddsim.PathCircuitSimulator(circ, mode=ddsim.PathMode.pairwise_recursive)
         result = sim.simulate(1000)
         self.assertEqual(len(result.keys()), 2)
         self.assertIn('000', result.keys())
@@ -48,7 +48,7 @@ class JKQStandaloneSimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.TaskBasedCircuitSimulator(circ, 1337, mode=ddsim.TaskBasedMode.pairwise_recursive)
+        sim = ddsim.PathCircuitSimulator(circ, 1337, mode=ddsim.PathMode.pairwise_recursive)
         result = sim.simulate(1000)
         self.assertEqual(len(result.keys()), 2)
         self.assertIn('000', result.keys())

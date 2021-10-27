@@ -1,6 +1,6 @@
 import datetime
 import time
-from jkq.ddsim.taskbasedqasmsimulator import TaskBasedQasmSimulator, get_contraction_path
+from jkq.ddsim.pathqasmsimulator import PathQasmSimulator, get_contraction_path
 from jkq import ddsim
 from qiskit import transpile
 
@@ -158,15 +158,15 @@ def execute_verification(qc: QuantumCircuit, backend, shots: int, mode: str = 's
 
     print('Starting setup')
     start_time = time.time()
-    task_based_mode = ddsim.TaskBasedMode.sequential
+    task_based_mode = ddsim.PathMode.sequential
     if mode == 'cotengra':
-        task_based_mode = ddsim.TaskBasedMode.cotengra
+        task_based_mode = ddsim.PathMode.cotengra
     elif mode == 'bestcase':
-        task_based_mode = ddsim.TaskBasedMode.bestcase
+        task_based_mode = ddsim.PathMode.bestcase
     elif mode == 'avgcase':
-        task_based_mode = ddsim.TaskBasedMode.avgcase
+        task_based_mode = ddsim.PathMode.avgcase
 
-    sim = ddsim.TaskBasedCircuitSimulator(circ=qccomp, seed=-1, mode=task_based_mode, nthreads=1)
+    sim = ddsim.PathCircuitSimulator(circ=qccomp, seed=-1, mode=task_based_mode, nthreads=1)
 
     if mode == 'bestcase':
         n_gates_1 = qc.size()
@@ -290,7 +290,7 @@ if __name__ == '__main__':
         file.write(datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S") + ';name;nqubits;ngates;mode;time_setup;time_sim\n')
 
     # settings
-    backend = TaskBasedQasmSimulator()
+    backend = PathQasmSimulator()
     configuration_dict = backend.configuration().to_dict()
     basis_gates = configuration_dict['basis_gates']
 

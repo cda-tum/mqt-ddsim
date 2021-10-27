@@ -1,7 +1,7 @@
 import unittest
 
 from qiskit import QuantumCircuit, BasicAer
-from jkq.ddsim.taskbasedqasmsimulator import TaskBasedQasmSimulator
+from jkq.ddsim.pathqasmsimulator import PathQasmSimulator
 from qiskit import execute
 
 
@@ -9,7 +9,7 @@ class JKQQasmSimulatorTest(unittest.TestCase):
     """Runs backend checks and the Basic qasm_simulator tests from Qiskit Terra."""
 
     def setUp(self):
-        self.backend = TaskBasedQasmSimulator()
+        self.backend = PathQasmSimulator()
         self.circuit = QuantumCircuit.from_qasm_str('''OPENQASM 2.0;
             include "qelib1.inc";
             qreg q[3];
@@ -18,7 +18,8 @@ class JKQQasmSimulatorTest(unittest.TestCase):
             cx q, r;
             creg c[3];
             creg d[3];
-            barrier q;''')
+            barrier q;
+            measure q -> c;''')
         self.circuit.name = 'test'
 
     def test_configuration(self):

@@ -5,12 +5,12 @@ import logging
 from qiskit.providers.models import BackendConfiguration
 
 from jkq import ddsim
-from jkq.ddsim.taskbasedqasmsimulator import TaskBasedQasmSimulator
+from jkq.ddsim.pathqasmsimulator import PathQasmSimulator
 
 logger = logging.getLogger(__name__)
 
 
-class TaskBasedStatevectorSimulator(TaskBasedQasmSimulator):
+class PathStatevectorSimulator(PathQasmSimulator):
     """Python interface to JKQ DDSIM"""
 
     SHOW_STATE_VECTOR = True

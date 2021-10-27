@@ -1,13 +1,9 @@
-//
-// Created by Lukas Burgholzer on 09.08.21.
-//
-
-#include "TaskBasedSimulator.hpp"
+#include "PathSimulator.hpp"
 
 #include <iterator>
 #include <utility>
 
-TaskBasedSimulator::ContractionPlan::ContractionPlan(std::size_t nleaves, TaskBasedSimulator::ContractionPlan::Path path, const qc::QuantumComputation* qc, bool assumeCorrectOrder):
+PathSimulator::SimulationPath::SimulationPath(std::size_t nleaves, PathSimulator::SimulationPath::Path path, const qc::QuantumComputation* qc, bool assumeCorrectOrder):
     path(std::move(path)), nleaves(nleaves), qc(qc) {
     steps.reserve(nleaves);
     // create empty vector of steps
@@ -99,7 +95,7 @@ TaskBasedSimulator::ContractionPlan::ContractionPlan(std::size_t nleaves, TaskBa
     }
 }
 
-std::map<std::string, std::size_t> TaskBasedSimulator::Simulate(unsigned int shots) {
+std::map<std::string, std::size_t> PathSimulator::Simulate(unsigned int shots) {
     // build task graph from contraction plan
     constructTaskGraph();
     //std::cout<< *qc << std::endl;
@@ -114,8 +110,8 @@ std::map<std::string, std::size_t> TaskBasedSimulator::Simulate(unsigned int sho
     return MeasureAllNonCollapsing(shots);
 }
 
-void TaskBasedSimulator::generateSequentialContractionPlan() {
-    ContractionPlan::Path path{};
+void PathSimulator::generateSequentialSimulationPath() {
+    SimulationPath::Path path{};
     path.reserve(qc->getNops());
 
     for (std::size_t i = 0; i < qc->getNops(); ++i) {
@@ -124,11 +120,12 @@ void TaskBasedSimulator::generateSequentialContractionPlan() {
         else
             path.emplace_back(qc->getNops() + i, i + 1);
     }
-    setContractionPlan(path, true);
+    setSimulationPath(path, true);
 }
 
-void TaskBasedSimulator::generateSequentialContractionPlanFalseOrder() {
-    ContractionPlan::Path path{};
+void PathSimulator::generateSequentialSimulationPathFalseOrder() {
+    // Assumption of correct order is set to false
+    SimulationPath::Path path{};
     path.reserve(qc->getNops());
 
     for (std::size_t i = 0; i < qc->getNops(); ++i) {
@@ -137,11 +134,11 @@ void TaskBasedSimulator::generateSequentialContractionPlanFalseOrder() {
         else
             path.emplace_back(qc->getNops() + i, i + 1);
     }
-    setContractionPlan(path, false);
+    setSimulationPath(path, false);
 }
 
-void TaskBasedSimulator::generatePairwiseRecursiveGroupingContractionPlan() {
-    ContractionPlan::Path path{};
+void PathSimulator::generatePairwiseRecursiveGroupingSimulationPath() {
+    SimulationPath::Path path{};
     path.reserve(qc->getNops());
 
     std::size_t nleaves = qc->getNops() + 1;
@@ -184,11 +181,11 @@ void TaskBasedSimulator::generatePairwiseRecursiveGroupingContractionPlan() {
     if (strayElementLeft) {
         path.emplace_back(offset, strayID);
     }
-    setContractionPlan(path, true);
+    setSimulationPath(path, true);
 }
 
-void TaskBasedSimulator::generateBracketContractionPlan(std::size_t bracketSize) {
-    ContractionPlan::Path path{};
+void PathSimulator::generateBracketSimulationPath(std::size_t bracketSize) {
+    SimulationPath::Path path{};
     path.reserve(qc->getNops());
     bool        rightSingle      = false;
     std::size_t startElemBracket = bracketSize + 1;
@@ -253,12 +250,12 @@ void TaskBasedSimulator::generateBracketContractionPlan(std::size_t bracketSize)
         //std::cout << memoryLeft + (bracketSize)*bracketMemory+opMemory << " " << strayElem << std::endl;
         path.emplace_back(memoryLeft + (bracketSize)*bracketMemory + opMemory, strayElem);
     }
-    setContractionPlan(path, true);
+    setSimulationPath(path, true);
 }
 
-void TaskBasedSimulator::constructTaskGraph() {
-    const auto& path  = contractionPlan.path;
-    const auto& steps = contractionPlan.steps;
+void PathSimulator::constructTaskGraph() {
+    const auto& path  = SimulationPath.path;
+    const auto& steps = SimulationPath.steps;
 
     if (path.empty())
         return;
@@ -327,7 +324,7 @@ void TaskBasedSimulator::constructTaskGraph() {
     }
 }
 
-void TaskBasedSimulator::addContractionTask(std::size_t leftID, std::size_t rightID, std::size_t resultID) {
+void PathSimulator::addContractionTask(std::size_t leftID, std::size_t rightID, std::size_t resultID) {
     const auto runner = [this, leftID, rightID, resultID]() {
         /// Enable the following statement for printing execution order
         //            std::cout << "Executing " << leftID << " " << rightID << " -> " << resultID << std::endl;

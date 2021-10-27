@@ -5,7 +5,7 @@
 // clang-format off
 #include "CircuitSimulator.hpp"
 #include "HybridSchrodingerFeynmanSimulator.hpp"
-#include "TaskBasedSimulator.hpp"
+#include "PathSimulator.hpp"
 #include "UnitarySimulator.hpp"
 #include "qiskit/QasmQobjExperiment.hpp"
 #include "qiskit/QuantumCircuit.hpp"

@@ -2,12 +2,12 @@ import unittest
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit import execute
 
-from jkq.ddsim.taskbasedstatevectorsimulator import TaskBasedStatevectorSimulator
+from jkq.ddsim.pathstatevectorsimulator import PathStatevectorSimulator
 
 
 class JKQStatevectorSimulatorTest(unittest.TestCase):
     def setUp(self):
-        self.backend = TaskBasedStatevectorSimulator()
+        self.backend = PathStatevectorSimulator()
         qr = QuantumRegister(2)
         self.q_circuit = QuantumCircuit(qr)
         self.q_circuit.h(qr[0])

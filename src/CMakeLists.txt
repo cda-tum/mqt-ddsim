@@ -7,19 +7,19 @@ add_library(${PROJECT_NAME}
             ${CMAKE_CURRENT_SOURCE_DIR}/GroverSimulator.cpp
             ${PROJECT_SOURCE_DIR}/include/ShorSimulator.hpp
             ${CMAKE_CURRENT_SOURCE_DIR}/ShorSimulator.cpp
-            ${PROJECT_SOURCE_DIR}/include/ShorFastSimulator.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/ShorFastSimulator.cpp
-            ${PROJECT_SOURCE_DIR}/include/StochasticNoiseSimulator.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/StochasticNoiseSimulator.cpp
-            ${PROJECT_SOURCE_DIR}/include/DeterministicNoiseSimulator.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/DeterministicNoiseSimulator.cpp
-            ${PROJECT_SOURCE_DIR}/include/HybridSchrodingerFeynmanSimulator.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/HybridSchrodingerFeynmanSimulator.cpp
-            ${PROJECT_SOURCE_DIR}/include/UnitarySimulator.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/UnitarySimulator.cpp
-            ${PROJECT_SOURCE_DIR}/include/TaskBasedSimulator.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/TaskBasedSimulator.cpp
-            )
+        ${PROJECT_SOURCE_DIR}/include/ShorFastSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/ShorFastSimulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/StochasticNoiseSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/StochasticNoiseSimulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/DeterministicNoiseSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/DeterministicNoiseSimulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/HybridSchrodingerFeynmanSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/HybridSchrodingerFeynmanSimulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/UnitarySimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/UnitarySimulator.cpp
+        ${PROJECT_SOURCE_DIR}/include/PathSimulator.hpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/PathSimulator.cpp
+        )
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)
 # set required C++ standard and disable compiler specific extensions
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
@@ -29,7 +29,7 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr")
 target_link_libraries(${PROJECT_NAME} PUBLIC JKQ::qfr)
 
 set(TF_BUILD_TESTS OFF CACHE BOOL "")
-set(TF_BUILD_EXAMPLES ON CACHE BOOL "")
+set(TF_BUILD_EXAMPLES OFF CACHE BOOL "")
 set(TF_BUILD_PROFILER OFF CACHE BOOL "")
 add_subdirectory("${PROJECT_SOURCE_DIR}/extern/taskflow" "extern/taskflow")
 target_link_libraries(${PROJECT_NAME} PUBLIC Taskflow)

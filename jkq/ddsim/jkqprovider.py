@@ -5,8 +5,8 @@ from .qasmsimulator import QasmSimulator
 from .statevectorsimulator import StatevectorSimulator
 from .hybridqasmsimulator import HybridQasmSimulator
 from .hybridstatevectorsimulator import HybridStatevectorSimulator
-from .taskbasedqasmsimulator import TaskBasedQasmSimulator
-from .taskbasedstatevectorsimulator import TaskBasedStatevectorSimulator
+from .pathqasmsimulator import PathQasmSimulator
+from .pathstatevectorsimulator import PathStatevectorSimulator
 from .unitarysimulator import UnitarySimulator
 
 
@@ -20,8 +20,8 @@ class JKQProvider(Provider):
                 ('statevector_simulator', StatevectorSimulator, None, None),
                 ('hybrid_qasm_simulator', HybridQasmSimulator, None, None),
                 ('hybrid_statevector_simulator', HybridStatevectorSimulator, None, None),
-                ('task_based_qasm_simulator', TaskBasedQasmSimulator, None, None),
-                ('task_based_statevector_simulator', TaskBasedStatevectorSimulator, None, None),
+                ('path_sim_qasm_simulator', PathQasmSimulator, None, None),
+                ('path_sim_statevector_simulator', PathStatevectorSimulator, None, None),
                 ('unitary_simulator', UnitarySimulator, None, None)
             ]
 

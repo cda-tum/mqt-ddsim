@@ -108,7 +108,7 @@ def get_contraction_path(qc, max_time: int = 60, max_repeats: int = 1024, dump_p
     return path
 
 
-class TaskBasedQasmSimulator(BackendV1):
+class PathQasmSimulator(BackendV1):
     """Python interface to JKQ DDSIM Task-Based Simulator"""
 
     SHOW_STATE_VECTOR = False
@@ -207,24 +207,24 @@ class TaskBasedQasmSimulator(BackendV1):
         nthreads = int(options.get('nthreads', 1))
         # TODO: Add new strategies here
         if mode == 'sequential':
-            task_based_mode = ddsim.TaskBasedMode.sequential
+            task_based_mode = ddsim.PathMode.sequential
         elif mode == 'pairwise_recursive':
-            task_based_mode = ddsim.TaskBasedMode.pairwise_recursive
+            task_based_mode = ddsim.PathMode.pairwise_recursive
         elif mode == 'cotengra':
-            task_based_mode = ddsim.TaskBasedMode.cotengra
+            task_based_mode = ddsim.PathMode.cotengra
         elif mode == 'bracket3':
-            task_based_mode = ddsim.TaskBasedMode.bracket3
+            task_based_mode = ddsim.PathMode.bracket3
         elif mode == 'bracket7':
-            task_based_mode = ddsim.TaskBasedMode.bracket7
+            task_based_mode = ddsim.PathMode.bracket7
         elif mode == 'bestcase':
-            task_based_mode = ddsim.TaskBasedMode.bestcase
+            task_based_mode = ddsim.PathMode.bestcase
         elif mode == 'avgcase':
-            task_based_mode = ddsim.TaskBasedMode.avgcase
+            task_based_mode = ddsim.PathMode.avgcase
         else:
             raise JKQSimulatorError('Simulation mode', mode,
                                     'not supported by JKQ task-based simulator. Available modes are \'sequential\' and \'pairwise_recursive\'')
 
-        sim = ddsim.TaskBasedCircuitSimulator(qobj_experiment, seed, task_based_mode, nthreads)
+        sim = ddsim.PathCircuitSimulator(qobj_experiment, seed, task_based_mode, nthreads)
 
         # determine the best case contraction path for verification purposes
         if mode == 'bestcase':
