@@ -148,7 +148,7 @@ PYBIND11_MODULE(pyddsim, m) {
             .def("get_final_amplitudes", &HybridSchrodingerFeynmanSimulator::getFinalAmplitudes);
 
     // TODO: Add new strategies here
-    py::enum_<PathSimulator::Mode>(m, "TaskBasedMode")
+    py::enum_<PathSimulator::Mode>(m, "PathSimulatorMode")
             .value("sequential", PathSimulator::Mode::Sequential)
             .value("pairwise_recursive", PathSimulator::Mode::PairwiseRecursiveGrouping)
             .value("cotengra", PathSimulator::Mode::Cotengra)
@@ -158,7 +158,7 @@ PYBIND11_MODULE(pyddsim, m) {
             .value("avgcase", PathSimulator::Mode::AvgCase)
             .export_values();
 
-    py::class_<PathSimulator>(m, "TaskBasedCircuitSimulator")
+    py::class_<PathSimulator>(m, "PathCircuitSimulator")
             .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Mode&, const std::size_t&>),
                  "circ"_a, "seed"_a, "mode"_a = PathSimulator::Mode::Sequential, "nthreads"_a = 1)
             .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Mode&, const std::size_t&>),
