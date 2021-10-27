@@ -254,8 +254,8 @@ void PathSimulator::generateBracketSimulationPath(std::size_t bracketSize) {
 }
 
 void PathSimulator::constructTaskGraph() {
-    const auto& path  = SimulationPath.path;
-    const auto& steps = SimulationPath.steps;
+    const auto& path  = simulationPath.path;
+    const auto& steps = simulationPath.steps;
 
     if (path.empty())
         return;
