@@ -18,8 +18,7 @@ class JKQQasmSimulatorTest(unittest.TestCase):
             cx q, r;
             creg c[3];
             creg d[3];
-            barrier q;
-            measure q->c;''')
+            barrier q;''')
         self.circuit.name = 'test'
 
     def test_configuration(self):
