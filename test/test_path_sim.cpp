@@ -173,4 +173,3 @@ TEST(TaskBasedSimTest, GroverCircuitPairwiseGroupingSingleThreadedApproximateInf
         std::cout << state << ": " << count << std::endl;
     }
 }
-
