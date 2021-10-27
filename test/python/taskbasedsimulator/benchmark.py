@@ -158,13 +158,13 @@ def execute_verification(qc: QuantumCircuit, backend, shots: int, mode: str = 's
 
     print('Starting setup')
     start_time = time.time()
-    task_based_mode = ddsim.PathMode.sequential
+    task_based_mode = ddsim.PathSimulatorMode.sequential
     if mode == 'cotengra':
-        task_based_mode = ddsim.PathMode.cotengra
+        task_based_mode = ddsim.PathSimulatorMode.cotengra
     elif mode == 'bestcase':
-        task_based_mode = ddsim.PathMode.bestcase
+        task_based_mode = ddsim.PathSimulatorMode.bestcase
     elif mode == 'avgcase':
-        task_based_mode = ddsim.PathMode.avgcase
+        task_based_mode = ddsim.PathSimulatorMode.avgcase
 
     sim = ddsim.PathCircuitSimulator(circ=qccomp, seed=-1, mode=task_based_mode, nthreads=1)
 
