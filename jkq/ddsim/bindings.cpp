@@ -148,25 +148,25 @@ PYBIND11_MODULE(pyddsim, m) {
             .def("get_final_amplitudes", &HybridSchrodingerFeynmanSimulator::getFinalAmplitudes);
 
     // TODO: Add new strategies here
-    py::enum_<TaskBasedSimulator::Mode>(m, "TaskBasedMode")
-            .value("sequential", TaskBasedSimulator::Mode::Sequential)
-            .value("pairwise_recursive", TaskBasedSimulator::Mode::PairwiseRecursiveGrouping)
-            .value("cotengra", TaskBasedSimulator::Mode::Cotengra)
-            .value("bracket3", TaskBasedSimulator::Mode::BracketGrouping3)
-            .value("bracket7", TaskBasedSimulator::Mode::BracketGrouping7)
-            .value("bestcase", TaskBasedSimulator::Mode::BestCase)
-            .value("avgcase", TaskBasedSimulator::Mode::AvgCase)
+    py::enum_<PathSimulator::Mode>(m, "TaskBasedMode")
+            .value("sequential", PathSimulator::Mode::Sequential)
+            .value("pairwise_recursive", PathSimulator::Mode::PairwiseRecursiveGrouping)
+            .value("cotengra", PathSimulator::Mode::Cotengra)
+            .value("bracket3", PathSimulator::Mode::BracketGrouping3)
+            .value("bracket7", PathSimulator::Mode::BracketGrouping7)
+            .value("bestcase", PathSimulator::Mode::BestCase)
+            .value("avgcase", PathSimulator::Mode::AvgCase)
             .export_values();
 
-    py::class_<TaskBasedSimulator>(m, "TaskBasedCircuitSimulator")
-            .def(py::init<>(&create_simulator<TaskBasedSimulator, TaskBasedSimulator::Mode&, const std::size_t&>),
-                 "circ"_a, "seed"_a, "mode"_a = TaskBasedSimulator::Mode::Sequential, "nthreads"_a = 1)
-            .def(py::init<>(&create_simulator_without_seed<TaskBasedSimulator, TaskBasedSimulator::Mode&, const std::size_t&>),
-                 "circ"_a, "mode"_a = TaskBasedSimulator::Mode::Sequential, "nthreads"_a = 1)
-            .def("set_contraction_path", py::overload_cast<const TaskBasedSimulator::ContractionPlan::Path&, bool>(&TaskBasedSimulator::setContractionPlan))
+    py::class_<PathSimulator>(m, "TaskBasedCircuitSimulator")
+            .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Mode&, const std::size_t&>),
+                 "circ"_a, "seed"_a, "mode"_a = PathSimulator::Mode::Sequential, "nthreads"_a = 1)
+            .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Mode&, const std::size_t&>),
+                 "circ"_a, "mode"_a = PathSimulator::Mode::Sequential, "nthreads"_a = 1)
+            .def("set_simulation_path", py::overload_cast<const PathSimulator::SimulationPath::Path&, bool>(&PathSimulator::setSimulationPath))
             .def("get_number_of_qubits", &CircuitSimulator::getNumberOfQubits)
             .def("get_name", &CircuitSimulator::getName)
-            .def("simulate", &TaskBasedSimulator::Simulate, "shots"_a)
+            .def("simulate", &PathSimulator::Simulate, "shots"_a)
             .def("statistics", &CircuitSimulator::AdditionalStatistics)
             .def("get_vector", &CircuitSimulator::getVectorComplex);
 
