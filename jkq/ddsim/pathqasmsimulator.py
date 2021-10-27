@@ -131,12 +131,12 @@ class PathQasmSimulator(BackendV1):
 
     def __init__(self, configuration=None, provider=None):
         conf = {
-            'backend_name': 'task_based_qasm_simulator',
+            'backend_name': 'path_sim_qasm_simulator',
             'backend_version': ddsim.__version__,
             'url': 'https://github.com/iic-jku/ddsim',
             'simulator': True,
             'local': True,
-            'description': 'JKQ DDSIM Task-Based C++ simulator',
+            'description': 'JKQ DDSIM C++ path simulator',
             'basis_gates': ['id', 'u0', 'u1', 'u2', 'u3', 'cu3',
                             'x', 'cx', 'ccx', 'mcx_gray', 'mcx_recursive', 'mcx_vchain', 'mcx',
                             'y', 'cy',

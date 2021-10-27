@@ -17,7 +17,7 @@ class PathStatevectorSimulator(PathQasmSimulator):
 
     def __init__(self, configuration=None, provider=None):
         conf = {
-            'backend_name': 'task_based_statevector_simulator',
+            'backend_name': 'path_sim_statevector_simulator',
             'backend_version': ddsim.__version__,
             'url': 'https://github.com/iic-jku/ddsim',
             'simulator': True,
