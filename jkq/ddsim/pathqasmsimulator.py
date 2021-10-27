@@ -207,19 +207,19 @@ class PathQasmSimulator(BackendV1):
         nthreads = int(options.get('nthreads', 1))
         # TODO: Add new strategies here
         if mode == 'sequential':
-            task_based_mode = ddsim.PathMode.sequential
+            task_based_mode = ddsim.PathSimulatorMode.sequential
         elif mode == 'pairwise_recursive':
-            task_based_mode = ddsim.PathMode.pairwise_recursive
+            task_based_mode = ddsim.PathSimulatorMode.pairwise_recursive
         elif mode == 'cotengra':
-            task_based_mode = ddsim.PathMode.cotengra
+            task_based_mode = ddsim.PathSimulatorMode.cotengra
         elif mode == 'bracket3':
-            task_based_mode = ddsim.PathMode.bracket3
+            task_based_mode = ddsim.PathSimulatorMode.bracket3
         elif mode == 'bracket7':
-            task_based_mode = ddsim.PathMode.bracket7
+            task_based_mode = ddsim.PathSimulatorMode.bracket7
         elif mode == 'bestcase':
-            task_based_mode = ddsim.PathMode.bestcase
+            task_based_mode = ddsim.PathSimulatorMode.bestcase
         elif mode == 'avgcase':
-            task_based_mode = ddsim.PathMode.avgcase
+            task_based_mode = ddsim.PathSimulatorMode.avgcase
         else:
             raise JKQSimulatorError('Simulation mode', mode,
                                     'not supported by JKQ task-based simulator. Available modes are \'sequential\' and \'pairwise_recursive\'')
