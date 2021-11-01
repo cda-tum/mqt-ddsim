@@ -123,7 +123,7 @@ private:
 
     dd::Package::dEdge makeZeroDensityOperator(dd::QubitCount n);
 
-    dd::Package::dEdge ApplyNoiseEffects(dd::Package::dEdge &density_op, const std::unique_ptr<qc::Operation>& op, unsigned char maxDepth);
+    dEdge  ApplyNoiseEffects(dEdge& originalEdge, const std::unique_ptr<qc::Operation>& op, unsigned char maxDepth, bool firstPathEdge, short predecessorEdgeIdx);
     dd::fp probForIndexToBeZero(dd::Package::dEdge e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob);
 };
 
