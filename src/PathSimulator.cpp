@@ -130,7 +130,7 @@ void PathSimulator::generateSequentialSimulationPathFalseOrder() {
 
     for (std::size_t i = 0; i < qc->getNops(); ++i) {
         if (i == 0)
-            path.emplace_back(0, 1);
+            path.emplace_back(1, 0);
         else
             path.emplace_back(qc->getNops() + i, i + 1);
     }
