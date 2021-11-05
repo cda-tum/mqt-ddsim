@@ -11,6 +11,11 @@ option(COVERAGE "Configure for coverage report generation")
 option(BINDINGS "Configure for building Python bindings")
 option(DEPLOY "Configure for deployment")
 
+if (DEFINED ENV{DEPLOY})
+    set(DEPLOY $ENV{DEPLOY} CACHE BOOL "Use deployment configuration from environment" FORCE)
+    message(STATUS "Setting deployment configuration to '${DEPLOY}' from environment")
+endif ()
+
 set(default_build_type "Release")
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
