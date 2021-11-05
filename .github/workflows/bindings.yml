@@ -15,6 +15,7 @@ env:
   CIBW_ENVIRONMENT: "DEPLOY=ON"
   CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=10.15 DEPLOY=ON"
   CIBW_ARCHS_MACOS: "x86_64 arm64"
+  CIBW_TEST_SKIP: "*_arm64"
   CIBW_SKIP: "*-win32 *-musllinux_i686 *-manylinux_i686"
   CIBW_BUILD_VERBOSITY: 0
   CIBW_TEST_REQUIRES: qiskit-terra
@@ -73,7 +74,7 @@ jobs:
     needs: [ test_bindings, build_sdist ]
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
