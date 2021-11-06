@@ -15,8 +15,8 @@ env:
   CIBW_ENVIRONMENT: "DEPLOY=ON"
   CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=10.15 DEPLOY=ON"
   CIBW_ARCHS_MACOS: "x86_64"
-  CIBW_TEST_SKIP: "*_arm64"
-  CIBW_SKIP: "*-win32 *-musllinux_i686 *-manylinux_i686 cp36-musllinux_x86_64"
+  CIBW_TEST_SKIP: "*_arm64 *-musllinux_x86_64 cp310-*"
+  CIBW_SKIP: "*-win32 *-musllinux_i686 *-manylinux_i686"
   CIBW_BUILD_VERBOSITY: 3
   CIBW_TEST_REQUIRES: qiskit-terra
   CIBW_TEST_COMMAND: "python -c \"from jkq import ddsim\""
