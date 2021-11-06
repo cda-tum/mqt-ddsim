@@ -11,13 +11,15 @@ on:
 
 env:
   CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-  CIBW_BUILD: cp3?-*
+  CIBW_BUILD: cp3*
+  CIBW_ENVIRONMENT: "DEPLOY=ON"
+  CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=10.15 DEPLOY=ON"
   CIBW_ARCHS_MACOS: "x86_64"
-  CIBW_SKIP: "*-win32 *-manylinux_i686"
-  CIBW_BUILD_VERBOSITY: 0
+  CIBW_TEST_SKIP: "*_arm64 *-musllinux_x86_64 cp310-*"
+  CIBW_SKIP: "*-win32 *-musllinux_i686 *-manylinux_i686"
+  CIBW_BUILD_VERBOSITY: 3
   CIBW_TEST_REQUIRES: qiskit-terra
   CIBW_TEST_COMMAND: "python -c \"from jkq import ddsim\""
-  CIBW_BEFORE_BUILD: "pip install cmake"
   CIBW_BEFORE_BUILD_MACOS: "brew install libomp"
 
 jobs:
@@ -31,7 +33,7 @@ jobs:
       - uses: actions/setup-python@v2
         name: Install Python
         with:
-          python-version: '3.8'
+          python-version: '3.9'
       - name: Install package
         run: |
           pip install -U pip setuptools wheel cmake
@@ -52,7 +54,7 @@ jobs:
       - uses: actions/setup-python@v2
         name: Install Python
         with:
-          python-version: '3.8'
+          python-version: '3.9'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
@@ -72,7 +74,7 @@ jobs:
     needs: [ test_bindings, build_sdist ]
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
@@ -81,7 +83,7 @@ jobs:
           submodules: recursive
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.1.1
+        uses: pypa/cibuildwheel@v2.2.2
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl
