@@ -21,8 +21,7 @@ public:
         Sequential,
         SequentialFalse,
         PairwiseRecursiveGrouping,
-        BracketGrouping3,
-        BracketGrouping7,
+        BracketGrouping,
         BestCase,
         AvgCase,
         Cotengra
@@ -53,41 +52,14 @@ public:
         const qc::QuantumComputation* qc{};
     };
 
-    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Sequential, std::size_t nthreads = std::thread::hardware_concurrency()):
+    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Sequential, std::size_t nthreads = std::thread::hardware_concurrency(), std::size_t bracketsize = 0, std::size_t seed = 0):
         CircuitSimulator(std::move(qc)), executor(nthreads) {
         // remove final measurements implement measurement support for task-based simulation
         qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
         // Add new strategies here
         switch (mode) {
-            case Mode::BracketGrouping3:
-                generateBracketSimulationPath(3);
-                break;
-            case Mode::PairwiseRecursiveGrouping:
-                generatePairwiseRecursiveGroupingSimulationPath();
-                break;
-            case Mode::SequentialFalse:
-                generateSequentialSimulationPathFalseOrder();
-                break;
-            case Mode::Cotengra:
-            case Mode::AvgCase:
-            case Mode::BestCase:
-                // in this case the contraction plan is explicitly set
-                break;
-            case Mode::Sequential:
-            default:
-                generateSequentialSimulationPath();
-                break;
-        }
-    }
-
-    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, const ApproximationInfo approx_info, const unsigned long long seed, Mode mode = Mode::Sequential, const std::size_t nthreads = 1):
-        CircuitSimulator(std::move(qc), approx_info, seed), executor(nthreads) {
-        // remove final measurements implement measurement support for task-based simulation
-        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
-        // Add new strategies here
-        switch (mode) {
-            case Mode::BracketGrouping3:
-                generateBracketSimulationPath(3);
+            case Mode::BracketGrouping:
+                generateBracketSimulationPath(bracketsize);
                 break;
             case Mode::PairwiseRecursiveGrouping:
                 generatePairwiseRecursiveGroupingSimulationPath();
