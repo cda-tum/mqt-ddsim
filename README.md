@@ -67,11 +67,16 @@ The simulator is based on the references listed below and can either be used as 
 
 ## Using the Python Bindings / Backend for Qiskit
 
-The backend for Qiskit is available via [PyPi](https://pypi.org/project/jkq.ddsim/) as wheel for Linux, Windows and MacOS. 
-Install with the following command. (We strongly recommend using a [virtual environment](https://docs.python.org/3/tutorial/venv.html).)
+The backend for Qiskit is available via [PyPi](https://pypi.org/project/jkq.ddsim/) as wheel for Linux, Windows and MacOS.
+In order to make the library as easy to use as possible (without compilation), we provide pre-built wheels for most common platforms (64-bit Linux, MacOS, Windows). (We strongly recommend using a [virtual environment](https://docs.python.org/3/tutorial/venv.html).)
 
 ```console
 (venv) $ pip install jkq.ddsim
+```
+
+However, in order to get the best performance out of DDSIM, it is recommended to build it locally from the source distribution via
+```bash
+pip install --no-binary jkq.ddsim
 ```
 
 The following code gives an example on the usage:
