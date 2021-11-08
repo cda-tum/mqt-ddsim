@@ -11,11 +11,16 @@ on:
 
 env:
   CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-  CIBW_BUILD:                  cp3?-*
-  CIBW_ARCHS_MACOS:            "x86_64"
-  CIBW_SKIP:                   "cp36-macos* *-win32 *-manylinux_i686"
-  CIBW_BUILD_VERBOSITY:        1
-  CIBW_TEST_COMMAND:           "python -c \"from jkq import ddsim\""
+
+  CIBW_BUILD: cp3*
+  CIBW_ENVIRONMENT: "DEPLOY=ON"
+  CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=10.15 DEPLOY=ON"
+  CIBW_ARCHS_MACOS: "x86_64"
+  CIBW_TEST_SKIP: "*_arm64 *-musllinux_x86_64 cp310-*"
+  CIBW_SKIP: "*-win32 *-musllinux_i686 *-manylinux_i686"
+  CIBW_BUILD_VERBOSITY: 0
+  CIBW_TEST_REQUIRES: qiskit-terra
+  CIBW_TEST_COMMAND: "python -c \"from jkq import ddsim\""
   CIBW_BEFORE_BUILD_MACOS: "brew install libomp"
 
 jobs:
@@ -29,7 +34,7 @@ jobs:
       - uses: actions/setup-python@v2
         name: Install Python
         with:
-          python-version: '3.8'
+          python-version: '3.9'
       - name: Install package
         run:  |
               pip install -U pip setuptools wheel
@@ -50,7 +55,7 @@ jobs:
       - uses: actions/setup-python@v2
         name: Install Python
         with:
-          python-version: '3.8'
+          python-version: '3.9'
       - name: Install dependencies
         run: pip install --upgrade pip setuptools wheel
       - name: Build sdist
