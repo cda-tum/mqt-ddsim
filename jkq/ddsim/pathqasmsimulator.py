@@ -214,16 +214,16 @@ class PathQasmSimulator(BackendV1):
             task_based_mode = ddsim.PathSimulatorMode.cotengra
         elif mode == 'bracket':
             task_based_mode = ddsim.PathSimulatorMode.bracket
-        elif mode == 'bestcase':
-            task_based_mode = ddsim.PathSimulatorMode.bestcase
+        elif mode == 'alternating':
+            task_based_mode = ddsim.PathSimulatorMode.alternating
         else:
             raise JKQSimulatorError('Simulation mode', mode,
-                                    'not supported by JKQ task-based simulator. Available modes are \'sequential\' and \'pairwise_recursive\'')
+                                    'not supported by JKQ path simulator. Available modes are \'sequential\', \'pairwise_recursive\', \'cotengra\', \'bracket\' and \'verification\'')
 
         sim = ddsim.PathCircuitSimulator(qobj_experiment, seed, task_based_mode, nthreads)
 
         # determine the best case contraction path for verification purposes
-        if mode == 'bestcase':
+        if mode == 'alternating':
             n_gates_1 = options.get('nGatesQC1', 0)
             n_gates_2 = options.get('nGatesQC2', 0)
             if n_gates_1 != n_gates_2:

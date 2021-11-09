@@ -22,7 +22,7 @@ public:
         SequentialFalse,
         PairwiseRecursiveGrouping,
         BracketGrouping,
-        BestCase,
+        AlternatingMiddle,
         Cotengra
     };
 
@@ -67,7 +67,7 @@ public:
                 generateSequentialSimulationPathFalseOrder();
                 break;
             case Mode::Cotengra:
-            case Mode::BestCase:
+            case Mode::AlternatingMiddle:
                 // in this case the contraction plan is explicitly set
                 break;
             case Mode::Sequential:
