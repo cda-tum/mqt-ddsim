@@ -254,6 +254,45 @@ void PathSimulator::generateBracketSimulationPath(std::size_t bracketSize) {
     setSimulationPath(path, true);
 }
 
+void PathSimulator::generateAlternatingSimulationPath(std::size_t startingPoint) {
+    SimulationPath::Path path{};
+    path.reserve(qc->getNops());
+    std::size_t startElem = startingPoint;
+    path.emplace_back(startElem, startElem + 1);
+    std::size_t leftID   = startElem - 1;
+    std::size_t leftEnd  = 0;
+    std::size_t rightID  = startElem + 2;
+    std::size_t rightEnd = qc->getNops() + 1;
+    std::size_t nextID   = rightEnd;
+    //Alternating between left and right-hand side
+    while (leftID != leftEnd && rightID != rightEnd) {
+        path.emplace_back(leftID, nextID);
+        nextID++;
+        path.emplace_back(nextID, rightID);
+        nextID++;
+        leftID--;
+        rightID++;
+    }
+
+    //Finish the left-hand side
+    while (leftID != leftEnd) {
+        path.emplace_back(leftID, nextID);
+        nextID++;
+        leftID--;
+    }
+
+    //Finish the right-hand side
+    while (rightID != rightEnd) {
+        path.emplace_back(nextID, rightID);
+        nextID++;
+        rightID++;
+    }
+
+    //Add the remaining matrix-vector multiplication
+    path.emplace_back(0, nextID);
+    setSimulationPath(path, true);
+}
+
 void PathSimulator::constructTaskGraph() {
     const auto& path  = simulationPath.path;
     const auto& steps = simulationPath.steps;

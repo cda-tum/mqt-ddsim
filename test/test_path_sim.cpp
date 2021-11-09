@@ -68,6 +68,50 @@ TEST(TaskBasedSimTest, GroverCircuitBracket) {
     }
 }
 
+TEST(TaskBasedSimTest, GroverCircuitAlternatingMiddle) {
+    std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(4, 12345);
+    auto                                    grover      = dynamic_cast<qc::Grover*>(qc.get());
+    auto                                    targetValue = grover->targetValue;
+
+    // construct simulator and generate sequential contraction plan
+    PathSimulator tbs(std::move(qc), PathSimulator::Mode::Alternating, 1);
+
+    // simulate circuit
+    auto counts = tbs.Simulate(4096);
+
+    auto c    = tbs.dd->getValueByPath(tbs.root_edge, targetValue);
+    auto prob = c.r * c.r + c.i * c.i;
+    EXPECT_GT(prob, 0.9);
+
+    dd::export2Dot(tbs.root_edge, "result_grover.dot", true, true);
+
+    for (const auto& [state, count]: counts) {
+        std::cout << state << ": " << count << std::endl;
+    }
+}
+
+TEST(TaskBasedSimTest, GroverCircuitAlternatingRandom) {
+    std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(4, 12345);
+    auto                                    grover      = dynamic_cast<qc::Grover*>(qc.get());
+    auto                                    targetValue = grover->targetValue;
+
+    // construct simulator and generate sequential contraction plan
+    PathSimulator tbs(std::move(qc), PathSimulator::Mode::Alternating, 1, 0, 6);
+
+    // simulate circuit
+    auto counts = tbs.Simulate(4096);
+
+    auto c    = tbs.dd->getValueByPath(tbs.root_edge, targetValue);
+    auto prob = c.r * c.r + c.i * c.i;
+    EXPECT_GT(prob, 0.9);
+
+    dd::export2Dot(tbs.root_edge, "result_grover.dot", true, true);
+
+    for (const auto& [state, count]: counts) {
+        std::cout << state << ": " << count << std::endl;
+    }
+}
+
 TEST(TaskBasedSimTest, SimpleCircuitBracket) {
     auto qc = std::make_unique<qc::QuantumComputation>(2);
     qc->h(1U);

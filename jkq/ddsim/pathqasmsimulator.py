@@ -218,52 +218,9 @@ class PathQasmSimulator(BackendV1):
             task_based_mode = ddsim.PathSimulatorMode.alternating
         else:
             raise JKQSimulatorError('Simulation mode', mode,
-                                    'not supported by JKQ path simulator. Available modes are \'sequential\', \'pairwise_recursive\', \'cotengra\', \'bracket\' and \'verification\'')
+                                    'not supported by JKQ path simulator. Available modes are \'sequential\', \'pairwise_recursive\', \'cotengra\', \'bracket\' and \'alternating\'')
 
         sim = ddsim.PathCircuitSimulator(qobj_experiment, seed, task_based_mode, nthreads)
-
-        # determine the best case contraction path for verification purposes
-        if mode == 'alternating':
-            n_gates_1 = options.get('nGatesQC1', 0)
-            n_gates_2 = options.get('nGatesQC2', 0)
-            if n_gates_1 != n_gates_2:
-                print('Warning: Circuits do not contain the same number of operations')
-
-            # add first task to path
-            path = [(n_gates_1, n_gates_1 + 1)]
-
-            left_id = n_gates_1 - 1
-            left_end = 0
-            right_id = n_gates_1 + 2
-            right_end = n_gates_1 + n_gates_2 + 1
-            next_id = n_gates_1 + n_gates_2 + 1
-
-            # alternate between applications from the left and the right
-            while left_id != left_end and right_id != right_end:
-                path.append((left_id, next_id))
-                next_id += 1
-                path.append((next_id, right_id))
-                next_id += 1
-                left_id -= 1
-                right_id += 1
-
-            # finish the left circuit
-            while left_id != left_end:
-                path.append((left_id, next_id))
-                next_id += 1
-                left_id -= 1
-
-            # finish the right circuit
-            while right_id != right_end:
-                path.append((next_id, right_id))
-                next_id += 1
-                right_id += 1
-
-            # add the remaining matrix-vector multiplication
-            path.append((0, next_id))
-
-            # set contraction path
-            sim.set_contraction_path(path, True)
 
         # determine the contraction path using cotengra in case this is requested
         if mode == 'cotengra':

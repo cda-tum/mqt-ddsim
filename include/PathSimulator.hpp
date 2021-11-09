@@ -22,7 +22,7 @@ public:
         SequentialFalse,
         PairwiseRecursiveGrouping,
         BracketGrouping,
-        AlternatingMiddle,
+        Alternating,
         Cotengra
     };
 
@@ -51,10 +51,18 @@ public:
         const qc::QuantumComputation* qc{};
     };
 
-    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Sequential, std::size_t nthreads = std::thread::hardware_concurrency(), std::size_t bracketsize = 0, std::size_t seed = 0):
+    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Sequential, std::size_t nthreads = std::thread::hardware_concurrency(), std::size_t bracketsize = 0, std::size_t startingpoint = 0, std::size_t seed = 0):
         CircuitSimulator(std::move(qc)), executor(nthreads) {
         // remove final measurements implement measurement support for task-based simulation
         qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
+
+        // case distinction for the starting point of the alternating strategie
+        std::size_t alternateStart = 0;
+        if (startingpoint == 0)
+            alternateStart = (this->qc->getNops()) / 2;
+        else
+            alternateStart = startingpoint;
+
         // Add new strategies here
         switch (mode) {
             case Mode::BracketGrouping:
@@ -67,8 +75,9 @@ public:
                 generateSequentialSimulationPathFalseOrder();
                 break;
             case Mode::Cotengra:
-            case Mode::AlternatingMiddle:
-                // in this case the contraction plan is explicitly set
+                break;
+            case Mode::Alternating:
+                generateAlternatingSimulationPath(alternateStart);
                 break;
             case Mode::Sequential:
             default:
@@ -94,6 +103,7 @@ public:
     void generateSequentialSimulationPathFalseOrder();
     void generatePairwiseRecursiveGroupingSimulationPath();
     void generateBracketSimulationPath(std::size_t bracketSize);
+    void generateAlternatingSimulationPath(std::size_t startingPoint);
 
 private:
     std::unordered_map<std::size_t, tf::Task>                                 tasks{};
