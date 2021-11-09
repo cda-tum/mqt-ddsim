@@ -19,7 +19,6 @@ public:
     // Add new strategies here
     enum class Mode {
         Sequential,
-        SequentialFalse,
         PairwiseRecursiveGrouping,
         BracketGrouping,
         Alternating,
@@ -51,28 +50,25 @@ public:
         const qc::QuantumComputation* qc{};
     };
 
-    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Sequential, std::size_t nthreads = std::thread::hardware_concurrency(), std::size_t bracketsize = 0, std::size_t startingpoint = 0, std::size_t seed = 0):
+    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Sequential, std::size_t nthreads = std::thread::hardware_concurrency(), std::size_t strategieVar = 0, std::size_t seed = 0):
         CircuitSimulator(std::move(qc)), executor(nthreads) {
         // remove final measurements implement measurement support for task-based simulation
         qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
 
         // case distinction for the starting point of the alternating strategie
         std::size_t alternateStart = 0;
-        if (startingpoint == 0)
+        if (strategieVar == 0)
             alternateStart = (this->qc->getNops()) / 2;
         else
-            alternateStart = startingpoint;
+            alternateStart = strategieVar;
 
         // Add new strategies here
         switch (mode) {
             case Mode::BracketGrouping:
-                generateBracketSimulationPath(bracketsize);
+                generateBracketSimulationPath(strategieVar);
                 break;
             case Mode::PairwiseRecursiveGrouping:
                 generatePairwiseRecursiveGroupingSimulationPath();
-                break;
-            case Mode::SequentialFalse:
-                generateSequentialSimulationPathFalseOrder();
                 break;
             case Mode::Cotengra:
                 break;
@@ -100,7 +96,6 @@ public:
 
     // Add new strategies here
     void generateSequentialSimulationPath();
-    void generateSequentialSimulationPathFalseOrder();
     void generatePairwiseRecursiveGroupingSimulationPath();
     void generateBracketSimulationPath(std::size_t bracketSize);
     void generateAlternatingSimulationPath(std::size_t startingPoint);

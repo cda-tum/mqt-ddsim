@@ -27,19 +27,17 @@ TEST(TaskBasedSimTest, SimpleCircuitSingleThreaded) {
     }
 }
 
-TEST(TaskBasedSimTest, SimpleCircuitSingleThreadedContractionPlanOrderFalse) {
+TEST(TaskBasedSimTest, SimpleCircuitSingleThreadedAssumeFalseOrder) {
     auto qc = std::make_unique<qc::QuantumComputation>(2);
     qc->h(1U);
     qc->x(0U, 1_pc);
-
+    PathSimulator tbs(std::move(qc));
     // construct simulator and generate sequential contraction plan
-    PathSimulator tbs(std::move(qc), PathSimulator::Mode::SequentialFalse, 1);
-
+    PathSimulator::SimulationPath::Path path{};
+    path.emplace_back(1, 0);
+    tbs.setSimulationPath(path, false);
     // simulate circuit
     auto counts = tbs.Simulate(1024);
-
-    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.root_edge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
-    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.root_edge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
 
     for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;
@@ -96,7 +94,7 @@ TEST(TaskBasedSimTest, GroverCircuitAlternatingRandom) {
     auto                                    targetValue = grover->targetValue;
 
     // construct simulator and generate sequential contraction plan
-    PathSimulator tbs(std::move(qc), PathSimulator::Mode::Alternating, 1, 0, 6);
+    PathSimulator tbs(std::move(qc), PathSimulator::Mode::Alternating, 1, 6);
 
     // simulate circuit
     auto counts = tbs.Simulate(4096);

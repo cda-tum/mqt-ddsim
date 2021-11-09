@@ -123,21 +123,6 @@ void PathSimulator::generateSequentialSimulationPath() {
     setSimulationPath(path, true);
 }
 
-void PathSimulator::generateSequentialSimulationPathFalseOrder() {
-    // Assumption of correct order is set to false
-    SimulationPath::Path path{};
-    path.reserve(qc->getNops());
-
-    for (std::size_t i = 0; i < qc->getNops(); ++i) {
-        if (i == 0)
-            path.emplace_back(1, 0);
-        else
-            path.emplace_back(i + 1, qc->getNops() + i);
-    }
-
-    setSimulationPath(path, false);
-}
-
 void PathSimulator::generatePairwiseRecursiveGroupingSimulationPath() {
     SimulationPath::Path path{};
     path.reserve(qc->getNops());
