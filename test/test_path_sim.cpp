@@ -35,9 +35,13 @@ TEST(TaskBasedSimTest, SimpleCircuitSingleThreadedAssumeFalseOrder) {
     // construct simulator and generate sequential contraction plan
     PathSimulator::SimulationPath::Path path{};
     path.emplace_back(1, 0);
+    path.emplace_back(2, 3);
     tbs.setSimulationPath(path, false);
     // simulate circuit
     auto counts = tbs.Simulate(1024);
+
+    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.root_edge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
+    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.root_edge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
 
     for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;
