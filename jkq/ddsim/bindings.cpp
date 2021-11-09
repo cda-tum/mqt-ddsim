@@ -145,9 +145,8 @@ PYBIND11_MODULE(pyddsim, m) {
             .value("sequential", PathSimulator::Mode::Sequential)
             .value("pairwise_recursive", PathSimulator::Mode::PairwiseRecursiveGrouping)
             .value("cotengra", PathSimulator::Mode::Cotengra)
-            .value("bracket3", PathSimulator::Mode::BracketGrouping)
+            .value("bracket", PathSimulator::Mode::BracketGrouping)
             .value("bestcase", PathSimulator::Mode::BestCase)
-            .value("avgcase", PathSimulator::Mode::AvgCase)
             .export_values();
 
     py::class_<PathSimulator>(m, "PathCircuitSimulator")
