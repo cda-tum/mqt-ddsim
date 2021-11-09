@@ -284,7 +284,7 @@ void PathSimulator::constructTaskGraph() {
 
         if (rightID < nleaves) {
             if (rightID == 0) {
-                throw std::runtime_error("Initial state must not appear on right side of contraction step.");
+                throw std::runtime_error("Initial state must not appear on right side of the simulation path member.");
             } else {
                 const auto&  op   = qc->at(rightID - 1);
                 qc::MatrixDD opDD = op->getDD(dd);
@@ -336,7 +336,7 @@ void PathSimulator::addContractionTask(std::size_t leftID, std::size_t rightID, 
         const auto rightIsVector = std::holds_alternative<qc::VectorDD>(rightDD);
 
         if (rightIsVector) {
-            throw std::runtime_error("Right element in contraction is a vector. This should not happen!");
+            throw std::runtime_error("Right element in this simulation path member is a vector. This should not happen!");
         }
 
         if (leftIsVector) {
