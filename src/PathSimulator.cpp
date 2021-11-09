@@ -152,24 +152,26 @@ void PathSimulator::generatePairwiseRecursiveGroupingSimulationPath() {
     bool        strayElementLeft       = false;
     bool        eliminatedStrayElement = false;
     std::size_t elements               = nleaves;
-
     for (std::size_t l = 0; l < depth; ++l) {
         if (eliminatedStrayElement) {
             id++;
             elements++;
             eliminatedStrayElement = false;
         }
-
+        // Pairwise adding elements
         for (std::size_t i = 0; i < elements - 1; i += 2) {
             path.emplace_back(offset + i, offset + i + 1);
         }
-
+        // Checking if the number of elements is even
         if (elements % 2 == 1) {
+            // Adding the stray element
             if (strayElementLeft) {
                 path.emplace_back(offset + elements - 1, strayID);
                 strayElementLeft       = false;
                 eliminatedStrayElement = true;
-            } else {
+            }
+            // Setting the stray element
+            else {
                 strayElementLeft = true;
                 strayID          = offset + elements - 1;
             }
@@ -179,6 +181,7 @@ void PathSimulator::generatePairwiseRecursiveGroupingSimulationPath() {
         elements >>= 1;
         id += elements;
     }
+    // Adding the remaining element
     if (strayElementLeft) {
         path.emplace_back(offset, strayID);
     }
@@ -194,25 +197,26 @@ void PathSimulator::generateBracketSimulationPath(std::size_t bracketSize) {
     std::size_t memoryLeft       = 0;
     std::size_t bracketMemory    = 0;
     std::size_t opMemory         = 0;
-    //std::cout << warmupDepth << std::endl;
+    // Sequentially adding tasks for the first braket
     for (std::size_t i = 0; i < bracketSize; i++) {
         if (i == 0)
             path.emplace_back(0, 1);
         else {
-            //std::cout << qc->getNops() + i << " " << 1+i << std::endl;
             path.emplace_back(qc->getNops() + i, 1 + i);
         }
     }
     memoryLeft = qc->getNops() + bracketSize;
+    //Creating the brackets by sequentially adding the individual operations
     while (!rightSingle) {
         for (auto i = 0U; i < bracketSize - 1; i++) {
+            //Checking for stray elements
             if (startElemBracket == qc->getNops()) {
                 rightSingle = true;
                 strayElem   = startElemBracket;
                 break;
             }
+            //Connecting operations sequentially
             if (i == 0) {
-                //std::cout << startElemBracket << " " << startElemBracket+1 << std::endl;
                 path.emplace_back(startElemBracket, startElemBracket + 1);
                 opMemory++;
                 if (startElemBracket + 1 == qc->getNops()) {
@@ -221,7 +225,6 @@ void PathSimulator::generateBracketSimulationPath(std::size_t bracketSize) {
                     break;
                 }
             } else {
-                //  std::cout << qc->getNops() + warmupDepth+i+(bracketSize*bracketMemory-bracketMemory) << " " << startElemBracket+1+i << std::endl;
                 path.emplace_back(qc->getNops() + bracketSize + i + (bracketSize * bracketMemory - bracketMemory), startElemBracket + 1 + i);
                 opMemory++;
                 if (startElemBracket + 1 + i >= qc->getNops()) {
@@ -234,21 +237,21 @@ void PathSimulator::generateBracketSimulationPath(std::size_t bracketSize) {
         if (rightSingle) {
             break;
         }
+        // Counting the number of brackets and moving the start element for the next bracket forward
         opMemory = 0;
         startElemBracket += bracketSize;
         bracketMemory++;
     }
+    //Adding the individual brackets in sequential order
     for (auto i = 0U; i < bracketMemory; i++) {
         if (i == 0) {
-            //std::cout << memoryLeft << " " << memoryLeft+(bracketSize-1) << std::endl;
             path.emplace_back(memoryLeft, memoryLeft + (bracketSize - 1));
         } else {
-            //std::cout << memoryLeft + (bracketSize-1)*bracketMemory+opMemory +i << " " << memoryLeft+(bracketSize-1)*(i+1) << std::endl;
             path.emplace_back(memoryLeft + (bracketSize - 1) * bracketMemory + opMemory + i, memoryLeft + (bracketSize - 1) * (i + 1));
         }
     }
+    //Adding the last stray element on the right-hand side
     if (rightSingle) {
-        //std::cout << memoryLeft + (bracketSize)*bracketMemory+opMemory << " " << strayElem << std::endl;
         path.emplace_back(memoryLeft + (bracketSize)*bracketMemory + opMemory, strayElem);
     }
     setSimulationPath(path, true);
