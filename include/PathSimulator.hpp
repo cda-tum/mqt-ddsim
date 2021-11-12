@@ -120,7 +120,7 @@ private:
     SimulationPath simulationPath{};
 
     void constructTaskGraph();
-    void addSimulationPathElement(std::size_t leftID, std::size_t rightID, std::size_t resultID);
+    void addSimulationTask(std::size_t leftID, std::size_t rightID, std::size_t resultID);
 };
 
 #endif //DDSIM_PATHSIMULATOR_HPP

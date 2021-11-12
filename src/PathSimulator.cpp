@@ -321,7 +321,7 @@ void PathSimulator::constructTaskGraph() {
         }
 
         // add MxV / MxM task
-        addSimulationPathElement(leftID, rightID, resultStep.id);
+        addSimulationTask(leftID, rightID, resultStep.id);
 
         // create dependencies
         if (leftID >= nleaves) {
@@ -352,7 +352,7 @@ void PathSimulator::constructTaskGraph() {
     }
 }
 
-void PathSimulator::addSimulationPathElement(std::size_t leftID, std::size_t rightID, std::size_t resultID) {
+void PathSimulator::addSimulationTask(std::size_t leftID, std::size_t rightID, std::size_t resultID) {
     const auto runner = [this, leftID, rightID, resultID]() {
         /// Enable the following statement for printing execution order
         //            std::cout << "Executing " << leftID << " " << rightID << " -> " << resultID << std::endl;
