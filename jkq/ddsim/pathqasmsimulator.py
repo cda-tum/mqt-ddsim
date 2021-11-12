@@ -78,7 +78,7 @@ def create_tensor_network(qc):
     return qtn.TensorNetwork(tensors)
 
 
-def get_simulation_path(qc, max_time: int = 60, max_repeats: int = 1024, dump_path: bool = True,
+def get_simulation_path(qc, max_time: int = 60, max_repeats: int = 1024, parallel_runs: int = 1, dump_path: bool = True,
                         plot_ring: bool = False):
     import cotengra as ctg
     from opt_einsum.paths import linear_to_ssa
@@ -88,7 +88,7 @@ def get_simulation_path(qc, max_time: int = 60, max_repeats: int = 1024, dump_pa
     opt = ctg.HyperOptimizer(max_time=max_time,
                              max_repeats=max_repeats,
                              progbar=True,
-                             parallel=4,
+                             parallel=parallel_runs,
                              minimize='flops')
     info = tn.contract(all, get='path-info', optimize=opt)
     path = linear_to_ssa(info.path)
@@ -120,8 +120,8 @@ class PathQasmSimulator(BackendV1):
             parameter_binds=None,
             simulator_seed=None,
             mode="sequential",
-            nGatesQC1=0,
-            nGatesQC2=0,
+            bracket_size=0,
+            starting_point=0,
             cotengra_max_time=60,
             cotengra_max_repeats=1024,
             cotengra_plot_ring=False,
