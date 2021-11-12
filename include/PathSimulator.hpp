@@ -38,13 +38,13 @@ public:
             static constexpr size_t UNKNOWN = std::numeric_limits<size_t>::max();
         };
 
-        using Path  = std::vector<std::pair<std::size_t, std::size_t>>;
-        using Steps = std::vector<Step>;
+        using ComponentsList = std::vector<std::pair<std::size_t, std::size_t>>;
+        using Steps          = std::vector<Step>;
 
         SimulationPath() = default;
-        SimulationPath(std::size_t nleaves, Path path, const qc::QuantumComputation* qc, bool assumeCorrectOrder = false);
+        SimulationPath(std::size_t nleaves, ComponentsList components, const qc::QuantumComputation* qc, bool assumeCorrectOrder = false);
 
-        Path                          path{};
+        ComponentsList                components{};
         Steps                         steps{};
         std::size_t                   nleaves{};
         const qc::QuantumComputation* qc{};
@@ -90,8 +90,8 @@ public:
     void setSimulationPath(const SimulationPath& plan) {
         simulationPath = plan;
     }
-    void setSimulationPath(const SimulationPath::Path& path, bool assumeCorrectOrder = false) {
-        simulationPath = SimulationPath(qc->getNops() + 1, path, qc.get(), assumeCorrectOrder);
+    void setSimulationPath(const SimulationPath::ComponentsList& components, bool assumeCorrectOrder = false) {
+        simulationPath = SimulationPath(qc->getNops() + 1, components, qc.get(), assumeCorrectOrder);
     }
 
     // Add new strategies here
@@ -109,7 +109,7 @@ private:
     SimulationPath simulationPath{};
 
     void constructTaskGraph();
-    void addContractionTask(std::size_t leftID, std::size_t rightID, std::size_t resultID);
+    void addSimulationPathElement(std::size_t leftID, std::size_t rightID, std::size_t resultID);
 };
 
 #endif //DDSIM_PATHSIMULATOR_HPP

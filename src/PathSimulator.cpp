@@ -3,15 +3,15 @@
 #include <iterator>
 #include <utility>
 
-PathSimulator::SimulationPath::SimulationPath(std::size_t nleaves, PathSimulator::SimulationPath::Path path, const qc::QuantumComputation* qc, bool assumeCorrectOrder):
-    path(std::move(path)), nleaves(nleaves), qc(qc) {
+PathSimulator::SimulationPath::SimulationPath(std::size_t nleaves, PathSimulator::SimulationPath::ComponentsList components, const qc::QuantumComputation* qc, bool assumeCorrectOrder):
+    components(std::move(components)), nleaves(nleaves), qc(qc) {
     steps.reserve(nleaves);
     // create empty vector of steps
     for (std::size_t id = 0; id < nleaves; ++id) {
         steps.emplace_back(id, std::vector{id});
     }
 
-    for (auto& [leftID, rightID]: this->path) {
+    for (auto& [leftID, rightID]: this->components) {
         if (leftID >= steps.size())
             throw std::runtime_error("Left contraction path index out of range.");
         if (rightID >= steps.size())
@@ -111,21 +111,21 @@ std::map<std::string, std::size_t> PathSimulator::Simulate(unsigned int shots) {
 }
 
 void PathSimulator::generateSequentialSimulationPath() {
-    SimulationPath::Path path{};
-    path.reserve(qc->getNops());
+    SimulationPath::ComponentsList components{};
+    components.reserve(qc->getNops());
 
     for (std::size_t i = 0; i < qc->getNops(); ++i) {
         if (i == 0)
-            path.emplace_back(0, 1);
+            components.emplace_back(0, 1);
         else
-            path.emplace_back(qc->getNops() + i, i + 1);
+            components.emplace_back(qc->getNops() + i, i + 1);
     }
-    setSimulationPath(path, true);
+    setSimulationPath(components, true);
 }
 
 void PathSimulator::generatePairwiseRecursiveGroupingSimulationPath() {
-    SimulationPath::Path path{};
-    path.reserve(qc->getNops());
+    SimulationPath::ComponentsList components{};
+    components.reserve(qc->getNops());
 
     std::size_t nleaves = qc->getNops() + 1;
     auto        depth   = static_cast<std::size_t>(std::ceil(std::log2(nleaves)));
@@ -145,13 +145,13 @@ void PathSimulator::generatePairwiseRecursiveGroupingSimulationPath() {
         }
         // Pairwise adding elements
         for (std::size_t i = 0; i < elements - 1; i += 2) {
-            path.emplace_back(offset + i, offset + i + 1);
+            components.emplace_back(offset + i, offset + i + 1);
         }
         // Checking if the number of elements is even
         if (elements % 2 == 1) {
             // Adding the stray element
             if (strayElementLeft) {
-                path.emplace_back(offset + elements - 1, strayID);
+                components.emplace_back(offset + elements - 1, strayID);
                 strayElementLeft       = false;
                 eliminatedStrayElement = true;
             }
@@ -168,14 +168,14 @@ void PathSimulator::generatePairwiseRecursiveGroupingSimulationPath() {
     }
     // Adding the remaining element
     if (strayElementLeft) {
-        path.emplace_back(offset, strayID);
+        components.emplace_back(offset, strayID);
     }
-    setSimulationPath(path, true);
+    setSimulationPath(components, true);
 }
 
 void PathSimulator::generateBracketSimulationPath(std::size_t bracketSize) {
-    SimulationPath::Path path{};
-    path.reserve(qc->getNops());
+    SimulationPath::ComponentsList components{};
+    components.reserve(qc->getNops());
     bool        rightSingle      = false;
     std::size_t startElemBracket = bracketSize + 1;
     std::size_t strayElem        = 0;
@@ -185,9 +185,9 @@ void PathSimulator::generateBracketSimulationPath(std::size_t bracketSize) {
     // Sequentially adding tasks for the first braket
     for (std::size_t i = 0; i < bracketSize; i++) {
         if (i == 0)
-            path.emplace_back(0, 1);
+            components.emplace_back(0, 1);
         else {
-            path.emplace_back(qc->getNops() + i, 1 + i);
+            components.emplace_back(qc->getNops() + i, 1 + i);
         }
     }
     memoryLeft = qc->getNops() + bracketSize;
@@ -202,7 +202,7 @@ void PathSimulator::generateBracketSimulationPath(std::size_t bracketSize) {
             }
             //Connecting operations sequentially
             if (i == 0) {
-                path.emplace_back(startElemBracket, startElemBracket + 1);
+                components.emplace_back(startElemBracket, startElemBracket + 1);
                 opMemory++;
                 if (startElemBracket + 1 == qc->getNops()) {
                     strayElem   = qc->getNops() + bracketSize + 1 + (bracketSize * bracketMemory - bracketMemory);
@@ -210,7 +210,7 @@ void PathSimulator::generateBracketSimulationPath(std::size_t bracketSize) {
                     break;
                 }
             } else {
-                path.emplace_back(qc->getNops() + bracketSize + i + (bracketSize * bracketMemory - bracketMemory), startElemBracket + 1 + i);
+                components.emplace_back(qc->getNops() + bracketSize + i + (bracketSize * bracketMemory - bracketMemory), startElemBracket + 1 + i);
                 opMemory++;
                 if (startElemBracket + 1 + i >= qc->getNops()) {
                     strayElem   = qc->getNops() + bracketSize + i + (bracketSize * bracketMemory - bracketMemory) + 1;
@@ -230,23 +230,23 @@ void PathSimulator::generateBracketSimulationPath(std::size_t bracketSize) {
     //Adding the individual brackets in sequential order
     for (auto i = 0U; i < bracketMemory; i++) {
         if (i == 0) {
-            path.emplace_back(memoryLeft, memoryLeft + (bracketSize - 1));
+            components.emplace_back(memoryLeft, memoryLeft + (bracketSize - 1));
         } else {
-            path.emplace_back(memoryLeft + (bracketSize - 1) * bracketMemory + opMemory + i, memoryLeft + (bracketSize - 1) * (i + 1));
+            components.emplace_back(memoryLeft + (bracketSize - 1) * bracketMemory + opMemory + i, memoryLeft + (bracketSize - 1) * (i + 1));
         }
     }
     //Adding the last stray element on the right-hand side
     if (rightSingle) {
-        path.emplace_back(memoryLeft + (bracketSize)*bracketMemory + opMemory, strayElem);
+        components.emplace_back(memoryLeft + (bracketSize)*bracketMemory + opMemory, strayElem);
     }
-    setSimulationPath(path, true);
+    setSimulationPath(components, true);
 }
 
 void PathSimulator::generateAlternatingSimulationPath(std::size_t startingPoint) {
-    SimulationPath::Path path{};
-    path.reserve(qc->getNops());
+    SimulationPath::ComponentsList components{};
+    components.reserve(qc->getNops());
     std::size_t startElem = startingPoint;
-    path.emplace_back(startElem, startElem + 1);
+    components.emplace_back(startElem, startElem + 1);
     std::size_t leftID   = startElem - 1;
     std::size_t leftEnd  = 0;
     std::size_t rightID  = startElem + 2;
@@ -254,9 +254,9 @@ void PathSimulator::generateAlternatingSimulationPath(std::size_t startingPoint)
     std::size_t nextID   = rightEnd;
     //Alternating between left and right-hand side
     while (leftID != leftEnd && rightID != rightEnd) {
-        path.emplace_back(leftID, nextID);
+        components.emplace_back(leftID, nextID);
         nextID++;
-        path.emplace_back(nextID, rightID);
+        components.emplace_back(nextID, rightID);
         nextID++;
         leftID--;
         rightID++;
@@ -264,25 +264,25 @@ void PathSimulator::generateAlternatingSimulationPath(std::size_t startingPoint)
 
     //Finish the left-hand side
     while (leftID != leftEnd) {
-        path.emplace_back(leftID, nextID);
+        components.emplace_back(leftID, nextID);
         nextID++;
         leftID--;
     }
 
     //Finish the right-hand side
     while (rightID != rightEnd) {
-        path.emplace_back(nextID, rightID);
+        components.emplace_back(nextID, rightID);
         nextID++;
         rightID++;
     }
 
     //Add the remaining matrix-vector multiplication
-    path.emplace_back(0, nextID);
-    setSimulationPath(path, true);
+    components.emplace_back(0, nextID);
+    setSimulationPath(components, true);
 }
 
 void PathSimulator::constructTaskGraph() {
-    const auto& path  = simulationPath.path;
+    const auto& path  = simulationPath.components;
     const auto& steps = simulationPath.steps;
 
     if (path.empty())
@@ -321,7 +321,7 @@ void PathSimulator::constructTaskGraph() {
         }
 
         // add MxV / MxM task
-        addContractionTask(leftID, rightID, resultStep.id);
+        addSimulationPathElement(leftID, rightID, resultStep.id);
 
         // create dependencies
         if (leftID >= nleaves) {
@@ -352,7 +352,7 @@ void PathSimulator::constructTaskGraph() {
     }
 }
 
-void PathSimulator::addContractionTask(std::size_t leftID, std::size_t rightID, std::size_t resultID) {
+void PathSimulator::addSimulationPathElement(std::size_t leftID, std::size_t rightID, std::size_t resultID) {
     const auto runner = [this, leftID, rightID, resultID]() {
         /// Enable the following statement for printing execution order
         //            std::cout << "Executing " << leftID << " " << rightID << " -> " << resultID << std::endl;

@@ -78,8 +78,8 @@ def create_tensor_network(qc):
     return qtn.TensorNetwork(tensors)
 
 
-def get_contraction_path(qc, max_time: int = 60, max_repeats: int = 1024, dump_path: bool = True,
-                         plot_ring: bool = False):
+def get_simulation_path(qc, max_time: int = 60, max_repeats: int = 1024, dump_path: bool = True,
+                        plot_ring: bool = False):
     import cotengra as ctg
     from opt_einsum.paths import linear_to_ssa
 
@@ -97,13 +97,13 @@ def get_contraction_path(qc, max_time: int = 60, max_repeats: int = 1024, dump_p
         if isinstance(qc, QuantumCircuit):
             filename = qc.name + '_' + str(qc.num_qubits) + ".path"
         else:
-            filename = 'contraction.path'
+            filename = 'simulation.path'
         with open(filename, 'w') as file:
             file.write(str(path))
 
     if plot_ring:
         fig = opt.get_tree().plot_ring(return_fig=True)
-        fig.savefig("contraction_ring.svg", bbox_inches='tight')
+        fig.savefig("simulation_ring.svg", bbox_inches='tight')
 
     return path
 
@@ -228,9 +228,9 @@ class PathQasmSimulator(BackendV1):
             max_repeats = options.get('cotengra_max_repeats', 1024)
             dump_path = options.get('cotengra_dump_path', False)
             plot_ring = options.get('cotengra_plot_ring', False)
-            path = get_contraction_path(qobj_experiment, max_time=max_time, max_repeats=max_repeats,
-                                        dump_path=dump_path, plot_ring=plot_ring)
-            sim.set_contraction_path(path, False)
+            path = get_simulation_path(qobj_experiment, max_time=max_time, max_repeats=max_repeats,
+                                       dump_path=dump_path, plot_ring=plot_ring)
+            sim.set_simulation_path(path, False)
 
         shots = options['shots']
         setup_time = time.time()
