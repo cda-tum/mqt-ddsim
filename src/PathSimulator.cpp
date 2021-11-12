@@ -13,9 +13,9 @@ PathSimulator::SimulationPath::SimulationPath(std::size_t nleaves, PathSimulator
 
     for (auto& [leftID, rightID]: this->components) {
         if (leftID >= steps.size())
-            throw std::runtime_error("Left contraction path index out of range.");
+            throw std::runtime_error("Left simulation path index out of range.");
         if (rightID >= steps.size())
-            throw std::runtime_error("Right contraction path index out of range");
+            throw std::runtime_error("Right simulation path index out of range");
 
         auto& leftStep  = steps.at(leftID);
         auto& rightStep = steps.at(rightID);
@@ -96,7 +96,7 @@ PathSimulator::SimulationPath::SimulationPath(std::size_t nleaves, PathSimulator
 }
 
 std::map<std::string, std::size_t> PathSimulator::Simulate(unsigned int shots) {
-    // build task graph from contraction plan
+    // build task graph from simulation path
     constructTaskGraph();
     //std::cout<< *qc << std::endl;
     /// Enable the following statements to generate a .dot file of the resulting taskflow
