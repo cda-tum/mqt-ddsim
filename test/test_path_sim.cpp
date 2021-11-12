@@ -33,7 +33,7 @@ TEST(TaskBasedSimTest, SimpleCircuitSingleThreadedAssumeFalseOrder) {
     qc->x(0U, 1_pc);
     PathSimulator tbs(std::move(qc));
     // construct simulator and generate sequential contraction plan
-    PathSimulator::SimulationPath::Path path{};
+    PathSimulator::SimulationPath::ComponentsList path{};
     path.emplace_back(1, 0);
     path.emplace_back(2, 3);
     tbs.setSimulationPath(path, false);
