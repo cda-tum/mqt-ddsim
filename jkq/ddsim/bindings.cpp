@@ -154,7 +154,7 @@ PYBIND11_MODULE(pyddsim, m) {
                  "circ"_a, "seed"_a, "mode"_a = PathSimulator::Mode::Sequential, "nthreads"_a = 1)
             .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Mode&, const std::size_t&>),
                  "circ"_a, "mode"_a = PathSimulator::Mode::Sequential, "nthreads"_a = 1)
-            .def("set_simulation_path", py::overload_cast<const PathSimulator::SimulationPath::Path&, bool>(&PathSimulator::setSimulationPath))
+            .def("set_simulation_path", py::overload_cast<const PathSimulator::SimulationPath::ComponentsList&, bool>(&PathSimulator::setSimulationPath))
             .def("get_number_of_qubits", &CircuitSimulator::getNumberOfQubits)
             .def("get_name", &CircuitSimulator::getName)
             .def("simulate", &PathSimulator::Simulate, "shots"_a)
