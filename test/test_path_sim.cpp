@@ -35,7 +35,7 @@ TEST(TaskBasedSimTest, SimpleCircuitAssumeFalseOrder) {
     // construct simulator and generate sequential contraction plan
     PathSimulator::SimulationPath::ComponentsList path{};
     path.emplace_back(1, 0);
-    path.emplace_back(2, 3);
+    path.emplace_back(3, 2);
     tbs.setSimulationPath(path, false);
     // simulate circuit
     auto counts = tbs.Simulate(1024);
