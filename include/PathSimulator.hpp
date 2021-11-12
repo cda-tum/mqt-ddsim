@@ -38,6 +38,17 @@ public:
             static constexpr size_t UNKNOWN = std::numeric_limits<size_t>::max();
         };
 
+        struct Configuration {
+            //settings for the alternating mode
+            std::size_t alternateStarting = 0;
+
+            //settings for the bracket size
+            std::size_t bracketSize = 0;
+
+            Configuration(std::size_t var):
+                alternateStarting(var), bracketSize(var) {}
+        };
+
         using ComponentsList = std::vector<std::pair<std::size_t, std::size_t>>;
         using Steps          = std::vector<Step>;
 
@@ -50,22 +61,22 @@ public:
         const qc::QuantumComputation* qc{};
     };
 
-    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Sequential, std::size_t nthreads = std::thread::hardware_concurrency(), std::size_t strategieVar = 0, std::size_t seed = 0):
+    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Sequential, std::size_t nthreads = std::thread::hardware_concurrency(), SimulationPath::Configuration&& var = 0, std::size_t seed = 0):
         CircuitSimulator(std::move(qc)), executor(nthreads) {
         // remove final measurements implement measurement support for task-based simulation
         qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
 
         // case distinction for the starting point of the alternating strategie
         std::size_t alternateStart = 0;
-        if (strategieVar == 0)
+        if (var.alternateStarting == 0)
             alternateStart = (this->qc->getNops()) / 2;
         else
-            alternateStart = strategieVar;
+            alternateStart = var.alternateStarting;
 
         // Add new strategies here
         switch (mode) {
             case Mode::BracketGrouping:
-                generateBracketSimulationPath(strategieVar);
+                generateBracketSimulationPath(var.bracketSize);
                 break;
             case Mode::PairwiseRecursiveGrouping:
                 generatePairwiseRecursiveGroupingSimulationPath();
