@@ -87,8 +87,8 @@ public:
     const SimulationPath& getSimulationPath() const {
         return simulationPath;
     }
-    void setSimulationPath(const SimulationPath& plan) {
-        simulationPath = plan;
+    void setSimulationPath(const SimulationPath& path) {
+        simulationPath = path;
     }
     void setSimulationPath(const SimulationPath::ComponentsList& components, bool assumeCorrectOrder = false) {
         simulationPath = SimulationPath(qc->getNops() + 1, components, qc.get(), assumeCorrectOrder);

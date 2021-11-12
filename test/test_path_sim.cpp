@@ -8,7 +8,7 @@
 
 using namespace dd::literals;
 
-TEST(TaskBasedSimTest, SimpleCircuitSingleThreaded) {
+TEST(TaskBasedSimTest, SimpleCircuit) {
     auto qc = std::make_unique<qc::QuantumComputation>(2);
     qc->h(1U);
     qc->x(0U, 1_pc);
@@ -27,7 +27,7 @@ TEST(TaskBasedSimTest, SimpleCircuitSingleThreaded) {
     }
 }
 
-TEST(TaskBasedSimTest, SimpleCircuitSingleThreadedAssumeFalseOrder) {
+TEST(TaskBasedSimTest, SimpleCircuitAssumeFalseOrder) {
     auto qc = std::make_unique<qc::QuantumComputation>(2);
     qc->h(1U);
     qc->x(0U, 1_pc);
@@ -132,7 +132,7 @@ TEST(TaskBasedSimTest, SimpleCircuitBracket) {
     }
 }
 
-TEST(TaskBasedSimTest, GroverCircuitPairwiseGroupingSingleThreaded) {
+TEST(TaskBasedSimTest, GroverCircuitPairwiseGrouping) {
     std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(4, 12345);
     auto                                    grover      = dynamic_cast<qc::Grover*>(qc.get());
     auto                                    targetValue = grover->targetValue;
