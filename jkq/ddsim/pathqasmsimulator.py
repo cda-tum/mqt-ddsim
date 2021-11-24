@@ -120,8 +120,7 @@ class PathQasmSimulator(BackendV1):
             parameter_binds=None,
             simulator_seed=None,
             mode="sequential",
-            bracket_size=0,
-            starting_point=0,
+            configuration_variable=0,
             cotengra_max_time=60,
             cotengra_max_repeats=1024,
             cotengra_plot_ring=False,
@@ -204,6 +203,7 @@ class PathQasmSimulator(BackendV1):
         start_time = time.time()
         seed = options.get('seed', -1)
         mode = options.get('mode', 'sequential')
+        configuration_var = options.get('configuration_variable', 0)
         nthreads = int(options.get('nthreads', 1))
         # TODO: Add new strategies here
         if mode == 'sequential':
@@ -220,7 +220,7 @@ class PathQasmSimulator(BackendV1):
             raise JKQSimulatorError('Simulation mode', mode,
                                     'not supported by JKQ path simulator. Available modes are \'sequential\', \'pairwise_recursive\', \'cotengra\', \'bracket\' and \'alternating\'')
 
-        sim = ddsim.PathCircuitSimulator(qobj_experiment, seed, task_based_mode, nthreads)
+        sim = ddsim.PathCircuitSimulator(qobj_experiment, seed, task_based_mode, configuration_var, nthreads)
 
         # determine the contraction path using cotengra in case this is requested
         if mode == 'cotengra':
@@ -246,6 +246,7 @@ class PathQasmSimulator(BackendV1):
                   'time_sim': end_time - setup_time,
                   'seed': seed,
                   'mode': mode,
+                  'configuration_variable': configuration_var,
                   'nthreads': nthreads,
                   'shots': shots,
                   'data': {'counts': counts_hex},

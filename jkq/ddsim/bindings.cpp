@@ -141,19 +141,42 @@ PYBIND11_MODULE(pyddsim, m) {
             .def("get_final_amplitudes", &HybridSchrodingerFeynmanSimulator::getFinalAmplitudes);
 
     // TODO: Add new strategies here
-    py::enum_<PathSimulator::Mode>(m, "PathSimulatorMode")
-            .value("sequential", PathSimulator::Mode::Sequential)
-            .value("pairwise_recursive", PathSimulator::Mode::PairwiseRecursiveGrouping)
-            .value("cotengra", PathSimulator::Mode::Cotengra)
-            .value("bracket", PathSimulator::Mode::BracketGrouping)
-            .value("alternating", PathSimulator::Mode::Alternating)
+    py::enum_<PathSimulator::Configuration::Mode>(m, "PathSimulatorMode")
+            .value("sequential", PathSimulator::Configuration::Mode::Sequential)
+            .value("pairwise_recursive", PathSimulator::Configuration::Mode::PairwiseRecursiveGrouping)
+            .value("cotengra", PathSimulator::Configuration::Mode::Cotengra)
+            .value("bracket", PathSimulator::Configuration::Mode::BracketGrouping)
+            .value("alternating", PathSimulator::Configuration::Mode::Alternating)
             .export_values();
 
+    py::class_<PathSimulator::Configuration>(m, "Configuration", "Configuration options for the JKQ DDSIM Path Simulator strategies")
+            .def(py::init())
+            .def_readwrite("sequential", &PathSimulator::Configuration::mode,
+                           R"pbdoc(Setting the mode for the sequential strategie)pbdoc")
+            .def_readwrite("pairwise_recursive", &PathSimulator::Configuration::mode,
+                           R"pbdoc(Setting the mode for the pairwise_recursive strategie)pbdoc")
+            .def_readwrite("bracket", &PathSimulator::Configuration::mode,
+                           R"pbdoc(Setting the mode for the bracketing strategie)pbdoc")
+            .def_readwrite("alternating", &PathSimulator::Configuration::mode,
+                           R"pbdoc(Setting the mode for the alternating strategie)pbdoc")
+            .def_readwrite("cotengra", &PathSimulator::Configuration::mode,
+                           R"pbdoc(Setting the mode for the cotengra strategie)pbdoc")
+            .def_readwrite("bracket size", &PathSimulator::Configuration::bracketSize,
+                           R"pbdoc(Size of the brackets one wants to combine)pbdoc")
+            .def_readwrite("alternating start", &PathSimulator::Configuration::alternateStarting,
+                           R"pbdoc(Start of the alternating strategie)pbdoc")
+            .def_readwrite("seed", &PathSimulator::Configuration::seed,
+                           R"pbdoc(Number of seeds)pbdoc")
+            .def_readwrite("number of threads", &PathSimulator::Configuration::nthreads,
+                           R"pbdoc(Number of used threads)pbdoc");
+
     py::class_<PathSimulator>(m, "PathCircuitSimulator")
-            .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Mode&, const std::size_t&>),
-                 "circ"_a, "seed"_a, "mode"_a = PathSimulator::Mode::Sequential, "nthreads"_a = 1)
-            .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Mode&, const std::size_t&>),
-                 "circ"_a, "mode"_a = PathSimulator::Mode::Sequential, "nthreads"_a = 1)
+            .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Configuration&>),
+                 "circ"_a, "seed"_a = &PathSimulator::Configuration::seed, "configuration"_a = PathSimulator::Configuration())
+            //.def(py::init<>(&create_simulator<PathSimulator, &PathSimulator::Configuration::seed, PathSimulator::Configuration::Mode&, &PathSimulator::Configuration::nthreads ,&PathSimulator::Configuration::bracketSize, &PathSimulator::Configuration::alternateStarting>),
+            //    "circ"_a, "seed"_a = &PathSimulator::Configuration::seed, "mode"_a = PathSimulator::Configuration::Mode(), "nthreads"_a = &PathSimulator::Configuration::nthreads, "bracket_size"_a = &PathSimulator::Configuration::bracketSize, "alternating_start"_a = &PathSimulator::Configuration::alternateStarting)
+            .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Configuration&>),
+                 "circ"_a, "configuration"_a = PathSimulator::Configuration())
             .def("set_simulation_path", py::overload_cast<const PathSimulator::SimulationPath::ComponentsList&, bool>(&PathSimulator::setSimulationPath))
             .def("get_number_of_qubits", &CircuitSimulator::getNumberOfQubits)
             .def("get_name", &CircuitSimulator::getName)

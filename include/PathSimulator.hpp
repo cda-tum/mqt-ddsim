@@ -16,15 +16,6 @@
 
 class PathSimulator: public CircuitSimulator {
 public:
-    // Add new strategies here
-    enum class Mode {
-        Sequential,
-        PairwiseRecursiveGrouping,
-        BracketGrouping,
-        Alternating,
-        Cotengra
-    };
-
     struct SimulationPath {
         struct Step {
             std::size_t                         id;
@@ -36,17 +27,6 @@ public:
                 id(id), operations(std::move(operations)), parent(parent), children(std::move(children)){};
 
             static constexpr size_t UNKNOWN = std::numeric_limits<size_t>::max();
-        };
-
-        struct Configuration {
-            //settings for the alternating mode
-            std::size_t alternateStarting = 0;
-
-            //settings for the bracket size
-            std::size_t bracketSize = 0;
-
-            Configuration(std::size_t var):
-                alternateStarting(var), bracketSize(var) {}
         };
 
         using ComponentsList = std::vector<std::pair<std::size_t, std::size_t>>;
@@ -61,32 +41,53 @@ public:
         const qc::QuantumComputation* qc{};
     };
 
-    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Sequential, std::size_t nthreads = std::thread::hardware_concurrency(), SimulationPath::Configuration&& var = 0, std::size_t seed = 0):
-        CircuitSimulator(std::move(qc)), executor(nthreads) {
+    struct Configuration {
+        // Add new strategies here
+        enum class Mode {
+            Sequential,
+            PairwiseRecursiveGrouping,
+            BracketGrouping,
+            Alternating,
+            Cotengra
+        };
+        //Number of seeds
+        std::size_t seed = 0;
+        //Number of threads
+        std::size_t nthreads = 1;
+        //settings for the alternating mode
+        std::size_t alternateStarting = 0;
+        //settings for the bracket size
+        std::size_t bracketSize = 2;
+        Mode        mode        = Mode::Sequential;
+        //Add new variables here
+    };
+
+    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration configuration):
+        CircuitSimulator(std::move(qc)), executor(configuration.nthreads) {
         // remove final measurements implement measurement support for task-based simulation
         qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
 
         // case distinction for the starting point of the alternating strategie
         std::size_t alternateStart = 0;
-        if (var.alternateStarting == 0)
+        if (configuration.alternateStarting == 0)
             alternateStart = (this->qc->getNops()) / 2;
         else
-            alternateStart = var.alternateStarting;
+            alternateStart = configuration.alternateStarting;
 
         // Add new strategies here
-        switch (mode) {
-            case Mode::BracketGrouping:
-                generateBracketSimulationPath(var.bracketSize);
+        switch (configuration.mode) {
+            case Configuration::Mode::BracketGrouping:
+                generateBracketSimulationPath(configuration.bracketSize);
                 break;
-            case Mode::PairwiseRecursiveGrouping:
+            case Configuration::Mode::PairwiseRecursiveGrouping:
                 generatePairwiseRecursiveGroupingSimulationPath();
                 break;
-            case Mode::Cotengra:
+            case Configuration::Mode::Cotengra:
                 break;
-            case Mode::Alternating:
+            case Configuration::Mode::Alternating:
                 generateAlternatingSimulationPath(alternateStart);
                 break;
-            case Mode::Sequential:
+            case Configuration::Mode::Sequential:
             default:
                 generateSequentialSimulationPath();
                 break;
