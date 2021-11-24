@@ -172,7 +172,7 @@ PYBIND11_MODULE(pyddsim, m) {
 
     py::class_<PathSimulator>(m, "PathCircuitSimulator")
             .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Configuration&>),
-                 "circ"_a, "seed"_a = &PathSimulator::Configuration::seed, "configuration"_a = PathSimulator::Configuration())
+                 "circ"_a, "seed"_a, "configuration"_a = PathSimulator::Configuration())
             //.def(py::init<>(&create_simulator<PathSimulator, &PathSimulator::Configuration::seed, PathSimulator::Configuration::Mode&, &PathSimulator::Configuration::nthreads ,&PathSimulator::Configuration::bracketSize, &PathSimulator::Configuration::alternateStarting>),
             //    "circ"_a, "seed"_a = &PathSimulator::Configuration::seed, "mode"_a = PathSimulator::Configuration::Mode(), "nthreads"_a = &PathSimulator::Configuration::nthreads, "bracket_size"_a = &PathSimulator::Configuration::bracketSize, "alternating_start"_a = &PathSimulator::Configuration::alternateStarting)
             .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Configuration&>),
