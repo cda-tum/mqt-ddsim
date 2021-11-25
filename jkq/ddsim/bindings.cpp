@@ -39,15 +39,8 @@ std::unique_ptr<Simulator> create_simulator(const py::object& circ, const long l
         throw std::runtime_error("PyObject is neither py::str, QuantumCircuit, nor QasmQobjExperiment");
     }
 
-    if (seed < 0) {
-        return std::make_unique<Simulator>(std::move(qc),
-                                           std::forward<Args>(args)...);
-    } else {
-        return std::make_unique<Simulator>(std::move(qc),
-                                           ApproximationInfo{1, 1, ApproximationInfo::ApproximationWhen::FidelityDriven},
-                                           seed,
-                                           std::forward<Args>(args)...);
-    }
+    return std::make_unique<Simulator>(std::move(qc),
+                                       std::forward<Args>(args)...);
 }
 
 template<class Simulator, typename... Args>
