@@ -98,6 +98,38 @@ public:
         }
     }
 
+    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration::Mode& mode, std::size_t seed, std::size_t nthreads, std::size_t alternateStarting, std::size_t bracketSize):
+        CircuitSimulator(std::move(qc)), executor(nthreads) {
+        // remove final measurements implement measurement support for task-based simulation
+        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
+
+        // case distinction for the starting point of the alternating strategie
+        std::size_t alternateStart = 0;
+        if (alternateStarting == 0)
+            alternateStart = (this->qc->getNops()) / 2;
+        else
+            alternateStart = alternateStarting;
+
+        // Add new strategies here
+        switch (mode) {
+            case Configuration::Mode::BracketGrouping:
+                generateBracketSimulationPath(bracketSize);
+                break;
+            case Configuration::Mode::PairwiseRecursiveGrouping:
+                generatePairwiseRecursiveGroupingSimulationPath();
+                break;
+            case Configuration::Mode::Cotengra:
+                break;
+            case Configuration::Mode::Alternating:
+                generateAlternatingSimulationPath(alternateStart);
+                break;
+            case Configuration::Mode::Sequential:
+            default:
+                generateSequentialSimulationPath();
+                break;
+        }
+    }
+
     std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
 
     const SimulationPath& getSimulationPath() const {

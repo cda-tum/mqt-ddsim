@@ -119,7 +119,7 @@ class PathQasmSimulator(BackendV1):
             shots=None,
             parameter_binds=None,
             simulator_seed=None,
-            configuration_pathsim=PathQasmSimulator.configuration(),
+            configuration_pathsim=ddsim.Configuration(),
             mode="sequential",
             configuration_variable=0,
             cotengra_max_time=60,
@@ -203,30 +203,29 @@ class PathQasmSimulator(BackendV1):
     def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options):
         start_time = time.time()
         configuration_pathsim = options.get('configuration_pathsim')
-        seed = options.get('seed', -1)
-        mode = options.get('mode', 'sequential')
-        configuration_var = options.get('configuration_variable', 0)
-        nthreads = int(options.get('nthreads', 1))
+        configuration_pathsim.seed = options.get('seed', -1)
+        configuration_pathsim.mode = options.get('mode', 'sequential')
+        configuration_pathsim.var = options.get('configuration_variable', 0)
+        configuration_pathsim.nthreads = int(options.get('nthreads', 1))
         # TODO: Add new strategies here
-        if mode == 'sequential':
+        if configuration_pathsim.mode == 'sequential':
             task_based_mode = ddsim.PathSimulatorMode.sequential
-        elif mode == 'pairwise_recursive':
+        elif configuration_pathsim.mode == 'pairwise_recursive':
             task_based_mode = ddsim.PathSimulatorMode.pairwise_recursive
-        elif mode == 'cotengra':
+        elif configuration_pathsim.mode == 'cotengra':
             task_based_mode = ddsim.PathSimulatorMode.cotengra
-        elif mode == 'bracket':
+        elif configuration_pathsim.mode == 'bracket':
             task_based_mode = ddsim.PathSimulatorMode.bracket
-        elif mode == 'alternating':
+        elif configuration_pathsim.mode == 'alternating':
             task_based_mode = ddsim.PathSimulatorMode.alternating
         else:
-            raise JKQSimulatorError('Simulation mode', mode,
+            raise JKQSimulatorError('Simulation mode', configuration_pathsim.mode,
                                     'not supported by JKQ path simulator. Available modes are \'sequential\', \'pairwise_recursive\', \'cotengra\', \'bracket\' and \'alternating\'')
 
-        sim = ddsim.PathCircuitSimulator(qobj_experiment, seed,
-                                         configuration_pathsim(task_based_mode, configuration_var))
+        sim = ddsim.PathCircuitSimulator(qobj_experiment, configuration_pathsim)
 
         # determine the contraction path using cotengra in case this is requested
-        if mode == 'cotengra':
+        if configuration_pathsim.mode == 'cotengra':
             max_time = options.get('cotengra_max_time', 60)
             max_repeats = options.get('cotengra_max_repeats', 1024)
             dump_path = options.get('cotengra_dump_path', False)
@@ -247,10 +246,10 @@ class PathQasmSimulator(BackendV1):
                   'time_taken': end_time - start_time,
                   'time_setup': setup_time - start_time,
                   'time_sim': end_time - setup_time,
-                  'seed': seed,
-                  'mode': mode,
-                  'configuration_variable': configuration_var,
-                  'nthreads': nthreads,
+                  'seed': configuration_pathsim.seed,
+                  'mode': configuration_pathsim.mode,
+                  'configuration_variable': configuration_pathsim.var,
+                  'nthreads': configuration_pathsim.nthreads,
                   'shots': shots,
                   'data': {'counts': counts_hex},
                   'success': True,

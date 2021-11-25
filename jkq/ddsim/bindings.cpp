@@ -172,15 +172,27 @@ PYBIND11_MODULE(pyddsim, m) {
 
     py::class_<PathSimulator>(m, "PathCircuitSimulator")
             .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Configuration&>),
-                 "circ"_a, "seed"_a, "mode"_a = PathSimulator::Configuration())
+                 "circ"_a, "seed"_a, "config"_a = PathSimulator::Configuration())
             .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Configuration&>),
-                 "circ"_a, "mode"_a = PathSimulator::Configuration())
+                 "circ"_a, "config"_a = PathSimulator::Configuration())
             .def("set_simulation_path", py::overload_cast<const PathSimulator::SimulationPath::ComponentsList&, bool>(&PathSimulator::setSimulationPath))
             .def("get_number_of_qubits", &CircuitSimulator::getNumberOfQubits)
             .def("get_name", &CircuitSimulator::getName)
             .def("simulate", &PathSimulator::Simulate, "shots"_a)
             .def("statistics", &CircuitSimulator::AdditionalStatistics)
             .def("get_vector", &CircuitSimulator::getVectorComplex);
+
+    //py::class_<PathSimulator>(m, "PathCircuitSimulatorTest")
+    //    .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Configuration::Mode&, const std::size_t&, const std::size_t&, const std::size_t&, const std::size_t&>),
+    //                 "circ"_a, "seed"_a, "mode"_a = PathSimulator::Configuration::Mode::Sequential, "seed"_a = &PathSimulator::Configuration::seed, "nthreads"_a = &PathSimulator::Configuration::nthreads, "alternatingStart"_a = &PathSimulator::Configuration::alternateStarting, "bracketSize"_a = &PathSimulator::Configuration::bracketSize)
+    //       .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Configuration&>),
+    //     "circ"_a, "mode"_a = PathSimulator::Configuration())
+    //.def("set_simulation_path", py::overload_cast<const PathSimulator::SimulationPath::ComponentsList&, bool>(&PathSimulator::setSimulationPath))
+    //.def("get_number_of_qubits", &CircuitSimulator::getNumberOfQubits)
+    //.def("get_name", &CircuitSimulator::getName)
+    //.def("simulate", &PathSimulator::Simulate, "shots"_a)
+    //.def("statistics", &CircuitSimulator::AdditionalStatistics)
+    //.def("get_vector", &CircuitSimulator::getVectorComplex);
 
     py::enum_<UnitarySimulator::Mode>(m, "ConstructionMode")
             .value("recursive", UnitarySimulator::Mode::Recursive)
