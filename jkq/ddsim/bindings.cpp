@@ -39,8 +39,15 @@ std::unique_ptr<Simulator> create_simulator(const py::object& circ, const long l
         throw std::runtime_error("PyObject is neither py::str, QuantumCircuit, nor QasmQobjExperiment");
     }
 
-    return std::make_unique<Simulator>(std::move(qc),
-                                       std::forward<Args>(args)...);
+    if (seed < 0) {
+        return std::make_unique<Simulator>(std::move(qc),
+                                           std::forward<Args>(args)...);
+    } else {
+        return std::make_unique<Simulator>(std::move(qc),
+                                           ApproximationInfo{1, 1, ApproximationInfo::ApproximationWhen::FidelityDriven},
+                                           seed,
+                                           std::forward<Args>(args)...);
+    }
 }
 
 template<class Simulator, typename... Args>
@@ -171,12 +178,10 @@ PYBIND11_MODULE(pyddsim, m) {
                            R"pbdoc(Number of used threads)pbdoc");
 
     py::class_<PathSimulator>(m, "PathCircuitSimulator")
-            .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Configuration&>),
-                 "circ"_a, "seed"_a, "configuration"_a = PathSimulator::Configuration())
-            //.def(py::init<>(&create_simulator<PathSimulator, &PathSimulator::Configuration::seed, PathSimulator::Configuration::Mode&, &PathSimulator::Configuration::nthreads ,&PathSimulator::Configuration::bracketSize, &PathSimulator::Configuration::alternateStarting>),
-            //    "circ"_a, "seed"_a = &PathSimulator::Configuration::seed, "mode"_a = PathSimulator::Configuration::Mode(), "nthreads"_a = &PathSimulator::Configuration::nthreads, "bracket_size"_a = &PathSimulator::Configuration::bracketSize, "alternating_start"_a = &PathSimulator::Configuration::alternateStarting)
-            .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Configuration&>),
-                 "circ"_a, "configuration"_a = PathSimulator::Configuration())
+            .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Configuration::Mode&, const std::size_t&>),
+                 "circ"_a, "seed"_a, "mode"_a = PathSimulator::Configuration::Mode::Sequential, "nthreads"_a = 1)
+            .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Configuration::Mode&, const std::size_t&>),
+                 "circ"_a, "mode"_a = PathSimulator::Configuration::Mode::Sequential, "nthreads"_a = 1)
             .def("set_simulation_path", py::overload_cast<const PathSimulator::SimulationPath::ComponentsList&, bool>(&PathSimulator::setSimulationPath))
             .def("get_number_of_qubits", &CircuitSimulator::getNumberOfQubits)
             .def("get_name", &CircuitSimulator::getName)
