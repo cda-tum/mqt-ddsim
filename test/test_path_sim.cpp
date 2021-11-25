@@ -14,7 +14,7 @@ TEST(TaskBasedSimTest, SimpleCircuit) {
     qc->x(0U, 1_pc);
 
     // construct simulator and generate sequential contraction plan
-    PathSimulator tbs(std::move(qc), PathSimulator::Mode::Sequential, 1);
+    PathSimulator tbs(std::move(qc), PathSimulator::Configuration());
 
     // simulate circuit
     auto counts = tbs.Simulate(1024);
@@ -31,7 +31,7 @@ TEST(TaskBasedSimTest, SimpleCircuitAssumeFalseOrder) {
     auto qc = std::make_unique<qc::QuantumComputation>(2);
     qc->h(1U);
     qc->x(0U, 1_pc);
-    PathSimulator tbs(std::move(qc));
+    PathSimulator tbs(std::move(qc), PathSimulator::Configuration());
     // construct simulator and generate sequential contraction plan
     PathSimulator::SimulationPath::ComponentsList path{};
     path.emplace_back(1, 0);
@@ -54,7 +54,7 @@ TEST(TaskBasedSimTest, GroverCircuitBracket) {
     auto                                    targetValue = grover->targetValue;
 
     // construct simulator and generate sequential contraction plan
-    PathSimulator tbs(std::move(qc), PathSimulator::Mode::BracketGrouping, 1, 3);
+    PathSimulator tbs(std::move(qc), PathSimulator::Configuration(PathSimulator::Configuration::Mode::BracketGrouping, 3));
 
     // simulate circuit
     auto counts = tbs.Simulate(4096);
@@ -76,7 +76,7 @@ TEST(TaskBasedSimTest, GroverCircuitAlternatingMiddle) {
     auto                                    targetValue = grover->targetValue;
 
     // construct simulator and generate sequential contraction plan
-    PathSimulator tbs(std::move(qc), PathSimulator::Mode::Alternating, 1);
+    PathSimulator tbs(std::move(qc), PathSimulator::Configuration(PathSimulator::Configuration::Mode::Alternating, 0));
 
     // simulate circuit
     auto counts = tbs.Simulate(4096);
@@ -98,7 +98,7 @@ TEST(TaskBasedSimTest, GroverCircuitAlternatingRandom) {
     auto                                    targetValue = grover->targetValue;
 
     // construct simulator and generate sequential contraction plan
-    PathSimulator tbs(std::move(qc), PathSimulator::Mode::Alternating, 1, 6);
+    PathSimulator tbs(std::move(qc), PathSimulator::Configuration(PathSimulator::Configuration::Mode::Alternating, 6));
 
     // simulate circuit
     auto counts = tbs.Simulate(4096);
@@ -122,7 +122,7 @@ TEST(TaskBasedSimTest, SimpleCircuitBracket) {
     qc->x(0U, 1_pc);
 
     // construct simulator and generate sequential contraction plan
-    PathSimulator tbs(std::move(qc), PathSimulator::Mode::BracketGrouping, 1, 3);
+    PathSimulator tbs(std::move(qc), PathSimulator::Configuration(PathSimulator::Configuration::Mode::BracketGrouping, 3));
 
     // simulate circuit
     auto counts = tbs.Simulate(1024);
@@ -139,7 +139,7 @@ TEST(TaskBasedSimTest, GroverCircuitPairwiseGrouping) {
     grover->print(std::cout);
 
     // construct simulator and generate sequential contraction plan
-    PathSimulator tbs(std::move(qc), PathSimulator::Mode::PairwiseRecursiveGrouping, 1);
+    PathSimulator tbs(std::move(qc), PathSimulator::Configuration(PathSimulator::Configuration::Mode::PairwiseRecursiveGrouping, 0));
 
     // simulate circuit
     auto counts = tbs.Simulate(4096);

@@ -60,6 +60,10 @@ public:
         std::size_t bracketSize = 2;
         Mode        mode        = Mode::Sequential;
         //Add new variables here
+        Configuration():
+            mode(), seed(), nthreads(), alternateStarting(), bracketSize() {}
+        Configuration(Mode mode1, std::size_t var1):
+            mode(mode1), alternateStarting(var1), bracketSize(var1) {}
     };
 
     explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration configuration):
