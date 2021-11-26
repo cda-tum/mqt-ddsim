@@ -204,19 +204,19 @@ class PathQasmSimulator(BackendV1):
         start_time = time.time()
         configuration_pathsim = options.get('configuration_pathsim')
         seed = options.get('seed', -1)
-        configuration_pathsim.mode = options.get('mode', 'sequential')
-        configuration_pathsim.var = options.get('configuration_variable', 0)
-        configuration_pathsim.nthreads = int(options.get('nthreads', 1))
+        mode = options.get('mode', 'sequential')
+        var = options.get('configuration_variable', 0)
+        nthreads = int(options.get('nthreads', 1))
         # TODO: Add new strategies here
-        if configuration_pathsim.mode == 'sequential':
+        if mode == 'sequential':
             task_based_mode = ddsim.PathSimulatorMode.sequential
-        elif configuration_pathsim.mode == 'pairwise_recursive':
+        elif mode == 'pairwise_recursive':
             task_based_mode = ddsim.PathSimulatorMode.pairwise_recursive
-        elif configuration_pathsim.mode == 'cotengra':
+        elif mode == 'cotengra':
             task_based_mode = ddsim.PathSimulatorMode.cotengra
-        elif configuration_pathsim.mode == 'bracket':
+        elif mode == 'bracket':
             task_based_mode = ddsim.PathSimulatorMode.bracket
-        elif configuration_pathsim.mode == 'alternating':
+        elif mode == 'alternating':
             task_based_mode = ddsim.PathSimulatorMode.alternating
         else:
             raise JKQSimulatorError('Simulation mode', configuration_pathsim.mode,
@@ -225,7 +225,7 @@ class PathQasmSimulator(BackendV1):
         sim = ddsim.PathCircuitSimulator(qobj_experiment, mode=task_based_mode)
 
         # determine the contraction path using cotengra in case this is requested
-        if configuration_pathsim.mode == 'cotengra':
+        if mode == 'cotengra':
             max_time = options.get('cotengra_max_time', 60)
             max_repeats = options.get('cotengra_max_repeats', 1024)
             dump_path = options.get('cotengra_dump_path', False)
@@ -246,10 +246,10 @@ class PathQasmSimulator(BackendV1):
                   'time_taken': end_time - start_time,
                   'time_setup': setup_time - start_time,
                   'time_sim': end_time - setup_time,
-                  'seed': configuration_pathsim.seed,
-                  'mode': configuration_pathsim.mode,
-                  'configuration_variable': configuration_pathsim.var,
-                  'nthreads': configuration_pathsim.nthreads,
+                  'seed': seed,
+                  'mode': mode,
+                  'configuration_variable': var,
+                  'nthreads': nthreads,
                   'shots': shots,
                   'data': {'counts': counts_hex},
                   'success': True,
