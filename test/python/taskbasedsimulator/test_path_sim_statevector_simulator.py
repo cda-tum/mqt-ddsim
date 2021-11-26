@@ -1,7 +1,7 @@
 import unittest
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit import execute
-
+from jkq import ddsim
 from jkq.ddsim.pathstatevectorsimulator import PathStatevectorSimulator
 
 
@@ -42,7 +42,8 @@ class JKQStatevectorSimulatorTest(unittest.TestCase):
 
     def test_statevector_output_pairwise(self):
         """Test final state vector for single circuit run."""
-        result = execute(self.q_circuit, backend=self.backend, mode='pairwise_recursive').result()
+        mode = ddsim.PathSimulatorMode.pairwise_recursive
+        result = execute(self.q_circuit, backend=self.backend, mode=mode).result()
         self.assertEqual(result.success, True)
         actual = result.get_statevector(self.q_circuit)
 
