@@ -149,7 +149,7 @@ PYBIND11_MODULE(pyddsim, m) {
             .value("alternating", PathSimulator::Configuration::Mode::Alternating)
             .export_values();
 
-    py::class_<PathSimulator::Configuration>(m, "Configuration", "Configuration options for the JKQ DDSIM Path Simulator strategies")
+    py::class_<PathSimulator::Configuration>(m, "ConfigurationPathSim", "Configuration options for the JKQ DDSIM Path Simulator strategies")
             .def(py::init())
             .def_readwrite("sequential", &PathSimulator::Configuration::mode,
                            R"pbdoc(Setting the mode for the sequential strategie)pbdoc")
@@ -161,9 +161,9 @@ PYBIND11_MODULE(pyddsim, m) {
                            R"pbdoc(Setting the mode for the alternating strategie)pbdoc")
             .def_readwrite("cotengra", &PathSimulator::Configuration::mode,
                            R"pbdoc(Setting the mode for the cotengra strategie)pbdoc")
-            .def_readwrite("bracket size", &PathSimulator::Configuration::bracketSize,
+            .def_readwrite("bracket_size", &PathSimulator::Configuration::bracketSize,
                            R"pbdoc(Size of the brackets one wants to combine)pbdoc")
-            .def_readwrite("alternating start", &PathSimulator::Configuration::alternateStarting,
+            .def_readwrite("alternating_start", &PathSimulator::Configuration::alternateStarting,
                            R"pbdoc(Start of the alternating strategie)pbdoc")
             .def_readwrite("seed", &PathSimulator::Configuration::seed,
                            R"pbdoc(Number of seeds)pbdoc")
@@ -173,26 +173,18 @@ PYBIND11_MODULE(pyddsim, m) {
     py::class_<PathSimulator>(m, "PathCircuitSimulator")
             .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Configuration&>),
                  "circ"_a, "seed"_a, "config"_a = PathSimulator::Configuration())
+            .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Configuration::Mode&, const std::size_t&, const std::size_t&, const std::size_t&>),
+                 "circ"_a, "seed"_a, "mode"_a = PathSimulator::Configuration::Mode::Sequential, "bracket_size"_a = 2, "alternating_start"_a = 1, "nthreads"_a = 1)
             .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Configuration&>),
                  "circ"_a, "config"_a = PathSimulator::Configuration())
+            .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Configuration::Mode&, const std::size_t&, const std::size_t&, const std::size_t&>),
+                 "circ"_a, "mode"_a = PathSimulator::Configuration::Mode::Sequential, "bracket_size"_a = 2, "alternating_start"_a = 1, "nthreads"_a = 1)
             .def("set_simulation_path", py::overload_cast<const PathSimulator::SimulationPath::ComponentsList&, bool>(&PathSimulator::setSimulationPath))
             .def("get_number_of_qubits", &CircuitSimulator::getNumberOfQubits)
             .def("get_name", &CircuitSimulator::getName)
             .def("simulate", &PathSimulator::Simulate, "shots"_a)
             .def("statistics", &CircuitSimulator::AdditionalStatistics)
             .def("get_vector", &CircuitSimulator::getVectorComplex);
-
-    //py::class_<PathSimulator>(m, "PathCircuitSimulatorTest")
-    //    .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Configuration::Mode&, const std::size_t&, const std::size_t&, const std::size_t&, const std::size_t&>),
-    //                 "circ"_a, "seed"_a, "mode"_a = PathSimulator::Configuration::Mode::Sequential, "seed"_a = &PathSimulator::Configuration::seed, "nthreads"_a = &PathSimulator::Configuration::nthreads, "alternatingStart"_a = &PathSimulator::Configuration::alternateStarting, "bracketSize"_a = &PathSimulator::Configuration::bracketSize)
-    //       .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Configuration&>),
-    //     "circ"_a, "mode"_a = PathSimulator::Configuration())
-    //.def("set_simulation_path", py::overload_cast<const PathSimulator::SimulationPath::ComponentsList&, bool>(&PathSimulator::setSimulationPath))
-    //.def("get_number_of_qubits", &CircuitSimulator::getNumberOfQubits)
-    //.def("get_name", &CircuitSimulator::getName)
-    //.def("simulate", &PathSimulator::Simulate, "shots"_a)
-    //.def("statistics", &CircuitSimulator::AdditionalStatistics)
-    //.def("get_vector", &CircuitSimulator::getVectorComplex);
 
     py::enum_<UnitarySimulator::Mode>(m, "ConstructionMode")
             .value("recursive", UnitarySimulator::Mode::Recursive)
