@@ -219,7 +219,7 @@ class PathQasmSimulator(BackendV1):
         elif mode == 'alternating':
             task_based_mode = ddsim.PathSimulatorMode.alternating
         else:
-            raise JKQSimulatorError('Simulation mode', configuration_pathsim.mode,
+            raise JKQSimulatorError('Simulation mode', mode,
                                     'not supported by JKQ path simulator. Available modes are \'sequential\', \'pairwise_recursive\', \'cotengra\', \'bracket\' and \'alternating\'')
 
         sim = ddsim.PathCircuitSimulator(qobj_experiment, mode=task_based_mode)
