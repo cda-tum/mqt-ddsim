@@ -119,7 +119,7 @@ class PathQasmSimulator(BackendV1):
             shots=None,
             parameter_binds=None,
             simulator_seed=None,
-            configuration_pathsim=ddsim.Configuration(),
+            configuration_pathsim=ddsim.ConfigurationPathSim(),
             mode="sequential",
             configuration_variable=0,
             cotengra_max_time=60,
