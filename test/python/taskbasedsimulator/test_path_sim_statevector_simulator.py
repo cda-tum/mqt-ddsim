@@ -42,7 +42,7 @@ class JKQStatevectorSimulatorTest(unittest.TestCase):
 
     def test_statevector_output_pairwise(self):
         """Test final state vector for single circuit run."""
-        mode = ddsim.PathSimulatorMode.pairwise_recursive
+        mode = "pairwise_recursive"
         result = execute(self.q_circuit, backend=self.backend, mode=mode).result()
         self.assertEqual(result.success, True)
         actual = result.get_statevector(self.q_circuit)
