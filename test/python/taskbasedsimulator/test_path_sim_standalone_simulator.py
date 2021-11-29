@@ -30,7 +30,7 @@ class JKQStandaloneSimulatorTests(unittest.TestCase):
         self.assertIn('000', result.keys())
         self.assertIn('111', result.keys())
 
-    def test_standalone_config_object(self):
+    def test_standalone_individual_objects(self):
         circ = QuantumCircuit(3)
         circ.h(0)
         circ.cx(0, 1)
@@ -42,7 +42,7 @@ class JKQStandaloneSimulatorTests(unittest.TestCase):
         self.assertIn('000', result.keys())
         self.assertIn('111', result.keys())
 
-    def test_standalone_pairwise(self):
+    def test_standalone_pairwise_only(self):
         circ = QuantumCircuit(3)
         circ.h(0)
         circ.cx(0, 1)

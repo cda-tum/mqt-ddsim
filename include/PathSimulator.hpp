@@ -60,13 +60,12 @@ public:
         std::size_t bracketSize = 2;
         Mode        mode        = Mode::Sequential;
         //Add new variables here
-
-        Configuration(Mode mode1, std::size_t var1):
-            mode(mode1), alternateStarting(var1), bracketSize(var1) {}
+        Configuration(Mode mode, std::size_t br, std::size_t as, std::size_t nt):
+            mode(mode), bracketSize(br), alternateStarting(as), nthreads(nt){};
         Configuration() = default;
     };
 
-    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration configuration):
+    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration configuration):
         CircuitSimulator(std::move(qc)), executor(configuration.nthreads) {
         // remove final measurements implement measurement support for task-based simulation
         qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
