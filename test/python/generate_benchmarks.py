@@ -1,12 +1,6 @@
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, AncillaRegister
 from qiskit.circuit.library import QFT, GraphState, GroverOperator
 import numpy as np
-import random
-from qiskit.qasm import pi
-from fractions import Fraction
-
-import networkx as nx
-
 
 # measure qubits in reverse order which is better suited for DD-based simulation
 def measure(qc: QuantumCircuit, q: QuantumRegister, c: ClassicalRegister):
@@ -55,7 +49,7 @@ def grover(n: int, include_measurements: bool = True):
     state_preparation.x(flag)
 
     oracle = QuantumCircuit(q, flag)
-    oracle.mcp(pi, q, flag)
+    oracle.mcp(np.pi, q, flag)
 
     operator = GroverOperator(oracle)
     iterations = Grover.optimal_num_iterations(1, n)
@@ -71,6 +65,8 @@ def grover(n: int, include_measurements: bool = True):
 
 
 def graph_state(n, include_measurements: bool = True):
+    import networkx as nx
+
     q = QuantumRegister(n, 'q')
     c = ClassicalRegister(n, 'c')
     qc = QuantumCircuit(q, c, name="graph_state")
@@ -114,6 +110,9 @@ def shor(N: int, a: int = 2, include_measurements: bool = True):
 
 
 def qpe_exact(n: int, include_measurements: bool = True):
+    from fractions import Fraction
+    import random
+
     q = QuantumRegister(n, 'q')
     psi = QuantumRegister(1, 'psi')
     c = ClassicalRegister(n + 1, 'c')
@@ -148,6 +147,9 @@ def qpe_exact(n: int, include_measurements: bool = True):
 
 
 def qpe_inexact(n: int, include_measurements: bool = True):
+    from fractions import Fraction
+    import random
+
     q = QuantumRegister(n, 'q')
     psi = QuantumRegister(1, 'psi')
     c = ClassicalRegister(n + 1, 'c')

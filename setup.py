@@ -97,15 +97,4 @@ setup(
         'Tracker': 'https://github.com/iic-jku/ddsim/issues',
         'Research': 'https://iic.jku.at/eda/research/quantum_simulation/',
     },
-    python_requires='>=3.6',
-    setup_requires=['cmake>=3.14'],
-    install_requires=[
-        'numpy>=1.19,<1.21',
-        'pandas>=1.1.4',
-        'networkx>=2.5',
-        'qiskit-terra>=0.18.1',
-        'quimb>=1.3',
-        'sparse>=0.13',
-        'cotengra @ https://github.com/jcmgray/cotengra/archive/refs/heads/master.zip'
-    ]
 )
