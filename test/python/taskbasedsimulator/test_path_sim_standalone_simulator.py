@@ -60,7 +60,7 @@ class JKQStandaloneSimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
         config = ddsim.ConfigurationPathSim()
-        sim = ddsim.PathCircuitSimulator(circ, 1337, config=config)
+        sim = ddsim.PathCircuitSimulator(circ, 1337, config_pathsim=config)
         result = sim.simulate(1000)
         self.assertEqual(len(result.keys()), 2)
         self.assertIn('000', result.keys())

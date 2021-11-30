@@ -172,11 +172,11 @@ PYBIND11_MODULE(pyddsim, m) {
 
     py::class_<PathSimulator>(m, "PathCircuitSimulator")
             .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Configuration&>),
-                 "circ"_a, "seed"_a, "config"_a = PathSimulator::Configuration())
+                 "circ"_a, "seed"_a, "config_pathsim"_a = PathSimulator::Configuration())
             .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Configuration::Mode&, const std::size_t&, const std::size_t&, const std::size_t&>),
                  "circ"_a, "seed"_a, "mode"_a = PathSimulator::Configuration::Mode::Sequential, "bracket_size"_a = 2, "alternating_start"_a = 1, "nthreads"_a = 1)
             .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Configuration&>),
-                 "circ"_a, "config"_a = PathSimulator::Configuration())
+                 "circ"_a, "config_pathsim"_a = PathSimulator::Configuration())
             .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Configuration::Mode&, const std::size_t&, const std::size_t&, const std::size_t&>),
                  "circ"_a, "mode"_a = PathSimulator::Configuration::Mode::Sequential, "bracket_size"_a = 2, "alternating_start"_a = 1, "nthreads"_a = 1)
             .def("set_simulation_path", py::overload_cast<const PathSimulator::SimulationPath::ComponentsList&, bool>(&PathSimulator::setSimulationPath))
