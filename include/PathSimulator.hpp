@@ -51,21 +51,20 @@ public:
             Cotengra
         };
         //Number of seeds
-        std::size_t seed = 0;
+        std::size_t seed;
         //Number of threads
-        std::size_t nthreads = 1;
+        std::size_t nthreads;
         //settings for the alternating mode
-        std::size_t alternateStarting = 0;
+        std::size_t alternateStarting;
         //settings for the bracket size
-        std::size_t bracketSize = 2;
-        Mode        mode        = Mode::Sequential;
+        std::size_t bracketSize;
+        Mode        mode;
         //Add new variables here
-        Configuration(Mode mode, std::size_t br, std::size_t as, std::size_t nt):
-            mode(mode), bracketSize(br), alternateStarting(as), nthreads(nt){};
-        Configuration() = default;
+        Configuration(Mode mode = Mode::Sequential, std::size_t br = 2, std::size_t as = 0, std::size_t nt = 1, std::size_t se = 0):
+            mode(mode), bracketSize(br), alternateStarting(as), nthreads(nt), seed(se){};
     };
 
-    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration configuration):
+    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration configuration):
         CircuitSimulator(std::move(qc)), executor(configuration.nthreads) {
         // remove final measurements implement measurement support for task-based simulation
         qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
@@ -97,11 +96,10 @@ public:
         }
     }
 
-    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration::Mode& mode, std::size_t bracketSize, std::size_t alternateStarting, std::size_t nthreads):
-        CircuitSimulator(std::move(qc)), executor(nthreads) {
+    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration::Mode& mode, std::size_t bracketSize, std::size_t alternateStarting, std::size_t nthreads, std::size_t seed):
+        CircuitSimulator(std::move(qc), seed), executor(nthreads) {
         // remove final measurements implement measurement support for task-based simulation
         qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
-
         // case distinction for the starting point of the alternating strategie
         std::size_t alternateStart = 0;
         if (alternateStarting == 0)

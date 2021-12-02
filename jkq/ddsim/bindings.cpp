@@ -171,14 +171,10 @@ PYBIND11_MODULE(pyddsim, m) {
                            R"pbdoc(Number of used threads)pbdoc");
 
     py::class_<PathSimulator>(m, "PathCircuitSimulator")
-            .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Configuration&>),
-                 "circ"_a, "seed"_a, "config_pathsim"_a = PathSimulator::Configuration())
-            .def(py::init<>(&create_simulator<PathSimulator, PathSimulator::Configuration::Mode&, const std::size_t&, const std::size_t&, const std::size_t&>),
-                 "circ"_a, "seed"_a, "mode"_a = PathSimulator::Configuration::Mode::Sequential, "bracket_size"_a = 2, "alternating_start"_a = 1, "nthreads"_a = 1)
             .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Configuration&>),
                  "circ"_a, "config_pathsim"_a = PathSimulator::Configuration())
-            .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Configuration::Mode&, const std::size_t&, const std::size_t&, const std::size_t&>),
-                 "circ"_a, "mode"_a = PathSimulator::Configuration::Mode::Sequential, "bracket_size"_a = 2, "alternating_start"_a = 1, "nthreads"_a = 1)
+            .def(py::init<>(&create_simulator_without_seed<PathSimulator, PathSimulator::Configuration::Mode&, const std::size_t&, const std::size_t&, const std::size_t&, const std::size_t&>),
+                 "circ"_a, "mode"_a = PathSimulator::Configuration::Mode::Sequential, "bracket_size"_a = 2, "alternating_start"_a = 1, "nthreads"_a = 1, "seed"_a = 0)
             .def("set_simulation_path", py::overload_cast<const PathSimulator::SimulationPath::ComponentsList&, bool>(&PathSimulator::setSimulationPath))
             .def("get_number_of_qubits", &CircuitSimulator::getNumberOfQubits)
             .def("get_name", &CircuitSimulator::getName)
