@@ -250,6 +250,7 @@ class PathQasmSimulator(BackendV1):
                   'time_taken': end_time - start_time,
                   'time_setup': setup_time - start_time,
                   'time_sim': end_time - setup_time,
+                  'configuration_setting': configuration_pathsim,
                   'seed': seed,
                   'mode': mode,
                   'configuration_variable': var,
