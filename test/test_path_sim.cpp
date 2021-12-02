@@ -162,7 +162,7 @@ TEST(TaskBasedSimTest, GroverCircuitPairwiseGroupingWOConstructor) {
     grover->print(std::cout);
     PathSimulator::Configuration::Mode var = PathSimulator::Configuration::Mode::PairwiseRecursiveGrouping;
     // construct simulator and generate sequential contraction plan
-    PathSimulator tbs = PathSimulator(std::move(qc), var, 0, 0, 1);
+    PathSimulator tbs = PathSimulator(std::move(qc), var, 0, 0, 1, 0);
 
     // simulate circuit
     auto counts = tbs.Simulate(4096);
@@ -185,7 +185,7 @@ TEST(TaskBasedSimTest, GroverCircuitBracketGroupingWOConstructor) {
     grover->print(std::cout);
     PathSimulator::Configuration::Mode var = PathSimulator::Configuration::Mode::BracketGrouping;
     // construct simulator and generate sequential contraction plan
-    PathSimulator tbs = PathSimulator(std::move(qc), var, 3, 0, 1);
+    PathSimulator tbs = PathSimulator(std::move(qc), var, 3, 0, 1, 0);
 
     // simulate circuit
     auto counts = tbs.Simulate(4096);
@@ -208,7 +208,7 @@ TEST(TaskBasedSimTest, GroverCircuitAlternatingGroupingWOConstructor) {
     grover->print(std::cout);
     PathSimulator::Configuration::Mode var = PathSimulator::Configuration::Mode::Alternating;
     // construct simulator and generate sequential contraction plan
-    PathSimulator tbs = PathSimulator(std::move(qc), var, 0, 0, 1);
+    PathSimulator tbs = PathSimulator(std::move(qc), var, 0, 0, 1, 0);
 
     // simulate circuit
     auto counts = tbs.Simulate(4096);

@@ -64,7 +64,7 @@ public:
             mode(mode), bracketSize(br), alternateStarting(as), nthreads(nt), seed(se){};
     };
 
-    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration configuration):
+    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration configuration):
         CircuitSimulator(std::move(qc)), executor(configuration.nthreads) {
         // remove final measurements implement measurement support for task-based simulation
         qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));

@@ -122,6 +122,7 @@ class PathQasmSimulator(BackendV1):
             configuration_pathsim=ddsim.ConfigurationPathSim(),
             mode="sequential",
             configuration_variable=0,
+            seed=0,
             cotengra_max_time=60,
             cotengra_max_repeats=1024,
             cotengra_plot_ring=False,
@@ -203,7 +204,7 @@ class PathQasmSimulator(BackendV1):
     def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options):
         start_time = time.time()
         configuration_pathsim = options.get('configuration_pathsim', ddsim.ConfigurationPathSim())
-        seed = options.get('seed', -1)
+        seed = options.get('seed', 0)
         mode = options.get('mode', 'sequential')
         var = options.get('configuration_variable', 0)
         nthreads = int(options.get('nthreads', 1))
