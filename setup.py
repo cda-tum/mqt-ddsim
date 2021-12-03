@@ -97,4 +97,7 @@ setup(
         'Tracker': 'https://github.com/iic-jku/ddsim/issues',
         'Research': 'https://iic.jku.at/eda/research/quantum_simulation/',
     },
+    extras_require={
+        "tnflow": ["sparse", "opt-einsum", "quimb", "pandas", "numpy", "cotengra @ https://github.com/jcmgray/cotengra/archive/refs/heads/master.zip"]
+    }
 )
