@@ -3,6 +3,7 @@
 
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
+#include "nlohmann/json.hpp"
 
 #include <future>
 #include <limits>
@@ -29,13 +30,13 @@ public:
             static constexpr size_t UNKNOWN = std::numeric_limits<size_t>::max();
         };
 
-        using ComponentsList = std::vector<std::pair<std::size_t, std::size_t>>;
-        using Steps          = std::vector<Step>;
+        using Components = std::vector<std::pair<std::size_t, std::size_t>>;
+        using Steps      = std::vector<Step>;
 
         SimulationPath() = default;
-        SimulationPath(std::size_t nleaves, ComponentsList components, const qc::QuantumComputation* qc, bool assumeCorrectOrder = false);
+        SimulationPath(std::size_t nleaves, Components components, const qc::QuantumComputation* qc, bool assumeCorrectOrder = false);
 
-        ComponentsList                components{};
+        Components                    components{};
         Steps                         steps{};
         std::size_t                   nleaves{};
         const qc::QuantumComputation* qc{};
@@ -50,31 +51,88 @@ public:
             Alternating,
             Cotengra
         };
-        //Number of seeds
-        std::size_t seed;
-        //Number of threads
-        std::size_t nthreads;
-        //settings for the alternating mode
-        std::size_t alternateStarting;
-        //settings for the bracket size
+
+        // mode to use
+        Mode mode;
+
+        // settings for the bracket size
         std::size_t bracketSize;
-        Mode        mode;
+        // settings for the alternating mode
+        std::size_t alternatingStart;
+
+        // random seed
+        std::size_t seed;
+
         //Add new variables here
-        Configuration(Mode mode = Mode::Sequential, std::size_t br = 2, std::size_t as = 0, std::size_t nt = 1, std::size_t se = 0):
-            mode(mode), bracketSize(br), alternateStarting(as), nthreads(nt), seed(se){};
+        explicit Configuration(Mode mode = Mode::Sequential, std::size_t bracketSize = 2, std::size_t alternatingStart = 0, std::size_t seed = 0):
+            mode(mode), bracketSize(bracketSize), alternatingStart(alternatingStart), seed(seed){};
+
+        static Mode modeFromString(const std::string& mode) {
+            if (mode == "sequential" || mode == "0") {
+                return Mode::Sequential;
+            } else if (mode == "pairwise_recursive" || mode == "1") {
+                return Mode::PairwiseRecursiveGrouping;
+            } else if (mode == "bracket" || mode == "2") {
+                return Mode::BracketGrouping;
+            } else if (mode == "alternating" || mode == "3") {
+                return Mode::Alternating;
+            } else if (mode == "cotengra" || mode == "4") {
+                return Mode::Cotengra;
+            } else {
+                throw std::invalid_argument("Invalid simulation path mode: " + mode);
+            }
+        }
+
+        static std::string modeToString(const Mode& mode) {
+            switch (mode) {
+                case Mode::Sequential:
+                    return "sequential";
+                case Mode::PairwiseRecursiveGrouping:
+                    return "pairwise_recursive";
+                case Mode::BracketGrouping:
+                    return "bracket";
+                case Mode::Alternating:
+                    return "alternating";
+                case Mode::Cotengra:
+                    return "cotengra";
+                default:
+                    throw std::invalid_argument("Invalid simulation path mode");
+            }
+        }
+
+        [[nodiscard]] nlohmann::json json() const {
+            nlohmann::json conf{};
+            conf["mode"] = modeToString(mode);
+            if (mode == Mode::BracketGrouping) {
+                conf["bracket_size"] = bracketSize;
+            } else if (mode == Mode::Alternating) {
+                conf["alternating_start"] = alternatingStart;
+            }
+            if (seed != 0) {
+                conf["seed"] = seed;
+            }
+            return conf;
+        }
+
+        [[nodiscard]] std::string toString() const {
+            return json().dump(2);
+        }
     };
 
-    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration configuration):
-        CircuitSimulator(std::move(qc)), executor(configuration.nthreads) {
+    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration configuration = Configuration()):
+        CircuitSimulator(std::move(qc)), executor(1) {
+        if (configuration.seed != 0) {
+            // override seed in case a non-trivial one is given
+            mt.seed(seed);
+        }
+
         // remove final measurements implement measurement support for task-based simulation
         qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
 
-        // case distinction for the starting point of the alternating strategie
-        std::size_t alternateStart = 0;
-        if (configuration.alternateStarting == 0)
-            alternateStart = (this->qc->getNops()) / 2;
-        else
-            alternateStart = configuration.alternateStarting;
+        // case distinction for the starting point of the alternating strategy
+        if (configuration.alternatingStart == 0) {
+            configuration.alternatingStart = (this->qc->getNops()) / 2;
+        }
 
         // Add new strategies here
         switch (configuration.mode) {
@@ -87,7 +145,7 @@ public:
             case Configuration::Mode::Cotengra:
                 break;
             case Configuration::Mode::Alternating:
-                generateAlternatingSimulationPath(alternateStart);
+                generateAlternatingSimulationPath(configuration.alternatingStart);
                 break;
             case Configuration::Mode::Sequential:
             default:
@@ -96,36 +154,8 @@ public:
         }
     }
 
-    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration::Mode& mode, std::size_t bracketSize, std::size_t alternateStarting, std::size_t nthreads, std::size_t seed):
-        CircuitSimulator(std::move(qc), seed), executor(nthreads) {
-        // remove final measurements implement measurement support for task-based simulation
-        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
-        // case distinction for the starting point of the alternating strategie
-        std::size_t alternateStart = 0;
-        if (alternateStarting == 0)
-            alternateStart = (this->qc->getNops()) / 2;
-        else
-            alternateStart = alternateStarting;
-
-        // Add new strategies here
-        switch (mode) {
-            case Configuration::Mode::BracketGrouping:
-                generateBracketSimulationPath(bracketSize);
-                break;
-            case Configuration::Mode::PairwiseRecursiveGrouping:
-                generatePairwiseRecursiveGroupingSimulationPath();
-                break;
-            case Configuration::Mode::Cotengra:
-                break;
-            case Configuration::Mode::Alternating:
-                generateAlternatingSimulationPath(alternateStart);
-                break;
-            case Configuration::Mode::Sequential:
-            default:
-                generateSequentialSimulationPath();
-                break;
-        }
-    }
+    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration::Mode mode, std::size_t bracketSize, std::size_t alternatingStart, std::size_t seed):
+        PathSimulator(std::move(qc), Configuration{mode, bracketSize, alternatingStart, seed}) {}
 
     std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
 
@@ -135,7 +165,7 @@ public:
     void setSimulationPath(const SimulationPath& path) {
         simulationPath = path;
     }
-    void setSimulationPath(const SimulationPath::ComponentsList& components, bool assumeCorrectOrder = false) {
+    void setSimulationPath(const SimulationPath::Components& components, bool assumeCorrectOrder = false) {
         simulationPath = SimulationPath(qc->getNops() + 1, components, qc.get(), assumeCorrectOrder);
     }
 

@@ -119,15 +119,15 @@ class PathQasmSimulator(BackendV1):
             shots=None,
             parameter_binds=None,
             simulator_seed=None,
-            configuration_pathsim=ddsim.ConfigurationPathSim(),
-            mode="sequential",
-            configuration_variable=0,
-            seed=0,
+            pathsim_configuration=ddsim.PathSimulatorConfiguration(),
+            mode=None,
+            bracket_size=None,
+            alternating_start=None,
+            seed=None,
             cotengra_max_time=60,
             cotengra_max_repeats=1024,
             cotengra_plot_ring=False,
-            cotengra_dump_path=True,
-            nthreads=1  # local_hardware_info()['cpus']
+            cotengra_dump_path=True
         )
 
     def __init__(self, configuration=None, provider=None):
@@ -203,34 +203,29 @@ class PathQasmSimulator(BackendV1):
 
     def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options):
         start_time = time.time()
-        configuration_pathsim = options.get('configuration_pathsim', ddsim.ConfigurationPathSim())
-        seed = options.get('seed', 0)
-        mode = options.get('mode', 'sequential')
-        var = options.get('configuration_variable', 0)
-        nthreads = int(options.get('nthreads', 1))
-        # TODO: Add new strategies here
-        if mode == 'sequential':
-            task_based_mode = ddsim.PathSimulatorMode.sequential
-        elif mode == 'pairwise_recursive':
-            task_based_mode = ddsim.PathSimulatorMode.pairwise_recursive
-        elif mode == 'cotengra':
-            task_based_mode = ddsim.PathSimulatorMode.cotengra
-        elif mode == 'bracket':
-            task_based_mode = ddsim.PathSimulatorMode.bracket
-        elif mode == 'alternating':
-            task_based_mode = ddsim.PathSimulatorMode.alternating
-        else:
-            raise JKQSimulatorError('Simulation mode', mode,
-                                    'not supported by JKQ path simulator. Available modes are \'sequential\', \'pairwise_recursive\', \'cotengra\', \'bracket\' and \'alternating\'')
 
-        if mode == 'sequential' and nthreads == 1 and var == 0:
-            sim = ddsim.PathCircuitSimulator(qobj_experiment, config_pathsim=configuration_pathsim)
-        else:
-            sim = ddsim.PathCircuitSimulator(qobj_experiment, mode=task_based_mode, nthreads=nthreads, bracket_size=var,
-                                             alternating_start=var, seed=seed)
+        pathsim_configuration = options.get('pathsim_configuration', ddsim.PathSimulatorConfiguration())
+
+        mode = options.get('mode')
+        if mode is not None:
+            pathsim_configuration.mode = ddsim.PathSimulatorMode(mode)
+
+        bracket_size = options.get('bracket_size')
+        if bracket_size is not None:
+            pathsim_configuration.bracket_size = bracket_size
+
+        alternating_start = options.get('alternating_start')
+        if alternating_start is not None:
+            pathsim_configuration.alternating_start = alternating_start
+
+        seed = options.get('seed')
+        if seed is not None:
+            pathsim_configuration.seed = seed
+
+        sim = ddsim.PathCircuitSimulator(qobj_experiment, config=pathsim_configuration)
 
         # determine the contraction path using cotengra in case this is requested
-        if mode == 'cotengra':
+        if pathsim_configuration.mode == ddsim.PathSimulatorMode.cotengra:
             max_time = options.get('cotengra_max_time', 60)
             max_repeats = options.get('cotengra_max_repeats', 1024)
             dump_path = options.get('cotengra_dump_path', False)
@@ -251,11 +246,7 @@ class PathQasmSimulator(BackendV1):
                   'time_taken': end_time - start_time,
                   'time_setup': setup_time - start_time,
                   'time_sim': end_time - setup_time,
-                  'configuration_setting': configuration_pathsim,
-                  'seed': seed,
-                  'mode': mode,
-                  'configuration_variable': var,
-                  'nthreads': nthreads,
+                  'config': pathsim_configuration,
                   'shots': shots,
                   'data': {'counts': counts_hex},
                   'success': True,

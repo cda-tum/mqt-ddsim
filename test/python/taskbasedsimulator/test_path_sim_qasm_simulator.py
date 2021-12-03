@@ -74,3 +74,39 @@ class JKQQasmSimulatorTest(unittest.TestCase):
         for key in target.keys():
             self.assertIn(key, counts)
             self.assertLess(abs(target[key] - counts[key]), threshold)
+
+    def test_qasm_simulator_bracket(self):
+        """Test data counts output for single circuit run against reference."""
+        shots = 1024
+        result = execute(self.circuit, self.backend, shots=shots, mode='bracket').result()
+
+        print(result)
+        threshold = 0.04 * shots
+        counts = result.get_counts('test')
+        target = {'100 100': shots / 8, '011 011': shots / 8,
+                  '101 101': shots / 8, '111 111': shots / 8,
+                  '000 000': shots / 8, '010 010': shots / 8,
+                  '110 110': shots / 8, '001 001': shots / 8}
+
+        self.assertEqual(len(target), len(counts))
+        for key in target.keys():
+            self.assertIn(key, counts)
+            self.assertLess(abs(target[key] - counts[key]), threshold)
+
+    def test_qasm_simulator_alternating(self):
+        """Test data counts output for single circuit run against reference."""
+        shots = 1024
+        result = execute(self.circuit, self.backend, shots=shots, mode='alternating').result()
+
+        print(result)
+        threshold = 0.04 * shots
+        counts = result.get_counts('test')
+        target = {'100 100': shots / 8, '011 011': shots / 8,
+                  '101 101': shots / 8, '111 111': shots / 8,
+                  '000 000': shots / 8, '010 010': shots / 8,
+                  '110 110': shots / 8, '001 001': shots / 8}
+
+        self.assertEqual(len(target), len(counts))
+        for key in target.keys():
+            self.assertIn(key, counts)
+            self.assertLess(abs(target[key] - counts[key]), threshold)

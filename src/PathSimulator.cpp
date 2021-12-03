@@ -3,7 +3,7 @@
 #include <iterator>
 #include <utility>
 
-PathSimulator::SimulationPath::SimulationPath(std::size_t nleaves, PathSimulator::SimulationPath::ComponentsList components, const qc::QuantumComputation* qc, bool assumeCorrectOrder):
+PathSimulator::SimulationPath::SimulationPath(std::size_t nleaves, PathSimulator::SimulationPath::Components components, const qc::QuantumComputation* qc, bool assumeCorrectOrder):
     components(std::move(components)), nleaves(nleaves), qc(qc) {
     steps.reserve(nleaves);
     // create empty vector of steps
@@ -111,7 +111,7 @@ std::map<std::string, std::size_t> PathSimulator::Simulate(unsigned int shots) {
 }
 
 void PathSimulator::generateSequentialSimulationPath() {
-    SimulationPath::ComponentsList components{};
+    SimulationPath::Components components{};
     components.reserve(qc->getNops());
 
     for (std::size_t i = 0; i < qc->getNops(); ++i) {
@@ -124,7 +124,7 @@ void PathSimulator::generateSequentialSimulationPath() {
 }
 
 void PathSimulator::generatePairwiseRecursiveGroupingSimulationPath() {
-    SimulationPath::ComponentsList components{};
+    SimulationPath::Components components{};
     components.reserve(qc->getNops());
 
     std::size_t nleaves = qc->getNops() + 1;
@@ -174,7 +174,7 @@ void PathSimulator::generatePairwiseRecursiveGroupingSimulationPath() {
 }
 
 void PathSimulator::generateBracketSimulationPath(std::size_t bracketSize) {
-    SimulationPath::ComponentsList components{};
+    SimulationPath::Components components{};
     components.reserve(qc->getNops());
     bool        rightSingle      = false;
     std::size_t startElemBracket = bracketSize + 1;
@@ -243,7 +243,7 @@ void PathSimulator::generateBracketSimulationPath(std::size_t bracketSize) {
 }
 
 void PathSimulator::generateAlternatingSimulationPath(std::size_t startingPoint) {
-    SimulationPath::ComponentsList components{};
+    SimulationPath::Components components{};
     components.reserve(qc->getNops());
     std::size_t startElem = startingPoint;
     components.emplace_back(startElem, startElem + 1);

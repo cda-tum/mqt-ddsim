@@ -5,9 +5,10 @@ from jkq import ddsim
 from qiskit import transpile
 
 from test.python.generate_benchmarks import *
+from typing import Union
 
 
-def execute_circuit(qc: QuantumCircuit, backend, shots: int, mode: str = 'sequential', **options):
+def execute_circuit(qc: QuantumCircuit, backend, shots: int, mode: Union[str, ddsim.PathSimulatorMode] = 'sequential', **options):
     print('Starting execution of circuit', qc.name)
     result = execute_verification(qc, backend, shots=shots, mode=mode, optimization_level=0, **options).result()
     counts = result.get_counts()
@@ -25,7 +26,7 @@ def execute_circuit(qc: QuantumCircuit, backend, shots: int, mode: str = 'sequen
           sep=';')
 
 
-def execute_verification(qc: QuantumCircuit, backend, shots: int, mode: str = 'sequential', **options):
+def execute_verification(qc: QuantumCircuit, backend, shots: int, mode: Union[str, ddsim.PathSimulatorMode] = 'sequential', **options):
     print('Starting execution of circuit', qc.name)
     configuration_dict = backend.configuration().to_dict()
     basis_gates = configuration_dict['basis_gates']
@@ -37,11 +38,8 @@ def execute_verification(qc: QuantumCircuit, backend, shots: int, mode: str = 's
 
     print('Starting setup')
     start_time = time.time()
-    task_based_mode = ddsim.PathSimulatorMode.sequential
-    if mode == 'cotengra':
-        task_based_mode = ddsim.PathSimulatorMode.cotengra
 
-    sim = ddsim.PathCircuitSimulator(circ=qccomp, seed=-1, mode=task_based_mode, nthreads=1)
+    sim = ddsim.PathCircuitSimulator(circ=qccomp, mode=ddsim.PathSimulatorMode(mode))
     if mode == 'cotengra':
         max_time = options.get('cotengra_max_time', 60)
         max_repeats = options.get('cotengra_max_repeats', 1024)
@@ -71,7 +69,7 @@ def execute_verification_all(qc, backend, basis_gates, shots, include_cotengra, 
     print('Transpiling circuit')
     qc = transpile(qc, basis_gates=basis_gates, optimization_level=0)
     execute_verification(qc, backend, shots)
-    execute_verification(qc, backend, shots, 'bestcase')
+    execute_verification(qc, backend, shots, 'alternating')
     if include_cotengra:
         execute_verification(qc, backend, shots, 'cotengra', cotengra_max_time=max_time,
                              cotengra_max_repeats=max_repeats, cotengra_plot_ring=plot_ring)
