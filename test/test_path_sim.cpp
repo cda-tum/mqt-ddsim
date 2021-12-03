@@ -8,6 +8,31 @@
 
 using namespace dd::literals;
 
+TEST(TaskBasedSimTest, Configuration) {
+    EXPECT_EQ(PathSimulator::Configuration::modeToString(PathSimulator::Configuration::Mode::Sequential), "sequential");
+    EXPECT_EQ(PathSimulator::Configuration::modeToString(PathSimulator::Configuration::Mode::PairwiseRecursiveGrouping), "pairwise_recursive");
+    EXPECT_EQ(PathSimulator::Configuration::modeToString(PathSimulator::Configuration::Mode::BracketGrouping), "bracket");
+    EXPECT_EQ(PathSimulator::Configuration::modeToString(PathSimulator::Configuration::Mode::Alternating), "alternating");
+    EXPECT_EQ(PathSimulator::Configuration::modeToString(PathSimulator::Configuration::Mode::Cotengra), "cotengra");
+
+    EXPECT_EQ(PathSimulator::Configuration::modeFromString("sequential"), PathSimulator::Configuration::Mode::Sequential);
+    EXPECT_EQ(PathSimulator::Configuration::modeFromString("pairwise_recursive"), PathSimulator::Configuration::Mode::PairwiseRecursiveGrouping);
+    EXPECT_EQ(PathSimulator::Configuration::modeFromString("bracket"), PathSimulator::Configuration::Mode::BracketGrouping);
+    EXPECT_EQ(PathSimulator::Configuration::modeFromString("alternating"), PathSimulator::Configuration::Mode::Alternating);
+    EXPECT_EQ(PathSimulator::Configuration::modeFromString("cotengra"), PathSimulator::Configuration::Mode::Cotengra);
+
+    auto config = PathSimulator::Configuration{};
+    config.seed = 12345U;
+
+    config.mode        = PathSimulator::Configuration::Mode::BracketGrouping;
+    config.bracketSize = 3;
+    std::cout << config.toString() << std::endl;
+
+    config.mode             = PathSimulator::Configuration::Mode::Alternating;
+    config.alternatingStart = 13;
+    std::cout << config.toString() << std::endl;
+}
+
 TEST(TaskBasedSimTest, SimpleCircuit) {
     auto qc = std::make_unique<qc::QuantumComputation>(2);
     qc->h(1U);
