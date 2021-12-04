@@ -16,7 +16,6 @@ from qiskit.result import Result
 from qiskit.compiler import assemble
 
 from .jkqjob import JKQJob
-from .jkqerror import JKQSimulatorError
 from jkq import ddsim
 
 logger = logging.getLogger(__name__)
