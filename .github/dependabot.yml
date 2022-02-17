@@ -1,0 +1,24 @@
+
+version: 2
+updates:
+  # Enable version updates for git submodules
+  - package-ecosystem: "gitsubmodule"
+    # Look for `.gitmodules` in the `root` directory
+    directory:         "/"
+    # Check the submodules for updates every week
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "burgholzer"
+      - "hillmich"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    # Look for `*.yml` files in the `.github/workflows` directory
+    directory:         "/"
+    # Check for updates to GitHub Actions every week
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "burgholzer"
+      - "hillmich"
