@@ -27,6 +27,22 @@ TEST(ShorSimTest, Factorize15EmulationTest) {
     ASSERT_EQ(ddsim.AdditionalStatistics().at("polr_result"), "SUCCESS(3*5)");
 }
 
+TEST(ShorSimTest, Factorize15EmulationNoSeedTest) {
+    // add verbose = true for coverage
+    ShorSimulator ddsim(15, 2, true, true, false);
+
+    ASSERT_EQ(ddsim.getNumberOfOps(), 0);
+    ASSERT_EQ(ddsim.getName(), "shor_15_2");
+    ASSERT_EQ(ddsim.getFactors().first, 0);
+    ASSERT_EQ(ddsim.getFactors().second, 0);
+    ASSERT_EQ(ddsim.AdditionalStatistics().at("sim_result"), "did not start");
+    ddsim.Simulate(1);
+
+    ASSERT_EQ(ddsim.AdditionalStatistics().at("polr_factor1"), "3");
+    ASSERT_EQ(ddsim.AdditionalStatistics().at("polr_factor2"), "5");
+    ASSERT_EQ(ddsim.AdditionalStatistics().at("polr_result"), "SUCCESS(3*5)");
+}
+
 TEST(ShorSimTest, Factorize15NegTest) {
     ShorSimulator ddsim(15, 2, 1ull);
     ddsim.Simulate(1);

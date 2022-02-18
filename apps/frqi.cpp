@@ -2,8 +2,8 @@
  * Based on code by Christoph Brandner, MedUni Wien
  */
 #include "CircuitSimulator.hpp"
+#include "cxxopts.hpp"
 
-#include <boost/program_options.hpp>
 #include <chrono>
 #include <cmath>
 #include <iostream>
@@ -14,35 +14,26 @@
 using namespace dd::literals;
 
 int main(int argc, char** argv) {
-    namespace po = boost::program_options;
-
-    unsigned int numOfShots = 1000000;
-    std::string  filename;
-
-    po::options_description description("FRQI with JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
+    cxxopts::Options options("FRQI", "with JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
     // clang-format off
-    description.add_options()
-            ("help,h", "produce help message")
-            ("shots", po::value<>(&numOfShots)->default_value(1000000), "number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)")
+    options.add_options()
+            ("h,help", "produce help message")
+            ("shots", "number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)", cxxopts::value<unsigned int>()->default_value("1000000"))
             ("verbose", "Causes some simulators to print additional information to STDERR")
-            ("file", po::value<>(&filename)->required(), "simulate a quantum circuit given by file (detection by the file extension)")
+            ("file", "simulate a quantum circuit given by file (detection by the file extension)", cxxopts::value<std::string>())
             ;
     // clang-format on
-    po::variables_map vm;
-    try {
-        po::store(po::parse_command_line(argc, argv, description), vm);
-
-        if (vm.count("help")) {
-            std::cout << description;
-            return 0;
-        }
-        po::notify(vm);
-    } catch (const po::error& e) {
-        std::cerr << "[ERROR] " << e.what() << "! Try option '--help' for available commandline options.\n";
-        std::exit(1);
+    auto vm = options.parse(argc, argv);
+    if (vm.count("help")) {
+        std::cout << options.help();
+        std::exit(0);
     }
 
-    cv::Mat        image, dest;
+    unsigned int numOfShots = vm["shots"].as<unsigned int>();
+    std::string  filename   = vm["file"].as<std::string>()
+
+                                   cv::Mat image,
+                dest;
     cv::Mat        genimg;
     cv::Size       size(32, 32);
     dd::QubitCount nqubits = 11;

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14...3.21)
 
 project(ddsim
         LANGUAGES CXX
-        VERSION 1.9.1
+        VERSION 1.10.0
         DESCRIPTION "DDSIM - A JKQ quantum simulator based on decision diagrams"
         )
 
@@ -32,6 +32,7 @@ macro(check_submodule_present MODULENAME)
 endmacro()
 
 check_submodule_present(qfr)
+check_submodule_present(cxxopts)
 
 add_subdirectory(src)
 

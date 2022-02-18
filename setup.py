@@ -66,7 +66,7 @@ with open(README_PATH, encoding="utf8") as readme_file:
 
 setup(
     name='jkq.ddsim',
-    version='1.9.1',
+    version='1.10.0',
     author='Stefan Hillmich',
     author_email='stefan.hillmich@jku.at',
     description='JKQ DDSIM - A quantum simulator based on decision diagrams written in C++',
@@ -95,7 +95,5 @@ setup(
         'Source': 'https://github.com/iic-jku/ddsim/',
         'Tracker': 'https://github.com/iic-jku/ddsim/issues',
         'Research': 'https://iic.jku.at/eda/research/quantum_simulation/',
-    },
-    python_requires='>=3.6',
-    setup_requires=['cmake>=3.14']
+    }
 )

@@ -7,10 +7,10 @@
 #include "algorithms/Entanglement.hpp"
 #include "algorithms/Grover.hpp"
 #include "algorithms/QFT.hpp"
+#include "cxxopts.hpp"
 #include "dd/Export.hpp"
 #include "nlohmann/json.hpp"
 
-#include <boost/program_options.hpp>
 #include <chrono>
 #include <fstream>
 #include <iostream>
@@ -20,61 +20,59 @@
 namespace nl = nlohmann;
 
 int main(int argc, char** argv) {
-    namespace po = boost::program_options;
-    // variables initialized by boost program_options default values
-    unsigned long long seed;
-    unsigned int       shots;
-
-    unsigned int                         approx_steps;
-    double                               step_fidelity;
-    ApproximationInfo::ApproximationWhen approx_when;
-
-    HybridSchrodingerFeynmanSimulator::Mode mode = HybridSchrodingerFeynmanSimulator::Mode::Amplitude;
-    unsigned int                            nthreads;
-
-    po::options_description description("JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
+    cxxopts::Options options("JKQ DDSIM", "for more information see https://iic.jku.at/eda/");
     // clang-format off
-    description.add_options()
-        ("help,h", "produce help message")
-        ("seed", po::value<>(&seed)->default_value(0), "seed for random number generator (default zero is possibly directly used as seed!)")
-        ("shots", po::value<>(&shots)->default_value(0), "number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)")
+    options.add_options()
+        ("h,help", "produce help message")
+        ("seed", "seed for random number generator (default zero is possibly directly used as seed!)", cxxopts::value<unsigned long long>()->default_value("0"))
+        ("shots", "number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)", cxxopts::value<unsigned int>()->default_value("0"))
         ("pv", "display the state vector")
         ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
         ("pm", "print measurement results")
         ("pcomplex", "print additional statistics on complex numbers")
-        ("dump_complex", po::value<std::string>(), "dump edge weights in final state DD to file")
+        ("dump_complex", "dump edge weights in final state DD to file", cxxopts::value<std::string>())
         ("verbose", "Causes some simulators to print additional information to STDERR")
-        ("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")
-        ("simulate_file_hybrid", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension) using the hybrid Schrodinger-Feynman simulator")
-        ("hybrid_mode", po::value<std::string>(), "mode used for hybrid Schrodinger-Feynman simulation (*amplitude*, dd)")
-        ("nthreads", po::value<>(&nthreads)->default_value(2), "#threads used for hybrid simulation")
-        ("simulate_qft", po::value<unsigned int>(), "simulate Quantum Fourier Transform for given number of qubits")
-        ("simulate_ghz", po::value<unsigned int>(), "simulate state preparation of GHZ state for given number of qubits")
-        ("step_fidelity", po::value<>(&step_fidelity)->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")
-        ("steps", po::value<>(&approx_steps)->default_value(1), "number of approximation steps")
-        ("approx_when", po::value<>(&approx_when)->default_value(ApproximationInfo::FidelityDriven), "approximation method ('fidelity' (default) or 'memory'")
+        ("simulate_file", "simulate a quantum circuit given by file (detection by the file extension)", cxxopts::value<std::string>())
+        ("simulate_file_hybrid", "simulate a quantum circuit given by file (detection by the file extension) using the hybrid Schrodinger-Feynman simulator", cxxopts::value<std::string>())
+        ("hybrid_mode", "mode used for hybrid Schrodinger-Feynman simulation (*amplitude*, dd)", cxxopts::value<std::string>())
+        ("nthreads", "#threads used for hybrid simulation", cxxopts::value<unsigned int>()->default_value("2"))
+        ("simulate_qft", "simulate Quantum Fourier Transform for given number of qubits", cxxopts::value<unsigned int>())
+        ("simulate_ghz", "simulate state preparation of GHZ state for given number of qubits", cxxopts::value<unsigned int>())
+        ("step_fidelity", "target fidelity for each approximation run (>=1 = disable approximation)", cxxopts::value<double>()->default_value("1.0"))
+        ("steps", "number of approximation steps", cxxopts::value<unsigned int>()->default_value("1"))
+        ("approx_when", "approximation method ('fidelity' (default) or 'memory'", cxxopts::value<std::string>()->default_value("fidelity"))
         ("approx_state", "do excessive approximation runs at the end of the simulation to see how the quantum state behaves")
-        ("simulate_grover", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle")
-        ("simulate_grover_emulated", po::value<unsigned int>(), "simulate Grover's search for given number of qubits with random oracle and emulation")
-        ("simulate_grover_oracle_emulated", po::value<std::string>(), "simulate Grover's search for given number of qubits with given oracle and emulation")
-        ("simulate_shor", po::value<unsigned int>(), "simulate Shor's algorithm factoring this number")
-        ("simulate_shor_coprime", po::value<unsigned int>()->default_value(0), "coprime number to use with Shor's algorithm (zero randomly generates a coprime)")
+        ("simulate_grover", "simulate Grover's search for given number of qubits with random oracle", cxxopts::value<unsigned int>())
+        ("simulate_grover_emulated", "simulate Grover's search for given number of qubits with random oracle and emulation", cxxopts::value<unsigned int>())
+        ("simulate_grover_oracle_emulated", "simulate Grover's search for given number of qubits with given oracle and emulation", cxxopts::value<std::string>())
+        ("simulate_shor", "simulate Shor's algorithm factoring this number", cxxopts::value<unsigned int>())
+        ("simulate_shor_coprime", "coprime number to use with Shor's algorithm (zero randomly generates a coprime)", cxxopts::value<unsigned int>()->default_value("0"))
         ("simulate_shor_no_emulation", "Force Shor simulator to do modular exponentiation instead of using emulation (you'll usually want emulation)")
-        ("simulate_fast_shor", po::value<unsigned int>(), "simulate Shor's algorithm factoring this number with intermediate measurements")
-        ("simulate_fast_shor_coprime", po::value<unsigned int>()->default_value(0),"coprime number to use with Shor's algorithm (zero randomly generates a coprime)");
+        ("simulate_fast_shor", "simulate Shor's algorithm factoring this number with intermediate measurements", cxxopts::value<unsigned int>())
+        ("simulate_fast_shor_coprime","coprime number to use with Shor's algorithm (zero randomly generates a coprime)", cxxopts::value<unsigned int>()->default_value("0"));
     // clang-format on
-    po::variables_map vm;
-    try {
-        po::store(po::parse_command_line(argc, argv, description), vm);
 
-        if (vm.count("help")) {
-            std::cout << description;
-            return 0;
-        }
-        po::notify(vm);
-    } catch (const po::error& e) {
-        std::cerr << "[ERROR] " << e.what() << "! Try option '--help' for available commandline options.\n";
-        std::exit(1);
+    auto vm = options.parse(argc, argv);
+    if (vm.count("help")) {
+        std::cout << options.help();
+        std::exit(0);
+    }
+
+    const auto seed          = vm["seed"].as<unsigned long long>();
+    const auto shots         = vm["shots"].as<unsigned int>();
+    const auto nthreads      = vm["nthreads"].as<unsigned int>();
+    const auto approx_steps  = vm["steps"].as<unsigned int>();
+    const auto step_fidelity = vm["step_fidelity"].as<double>();
+
+    HybridSchrodingerFeynmanSimulator::Mode mode = HybridSchrodingerFeynmanSimulator::Mode::Amplitude;
+
+    ApproximationInfo::ApproximationWhen approx_when;
+    if (vm["approx_when"].as<std::string>() == "fidelity") {
+        approx_when = ApproximationInfo::FidelityDriven;
+    } else if (vm["approx_when"].as<std::string>() == "memory") {
+        approx_when = ApproximationInfo::MemoryDriven;
+    } else {
+        throw std::runtime_error("Unknown approximation method '" + vm["approx_when"].as<std::string>() + "'.");
     }
 
     std::unique_ptr<qc::QuantumComputation> quantumComputation;
@@ -138,7 +136,7 @@ int main(int argc, char** argv) {
         ddsim                       = std::make_unique<CircuitSimulator>(std::move(quantumComputation), approx_info, seed);
     } else {
         std::cerr << "Did not find anything to simulate. See help below.\n"
-                  << description << "\n";
+                  << options.help() << "\n";
         std::exit(1);
     }
 

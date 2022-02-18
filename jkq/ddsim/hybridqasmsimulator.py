@@ -127,7 +127,7 @@ class HybridQasmSimulator(BackendV1):
 
         sim = ddsim.HybridCircuitSimulator(qobj_experiment, seed, hybrid_mode, nthreads)
 
-        shots = options['shots']
+        shots = options.get('shots', 1024)
         if self.SHOW_STATE_VECTOR and shots > 0:
             logger.info('Statevector can only be shown if shots == 0 when using the amplitude hybrid simulation mode. Setting shots=0.')
             shots = 0

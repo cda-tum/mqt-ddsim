@@ -105,7 +105,7 @@ class QasmSimulator(BackendV1):
     def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options):
         start_time = time.time()
         sim = ddsim.CircuitSimulator(qobj_experiment, options.get('seed', -1))
-        counts = sim.simulate(options['shots'])
+        counts = sim.simulate(options.get('shots', 1024))
         end_time = time.time()
         counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
 
@@ -114,7 +114,7 @@ class QasmSimulator(BackendV1):
                   'status': 'DONE',
                   'time_taken': end_time - start_time,
                   'seed': options.get('seed', -1),
-                  'shots': options['shots'],
+                  'shots': options.get('shots', 1024),
                   'data': {'counts': counts_hex},
                   'success': True,
                   }
