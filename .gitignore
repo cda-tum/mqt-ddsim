@@ -2,6 +2,9 @@
 /cmake-build-*
 .idea
 venv/
+.venv/
 *.egg-info/
 __pycache__/
 *.so
+.pytest_cache/
+.ipynb_checkpoints/
