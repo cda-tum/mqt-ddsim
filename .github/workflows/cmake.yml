@@ -96,7 +96,7 @@ jobs:
         working-directory: ${{github.workspace}}/build/test
         run: ctest -C Debug --output-on-failure
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2.1.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
