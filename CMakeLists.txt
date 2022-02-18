@@ -32,6 +32,7 @@ macro(check_submodule_present MODULENAME)
 endmacro()
 
 check_submodule_present(qfr)
+check_submodule_present(cxxopts)
 
 add_subdirectory(src)
 
