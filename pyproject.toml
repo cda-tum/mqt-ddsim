@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools", "wheel", "cmake"]
+build-backend = "setuptools.build_meta"
+
+[tool.cibuildwheel]
+build = "cp3*"
+skip = "*-win32 *-musllinux_i686 *-manylinux_i686"
+test-skip = "*_arm64 *-musllinux_x86_64 cp310-* *_universal2:arm64"
+test-command = "python -c \"from jkq import ddsim\""
+test-requires = ["qiskit-terra"]
+environment = { DEPLOY = "ON" }
+build-verbosity = 3
+
+[tool.cibuildwheel.linux]
+
+[tool.cibuildwheel.macos]
+archs = "x86_64"
+environment = { MACOSX_DEPLOYMENT_TARGET = "10.15", DEPLOY = "ON" }
+before-build = "brew install libomp"
+
+[tool.cibuildwheel.windows]
