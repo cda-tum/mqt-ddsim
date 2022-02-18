@@ -20,3 +20,10 @@ updates:
       interval: "weekly"
     assignees:
       - "hillmich"
+
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "hillmich"

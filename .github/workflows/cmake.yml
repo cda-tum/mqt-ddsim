@@ -72,7 +72,7 @@ jobs:
           submodules: recursive
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Configure CMake
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_DDSIM_TESTS=ON -T "ClangCl" -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_MULTITHREADED=ON -DBoost_USE_STATIC_RUNTIME=OFF -DBOOST_ROOT="${{github.workspace}}\boost_1_70_0" -DBOOST_INCLUDEDIR="${{github.workspace}}\boost_1_70_0\include" -DBOOST_LIBRARYDIR="${{github.workspace}}\boost_1_70_0\lib"
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_DDSIM_TESTS=ON -T "ClangCl"
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --parallel 8
       - name: Test
