@@ -1,7 +1,7 @@
 #include "DeterministicNoiseSimulator.hpp"
 #include "StochasticNoiseSimulator.hpp"
-#include "nlohmann/json.hpp"
 #include "cxxopts.hpp"
+#include "nlohmann/json.hpp"
 
 #include <chrono>
 #include <iomanip>
