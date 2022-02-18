@@ -91,12 +91,14 @@ jobs:
       - name: Configure CMake
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DBUILD_DDSIM_TESTS=ON -DBINDINGS=ON
       - name: Build
-        run: cmake --build "${{github.workspace}}/build" --config Debug
+        run: cmake --build "${{github.workspace}}/build" --config Debug --target ddsim_test
       - name: Test
         working-directory: ${{github.workspace}}/build/test
         run: ctest -C Debug --output-on-failure
+      - name: Run gcov
+        run:  find . -type f -name '*.gcno' -exec gcov -p  {} +
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2.1.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
