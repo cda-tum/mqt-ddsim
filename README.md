@@ -118,8 +118,7 @@ A slightly more elaborate example can be found in the notebook [ddsim.ipynb](dds
 Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). However, the implementation should be compatible
 with any current C++ compiler supporting C++17 and a minimum CMake version of 3.14.
 
-`OpenMP >= 4.0` is required for building the `ddsim` library. Additionally, `boost/program_options >= 1.50` is required for building the commandline interface for `ddsim_simple` and `ddsim_noise_aware`. The `ddsim_noise_aware` simulator
-further requires `Threads::Threads`.
+`OpenMP >= 4.0` is required for building the `ddsim` library. The `ddsim_noise_aware` simulator further requires `Threads::Threads`.
 
 ## Clone, Build, and Run
 
@@ -161,7 +160,7 @@ auto samples = sim.MeasureAllNonCollapsing(1000);
 
 ### Executable Simulator
 
-To build the executable simulator, build the `ddsim_simple` CMake target (which requires `boost/program_options`) and run the resulting executable with options according to your needs.
+To build the executable simulator, build the `ddsim_simple` CMake target and run the resulting executable with options according to your needs.
 
 The standalone executable is launched in the following way, showing available options:
 ```console
@@ -247,13 +246,11 @@ JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
 
 From here on you can start simulating quantum circuits or run the integrated algorithms.
 
-Note that you have to have the Boost program_options library installed.
-
 ### Executable Noise-aware Simulator
 
 The tool also supports noise-aware quantum circuit simulation, based on a stochastic approach. It currently supports global decoherence and gate error noise effects. A detailed summary of the simulator is presented in [[2]](https://arxiv.org/abs/2012.05620). Note that the simulator currently does not support simulating the integrated algorithms.
 
-Building the simulator requires `boost/program_options` and `Threads::Threads`. It can be built by executing
+Building the simulator requires `Threads::Threads`. It can be built by executing
 
 ```console
 $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
@@ -320,14 +317,6 @@ $ ./build/test/ddsim_test
 
 ## Frequently Asked Questions
 
-**Why is target `ddsim_simple` unavailable when I try to build it?**
-
-To build the commandline interfaces such as `ddsim_simple` you require the Boost program_options library.
-If it is missing, you will see the following message in the CMake generation step
-
-> `-- Did not find Boost! Commandline interface will not be an available target!`
-
-Under Ubuntu you can simply install [`libboost-program-options-dev`](https://packages.ubuntu.com/search?keywords=libboost-program-options-dev&searchon=names&exact=1&suite=all&section=all).
 
 **Why does generation step of CMake fail?**
 

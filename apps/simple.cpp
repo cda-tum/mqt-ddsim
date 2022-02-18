@@ -20,8 +20,6 @@
 namespace nl = nlohmann;
 
 int main(int argc, char** argv) {
-    // variables initialized by boost program_options default values
-
     cxxopts::Options options("JKQ DDSIM", "for more information see https://iic.jku.at/eda/");
     // clang-format off
     options.add_options()
