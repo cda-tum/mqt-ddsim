@@ -56,7 +56,7 @@ if (NOT TARGET benchmark::benchmark)
 endif ()
 
 add_executable(ddsim_benchmark EXCLUDE_FROM_ALL ${CMAKE_CURRENT_SOURCE_DIR}/benchmark.cpp)
-target_link_libraries(ddsim_benchmark PRIVATE ${PROJECT_NAME} benchmark::benchmark_main Threads::Threads)
+target_link_libraries(ddsim_benchmark PRIVATE ${PROJECT_NAME} benchmark::benchmark_main)
 set_target_properties(ddsim_benchmark PROPERTIES EXPORT_NAME ddsim_benchmark)
 set_target_properties(ddsim_benchmark PROPERTIES FOLDER tests CMAKE_CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
 
