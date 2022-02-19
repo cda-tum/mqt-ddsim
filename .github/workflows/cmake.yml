@@ -74,7 +74,7 @@ jobs:
       - name: Configure CMake
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_DDSIM_TESTS=ON -T "ClangCl"
       - name: Build
-        run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --parallel 8
+        run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
       - name: Test
         working-directory: ${{github.workspace}}/build/test
         run: cd $BUILD_TYPE && ./ddsim_test
