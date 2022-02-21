@@ -75,8 +75,8 @@ In order to make the library as easy to use as possible (without compilation), w
 ```
 
 However, in order to get the best performance out of DDSIM, it is recommended to build it locally from the source distribution via
-```bash
-pip install --no-binary jkq.ddsim
+```console
+(venv) $ pip install --no-binary jkq.ddsim jkq.ddsim
 ```
 
 The following code gives an example on the usage:
