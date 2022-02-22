@@ -51,7 +51,6 @@ class CMakeBuild(build_ext):
                 cpus = 2
             build_args += ['--', f'-j{cpus}']
 
-
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
                                                               self.distribution.get_version())

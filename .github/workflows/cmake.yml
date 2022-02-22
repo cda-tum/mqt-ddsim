@@ -35,8 +35,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - name: Install boost program-options
-        run: sudo apt install libboost-program-options-dev
       - name: Configure CMake
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBINDINGS=ON -DBUILD_DDSIM_TESTS=ON
       - name: Build
@@ -53,8 +51,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - name: Install boost dependency
-        run: brew install boost
       - name: Install OpenMP dependency
         run: brew install libomp
       - name: Configure CMake
@@ -74,29 +70,11 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - name: Cache Boost
-        id: cache-boost
-        uses: actions/cache@v2
-        with:
-          path: ${{github.workspace}}/boost_1_70_0
-          key: ${{ runner.OS }}-boost
-      - name: Download boost
-        if: steps.cache-boost.outputs.cache-hit != 'true'
-        shell: cmd
-        run: |
-          C:\msys64\usr\bin\wget.exe https://boostorg.jfrog.io/artifactory/main/release/1.70.0/source/boost_1_70_0.7z --no-check-certificate
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: Building boost
-        if: steps.cache-boost.outputs.cache-hit != 'true'
-        run: |
-          "/c/Program Files/7-Zip/7z.exe" x boost_1_70_0.7z "-o${{github.workspace}}"
-          cd boost_1_70_0
-          ./bootstrap.bat
-          ./b2.exe -j8 address-model=64 link=static threading=multi runtime-link=shared variant=release --build-type=minimal --with-program_options
       - name: Configure CMake
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_DDSIM_TESTS=ON -T "ClangCl" -DBoost_USE_STATIC_LIBS=ON -DBoost_USE_MULTITHREADED=ON -DBoost_USE_STATIC_RUNTIME=OFF -DBOOST_ROOT="${{github.workspace}}\boost_1_70_0" -DBOOST_INCLUDEDIR="${{github.workspace}}\boost_1_70_0\include" -DBOOST_LIBRARYDIR="${{github.workspace}}\boost_1_70_0\lib"
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBUILD_DDSIM_TESTS=ON -T "ClangCl"
       - name: Build
-        run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE --parallel 8
+        run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
       - name: Test
         working-directory: ${{github.workspace}}/build/test
         run: cd $BUILD_TYPE && ./ddsim_test
@@ -113,12 +91,14 @@ jobs:
       - name: Configure CMake
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DBUILD_DDSIM_TESTS=ON -DBINDINGS=ON
       - name: Build
-        run: cmake --build "${{github.workspace}}/build" --config Debug
+        run: cmake --build "${{github.workspace}}/build" --config Debug --target ddsim_test
       - name: Test
         working-directory: ${{github.workspace}}/build/test
         run: ctest -C Debug --output-on-failure
+      - name: Run gcov
+        run:  find . -type f -name '*.gcno' -exec gcov -p  {} +
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2.1.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true

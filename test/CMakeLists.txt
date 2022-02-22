@@ -17,7 +17,7 @@ macro(package_add_test TESTNAME)
     # link the Google test infrastructure and a default main fuction to the test executable.
     target_link_libraries(${TESTNAME} PRIVATE ${PROJECT_NAME} gmock gtest_main)
     # discover tests
-    gtest_discover_tests(${TESTNAME} WORKING_DIRECTORY ${PROJECT_DIR} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}")
+    gtest_discover_tests(${TESTNAME} WORKING_DIRECTORY ${PROJECT_DIR} DISCOVERY_TIMEOUT 60 PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_DIR}")
     set_target_properties(${TESTNAME} PROPERTIES FOLDER tests)
 endmacro()
 
@@ -41,10 +41,25 @@ add_custom_command(TARGET ${PROJECT_NAME}_test
         COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE_DIR:${PROJECT_NAME}_test>/circuits ${CMAKE_BINARY_DIR}/circuits
         COMMENT "Copying circuits and creating symlinks for ${PROJECT_NAME}_test"
         VERBATIM)
+        
+        
 
-add_executable(ddsim_benchmark ${CMAKE_CURRENT_SOURCE_DIR}/benchmark.cpp)
+if (NOT TARGET benchmark::benchmark)
+	set(THREADS_PREFER_PTHREAD_FLAG ON)
+	find_package(Threads REQUIRED)
+	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Skip google benchmark self tests")
+	add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr/extern/dd_package/extern/benchmark" "extern/qfr/extern/dd_package/extern/benchmark" EXCLUDE_FROM_ALL)
+	set_target_properties(benchmark benchmark_main PROPERTIES FOLDER extern/qfr/extern/dd_package/extern)
+	if (BINDINGS)
+		# adjust visibility settings for building Python bindings
+		target_compile_options(benchmark PUBLIC -fvisibility=hidden)
+	endif ()
+endif ()
+
+add_executable(ddsim_benchmark EXCLUDE_FROM_ALL ${CMAKE_CURRENT_SOURCE_DIR}/benchmark.cpp)
 target_link_libraries(ddsim_benchmark PRIVATE ${PROJECT_NAME} benchmark::benchmark_main)
 set_target_properties(ddsim_benchmark PROPERTIES EXPORT_NAME ddsim_benchmark)
+set_target_properties(ddsim_benchmark PROPERTIES FOLDER tests CMAKE_CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
 
 add_custom_command(TARGET ${PROJECT_NAME}_benchmark
         POST_BUILD
