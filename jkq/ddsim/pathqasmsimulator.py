@@ -233,7 +233,7 @@ class PathQasmSimulator(BackendV1):
                                        dump_path=dump_path, plot_ring=plot_ring)
             sim.set_simulation_path(path, False)
 
-        shots = options['shots']
+        shots = options.get('shots', 1024)
         setup_time = time.time()
         counts = sim.simulate(shots)
         end_time = time.time()
