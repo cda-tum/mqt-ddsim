@@ -108,7 +108,7 @@ def get_simulation_path(qc, max_time: int = 60, max_repeats: int = 1024, paralle
 
 
 class PathQasmSimulator(BackendV1):
-    """Python interface to JKQ DDSIM Task-Based Simulator"""
+    """Python interface to JKQ DDSIM Simulation Path Framework"""
 
     SHOW_STATE_VECTOR = False
 
@@ -136,7 +136,7 @@ class PathQasmSimulator(BackendV1):
             'url': 'https://github.com/iic-jku/ddsim',
             'simulator': True,
             'local': True,
-            'description': 'JKQ DDSIM C++ path simulator',
+            'description': 'JKQ DDSIM C++ simulation path framework',
             'basis_gates': ['id', 'u0', 'u1', 'u2', 'u3', 'cu3',
                             'x', 'cx', 'ccx', 'mcx_gray', 'mcx_recursive', 'mcx_vchain', 'mcx',
                             'y', 'cy',

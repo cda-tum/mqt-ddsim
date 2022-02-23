@@ -104,12 +104,14 @@ counts = result.get_counts(circ)
 print(counts)
 ```
 
-The provider currently has five backends:
+The provider currently has seven backends:
 
 * `qasm_simulator` which simulates the circuit and returns the requested number of shots
 * `statevector_simulator` which also simulates the circuit and returns the statevector along the requested number of shots
 * `hybrid_qasm_simulator` which simulates the circuit in parallel using a hybrid Schrodinger-Feynman technique and returns the requested number of shots
 * `hybrid_statevector_simulator` which also simulates the circuit in parallel using a hybrid Schrodinger-Feynman technique and returns the statevector
+* `path_sim_qasm_simulator` which allows to exploit arbitrary simulation paths for the simulation of the circuit and returns the requested number of shots
+* `path_sim_statevector_simulator` which also allows to exploit arbitrary simulation paths and returns the statevector along the requested number of shots
 * `unitary_simulator` which constructs the unitary functionality of a circuit and returns the corresponding unitary matrix
 
 A slightly more elaborate example can be found in the notebook [ddsim.ipynb](ddsim.ipynb).
@@ -312,18 +314,20 @@ $ ./build/ddsim_noise_aware --ps --noise_effects APD --stoch_runs 10000 --noise_
 
 ### Simulation Path Framework
 
-The tool also supports a simulation path framework that allows the usage of different strategies for quantum circuit
-simulation, the related publication can be found
-at [[6]](https://iic.jku.at/files/eda/2022_date_exploiting_arbitrary_paths_simulation_quantum_circuits_decision_diagrams.pdf)
-. It allows speedups of up to several orders of magnitude when simulating quantum circuits and is inspired by work
-previously done at [[7]](https://github.com/taskflow/taskflow). The framework supports strategies implemented
-directly `sequential, pairwise_recursive, bracket, alternating` and strategies from the tensor network domain `cotengra`
-. If no additional strategie is declared `sequential` is used.
+The tool also provides a framework for exploiting arbitrary simulation paths (using the [taskflow](https://github.com/taskflow/taskflow) library) based on the methods proposed in [[6]](https://iic.jku.at/files/eda/2022_date_exploiting_arbitrary_paths_simulation_quantum_circuits_decision_diagrams.pdf). 
+
+The framework comes with several pre-defined simulation path strategies:
+ 
+ - `sequential` (*default*)
+ - `pairwise_recursive`
+ - `bracket`
+ - `alternating` 
+ 
+ as well as the option to translate strategies from the domain of tensor networks to decision diagrams (using the [CoTenGra](https://github.com/jcmgray/cotengra) library).
 
 **Basic Example**
 
-This example shall serve as a showcase on how to work with the simulation path framework and what exactly it does. At
-first one has to have a quantum circuit.
+This example shall serve as a showcase on how to use the simulation path framework. At first one has to have a quantum circuit.
 
 ```
 auto qc = std::make_unique<qc::QuantumComputation>(2);
@@ -572,24 +576,9 @@ If you use our tool for your research, we will be thankful if you refer to it by
                Alexander Ploier and
                Robert Wille},
       title={Exploiting Arbitrary Paths for the Simulation of Quantum Circuits with Decision Diagrams},
-      year={2021},
-      eprint={2105.07045},
-      archivePrefix={arXiv},
-      primaryClass={quant-ph}
+      booktitle = {Design, Automation and Test in Europe},
+      year      = {2022}
 }
 ```
 
-</details>
-
-<details>
-<summary>
-  [7] https://github.com/taskflow/taskflow
-</summary>
-
-</details>
-
-<details>
-<summary>
-  [8] https://github.com/jcmgray/cotengra
-</summary>
 </details>
