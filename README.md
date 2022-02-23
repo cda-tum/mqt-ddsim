@@ -27,6 +27,7 @@ If you have any questions, feel free to contact us via [iic-quantum@jku.at](mail
     * [Library](#library)
     * [Executable Simulator](#executable-simulator)
     * [Executable Noise-aware Simulator](#executable-noise-aware-simulator)
+    * [Simulation Path Framework](#simulation-path-framework)
 - [Running Tests](#running-tests)
 - [Frequently Asked Questions](#frequently-asked-questions) 
 - [References](#references)
@@ -248,7 +249,10 @@ From here on you can start simulating quantum circuits or run the integrated alg
 
 ### Executable Noise-aware Simulator
 
-The tool also supports noise-aware quantum circuit simulation, based on a stochastic approach. It currently supports global decoherence and gate error noise effects. A detailed summary of the simulator is presented in [[2]](https://arxiv.org/abs/2012.05620). Note that the simulator currently does not support simulating the integrated algorithms.
+The tool also supports noise-aware quantum circuit simulation, based on a stochastic approach. It currently supports
+global decoherence and gate error noise effects. A detailed summary of the simulator is presented
+in [[3]](https://arxiv.org/abs/2012.05620). Note that the simulator currently does not support simulating the integrated
+algorithms.
 
 Building the simulator requires `Threads::Threads`. It can be built by executing
 
@@ -306,8 +310,119 @@ $ ./build/ddsim_noise_aware --ps --noise_effects APD --stoch_runs 10000 --noise_
 }
 ```
 
+### Simulation Path Framework
+
+The tool also supports a simulation path framework that allows the usage of different strategies for quantum circuit
+simulation, the related publication can be found
+at [[6]](https://iic.jku.at/files/eda/2022_date_exploiting_arbitrary_paths_simulation_quantum_circuits_decision_diagrams.pdf)
+. It allows speedups of up to several orders of magnitude when simulating quantum circuits and is inspired by work
+previously done at [[7]](https://github.com/taskflow/taskflow). The framework supports strategies implemented
+directly `sequential, pairwise_recursive, bracket, alternating` and strategies from the tensor network domain `cotengra`
+. If no additional strategie is declared `sequential` is used.
+
+**Basic Example**
+
+This example shall serve as a showcase on how to work with the simulation path framework and what exactly it does. At
+first one has to have a quantum circuit.
+
+```
+auto qc = std::make_unique<qc::QuantumComputation>(2);
+qc->h(1U);
+qc->x(0U, 1_pc);
+qc->x(0U, 1_pc);
+qc->x(0U, 1_pc);
+```
+
+This is a two qubit quantum circuit with a hadamard gate on the first qubit and then three CNOT gates coming afterwards.
+In this setup the hadamard gate would correspond to the number `1`, the CNOTs to `2,3,4` and the initial state to the
+number `0` respectivly. Applying the sequential strategie to this quantum circuit would first combine the numbers `0`
+and `1` and save the result as number `5` on the first position in the circuit, deleting `0` and `1` in the process. The
+next step is to combine `5` and `2`. Again saving the result in `6` and putting it in front. This goes on until only one
+single number remains.
+
+```
+auto config        = PathSimulator::Configuration{};
+config.mode        = PathSimulator::Configuration::Mode::Sequential;
+```
+
+Is used to create the configuration object and set the mode of the simulation path strategie. The next step is to create
+a **PathSimulator** object and simulate it.
+
+```
+PathSimulator tbs(std::move(qc), config);
+auto counts = tbs.Simulate(1024);
+```
+
+**CoTenGra**
+
+For a deeper dive into what CoTenGra does, we refer to [[8]](https://github.com/jcmgray/cotengra). It is also possible
+to have the visualization and path available when working with the CoTenGra mode. This is achieved by setting the
+boolean parameters for `dump_path` and `plot_ring` to true
+
+```
+if pathsim_configuration.mode == ddsim.PathSimulatorMode.cotengra:
+            max_time = options.get('cotengra_max_time', 60)
+            max_repeats = options.get('cotengra_max_repeats', 1024)
+            dump_path = options.get('cotengra_dump_path', True)
+            plot_ring = options.get('cotengra_plot_ring', True)
+            path = get_simulation_path(qobj_experiment, max_time=max_time, max_repeats=max_repeats,
+                                       dump_path=dump_path, plot_ring=plot_ring)
+```
+
+**The configuration**
+
+To make use of the functionality, one can call it as an additional argument when simulating quantum circuits with
+decision diagrams. Either via a **configuration** object itself
+
+```
+ auto config        = PathSimulator::Configuration{};
+ config.mode        = PathSimulator::Configuration::Mode::BracketGrouping;
+ config.bracketSize = 3;
+ PathSimulator tbs(std::move(qc), config);
+```
+
+or as a set of individual parameters directly in the function call.
+
+```
+PathSimulator tbs(std::move(qc), PathSimulator::Configuration::Mode::Sequential, 2, 0, 12345U);
+```
+
+This can be done in c++, as seen above, or python. For the latter the call looks like this
+
+```
+sim = ddsim.PathCircuitSimulator(circ, seed=0, mode=ddsim.PathSimulatorMode.bracket, bracket_size=2)
+```
+
+**Adding new strategies**
+
+Shall be done in `PathSimulator.cpp`, `PathSimulator.hpp` and in `bindings.cpp` respectivly. The following is an example
+on how such an implementation can look like
+
+```
+void PathSimulator::generateSequentialSimulationPath() {
+    SimulationPath::Components components{};
+    components.reserve(qc->getNops());
+
+    for (std::size_t i = 0; i < qc->getNops(); ++i) {
+        if (i == 0)
+            components.emplace_back(0, 1);
+        else
+            components.emplace_back(qc->getNops() + i, i + 1);
+    }
+    setSimulationPath(components, true);
+}
+```
+
+The basic idea is to add numbers in the components list where the numbers represent either gates of the quantum circuit
+or the result of multipliying two gates together. Again we refer
+to [[6]](https://iic.jku.at/files/eda/2022_date_exploiting_arbitrary_paths_simulation_quantum_circuits_decision_diagrams.pdf)
+for a deeper look into the specifics.
+
 ## Running Tests
-The repository also includes some (rudimentary) unit tests (using GoogleTest), which aim to ensure the correct behavior of the tool. They can be built and executed in the following way:
+
+The repository also includes some (rudimentary) unit tests (using GoogleTest), which aim to ensure the correct behavior
+of the tool. They can be built and executed in the following way:
+
 ```console
 $ cmake -DBUILD_DDSIM_TESTS=ON -DCMAKE_BUILD_TYPE=Release -S . -B build
 $ cmake --build build/ --config Release
@@ -443,4 +558,38 @@ If you use our tool for your research, we will be thankful if you refer to it by
       primaryClass={quant-ph}
 }
 ```
+
+</details>
+
+<details>
+<summary>
+  [6] L. Burgholzer, A.Ploier, and R. Wille, "<a href="https://iic.jku.at/files/eda/2022_date_exploiting_arbitrary_paths_simulation_quantum_circuits_decision_diagrams.pdf">Exploiting Arbitrary Paths for the Simulation of Quantum Circuits with Decision Diagrams</a>," 2021
+</summary>
+
+```bibtex
+@misc{burgholzer2021hybrid,
+      author={Lukas Burgholzer and
+               Alexander Ploier and
+               Robert Wille},
+      title={Exploiting Arbitrary Paths for the Simulation of Quantum Circuits with Decision Diagrams},
+      year={2021},
+      eprint={2105.07045},
+      archivePrefix={arXiv},
+      primaryClass={quant-ph}
+}
+```
+
+</details>
+
+<details>
+<summary>
+  [7] https://github.com/taskflow/taskflow
+</summary>
+
+</details>
+
+<details>
+<summary>
+  [8] https://github.com/jcmgray/cotengra
+</summary>
 </details>
