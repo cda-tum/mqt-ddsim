@@ -33,7 +33,6 @@ public:
         using Components = std::vector<std::pair<std::size_t, std::size_t>>;
         using Steps      = std::vector<Step>;
 
-        SimulationPath() = default;
         SimulationPath(std::size_t nleaves, Components components, const qc::QuantumComputation* qc, bool assumeCorrectOrder = false);
 
         Components                    components{};

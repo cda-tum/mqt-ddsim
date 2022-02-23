@@ -315,6 +315,10 @@ $ ./build/ddsim_noise_aware --ps --noise_effects APD --stoch_runs 10000 --noise_
 ### Simulation Path Framework
 
 The tool also provides a framework for exploiting arbitrary simulation paths (using the [taskflow](https://github.com/taskflow/taskflow) library) based on the methods proposed in [[6]](https://iic.jku.at/files/eda/2022_date_exploiting_arbitrary_paths_simulation_quantum_circuits_decision_diagrams.pdf). 
+A *simulation path* describes the order in which the individual MxV or MxM multiplications are conducted during the simulation of a quantum circuit.
+It can be described as a list of tuples that identify the individual states/operations to be multiplied.
+The initial state is always assigned `ID 0`, while the i-th operation is assigned `ID i`.
+The result of a multiplication is assigned the next highest, unused ID, e.g., in a circuit with `n` gates the result of the first multiplication is assigned `ID n+1`.
 
 The framework comes with several pre-defined simulation path strategies:
  
@@ -340,7 +344,7 @@ circ.cx(0, 1)     # corresponds to ID 2
 circ.cx(0, 2)     # corresponds to ID 3
 ```
 
-Then, obtain the simulation path framework qiskit backend. You can choose between the `path_sim_qasm_simulator` and the `path_sim_statevector_simulator`. The first just yields a dictionary with the results of the performed shots, while the latter also provides the complete statevector (which, depending on the amount of qubits, might not fit in the available memory).
+Then, obtain the simulation path framework qiskit backend. You can choose between the `path_sim_qasm_simulator` and the `path_sim_statevector_simulator`. The first just yields a dictionary with the counts of the measurements, while the latter also provides the complete statevector (which, depending on the amount of qubits, might not fit in the available memory).
 
 ```python
 from jkq import ddsim
@@ -349,13 +353,14 @@ provider = ddsim.JKQProvider()
 backend = provider.get_backend('path_sim_qasm_simulator')
 ```
 
-Run the simulation by calling the `execute` function, which takes several optional configuration parameters (such as the simulation path strategy). For a complete list of configuration options see [here](#configuration).
-Per default, this uses the `sequential` strategy, i.e., 
+Per default, the backend uses the `sequential` strategy. For this particular example, this means: 
  - first, the Hadamard operation is applied to the initial state (`[0, 1] -> 4`)
- - then, the first CNOT is applied to the resulting state (`[4, 2] -> 5`)
- - finally, the last CNOT is applied to the resulting state (`[5, 3] -> 6`)
+ - then, the first CNOT is applied (`[4, 2] -> 5`)
+ - finally, the last CNOT is applied (`[5, 3] -> 6`)
 
  The corresponding simulation path is thus described by `[[0, 1], [4, 2], [5, 3]]` and the final state is the one with ID `6`.
+
+The simulation is started by calling the `execute` function, which takes several optional configuration parameters (such as the simulation path strategy). For a complete list of configuration options see [here](#configuration).
 
 ```python
 job = execute(circ, backend)
@@ -367,68 +372,29 @@ print(counts)
 
 #### CoTenGra
 
-For a deeper dive into what CoTenGra does, we refer to [[8]](https://github.com/jcmgray/cotengra). It is also possible
-to have the visualization and path available when working with the CoTenGra mode. This is achieved by setting the
-boolean parameters for `dump_path` and `plot_ring` to true
-
-```python3
-if pathsim_configuration.mode == ddsim.PathSimulatorMode.cotengra:
-            max_time = options.get('cotengra_max_time', 60)
-            max_repeats = options.get('cotengra_max_repeats', 1024)
-            dump_path = options.get('cotengra_dump_path', True)
-            plot_ring = options.get('cotengra_plot_ring', True)
-            path = get_simulation_path(qobj_experiment, max_time=max_time, max_repeats=max_repeats,
-                                       dump_path=dump_path, plot_ring=plot_ring)
+Instead of re-inventing the wheel, the framework allows to translate strategies from the domain of tensor networks to decision diagrams.
+To this end, the tensor network contraction library [CoTenGra](https://github.com/jcmgray/cotengra) is used.
+In order to use this part of the framework, some extra dependencies have to be installed. This can be accomplished by running
+```console
+pip install jkq.ddsim[tnflow]
 ```
+
+Then, in order to let CoTenGra determine a simulation path for a given circuit the `mode="cotengra"` option has to be used when calling `execute`, i.e.,
+```python
+job = execute(circ, backend, mode="cotengra")
+```
+Per default this uses a maximum of `60s` (option `cotengra_max_time`) and `1024` trials (option `cotengra_max_repeats`) for CoTenGra and dumps a representation of the determined simulation path to a file in the current working directory (option `cotengra_dump_path`).
+Optionally, a visualization of the simulation path can be generated by specifying `cotengra_plot_ring=True`.
 
 #### Configuration
 
-To make use of the functionality, one can call it as an additional argument when simulating quantum circuits with
-decision diagrams. Either via a **configuration** object itself
+The framework can be configured using multiple options (which can be passed to the `execute` function):
+ - `mode`: the simulation path mode to use (**`sequential`**, `pairwise_recursive`, `bracket`, `alternating`, `cotengra`))
+ - `bracket_size`: the bracket size used for the `bracket` mode (default: *`2`*)
+ - `alternating_start`: the id of the operation to start with in the `alternating` mode (default: *`0`*)
+ - `seed`: the random seed used for the simulator (default *`0`*, i.e., no particular seed)
 
-```cpp
- auto config        = PathSimulator::Configuration{};
- config.mode        = PathSimulator::Configuration::Mode::BracketGrouping;
- config.bracketSize = 3;
- PathSimulator tbs(std::move(qc), config);
-```
-
-or as a set of individual parameters directly in the function call.
-
-```cpp
-PathSimulator tbs(std::move(qc), PathSimulator::Configuration::Mode::Sequential, 2, 0, 12345U);
-```
-
-This can be done in c++, as seen above, or python. For the latter the call looks like this
-
-```python3
-sim = ddsim.PathCircuitSimulator(circ, seed=0, mode=ddsim.PathSimulatorMode.bracket, bracket_size=2)
-```
-
-**Adding new strategies**
-
-Shall be done in `PathSimulator.cpp`, `PathSimulator.hpp` and in `bindings.cpp` respectivly. The following is an example
-on how such an implementation can look like
-
-```cpp
-void PathSimulator::generateSequentialSimulationPath() {
-    SimulationPath::Components components{};
-    components.reserve(qc->getNops());
-
-    for (std::size_t i = 0; i < qc->getNops(); ++i) {
-        if (i == 0)
-            components.emplace_back(0, 1);
-        else
-            components.emplace_back(qc->getNops() + i, i + 1);
-    }
-    setSimulationPath(components, true);
-}
-```
-
-The basic idea is to add numbers in the components list where the numbers represent either gates of the quantum circuit
-or the result of multipliying two gates together. Again we refer
-to [[6]](https://iic.jku.at/files/eda/2022_date_exploiting_arbitrary_paths_simulation_quantum_circuits_decision_diagrams.pdf)
-for a deeper look into the specifics.
+In addition to the above, CoTenGra can be configured using the options described [above](#cotengra).
 
 ## Running Tests
 

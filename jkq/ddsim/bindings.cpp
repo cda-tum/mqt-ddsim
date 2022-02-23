@@ -171,7 +171,7 @@ PYBIND11_MODULE(pyddsim, m) {
             .def_readwrite("alternating_start", &PathSimulator::Configuration::alternatingStart,
                            R"pbdoc(Start of the alternating strategy)pbdoc")
             .def_readwrite("seed", &PathSimulator::Configuration::seed,
-                           R"pbdoc(Number of seeds)pbdoc")
+                           R"pbdoc(Seed for the simulator)pbdoc")
             .def("json", &PathSimulator::Configuration::json)
             .def("__repr__", &PathSimulator::Configuration::toString);
 
