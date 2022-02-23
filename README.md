@@ -329,7 +329,7 @@ The framework comes with several pre-defined simulation path strategies:
 
 This example shall serve as a showcase on how to use the simulation path framework. At first one has to have a quantum circuit.
 
-```
+```cpp
 auto qc = std::make_unique<qc::QuantumComputation>(2);
 qc->h(1U);
 qc->x(0U, 1_pc);
@@ -344,7 +344,7 @@ and `1` and save the result as number `5` on the first position in the circuit, 
 next step is to combine `5` and `2`. Again saving the result in `6` and putting it in front. This goes on until only one
 single number remains.
 
-```
+```cpp
 auto config        = PathSimulator::Configuration{};
 config.mode        = PathSimulator::Configuration::Mode::Sequential;
 ```
@@ -352,7 +352,7 @@ config.mode        = PathSimulator::Configuration::Mode::Sequential;
 Is used to create the configuration object and set the mode of the simulation path strategie. The next step is to create
 a **PathSimulator** object and simulate it.
 
-```
+```cpp
 PathSimulator tbs(std::move(qc), config);
 auto counts = tbs.Simulate(1024);
 ```
@@ -363,7 +363,7 @@ For a deeper dive into what CoTenGra does, we refer to [[8]](https://github.com/
 to have the visualization and path available when working with the CoTenGra mode. This is achieved by setting the
 boolean parameters for `dump_path` and `plot_ring` to true
 
-```
+```python3
 if pathsim_configuration.mode == ddsim.PathSimulatorMode.cotengra:
             max_time = options.get('cotengra_max_time', 60)
             max_repeats = options.get('cotengra_max_repeats', 1024)
@@ -378,7 +378,7 @@ if pathsim_configuration.mode == ddsim.PathSimulatorMode.cotengra:
 To make use of the functionality, one can call it as an additional argument when simulating quantum circuits with
 decision diagrams. Either via a **configuration** object itself
 
-```
+```cpp
  auto config        = PathSimulator::Configuration{};
  config.mode        = PathSimulator::Configuration::Mode::BracketGrouping;
  config.bracketSize = 3;
@@ -387,13 +387,13 @@ decision diagrams. Either via a **configuration** object itself
 
 or as a set of individual parameters directly in the function call.
 
-```
+```cpp
 PathSimulator tbs(std::move(qc), PathSimulator::Configuration::Mode::Sequential, 2, 0, 12345U);
 ```
 
 This can be done in c++, as seen above, or python. For the latter the call looks like this
 
-```
+```python3
 sim = ddsim.PathCircuitSimulator(circ, seed=0, mode=ddsim.PathSimulatorMode.bracket, bracket_size=2)
 ```
 
@@ -402,7 +402,7 @@ sim = ddsim.PathCircuitSimulator(circ, seed=0, mode=ddsim.PathSimulatorMode.brac
 Shall be done in `PathSimulator.cpp`, `PathSimulator.hpp` and in `bindings.cpp` respectivly. The following is an example
 on how such an implementation can look like
 
-```
+```cpp
 void PathSimulator::generateSequentialSimulationPath() {
     SimulationPath::Components components{};
     components.reserve(qc->getNops());
