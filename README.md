@@ -318,46 +318,54 @@ The tool also provides a framework for exploiting arbitrary simulation paths (us
 
 The framework comes with several pre-defined simulation path strategies:
  
- - `sequential` (*default*)
- - `pairwise_recursive`
- - `bracket`
- - `alternating` 
+ - `sequential` (*default*): simulate the circuit sequentially from left to right using only MxV multiplications
+ - `pairwise_recursive`: recursively group pairs of states and operations to form a binary tree of MxV/MxM multiplications
+ - `bracket`: group certain number of operations according to a given `bracket_size`
+ - `alternating`: start the simulation in the middle of the circuit and alternate between applications of gates "from the left" and "from the right" (which might potentially be useful for equivalence checking) 
  
- as well as the option to translate strategies from the domain of tensor networks to decision diagrams (using the [CoTenGra](https://github.com/jcmgray/cotengra) library).
+ as well as the option to translate strategies from the domain of tensor networks to decision diagrams (using the [CoTenGra](https://github.com/jcmgray/cotengra) library), see [here](#cotengra).
 
-**Basic Example**
+#### Basic Example
 
-This example shall serve as a showcase on how to use the simulation path framework. At first one has to have a quantum circuit.
+This example shall serve as a showcase on how to use the simulation path framework (via Python).
+First, create the circuit to be simulated using qiskit, e.g., in this case a three-qubit GHZ state:
 
-```cpp
-auto qc = std::make_unique<qc::QuantumComputation>(2);
-qc->h(1U);
-qc->x(0U, 1_pc);
-qc->x(0U, 1_pc);
-qc->x(0U, 1_pc);
+```python
+from qiskit import *
+
+circ = QuantumCircuit(3)
+# the initial state corresponds to ID 0
+circ.h(0)         # corresponds to ID 1
+circ.cx(0, 1)     # corresponds to ID 2
+circ.cx(0, 2)     # corresponds to ID 3
 ```
 
-This is a two qubit quantum circuit with a hadamard gate on the first qubit and then three CNOT gates coming afterwards.
-In this setup the hadamard gate would correspond to the number `1`, the CNOTs to `2,3,4` and the initial state to the
-number `0` respectivly. Applying the sequential strategie to this quantum circuit would first combine the numbers `0`
-and `1` and save the result as number `5` on the first position in the circuit, deleting `0` and `1` in the process. The
-next step is to combine `5` and `2`. Again saving the result in `6` and putting it in front. This goes on until only one
-single number remains.
+Then, obtain the simulation path framework qiskit backend. You can choose between the `path_sim_qasm_simulator` and the `path_sim_statevector_simulator`. The first just yields a dictionary with the results of the performed shots, while the latter also provides the complete statevector (which, depending on the amount of qubits, might not fit in the available memory).
 
-```cpp
-auto config        = PathSimulator::Configuration{};
-config.mode        = PathSimulator::Configuration::Mode::Sequential;
+```python
+from jkq import ddsim
+
+provider = ddsim.JKQProvider()
+backend = provider.get_backend('path_sim_qasm_simulator')
 ```
 
-Is used to create the configuration object and set the mode of the simulation path strategie. The next step is to create
-a **PathSimulator** object and simulate it.
+Run the simulation by calling the `execute` function, which takes several optional configuration parameters (such as the simulation path strategy). For a complete list of configuration options see [here](#configuration).
+Per default, this uses the `sequential` strategy, i.e., 
+ - first, the Hadamard operation is applied to the initial state (`[0, 1] -> 4`)
+ - then, the first CNOT is applied to the resulting state (`[4, 2] -> 5`)
+ - finally, the last CNOT is applied to the resulting state (`[5, 3] -> 6`)
 
-```cpp
-PathSimulator tbs(std::move(qc), config);
-auto counts = tbs.Simulate(1024);
+ The corresponding simulation path is thus described by `[[0, 1], [4, 2], [5, 3]]` and the final state is the one with ID `6`.
+
+```python
+job = execute(circ, backend)
+result = job.result()
+
+counts = result.get_counts(circ)
+print(counts)
 ```
 
-**CoTenGra**
+#### CoTenGra
 
 For a deeper dive into what CoTenGra does, we refer to [[8]](https://github.com/jcmgray/cotengra). It is also possible
 to have the visualization and path available when working with the CoTenGra mode. This is achieved by setting the
@@ -373,7 +381,7 @@ if pathsim_configuration.mode == ddsim.PathSimulatorMode.cotengra:
                                        dump_path=dump_path, plot_ring=plot_ring)
 ```
 
-**The configuration**
+#### Configuration
 
 To make use of the functionality, one can call it as an additional argument when simulating quantum circuits with
 decision diagrams. Either via a **configuration** object itself
