@@ -541,7 +541,7 @@ If you use our tool for your research, we will be thankful if you refer to it by
 
 <details>
 <summary>
-  [6] L. Burgholzer, A.Ploier, and R. Wille, "<a href="https://iic.jku.at/files/eda/2022_date_exploiting_arbitrary_paths_simulation_quantum_circuits_decision_diagrams.pdf">Exploiting Arbitrary Paths for the Simulation of Quantum Circuits with Decision Diagrams</a>," 2021
+  [6] L. Burgholzer, A.Ploier, and R. Wille, "<a href="https://iic.jku.at/files/eda/2022_date_exploiting_arbitrary_paths_simulation_quantum_circuits_decision_diagrams.pdf">Exploiting Arbitrary Paths for the Simulation of Quantum Circuits with Decision Diagrams</a>," in Design, Automation and Test in Europe (DATE), 2022
 </summary>
 
 ```bibtex
