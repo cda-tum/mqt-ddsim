@@ -66,7 +66,7 @@ with open(README_PATH, encoding="utf8") as readme_file:
 
 setup(
     name='jkq.ddsim',
-    version='1.10.0',
+    version='1.11.0',
     author='Stefan Hillmich',
     author_email='stefan.hillmich@jku.at',
     description='JKQ DDSIM - A quantum simulator based on decision diagrams written in C++',
@@ -95,5 +95,8 @@ setup(
         'Source': 'https://github.com/iic-jku/ddsim/',
         'Tracker': 'https://github.com/iic-jku/ddsim/issues',
         'Research': 'https://iic.jku.at/eda/research/quantum_simulation/',
+    },
+    extras_require={
+        "tnflow": ["sparse", "opt-einsum", "quimb", "pandas", "numpy", "cotengra @ https://github.com/jcmgray/cotengra/archive/refs/heads/master.zip"]
     }
 )

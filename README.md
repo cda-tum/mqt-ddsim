@@ -27,6 +27,7 @@ If you have any questions, feel free to contact us via [iic-quantum@jku.at](mail
     * [Library](#library)
     * [Executable Simulator](#executable-simulator)
     * [Executable Noise-aware Simulator](#executable-noise-aware-simulator)
+    * [Simulation Path Framework](#simulation-path-framework)
 - [Running Tests](#running-tests)
 - [Frequently Asked Questions](#frequently-asked-questions) 
 - [References](#references)
@@ -103,12 +104,14 @@ counts = result.get_counts(circ)
 print(counts)
 ```
 
-The provider currently has five backends:
+The provider currently has seven backends:
 
 * `qasm_simulator` which simulates the circuit and returns the requested number of shots
 * `statevector_simulator` which also simulates the circuit and returns the statevector along the requested number of shots
 * `hybrid_qasm_simulator` which simulates the circuit in parallel using a hybrid Schrodinger-Feynman technique and returns the requested number of shots
 * `hybrid_statevector_simulator` which also simulates the circuit in parallel using a hybrid Schrodinger-Feynman technique and returns the statevector
+* `path_sim_qasm_simulator` which allows to exploit arbitrary simulation paths for the simulation of the circuit and returns the requested number of shots
+* `path_sim_statevector_simulator` which also allows to exploit arbitrary simulation paths and returns the statevector along the requested number of shots
 * `unitary_simulator` which constructs the unitary functionality of a circuit and returns the corresponding unitary matrix
 
 A slightly more elaborate example can be found in the notebook [ddsim.ipynb](ddsim.ipynb).
@@ -248,7 +251,10 @@ From here on you can start simulating quantum circuits or run the integrated alg
 
 ### Executable Noise-aware Simulator
 
-The tool also supports noise-aware quantum circuit simulation, based on a stochastic approach. It currently supports global decoherence and gate error noise effects. A detailed summary of the simulator is presented in [[2]](https://arxiv.org/abs/2012.05620). Note that the simulator currently does not support simulating the integrated algorithms.
+The tool also supports noise-aware quantum circuit simulation, based on a stochastic approach. It currently supports
+global decoherence and gate error noise effects. A detailed summary of the simulator is presented
+in [[3]](https://arxiv.org/abs/2012.05620). Note that the simulator currently does not support simulating the integrated
+algorithms.
 
 Building the simulator requires `Threads::Threads`. It can be built by executing
 
@@ -306,8 +312,95 @@ $ ./build/ddsim_noise_aware --ps --noise_effects APD --stoch_runs 10000 --noise_
 }
 ```
 
+### Simulation Path Framework
+
+The tool also provides a framework for exploiting arbitrary simulation paths (using the [taskflow](https://github.com/taskflow/taskflow) library) based on the methods proposed in [[6]](https://iic.jku.at/files/eda/2022_date_exploiting_arbitrary_paths_simulation_quantum_circuits_decision_diagrams.pdf). 
+A *simulation path* describes the order in which the individual MxV or MxM multiplications are conducted during the simulation of a quantum circuit.
+It can be described as a list of tuples that identify the individual states/operations to be multiplied.
+The initial state is always assigned `ID 0`, while the i-th operation is assigned `ID i`.
+The result of a multiplication is assigned the next highest, unused ID, e.g., in a circuit with `n` gates the result of the first multiplication is assigned `ID n+1`.
+
+The framework comes with several pre-defined simulation path strategies:
+ 
+ - `sequential` (*default*): simulate the circuit sequentially from left to right using only MxV multiplications
+ - `pairwise_recursive`: recursively group pairs of states and operations to form a binary tree of MxV/MxM multiplications
+ - `bracket`: group certain number of operations according to a given `bracket_size`
+ - `alternating`: start the simulation in the middle of the circuit and alternate between applications of gates "from the left" and "from the right" (which might potentially be useful for equivalence checking) 
+ 
+ as well as the option to translate strategies from the domain of tensor networks to decision diagrams (using the [CoTenGra](https://github.com/jcmgray/cotengra) library), see [here](#cotengra).
+
+#### Basic Example
+
+This example shall serve as a showcase on how to use the simulation path framework (via Python).
+First, create the circuit to be simulated using qiskit, e.g., in this case a three-qubit GHZ state:
+
+```python
+from qiskit import *
+
+circ = QuantumCircuit(3)
+# the initial state corresponds to ID 0
+circ.h(0)         # corresponds to ID 1
+circ.cx(0, 1)     # corresponds to ID 2
+circ.cx(0, 2)     # corresponds to ID 3
+```
+
+Then, obtain the simulation path framework qiskit backend. You can choose between the `path_sim_qasm_simulator` and the `path_sim_statevector_simulator`. The first just yields a dictionary with the counts of the measurements, while the latter also provides the complete statevector (which, depending on the amount of qubits, might not fit in the available memory).
+
+```python
+from jkq import ddsim
+
+provider = ddsim.JKQProvider()
+backend = provider.get_backend('path_sim_qasm_simulator')
+```
+
+Per default, the backend uses the `sequential` strategy. For this particular example, this means: 
+ - first, the Hadamard operation is applied to the initial state (`[0, 1] -> 4`)
+ - then, the first CNOT is applied (`[4, 2] -> 5`)
+ - finally, the last CNOT is applied (`[5, 3] -> 6`)
+
+ The corresponding simulation path is thus described by `[[0, 1], [4, 2], [5, 3]]` and the final state is the one with ID `6`.
+
+The simulation is started by calling the `execute` function, which takes several optional configuration parameters (such as the simulation path strategy). For a complete list of configuration options see [here](#configuration).
+
+```python
+job = execute(circ, backend)
+result = job.result()
+
+counts = result.get_counts(circ)
+print(counts)
+```
+
+#### CoTenGra
+
+Instead of re-inventing the wheel, the framework allows to translate strategies from the domain of tensor networks to decision diagrams.
+To this end, the tensor network contraction library [CoTenGra](https://github.com/jcmgray/cotengra) is used.
+In order to use this part of the framework, some extra dependencies have to be installed. This can be accomplished by running
+```console
+pip install jkq.ddsim[tnflow]
+```
+
+Then, in order to let CoTenGra determine a simulation path for a given circuit the `mode="cotengra"` option has to be used when calling `execute`, i.e.,
+```python
+job = execute(circ, backend, mode="cotengra")
+```
+Per default this uses a maximum of `60s` (option `cotengra_max_time`) and `1024` trials (option `cotengra_max_repeats`) for CoTenGra and dumps a representation of the determined simulation path to a file in the current working directory (option `cotengra_dump_path`).
+Optionally, a visualization of the simulation path can be generated by specifying `cotengra_plot_ring=True`.
+
+#### Configuration
+
+The framework can be configured using multiple options (which can be passed to the `execute` function):
+ - `mode`: the simulation path mode to use (**`sequential`**, `pairwise_recursive`, `bracket`, `alternating`, `cotengra`))
+ - `bracket_size`: the bracket size used for the `bracket` mode (default: *`2`*)
+ - `alternating_start`: the id of the operation to start with in the `alternating` mode (default: *`0`*)
+ - `seed`: the random seed used for the simulator (default *`0`*, i.e., no particular seed)
+
+In addition to the above, CoTenGra can be configured using the options described [above](#cotengra).
+
 ## Running Tests
-The repository also includes some (rudimentary) unit tests (using GoogleTest), which aim to ensure the correct behavior of the tool. They can be built and executed in the following way:
+
+The repository also includes some (rudimentary) unit tests (using GoogleTest), which aim to ensure the correct behavior
+of the tool. They can be built and executed in the following way:
+
 ```console
 $ cmake -DBUILD_DDSIM_TESTS=ON -DCMAKE_BUILD_TYPE=Release -S . -B build
 $ cmake --build build/ --config Release
@@ -443,4 +536,23 @@ If you use our tool for your research, we will be thankful if you refer to it by
       primaryClass={quant-ph}
 }
 ```
+
+</details>
+
+<details>
+<summary>
+  [6] L. Burgholzer, A.Ploier, and R. Wille, "<a href="https://iic.jku.at/files/eda/2022_date_exploiting_arbitrary_paths_simulation_quantum_circuits_decision_diagrams.pdf">Exploiting Arbitrary Paths for the Simulation of Quantum Circuits with Decision Diagrams</a>," in Design, Automation and Test in Europe (DATE), 2022
+</summary>
+
+```bibtex
+@misc{burgholzer2021hybrid,
+      author={Lukas Burgholzer and
+               Alexander Ploier and
+               Robert Wille},
+      title={Exploiting Arbitrary Paths for the Simulation of Quantum Circuits with Decision Diagrams},
+      booktitle = {Design, Automation and Test in Europe},
+      year      = {2022}
+}
+```
+
 </details>

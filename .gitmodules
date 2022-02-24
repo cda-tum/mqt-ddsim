@@ -3,6 +3,11 @@
 	url = https://github.com/iic-jku/qfr.git
     branch = master
     shallow = true
+[submodule "extern/taskflow"]
+	path = extern/taskflow
+	url = https://github.com/taskflow/taskflow.git
+	branch = master
+	shallow = true
 [submodule "extern/cxxopts"]
 	path = extern/cxxopts
 	url = https://github.com/jarro2783/cxxopts.git

@@ -11,7 +11,7 @@ on:
 
 jobs:
   test_bindings:
-    name: Test Python bindings
+    name:    Test Python bindings
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,9 +22,9 @@ jobs:
         with:
           python-version: '3.9'
       - name: Install package
-        run: |
-          pip install -U pip setuptools wheel cmake
-          pip install .
+        run:  |
+              pip install -U pip setuptools wheel
+              pip install .
       - name: Test package
         run: |
           pip install pytest
@@ -43,10 +43,9 @@ jobs:
         with:
           python-version: '3.9'
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip setuptools wheel
+        run: pip install -q build
       - name: Build sdist
-        run: python setup.py sdist
+        run: python -m build --sdist
       - name: Install sdist
         run: pip install --verbose dist/*.tar.gz
         env:
@@ -63,7 +62,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
     steps:
       - uses: actions/checkout@v2
         with:
