@@ -92,8 +92,8 @@ setup(
     ],
     keywords='mqt quantum simulation',
     project_urls={
-        'Source': 'https://github.com/iic-jku/ddsim/',
-        'Tracker': 'https://github.com/iic-jku/ddsim/issues',
+        'Source': 'https://github.com/cda-tum/ddsim/',
+        'Tracker': 'https://github.com/cda-tum/ddsim/issues',
         'Research': 'https://iic.jku.at/eda/research/quantum_simulation/',
     },
     extras_require={
