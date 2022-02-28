@@ -1,7 +1,7 @@
 import unittest
 
 from qiskit import QuantumCircuit, BasicAer
-from jkq.ddsim.pathqasmsimulator import PathQasmSimulator
+from mqt.ddsim.pathqasmsimulator import PathQasmSimulator
 from qiskit import execute
 
 

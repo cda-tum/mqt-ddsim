@@ -1,4 +1,4 @@
-from qiskit.providers import ProviderV1 as Provider
+from qiskit.providers import ProviderV1
 from qiskit.providers.providerutils import filter_backends
 
 from .qasmsimulator import QasmSimulator
@@ -10,12 +10,12 @@ from .pathstatevectorsimulator import PathStatevectorSimulator
 from .unitarysimulator import UnitarySimulator
 
 
-class JKQProvider(Provider):
+class DDSIMProvider(ProviderV1):
     _BACKENDS = None
 
     def __init__(self):
-        if JKQProvider._BACKENDS is None:
-            JKQProvider._BACKENDS = [
+        if DDSIMProvider._BACKENDS is None:
+            DDSIMProvider._BACKENDS = [
                 ('qasm_simulator', QasmSimulator, None, None),
                 ('statevector_simulator', StatevectorSimulator, None, None),
                 ('hybrid_qasm_simulator', HybridQasmSimulator, None, None),
@@ -44,4 +44,4 @@ class JKQProvider(Provider):
         return filter_backends(backends, filters=filters)
 
     def __str__(self):
-        return 'JKQProvider'
+        return 'MQTProvider'

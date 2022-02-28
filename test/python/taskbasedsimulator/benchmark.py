@@ -1,7 +1,7 @@
 import datetime
 import time
-from jkq.ddsim.pathqasmsimulator import PathQasmSimulator, get_simulation_path
-from jkq import ddsim
+from mqt.ddsim.pathqasmsimulator import PathQasmSimulator, get_simulation_path
+from mqt import ddsim
 from qiskit import transpile
 
 from test.python.generate_benchmarks import *

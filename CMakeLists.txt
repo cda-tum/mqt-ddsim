@@ -55,5 +55,5 @@ endif ()
 
 # add Python binding code
 if (BINDINGS)
-    add_subdirectory(jkq/ddsim)
+    add_subdirectory(mqt/ddsim)
 endif ()

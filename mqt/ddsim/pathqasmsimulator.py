@@ -15,8 +15,8 @@ from qiskit.qobj import QasmQobjExperiment, Qobj, QasmQobj, PulseQobj
 from qiskit.result import Result
 from qiskit.compiler import assemble
 
-from .jkqjob import JKQJob
-from jkq import ddsim
+from .job import DDSIMJob
+from mqt import ddsim
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ def read_tensor_network_file(filename):
 def create_tensor_network(qc):
     import quimb.tensor as qtn
     import sparse
-    from jkq.ddsim import dump_tensor_network
+    from mqt.ddsim import dump_tensor_network
 
     if isinstance(qc, QuantumCircuit):
         filename = qc.name + '_' + str(qc.num_qubits) + ".tensor"
@@ -133,10 +133,10 @@ class PathQasmSimulator(BackendV1):
         conf = {
             'backend_name': 'path_sim_qasm_simulator',
             'backend_version': ddsim.__version__,
-            'url': 'https://github.com/iic-jku/ddsim',
+            'url': 'https://github.com/cda-tum/ddsim',
             'simulator': True,
             'local': True,
-            'description': 'JKQ DDSIM C++ simulation path framework',
+            'description': 'MQT DDSIM C++ simulation path framework',
             'basis_gates': ['id', 'u0', 'u1', 'u2', 'u3', 'cu3',
                             'x', 'cx', 'ccx', 'mcx_gray', 'mcx_recursive', 'mcx_vchain', 'mcx',
                             'y', 'cy',
@@ -177,7 +177,7 @@ class PathQasmSimulator(BackendV1):
         circuit_qobj = assemble(quantum_circuits, self, **out_options)
 
         job_id = str(uuid.uuid4())
-        local_job = JKQJob(self, job_id, self._run_job, circuit_qobj, **options)
+        local_job = DDSIMJob(self, job_id, self._run_job, circuit_qobj, **options)
         local_job.submit()
         return local_job
 

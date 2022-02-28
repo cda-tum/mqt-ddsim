@@ -1,7 +1,7 @@
 import unittest
 
 from qiskit import QuantumCircuit
-from jkq.ddsim.unitarysimulator import UnitarySimulator
+from mqt.ddsim.unitarysimulator import UnitarySimulator
 from qiskit import execute
 
 import numpy as np

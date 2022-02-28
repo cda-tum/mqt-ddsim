@@ -15,9 +15,9 @@ from qiskit.result import Result
 from qiskit.compiler import assemble
 from qiskit.utils.multiprocessing import local_hardware_info
 
-from .jkqjob import JKQJob
-from .jkqerror import JKQSimulatorError
-from jkq import ddsim
+from .job import DDSIMJob
+from .error import DDSIMError
+from mqt import ddsim
 
 import numpy as np
 
@@ -32,7 +32,7 @@ class UnitarySimulator(BackendV1):
             'backend_name': 'unitary_simulator',
             'backend_version': ddsim.__version__,
             'n_qubits': min(24, int(log2(sqrt(local_hardware_info()['memory'] * (1024 ** 3) / 16)))),
-            'url': 'https://github.com/iic-jku/ddsim',
+            'url': 'https://github.com/cda-tum/ddsim',
             'simulator': True,
             'local': True,
             'conditional': False,
@@ -40,7 +40,7 @@ class UnitarySimulator(BackendV1):
             'memory': False,
             'max_shots': 1000000000,
             'coupling_map': None,
-            'description': 'JKQ DDSIM C++ Unitary Simulator',
+            'description': 'MQT DDSIM C++ Unitary Simulator',
             'basis_gates': ['id', 'u0', 'u1', 'u2', 'u3', 'cu3',
                             'x', 'cx', 'ccx', 'mcx_gray', 'mcx_recursive', 'mcx_vchain',
                             'y', 'cy',
@@ -79,7 +79,7 @@ class UnitarySimulator(BackendV1):
         circuit_qobj = assemble(quantum_circuits, self, **out_options)
 
         job_id = str(uuid.uuid4())
-        local_job = JKQJob(self, job_id, self._run_job, circuit_qobj, **options)
+        local_job = DDSIMJob(self, job_id, self._run_job, circuit_qobj, **options)
         local_job.submit()
         return local_job
 
@@ -112,7 +112,7 @@ class UnitarySimulator(BackendV1):
         elif mode == 'recursive':
             construction_mode = ddsim.ConstructionMode.recursive
         else:
-            raise JKQSimulatorError('Construction mode', mode, 'not supported by JKQ unitary simulator. Available modes are \'recursive\' and \'sequential\'')
+            raise DDSIMError('Construction mode', mode, 'not supported by JKQ unitary simulator. Available modes are \'recursive\' and \'sequential\'')
 
         sim = ddsim.UnitarySimulator(qobj_experiment, seed, construction_mode)
         sim.construct()
@@ -143,7 +143,7 @@ class UnitarySimulator(BackendV1):
         n_qubits = qobj.config.n_qubits
         max_qubits = self.configuration().n_qubits
         if n_qubits > max_qubits:
-            raise JKQSimulatorError('Number of qubits {} '.format(n_qubits) +
+            raise DDSIMError('Number of qubits {} '.format(n_qubits) +
                                     'is greater than maximum ({}) '.format(max_qubits) +
                                     'for "{}".'.format(self.name()))
         if hasattr(qobj.config, 'shots') and qobj.config.shots != 1:
@@ -159,6 +159,6 @@ class UnitarySimulator(BackendV1):
                 experiment.config.shots = 1
             for operation in experiment.instructions:
                 if operation.name in ['measure', 'reset']:
-                    raise JKQSimulatorError('Unsupported "%s" instruction "%s" ' +
+                    raise DDSIMError('Unsupported "%s" instruction "%s" ' +
                                             'in circuit "%s" ', self.name(),
                                             operation.name, name)

@@ -1,8 +1,8 @@
 import unittest
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit import execute
-from jkq import ddsim
-from jkq.ddsim.pathstatevectorsimulator import PathStatevectorSimulator
+from mqt import ddsim
+from mqt.ddsim.pathstatevectorsimulator import PathStatevectorSimulator
 
 
 class JKQStatevectorSimulatorTest(unittest.TestCase):
