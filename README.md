@@ -376,6 +376,7 @@ To this end, the tensor network contraction library [CoTenGra](https://github.co
 In order to use this part of the framework, some extra dependencies have to be installed. This can be accomplished by running
 ```console
 pip install jkq.ddsim[tnflow]
+pip install -U git+https://github.com/jcmgray/cotengra.git
 ```
 
 Then, in order to let CoTenGra determine a simulation path for a given circuit the `mode="cotengra"` option has to be used when calling `execute`, i.e.,
