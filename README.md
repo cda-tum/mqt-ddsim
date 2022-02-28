@@ -1,21 +1,20 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![toolset: JKQ](https://img.shields.io/badge/toolset-JKQ-blue)](https://github.com/iic-jku/jkq)
-[![PyPI](https://img.shields.io/pypi/v/jkq.ddsim?logo=pypi)](https://pypi.org/project/jkq.ddsim/)
-[![CI](https://github.com/iic-jku/ddsim/actions/workflows/cmake.yml/badge.svg)](https://github.com/iic-jku/ddsim/actions/workflows/cmake.yml)
-[![codecov](https://codecov.io/gh/iic-jku/ddsim/branch/master/graph/badge.svg)](https://codecov.io/gh/iic-jku/ddsim)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/github/iic-jku/ddsim?label=python&logo=lgtm)](https://lgtm.com/projects/g/iic-jku/ddsim/context:python)
-[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/github/iic-jku/ddsim?label=c%2B%2B&logo=lgtm)](https://lgtm.com/projects/g/iic-jku/ddsim/context:cpp)
+[![PyPI](https://img.shields.io/pypi/v/mqt.ddsim?logo=pypi)](https://pypi.org/project/mqt.ddsim/)
+[![CI](https://github.com/cda-tum/ddsim/actions/workflows/cmake.yml/badge.svg)](https://github.com/cda-tum/ddsim/actions/workflows/cmake.yml)
+[![codecov](https://codecov.io/gh/cda-tum/ddsim/branch/master/graph/badge.svg)](https://codecov.io/gh/cda-tum/ddsim)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/github/cda-tum/ddsim?label=python&logo=lgtm)](https://lgtm.com/projects/g/cda-tum/ddsim/context:python)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/github/cda-tum/ddsim?label=c%2B%2B&logo=lgtm)](https://lgtm.com/projects/g/cda-tum/ddsim/context:cpp)
 
 
 # MQT DDSIM - A quantum circuit simulator based on decision diagrams written in C++
 
 A tool for quantum circuit simulation by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at).
 
-The tool builds upon [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git) which in turns builds on [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git).
+The tool builds upon [our quantum functionality representation (QFR)](https://github.com/cda-tumu/qfr.git) which in turns builds on [our decision diagram (DD) package](https://github.com/cda-tum/dd_package.git).
 
 For more information, on our work on quantum circuit simulation please visit [iic.jku.at/eda/research/quantum_simulation](https://iic.jku.at/eda/research/quantum_simulation) or, for more information on our work on noise-aware quantum circuit simulation, please visit [iic.jku.at/eda/research/noise_aware_simulation](https://iic.jku.at/eda/research/noise_aware_simulation).
 
-If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an [issue](https://github.com/iic-jku/ddsim/issues) on GitHub.
+If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an [issue](https://github.com/cda-tum/ddsim/issues) on GitHub.
 
 # Table of contents
 <!--ts-->
@@ -37,10 +36,10 @@ If you have any questions, feel free to contact us via [iic-quantum@jku.at](mail
 
 This tool can be used for simulating quantum circuits provided in any of the following formats:
 * `Real` from [RevLib](http://revlib.org/documentation.php)
-  * [Our set of circuits](https://github.com/iic-jku/quantum_circuits)
+  * [Our set of circuits](https://github.com/cda-tum/quantum_circuits)
   * [RevLib](http://revlib.org)
 * `OpenQASM` used by IBM's [Qiskit](https://github.com/Qiskit/qiskit)
-  * [Our set of circuits](https://github.com/iic-jku/quantum_circuits)
+  * [Our set of circuits](https://github.com/cda-tum/quantum_circuits)
   * [OpenQASM Repo](https://github.com/Qiskit/openqasm)
   * [QUEKO](https://github.com/tbcdebug/QUEKO-benchmark) (focus on mapping though)
 * `GRCS`
@@ -55,7 +54,7 @@ This tool can be used for simulating quantum circuits provided in any of the fol
 The format is automatically detected through the file extension.
 
 
-The following additional algorithms are integrated in [QFR](https://github.com/iic-jku/qfr.git) and hence available in the simulator as well:
+The following additional algorithms are integrated in [QFR](https://github.com/cda-tum/qfr.git) and hence available in the simulator as well:
 * Quantum Fourier Transformation
 * Bernstein-Vazirani
 * GHZ / Entanglement
@@ -127,7 +126,7 @@ with any current C++ compiler supporting C++17 and a minimum CMake version of 3.
 The code uses quite a few submodules, which have to be initialized.
 There are two ways to do this:
 
-1. While cloning the repository with the `--recurse-submodules` option to `git clone`. For HTTPS access: `git clone --recurse-submodules https://github.com/iic-jku/ddsim/`.
+1. While cloning the repository with the `--recurse-submodules` option to `git clone`. For HTTPS access: `git clone --recurse-submodules https://github.com/cda-tum/ddsim/`.
 2. After cloning with `git submodule update --init --recursive`.
 
 
@@ -228,7 +227,7 @@ $ ./build/ddsim_simple --simulate_ghz 4 --shots 1000 --ps --pm
 Execute the following lines to get the simulator running in no time:
 
 ```console
-$ git clone --recurse-submodules https://github.com/iic-jku/ddsim/
+$ git clone --recurse-submodules https://github.com/cda-tum/ddsim/
 [...]
 
 $ cd ddsim
