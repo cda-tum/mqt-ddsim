@@ -65,19 +65,19 @@ with open(README_PATH, encoding="utf8") as readme_file:
     README = readme_file.read()
 
 setup(
-    name='jkq.ddsim',
+    name='mqt.ddsim',
     version='1.11.0',
     author='Stefan Hillmich',
     author_email='stefan.hillmich@jku.at',
-    description='JKQ DDSIM - A quantum simulator based on decision diagrams written in C++',
+    description='MQT DDSIM - A quantum simulator based on decision diagrams written in C++',
     long_description=README,
     long_description_content_type='text/markdown',
     license='MIT',
     url='https://iic.jku.at/eda/research/quantum_simulation/',
-    ext_modules=[CMakeExtension('pyddsim', namespace='jkq.ddsim.')],
+    ext_modules=[CMakeExtension('pyddsim', namespace='mqt.ddsim.')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
-    packages=find_namespace_packages(include=['jkq.*']),
+    packages=find_namespace_packages(include=['mqt.*']),
     classifiers=[
         'Development Status :: 4 - Beta',
         'Programming Language :: Python :: 3',
@@ -90,7 +90,7 @@ setup(
         'Natural Language :: English',
         'Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)',
     ],
-    keywords='jkq quantum simulation',
+    keywords='mqt quantum simulation',
     project_urls={
         'Source': 'https://github.com/iic-jku/ddsim/',
         'Tracker': 'https://github.com/iic-jku/ddsim/issues',

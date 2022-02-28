@@ -7,10 +7,9 @@
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/github/iic-jku/ddsim?label=c%2B%2B&logo=lgtm)](https://lgtm.com/projects/g/iic-jku/ddsim/context:cpp)
 
 
-# JKQ DDSIM - A quantum circuit simulator based on decision diagrams written in C++
+# MQT DDSIM - A quantum circuit simulator based on decision diagrams written in C++
 
-A tool for quantum circuit simulation by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at)
-and a part of the [JKQ toolset](https://github.com/iic-jku/jkq).
+A tool for quantum circuit simulation by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at).
 
 The tool builds upon [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git) which in turns builds on [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git).
 
@@ -68,23 +67,23 @@ The simulator is based on the references listed below and can either be used as 
 
 ## Using the Python Bindings / Backend for Qiskit
 
-The backend for Qiskit is available via [PyPi](https://pypi.org/project/jkq.ddsim/) as wheel for Linux, Windows and MacOS.
+The backend for Qiskit is available via [PyPi](https://pypi.org/project/mqt.ddsim/) as wheel for Linux, Windows and MacOS.
 In order to make the library as easy to use as possible (without compilation), we provide pre-built wheels for most common platforms (64-bit Linux, MacOS, Windows). (We strongly recommend using a [virtual environment](https://docs.python.org/3/tutorial/venv.html).)
 
 ```console
-(venv) $ pip install jkq.ddsim
+(venv) $ pip install mqt.ddsim
 ```
 
 However, in order to get the best performance out of DDSIM, it is recommended to build it locally from the source distribution via
 ```console
-(venv) $ pip install --no-binary jkq.ddsim jkq.ddsim
+(venv) $ pip install --no-binary mqt.ddsim mqt.ddsim
 ```
 
 The following code gives an example on the usage:
 
 ```python3
 from qiskit import *
-from jkq import ddsim
+from mqt import ddsim
 
 circ = QuantumCircuit(3)
 circ.h(0)
@@ -93,7 +92,7 @@ circ.cx(0, 2)
 
 print(circ.draw(fold=-1))
 
-provider = ddsim.JKQProvider()
+provider = ddsim.MQTProvider()
 
 backend = provider.get_backend('qasm_simulator')
 
@@ -347,7 +346,7 @@ circ.cx(0, 2)     # corresponds to ID 3
 Then, obtain the simulation path framework qiskit backend. You can choose between the `path_sim_qasm_simulator` and the `path_sim_statevector_simulator`. The first just yields a dictionary with the counts of the measurements, while the latter also provides the complete statevector (which, depending on the amount of qubits, might not fit in the available memory).
 
 ```python
-from jkq import ddsim
+from mqt import ddsim
 
 provider = ddsim.JKQProvider()
 backend = provider.get_backend('path_sim_qasm_simulator')

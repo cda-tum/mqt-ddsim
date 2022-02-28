@@ -4,27 +4,27 @@ import logging
 
 from qiskit.providers.models import BackendConfiguration
 
-from jkq import ddsim
-from jkq.ddsim.qasmsimulator import QasmSimulator
+from mqt import ddsim
+from mqt.ddsim.pathqasmsimulator import PathQasmSimulator
 
 logger = logging.getLogger(__name__)
 
 
-class StatevectorSimulator(QasmSimulator):
-    """Python interface to JKQ DDSIM"""
+class PathStatevectorSimulator(PathQasmSimulator):
+    """Python interface to MQT DDSIM Simulation Path Framework"""
 
     SHOW_STATE_VECTOR = True
 
     def __init__(self, configuration=None, provider=None):
         conf = {
-            'backend_name': 'statevector_simulator',
+            'backend_name': 'path_sim_statevector_simulator',
             'backend_version': ddsim.__version__,
-            'url': 'https://github.com/iic-jku/ddsim',
+            'url': 'https://github.com/cda-tum/ddsim',
             'simulator': True,
             'local': True,
-            'description': 'JKQ DDSIM C++ simulator',
+            'description': 'MQT DDSIM C++ simulation path framework',
             'basis_gates': ['id', 'u0', 'u1', 'u2', 'u3', 'cu3',
-                            'x', 'cx', 'ccx', 'mcx_gray', 'mcx_recursive', 'mcx_vchain',
+                            'x', 'cx', 'ccx', 'mcx_gray', 'mcx_recursive', 'mcx_vchain', 'mcx',
                             'y', 'cy',
                             'z', 'cz',
                             'h', 'ch',
@@ -37,7 +37,7 @@ class StatevectorSimulator(QasmSimulator):
                             'swap', 'cswap', 'iswap',
                             'snapshot'],
             'memory': False,
-            'n_qubits': 64,
+            'n_qubits': 128,
             'coupling_map': None,
             'conditional': False,
             'max_shots': 1000000000,
@@ -48,4 +48,3 @@ class StatevectorSimulator(QasmSimulator):
 
     def _validate(self, quantum_circuit):
         return
-

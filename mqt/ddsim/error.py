@@ -5,7 +5,7 @@ Exception for errors raised by JKQ simulator.
 from qiskit import QiskitError
 
 
-class JKQSimulatorError(QiskitError):
+class DDSIMError(QiskitError):
     """Class for errors raised by the JKQ simulator."""
 
     def __init__(self, *message):

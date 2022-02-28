@@ -2,7 +2,7 @@ from qiskit.algorithms import Grover
 from qiskit.algorithms import AmplificationProblem
 from qiskit.circuit.library import PhaseOracle
 from qiskit import BasicAer
-from jkq.ddsim import JKQProvider
+from mqt.ddsim import JKQProvider
 input_3sat_instance = '''
 c example DIMACS-CNF 3-SAT
 p cnf 3 5

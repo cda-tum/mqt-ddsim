@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 build = "cp3*"
 skip = "*-win32 *-musllinux_i686 *-manylinux_i686"
 test-skip = "*_arm64 *-musllinux_x86_64 *_universal2:arm64"
-test-command = "python -c \"from jkq import ddsim\""
+test-command = "python -c \"from mqt import ddsim\""
 test-requires = ["qiskit-terra"]
 environment = { DEPLOY = "ON" }
 build-verbosity = 3
