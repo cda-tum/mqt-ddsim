@@ -2,7 +2,7 @@ import unittest
 
 from qiskit import *
 
-from jkq import ddsim
+from mqt import ddsim
 
 import numpy as np
 

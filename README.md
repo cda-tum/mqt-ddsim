@@ -1,40 +1,40 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PyPI](https://img.shields.io/pypi/v/jkq.ddsim?logo=pypi)](https://pypi.org/project/jkq.ddsim/)
-[![CI](https://github.com/iic-jku/ddsim/actions/workflows/cmake.yml/badge.svg)](https://github.com/iic-jku/ddsim/actions/workflows/cmake.yml)
+[![PyPI](https://img.shields.io/pypi/v/mqt.ddsim?logo=pypi)](https://pypi.org/project/mqt.ddsim/)
+[![CI](https://github.com/cda-tum/ddsim/actions/workflows/cmake.yml/badge.svg)](https://github.com/cda-tum/ddsim/actions/workflows/cmake.yml)
 [![Documentation](https://img.shields.io/readthedocs/thapbi-pict.svg?logo=read-the-docs)](https://readthedocs.io)
-[![codecov](https://codecov.io/gh/iic-jku/ddsim/branch/master/graph/badge.svg)](https://codecov.io/gh/iic-jku/ddsim)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/github/iic-jku/ddsim?label=python&logo=lgtm)](https://lgtm.com/projects/g/iic-jku/ddsim/context:python)
-[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/github/iic-jku/ddsim?label=c%2B%2B&logo=lgtm)](https://lgtm.com/projects/g/iic-jku/ddsim/context:cpp)
+[![codecov](https://codecov.io/gh/cda-tum/ddsim/branch/master/graph/badge.svg)](https://codecov.io/gh/cda-tum/ddsim)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/github/cda-tum/ddsim?label=python&logo=lgtm)](https://lgtm.com/projects/g/cda-tum/ddsim/context:python)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/github/cda-tum/ddsim?label=c%2B%2B&logo=lgtm)](https://lgtm.com/projects/g/cda-tum/ddsim/context:cpp)
 
 
-# JKQ DDSIM - A quantum circuit simulator based on decision diagrams written in C++
+# MQT DDSIM - A quantum circuit simulator based on decision diagrams written in C++
 
 A tool for quantum circuit simulation by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at).
-The simulator builds upon [our quantum functionality representation (QFR)](https://github.com/iic-jku/qfr.git) which in turns builds on [our decision diagram (DD) package](https://github.com/iic-jku/dd_package.git).
+The simulator builds upon [our quantum functionality representation (QFR)](https://github.com/cda-tum/qfr.git) which in turns builds on [our decision diagram (DD) package](https://github.com/cda-tum/dd_package.git).
 
-If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an [issue](https://github.com/iic-jku/ddsim/issues) on GitHub.
+If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an [issue](https://github.com/cda-tum/ddsim/issues) on GitHub.
 
 ---
 
-This tool can be used for simulating quantum circuits provided in multiple format such as OpenQASM (see our [our set of circuits](https://github.com/iic-jku/quantum_circuits)) and Qiskit QuantumCircuit objects.
-Additional algorithms are integrated in [QFR](https://github.com/iic-jku/qfr.git) and hence available in the simulator.
+This tool can be used for simulating quantum circuits provided in multiple format such as OpenQASM (see our [our set of circuits](https://github.com/cda-tum/quantum_circuits)) and Qiskit QuantumCircuit objects.
+Additional algorithms are integrated in [QFR](https://github.com/cda-tum/qfr.git) and hence available in the simulator.
 A complete list of supported formats and algorithms is available at [RtD]().
 
 **You can find the detailed documention at [ReadTheDocs]().** (Here the button might make sense ;) )
 
 ## Using the Python Bindings / Backend for Qiskit
 
-The simulator bundled with the backend for Qiskit is available via [PyPi](https://pypi.org/project/jkq.ddsim/) as wheel for Linux, Windows and MacOS.
+The simulator bundled with the backend for Qiskit is available via [PyPi](https://pypi.org/project/mqt.ddsim/) as wheel for Linux, Windows and MacOS.
 
 ```console
-(venv) $ pip install jkq.ddsim
+(venv) $ pip install mqt.ddsim
 ```
 
 The following code gives an example on the usage:
 
 ```python3
 from qiskit import *
-from jkq import ddsim
+from mqt import ddsim
 
 circ = QuantumCircuit(3)
 circ.h(0)
@@ -43,7 +43,7 @@ circ.cx(0, 2)
 
 print(circ.draw(fold=-1))
 
-provider = ddsim.JKQProvider()
+provider = ddsim.DDSIMProvider()
 backend = provider.get_backend('qasm_simulator')
 
 job = execute(circ, backend, shots=10000)
@@ -64,7 +64,7 @@ The required dependencies are `OpenMP >= 4.0` and `Threads::Threads`.
 Clone and build the repository with  
 
 ```console
-$ git clone --recurse-submodules https://github.com/iic-jku/ddsim/
+$ git clone --recurse-submodules https://github.com/cda-tum/ddsim/
 $ cd ddsim 
 ddsim $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
 ddsim $ cmake --build build --config Release --target ddsim

@@ -1,5 +1,5 @@
 /*
- * This file is part of JKQ DDSIM library which is released under the MIT license.
+ * This file is part of MQT DDSIM library which is released under the MIT license.
  * See file README.md or go to https://iic.jku.at/eda/research/quantum/ for more information.
  */
 // clang-format off
@@ -123,7 +123,7 @@ void dump_tensor_network(const py::object& circ, const std::string& filename) {
 }
 
 PYBIND11_MODULE(pyddsim, m) {
-    m.doc() = "Python interface for the JKQ DDSIM quantum circuit simulator";
+    m.doc() = "Python interface for the MQT DDSIM quantum circuit simulator";
 
     py::class_<CircuitSimulator>(m, "CircuitSimulator")
             .def(py::init<>(&create_simulator<CircuitSimulator>), "circ"_a, "seed"_a)

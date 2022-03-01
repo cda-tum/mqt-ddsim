@@ -2,7 +2,7 @@ import unittest
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit import execute
 
-from jkq.ddsim.statevectorsimulator import StatevectorSimulator
+from mqt.ddsim.statevectorsimulator import StatevectorSimulator
 
 
 class JKQStatevectorSimulatorTest(unittest.TestCase):

@@ -4,9 +4,9 @@ on:
   release:
     types: [ published ]
   push:
-    branches: [ master ]
+    branches: [ master, main ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, main ]
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v3
         name: Install Python
         with:
           python-version: '3.9'
@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v3
         name: Install Python
         with:
           python-version: '3.9'

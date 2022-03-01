@@ -1,7 +1,7 @@
 import unittest
 
 from qiskit import QuantumCircuit, BasicAer, QuantumRegister
-from jkq.ddsim.hybridqasmsimulator import HybridQasmSimulator
+from mqt.ddsim.hybridqasmsimulator import HybridQasmSimulator
 from qiskit import execute
 
 

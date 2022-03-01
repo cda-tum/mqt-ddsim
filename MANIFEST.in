@@ -3,6 +3,7 @@ include src/*
 include include/*
 include apps/*
 graft jkq/*
+graft mqt/*
 
 # Include relevant files from other JKQ projects
 include extern/qfr/CMakeLists.txt
