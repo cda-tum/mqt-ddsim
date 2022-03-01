@@ -1,7 +1,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PyPI](https://img.shields.io/pypi/v/mqt.ddsim?logo=pypi)](https://pypi.org/project/mqt.ddsim/)
 [![CI](https://github.com/cda-tum/ddsim/actions/workflows/cmake.yml/badge.svg)](https://github.com/cda-tum/ddsim/actions/workflows/cmake.yml)
-[![Documentation](https://img.shields.io/readthedocs/thapbi-pict.svg?logo=read-the-docs)](https://readthedocs.io)
+[![Documentation](https://img.shields.io/readthedocs/thapbi-pict.svg?logo=read-the-docs)](https://ddsim.readthedocs.io/en/latest/)
 [![codecov](https://codecov.io/gh/cda-tum/ddsim/branch/master/graph/badge.svg)](https://codecov.io/gh/cda-tum/ddsim)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/github/cda-tum/ddsim?label=python&logo=lgtm)](https://lgtm.com/projects/g/cda-tum/ddsim/context:python)
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/github/cda-tum/ddsim?label=c%2B%2B&logo=lgtm)](https://lgtm.com/projects/g/cda-tum/ddsim/context:cpp)
