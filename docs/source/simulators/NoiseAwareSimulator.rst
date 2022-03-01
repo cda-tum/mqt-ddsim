@@ -6,13 +6,17 @@ global decoherence and gate error noise effects. A detailed summary of the simul
 in :cite:p:`grurl2020stochastic`. Note that the simulator currently does not support simulating the integrated
 algorithms.
 
-Building the simulator requires :code:`Threads::Threads`. It can be built by executing ::
+Building the simulator requires :code:`Threads::Threads`. It can be built by executing
+
+.. code-block:: console
 
     $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
     $ cmake --build build --config Release --target ddsim_noise_aware
 
 
-The simulator provides a help function which is called in the following way::
+The simulator provides a help function which is called in the following way:
+
+.. code-block:: console
 
     $ ./build/ddsim_noise_aware -h
     JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
@@ -34,7 +38,9 @@ The simulator provides a help function which is called in the following way::
     Process finished with exit code 0
 
 
-An example run, with amplitude damping, phase flip, and depolarization error (each with a probability of 0.1% whenever a gate is applied) looks like this::
+An example run, with amplitude damping, phase flip, and depolarization error (each with a probability of 0.1% whenever a gate is applied) looks like this:
+
+.. code-block:: console
 
     $ ./build/ddsim_noise_aware --ps --noise_effects APD --stoch_runs 10000 --noise_prob 0.001 --simulate_file adder4.qasm
     {
