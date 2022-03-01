@@ -3,7 +3,9 @@ CircuitSimulator
 
 To build the simulator execute, build the :code:`ddsim_simple` (the name stuck due to historical reasons ;) ) CMake target and run the resulting executable with options according to your needs.
 
-The standalone executable is launched in the following way, showing available options::
+The standalone executable is launched in the following way, showing available options:
+
+.. code-block:: console
 
     $ ./ddsim_simple --help
     MQT DDSIM by https://iic.jku.at/eda/ -- Allowed options:
@@ -32,7 +34,9 @@ The standalone executable is launched in the following way, showing available op
     --simulate_fast_shor arg              simulate Shor's algorithm factoring this number with intermediate measurements
     --simulate_fast_shor_coprime arg (=0) coprime number to use with Shor's algorithm (zero randomly generates a coprime)
 
-The output is JSON-formatted as shown below (with hopefully intuitive naming). ::
+The output is JSON-formatted as shown below (with hopefully intuitive naming).
+
+.. code-block:: console
 
     $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
     $ cmake --build build --config Release --target ddsim_simple
@@ -62,7 +66,9 @@ The output is JSON-formatted as shown below (with hopefully intuitive naming). :
 Quickstart Guide
 ################
 
-Execute the following lines to get the simulator running in no time::
+Execute the following lines to get the simulator running in no time:
+
+.. code-block:: console
 
     $ git clone --recurse-submodules https://github.com/cda-tum/ddsim/
     [...]

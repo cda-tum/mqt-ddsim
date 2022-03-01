@@ -20,7 +20,9 @@ Basic Example
 #############
 
 This example shall serve as a showcase on how to use the simulation path framework (via Python).
-First, create the circuit to be simulated using qiskit, e.g., in this case a three-qubit GHZ state::
+First, create the circuit to be simulated using qiskit, e.g., in this case a three-qubit GHZ state:
+
+.. code-block:: python3
 
     from qiskit import *
 
@@ -32,7 +34,9 @@ First, create the circuit to be simulated using qiskit, e.g., in this case a thr
 
 
 Then, obtain the simulation path framework qiskit backend. You can choose between the :code:`path_sim_qasm_simulator` and the :code:`path_sim_statevector_simulator`.
-The first just yields a dictionary with the counts of the measurements, while the latter also provides the complete statevector (which, depending on the amount of qubits, might not fit in the available memory). ::
+The first just yields a dictionary with the counts of the measurements, while the latter also provides the complete statevector (which, depending on the amount of qubits, might not fit in the available memory).
+
+.. code-block:: python3
 
     from mqt import ddsim
 
@@ -48,7 +52,9 @@ Per default, the backend uses the :code:`sequential` strategy. For this particul
  The corresponding simulation path is thus described by :code:`[[0, 1], [4, 2], [5, 3]]` and the final state is the one with ID :code:`6`.
 
 The simulation is started by calling the :code:`execute` function, which takes several optional configuration parameters (such as the simulation path strategy).
-For a complete list of configuration options see [here](#configuration). ::
+For a complete list of configuration options see [here](#configuration).
+
+.. code-block:: python3
 
     job = execute(circ, backend)
     result = job.result()
@@ -62,12 +68,16 @@ CoTenGra
 
 Instead of re-inventing the wheel, the framework allows to translate strategies from the domain of tensor networks to decision diagrams.
 To this end, the tensor network contraction library `CoTenGra <https://github.com/jcmgray/cotengra>`_ is used.
-In order to use this part of the framework, some extra dependencies have to be installed. This can be accomplished by running ::
+In order to use this part of the framework, some extra dependencies have to be installed. This can be accomplished by running
+
+.. code-block:: console
 
     pip install jkq.ddsim[tnflow]
     pip install -U git+https://github.com/jcmgray/cotengra.git
 
-Then, in order to let CoTenGra determine a simulation path for a given circuit the :code:`mode="cotengra"` option has to be used when calling :code:`execute`, i.e., ::
+Then, in order to let CoTenGra determine a simulation path for a given circuit the :code:`mode="cotengra"` option has to be used when calling :code:`execute`, i.e.,
+
+.. code-block:: python3
 
     job = execute(circ, backend, mode="cotengra")
 
@@ -89,7 +99,9 @@ Running Tests
 #############
 
 The repository also includes some (rudimentary) unit tests (using GoogleTest), which aim to ensure the correct behavior
-of the tool. They can be built and executed in the following way::
+of the tool. They can be built and executed in the following way:
+
+.. code-block:: console
 
     $ cmake -DBUILD_DDSIM_TESTS=ON -DCMAKE_BUILD_TYPE=Release -S . -B build
     $ cmake --build build/ --config Release
