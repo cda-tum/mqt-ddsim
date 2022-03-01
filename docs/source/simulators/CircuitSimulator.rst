@@ -59,7 +59,8 @@ The output is JSON-formatted as shown below (with hopefully intuitive naming). :
     }
 
 
-#### Quickstart Guide
+Quickstart Guide
+################
 
 Execute the following lines to get the simulator running in no time::
 
@@ -79,3 +80,5 @@ Execute the following lines to get the simulator running in no time::
     JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
       -h [ --help ]                         produce help message
     [...]
+
+If you are using this simulator, please cite :cite:p:`zulehner2019advanced`.

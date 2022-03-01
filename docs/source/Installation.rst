@@ -1,7 +1,7 @@
 Installation
 ============
 
-MQT DDSIM is mainly developed as a *C++* library that builds upon `our decision diagram (DD) package <https://github.com/cda-tum/dd_package.git>`_ as well as `our quantum functionality representation (QFR) <https://github.com/cda-tum/qfr.git>`_.
+MQT DDSIM is mainly developed as a C++ library that builds upon `our decision diagram (DD) package <https://github.com/cda-tum/dd_package.git>`_ as well as `our quantum functionality representation (QFR) <https://github.com/cda-tum/qfr.git>`_.
 In order to make the tool as accessible as possible, it comes with an easy-to-use Python interface.
 
 
@@ -16,7 +16,7 @@ We encourage installing DDSIM via pip (preferably in a `virtual environment <htt
 
 In most practical cases (under 64-bit Linux, MacOS, and Windows), this requires no compilation and merely downloads and installs a platform-specific pre-built wheel.
 
-However, in order to get the best performance out of QCEC and enable platform-specific compiler optimizations that cannot be enabled on portable wheels, it is recommended to build the package from source via:
+However, in order to get the best performance out of DDSIM and enable platform-specific compiler optimizations that cannot be enabled on portable wheels, it is recommended to build the package from source via:
 
     .. code-block:: console
 
@@ -29,7 +29,7 @@ In order to access the latest build logs, visit `ddsim/actions/workflows/ci.yml 
 
 **Disclaimer**: We noticed some issues when compiling with Microsoft's MSCV compiler toolchain. If you want to start development on this project under Windows, consider using the *clang* compiler toolchain. A detailed description of how to set this up can be found `here <https://docs.microsoft.com/en-us/cpp/build/clang-support-msbuild?view=msvc-160>`_.
 
-eveloper
+Developer
 #########
 
 In order to start developing, clone the DDSIM repository using
@@ -83,5 +83,5 @@ The :code:`mqt.ddsim` Python module can be conveniently built locally by calling
 
 The :code:`--editable` flag ensures that changes in the Python code are instantly available without re-running the command.
 
-`Pybind11 <https://pybind11.readthedocs.io/>`_ is used for providing bindings of the C++ core library to Python (see `bindings.cpp <https://github.com/cda-tum/qcec/tree/master/mqt/ddsim/bindings.cpp>`_).
+`Pybind11 <https://pybind11.readthedocs.io/>`_ is used for providing bindings of the C++ core library to Python (see `bindings.cpp <https://github.com/cda-tum/ddsim/tree/master/mqt/ddsim/bindings.cpp>`_).
 If parts of the C++ code have been changed, the above command has to be run again to make the changes visible in Python.
