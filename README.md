@@ -53,7 +53,7 @@ Building (and running) is continuously tested under Linux, MacOS, and Windows us
 
 ## References
 
-If you use our tools for your research, we will be thankful if you refer to it by citing the appropriate publication.
+DDSIM has been developed based on methods proposed in the following papers:
 
 - A. Zulehner and R. Wille, "[Advanced Simulation of Quantum Computations](https://iic.jku.at/files/eda/2018_tcad_advanced_simulation_quantum_computation.pdf)," Transactions on CAD of Integrated Circuits and Systems (TCAD), 2019
 - S. Hillmich, I.L. Markov, and R. Wille, "[Just Like the Real Thing: Fast Weak Simulation of Quantum Computation](https://iic.jku.at/files/eda/2020_dac_weak_simulation_quantum_computation.pdf)," in Design Automation Conference (DAC), 2020
