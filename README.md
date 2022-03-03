@@ -59,7 +59,7 @@ ddsim/ $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
 ddsim/ $ cmake --build build --config Release 
 ```
 
-This builds the whole project including the library and executables, please refer to the [documentation](https://ddsim.readthedocs.io/en/latest/).
+This builds the whole project including the library and executables, please refer to the [documentation](https://ddsim.readthedocs.io/en/latest/) on their usage.
 
 ## References
 
