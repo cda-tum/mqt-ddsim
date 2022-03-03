@@ -1,11 +1,10 @@
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![PyPI](https://img.shields.io/pypi/v/mqt.ddsim?logo=pypi)](https://pypi.org/project/mqt.ddsim/)
-[![CI](https://github.com/cda-tum/ddsim/actions/workflows/cmake.yml/badge.svg)](https://github.com/cda-tum/ddsim/actions/workflows/cmake.yml)
-[![Documentation](https://img.shields.io/readthedocs/thapbi-pict.svg?logo=read-the-docs)](https://ddsim.readthedocs.io/en/latest/)
-[![codecov](https://codecov.io/gh/cda-tum/ddsim/branch/master/graph/badge.svg)](https://codecov.io/gh/cda-tum/ddsim)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/github/cda-tum/ddsim?label=python&logo=lgtm)](https://lgtm.com/projects/g/cda-tum/ddsim/context:python)
-[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/github/cda-tum/ddsim?label=c%2B%2B&logo=lgtm)](https://lgtm.com/projects/g/cda-tum/ddsim/context:cpp)
-
+[![PyPI](https://img.shields.io/pypi/v/mqt.ddsim?logo=pypi&style=flat-square)](https://pypi.org/project/mqt.ddsim/)
+![OS](https://img.shields.io/badge/os-linux%20%7C%20macos%20%7C%20windows-purple?logoColor=b0c0c0&labelColor=363D44&style=flat-square)
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![CI](https://img.shields.io/github/workflow/status/cda-tum/ddsim/CI?style=flat-square&logo=github&label=c%2B%2B)](https://github.com/cda-tum/ddsim/actions/workflows/cmake.yml)
+[![Bindings](https://img.shields.io/github/workflow/status/cda-tum/ddsim/Deploy%20to%20PyPI?style=flat-square&logo=github&label=python)](https://github.com/cda-tum/ddsim/actions/workflows/bindings.yml)
+[![Documentation](https://img.shields.io/readthedocs/ddsim?logo=readthedocs&style=flat-square)](https://ddsim.readthedocs.io/en/latest/)
+[![codecov](https://img.shields.io/codecov/c/github/cda-tum/ddsim?style=flat-square&logo=codecov)](https://codecov.io/gh/cda-tum/ddsim)
 
 # MQT DDSIM - A quantum circuit simulator based on decision diagrams written in C++
 
@@ -16,7 +15,7 @@ The simulator builds upon [our quantum functionality representation (QFR)](https
 
 If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an [issue](https://github.com/cda-tum/ddsim/issues) on GitHub.
 
-## Getting Started with the Python bindings
+## Getting Started
 
 DDSIM bundled with the provider and backends for Qiskit is available via [PyPi](https://pypi.org/project/mqt.ddsim/) as wheel for Linux, Windows and macOS.
 
@@ -44,22 +43,13 @@ counts = job.result().get_counts(circ)
 print(counts)
 ```
 
-## Clone, Build, and Run
+## System Requirements and Building
 
-Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). 
-The implementation should be compatible with any C++17 compiler and a minimum CMake version of 3.14.
+The implementation is compatible with any C++17 compiler and a minimum CMake version of 3.14.
 The required dependencies are `OpenMP >= 4.0` and `Threads::Threads`.
+Please refer to the [documentation](https://ddsim.readthedocs.io/en/latest/) on how to build the project.
 
-Clone and build the repository with  
-
-```console
-$ git clone --recurse-submodules https://github.com/cda-tum/ddsim/
-$ cd ddsim 
-ddsim/ $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
-ddsim/ $ cmake --build build --config Release 
-```
-
-This builds the whole project including the library and executables, please refer to the [documentation](https://ddsim.readthedocs.io/en/latest/) on their usage.
+Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments).
 
 ## References
 
