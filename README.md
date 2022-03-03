@@ -44,8 +44,6 @@ counts = job.result().get_counts(circ)
 print(counts)
 ```
 
-Detailed documentation on the available backends and their usage is available on [RtD]().
-
 ## Clone, Build, and Run
 
 Building (and running) is continuously tested under Linux, MacOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments). 
