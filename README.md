@@ -16,15 +16,14 @@ If you have any questions, feel free to contact us via [iic-quantum@jku.at](mail
 
 ---
 
-This tool can be used for simulating quantum circuits provided in multiple format such as OpenQASM (see our [our set of circuits](https://github.com/cda-tum/quantum_circuits)) and Qiskit QuantumCircuit objects.
-Additional algorithms are integrated in [QFR](https://github.com/cda-tum/qfr.git) and hence available in the simulator.
-A complete list of supported formats and algorithms is available at [RtD]().
+DDSIM can be used for simulating quantum circuits provided in multiple format such as OpenQASM (see our [our set of circuits](https://github.com/cda-tum/quantum_circuits)) and Qiskit QuantumCircuit objects.
+Additional algorithms are integrated in [QFR](https://github.com/cda-tum/qfr) and hence available in the simulator.
 
-**You can find the detailed documention at [ReadTheDocs]().** (Here the button might make sense ;) )
+**Detailed documentation on all available formats, options, and algorithms is available at  [ReadTheDocs](https://ddsim.readthedocs.io/en/latest/).
 
-## Using the Python Bindings / Backend for Qiskit
+## Getting Started with the Python bindings
 
-The simulator bundled with the backend for Qiskit is available via [PyPi](https://pypi.org/project/mqt.ddsim/) as wheel for Linux, Windows and MacOS.
+DDSIM bundled with the provider and backends for Qiskit is available via [PyPi](https://pypi.org/project/mqt.ddsim/) as wheel for Linux, Windows and macOS.
 
 ```console
 (venv) $ pip install mqt.ddsim
@@ -43,13 +42,10 @@ circ.cx(0, 2)
 
 print(circ.draw(fold=-1))
 
-provider = ddsim.DDSIMProvider()
-backend = provider.get_backend('qasm_simulator')
+backend = ddsim.DDSIMProvider().get_backend('qasm_simulator')
 
 job = execute(circ, backend, shots=10000)
-result = job.result()
-
-counts = result.get_counts(circ)
+counts = job.result().get_counts(circ)
 print(counts)
 ```
 
@@ -66,21 +62,20 @@ Clone and build the repository with
 ```console
 $ git clone --recurse-submodules https://github.com/cda-tum/ddsim/
 $ cd ddsim 
-ddsim $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
-ddsim $ cmake --build build --config Release --target ddsim
+ddsim/ $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
+ddsim/ $ cmake --build build --config Release 
 ```
 
-Documentation on where to go from here is available on [RtD]().
+This builds the whole project including the library and executables, please refer to the [documentation](https://ddsim.readthedocs.io/en/latest/).
 
 ## References
 
-If you use our tool for your research, we will be thankful if you refer to it by citing the appropriate publication.
-A more elaborate description of the papers is available at [RtD]().
+If you use our tools for your research, we will be thankful if you refer to it by citing the appropriate publication.
 
 - A. Zulehner and R. Wille, "[Advanced Simulation of Quantum Computations](https://iic.jku.at/files/eda/2018_tcad_advanced_simulation_quantum_computation.pdf)," Transactions on CAD of Integrated Circuits and Systems (TCAD), 2019
 - S. Hillmich, I.L. Markov, and R. Wille, "[Just Like the Real Thing: Fast Weak Simulation of Quantum Computation](https://iic.jku.at/files/eda/2020_dac_weak_simulation_quantum_computation.pdf)," in Design Automation Conference (DAC), 2020
 - T. Grurl, R. Kueng, J. Fuß, and R. Wille, "[Stochastic Quantum Circuit Simulation Using Decision Diagrams](https://iic.jku.at/files/eda/2021_stochastic_quantum_circuit_simulation_using_decision_diagrams.pdf)," in Design, Automation and Test in Europe (DATE), 2021
 - S. Hillmich, R. Kueng, I. L. Markov, and R. Wille, "[As Accurate as Needed, as Efficient as Possible: Approximations in DD-based Quantum Circuit Simulation](https://iic.jku.at/files/eda/2021_date_approximations_dd_baed_quantum_circuit_simulation.pdf)," in Design, Automation and Test in Europe (DATE), 2021
-- L. Burgholzer, H. Bauer, and R. Wille, "[Hybrid Schrödinger-Feynman Simulation of Quantum Circuits With Decision Diagrams](https://arxiv.org/pdf/2105.07045.pdf)," arXiv:2105.07045, 2021
+- L. Burgholzer, H. Bauer, and R. Wille, "[Hybrid Schrödinger-Feynman Simulation of Quantum Circuits With Decision Diagrams](https://iic.jku.at/files/eda/2021_qce_hybrid_schrodinger_feynman_simulation_with_decision_diagrams.pdf)," Conference on Quantum Computing and Engineering (QCE), 2021
 - L. Burgholzer, A.Ploier, and R. Wille, "[Exploiting Arbitrary Paths for the Simulation of Quantum Circuits with Decision Diagrams](https://iic.jku.at/files/eda/2022_date_exploiting_arbitrary_paths_simulation_quantum_circuits_decision_diagrams.pdf)," in Design, Automation and Test in Europe (DATE), 2022
 

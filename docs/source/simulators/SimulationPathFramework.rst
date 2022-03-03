@@ -94,16 +94,3 @@ The framework can be configured using multiple options (which can be passed to t
  - :code:`seed`: the random seed used for the simulator (default :code:`0`, i.e., no particular seed)
 
 In addition to the above, CoTenGra can be configured using the options described [above](#cotengra).
-
-Running Tests
-#############
-
-The repository also includes some (rudimentary) unit tests (using GoogleTest), which aim to ensure the correct behavior
-of the tool. They can be built and executed in the following way:
-
-.. code-block:: console
-
-    $ cmake -DBUILD_DDSIM_TESTS=ON -DCMAKE_BUILD_TYPE=Release -S . -B build
-    $ cmake --build build/ --config Release
-    $ ./build/test/ddsim_test
-    [...]

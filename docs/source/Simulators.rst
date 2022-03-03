@@ -9,3 +9,4 @@ DDSIM offers different kinds of simulators to use.
    simulators/CircuitSimulator
    simulators/NoiseAwareSimulator
    simulators/SimulationPathFramework
+   simulators/HybridSchrodingerFeynman

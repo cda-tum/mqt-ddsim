@@ -83,7 +83,7 @@ Execute the following lines to get the simulator running in no time:
     [100%] Built target ddsim_simple
 
     ddsim/ $ build/ddsim_simple --help
-    JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options:
+    MQT DDSIM by https://iic.jku.at/eda/ -- Allowed options:
       -h [ --help ]                         produce help message
     [...]
 
