@@ -9,17 +9,12 @@
 
 # MQT DDSIM - A quantum circuit simulator based on decision diagrams written in C++
 
-A tool for quantum circuit simulation by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at).
+A tool for classical quantum circuit simulation by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at).
 The simulator builds upon [our quantum functionality representation (QFR)](https://github.com/cda-tum/qfr.git) which in turns builds on [our decision diagram (DD) package](https://github.com/cda-tum/dd_package.git).
 
+**Detailed documentation on all available formats, options, and algorithms is available at  [ReadTheDocs](https://ddsim.readthedocs.io/en/latest/).**
+
 If you have any questions, feel free to contact us via [iic-quantum@jku.at](mailto:iic-quantum@jku.at) or by creating an [issue](https://github.com/cda-tum/ddsim/issues) on GitHub.
-
----
-
-DDSIM can be used for simulating quantum circuits provided in multiple format such as OpenQASM (see our [our set of circuits](https://github.com/cda-tum/quantum_circuits)) and Qiskit QuantumCircuit objects.
-Additional algorithms are integrated in [QFR](https://github.com/cda-tum/qfr) and hence available in the simulator.
-
-**Detailed documentation on all available formats, options, and algorithms is available at  [ReadTheDocs](https://ddsim.readthedocs.io/en/latest/).
 
 ## Getting Started with the Python bindings
 
