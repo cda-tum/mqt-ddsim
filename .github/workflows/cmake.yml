@@ -19,7 +19,7 @@ jobs:
   codestyle:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - uses: DoozyX/clang-format-lint-action@v0.13
@@ -32,7 +32,7 @@ jobs:
     name: Build and Test on Ubuntu
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Configure CMake
@@ -48,7 +48,7 @@ jobs:
     needs: [ build-ubuntu, codestyle ]
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Install OpenMP dependency
@@ -67,7 +67,7 @@ jobs:
     needs: [ build-ubuntu, codestyle ]
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - uses: ilammy/msvc-dev-cmd@v1
@@ -85,7 +85,7 @@ jobs:
     needs: [ build-ubuntu, codestyle ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Configure CMake

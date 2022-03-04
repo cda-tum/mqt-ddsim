@@ -14,7 +14,7 @@ jobs:
     name:    Test Python bindings
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - uses: actions/setup-python@v3
@@ -35,7 +35,7 @@ jobs:
     name: Build source distribution
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - uses: actions/setup-python@v3
@@ -64,7 +64,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - uses: ilammy/msvc-dev-cmd@v1
