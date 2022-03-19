@@ -12,7 +12,7 @@
 #include <vector>
 
 class DeterministicNoiseSimulator: public Simulator {
-    using CN = dd::ComplexNumbers;
+    using CN    = dd::ComplexNumbers;
     using dEdge = dd::Package::dEdge;
 
 public:
@@ -24,11 +24,11 @@ public:
     //    }
 
     DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, unsigned long long seed):
-            Simulator(seed), qc(qc) {
+        Simulator(seed), qc(qc) {
     }
 
     DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const std::string& noise_effects, double noise_prob):
-            qc(qc) {
+        qc(qc) {
         setNoiseEffects(noise_effects);
         setAmplitudeDampingProbability(noise_prob);
     }
@@ -98,7 +98,7 @@ public:
     //    qc::MatrixDD density_root_edge{};
     dd::Package::dEdge density_root_edge{};
 
-    bool sequentialApplyNoise = false;
+    bool sequentialApplyNoise    = false;
     bool use_density_matrix_type = true;
     char MeasureOneCollapsing(dd::Qubit index);
 
@@ -106,7 +106,8 @@ private:
     std::unique_ptr<qc::QuantumComputation>& qc;
 
     std::string gateNoiseTypes;
-    long        calls = 0;
+    long        calls   = 0;
+    int         opCount = 0;
 
     //    const unsigned int step_number;Q
     //    const double       step_fidelity;
@@ -123,7 +124,7 @@ private:
 
     dd::Package::dEdge makeZeroDensityOperator(dd::QubitCount n);
 
-    dEdge  ApplyNoiseEffects(dEdge& originalEdge, const std::unique_ptr<qc::Operation>& op, unsigned char maxDepth, bool firstPathEdge, short predecessorEdgeIdx);
+    dEdge  ApplyNoiseEffects(dEdge& originalEdge, const std::unique_ptr<qc::Operation>& op, const std::vector<dd::Qubit>& used_qubits, unsigned char maxDepth, bool firstPathEdge);
     dd::fp probForIndexToBeZero(dd::Package::dEdge e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob);
 };
 
