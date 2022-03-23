@@ -70,15 +70,20 @@ else ()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic $<$<CONFIG:DEBUG>:-Og>)
 
     if (BINDINGS)
-        # adjust visibility settings for building Python bindings
-        include(CheckPIESupported)
-        check_pie_supported()
-        set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
-        target_compile_options(${PROJECT_NAME} PUBLIC -fvisibility=hidden)
+	    # adjust visibility settings for building Python bindings
+	    include(CheckPIESupported)
+	    check_pie_supported()
+	    set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+	    target_compile_options(${PROJECT_NAME} PUBLIC -fvisibility=hidden)
     endif ()
     if (NOT DEPLOY)
-        # only include machine-specific optimizations when building for the host machine
-        target_compile_options(${PROJECT_NAME} PUBLIC -mtune=native -march=native)
+	    # only include machine-specific optimizations when building for the host machine
+	    target_compile_options(${PROJECT_NAME} PUBLIC -mtune=native)
+	    include(CheckCXXCompilerFlag)
+	    check_cxx_compiler_flag(-march=native HAS_MARCH_NATIVE)
+	    if (HAS_MARCH_NATIVE)
+		    target_compile_options(${PROJECT_NAME} PUBLIC -march=native)
+	    endif ()
     endif ()
 endif ()
 
