@@ -9,10 +9,6 @@ on:
     branches: [ master, main ]
   workflow_dispatch:
 
-env:
-  LIBOMP_VERSION_TAG: libomp-13.0.1
-  LIBOMP_HASH:        ad8604a13319a9959ce6a4adc769b114a78d7c2cb81e08116e499310d1ba518e
-
 jobs:
   test_bindings:
     name:    Test Python bindings
@@ -74,29 +70,6 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.3.1
-      - uses: actions/upload-artifact@v2
-        with:
-          path: ./wheelhouse/*.whl
-
-  build_macos_m1_wheels:
-    name:    Build wheels on macOS for Apple Silicon
-    needs: [ test_bindings, build_sdist ]
-    runs-on: macos-11
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - uses: actions/setup-python@v3
-        name: Install Python
-        with:
-          python-version: '3.9'
-      - name: Build wheels
-        uses: pypa/cibuildwheel@v2.3.1
-        env:
-          CIBW_ARCHS_MACOS:        arm64
-          CIBW_BEFORE_BUILD_MACOS: |
-                                   curl -L -H "Authorization: Bearer QQ==" -o ${{ env.LIBOMP_VERSION_TAG }}.big_sur.bottle.tar.gz https://ghcr.io/v2/homebrew/core/libomp/blobs/sha256:${{ env.LIBOMP_HASH }} 
-                                   brew install -f ${{ env.LIBOMP_VERSION_TAG }}.big_sur.bottle.tar.gz
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl
