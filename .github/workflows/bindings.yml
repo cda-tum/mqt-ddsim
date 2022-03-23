@@ -90,15 +90,13 @@ jobs:
         name: Install Python
         with:
           python-version: '3.9'
-      - name: Install limbomp
-        run:  |
-              curl -L -H "Authorization: Bearer QQ==" -o ${{ env.LIBOMP_VERSION_TAG }}.big_sur.bottle.tar.gz https://ghcr.io/v2/homebrew/core/libomp/blobs/sha256:${{ env.LIBOMP_HASH }}
-              brew install -f ${{ env.LIBOMP_VERSION_TAG }}.big_sur.bottle.tar.gz
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.3.1
         env:
           CIBW_ARCHS_MACOS:        arm64
-          CIBW_BEFORE_BUILD_MACOS: ""
+          CIBW_BEFORE_BUILD_MACOS: |
+                                   curl -L -H "Authorization: Bearer QQ==" -o ${{ env.LIBOMP_VERSION_TAG }}.big_sur.bottle.tar.gz https://ghcr.io/v2/homebrew/core/libomp/blobs/sha256:${{ env.LIBOMP_HASH }} 
+                                   brew install -f ${{ env.LIBOMP_VERSION_TAG }}.big_sur.bottle.tar.gz
       - uses: actions/upload-artifact@v2
         with:
           path: ./wheelhouse/*.whl
