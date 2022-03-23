@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  LIBOMP_VERSION_TAG: 13.0.1
+  LIBOMP_VERSION_TAG: libomp-13.0.1
   LIBOMP_HASH:        ad8604a13319a9959ce6a4adc769b114a78d7c2cb81e08116e499310d1ba518e
 
 jobs:
