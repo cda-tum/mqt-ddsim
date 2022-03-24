@@ -115,7 +115,7 @@ However, in order to get the best performance out of DDSIM and enable platform-s
 
         (venv) $ pip install mqt.ddsim --no-binary mqt.ddsim
 
-This requires a C++ compiler supporting C++17, a minimum `CMake <https://cmake.org/>`_ version of 3.14 and `OpenMP <https://www.openmp.org/>`_.
+This requires a `C++ compiler <https://en.wikipedia.org/wiki/List_of_compilers#C++_compilers>`_ supporting C++17, a minimum `CMake <https://cmake.org/>`_ version of 3.14 and `OpenMP <https://www.openmp.org/>`_.
 
 The library is continuously tested under Linux, MacOS, and Windows using the `latest available system versions for GitHub Actions <https://github.com/actions/virtual-environments>`_.
 In order to access the latest build logs, visit `ddsim/actions/workflows/ci.yml <https://github.com/cda-tum/ddsim/actions/workflows/ci.yml>`_.
