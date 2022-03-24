@@ -74,13 +74,51 @@ The following snippet shows the installation process on Linux (more specifically
                                    0  1  2
         {'000': 50149, '111': 49851}
 
+Possibly requires the installation of :code:`python3-venv` (:code:`sudo apt install python3-venv`).
+
 macOS
 ^^^^^
-TODO
+
+The following snippet shows the installation process on macOS from setting up the virtual environment to running a small example program.
+
+    .. code-block:: console
+        $ python3 -m venv venv
+        $ . venv/bin/activate
+        (venv) $ pip install -U pip setuptools wheel
+        (venv) $ pip install mqt.ddsim qiskit-terra
+        (venv) $ python3 ghz_3.py
+                ┌───┐           ░ ┌─┐
+           q_0: ┤ H ├──■────■───░─┤M├──────
+                └───┘┌─┴─┐  │   ░ └╥┘┌─┐
+           q_1: ─────┤ X ├──┼───░──╫─┤M├───
+                     └───┘┌─┴─┐ ░  ║ └╥┘┌─┐
+           q_2: ──────────┤ X ├─░──╫──╫─┤M├
+                          └───┘ ░  ║  ║ └╥┘
+        meas: 3/═══════════════════╩══╩══╩═
+                                   0  1  2
+        {'000': 50149, '111': 49851}
 
 Windows
 ^^^^^^^
-TODO
+The following snippet shows the installation process on Windows from setting up the virtual environment to running a small example program.
+
+    .. code-block:: console
+        > python3 -m venv venv
+        > .\venv\bin\activate
+        (venv) > pip install -U pip setuptools wheel
+        (venv) > pip install mqt.ddsim qiskit-terra
+        (venv) > python3 ghz_3.py
+                ┌───┐           ░ ┌─┐
+           q_0: ┤ H ├──■────■───░─┤M├──────
+                └───┘┌─┴─┐  │   ░ └╥┘┌─┐
+           q_1: ─────┤ X ├──┼───░──╫─┤M├───
+                     └───┘┌─┴─┐ ░  ║ └╥┘┌─┐
+           q_2: ──────────┤ X ├─░──╫──╫─┤M├
+                          └───┘ ░  ║  ║ └╥┘
+        meas: 3/═══════════════════╩══╩══╩═
+                                   0  1  2
+        {'000': 50149, '111': 49851}
+
 
 Developer
 #########
