@@ -35,7 +35,9 @@ A Detailed Walk Through
 ---------------------
 First, save the following lines as :code:`ghz_3.py` in a folder where you want to install the simulator and run the example.
 Then proceed as described in the section on your operating system.
+
     .. code-block:: python
+
         from qiskit import *
         from mqt import ddsim
 
@@ -58,6 +60,7 @@ Linux
 The following snippet shows the installation process on Linux (more specifically Ubuntu 20.04 LTS) from setting up the virtual environment to running a small example program.
 
     .. code-block:: console
+
         $ python3 -m venv venv
         $ . venv/bin/activate
         (venv) $ pip install -U pip setuptools wheel
@@ -82,6 +85,7 @@ macOS
 The following snippet shows the installation process on macOS from setting up the virtual environment to running a small example program.
 
     .. code-block:: console
+
         $ python3 -m venv venv
         $ . venv/bin/activate
         (venv) $ pip install -U pip setuptools wheel
@@ -103,6 +107,7 @@ Windows
 The following snippet shows the installation process on Windows from setting up the virtual environment to running a small example program.
 
     .. code-block:: console
+
         > python3 -m venv venv
         > .\venv\bin\activate
         (venv) > pip install -U pip setuptools wheel
