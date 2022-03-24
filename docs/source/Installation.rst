@@ -27,7 +27,60 @@ This requires a C++ compiler supporting C++17, a minimum CMake version of 3.14 a
 The library is continuously tested under Linux, MacOS, and Windows using the `latest available system versions for GitHub Actions <https://github.com/actions/virtual-environments>`_.
 In order to access the latest build logs, visit `ddsim/actions/workflows/ci.yml <https://github.com/cda-tum/ddsim/actions/workflows/ci.yml>`_.
 
-**Disclaimer**: We noticed some issues when compiling with Microsoft's MSCV compiler toolchain. If you want to start development on this project under Windows, consider using the *clang* compiler toolchain. A detailed description of how to set this up can be found `here <https://docs.microsoft.com/en-us/cpp/build/clang-support-msbuild?view=msvc-160>`_.
+**Disclaimer**: We noticed some issues when compiling with Microsoft's MSCV compiler toolchain.
+If you want to start development on this project under Windows, consider using the *clang* compiler toolchain.
+A detailed description of how to set this up can be found `here <https://docs.microsoft.com/en-us/cpp/build/clang-support-msbuild?view=msvc-160>`_.
+
+A Detailed Walk Through
+---------------------
+First, save the following lines as :code:`ghz_3.py` in a folder where you want to install the simulator and run the example.
+Then proceed as described in the section on your operating system.
+    .. code-block:: python
+        from qiskit import *
+        from mqt import ddsim
+
+        circ = QuantumCircuit(3)
+        circ.h(0)
+        circ.cx(0, 1)
+        circ.cx(0, 2)
+
+        print(circ.draw(fold=-1))
+
+        backend = ddsim.DDSIMProvider().get_backend('qasm_simulator')
+
+        job = execute(circ, backend, shots=10000)
+        counts = job.result().get_counts(circ)
+        print(counts)
+
+Linux
+^^^^^
+
+The following snippet shows the installation process on Linux (more specifically Ubuntu 20.04 LTS) from setting up the virtual environment to running a small example program.
+
+    .. code-block:: console
+        $ python3 -m venv venv
+        $ . venv/bin/activate
+        (venv) $ pip install -U pip setuptools wheel
+        (venv) $ pip install mqt.ddsim qiskit-terra
+        (venv) $ python3 ghz_3.py
+                ┌───┐           ░ ┌─┐
+           q_0: ┤ H ├──■────■───░─┤M├──────
+                └───┘┌─┴─┐  │   ░ └╥┘┌─┐
+           q_1: ─────┤ X ├──┼───░──╫─┤M├───
+                     └───┘┌─┴─┐ ░  ║ └╥┘┌─┐
+           q_2: ──────────┤ X ├─░──╫──╫─┤M├
+                          └───┘ ░  ║  ║ └╥┘
+        meas: 3/═══════════════════╩══╩══╩═
+                                   0  1  2
+        {'000': 50149, '111': 49851}
+
+macOS
+^^^^^
+TODO
+
+Windows
+^^^^^^^
+TODO
 
 Developer
 #########
