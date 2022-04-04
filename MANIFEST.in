@@ -28,5 +28,9 @@ prune   extern/qfr/extern/pybind11_json/test
 graft extern/taskflow
 prune extern/taskflow/docs
 prune extern/taskflow/image
+prune extern/taskflow/benchmarks
+prune extern/taskflow/doxygen
+prune extern/taskflow/3rd-party
+prune extern/taskflow/tfprof
 
 graft extern/cxxopts
