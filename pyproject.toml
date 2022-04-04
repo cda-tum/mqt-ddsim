@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "wheel", "cmake"]
+requires = ["setuptools", "ninja; sys_platform != 'win32'", "wheel", "cmake"]
 build-backend = "setuptools.build_meta"
 
 [tool.cibuildwheel]

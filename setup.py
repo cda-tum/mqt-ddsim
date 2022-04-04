@@ -16,16 +16,6 @@ class CMakeExtension(Extension):
 
 
 class CMakeBuild(build_ext):
-    def run(self):
-        try:
-            subprocess.check_output(['cmake', '--version'])
-        except OSError:
-            raise RuntimeError("CMake must be installed to build the following extensions: " +
-                               ", ".join(e.name for e in self.extensions))
-
-        for ext in self.extensions:
-            self.build_extension(ext)
-
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.namespace+ext.name)))
         # required for auto-detection of auxiliary "native" libs
@@ -35,6 +25,16 @@ class CMakeBuild(build_ext):
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
                       '-DBINDINGS=ON']
+        print(self.compiler)
+        if self.compiler.compiler_type != "msvc":
+            # Using Ninja-build since it a) is available as a wheel and b)
+            # multithreads automatically. MSVC would require all variables be
+            # exported for Ninja to pick it up, which is a little tricky to do.
+            # Users can override the generator with CMAKE_GENERATOR in CMake
+            # 3.15+.
+            cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
+            if not cmake_generator:
+                cmake_args += ["-GNinja"]
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
@@ -84,7 +84,7 @@ setup(
     license='MIT',
     url='https://iic.jku.at/eda/research/quantum_simulation/',
     ext_modules=[CMakeExtension('pyddsim', namespace='mqt.ddsim.')],
-    cmdclass=dict(build_ext=CMakeBuild),
+    cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     packages=find_namespace_packages(include=['mqt.*']),
     classifiers=[
