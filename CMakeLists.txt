@@ -11,6 +11,8 @@ option(COVERAGE "Configure for coverage report generation")
 option(BINDINGS "Configure for building Python bindings")
 option(DEPLOY "Configure for deployment")
 
+message("-- Generator is set to ${CMAKE_GENERATOR}")
+
 if (DEFINED ENV{DEPLOY})
     set(DEPLOY $ENV{DEPLOY} CACHE BOOL "Use deployment configuration from environment" FORCE)
     message(STATUS "Setting deployment configuration to '${DEPLOY}' from environment")
