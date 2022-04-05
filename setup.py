@@ -74,14 +74,14 @@ with open(README_PATH, encoding="utf8") as readme_file:
 
 setup(
     name='mqt.ddsim',
-    version='1.11.2',
+    version='1.11.3',
     author='Stefan Hillmich',
     author_email='stefan.hillmich@jku.at',
     description='MQT DDSIM - A quantum simulator based on decision diagrams written in C++',
     long_description=README,
     long_description_content_type='text/markdown',
     license='MIT',
-    url='https://iic.jku.at/eda/research/quantum_simulation/',
+    url='https://www.cda.cit.tum.de/research/quantum_simulation/',
     ext_modules=[CMakeExtension('pyddsim', namespace='mqt.ddsim.')],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
@@ -102,7 +102,7 @@ setup(
     project_urls={
         'Source': 'https://github.com/cda-tum/ddsim/',
         'Tracker': 'https://github.com/cda-tum/ddsim/issues',
-        'Research': 'https://iic.jku.at/eda/research/quantum_simulation/',
+        'Research': 'https://www.cda.cit.tum.de/research/quantum_simulation/',
     },
     extras_require={
         "tnflow": ["sparse", "opt-einsum", "quimb", "pandas", "numpy"]
