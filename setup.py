@@ -86,6 +86,7 @@ setup(
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     packages=find_namespace_packages(include=['mqt.*']),
+    python_requires=">=3.7"
     classifiers=[
         'Development Status :: 4 - Beta',
         'Programming Language :: Python :: 3',
