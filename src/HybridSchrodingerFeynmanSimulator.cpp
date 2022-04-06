@@ -1,7 +1,6 @@
 #include "HybridSchrodingerFeynmanSimulator.hpp"
 
 #include <cmath>
-#include <omp.h>
 #include <taskflow/taskflow.hpp>
 
 std::size_t HybridSchrodingerFeynmanSimulator::getNDecisions(dd::Qubit split_qubit) {
@@ -135,99 +134,8 @@ std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator::Simulate(u
     }
 }
 
-void HybridSchrodingerFeynmanSimulator::SimulateHybrid(dd::Qubit split_qubit) {
-    auto               ndecisions  = getNDecisions(split_qubit);
-    const std::int64_t max_control = 1LL << ndecisions;
-
-    int actuallyUsedThreads = static_cast<int>(nthreads);
-    if (static_cast<std::size_t>(max_control) < nthreads) {
-        actuallyUsedThreads = static_cast<int>(max_control);
-    }
-    omp_set_num_threads(1);
-    root_edge                    = qc::VectorDD::zero;
-    std::int64_t nslices_at_once = 16;
-    nslices_at_once              = std::min(nslices_at_once, max_control / static_cast<std::int64_t>(actuallyUsedThreads));
-    std::stack<std::pair<std::int64_t, std::int64_t>> stack{};
-    for (auto i = max_control - 1; i >= 0; i -= nslices_at_once) {
-        std::cerr << "Add initial task task (" << 0 << ", " << i << ")\n";
-        stack.emplace(0, i);
-    }
-    std::vector<std::vector<bool>> computed(ndecisions, std::vector<bool>(max_control, false));
-
-    omp_lock_t stacklock;
-    omp_init_lock(&stacklock);
-#pragma omp parallel // NOLINT(openmp-use-default-none)
-    {
-        bool                                  isempty;
-        std::pair<std::int64_t, std::int64_t> current{};
-        omp_set_lock(&stacklock);
-        isempty = stack.empty();
-        if (!isempty) {
-            current = stack.top();
-            stack.pop();
-        }
-        std::cerr << "Current  (" << current.first << ", " << current.second << ")\n";
-        omp_unset_lock(&stacklock);
-
-        while (!isempty) {
-
-            if (current.first == 0) { // slice
-                std::unique_ptr<dd::Package> old_dd;
-                qc::VectorDD                 edge{};
-                for (std::int64_t i = 0; i < nslices_at_once; i++) {
-                    auto slice_dd = std::make_unique<dd::Package>(getNumberOfQubits());
-                    auto result   = SimulateSlicing(slice_dd, split_qubit, current.second + i);
-                    if (i > 0) {
-                        edge = slice_dd->add(slice_dd->transfer(edge), result);
-                    } else {
-                        edge = result;
-                    }
-                    old_dd = std::move(slice_dd);
-                }
-
-                current.first = static_cast<std::int64_t>(std::log2(nslices_at_once));
-                current.second /= nslices_at_once;
-                dd::serialize(edge, "slice_" + std::to_string(current.first) + "_" + std::to_string(current.second) + ".dd", true);
-            } else { // adding
-                auto        slice_dd       = std::make_unique<dd::Package>(getNumberOfQubits());
-                std::string filename       = "slice_" + std::to_string(current.first - 1) + "_";
-                std::string filename_left  = filename + std::to_string(current.second * 2) + ".dd";
-                std::string filename_right = filename + std::to_string(current.second * 2 + 1) + ".dd";
-
-                auto result  = slice_dd->deserialize<dd::Package::vNode>(filename_left, true);
-                auto result2 = slice_dd->deserialize<dd::Package::vNode>(filename_right, true);
-                result       = slice_dd->add(result, result2);
-                dd::serialize(result, "slice_" + std::to_string(current.first) + "_" + std::to_string(current.second) + ".dd", true);
-
-                remove(filename_left.c_str());
-                remove(filename_right.c_str());
-            }
-
-            omp_set_lock(&stacklock);
-            if (current.first < static_cast<std::int64_t>(ndecisions)) {
-                computed[current.first][current.second] = true;
-
-                if (computed.at(current.first).at(current.second + (current.second % 2 ? (-1) : 1))) {
-                    std::cerr << "Add dynamic task (" << current.first + 1 << ", " << current.second / 2 << ")\n";
-                    stack.push(std::make_pair(current.first + 1, current.second / 2));
-                }
-            }
-            isempty = stack.empty();
-            if (!isempty) {
-                current = stack.top();
-                stack.pop();
-            }
-            std::cerr << "Current  (" << current.first << ", " << current.second << ")\n";
-            omp_unset_lock(&stacklock);
-        }
-    }
-    omp_destroy_lock(&stacklock);
-    root_edge = dd->deserialize<dd::Package::vNode>("slice_" + std::to_string(ndecisions) + "_0.dd", true);
-    dd->incRef(root_edge);
-}
-
 void HybridSchrodingerFeynmanSimulator::SimulateHybridTaskflow(const dd::Qubit split_qubit) {
-    const auto               ndecisions  = getNDecisions(split_qubit);
+    const auto         ndecisions  = getNDecisions(split_qubit);
     const std::int64_t max_control = 1LL << ndecisions;
 
     int actuallyUsedThreads = static_cast<int>(nthreads);
@@ -235,16 +143,15 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridTaskflow(const dd::Qubit s
         actuallyUsedThreads = static_cast<int>(max_control);
     }
 
-
-    root_edge                    = qc::VectorDD::zero;
-    const std::int64_t nslices_at_once = std::min<std::int64_t>(16, max_control / static_cast<std::int64_t>(actuallyUsedThreads));;
+    root_edge                          = qc::VectorDD::zero;
+    const std::int64_t nslices_at_once = std::min<std::int64_t>(16, max_control / static_cast<std::int64_t>(actuallyUsedThreads));
+    ;
     std::stack<std::pair<std::int64_t, std::int64_t>> stack{};
-    std::vector<std::vector<bool>> computed(ndecisions, std::vector<bool>(max_control, false));
+    std::vector<std::vector<bool>>                    computed(ndecisions, std::vector<bool>(max_control, false));
 
     tf::Executor executor(1);
 
     std::function<void(std::pair<std::int64_t, std::int64_t>)> compute_pair = [this, &compute_pair, &computed, &executor, ndecisions, nslices_at_once, split_qubit](std::pair<std::int64_t, std::int64_t> current) {
-        std::cerr << "Current  (" << current.first << ", " << current.second << ")\n";
         if (current.first == 0) { // slice
             std::unique_ptr<dd::Package> old_dd;
             qc::VectorDD                 edge{};
@@ -283,15 +190,13 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridTaskflow(const dd::Qubit s
             const auto comp_second = current.second + (current.second % 2 ? (-1) : 1);
 
             if (computed.at(current.first).at(comp_second)) {
-                std::cerr << "Add dynamic task (" << current.first + 1 << ", " << current.second / 2 << ")\n";
-                executor.silent_async([&]() {compute_pair(std::make_pair(current.first + 1, current.second / 2));});
+                executor.silent_async([&]() { compute_pair(std::make_pair(current.first + 1, current.second / 2)); });
             }
         }
     };
 
     for (auto i = max_control - 1; i >= 0; i -= nslices_at_once) {
-        std::cerr << "Add initial task task (" << 0 << ", " << i << ")\n";
-        executor.silent_async([&compute_pair, i]() {compute_pair(std::make_pair(0, i));});
+        executor.silent_async([&compute_pair, i]() { compute_pair(std::make_pair(0, i)); });
     }
     executor.wait_for_all();
 
@@ -299,13 +204,12 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridTaskflow(const dd::Qubit s
     dd->incRef(root_edge);
 }
 
-
 void HybridSchrodingerFeynmanSimulator::SimulateHybridAmplitudes(dd::Qubit split_qubit) {
     const auto         ndecisions  = getNDecisions(split_qubit);
     const std::int64_t max_control = 1LL << ndecisions;
 
     const int actuallyUsedThreads = static_cast<std::size_t>(max_control) < nthreads ? static_cast<int>(max_control) : static_cast<int>(nthreads);
-    root_edge = qc::VectorDD::zero;
+    root_edge                     = qc::VectorDD::zero;
 
     const std::int64_t   nslices_on_one_cpu = std::min<std::int64_t>(64, max_control / actuallyUsedThreads);
     const dd::QubitCount nqubits            = getNumberOfQubits();
@@ -327,8 +231,6 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridAmplitudes(dd::Qubit split
         });
     }
     executor.wait_for_all();
-
-
 
     std::size_t old_increment = 1;
     for (unsigned short level = 0; level < static_cast<unsigned short>(std::log2(actuallyUsedThreads)); ++level) {

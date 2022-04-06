@@ -43,7 +43,7 @@ private:
     std::size_t                       nthreads = 2;
     std::vector<std::complex<dd::fp>> finalAmplitudes{};
 
-    void SimulateHybrid(dd::Qubit split_qubit);
+    void SimulateHybridTaskflow(dd::Qubit split_qubit);
     void SimulateHybridAmplitudes(dd::Qubit split_qubit);
 
     qc::VectorDD SimulateSlicing(std::unique_ptr<dd::Package>& dd, dd::Qubit split_qubit, std::size_t controls);
@@ -80,7 +80,6 @@ private:
         // returns true if this operation was a split operation
         bool apply(std::unique_ptr<dd::Package>& dd, const std::unique_ptr<qc::Operation>& op);
     };
-    void SimulateHybridTaskflow(signed char split_qubit);
 };
 
 #endif //DDSIM_HYBRIDSCHRODINGERFEYNMANSIMULATOR_HPP
