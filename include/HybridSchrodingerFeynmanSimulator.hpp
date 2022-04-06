@@ -7,10 +7,8 @@
 #include "dd/Export.hpp"
 #include "dd/Package.hpp"
 
-#include <cmath>
 #include <complex>
 #include <memory>
-#include <omp.h>
 
 class HybridSchrodingerFeynmanSimulator: public CircuitSimulator {
 public:
@@ -82,6 +80,7 @@ private:
         // returns true if this operation was a split operation
         bool apply(std::unique_ptr<dd::Package>& dd, const std::unique_ptr<qc::Operation>& op);
     };
+    void SimulateHybridTaskflow(signed char split_qubit);
 };
 
 #endif //DDSIM_HYBRIDSCHRODINGERFEYNMANSIMULATOR_HPP
