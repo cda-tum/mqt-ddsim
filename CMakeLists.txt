@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14...3.22)
 
 project(ddsim
         LANGUAGES CXX
-        VERSION 1.11.2
+        VERSION 1.11.3
         DESCRIPTION "DDSIM - A JKQ quantum simulator based on decision diagrams"
         )
 
@@ -10,6 +10,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 option(COVERAGE "Configure for coverage report generation")
 option(BINDINGS "Configure for building Python bindings")
 option(DEPLOY "Configure for deployment")
+
+message("-- Generator is set to ${CMAKE_GENERATOR}")
 
 if (DEFINED ENV{DEPLOY})
     set(DEPLOY $ENV{DEPLOY} CACHE BOOL "Use deployment configuration from environment" FORCE)

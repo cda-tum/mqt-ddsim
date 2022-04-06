@@ -4,6 +4,9 @@ include include/*
 include apps/*
 graft jkq/*
 graft mqt/*
+global-exclude __pycache__/
+global-exclude *.py[cod]
+global-exclude *.so
 
 # Include relevant files from other JKQ projects
 include extern/qfr/CMakeLists.txt
@@ -17,6 +20,9 @@ graft   extern/qfr/extern/dd_package/include
 graft   extern/qfr/extern/json
 prune   extern/qfr/extern/json/doc
 prune   extern/qfr/extern/json/test
+prune   extern/qfr/extern/json/benchmarks
+prune   extern/qfr/extern/json/third_party
+prune   extern/qfr/extern/json/include
 
 graft   extern/qfr/extern/pybind11
 prune   extern/qfr/extern/pybind11/docs
@@ -28,5 +34,13 @@ prune   extern/qfr/extern/pybind11_json/test
 graft extern/taskflow
 prune extern/taskflow/docs
 prune extern/taskflow/image
+prune extern/taskflow/benchmarks
+prune extern/taskflow/doxygen
+prune extern/taskflow/3rd-party
+prune extern/taskflow/tfprof
+prune extern/taskflow/sandbox
+prune extern/taskflow/unittests
+prune extern/taskflow/examples
 
 graft extern/cxxopts
+prune extern/cxxopts/test
