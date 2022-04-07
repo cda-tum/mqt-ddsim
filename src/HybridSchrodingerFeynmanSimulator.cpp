@@ -135,21 +135,16 @@ std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator::Simulate(u
 }
 
 void HybridSchrodingerFeynmanSimulator::SimulateHybridTaskflow(const dd::Qubit split_qubit) {
-    const auto         ndecisions  = getNDecisions(split_qubit);
-    const std::int64_t max_control = 1LL << ndecisions;
+    const auto         ndecisions          = getNDecisions(split_qubit);
+    const std::int64_t max_control         = 1LL << ndecisions;
+    const int          actuallyUsedThreads = static_cast<std::size_t>(max_control) < nthreads ? static_cast<int>(max_control) : static_cast<int>(nthreads);
+    const std::int64_t nslices_at_once     = std::min<std::int64_t>(16, max_control / static_cast<std::int64_t>(actuallyUsedThreads));
 
-    int actuallyUsedThreads = static_cast<int>(nthreads);
-    if (static_cast<std::size_t>(max_control) < nthreads) {
-        actuallyUsedThreads = static_cast<int>(max_control);
-    }
+    root_edge = qc::VectorDD::zero;
 
-    root_edge                          = qc::VectorDD::zero;
-    const std::int64_t nslices_at_once = std::min<std::int64_t>(16, max_control / static_cast<std::int64_t>(actuallyUsedThreads));
-    ;
-    std::stack<std::pair<std::int64_t, std::int64_t>> stack{};
-    std::vector<std::vector<bool>>                    computed(ndecisions, std::vector<bool>(max_control, false));
+    std::vector<std::vector<bool>> computed(ndecisions, std::vector<bool>(max_control, false));
 
-    tf::Executor executor(1);
+    tf::Executor executor(nthreads);
 
     std::function<void(std::pair<std::int64_t, std::int64_t>)> compute_pair = [this, &compute_pair, &computed, &executor, ndecisions, nslices_at_once, split_qubit](std::pair<std::int64_t, std::int64_t> current) {
         if (current.first == 0) { // slice
@@ -190,7 +185,7 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridTaskflow(const dd::Qubit s
             const auto comp_second = current.second + (current.second % 2 ? (-1) : 1);
 
             if (computed.at(current.first).at(comp_second)) {
-                executor.silent_async([&]() { compute_pair(std::make_pair(current.first + 1, current.second / 2)); });
+                executor.silent_async([&compute_pair, current]() { compute_pair(std::make_pair(current.first + 1, current.second / 2)); });
             }
         }
     };
