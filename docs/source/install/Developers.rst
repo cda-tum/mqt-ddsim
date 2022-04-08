@@ -9,8 +9,7 @@ In order to start developing, clone the DDSIM repository using
 
 Note the :code:`--recurse-submodules` flag. It is required to also clone all the required submodules. If you happen to forget passing the flag on your initial clone, you can initialize all the submodules by executing :code:`git submodule update --init --recursive` in the main project directory.
 
-A C++ compiler supporting C++17, a minimum CMake version of 3.14 and OpenMP is required to build the project.
-The :code:`ddsim_noise_aware simulator` further requires :code:`Threads::Threads`.
+A C++ compiler supporting C++17 and a minimum CMake version of 3.14 are required to build the project.
 
 Working on the core C++ library
 ###############################
