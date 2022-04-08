@@ -7,10 +7,8 @@
 #include "dd/Export.hpp"
 #include "dd/Package.hpp"
 
-#include <cmath>
 #include <complex>
 #include <memory>
-#include <omp.h>
 
 class HybridSchrodingerFeynmanSimulator: public CircuitSimulator {
 public:
@@ -45,7 +43,7 @@ private:
     std::size_t                       nthreads = 2;
     std::vector<std::complex<dd::fp>> finalAmplitudes{};
 
-    void SimulateHybrid(dd::Qubit split_qubit);
+    void SimulateHybridTaskflow(dd::Qubit split_qubit);
     void SimulateHybridAmplitudes(dd::Qubit split_qubit);
 
     qc::VectorDD SimulateSlicing(std::unique_ptr<dd::Package>& dd, dd::Qubit split_qubit, std::size_t controls);

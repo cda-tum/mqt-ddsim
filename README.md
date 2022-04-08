@@ -46,7 +46,6 @@ print(counts)
 ## System Requirements and Building
 
 The implementation is compatible with any C++17 compiler and a minimum CMake version of 3.14.
-The required dependencies are `OpenMP >= 4.0` and `Threads::Threads`.
 Please refer to the [documentation](https://ddsim.readthedocs.io/en/latest/) on how to build the project.
 
 Building (and running) is continuously tested under Linux, macOS, and Windows using the [latest available system versions for GitHub Actions](https://github.com/actions/virtual-environments).
