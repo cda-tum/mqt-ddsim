@@ -56,7 +56,7 @@ void StochasticNoiseSimulator::perfect_simulation_run() {
                     for (signed char i: quantum) {
                         auto result = MeasureOneCollapsing(i, true);
                         if (result == '1') {
-                            setMeasuredQubitToZero(quantum.at(i), root_edge, dd);
+                            setMeasuredQubitToZero(i, root_edge, dd);
                         }
                     }
                 } else if (op->getType() == qc::Barrier) {
@@ -121,6 +121,7 @@ std::map<std::string, double> StochasticNoiseSimulator::StochSimulate() {
     // after the runs have finished
     for (unsigned int i = 0; i < max_instances + 1; i++) {
         recorded_properties_per_instance.emplace_back(std::vector<double>(recorded_properties.size(), 0));
+        classical_measurements_maps.emplace_back(std::map<std::string, int>());
     }
     //std::clog << "Conducting " << stochastic_runs << " runs using " << max_instances << " cores...\n";
     std::vector<std::thread> threadArray;
@@ -135,6 +136,7 @@ std::map<std::string, double> StochasticNoiseSimulator::StochSimulate() {
                                  noiseless_root_edge,
                                  std::ref(recorded_properties_per_instance[runID]),
                                  std::ref(recorded_properties),
+                                 std::ref(classical_measurements_maps[runID]),
                                  static_cast<unsigned long long>(mt()));
     }
     // wait for threads to finish
@@ -143,6 +145,14 @@ std::map<std::string, double> StochasticNoiseSimulator::StochSimulate() {
     }
     const auto t2_stoch = std::chrono::steady_clock::now();
     stoch_run_time      = std::chrono::duration<float>(t2_stoch - t1_stoch).count();
+
+    for (unsigned long j = 0; j < max_instances; j++) {
+        //        for (unsigned int i = 0; i < classical_measurements_maps[j].size(); i++) {
+        for (const std::pair<const std::basic_string<char>, long>& classical_measurements_map: classical_measurements_maps[j]) {
+            classical_measurements_maps[max_instances][classical_measurements_map.first] += classical_measurements_map.second;
+        }
+    }
+
     //std::clog <<"Calculating amplitudes from all runs...\n";
     for (unsigned long j = 0; j < recorded_properties.size(); j++) {
         for (unsigned int i = 0; i < max_instances; i++) {
@@ -151,8 +161,15 @@ std::map<std::string, double> StochasticNoiseSimulator::StochSimulate() {
         recorded_properties_per_instance[max_instances][j] /= stochastic_runs;
     }
 
-    //std::clog << "Probabilities are ... (probabilities < 0.001 are omitted)\n";
+    // Adding the result of classical registers to the measure_result map
     std::map<std::string, double> measure_result;
+    for (const std::pair<const std::basic_string<char>, int>& classical_measurements_map: classical_measurements_maps[max_instances]) {
+        auto probability = (double) classical_measurements_map.second / stochastic_runs;
+        measure_result.insert({classical_measurements_map.first, probability});
+    }
+
+    //std::clog << "Probabilities are ... (probabilities < 0.001 are omitted)\n";
+    //    std::map<std::string, double> measure_result;
     for (unsigned long m = 0; m < recorded_properties.size(); m++) {
         if (std::get<0>(recorded_properties[m]) == -3) {
             mean_stoch_time = recorded_properties_per_instance[max_instances][m];
@@ -160,7 +177,7 @@ std::map<std::string, double> StochasticNoiseSimulator::StochSimulate() {
             approximation_runs = recorded_properties_per_instance[max_instances][m];
         } else if (std::get<0>(recorded_properties[m]) == -1) {
             final_fidelity = recorded_properties_per_instance[max_instances][m];
-        } else if (recorded_properties_per_instance[max_instances][m] > 0.001 || m < 2) {
+        } else if (recorded_properties_per_instance[max_instances][m] > 0 || m < 2) {
             std::string amplitude = std::get<1>(recorded_properties[m]);
             std::replace(amplitude.begin(), amplitude.end(), '2', '1');
             measure_result.insert({amplitude, recorded_properties_per_instance[max_instances][m]});
@@ -174,6 +191,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                                                        dd::Package::vEdge                          rootEdgePerfectRun,
                                                        std::vector<double>&                        recordedPropertiesStorage,
                                                        std::vector<std::tuple<long, std::string>>& recordedPropertiesList,
+                                                       std::map<std::string, int>&                classicalMeasurementsMap,
                                                        unsigned long long                          localSeed) {
     std::mt19937_64                        generator(localSeed);
     std::uniform_real_distribution<dd::fp> dist(0.0, 1.0L);
@@ -213,9 +231,15 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                             assert(result == '0' || result == '1');
                             classic_values[classic.at(i)] = (result == '1');
                         }
-                    } else if (nu_op->getName()[0] == 'R' && nu_op->getName()[1] == 's' && nu_op->getName()[2] == 't') {
+                    } else if (op->getType() == qc::Reset) {
                         // Reset qubit
-                        throw std::runtime_error("Warning: Reset is currently not supported");
+                        auto quantum = nu_op->getTargets();
+                        for (signed char i: quantum) {
+                            auto result = localDD->measureOneCollapsing(localRootEdge, i, true, generator);
+                            if (result == '1') {
+                                setMeasuredQubitToZero(i, localRootEdge, localDD);
+                            }
+                        }
                     } else {
                         //Skipping barrier
                         if (op->getType() == qc::Barrier) {
@@ -268,6 +292,17 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
         }
         localDD->decRef(localRootEdge);
         const auto t2 = std::chrono::steady_clock::now();
+
+        //        for (bool classic_value : classic_values) {
+        std::string classic_register_string;
+        for (unsigned long i = 0; i < classic_values.size(); i++) {
+            if (classic_values[i]) {
+                classic_register_string.push_back('0');
+            } else {
+                classic_register_string.push_back('1');
+            }
+        }
+        classicalMeasurementsMap[classic_register_string] += 1;
 
         for (unsigned long i = 0; i < recordedPropertiesStorage.size(); i++) {
             if (std::get<0>(recordedPropertiesList[i]) == -3) {

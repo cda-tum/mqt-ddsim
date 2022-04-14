@@ -74,19 +74,21 @@ public:
         one_minus_sqrt_amplitude_damping_probability = {sqrt(1 - noise_probability * 2), 0};
     }
 
-    double       stoch_error_margin = 0.01;
-    double       stoch_confidence   = 0.05;
-    unsigned int stochastic_runs    = 0;
-    bool use_density_matrix_type = true;
+    double       stoch_error_margin      = 0.01;
+    double       stoch_confidence        = 0.05;
+    unsigned int stochastic_runs         = 0;
+    bool         use_density_matrix_type = true;
 
     void setRecordedProperties(const std::string& input);
 
     std::vector<std::tuple<long, std::string>> recorded_properties;
     std::vector<std::vector<double>>           recorded_properties_per_instance;
+    std::vector<std::map<std::string , int>>   classical_measurements_maps;
 
     std::string gate_noise_types;
 
     const unsigned int max_instances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
+    //    const unsigned int max_instances = 1;
 
 private:
     std::unique_ptr<qc::QuantumComputation>& qc;
@@ -107,6 +109,7 @@ private:
                                  dd::Package::vEdge                          rootEdgePerfectRun,
                                  std::vector<double>&                        recordedPropertiesStorage,
                                  std::vector<std::tuple<long, std::string>>& recordedPropertiesList,
+                                 std::map<std::string , int>&               classicalMeasurementsMap,
                                  unsigned long long                          localSeed);
 
     dd::Package::mEdge generateNoiseOperation(bool                                    amplitudeDamping,

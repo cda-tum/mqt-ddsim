@@ -106,8 +106,8 @@ private:
     std::unique_ptr<qc::QuantumComputation>& qc;
 
     std::string gateNoiseTypes;
-    long        calls   = 0;
-    int         opCount = 0;
+//    long        calls   = 0;
+//    int         opCount = 0;
 
     //    const unsigned int step_number;Q
     //    const double       step_fidelity;
@@ -118,7 +118,7 @@ private:
 
     void ApplyPhaseFlipToNode(std::array<dEdge, 4>& e);
 
-    void ApplyDepolaritationToNode(std::array<dEdge, 4>& e);
+    void ApplyDepolarisationToNode(std::array<dEdge, 4>& e);
 
     void generateGate(qc::MatrixDD* pointer_for_matrices, char noise_type, dd::Qubit target);
 
