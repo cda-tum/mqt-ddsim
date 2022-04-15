@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
                                                                                                      seed);
 
         ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>());
-        ddsim->setAmplitudeDampingProbability(vm["noise_prob"].as<double>());
+        ddsim->setNoiseProbability(vm["noise_prob"].as<double>());
         ddsim->stoch_confidence = vm["confidence"].as<double>();
         ddsim->setRecordedProperties(vm["properties"].as<std::string>());
         ddsim->stoch_error_margin = vm["error_bound"].as<double>();

@@ -35,7 +35,7 @@ public:
         step_number(step_number), step_fidelity(step_fidelity) {
         setNoiseEffects(noise_effects);
         setRecordedProperties(recorded_properties);
-        setAmplitudeDampingProbability(noise_prob);
+        setNoiseProbability(noise_prob);
         stochastic_runs = stoch_runs;
     }
 
@@ -67,17 +67,25 @@ public:
     dd::ComplexValue sqrt_amplitude_damping_probability{};
     dd::ComplexValue one_minus_sqrt_amplitude_damping_probability{};
 
-    void setAmplitudeDampingProbability(double cGateNoiseProbability) {
+    double           m_noise_probability = 0.0;
+    dd::ComplexValue m_sqrt_amplitude_damping_probability{};
+    dd::ComplexValue m_one_minus_sqrt_amplitude_damping_probability{};
+
+    void setNoiseProbability(double cGateNoiseProbability) {
         //The probability of amplitude damping (t1) often is double the probability , of phase flip, which is why I double it here
         noise_probability                            = cGateNoiseProbability;
         sqrt_amplitude_damping_probability           = {sqrt(noise_probability * 2), 0};
         one_minus_sqrt_amplitude_damping_probability = {sqrt(1 - noise_probability * 2), 0};
+
+        m_noise_probability                            = cGateNoiseProbability * 2;
+        m_sqrt_amplitude_damping_probability           = {sqrt(noise_probability * 4), 0};
+        m_one_minus_sqrt_amplitude_damping_probability = {sqrt(1 - noise_probability * 4), 0};
+
     }
 
     double       stoch_error_margin      = 0.01;
     double       stoch_confidence        = 0.05;
     unsigned int stochastic_runs         = 0;
-    bool         use_density_matrix_type = true;
 
     void setRecordedProperties(const std::string& input);
 
