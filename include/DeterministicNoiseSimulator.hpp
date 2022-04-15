@@ -107,7 +107,7 @@ private:
 
     std::string gateNoiseTypes;
 //    long        calls   = 0;
-//    int         opCount = 0;
+    //    int         opCount = 0;
 
     //    const unsigned int step_number;Q
     //    const double       step_fidelity;

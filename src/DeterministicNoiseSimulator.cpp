@@ -231,7 +231,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
     printf("Multiplication cache");
     dd->matrixDensityMultiplication.printStatistics();
     printf("Add cache\n");
-    dd->densityAdd.printStatistics();
+    dd->matrixDensityAdd.printStatistics();
     printf("Noise cache\n");
     dd->densityNoiseOperations.printStatistics();
     return AnalyseState(n_qubits, false);
@@ -445,9 +445,8 @@ void DeterministicNoiseSimulator::ApplyAmplitudeDampingToNode(std::array<dEdge, 
 void DeterministicNoiseSimulator::ApplyDepolarisationToNode(std::array<dEdge, 4>& e) {
     double probability = noiseProbability;
     dEdge  helper_edge[2];
-    helper_edge[0].w         = dd->cn.getCached();
-    helper_edge[1].w         = dd->cn.getCached();
     dd::Complex complex_prob = dd->cn.getCached();
+    complex_prob.i->value = 0;
 
     dEdge old_e0_edge;
     old_e0_edge.w = dd->cn.getCached(dd::CTEntry::val(e[0].w.r), dd::CTEntry::val(e[0].w.i));
@@ -455,22 +454,37 @@ void DeterministicNoiseSimulator::ApplyDepolarisationToNode(std::array<dEdge, 4>
 
     //e[0] = 0.5*((2-p)*e[0] + p*e[3])
     {
-        complex_prob.i->value = 0;
+        helper_edge[0].w         = dd::Complex::zero;
+        helper_edge[1].w         = dd::Complex::zero;
+
         //helper_edge[0] = 0.5*((2-p)*e[0]
-        complex_prob.r->value = (2 - probability) * 0.5;
-        CN::mul(helper_edge[0].w, complex_prob, e[0].w);
-        helper_edge[0].p = e[0].p;
+        if(!e[0].w.approximatelyZero()){
+            helper_edge[0].w = dd->cn.getCached();
+            complex_prob.r->value = (2 - probability) * 0.5;
+            CN::mul(helper_edge[0].w, complex_prob, e[0].w);
+            helper_edge[0].p = e[0].p;
+        }
 
         //helper_edge[1] = 0.5*p*e[3]
-        complex_prob.r->value = probability * 0.5;
-        CN::mul(helper_edge[1].w, complex_prob, e[3].w);
-        helper_edge[1].p = e[3].p;
+        if (!e[3].w.approximatelyZero()){
+            helper_edge[1].w = dd->cn.getCached();
+            complex_prob.r->value = probability * 0.5;
+            CN::mul(helper_edge[1].w, complex_prob, e[3].w);
+            helper_edge[1].p = e[3].p;
+        }
 
         //e[0] = helper_edge[0] + helper_edge[1]
         if (e[0].w != dd::Complex::zero) {
             dd->cn.returnToCache(e[0].w);
         }
         e[0] = dd->add2(helper_edge[0], helper_edge[1]);
+
+        if(helper_edge[0].w != dd::Complex::zero){
+            dd->cn.returnToCache(helper_edge[0].w);
+        }
+        if(helper_edge[1].w != dd::Complex::zero){
+            dd->cn.returnToCache(helper_edge[1].w);
+        }
     }
 
     //e[1]=1-p*e[1]
@@ -488,27 +502,38 @@ void DeterministicNoiseSimulator::ApplyDepolarisationToNode(std::array<dEdge, 4>
 
     //e[3] = 0.5*((2-p)*e[3]) + 0.5*(p*e[0])
     {
-        complex_prob.i->value = 0;
+        helper_edge[0].w         = dd::Complex::zero;
+        helper_edge[1].w         = dd::Complex::zero;
+
         //helper_edge[0] = 0.5*((2-p)*e[3])
-        complex_prob.r->value = (2 - probability) * 0.5;
-        CN::mul(helper_edge[0].w, complex_prob, e[3].w);
-        helper_edge[0].p = e[3].p;
+        if(!e[3].w.approximatelyZero()){
+            helper_edge[0].w = dd->cn.getCached();
+            complex_prob.r->value = (2 - probability) * 0.5;
+            CN::mul(helper_edge[0].w, complex_prob, e[3].w);
+            helper_edge[0].p = e[3].p;
+        }
 
         //helper_edge[1] = 0.5*p*e[0]
-        complex_prob.r->value = probability * 0.5;
-        CN::mul(helper_edge[1].w, complex_prob, old_e0_edge.w);
-        helper_edge[1].p = old_e0_edge.p;
+        if(!old_e0_edge.w.approximatelyZero()){
+            helper_edge[1].w = dd->cn.getCached();
+            complex_prob.r->value = probability * 0.5;
+            CN::mul(helper_edge[1].w, complex_prob, old_e0_edge.w);
+            helper_edge[1].p = old_e0_edge.p;
+        }
 
         //e[3] = helper_edge[0] + helper_edge[1]
         if (e[3].w != dd::Complex::zero) {
             dd->cn.returnToCache(e[3].w);
         }
         e[3] = dd->add2(helper_edge[0], helper_edge[1]);
-    }
 
-    //    helper_edge[0].w.r->next->next->next->next->next->next = ComplexCache_Avail;
-    dd->cn.returnToCache(helper_edge[0].w);
-    dd->cn.returnToCache(helper_edge[1].w);
+        if(helper_edge[0].w != dd::Complex::zero){
+            dd->cn.returnToCache(helper_edge[0].w);
+        }
+        if(helper_edge[1].w != dd::Complex::zero){
+            dd->cn.returnToCache(helper_edge[1].w);
+        }
+    }
     dd->cn.returnToCache(old_e0_edge.w);
     dd->cn.returnToCache(complex_prob);
 }
