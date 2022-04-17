@@ -63,9 +63,9 @@ public:
 
     void setNoiseEffects(const std::string& cGateNoise) { gate_noise_types = cGateNoise; }
 
-    double           noise_probability = 0.0;
-    dd::ComplexValue sqrt_amplitude_damping_probability{};
-    dd::ComplexValue one_minus_sqrt_amplitude_damping_probability{};
+    double           noise_probability = 0.0; // noise_probability
+    dd::ComplexValue sqrt_amplitude_damping_probability{}; // sqrt_amplitude_damping_probability
+    dd::ComplexValue one_minus_sqrt_amplitude_damping_probability{}; //one_minus_sqrt_amplitude_damping_probability
 
     double           m_noise_probability = 0.0;
     dd::ComplexValue m_sqrt_amplitude_damping_probability{};
@@ -80,23 +80,22 @@ public:
         m_noise_probability                            = cGateNoiseProbability * 2;
         m_sqrt_amplitude_damping_probability           = {sqrt(noise_probability * 4), 0};
         m_one_minus_sqrt_amplitude_damping_probability = {sqrt(1 - noise_probability * 4), 0};
-
     }
 
-    double       stoch_error_margin      = 0.01;
-    double       stoch_confidence        = 0.05;
-    unsigned int stochastic_runs         = 0;
+    double       stoch_error_margin = 0.01;
+    double       stoch_confidence   = 0.05;
+    unsigned int stochastic_runs    = 0;
 
     void setRecordedProperties(const std::string& input);
 
     std::vector<std::tuple<long, std::string>> recorded_properties;
     std::vector<std::vector<double>>           recorded_properties_per_instance;
-    std::vector<std::map<std::string , int>>   classical_measurements_maps;
+    std::vector<std::map<std::string, int>>    classical_measurements_maps;
 
     std::string gate_noise_types;
 
-    const unsigned int max_instances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
-    //    const unsigned int max_instances = 1;
+    //const unsigned int max_instances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
+    const unsigned int max_instances = 1;
 
 private:
     std::unique_ptr<qc::QuantumComputation>& qc;
@@ -117,26 +116,14 @@ private:
                                  dd::Package::vEdge                          rootEdgePerfectRun,
                                  std::vector<double>&                        recordedPropertiesStorage,
                                  std::vector<std::tuple<long, std::string>>& recordedPropertiesList,
-                                 std::map<std::string , int>&               classicalMeasurementsMap,
+                                 std::map<std::string, int>&                 classicalMeasurementsMap,
                                  unsigned long long                          localSeed);
 
-    dd::Package::mEdge generateNoiseOperation(bool                                    amplitudeDamping,
-                                              dd::Qubit                               target,
-                                              std::mt19937_64&                        engine,
-                                              std::uniform_real_distribution<dd::fp>& distribution,
-                                              dd::Package::mEdge                      dd_operation,
-                                              std::unique_ptr<dd::Package>&           localDD);
+    dd::Package::mEdge generateNoiseOperation(bool amplitudeDamping, dd::Qubit target, std::mt19937_64& engine, std::uniform_real_distribution<dd::fp>& distribution, dd::Package::mEdge dd_operation, std::unique_ptr<dd::Package>& localDD, bool multi_qubit_op);
 
-    void applyNoiseOperation(const qc::Targets&                      targets,
-                             const dd::Controls&                     control_qubits,
-                             dd::Package::mEdge                      dd_op,
-                             std::unique_ptr<dd::Package>&           localDD,
-                             dd::Package::vEdge&                     localRootEdge,
-                             std::mt19937_64&                        generator,
-                             std::uniform_real_distribution<dd::fp>& dist,
-                             dd::Package::mEdge                      identityDD);
+    void applyNoiseOperation(const std::vector<dd::Qubit>& usedQubits, dd::Package::mEdge dd_op, std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& localRootEdge, std::mt19937_64& generator, std::uniform_real_distribution<dd::fp>& dist, dd::Package::mEdge identityDD);
 
-    [[nodiscard]] dd::NoiseOperationKind ReturnNoiseOperation(char i, double d) const;
+    [[nodiscard]] dd::NoiseOperationKind ReturnNoiseOperation(char i, double prob, bool multi_qubit_noise) const;
 
     [[nodiscard]] std::string intToString(long target_number) const;
 
