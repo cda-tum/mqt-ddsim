@@ -167,14 +167,20 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
             }
 
             if (noiseProbability > 0) {
+                std::vector used_qubits = op->getTargets();
+                for (auto control: op->getControls()) {
+                    used_qubits.push_back(control.qubit);
+                }
+
+
                 if (sequentialApplyNoise) { // was `stochastic_runs == -2`
                     [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
 
-                    auto seq_targets = targets;
-                    for (auto const& control: controls) {
-                        seq_targets.push_back(control.qubit);
-                    }
-                    applyDetNoiseSequential(seq_targets);
+//                    auto seq_targets = targets;
+//                    for (auto const& control: controls) {
+//                        seq_targets.push_back(control.qubit);
+//                    }
+                    applyDetNoiseSequential(used_qubits);
 
                     [[maybe_unused]] auto cache_size_after = dd->cn.cacheCount();
                     assert(cache_size_after == cache_size_before);
@@ -187,10 +193,6 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                         }
                     }
 
-                    std::vector used_qubits = op->getTargets();
-                    for (auto control: op->getControls()) {
-                        used_qubits.push_back(control.qubit);
-                    }
                     //todo I only must check array elements <=current_v, for the caching
                     sort(used_qubits.begin(), used_qubits.end(), std::greater<>());
 
