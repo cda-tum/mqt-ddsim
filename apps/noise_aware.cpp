@@ -31,11 +31,12 @@ int main(int argc, char** argv) {
 
         ("noise_effects", po::value<std::string>()->default_value("APD"), "Noise effects (A (=amplitude damping), D (=depolarization),P (=phase flip)) in the form of a character string describing the noise effects (default=\"APD\")")
         ("noise_prob", po::value<double>()->default_value(0.001), "Probability for applying noise (default=0.001)")
-        ("confidence", po::value<double>()->default_value(0.05), "Confidence in the error bound of the stochastic simulation (default= 0.05)")
-        ("error_bound", po::value<double>()->default_value(0.1), "Error bound of the stochastic simulation (default=0.1)")
+//        ("confidence", po::value<double>()->default_value(0.05), "Confidence in the error bound of the stochastic simulation (default= 0.05)")
+//        ("error_bound", po::value<double>()->default_value(0.1), "Error bound of the stochastic simulation (default=0.1)")
         ("stoch_runs", po::value<long>()->default_value(0), "Number of stochastic runs. When the value is 0 the value is calculated using the confidence, error_bound and number of tracked properties. When the value is -1, the deterministic simulator is started. When the value is -2 the old method for deterministic noise application is used) (default = 0)")
         ("properties", po::value<std::string>()->default_value("-3--1"), R"(Comma separated list of tracked properties. Note that -1 is the fidelity and "-" can be used to specify a range.  (default="-3-1000"))")
         ("dm", "Don't use the density matrix data type for simulating with density matrices")
+        ("unoptimized_sim", "Use unoptimized scheme for stoch/det noise-aware simulation")
     ;
     // clang-format on
     po::variables_map vm;
@@ -67,17 +68,22 @@ int main(int argc, char** argv) {
         std::clog << "[WARNING] Quantum computation contains quite many qubits. You're jumping into the deep end.\n";
     }
 
+
+
     if (vm["stoch_runs"].as<long>() >= 0) {
         std::unique_ptr<StochasticNoiseSimulator> ddsim = std::make_unique<StochasticNoiseSimulator>(quantumComputation,
                                                                                                      vm["steps"].as<unsigned int>(),
                                                                                                      vm["step_fidelity"].as<double>(),
                                                                                                      seed);
 
+        if (vm.count("unoptimized_sim")) {
+            ddsim->sequentialApplyNoise = true;
+        }
         ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>());
         ddsim->setNoiseProbability(vm["noise_prob"].as<double>());
-        ddsim->stoch_confidence = vm["confidence"].as<double>();
+//        ddsim->stoch_confidence = vm["confidence"].as<double>();
         ddsim->setRecordedProperties(vm["properties"].as<std::string>());
-        ddsim->stoch_error_margin = vm["error_bound"].as<double>();
+//        ddsim->stoch_error_margin = vm["error_bound"].as<double>();
         ddsim->stochastic_runs    = vm["stoch_runs"].as<long>();
 
         auto t1 = std::chrono::steady_clock::now();
@@ -112,10 +118,9 @@ int main(int argc, char** argv) {
             output_obj["measurement_results"] = measurement_results;
         }
         std::cout << std::setw(2) << output_obj << std::endl;
-    } else if (vm["stoch_runs"].as<long>() < 0) {
+    } else if (vm["stoch_runs"].as<long>() == -1) {
         std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, seed);
-
-        if (vm["stoch_runs"].as<long>() == -2) {
+        if (vm.count("unoptimized_sim")) {
             ddsim->sequentialApplyNoise = true;
         }
         if (vm.count("dm")) {

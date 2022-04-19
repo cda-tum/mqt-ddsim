@@ -85,6 +85,7 @@ public:
     double       stoch_error_margin = 0.01;
     double       stoch_confidence   = 0.05;
     unsigned int stochastic_runs    = 0;
+    bool sequentialApplyNoise = false;
 
     void setRecordedProperties(const std::string& input);
 

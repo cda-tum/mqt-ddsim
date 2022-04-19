@@ -330,6 +330,11 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
 void StochasticNoiseSimulator::applyNoiseOperation(const std::vector<dd::Qubit>& usedQubits, dd::Package::mEdge dd_op, std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& localRootEdge, std::mt19937_64& generator, std::uniform_real_distribution<dd::fp>& dist, dd::Package::mEdge identityDD) {
     bool multi_qubit_operation = usedQubits.size() > 1;
 
+    if (sequentialApplyNoise) {
+        std::cout << "ok" << std::endl;
+        sequentialApplyNoise = false;
+    }
+
     for (auto& target: usedQubits) {
         auto operation = generateNoiseOperation(false, target, generator, dist, dd_op, localDD, multi_qubit_operation);
         auto tmp       = localDD->multiply(operation, localRootEdge);
