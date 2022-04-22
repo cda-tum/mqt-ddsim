@@ -14,7 +14,7 @@ namespace nl = nlohmann;
 int main(int argc, char** argv) {
     unsigned long long seed;
 
-    cxxopts::Options options("JKQ DDSIM", "see for more information https://iic.jku.at/eda/");
+    cxxopts::Options options("MQT DDSIM", "see for more information https://www.cda.cit.tum.de/");
     // clang-format off
     options.add_options()
         ("h,help", "produce help message")

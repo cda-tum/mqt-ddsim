@@ -8,8 +8,9 @@
 
 # MQT DDSIM - A quantum circuit simulator based on decision diagrams written in C++
 
-A tool for classical quantum circuit simulation by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at).
-The simulator builds upon [our quantum functionality representation (QFR)](https://github.com/cda-tum/qfr.git) which in turns builds on [our decision diagram (DD) package](https://github.com/cda-tum/dd_package.git).
+A tool for classical quantum circuit simulation by the [Chair for Design Automation](https://www.cda.cit.tum.de/) at the [Technical University of Munich](https://www.tum.de/).
+QCEC is part of the Munich Quantum Toolkit (MQT; formerly known as JKQ and developed by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at)).
+It builds upon [our quantum functionality representation (QFR)](https://github.com/cda-tum/qfr) and [our decision diagram (DD) package](https://github.com/cda-tum/dd_package.git).
 
 **Detailed documentation on all available formats, options, and algorithms is available at  [ReadTheDocs](https://ddsim.readthedocs.io/en/latest/).**
 

@@ -20,7 +20,7 @@
 namespace nl = nlohmann;
 
 int main(int argc, char** argv) {
-    cxxopts::Options options("JKQ DDSIM", "for more information see https://iic.jku.at/eda/");
+    cxxopts::Options options("MQT DDSIM", "for more information see https://www.cda.cit.tum.de/");
     // clang-format off
     options.add_options()
         ("h,help", "produce help message")

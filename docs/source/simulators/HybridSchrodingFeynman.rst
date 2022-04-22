@@ -8,7 +8,7 @@ Launching the standalone executable with :code:`-h` parameter shows the availabl
 .. code-block:: console
 
     $ ./ddsim_simple --help
-    MQT DDSIM by https://iic.jku.at/eda/ -- Allowed options:
+    MQT DDSIM by https://www.cda.cit.tum.de/ -- Allowed options:
     -h [ --help ]                         produce help message
     --seed arg (=0)                       seed for random number generator (default zero is possibly directly used as seed!)
     --shots arg (=0)                      number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)
