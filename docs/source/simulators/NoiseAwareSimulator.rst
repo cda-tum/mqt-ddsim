@@ -19,7 +19,7 @@ The simulator provides a help function which is called in the following way:
 .. code-block:: console
 
     $ ./build/ddsim_noise_aware -h
-    JKQ DDSIM by https://www.cda.cit.tum.de/ -- Allowed options:
+    MQT DDSIM by https://www.cda.cit.tum.de/ -- Allowed options:
       -h [ --help ]                         produce help message
       --seed arg (=0)                       seed for random number generator (default zero is possibly directly used as seed!)
       --pm                                  print measurements

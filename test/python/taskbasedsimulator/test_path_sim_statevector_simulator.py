@@ -5,7 +5,7 @@ from mqt import ddsim
 from mqt.ddsim.pathstatevectorsimulator import PathStatevectorSimulator
 
 
-class JKQStatevectorSimulatorTest(unittest.TestCase):
+class MQTStatevectorSimulatorTest(unittest.TestCase):
     def setUp(self):
         self.backend = PathStatevectorSimulator()
         qr = QuantumRegister(2)
