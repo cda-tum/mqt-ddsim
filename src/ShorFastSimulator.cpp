@@ -257,7 +257,7 @@ dd::mEdge ShorFastSimulator::limitTo(unsigned long long a) {
 }
 
 dd::mEdge ShorFastSimulator::addConst(unsigned long long a) {
-    dd::Edge                          f = dd::mEdge::one;
+    dd::Edge                 f = dd::mEdge::one;
     std::array<dd::mEdge, 4> edges{
             dd::mEdge::zero, dd::mEdge::zero,
             dd::mEdge::zero, dd::mEdge::zero};

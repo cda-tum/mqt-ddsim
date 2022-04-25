@@ -449,13 +449,13 @@ void ShorSimulator::u_a_emulate(unsigned long long a, int q) {
             active = dd->makeDDNode(p, edges, false);
         }
 
-        active.w                   = dd->cn.lookup(-1, 0);
+        active.w          = dd->cn.lookup(-1, 0);
         dd::mEdge passive = dd->multiply(f, dd->add(limit, active));
-        active.w                   = dd::Complex::one;
-        active                     = dd->multiply(f, active);
+        active.w          = dd::Complex::one;
+        active            = dd->multiply(f, active);
 
         dd::mEdge tmp = addConstMod(t);
-        active                 = dd->multiply(tmp, active);
+        active        = dd->multiply(tmp, active);
 
         dd->decRef(f);
         f = dd->add(active, passive);

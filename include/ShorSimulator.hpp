@@ -64,11 +64,11 @@ class ShorSimulator: public Simulator {
 
     std::vector<unsigned long long> ts;
 
-   dd::mEdge addConst(unsigned long long a);
+    dd::mEdge addConst(unsigned long long a);
 
-   dd::mEdge addConstMod(unsigned long long a);
+    dd::mEdge addConstMod(unsigned long long a);
 
-   dd::mEdge limitTo(unsigned long long a);
+    dd::mEdge limitTo(unsigned long long a);
 
     [[nodiscard]] std::pair<unsigned int, unsigned int> post_processing(const std::string& sample) const;
 
@@ -92,9 +92,9 @@ class ShorSimulator: public Simulator {
     long double        final_fidelity{1.0L};
     double             step_fidelity{0.9};
 
-   dd::mEdge limitStateVector(dd::vEdge e);
+    dd::mEdge limitStateVector(dd::vEdge e);
 
-    std::map<dd::vNode*,dd::mEdge> dag_edges;
+    std::map<dd::vNode*, dd::mEdge> dag_edges;
 
 public:
     ShorSimulator(int composite_number, int coprime_a):

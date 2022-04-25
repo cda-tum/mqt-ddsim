@@ -171,7 +171,7 @@ std::map<std::string, double> StochasticNoiseSimulator::StochSimulate() {
 
 void StochasticNoiseSimulator::runStochSimulationForId(unsigned int                                stochRun,
                                                        int                                         n_qubits,
-                                                       dd::vEdge                          rootEdgePerfectRun,
+                                                       dd::vEdge                                   rootEdgePerfectRun,
                                                        std::vector<double>&                        recordedPropertiesStorage,
                                                        std::vector<std::tuple<long, std::string>>& recordedPropertiesList,
                                                        unsigned long long                          localSeed) {
@@ -227,9 +227,9 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                     throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
                 }
             } else {
-                dd::mEdge dd_op{};
-                qc::Targets        targets;
-                dd::Controls       controls;
+                dd::mEdge    dd_op{};
+                qc::Targets  targets;
+                dd::Controls controls;
                 if (op->isClassicControlledOperation()) {
                     // Check if the operation is controlled by a classical register
                     auto* classic_op = dynamic_cast<qc::ClassicControlledOperation*>(op.get());
@@ -289,12 +289,12 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
 
 void StochasticNoiseSimulator::applyNoiseOperation(const qc::Targets&                      targets,
                                                    const dd::Controls&                     control_qubits,
-                                                   dd::mEdge                      dd_op,
-                                                   std::unique_ptr<dd::Package<>>&           localDD,
-                                                   dd::vEdge&                     localRootEdge,
+                                                   dd::mEdge                               dd_op,
+                                                   std::unique_ptr<dd::Package<>>&         localDD,
+                                                   dd::vEdge&                              localRootEdge,
                                                    std::mt19937_64&                        generator,
                                                    std::uniform_real_distribution<dd::fp>& dist,
-                                                   dd::mEdge                      identityDD) {
+                                                   dd::mEdge                               identityDD) {
     std::vector usedQubits = targets;
     for (auto control: control_qubits) {
         usedQubits.push_back(control.qubit);
@@ -322,11 +322,11 @@ void StochasticNoiseSimulator::applyNoiseOperation(const qc::Targets&           
 }
 
 dd::mEdge StochasticNoiseSimulator::generateNoiseOperation(bool                                    amplitudeDamping,
-                                                                    dd::Qubit                               target,
-                                                                    std::mt19937_64&                        engine,
-                                                                    std::uniform_real_distribution<dd::fp>& distribution,
-                                                                    dd::mEdge                      dd_operation,
-                                                                    std::unique_ptr<dd::Package<>>&           localDD) {
+                                                           dd::Qubit                               target,
+                                                           std::mt19937_64&                        engine,
+                                                           std::uniform_real_distribution<dd::fp>& distribution,
+                                                           dd::mEdge                               dd_operation,
+                                                           std::unique_ptr<dd::Package<>>&         localDD) {
     dd::NoiseOperationKind effect;
 
     for (const auto& noise_type: gate_noise_types) {
