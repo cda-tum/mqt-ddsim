@@ -13,7 +13,7 @@ include extern/qfr/CMakeLists.txt
 graft   extern/qfr/include
 graft   extern/qfr/src
 graft   extern/qfr/jkq/qfr
-graft   extern/qfr/jkq/mqt
+graft   extern/qfr/mqt/qfr
 include extern/qfr/extern/dd_package/CMakeLists.txt
 graft   extern/qfr/extern/dd_package/include
 
