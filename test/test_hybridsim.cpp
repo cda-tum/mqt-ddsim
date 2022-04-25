@@ -85,9 +85,9 @@ TEST(HybridSimTest, GRCSTestDD) {
     dd::serialize(ddsim_hybrid_dd.root_edge, "result_parallel.dd", true);
     dd::serialize(ddsim.root_edge, "result.dd", true);
 
-    auto dd     = std::make_unique<dd::Package>(ddsim.getNumberOfQubits());
-    auto result = dd->deserialize<dd::Package::vNode>("result_parallel.dd", true);
-    auto ref    = dd->deserialize<dd::Package::vNode>("result.dd", true);
+    auto dd     = std::make_unique<dd::Package<>>(ddsim.getNumberOfQubits());
+    auto result = dd->deserialize<dd::vNode>("result_parallel.dd", true);
+    auto ref    = dd->deserialize<dd::vNode>("result.dd", true);
 
     bool equal = (result == ref);
     if (!equal) {

@@ -1,14 +1,16 @@
 #include "UnitarySimulator.hpp"
 
+#include "dd/FunctionalityConstruction.hpp"
+
 #include <chrono>
 
 void UnitarySimulator::Construct() {
     // carry out actual computation
     auto start = std::chrono::steady_clock::now();
     if (mode == Mode::Sequential) {
-        e = qc->buildFunctionality(dd);
+        e = dd::buildFunctionality(qc.get(), dd);
     } else if (mode == Mode::Recursive) {
-        e = qc->buildFunctionalityRecursive(dd);
+        e = dd::buildFunctionalityRecursive(qc.get(), dd);
     }
     auto end         = std::chrono::steady_clock::now();
     constructionTime = std::chrono::duration<double>(end - start).count();

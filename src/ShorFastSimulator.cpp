@@ -228,19 +228,19 @@ std::pair<unsigned int, unsigned int> ShorFastSimulator::post_processing(const s
     }
 }
 
-dd::Package::mEdge ShorFastSimulator::limitTo(unsigned long long a) {
-    std::array<dd::Package::mEdge, 4> edges{
-            dd::Package::mEdge::zero, dd::Package::mEdge::zero,
-            dd::Package::mEdge::zero, dd::Package::mEdge::zero};
+dd::mEdge ShorFastSimulator::limitTo(unsigned long long a) {
+    std::array<dd::mEdge, 4> edges{
+            dd::mEdge::zero, dd::mEdge::zero,
+            dd::mEdge::zero, dd::mEdge::zero};
 
     if (a & 1u) {
-        edges[0] = edges[3] = dd::Package::mEdge::one;
+        edges[0] = edges[3] = dd::mEdge::one;
     } else {
-        edges[0] = dd::Package::mEdge::one;
+        edges[0] = dd::mEdge::one;
     }
     dd::Edge f = dd->makeDDNode(0, edges, false);
 
-    edges[0] = edges[1] = edges[2] = edges[3] = dd::Package::mEdge::zero;
+    edges[0] = edges[1] = edges[2] = edges[3] = dd::mEdge::zero;
 
     for (unsigned int p = 1; p < required_bits + 1; p++) {
         if ((a >> p) & 1u) {
@@ -250,17 +250,17 @@ dd::Package::mEdge ShorFastSimulator::limitTo(unsigned long long a) {
             edges[0] = f;
         }
         f        = dd->makeDDNode(p, edges, false);
-        edges[3] = dd::Package::mEdge::zero;
+        edges[3] = dd::mEdge::zero;
     }
 
     return f;
 }
 
-dd::Package::mEdge ShorFastSimulator::addConst(unsigned long long a) {
-    dd::Edge                          f = dd::Package::mEdge::one;
-    std::array<dd::Package::mEdge, 4> edges{
-            dd::Package::mEdge::zero, dd::Package::mEdge::zero,
-            dd::Package::mEdge::zero, dd::Package::mEdge::zero};
+dd::mEdge ShorFastSimulator::addConst(unsigned long long a) {
+    dd::Edge                          f = dd::mEdge::one;
+    std::array<dd::mEdge, 4> edges{
+            dd::mEdge::zero, dd::mEdge::zero,
+            dd::mEdge::zero, dd::mEdge::zero};
 
     unsigned int p = 0;
     while (!((a >> p) & 1u)) {
@@ -270,20 +270,20 @@ dd::Package::mEdge ShorFastSimulator::addConst(unsigned long long a) {
         p++;
     }
 
-    edges[0] = edges[1] = edges[2] = edges[3] = dd::Package::mEdge::zero;
+    edges[0] = edges[1] = edges[2] = edges[3] = dd::mEdge::zero;
     edges[2]                                  = f;
     dd::Edge left                             = dd->makeDDNode(p, edges, false);
-    edges[2]                                  = dd::Package::mEdge::zero;
+    edges[2]                                  = dd::mEdge::zero;
     edges[1]                                  = f;
     dd::Edge right                            = dd->makeDDNode(p, edges, false);
     p++;
 
     for (; p < required_bits; p++) {
-        edges[0] = edges[1] = edges[2] = edges[3] = dd::Package::mEdge::zero;
+        edges[0] = edges[1] = edges[2] = edges[3] = dd::mEdge::zero;
         if ((a >> p) & 1u) {
             edges[2]           = left;
             dd::Edge new_left  = dd->makeDDNode(p, edges, false);
-            edges[2]           = dd::Package::mEdge::zero;
+            edges[2]           = dd::mEdge::zero;
             edges[0]           = right;
             edges[1]           = left;
             edges[3]           = right;
@@ -293,7 +293,7 @@ dd::Package::mEdge ShorFastSimulator::addConst(unsigned long long a) {
         } else {
             edges[1]           = right;
             dd::Edge new_right = dd->makeDDNode(p, edges, false);
-            edges[1]           = dd::Package::mEdge::zero;
+            edges[1]           = dd::mEdge::zero;
             edges[0]           = left;
             edges[2]           = right;
             edges[3]           = left;
@@ -311,14 +311,14 @@ dd::Package::mEdge ShorFastSimulator::addConst(unsigned long long a) {
     return dd->makeDDNode(p, edges, false);
 }
 
-dd::Package::mEdge ShorFastSimulator::addConstMod(unsigned long long a) {
-    dd::Package::mEdge f = addConst(a);
+dd::mEdge ShorFastSimulator::addConstMod(unsigned long long a) {
+    dd::mEdge f = addConst(a);
 
-    dd::Package::mEdge f2 = addConst(n);
+    dd::mEdge f2 = addConst(n);
 
-    dd::Package::mEdge f3 = limitTo(n - 1);
+    dd::mEdge f3 = limitTo(n - 1);
 
-    dd::Package::mEdge f4 = limitTo(n - 1 - a);
+    dd::mEdge f4 = limitTo(n - 1 - a);
 
     f4.w           = dd::ComplexNumbers::neg(f4.w);
     dd::Edge diff2 = dd->add(f3, f4);
@@ -343,9 +343,9 @@ void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
     [[maybe_unused]] const std::size_t cache_count_before = dd->cn.cacheCount();
     dag_edges.clear();
 
-    dd::Package::vEdge                        f = dd::Package::vEdge::one;
-    std::array<dd::Package::vEdge, dd::RADIX> edges{
-            dd::Package::vEdge::zero, dd::Package::vEdge::zero};
+    dd::vEdge                        f = dd::vEdge::one;
+    std::array<dd::vEdge, dd::RADIX> edges{
+            dd::vEdge::zero, dd::vEdge::zero};
 
     unsigned long long t = a;
     for (dd::Qubit p = 0; p < n_qubits - 1; ++p) {
@@ -358,7 +358,7 @@ void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
     dd->incRef(f);
 
     for (auto& m: nodesOnLevel) {
-        m = std::map<dd::Package::vNode*, dd::Package::vEdge>();
+        m = std::map<dd::vNode*, dd::vEdge>();
     }
 
     u_a_emulate2_rec(root_edge.p->e[0]);
@@ -366,22 +366,22 @@ void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
     //dd->setMode(dd::Matrix);
 
     for (const auto& entry: nodesOnLevel.at(0)) {
-        dd::Package::vEdge left = f;
+        dd::vEdge left = f;
         if (entry.first->e[0].w == dd::Complex::zero) {
-            left = dd::Package::vEdge::zero;
+            left = dd::vEdge::zero;
         } else {
             left.w = dd->cn.mulCached(left.w, entry.first->e[0].w);
         }
 
-        dd::Package::vEdge right = dd->multiply(addConstMod(ts[entry.first->v]), f);
+        dd::vEdge right = dd->multiply(addConstMod(ts[entry.first->v]), f);
 
         if (entry.first->e[1].w == dd::Complex::zero) {
-            right = dd::Package::vEdge::zero;
+            right = dd::vEdge::zero;
         } else {
             right.w = dd->cn.mulCached(right.w, entry.first->e[1].w);
         }
 
-        dd::Package::vEdge result = dd->add(left, right);
+        dd::vEdge result = dd->add(left, right);
 
         if (left.w != dd::Complex::zero) {
             dd->cn.returnToCache(left.w);
@@ -396,21 +396,21 @@ void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
     }
 
     for (int i = 1; i < n_qubits - 1; i++) {
-        std::vector<dd::Package::vEdge> saveEdges;
+        std::vector<dd::vEdge> saveEdges;
         for (auto it = nodesOnLevel.at(i).begin(); it != nodesOnLevel.at(i).end(); it++) {
-            dd::Package::vEdge left = dd::Package::vEdge::zero;
+            dd::vEdge left = dd::vEdge::zero;
             if (it->first->e.at(0).w != dd::Complex::zero) {
                 left   = nodesOnLevel.at(i - 1)[it->first->e.at(0).p];
                 left.w = dd->cn.mulCached(left.w, it->first->e.at(0).w);
             }
 
-            dd::Package::vEdge right = dd::Package::vEdge::zero;
+            dd::vEdge right = dd::vEdge::zero;
             if (it->first->e.at(1).w != dd::Complex::zero) {
                 right   = dd->multiply(addConstMod(ts.at(it->first->v)), nodesOnLevel.at(i - 1)[it->first->e.at(1).p]);
                 right.w = dd->cn.mulCached(right.w, it->first->e.at(1).w);
             }
 
-            dd::Package::vEdge result = dd->add(left, right);
+            dd::vEdge result = dd->add(left, right);
 
             if (left.w != dd::Complex::zero) {
                 dd->cn.returnToCache(left.w);
@@ -435,14 +435,14 @@ void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
         throw std::runtime_error("error occurred");
     }
 
-    dd::Package::vEdge result = nodesOnLevel.at(n_qubits - 2)[root_edge.p->e[0].p];
+    dd::vEdge result = nodesOnLevel.at(n_qubits - 2)[root_edge.p->e[0].p];
 
     dd->decRef(result);
 
     result.w = dd->cn.mulCached(result.w, root_edge.p->e[0].w);
     auto tmp = result.w;
 
-    result = dd->makeDDNode(root_edge.p->v, std::array<dd::Package::vEdge, dd::RADIX>{root_edge.p->e[0], result});
+    result = dd->makeDDNode(root_edge.p->v, std::array<dd::vEdge, dd::RADIX>{root_edge.p->e[0], result});
     dd->cn.returnToCache(tmp);
 
     //dd->setMode(dd::Vector);
@@ -458,11 +458,11 @@ void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
     assert(dd->cn.cacheCount() == cache_count_before);
 }
 
-void ShorFastSimulator::u_a_emulate2_rec(dd::Package::vEdge e) {
+void ShorFastSimulator::u_a_emulate2_rec(dd::vEdge e) {
     if (e.isTerminal() || nodesOnLevel.at(e.p->v).find(e.p) != nodesOnLevel.at(e.p->v).end()) {
         return;
     }
-    nodesOnLevel.at(e.p->v)[e.p] = dd::Package::vEdge::zero;
+    nodesOnLevel.at(e.p->v)[e.p] = dd::vEdge::zero;
     u_a_emulate2_rec(e.p->e[0]);
     u_a_emulate2_rec(e.p->e[1]);
 }

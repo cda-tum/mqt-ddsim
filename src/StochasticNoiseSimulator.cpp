@@ -90,7 +90,7 @@ void StochasticNoiseSimulator::perfect_simulation_run() {
                 }
             }
 
-            auto dd_op = op->getDD(dd);
+            auto dd_op = dd::getDD(op.get(), dd);
             auto tmp   = dd->multiply(dd_op, root_edge);
             dd->incRef(tmp);
             dd->decRef(root_edge);
@@ -171,7 +171,7 @@ std::map<std::string, double> StochasticNoiseSimulator::StochSimulate() {
 
 void StochasticNoiseSimulator::runStochSimulationForId(unsigned int                                stochRun,
                                                        int                                         n_qubits,
-                                                       dd::Package::vEdge                          rootEdgePerfectRun,
+                                                       dd::vEdge                          rootEdgePerfectRun,
                                                        std::vector<double>&                        recordedPropertiesStorage,
                                                        std::vector<std::tuple<long, std::string>>& recordedPropertiesList,
                                                        unsigned long long                          localSeed) {
@@ -181,22 +181,22 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
     const unsigned long numberOfRuns = stochastic_runs / max_instances + (stochRun < stochastic_runs % max_instances ? 1 : 0);
     const int           approx_mod   = std::ceil(static_cast<double>(qc->getNops()) / (step_number + 1));
 
-    //        dd::NoiseOperationTable<dd::Package::mEdge> noiseOperationTable(getNumberOfQubits());
+    //        dd::NoiseOperationTable<dd::mEdge> noiseOperationTable(getNumberOfQubits());
 
     //printf("Running %d times and using the dd at %p, using the cn object at %p\n", numberOfRuns, (void *) &localDD, (void *) &localDD->cn);
     for (unsigned long current_run = 0; current_run < numberOfRuns; current_run++) {
         const auto t1 = std::chrono::steady_clock::now();
 
-        std::unique_ptr<dd::Package> localDD = std::make_unique<dd::Package>(getNumberOfQubits());
+        std::unique_ptr<dd::Package<>> localDD = std::make_unique<dd::Package<>>(getNumberOfQubits());
 
         std::map<unsigned int, bool> classic_values;
 
         unsigned int op_count     = 0;
         unsigned int approx_count = 0;
 
-        dd::Package::mEdge identity_DD = localDD->makeIdent(n_qubits);
+        dd::mEdge identity_DD = localDD->makeIdent(n_qubits);
         localDD->incRef(identity_DD);
-        dd::Package::vEdge localRootEdge = localDD->makeZeroState(n_qubits);
+        dd::vEdge localRootEdge = localDD->makeZeroState(n_qubits);
         localDD->incRef(localRootEdge);
 
         for (auto& op: *qc) {
@@ -227,7 +227,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                     throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
                 }
             } else {
-                dd::Package::mEdge dd_op{};
+                dd::mEdge dd_op{};
                 qc::Targets        targets;
                 dd::Controls       controls;
                 if (op->isClassicControlledOperation()) {
@@ -244,7 +244,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                             expValue = expValue >> 1u;
                         }
                     }
-                    dd_op    = classic_op->getOperation()->getDD(localDD);
+                    dd_op    = dd::getDD(classic_op->getOperation(), localDD);
                     targets  = classic_op->getOperation()->getTargets();
                     controls = classic_op->getOperation()->getControls();
                     if (!execute_op) {
@@ -252,7 +252,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                         continue;
                     }
                 } else {
-                    dd_op    = op->getDD(localDD);
+                    dd_op    = dd::getDD(op.get(), localDD);
                     targets  = op->getTargets();
                     controls = op->getControls();
                 }
@@ -289,12 +289,12 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
 
 void StochasticNoiseSimulator::applyNoiseOperation(const qc::Targets&                      targets,
                                                    const dd::Controls&                     control_qubits,
-                                                   dd::Package::mEdge                      dd_op,
-                                                   std::unique_ptr<dd::Package>&           localDD,
-                                                   dd::Package::vEdge&                     localRootEdge,
+                                                   dd::mEdge                      dd_op,
+                                                   std::unique_ptr<dd::Package<>>&           localDD,
+                                                   dd::vEdge&                     localRootEdge,
                                                    std::mt19937_64&                        generator,
                                                    std::uniform_real_distribution<dd::fp>& dist,
-                                                   dd::Package::mEdge                      identityDD) {
+                                                   dd::mEdge                      identityDD) {
     std::vector usedQubits = targets;
     for (auto control: control_qubits) {
         usedQubits.push_back(control.qubit);
@@ -321,12 +321,12 @@ void StochasticNoiseSimulator::applyNoiseOperation(const qc::Targets&           
     }
 }
 
-dd::Package::mEdge StochasticNoiseSimulator::generateNoiseOperation(bool                                    amplitudeDamping,
+dd::mEdge StochasticNoiseSimulator::generateNoiseOperation(bool                                    amplitudeDamping,
                                                                     dd::Qubit                               target,
                                                                     std::mt19937_64&                        engine,
                                                                     std::uniform_real_distribution<dd::fp>& distribution,
-                                                                    dd::Package::mEdge                      dd_operation,
-                                                                    std::unique_ptr<dd::Package>&           localDD) {
+                                                                    dd::mEdge                      dd_operation,
+                                                                    std::unique_ptr<dd::Package<>>&           localDD) {
     dd::NoiseOperationKind effect;
 
     for (const auto& noise_type: gate_noise_types) {
@@ -481,15 +481,15 @@ std::string StochasticNoiseSimulator::intToString(long target_number) const {
     }
     return path;
 }
-void StochasticNoiseSimulator::setMeasuredQubitToZero(signed char& at, dd::Package::vEdge& e, std::unique_ptr<dd::Package>& localDD) {
-    auto f = dd::Package::mEdge::one;
+void StochasticNoiseSimulator::setMeasuredQubitToZero(signed char& at, dd::vEdge& e, std::unique_ptr<dd::Package<>>& localDD) {
+    auto f = dd::mEdge::one;
 
     for (std::size_t p = 0; p < getNumberOfQubits(); p++) {
         if (static_cast<dd::Qubit>(p) == at) {
-            f = localDD->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, f, dd::Package::mEdge::zero, dd::Package::mEdge::zero});
-            //                f = dd->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, dd::Package::mEdge::zero, dd::Package::mEdge::zero, dd::Package::mEdge::zero});
+            f = localDD->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, f, dd::mEdge::zero, dd::mEdge::zero});
+            //                f = dd->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, dd::mEdge::zero, dd::mEdge::zero, dd::mEdge::zero});
         } else {
-            f = localDD->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, dd::Package::mEdge::zero, dd::Package::mEdge::zero, f});
+            f = localDD->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, dd::mEdge::zero, dd::mEdge::zero, f});
         }
     }
     auto tmp = localDD->multiply(f, e);

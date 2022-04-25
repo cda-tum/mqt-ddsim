@@ -31,7 +31,7 @@ std::size_t HybridSchrodingerFeynmanSimulator::getNDecisions(dd::Qubit split_qub
     return ndecisions;
 }
 
-qc::VectorDD HybridSchrodingerFeynmanSimulator::SimulateSlicing(std::unique_ptr<dd::Package>& slice_dd, dd::Qubit split_qubit, std::size_t controls) {
+qc::VectorDD HybridSchrodingerFeynmanSimulator::SimulateSlicing(std::unique_ptr<dd::Package<>>& slice_dd, dd::Qubit split_qubit, std::size_t controls) {
     Slice lower(slice_dd, 0, static_cast<dd::Qubit>(split_qubit - 1), controls);
     Slice upper(slice_dd, split_qubit, static_cast<dd::Qubit>(getNumberOfQubits() - 1), controls);
 
@@ -50,7 +50,7 @@ qc::VectorDD HybridSchrodingerFeynmanSimulator::SimulateSlicing(std::unique_ptr<
     return result;
 }
 
-bool HybridSchrodingerFeynmanSimulator::Slice::apply(std::unique_ptr<dd::Package>& slice_dd, const std::unique_ptr<qc::Operation>& op) {
+bool HybridSchrodingerFeynmanSimulator::Slice::apply(std::unique_ptr<dd::Package<>>& slice_dd, const std::unique_ptr<qc::Operation>& op) {
     bool is_split_op = false;
     if (reinterpret_cast<qc::StandardOperation*>(op.get())) { // TODO change control and target if wrong direction
         qc::Targets  op_targets{};
@@ -104,7 +104,7 @@ bool HybridSchrodingerFeynmanSimulator::Slice::apply(std::unique_ptr<dd::Package
             const auto&           param = op->getParameter();
             qc::StandardOperation new_op(nqubits, op_controls, op_targets, op->getType(), param[0], param[1], param[2], start);
             slice_dd->decRef(edge);
-            edge = slice_dd->multiply(new_op.getDD(slice_dd), edge, start);
+            edge = slice_dd->multiply(dd::getDD(&new_op, slice_dd), edge, start);
             slice_dd->incRef(edge);
         }
     } else {
@@ -148,10 +148,10 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridTaskflow(const dd::Qubit s
 
     std::function<void(std::pair<std::int64_t, std::int64_t>)> compute_pair = [this, &compute_pair, &computed, &executor, ndecisions, nslices_at_once, split_qubit](std::pair<std::int64_t, std::int64_t> current) {
         if (current.first == 0) { // slice
-            std::unique_ptr<dd::Package> old_dd;
-            qc::VectorDD                 edge{};
+            std::unique_ptr<dd::Package<>> old_dd;
+            qc::VectorDD                   edge{};
             for (std::int64_t i = 0; i < nslices_at_once; i++) {
-                auto slice_dd = std::make_unique<dd::Package>(getNumberOfQubits());
+                auto slice_dd = std::make_unique<dd::Package<>>(getNumberOfQubits());
                 auto result   = SimulateSlicing(slice_dd, split_qubit, current.second + i);
                 if (i > 0) {
                     edge = slice_dd->add(slice_dd->transfer(edge), result);
@@ -165,13 +165,13 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridTaskflow(const dd::Qubit s
             current.second /= nslices_at_once;
             dd::serialize(edge, "slice_" + std::to_string(current.first) + "_" + std::to_string(current.second) + ".dd", true);
         } else { // adding
-            auto        slice_dd       = std::make_unique<dd::Package>(getNumberOfQubits());
+            auto        slice_dd       = std::make_unique<dd::Package<>>(getNumberOfQubits());
             std::string filename       = "slice_" + std::to_string(current.first - 1) + "_";
             std::string filename_left  = filename + std::to_string(current.second * 2) + ".dd";
             std::string filename_right = filename + std::to_string(current.second * 2 + 1) + ".dd";
 
-            auto result  = slice_dd->deserialize<dd::Package::vNode>(filename_left, true);
-            auto result2 = slice_dd->deserialize<dd::Package::vNode>(filename_right, true);
+            auto result  = slice_dd->deserialize<dd::vNode>(filename_left, true);
+            auto result2 = slice_dd->deserialize<dd::vNode>(filename_right, true);
             result       = slice_dd->add(result, result2);
             dd::serialize(result, "slice_" + std::to_string(current.first) + "_" + std::to_string(current.second) + ".dd", true);
 
@@ -195,7 +195,7 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridTaskflow(const dd::Qubit s
     }
     executor.wait_for_all();
 
-    root_edge = dd->deserialize<dd::Package::vNode>("slice_" + std::to_string(ndecisions) + "_0.dd", true);
+    root_edge = dd->deserialize<dd::vNode>("slice_" + std::to_string(ndecisions) + "_0.dd", true);
     dd->incRef(root_edge);
 }
 
@@ -218,9 +218,9 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridAmplitudes(dd::Qubit split
             std::vector<std::complex<dd::fp>>& thread_amplitudes = amplitudes.at(current_thread);
 
             for (std::int64_t local_control = 0; local_control < nslices_on_one_cpu; local_control++) {
-                const std::int64_t           total_control = control + local_control;
-                std::unique_ptr<dd::Package> slice_dd      = std::make_unique<dd::Package>(getNumberOfQubits());
-                auto                         result        = SimulateSlicing(slice_dd, split_qubit, total_control);
+                const std::int64_t             total_control = control + local_control;
+                std::unique_ptr<dd::Package<>> slice_dd      = std::make_unique<dd::Package<>>(getNumberOfQubits());
+                auto                           result        = SimulateSlicing(slice_dd, split_qubit, total_control);
                 slice_dd->addAmplitudes(result, thread_amplitudes, nqubits);
             }
         });

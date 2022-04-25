@@ -145,7 +145,7 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
                       << " #controls=" << op->getControls().size()
                       << " statesize=" << dd->size(root_edge) << "\n";//*/
 
-            auto dd_op = op->getDD(dd);
+            auto dd_op = dd::getDD(op.get(), dd);
             auto tmp   = dd->multiply(dd_op, root_edge);
             dd->incRef(tmp);
             dd->decRef(root_edge);
@@ -167,7 +167,7 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
                               << "\n";//*/
                 } else if (approx_info.approx_when == ApproximationInfo::MemoryDriven) {
                     [[maybe_unused]] const unsigned int size_before = dd->size(root_edge);
-                    if (dd->getUniqueTable<dd::Package::vNode>().possiblyNeedsCollection()) {
+                    if (dd->getUniqueTable<dd::vNode>().possiblyNeedsCollection()) {
                         const double ap_fid = ApproximateByFidelity(approx_info.step_fidelity, false, true);
                         approximation_runs++;
                         final_fidelity *= ap_fid;
