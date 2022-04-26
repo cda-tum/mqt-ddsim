@@ -7,7 +7,7 @@ It builds upon `our quantum functionality representation (QFR) <https://github.c
 
 The tool builds upon our `quantum functionality representation (QFR) <https://github.com/cda-tumu/qfr.git>`_ which in turns builds on our `decision diagram (DD) package <https://github.com/cda-tum/dd_package.git>`_.
 
-For more information, on our work on quantum circuit simulation please visit `www.cda.cit.tum.de/research/quantum_simulation <https://www.cda.cit.tum.de/research/quantum_simulation>`_ or, for more information on our work on noise-aware quantum circuit simulation, please visit `iic.jku.at/eda/research/noise_aware_simulation <https://iic.jku.at/eda/research/noise_aware_simulation>`_.
+For more information, on our work on quantum circuit simulation please visit `www.cda.cit.tum.de/research/quantum_simulation <https://www.cda.cit.tum.de/research/quantum_simulation>`_ or, for more information on our work on noise-aware quantum circuit simulation, please visit `www.cda.cit.tum.de/research/noise_aware_simulation <https://www.cda.cit.tum.de/research/noise_aware_simulation/>`_.
 
 If you have any questions, feel free to contact us via quantum.cda@xcit.tum.de or by creating an `issue <https://github.com/cda-tum/ddsim/issues>`_ on GitHub.
 
