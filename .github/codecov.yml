@@ -3,7 +3,7 @@ ignore:
   - "apps/*"
   - "test/*.cpp"
   - "mqt/**/*"
-  -  "jkq/**/*"
+  - "jkq/**/*"
 
 coverage:
   range:     60..95

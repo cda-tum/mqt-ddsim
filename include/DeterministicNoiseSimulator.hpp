@@ -87,7 +87,7 @@ private:
     static constexpr unsigned short NoiseSLOTS = 16384;
     static constexpr unsigned short NoiseMASK  = NoiseSLOTS - 1;
     struct NoiseEntry {
-        dd::Package::mNode *   a, *r; // a is the argument, r is the result
+        dd::mNode *            a, *r; // a is the argument, r is the result
         dd::ComplexValue       aw, rw;
         dd::NoiseOperationKind which; // type of operation
         signed char            usedQubits[std::numeric_limits<dd::Qubit>::max() + 1];
@@ -116,7 +116,7 @@ private:
     qc::MatrixDD makeZeroDensityOperator(dd::QubitCount n);
 
     qc::MatrixDD         ApplyNoiseEffects(qc::MatrixDD density_op, const std::unique_ptr<qc::Operation>& op, unsigned char maxDepth);
-    static unsigned long noiseHash(dd::Package::mNode* a, const dd::ComplexValue& aw, const std::vector<signed char>& usedQubits);
+    static unsigned long noiseHash(dd::mNode* a, const dd::ComplexValue& aw, const std::vector<signed char>& usedQubits);
     qc::MatrixDD         noiseLookup(const qc::MatrixDD& a, const std::vector<signed char>& usedQubits);
     void                 noiseInsert(const qc::MatrixDD& a, const std::vector<signed char>& usedQubits, const qc::MatrixDD& r);
     dd::fp               probForIndexToBeZero(qc::MatrixDD e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob);

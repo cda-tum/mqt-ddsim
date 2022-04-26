@@ -40,7 +40,7 @@ The first just yields a dictionary with the counts of the measurements, while th
 
     from mqt import ddsim
 
-    provider = ddsim.JKQProvider()
+    provider = ddsim.DDSIMProvider()
     backend = provider.get_backend('path_sim_qasm_simulator')
 
 
@@ -72,7 +72,7 @@ In order to use this part of the framework, some extra dependencies have to be i
 
 .. code-block:: console
 
-    pip install jkq.ddsim[tnflow]
+    pip install mqt.ddsim[tnflow]
     pip install -U git+https://github.com/jcmgray/cotengra.git
 
 Then, in order to let CoTenGra determine a simulation path for a given circuit the :code:`mode="cotengra"` option has to be used when calling :code:`execute`, i.e.,

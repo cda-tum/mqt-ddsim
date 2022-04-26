@@ -103,26 +103,26 @@ private:
 
     void runStochSimulationForId(unsigned int                                stochRun,
                                  int                                         n_qubits,
-                                 dd::Package::vEdge                          rootEdgePerfectRun,
+                                 dd::vEdge                                   rootEdgePerfectRun,
                                  std::vector<double>&                        recordedPropertiesStorage,
                                  std::vector<std::tuple<long, std::string>>& recordedPropertiesList,
                                  unsigned long long                          localSeed);
 
-    dd::Package::mEdge generateNoiseOperation(bool                                    amplitudeDamping,
-                                              dd::Qubit                               target,
-                                              std::mt19937_64&                        engine,
-                                              std::uniform_real_distribution<dd::fp>& distribution,
-                                              dd::Package::mEdge                      dd_operation,
-                                              std::unique_ptr<dd::Package>&           localDD);
+    dd::mEdge generateNoiseOperation(bool                                    amplitudeDamping,
+                                     dd::Qubit                               target,
+                                     std::mt19937_64&                        engine,
+                                     std::uniform_real_distribution<dd::fp>& distribution,
+                                     dd::mEdge                               dd_operation,
+                                     std::unique_ptr<dd::Package<>>&         localDD);
 
     void applyNoiseOperation(const qc::Targets&                      targets,
                              const dd::Controls&                     control_qubits,
-                             dd::Package::mEdge                      dd_op,
-                             std::unique_ptr<dd::Package>&           localDD,
-                             dd::Package::vEdge&                     localRootEdge,
+                             dd::mEdge                               dd_op,
+                             std::unique_ptr<dd::Package<>>&         localDD,
+                             dd::vEdge&                              localRootEdge,
                              std::mt19937_64&                        generator,
                              std::uniform_real_distribution<dd::fp>& dist,
-                             dd::Package::mEdge                      identityDD);
+                             dd::mEdge                               identityDD);
 
     [[nodiscard]] dd::NoiseOperationKind ReturnNoiseOperation(char i, double d) const;
 
@@ -131,7 +131,7 @@ private:
     //    double ApproximateEdgeByFidelity(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes);
     //
     //    dd::Package::vEdge RemoveNodesInPackage(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge e, std::map<dd::Package::vNode*, dd::Package::vEdge>& dag_edges);
-    void setMeasuredQubitToZero(signed char& at, dd::Package::vEdge& e, std::unique_ptr<dd::Package>& localDD);
+    void setMeasuredQubitToZero(signed char& at, dd::vEdge& e, std::unique_ptr<dd::Package<>>& localDD);
 };
 
 #endif //DDSIM_STOCHASTICNOISESIMULATOR_HPP

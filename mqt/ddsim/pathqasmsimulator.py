@@ -108,7 +108,7 @@ def get_simulation_path(qc, max_time: int = 60, max_repeats: int = 1024, paralle
 
 
 class PathQasmSimulator(BackendV1):
-    """Python interface to JKQ DDSIM Simulation Path Framework"""
+    """Python interface to MQT DDSIM Simulation Path Framework"""
 
     SHOW_STATE_VECTOR = False
 

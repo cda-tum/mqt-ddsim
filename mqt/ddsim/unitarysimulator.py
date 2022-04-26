@@ -112,7 +112,7 @@ class UnitarySimulator(BackendV1):
         elif mode == 'recursive':
             construction_mode = ddsim.ConstructionMode.recursive
         else:
-            raise DDSIMError('Construction mode', mode, 'not supported by JKQ unitary simulator. Available modes are \'recursive\' and \'sequential\'')
+            raise DDSIMError('Construction mode', mode, 'not supported by DDSIM unitary simulator. Available modes are \'recursive\' and \'sequential\'')
 
         sim = ddsim.UnitarySimulator(qobj_experiment, seed, construction_mode)
         sim.construct()

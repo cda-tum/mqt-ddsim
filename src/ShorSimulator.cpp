@@ -281,21 +281,21 @@ std::pair<unsigned int, unsigned int> ShorSimulator::post_processing(const std::
     }
 }
 
-dd::Package::mEdge ShorSimulator::limitTo(unsigned long long a) {
-    std::array<dd::Package::mEdge, 4> edges{
-            dd::Package::mEdge::zero,
-            dd::Package::mEdge::zero,
-            dd::Package::mEdge::zero,
-            dd::Package::mEdge::zero};
+dd::mEdge ShorSimulator::limitTo(unsigned long long a) {
+    std::array<dd::mEdge, 4> edges{
+            dd::mEdge::zero,
+            dd::mEdge::zero,
+            dd::mEdge::zero,
+            dd::mEdge::zero};
 
     if (a & 1u) {
-        edges[0] = edges[3] = dd::Package::mEdge::one;
+        edges[0] = edges[3] = dd::mEdge::one;
     } else {
-        edges[0] = dd::Package::mEdge::one;
+        edges[0] = dd::mEdge::one;
     }
     dd::Edge f = dd->makeDDNode(0, edges, false);
 
-    edges[0] = edges[1] = edges[2] = edges[3] = dd::Package::mEdge::zero;
+    edges[0] = edges[1] = edges[2] = edges[3] = dd::mEdge::zero;
 
     for (unsigned int p = 1; p < required_bits + 1; p++) {
         if ((a >> p) & 1u) {
@@ -305,19 +305,19 @@ dd::Package::mEdge ShorSimulator::limitTo(unsigned long long a) {
             edges[0] = f;
         }
         f        = dd->makeDDNode(p, edges, false);
-        edges[3] = dd::Package::mEdge::zero;
+        edges[3] = dd::mEdge::zero;
     }
 
     return f;
 }
 
-dd::Package::mEdge ShorSimulator::addConst(unsigned long long a) {
-    dd::Package::mEdge                f = dd::Package::mEdge::one;
-    std::array<dd::Package::mEdge, 4> edges{
-            dd::Package::mEdge::zero,
-            dd::Package::mEdge::zero,
-            dd::Package::mEdge::zero,
-            dd::Package::mEdge::zero};
+dd::mEdge ShorSimulator::addConst(unsigned long long a) {
+    dd::mEdge                f = dd::mEdge::one;
+    std::array<dd::mEdge, 4> edges{
+            dd::mEdge::zero,
+            dd::mEdge::zero,
+            dd::mEdge::zero,
+            dd::mEdge::zero};
 
     unsigned int p = 0;
     while (!((a >> p) & 1u)) {
@@ -327,23 +327,23 @@ dd::Package::mEdge ShorSimulator::addConst(unsigned long long a) {
         p++;
     }
 
-    dd::Package::mEdge right, left;
+    dd::mEdge right, left;
 
-    edges[0] = edges[1] = edges[2] = edges[3] = dd::Package::mEdge::zero;
+    edges[0] = edges[1] = edges[2] = edges[3] = dd::mEdge::zero;
     edges[2]                                  = f;
     left                                      = dd->makeDDNode(p, edges, false);
-    edges[2]                                  = dd::Package::mEdge::zero;
+    edges[2]                                  = dd::mEdge::zero;
     edges[1]                                  = f;
     right                                     = dd->makeDDNode(p, edges, false);
     p++;
 
-    dd::Package::mEdge new_left, new_right;
+    dd::mEdge new_left, new_right;
     for (; p < required_bits; p++) {
-        edges[0] = edges[1] = edges[2] = edges[3] = dd::Package::mEdge::zero;
+        edges[0] = edges[1] = edges[2] = edges[3] = dd::mEdge::zero;
         if ((a >> p) & 1u) {
             edges[2]  = left;
             new_left  = dd->makeDDNode(p, edges, false);
-            edges[2]  = dd::Package::mEdge::zero;
+            edges[2]  = dd::mEdge::zero;
             edges[0]  = right;
             edges[1]  = left;
             edges[3]  = right;
@@ -351,7 +351,7 @@ dd::Package::mEdge ShorSimulator::addConst(unsigned long long a) {
         } else {
             edges[1]  = right;
             new_right = dd->makeDDNode(p, edges, false);
-            edges[1]  = dd::Package::mEdge::zero;
+            edges[1]  = dd::mEdge::zero;
             edges[0]  = left;
             edges[2]  = right;
             edges[3]  = left;
@@ -369,7 +369,7 @@ dd::Package::mEdge ShorSimulator::addConst(unsigned long long a) {
     return dd->makeDDNode(p, edges, false);
 }
 
-dd::Package::mEdge ShorSimulator::addConstMod(unsigned long long a) {
+dd::mEdge ShorSimulator::addConstMod(unsigned long long a) {
     dd::Edge f = addConst(a);
 
     dd::Edge f2 = addConst(n);
@@ -386,12 +386,12 @@ dd::Package::mEdge ShorSimulator::addConstMod(unsigned long long a) {
     return tmp.p->e[0];
 }
 
-dd::Package::mEdge ShorSimulator::limitStateVector(dd::Package::vEdge e) {
-    if (e.p == dd::Package::vEdge::zero.p) {
+dd::mEdge ShorSimulator::limitStateVector(dd::vEdge e) {
+    if (e.p == dd::vEdge::zero.p) {
         if (e.w == dd::Complex::zero) {
-            return dd::Package::mEdge::zero;
+            return dd::mEdge::zero;
         } else {
-            return dd::Package::mEdge::one;
+            return dd::mEdge::one;
         }
     }
     auto it = dag_edges.find(e.p);
@@ -399,10 +399,10 @@ dd::Package::mEdge ShorSimulator::limitStateVector(dd::Package::vEdge e) {
         return it->second;
     }
 
-    std::array<dd::Package::mEdge, 4> edges{
+    std::array<dd::mEdge, 4> edges{
             limitStateVector(e.p->e.at(0)),
-            dd::Package::mEdge::zero,
-            dd::Package::mEdge::zero,
+            dd::mEdge::zero,
+            dd::mEdge::zero,
             limitStateVector(e.p->e.at(1))};
 
     dd::Edge result = dd->makeDDNode(e.p->v, edges, false);
@@ -411,14 +411,14 @@ dd::Package::mEdge ShorSimulator::limitStateVector(dd::Package::vEdge e) {
 }
 
 void ShorSimulator::u_a_emulate(unsigned long long a, int q) {
-    dd::Package::mEdge limit = dd->makeIdent(0, required_bits - 1);
+    dd::mEdge limit = dd->makeIdent(0, required_bits - 1);
 
-    dd::Package::mEdge                f = dd::Package::mEdge::one;
-    std::array<dd::Package::mEdge, 4> edges{
-            dd::Package::mEdge::zero,
-            dd::Package::mEdge::zero,
-            dd::Package::mEdge::zero,
-            dd::Package::mEdge::zero};
+    dd::mEdge                f = dd::mEdge::one;
+    std::array<dd::mEdge, 4> edges{
+            dd::mEdge::zero,
+            dd::mEdge::zero,
+            dd::mEdge::zero,
+            dd::mEdge::zero};
 
     for (unsigned int p = 0; p < required_bits; ++p) {
         edges[0] = f;
@@ -430,7 +430,7 @@ void ShorSimulator::u_a_emulate(unsigned long long a, int q) {
 
     f = dd->multiply(f, limit);
 
-    edges[1] = dd::Package::mEdge::zero;
+    edges[1] = dd::mEdge::zero;
 
     dd->incRef(f);
     dd->incRef(limit);
@@ -438,24 +438,24 @@ void ShorSimulator::u_a_emulate(unsigned long long a, int q) {
     unsigned long t = a;
 
     for (unsigned int i = 0; i < required_bits; ++i) {
-        dd::Package::mEdge active = dd::Package::mEdge::one;
+        dd::mEdge active = dd::mEdge::one;
         for (unsigned int p = 0; p < required_bits; ++p) {
             if (p == i) {
                 edges[3] = active;
-                edges[0] = dd::Package::mEdge::zero;
+                edges[0] = dd::mEdge::zero;
             } else {
                 edges[0] = edges[3] = active;
             }
             active = dd->makeDDNode(p, edges, false);
         }
 
-        active.w                   = dd->cn.lookup(-1, 0);
-        dd::Package::mEdge passive = dd->multiply(f, dd->add(limit, active));
-        active.w                   = dd::Complex::one;
-        active                     = dd->multiply(f, active);
+        active.w          = dd->cn.lookup(-1, 0);
+        dd::mEdge passive = dd->multiply(f, dd->add(limit, active));
+        active.w          = dd::Complex::one;
+        active            = dd->multiply(f, active);
 
-        dd::Package::mEdge tmp = addConstMod(t);
-        active                 = dd->multiply(tmp, active);
+        dd::mEdge tmp = addConstMod(t);
+        active        = dd->multiply(tmp, active);
 
         dd->decRef(f);
         f = dd->add(active, passive);
@@ -468,22 +468,22 @@ void ShorSimulator::u_a_emulate(unsigned long long a, int q) {
     dd->decRef(limit);
     dd->decRef(f);
 
-    dd::Package::mEdge e = f;
+    dd::mEdge e = f;
 
     for (int i = 2 * required_bits - 1; i >= 0; --i) {
         if (i == q) {
-            edges[1] = edges[2] = dd::Package::mEdge::zero;
+            edges[1] = edges[2] = dd::mEdge::zero;
             edges[0]            = dd->makeIdent(0, n_qubits - i - 2);
             edges[3]            = e;
             e                   = dd->makeDDNode(n_qubits - 1 - i, edges, false);
         } else {
-            edges[1] = edges[2] = dd::Package::mEdge::zero;
+            edges[1] = edges[2] = dd::mEdge::zero;
             edges[0] = edges[3] = e;
             e                   = dd->makeDDNode(n_qubits - 1 - i, edges, false);
         }
     }
 
-    dd::Package::vEdge tmp = dd->multiply(e, root_edge);
+    dd::vEdge tmp = dd->multiply(e, root_edge);
     dd->incRef(tmp);
     dd->decRef(root_edge);
     root_edge = tmp;

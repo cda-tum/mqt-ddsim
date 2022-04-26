@@ -46,7 +46,7 @@ private:
     void SimulateHybridTaskflow(dd::Qubit split_qubit);
     void SimulateHybridAmplitudes(dd::Qubit split_qubit);
 
-    qc::VectorDD SimulateSlicing(std::unique_ptr<dd::Package>& dd, dd::Qubit split_qubit, std::size_t controls);
+    qc::VectorDD SimulateSlicing(std::unique_ptr<dd::Package<>>& dd, dd::Qubit split_qubit, std::size_t controls);
 
     class Slice {
     protected:
@@ -66,19 +66,19 @@ private:
         std::size_t          nDecisionsExecuted = 0;
         qc::VectorDD         edge{};
 
-        explicit Slice(std::unique_ptr<dd::Package>& dd, dd::Qubit start, dd::Qubit end, const std::size_t controls):
+        explicit Slice(std::unique_ptr<dd::Package<>>& dd, dd::Qubit start, dd::Qubit end, const std::size_t controls):
             start(start), end(end), controls(controls), nqubits(end - start + 1) {
             edge = dd->makeZeroState(nqubits, start);
             dd->incRef(edge);
         }
 
-        explicit Slice(std::unique_ptr<dd::Package>& dd, qc::VectorDD edge, dd::Qubit start, dd::Qubit end, const std::size_t controls):
+        explicit Slice(std::unique_ptr<dd::Package<>>& dd, qc::VectorDD edge, dd::Qubit start, dd::Qubit end, const std::size_t controls):
             start(start), end(end), controls(controls), nqubits(end - start + 1), edge(edge) {
             dd->incRef(edge);
         }
 
         // returns true if this operation was a split operation
-        bool apply(std::unique_ptr<dd::Package>& dd, const std::unique_ptr<qc::Operation>& op);
+        bool apply(std::unique_ptr<dd::Package<>>& dd, const std::unique_ptr<qc::Operation>& op);
     };
 };
 

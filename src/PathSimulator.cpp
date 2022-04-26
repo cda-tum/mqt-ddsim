@@ -303,7 +303,7 @@ void PathSimulator::constructTaskGraph() {
                 results.emplace(leftID, zeroState);
             } else {
                 const auto&  op   = qc->at(leftID - 1);
-                qc::MatrixDD opDD = op->getDD(dd);
+                qc::MatrixDD opDD = dd::getDD(op.get(), dd);
                 dd->incRef(opDD);
                 results.emplace(leftID, opDD);
             }
@@ -314,7 +314,7 @@ void PathSimulator::constructTaskGraph() {
                 throw std::runtime_error("Initial state must not appear on right side of the simulation path member.");
             } else {
                 const auto&  op   = qc->at(rightID - 1);
-                qc::MatrixDD opDD = op->getDD(dd);
+                qc::MatrixDD opDD = dd::getDD(op.get(), dd);
                 dd->incRef(opDD);
                 results.emplace(rightID, opDD);
             }
