@@ -2,10 +2,10 @@ import unittest
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit import execute
 
-from jkq.ddsim.hybridstatevectorsimulator import HybridStatevectorSimulator
+from mqt.ddsim.hybridstatevectorsimulator import HybridStatevectorSimulator
 
 
-class JKQHybridStatevectorSimulatorTest(unittest.TestCase):
+class MQTHybridStatevectorSimulatorTest(unittest.TestCase):
     """Runs backend checks and some very basic functionality tests"""
 
     def setUp(self):

@@ -52,7 +52,9 @@ public:
         CN::incRef(oneMinusNoiseProbFromTable);
     }
 
-    std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override{};
+    std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override {
+        return {};
+    };
 
     std::map<std::string, double> DeterministicSimulate();
 

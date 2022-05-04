@@ -1,0 +1,25 @@
+[build-system]
+requires = [
+    "setuptools>=45",
+    "wheel>=0.37",
+    "ninja>=1.10; sys_platform != 'win32'",
+    "cmake>=3.14",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.cibuildwheel]
+build = "cp3*"
+archs = "auto64"
+test-skip = "*_arm64 *-musllinux_x86_64 *_universal2:arm64"
+test-command = "python -c \"from mqt import ddsim\""
+test-requires = ["qiskit-terra"]
+environment = { DEPLOY = "ON" }
+build-verbosity = 1
+
+[tool.cibuildwheel.linux]
+
+[tool.cibuildwheel.macos]
+archs = "x86_64"
+environment = { MACOSX_DEPLOYMENT_TARGET = "10.15", DEPLOY = "ON" }
+
+[tool.cibuildwheel.windows]

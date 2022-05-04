@@ -1,11 +1,11 @@
 import unittest
 
-from jkq.ddsim import JKQProvider
+from mqt.ddsim import DDSIMProvider
 
 
-class JKQProviderTestCase(unittest.TestCase):
+class DDSIMProviderTestCase(unittest.TestCase):
     def setUp(self):
-        self.provider = JKQProvider()
+        self.provider = DDSIMProvider()
         self.backend_name = 'qasm_simulator'
 
     def test_backends(self):

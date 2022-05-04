@@ -139,7 +139,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                         expValue = expValue >> 1u;
                     }
                 }
-                dd_op   = classic_op->getOperation()->getDD(dd);
+                dd_op   = dd::getDD(classic_op->getOperation(), dd);
                 targets = classic_op->getOperation()->getTargets();
                 assert(targets.size() == 1);
                 controls = classic_op->getOperation()->getControls();
@@ -147,7 +147,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                     continue;
                 }
             } else {
-                dd_op   = op->getDD(dd);
+                dd_op   = dd::getDD(op.get(), dd);
                 targets = op->getTargets();
                 assert(targets.size() == 1);
                 controls = op->getControls();

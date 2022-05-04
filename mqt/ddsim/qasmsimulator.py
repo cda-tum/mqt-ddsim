@@ -13,14 +13,14 @@ from qiskit.qobj import QasmQobjExperiment, Qobj, QasmQobj, PulseQobj
 from qiskit.result import Result
 from qiskit.compiler import assemble
 
-from .jkqjob import JKQJob
-from jkq import ddsim
+from .job import DDSIMJob
+from mqt import ddsim
 
 logger = logging.getLogger(__name__)
 
 
 class QasmSimulator(BackendV1):
-    """Python interface to JKQ DDSIM"""
+    """Python interface to MQT DDSIM"""
 
     SHOW_STATE_VECTOR = False
 
@@ -36,10 +36,10 @@ class QasmSimulator(BackendV1):
         conf = {
             'backend_name': 'qasm_simulator',
             'backend_version': ddsim.__version__,
-            'url': 'https://github.com/iic-jku/ddsim',
+            'url': 'https://github.com/cda-tum/ddsim',
             'simulator': True,
             'local': True,
-            'description': 'JKQ DDSIM C++ simulator',
+            'description': 'MQT DDSIM C++ simulator',
             'basis_gates': ['id', 'u0', 'u1', 'u2', 'u3', 'cu3',
                             'x', 'cx', 'ccx', 'mcx_gray', 'mcx_recursive', 'mcx_vchain',
                             'y', 'cy',
@@ -79,7 +79,7 @@ class QasmSimulator(BackendV1):
         circuit_qobj = assemble(quantum_circuits, self, **out_options)
 
         job_id = str(uuid.uuid4())
-        local_job = JKQJob(self, job_id, self._run_job, circuit_qobj, **options)
+        local_job = DDSIMJob(self, job_id, self._run_job, circuit_qobj, **options)
         local_job.submit()
         return local_job
 
@@ -105,7 +105,7 @@ class QasmSimulator(BackendV1):
     def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options):
         start_time = time.time()
         sim = ddsim.CircuitSimulator(qobj_experiment, options.get('seed', -1))
-        counts = sim.simulate(options['shots'])
+        counts = sim.simulate(options.get('shots', 1024))
         end_time = time.time()
         counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
 
@@ -114,7 +114,7 @@ class QasmSimulator(BackendV1):
                   'status': 'DONE',
                   'time_taken': end_time - start_time,
                   'seed': options.get('seed', -1),
-                  'shots': options['shots'],
+                  'shots': options.get('shots', 1024),
                   'data': {'counts': counts_hex},
                   'success': True,
                   }

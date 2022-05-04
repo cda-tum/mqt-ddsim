@@ -92,20 +92,20 @@ public:
         return binary;
     }
 
-    double ApproximateByFidelity(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose = false);
+    double ApproximateByFidelity(std::unique_ptr<dd::Package<>>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose = false);
     double ApproximateByFidelity(double targetFidelity, bool allLevels, bool removeNodes, bool verbose = false) {
         return ApproximateByFidelity(dd, root_edge, targetFidelity, allLevels, removeNodes, verbose);
     }
 
-    double ApproximateBySampling(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, std::size_t nSamples, std::size_t threshold, bool removeNodes, bool verbose = false);
+    double ApproximateBySampling(std::unique_ptr<dd::Package<>>& localDD, dd::vEdge& edge, std::size_t nSamples, std::size_t threshold, bool removeNodes, bool verbose = false);
     double ApproximateBySampling(std::size_t nSamples, std::size_t threshold, bool removeNodes, bool verbose = false) {
         return ApproximateBySampling(dd, root_edge, nSamples, threshold, removeNodes, verbose);
     }
 
-    dd::Package::vEdge static RemoveNodes(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge edge, std::map<dd::Package::vNode*, dd::Package::vEdge>& dag_edges);
+    dd::vEdge static RemoveNodes(std::unique_ptr<dd::Package<>>& localDD, dd::vEdge edge, std::map<dd::vNode*, dd::vEdge>& dag_edges);
 
-    std::unique_ptr<dd::Package> dd = std::make_unique<dd::Package>();
-    dd::Package::vEdge           root_edge{};
+    std::unique_ptr<dd::Package<>> dd = std::make_unique<dd::Package<>>();
+    dd::vEdge                      root_edge{};
 
 protected:
     std::mt19937_64 mt;

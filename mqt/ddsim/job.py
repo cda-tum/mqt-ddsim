@@ -2,7 +2,7 @@ from concurrent import futures
 import logging
 import functools
 
-from qiskit.providers import JobV1 as Job
+from qiskit.providers import JobV1
 from qiskit.providers import JobStatus, JobError
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ def requires_submit(func):
     return _wrapper
 
 
-class JKQJob(Job):
+class DDSIMJob(JobV1):
     """AerJob class.
     Attributes:
         _executor (futures.Executor): executor to handle asynchronous jobs

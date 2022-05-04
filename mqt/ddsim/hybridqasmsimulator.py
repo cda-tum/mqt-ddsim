@@ -15,15 +15,15 @@ from qiskit.result import Result
 from qiskit.compiler import assemble
 from qiskit.utils.multiprocessing import local_hardware_info
 
-from .jkqjob import JKQJob
-from .jkqerror import JKQSimulatorError
-from jkq import ddsim
+from .job import DDSIMJob
+from .error import DDSIMError
+from mqt import ddsim
 
 logger = logging.getLogger(__name__)
 
 
 class HybridQasmSimulator(BackendV1):
-    """Python interface to JKQ DDSIM Hybrid Schrodinger-Feynman Simulator"""
+    """Python interface to MQT DDSIM Hybrid Schrodinger-Feynman Simulator"""
 
     SHOW_STATE_VECTOR = False
 
@@ -41,10 +41,10 @@ class HybridQasmSimulator(BackendV1):
         conf = {
             'backend_name': 'hybrid_qasm_simulator',
             'backend_version': ddsim.__version__,
-            'url': 'https://github.com/iic-jku/ddsim',
+            'url': 'https://github.com/cda-tum/ddsim',
             'simulator': True,
             'local': True,
-            'description': 'JKQ DDSIM Hybrid Schrodinger-Feynman C++ simulator',
+            'description': 'MQT DDSIM Hybrid Schrodinger-Feynman C++ simulator',
             'basis_gates': ['id', 'u0', 'u1', 'u2', 'u3', 'cu3',
                             'x', 'cx',
                             'y', 'cy',
@@ -84,7 +84,7 @@ class HybridQasmSimulator(BackendV1):
         circuit_qobj = assemble(quantum_circuits, self, **out_options)
 
         job_id = str(uuid.uuid4())
-        local_job = JKQJob(self, job_id, self._run_job, circuit_qobj, **options)
+        local_job = DDSIMJob(self, job_id, self._run_job, circuit_qobj, **options)
         local_job.submit()
         return local_job
 
@@ -117,17 +117,17 @@ class HybridQasmSimulator(BackendV1):
             max_qubits = int(log2(local_hardware_info()['memory'] * (1024 ** 3) / 16))
             algorithm_qubits = qobj_experiment.header.n_qubits
             if algorithm_qubits > max_qubits:
-                raise JKQSimulatorError('Not enough memory available to simulate the circuit even on a single thread')
+                raise DDSIMError('Not enough memory available to simulate the circuit even on a single thread')
             qubit_diff = max_qubits - algorithm_qubits
             nthreads = int(min(2 ** qubit_diff, nthreads))
         elif mode == 'dd':
             hybrid_mode = ddsim.HybridMode.DD
         else:
-            raise JKQSimulatorError('Simulation mode', mode, 'not supported by JKQ hybrid simulator. Available modes are \'amplitude\' and \'dd\'')
+            raise DDSIMError('Simulation mode', mode, 'not supported by MQT hybrid simulator. Available modes are \'amplitude\' and \'dd\'')
 
         sim = ddsim.HybridCircuitSimulator(qobj_experiment, seed, hybrid_mode, nthreads)
 
-        shots = options['shots']
+        shots = options.get('shots', 1024)
         if self.SHOW_STATE_VECTOR and shots > 0:
             logger.info('Statevector can only be shown if shots == 0 when using the amplitude hybrid simulation mode. Setting shots=0.')
             shots = 0

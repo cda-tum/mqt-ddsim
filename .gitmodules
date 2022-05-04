@@ -1,5 +1,15 @@
 [submodule "extern/qfr"]
 	path = extern/qfr
-	url = https://github.com/iic-jku/qfr.git
-    branch = master
+	url = https://github.com/cda-tum/qfr.git
+    branch = main
     shallow = true
+[submodule "extern/taskflow"]
+	path = extern/taskflow
+	url = https://github.com/taskflow/taskflow.git
+	branch = master
+	shallow = true
+[submodule "extern/cxxopts"]
+	path = extern/cxxopts
+	url = https://github.com/jarro2783/cxxopts.git
+	branch = master
+	shallow = true

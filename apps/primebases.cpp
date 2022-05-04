@@ -1,4 +1,5 @@
-#include <boost/program_options.hpp>
+#include "cxxopts.hpp"
+
 #include <cmath>
 #include <iostream>
 #include <string>
@@ -51,22 +52,19 @@ void output_primes(const unsigned int composite_number, const unsigned int lengt
 }
 
 int main(int argc, char** argv) {
-    namespace po = boost::program_options;
-    po::options_description description("JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
-    description.add_options()("help,h", "produce help message")("composite_number,N", po::value<unsigned int>()->required(),
-                                                                "number of measurements on the final quantum state")("strategy,S", po::value<std::string>()->required(),
-                                                                                                                     "strategy for prime base generation (primes, coprimes)")("length,L", po::value<unsigned int>()->required(), "how many bases to generate");
-    po::variables_map vm;
-    try {
-        po::store(po::parse_command_line(argc, argv, description), vm);
-        if (vm.count("help")) {
-            std::cout << description;
-            return 0;
-        }
-        po::notify(vm);
-    } catch (const po::error& e) {
-        std::cerr << "[ERROR] " << e.what() << "! Try option '--help' for available commandline options.\n";
-        std::exit(1);
+    cxxopts::Options options("MQT DDSIM", "see for more information https://www.cda.cit.tum.de/");
+    // clang-format off
+    options.add_options()
+        ("h,help", "produce help message")
+        ("N,composite_number", "number of measurements on the final quantum state", cxxopts::value<unsigned int>())
+        ("S,strategy", "strategy for prime base generation (primes, coprimes)", cxxopts::value<std::string>())
+        ("L,length", "how many bases to generate", cxxopts::value<unsigned int>());
+    // clang-format on
+
+    auto vm = options.parse(argc, argv);
+    if (vm.count("help")) {
+        std::cout << options.help();
+        std::exit(0);
     }
 
     if (vm["strategy"].as<std::string>() == "coprimes") {

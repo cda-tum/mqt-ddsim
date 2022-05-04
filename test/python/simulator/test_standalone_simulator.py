@@ -2,10 +2,10 @@ import unittest
 
 from qiskit import *
 
-from jkq import ddsim
+from mqt import ddsim
 
 
-class JKQStandaloneSimulatorTests(unittest.TestCase):
+class MQTStandaloneSimulatorTests(unittest.TestCase):
     def test_standalone(self):
         circ = QuantumCircuit(3)
         circ.h(0)

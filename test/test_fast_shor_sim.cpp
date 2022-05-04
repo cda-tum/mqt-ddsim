@@ -22,6 +22,19 @@ TEST(FastShorSimTest, Factorize15BaseTest) {
     ASSERT_EQ(ddsim.AdditionalStatistics().at("sim_result"), "SUCCESS(3*5)");
 }
 
+TEST(FastShorSimTest, Factorize15NoSeedBaseTest) {
+    ShorFastSimulator ddsim(15, 2, true);
+
+    ASSERT_EQ(ddsim.getNumberOfOps(), 0);
+    ASSERT_EQ(ddsim.getName(), "fast_shor_15_2");
+    ASSERT_EQ(ddsim.getFactors().first, 0);
+    ASSERT_EQ(ddsim.getFactors().second, 0);
+    ASSERT_EQ(ddsim.AdditionalStatistics().at("sim_result"), "did not start");
+    ddsim.Simulate(1);
+
+    ASSERT_EQ(ddsim.getNumberOfQubits(), 5);
+}
+
 TEST(FastShorSimTest, Factorize15BaseTestNoFixedCoPrime) {
     ShorFastSimulator ddsim(15, 0, 1ull);
     ddsim.Simulate(1);

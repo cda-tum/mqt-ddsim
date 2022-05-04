@@ -1,6 +1,7 @@
 import os
 import sys
 import platform
+import re
 import subprocess
 
 from setuptools import setup, Extension, find_namespace_packages
@@ -15,16 +16,6 @@ class CMakeExtension(Extension):
 
 
 class CMakeBuild(build_ext):
-    def run(self):
-        try:
-            subprocess.check_output(['cmake', '--version'])
-        except OSError:
-            raise RuntimeError("CMake must be installed to build the following extensions: " +
-                               ", ".join(e.name for e in self.extensions))
-
-        for ext in self.extensions:
-            self.build_extension(ext)
-
     def build_extension(self, ext):
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.namespace+ext.name)))
         # required for auto-detection of auxiliary "native" libs
@@ -33,8 +24,16 @@ class CMakeBuild(build_ext):
 
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
-                      '-DBINDINGS=ON',
-                      '-DDEPLOY=ON']
+                      '-DBINDINGS=ON']
+        if self.compiler.compiler_type != "msvc":
+            # Using Ninja-build since it a) is available as a wheel and b)
+            # multithreads automatically. MSVC would require all variables be
+            # exported for Ninja to pick it up, which is a little tricky to do.
+            # Users can override the generator with CMAKE_GENERATOR in CMake
+            # 3.15+.
+            cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
+            if not cmake_generator:
+                cmake_args += ["-GNinja"]
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
@@ -42,12 +41,23 @@ class CMakeBuild(build_ext):
         if platform.system() == "Windows":
             cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(cfg.upper(), extdir)]
             cmake_args += ['-T', 'ClangCl']
-            if sys.maxsize > 2**32:
+            if sys.maxsize > 2 ** 32:
                 cmake_args += ['-A', 'x64']
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-            build_args += ['--', '-j2']
+            cpus = os.cpu_count()
+            if cpus is None:
+                cpus = 2
+            build_args += ['--', f'-j{cpus}']
+
+        # cross-compile support for macOS - respect ARCHFLAGS if set
+        if sys.platform.startswith("darwin"):
+            archs = re.findall(r"-arch (\S+)", os.environ.get("ARCHFLAGS", ""))
+            if archs:
+                arch_argument = "-DCMAKE_OSX_ARCHITECTURES={}".format(";".join(archs))
+                print('macOS building with: ', arch_argument, flush=True)
+                cmake_args += [arch_argument]
 
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
@@ -63,19 +73,20 @@ with open(README_PATH, encoding="utf8") as readme_file:
     README = readme_file.read()
 
 setup(
-    name='jkq.ddsim',
-    version='1.8.0',
+    name='mqt.ddsim',
+    version='1.12.1',
     author='Stefan Hillmich',
     author_email='stefan.hillmich@jku.at',
-    description='JKQ DDSIM - A quantum simulator based on decision diagrams written in C++',
+    description='MQT DDSIM - A quantum simulator based on decision diagrams written in C++',
     long_description=README,
     long_description_content_type='text/markdown',
     license='MIT',
-    url='https://iic.jku.at/eda/research/quantum_simulation/',
-    ext_modules=[CMakeExtension('pyddsim', namespace='jkq.ddsim.')],
-    cmdclass=dict(build_ext=CMakeBuild),
+    url='https://www.cda.cit.tum.de/research/quantum_simulation/',
+    ext_modules=[CMakeExtension('pyddsim', namespace='mqt.ddsim.')],
+    cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
-    packages=find_namespace_packages(include=['jkq.*']),
+    packages=find_namespace_packages(include=['mqt.*']),
+    python_requires=">=3.7",
     classifiers=[
         'Development Status :: 4 - Beta',
         'Programming Language :: Python :: 3',
@@ -88,12 +99,13 @@ setup(
         'Natural Language :: English',
         'Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)',
     ],
-    keywords='jkq quantum simulation',
+    keywords='mqt quantum simulation',
     project_urls={
-        'Source': 'https://github.com/iic-jku/ddsim/',
-        'Tracker': 'https://github.com/iic-jku/ddsim/issues',
-        'Research': 'https://iic.jku.at/eda/research/quantum_simulation/',
+        'Source': 'https://github.com/cda-tum/ddsim/',
+        'Tracker': 'https://github.com/cda-tum/ddsim/issues',
+        'Research': 'https://www.cda.cit.tum.de/research/quantum_simulation/',
     },
-    python_requires='>=3.6',
-    setup_requires=['cmake>=3.14']
+    extras_require={
+        "tnflow": ["sparse", "opt-einsum", "quimb", "pandas", "numpy"]
+    }
 )

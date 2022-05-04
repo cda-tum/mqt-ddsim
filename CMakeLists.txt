@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.14...3.19)
+cmake_minimum_required(VERSION 3.14...3.22)
 
 project(ddsim
         LANGUAGES CXX
-        VERSION 1.8.0
+        VERSION 1.12.1
         DESCRIPTION "DDSIM - A JKQ quantum simulator based on decision diagrams"
         )
 
@@ -10,6 +10,13 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 option(COVERAGE "Configure for coverage report generation")
 option(BINDINGS "Configure for building Python bindings")
 option(DEPLOY "Configure for deployment")
+
+message("-- Generator is set to ${CMAKE_GENERATOR}")
+
+if (DEFINED ENV{DEPLOY})
+    set(DEPLOY $ENV{DEPLOY} CACHE BOOL "Use deployment configuration from environment" FORCE)
+    message(STATUS "Setting deployment configuration to '${DEPLOY}' from environment")
+endif ()
 
 set(default_build_type "Release")
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -27,6 +34,7 @@ macro(check_submodule_present MODULENAME)
 endmacro()
 
 check_submodule_present(qfr)
+check_submodule_present(cxxopts)
 
 add_subdirectory(src)
 
@@ -49,5 +57,5 @@ endif ()
 
 # add Python binding code
 if (BINDINGS)
-    add_subdirectory(jkq/ddsim)
+    add_subdirectory(mqt/ddsim)
 endif ()

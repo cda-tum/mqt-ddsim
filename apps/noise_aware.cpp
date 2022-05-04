@@ -1,8 +1,8 @@
 #include "DeterministicNoiseSimulator.hpp"
 #include "StochasticNoiseSimulator.hpp"
+#include "cxxopts.hpp"
 #include "nlohmann/json.hpp"
 
-#include <boost/program_options.hpp>
 #include <chrono>
 #include <dd/Export.hpp>
 #include <iomanip>
@@ -13,44 +13,34 @@
 namespace nl = nlohmann;
 
 int main(int argc, char** argv) {
-    namespace po = boost::program_options;
     unsigned long long seed;
 
-    po::options_description description("JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
+    cxxopts::Options options("MQT DDSIM", "see for more information https://www.cda.cit.tum.de/");
     // clang-format off
-    description.add_options()
-        ("help,h", "produce help message")
-        ("seed", po::value<unsigned long long>(&seed)->default_value(0), "seed for random number generator (default zero is possibly directly used as seed!)")
+    options.add_options()
+        ("h,help", "produce help message")
+        ("seed", "seed for random number generator (default zero is possibly directly used as seed!)", cxxopts::value<unsigned long long>()->default_value("0"))
         ("pm", "print measurements")
         ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
         ("verbose", "Causes some simulators to print additional information to STDERR")
 
-        ("simulate_file", po::value<std::string>(), "simulate a quantum circuit given by file (detection by the file extension)")
-        ("step_fidelity", po::value<double>()->default_value(1.0), "target fidelity for each approximation run (>=1 = disable approximation)")
-        ("steps", po::value<unsigned int>()->default_value(1), "number of approximation steps")
+        ("simulate_file", "simulate a quantum circuit given by file (detection by the file extension)", cxxopts::value<std::string>())
+        ("step_fidelity", "target fidelity for each approximation run (>=1 = disable approximation)", cxxopts::value<double>()->default_value("1.0"))
+        ("steps", "number of approximation steps", cxxopts::value<unsigned int>()->default_value("1"))
 
-        ("noise_effects", po::value<std::string>()->default_value("APD"), "Noise effects (A (=amplitude damping), D (=depolarization),P (=phase flip)) in the form of a character string describing the noise effects (default=\"APD\")")
-        ("noise_prob", po::value<double>()->default_value(0.001), "Probability for applying noise (default=0.001)")
-//        ("confidence", po::value<double>()->default_value(0.05), "Confidence in the error bound of the stochastic simulation (default= 0.05)")
-//        ("error_bound", po::value<double>()->default_value(0.1), "Error bound of the stochastic simulation (default=0.1)")
-        ("stoch_runs", po::value<long>()->default_value(0), "Number of stochastic runs. When the value is 0 the value is calculated using the confidence, error_bound and number of tracked properties. When the value is -1, the deterministic simulator is started. When the value is -2 the old method for deterministic noise application is used) (default = 0)")
-        ("properties", po::value<std::string>()->default_value("-3--1"), R"(Comma separated list of tracked properties. Note that -1 is the fidelity and "-" can be used to specify a range.  (default="-3-1000"))")
-        ("dm", "Don't use the density matrix data type for simulating with density matrices")
-        ("unoptimized_sim", "Use unoptimized scheme for stoch/det noise-aware simulation")
-    ;
+        ("noise_effects", "Noise effects (A (=amplitude damping),D (=depolarization),P (=phase flip)) in the form of a character string describing the noise effects (default=\"APD\")", cxxopts::value<std::string>()->default_value("APD"))
+        ("noise_prob", "Probability for applying noise (default=0.001)", cxxopts::value<double>()->default_value("0.001"))
+        ("confidence", "Confidence in the error bound of the stochastic simulation (default= 0.05)", cxxopts::value<double>()->default_value("0.05"))
+        ("error_bound", "Error bound of the stochastic simulation (default=0.1)", cxxopts::value<double>()->default_value("0.1"))
+        ("stoch_runs", "Number of stochastic runs. When the value is 0 the value is calculated using the confidence, error_bound and number of tracked properties. When the value is -1, the deterministic simulator is started. When the value is -2 the old method for deterministic noise application is used) (default = 0)", cxxopts::value<long>()->default_value("0"))
+        ("properties", R"(Comma separated list of tracked properties. Note that -1 is the fidelity and "-" can be used to specify a range.  (default="-3-1000"))", cxxopts::value<std::string>()->default_value("-3-1000"))
+;
     // clang-format on
-    po::variables_map vm;
-    try {
-        po::store(po::parse_command_line(argc, argv, description), vm);
+    auto vm = options.parse(argc, argv);
 
-        if (vm.count("help")) {
-            std::cout << description;
-            return 0;
-        }
-        po::notify(vm);
-    } catch (const po::error& e) {
-        std::cerr << "[ERROR] " << e.what() << "! Try option '--help' for available commandline options.\n";
-        std::exit(1);
+    if (vm.count("help")) {
+        std::cout << options.help();
+        std::exit(0);
     }
 
     std::unique_ptr<qc::QuantumComputation> quantumComputation;
@@ -60,7 +50,7 @@ int main(int argc, char** argv) {
         quantumComputation      = std::make_unique<qc::QuantumComputation>(fname);
     } else {
         std::cerr << "Did not find anything to simulate. See help below.\n"
-                  << description << "\n";
+                  << options.help() << "\n";
         std::exit(1);
     }
 

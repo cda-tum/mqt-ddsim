@@ -36,20 +36,20 @@ class ShorFastSimulator: public Simulator {
 
     void u_a_emulate2(unsigned long long a);
 
-    void u_a_emulate2_rec(dd::Package::vEdge e);
+    void u_a_emulate2_rec(dd::vEdge e);
 
     [[nodiscard]] std::pair<unsigned int, unsigned int> post_processing(const std::string& sample) const;
 
     void ApplyGate(dd::GateMatrix matrix, dd::Qubit target);
 
-    std::vector<unsigned long long>                                ts;
-    std::vector<std::map<dd::Package::vNode*, dd::Package::vEdge>> nodesOnLevel;
+    std::vector<unsigned long long>              ts;
+    std::vector<std::map<dd::vNode*, dd::vEdge>> nodesOnLevel;
 
-    dd::Package::mEdge addConst(unsigned long long a);
+    dd::mEdge addConst(unsigned long long a);
 
-    dd::Package::mEdge addConstMod(unsigned long long a);
+    dd::mEdge addConstMod(unsigned long long a);
 
-    dd::Package::mEdge limitTo(unsigned long long a);
+    dd::mEdge limitTo(unsigned long long a);
 
     /// composite number to be factored
     const unsigned int n;
@@ -65,7 +65,7 @@ class ShorFastSimulator: public Simulator {
 
     const bool verbose;
 
-    std::map<dd::Package::vNode*, dd::Package::vEdge> dag_edges;
+    std::map<dd::vNode*, dd::vEdge> dag_edges;
 
 public:
     ShorFastSimulator(int composite_number, int coprime_a, bool verbose = false):

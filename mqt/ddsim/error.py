@@ -1,12 +1,12 @@
 """
-Exception for errors raised by JKQ simulator.
+Exception for errors raised by DDSIM simulator.
 """
 
 from qiskit import QiskitError
 
 
-class JKQSimulatorError(QiskitError):
-    """Class for errors raised by the JKQ simulator."""
+class DDSIMError(QiskitError):
+    """Class for errors raised by the DDSIM simulator."""
 
     def __init__(self, *message):
         """Set the error message."""

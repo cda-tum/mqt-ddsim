@@ -5,7 +5,7 @@
 
 using namespace dd::literals;
 
-TEST(HybridSimTest, TrivialParallelTest) {
+TEST(HybridSimTest, TrivialParallelDD) {
     auto quantumComputation = [] {
         auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
         quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::H);
@@ -17,25 +17,58 @@ TEST(HybridSimTest, TrivialParallelTest) {
     };
 
     HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::DD);
-    ddsim.Simulate(1);
+
+    auto resultDD = ddsim.Simulate(8192);
+    for (const auto& entry: resultDD) {
+        std::cout << "resultDD[" << entry.first << "] = " << entry.second << "\n";
+    }
 
     ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
+    ASSERT_EQ(resultDD.size(), 4);
+    auto it = resultDD.find("0000");
+    ASSERT_TRUE(it != resultDD.end());
+    EXPECT_NEAR(it->second, 2048, 128);
+    it = resultDD.find("0010");
+    ASSERT_TRUE(it != resultDD.end());
+    EXPECT_NEAR(it->second, 2048, 128);
+    it = resultDD.find("0100");
+    ASSERT_TRUE(it != resultDD.end());
+    EXPECT_NEAR(it->second, 2048, 128);
+    it = resultDD.find("0111");
+    ASSERT_TRUE(it != resultDD.end());
+    EXPECT_NEAR(it->second, 2048, 128);
+}
 
-    HybridSchrodingerFeynmanSimulator ddsim2(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
-    auto                              result = ddsim2.Simulate(8192);
+TEST(HybridSimTest, TrivialParallelAmplitude) {
+    auto quantumComputation = [] {
+        auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
+        quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::H);
+        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::H);
+        quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{2_pc, 1_pc}, 0, qc::X);
+        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I); // some dummy operations
+        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I);
+        return quantumComputation;
+    };
 
-    EXPECT_EQ(result.size(), 4);
-    auto it = result.find("0000");
-    ASSERT_TRUE(it != result.end());
+    HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
+
+    auto resultAmp = ddsim.Simulate(8192);
+    for (const auto& entry: resultAmp) {
+        std::cout << "resultAmp[" << entry.first << "] = " << entry.second << "\n";
+    }
+
+    ASSERT_EQ(resultAmp.size(), 4);
+    auto it = resultAmp.find("0000");
+    ASSERT_TRUE(it != resultAmp.end());
     EXPECT_NEAR(it->second, 2048, 128);
-    it = result.find("0010");
-    ASSERT_TRUE(it != result.end());
+    it = resultAmp.find("0010");
+    ASSERT_TRUE(it != resultAmp.end());
     EXPECT_NEAR(it->second, 2048, 128);
-    it = result.find("0100");
-    ASSERT_TRUE(it != result.end());
+    it = resultAmp.find("0100");
+    ASSERT_TRUE(it != resultAmp.end());
     EXPECT_NEAR(it->second, 2048, 128);
-    it = result.find("1110");
-    ASSERT_TRUE(it != result.end());
+    it = resultAmp.find("1110");
+    ASSERT_TRUE(it != resultAmp.end());
     EXPECT_NEAR(it->second, 2048, 128);
 }
 
@@ -52,9 +85,9 @@ TEST(HybridSimTest, GRCSTestDD) {
     dd::serialize(ddsim_hybrid_dd.root_edge, "result_parallel.dd", true);
     dd::serialize(ddsim.root_edge, "result.dd", true);
 
-    auto dd     = std::make_unique<dd::Package>(ddsim.getNumberOfQubits());
-    auto result = dd->deserialize<dd::Package::vNode>("result_parallel.dd", true);
-    auto ref    = dd->deserialize<dd::Package::vNode>("result.dd", true);
+    auto dd     = std::make_unique<dd::Package<>>(ddsim.getNumberOfQubits());
+    auto result = dd->deserialize<dd::vNode>("result_parallel.dd", true);
+    auto ref    = dd->deserialize<dd::vNode>("result.dd", true);
 
     bool equal = (result == ref);
     if (!equal) {
