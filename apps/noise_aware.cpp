@@ -30,10 +30,13 @@ int main(int argc, char** argv) {
 
         ("noise_effects", "Noise effects (A (=amplitude damping),D (=depolarization),P (=phase flip)) in the form of a character string describing the noise effects (default=\"APD\")", cxxopts::value<std::string>()->default_value("APD"))
         ("noise_prob", "Probability for applying noise (default=0.001)", cxxopts::value<double>()->default_value("0.001"))
-        ("confidence", "Confidence in the error bound of the stochastic simulation (default= 0.05)", cxxopts::value<double>()->default_value("0.05"))
-        ("error_bound", "Error bound of the stochastic simulation (default=0.1)", cxxopts::value<double>()->default_value("0.1"))
-        ("stoch_runs", "Number of stochastic runs. When the value is 0 the value is calculated using the confidence, error_bound and number of tracked properties. When the value is -1, the deterministic simulator is started. When the value is -2 the old method for deterministic noise application is used) (default = 0)", cxxopts::value<long>()->default_value("0"))
+//        ("confidence", "Confidence in the error bound of the stochastic simulation (default= 0.05)", cxxopts::value<double>()->default_value("0.05"))
+//        ("error_bound", "Error bound of the stochastic simulation (default=0.1)", cxxopts::value<double>()->default_value("0.1"))
+        ("stoch_runs", "Number of stochastic runs. When the value is -1, the deterministic simulator is started. (default = 0)", cxxopts::value<long>()->default_value("0"))
         ("properties", R"(Comma separated list of tracked properties. Note that -1 is the fidelity and "-" can be used to specify a range.  (default="-3-1000"))", cxxopts::value<std::string>()->default_value("-3-1000"))
+        ("dm", "Don't use the density matrix data type for simulating with density matrices")
+        ("unoptimized_sim", "Use unoptimized scheme for stoch/det noise-aware simulation")
+
 ;
     // clang-format on
     auto vm = options.parse(argc, argv);
