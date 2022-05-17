@@ -3,8 +3,8 @@
 #include "dd/Export.hpp"
 
 using CN    = dd::ComplexNumbers;
-using dEdge = dd::Package::dEdge;
-using Edge  = dd::Edge<dd::Package::dNode>;
+using dEdge = dd::dEdge;
+using Edge  = dd::Edge<dd::dNode>;
 
 dEdge DeterministicNoiseSimulator::makeZeroDensityOperator(dd::QubitCount n) {
     auto f = dEdge::one;
@@ -72,7 +72,7 @@ char DeterministicNoiseSimulator::MeasureOneCollapsing(dd::Qubit index) {
     density_root_edge = reinterpret_cast<dEdge&>(tmp0);
 
     // Normalize the density matrix
-    auto trace = dd->trace(reinterpret_cast<dd::Package::mEdge&>(density_root_edge));
+    auto trace = dd->trace(reinterpret_cast<dd::mEdge&>(density_root_edge));
     assert(trace.i == 0);
     auto tmp_complex = dd->cn.getTemporary(1 / trace.r, 0);
     dd::ComplexNumbers::mul(tmp_complex, density_root_edge.w, tmp_complex);
@@ -84,6 +84,9 @@ char DeterministicNoiseSimulator::MeasureOneCollapsing(dd::Qubit index) {
 std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate() {
     const unsigned short         n_qubits = qc->getNqubits();
     std::map<unsigned int, bool> classic_values;
+
+    volatile dd::dEdge* test = reinterpret_cast<dd::dEdge*>(0x7fffffffc890);
+    volatile dd::dNode* test2 = reinterpret_cast<dd::dNode*>(0x5555557a5180);
 
     density_root_edge = makeZeroDensityOperator(n_qubits);
 
@@ -155,8 +158,8 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
 
             // Applying the operation to the density matrix
             auto tmp0 = dd->conjugateTranspose(dd_op);
-            auto tmp1 = dd->multiply(density_root_edge, reinterpret_cast<dEdge&>(tmp0), 0, false);
-            auto tmp2 = dd->multiply(reinterpret_cast<dEdge&>(dd_op), tmp1, 0, use_density_matrix_type);
+            auto tmp1 = dd->multiply(reinterpret_cast<dEdge&>(density_root_edge), reinterpret_cast<dEdge&>(tmp0), 0, false);
+            auto tmp2 = dd->multiply(reinterpret_cast<dEdge&>(dd_op), reinterpret_cast<dEdge&>(tmp1), 0, use_density_matrix_type);
             dd->incRef(tmp2);
             density_root_edge.p = Edge::getAlignedDensityNode(density_root_edge.p);
             dd->decRef(density_root_edge);
@@ -197,7 +200,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
 
                     [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
 
-                    dd::Edge<dd::Package::dNode> nodeAfterNoise = {};
+                    dd::Edge<dd::dNode> nodeAfterNoise = {};
                     if (use_density_matrix_type) {
                         Edge::applyDmChangesToEdges(&density_root_edge, nullptr);
                         nodeAfterNoise = ApplyNoiseEffects(density_root_edge, op, used_qubits, maxDepth, false);
@@ -226,11 +229,11 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
     }
     dd->garbageCollect(true);
     printf("Multiplication cache");
-    dd->matrixDensityMultiplication.printStatistics();
+    dd->densityMul.printStatistics();
     printf("Add cache\n");
-    dd->matrixDensityAdd.printStatistics();
+    dd->densityAdd.printStatistics();
     printf("Noise cache\n");
-    dd->densityNoiseOperations.printStatistics();
+    dd->densityNoise.printStatistics();
     return AnalyseState(n_qubits, false);
 }
 
@@ -254,7 +257,7 @@ dEdge DeterministicNoiseSimulator::ApplyNoiseEffects(dEdge& originalEdge, const 
     originalCopy.w    = dd::Complex::one;
 
     // Check if the target of the current edge is in the "compute table".
-    auto noiseLookUpResult = dd->densityNoiseOperations.lookup(originalCopy, used_qubits);
+    auto noiseLookUpResult = dd->densityNoise.lookup(originalCopy, used_qubits);
 
     if (noiseLookUpResult.p != nullptr) {
         auto tmpComplexValue = dd->cn.getCached();
@@ -281,7 +284,7 @@ dEdge DeterministicNoiseSimulator::ApplyNoiseEffects(dEdge& originalEdge, const 
             Edge::revertDmChangesToEdges(&originalCopy.p->e[i], nullptr);
         }
     }
-    dd::Edge<dd::Package::dNode> e = {};
+    dd::Edge<dd::dNode> e = {};
 
     if (op->actsOn(originalCopy.p->v)) {
         //        [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
@@ -345,7 +348,7 @@ dEdge DeterministicNoiseSimulator::ApplyNoiseEffects(dEdge& originalEdge, const 
     e = dd->makeDDNode(originalCopy.p->v, new_edges, false, firstPathEdge);
 
     // Adding the noise operation to the cache, note that e.w is from the complex number table
-    dd->densityNoiseOperations.insert(originalCopy, e, used_qubits);
+    dd->densityNoise.insert(originalCopy, e, used_qubits);
 
     // Multiplying the old edge weight with the new one and looking up in the complex numbers table
     if (!e.w.approximatelyZero()) {
@@ -553,7 +556,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(dd::Qubi
         int current_result         = m;
         global_probability         = dd::CTEntry::val(density_root_edge.w.r);
         std::string  result_string = intToString(m, '1');
-        qc::MatrixDD cur           = reinterpret_cast<const dd::Package::mEdge&>(density_root_edge);
+        qc::MatrixDD cur           = reinterpret_cast<const dd::mEdge&>(density_root_edge);
         for (int i = 0; i < nr_qubits; ++i) {
             if (cur.p->v != -1) {
                 assert(dd::CTEntry::approximatelyZero(cur.p->e.at(0).w.i) && dd::CTEntry::approximatelyZero(cur.p->e.at(3).w.i));
@@ -665,7 +668,7 @@ void DeterministicNoiseSimulator::generateGate(qc::MatrixDD* pointer_for_matrice
 }
 
 void DeterministicNoiseSimulator::applyDetNoiseSequential(const qc::Targets& targets) {
-    dd::Package::dEdge tmp = {};
+    dd::dEdge tmp = {};
     //    qc::MatrixDD ancillary_edge_1 = {};
     qc::MatrixDD idle_operation[4];
 

@@ -13,7 +13,7 @@
 
 class DeterministicNoiseSimulator: public Simulator {
     using CN    = dd::ComplexNumbers;
-    using dEdge = dd::Package::dEdge;
+    using dEdge = dd::dEdge;
 
 public:
     //    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity):
@@ -34,7 +34,7 @@ public:
     }
 
     void setAmplitudeDampingProbability(double cGateNoiseProbability) {
-        //The probability of amplitude damping (t1) often is double the probability , of phase flip, which is why I double it here
+        //The probability of amplitude damping (t1) often is double the probability, of phase flip, which is why I double it here
         noiseProbability   = cGateNoiseProbability;
         noiseProbFromTable = dd->cn.lookup(noiseProbability, 0);
         CN::incRef(noiseProbFromTable);
@@ -96,9 +96,7 @@ public:
     dd::Complex twoMinusNoiseProbFromTable        = {};
     dd::Complex oneMinusNoiseProbFromTable        = {};
 
-    //todo implement a new structure for density matrices
-    //    qc::MatrixDD density_root_edge{};
-    dd::Package::dEdge density_root_edge{};
+    dEdge density_root_edge{};
 
     bool sequentialApplyNoise    = false;
     bool use_density_matrix_type = true;
@@ -124,10 +122,10 @@ private:
 
     void generateGate(qc::MatrixDD* pointer_for_matrices, char noise_type, dd::Qubit target);
 
-    dd::Package::dEdge makeZeroDensityOperator(dd::QubitCount n);
+    dEdge makeZeroDensityOperator(dd::QubitCount n);
 
     dEdge  ApplyNoiseEffects(dEdge& originalEdge, const std::unique_ptr<qc::Operation>& op, const std::vector<dd::Qubit>& used_qubits, unsigned char maxDepth, bool firstPathEdge);
-    dd::fp probForIndexToBeZero(dd::Package::dEdge e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob);
+    dd::fp probForIndexToBeZero(dEdge e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob);
 };
 
 #endif //DDSIM_DETERMINISTICNOISESIMULATOR_HPP
