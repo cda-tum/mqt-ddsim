@@ -85,14 +85,11 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
     const unsigned short         n_qubits = qc->getNqubits();
     std::map<unsigned int, bool> classic_values;
 
-    volatile dd::dEdge* test = reinterpret_cast<dd::dEdge*>(0x7fffffffc890);
-    volatile dd::dNode* test2 = reinterpret_cast<dd::dNode*>(0x5555557a5180);
-
     density_root_edge = makeZeroDensityOperator(n_qubits);
-
     dd->incRef(density_root_edge);
 
     for (auto const& op: *qc) {
+        //        opCounter++;
         dd->garbageCollect();
         if (!op->isUnitary() && !(op->isClassicControlledOperation())) {
             if (auto* nu_op = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
@@ -183,13 +180,13 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                     [[maybe_unused]] auto cache_size_after = dd->cn.cacheCount();
                     assert(cache_size_after == cache_size_before);
                 } else {
-                    signed char maxDepth       = targets[0];
-                    auto        control_qubits = op->getControls();
-                    for (auto& control: control_qubits) {
-                        if (control.qubit < maxDepth) {
-                            maxDepth = control.qubit;
-                        }
-                    }
+//                    signed char maxDepth       = targets[0];
+//                    auto        control_qubits = op->getControls();
+//                    for (auto& control: control_qubits) {
+//                        if (control.qubit < maxDepth) {
+//                            maxDepth = control.qubit;
+//                        }
+//                    }
 
                     //todo I only must check array elements <=current_v, for the caching
                     sort(used_qubits.begin(), used_qubits.end(), std::greater<>());
@@ -203,10 +200,10 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
                     dd::Edge<dd::dNode> nodeAfterNoise = {};
                     if (use_density_matrix_type) {
                         Edge::applyDmChangesToEdges(&density_root_edge, nullptr);
-                        nodeAfterNoise = ApplyNoiseEffects(density_root_edge, op, used_qubits, maxDepth, false);
+                        nodeAfterNoise = ApplyNoiseEffects(density_root_edge, used_qubits, false);
                         Edge::revertDmChangesToEdges(&density_root_edge, nullptr);
                     } else {
-                        nodeAfterNoise = ApplyNoiseEffects(density_root_edge, op, used_qubits, maxDepth, true);
+                        nodeAfterNoise = ApplyNoiseEffects(density_root_edge, used_qubits, true);
                     }
                     if (used_qubits.size() > 1) {
                         noiseProbability /= 2;
@@ -237,8 +234,8 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
     return AnalyseState(n_qubits, false);
 }
 
-dEdge DeterministicNoiseSimulator::ApplyNoiseEffects(dEdge& originalEdge, const std::unique_ptr<qc::Operation>& op, const std::vector<dd::Qubit>& used_qubits, unsigned char maxDepth, bool firstPathEdge) {
-    if (originalEdge.p->v < maxDepth || originalEdge.isTerminal()) {
+dEdge DeterministicNoiseSimulator::ApplyNoiseEffects(dEdge& originalEdge, const std::vector<dd::Qubit>& used_qubits, bool firstPathEdge) {
+    if (originalEdge.p->v < used_qubits.back() || originalEdge.isTerminal()) {
         dEdge tmp{};
         if (originalEdge.w.approximatelyZero()) {
             tmp.w = dd::Complex::zero;
@@ -272,7 +269,7 @@ dEdge DeterministicNoiseSimulator::ApplyNoiseEffects(dEdge& originalEdge, const 
         if (firstPathEdge || i == 1) {
             // If I am to the firstPathEdge I cannot minimize the necessary operations anymore
             Edge::applyDmChangesToEdges(&originalCopy.p->e[i], nullptr);
-            new_edges[i] = ApplyNoiseEffects(originalCopy.p->e[i], op, used_qubits, maxDepth, true);
+            new_edges[i] = ApplyNoiseEffects(originalCopy.p->e[i], used_qubits, true);
             Edge::revertDmChangesToEdges(&originalCopy.p->e[i], nullptr);
         } else if (i == 2) {
             // Size e[1] == e[2] (due to density matrix representation), I can skip calculating e[2]
@@ -280,13 +277,13 @@ dEdge DeterministicNoiseSimulator::ApplyNoiseEffects(dEdge& originalEdge, const 
             new_edges[2].w = new_edges[1].w;
         } else {
             Edge::applyDmChangesToEdges(&originalCopy.p->e[i], nullptr);
-            new_edges[i] = ApplyNoiseEffects(originalCopy.p->e[i], op, used_qubits, maxDepth, false);
+            new_edges[i] = ApplyNoiseEffects(originalCopy.p->e[i], used_qubits, false);
             Edge::revertDmChangesToEdges(&originalCopy.p->e[i], nullptr);
         }
     }
     dd::Edge<dd::dNode> e = {};
-
-    if (op->actsOn(originalCopy.p->v)) {
+    if (std::count(used_qubits.begin(), used_qubits.end(), originalCopy.p->v)) {
+//    if (op->actsOn(originalCopy.p->v)) {
         //        [[maybe_unused]] auto cache_size_before = dd->cn.cacheCount();
         //        applyNoiseCall++;
         for (auto& new_edge: new_edges) {
@@ -683,7 +680,7 @@ void DeterministicNoiseSimulator::applyDetNoiseSequential(const qc::Targets& tar
                 auto tmp1 = dd->multiply(density_root_edge, reinterpret_cast<dEdge&>(tmp0), 0, false);
                 auto tmp2 = dd->multiply(reinterpret_cast<dEdge&>(idle_operation[m]), tmp1, 0, use_density_matrix_type);
 
-//                auto tmp0 = dd->multiply(dd->multiply(idle_operation[m], density_root_edge), dd->conjugateTranspose(idle_operation[m]));
+                //                auto tmp0 = dd->multiply(dd->multiply(idle_operation[m], density_root_edge), dd->conjugateTranspose(idle_operation[m]));
                 if (tmp.p == nullptr) {
                     tmp = tmp2;
                 } else {
@@ -704,7 +701,7 @@ void DeterministicNoiseSimulator::applyDetNoiseSequential(const qc::Targets& tar
 std::string DeterministicNoiseSimulator::intToString(long target_number, char value) const {
     if (target_number < 0) {
         assert(target_number == -1);
-        return (std::string("F"));
+        return {"F"};
     }
     auto        qubits = getNumberOfQubits();
     std::string path(qubits, '0');
