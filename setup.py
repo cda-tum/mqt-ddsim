@@ -17,7 +17,8 @@ class CMakeExtension(Extension):
 
 class CMakeBuild(build_ext):
     def build_extension(self, ext):
-        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.namespace+ext.name)))
+        self.package = ext.namespace
+        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         # required for auto-detection of auxiliary "native" libs
         if not extdir.endswith(os.path.sep):
             extdir += os.path.sep
@@ -64,6 +65,8 @@ class CMakeBuild(build_ext):
                                                               self.distribution.get_version())
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
+        else:
+            os.remove(os.path.join(self.build_temp, 'CMakeCache.txt'))
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.', '--target', ext.name] + build_args, cwd=self.build_temp)
 
@@ -82,7 +85,7 @@ setup(
     long_description_content_type='text/markdown',
     license='MIT',
     url='https://www.cda.cit.tum.de/research/quantum_simulation/',
-    ext_modules=[CMakeExtension('pyddsim', namespace='mqt.ddsim.')],
+    ext_modules=[CMakeExtension('pyddsim', namespace='mqt.ddsim')],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     packages=find_namespace_packages(include=['mqt.*']),
