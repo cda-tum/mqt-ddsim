@@ -188,3 +188,20 @@ TEST(TaskBasedSimTest, GroverCircuitPairwiseGrouping) {
         std::cout << state << ": " << count << std::endl;
     }
 }
+
+TEST(TaskBasedSimTest, EmptyCircuit) {
+    auto qc = std::make_unique<qc::QuantumComputation>(2);
+
+    // construct simulator and generate bracketing contraction plan
+    PathSimulator tbs(std::move(qc));
+
+    // simulate circuit
+    const auto shots = 1024U;
+    auto counts = tbs.Simulate(shots);
+
+    for (const auto& [state, count]: counts) {
+        EXPECT_EQ(state, "00");
+        EXPECT_EQ(count, shots);
+        std::cout << state << ": " << count << std::endl;
+    }
+}
