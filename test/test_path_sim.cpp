@@ -196,8 +196,8 @@ TEST(TaskBasedSimTest, EmptyCircuit) {
     PathSimulator tbs(std::move(qc));
 
     // simulate circuit
-    const auto shots = 1024U;
-    auto counts = tbs.Simulate(shots);
+    const auto shots  = 1024U;
+    auto       counts = tbs.Simulate(shots);
 
     for (const auto& [state, count]: counts) {
         EXPECT_EQ(state, "00");
