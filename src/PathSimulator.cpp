@@ -285,8 +285,10 @@ void PathSimulator::constructTaskGraph() {
     const auto& path  = simulationPath.components;
     const auto& steps = simulationPath.steps;
 
-    if (path.empty())
+    if (path.empty()) {
+        root_edge = dd->makeZeroState(qc->getNqubits());
         return;
+    }
 
     const std::size_t nleaves = qc->getNops() + 1;
 
