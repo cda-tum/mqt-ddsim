@@ -89,6 +89,7 @@ with open(README_PATH, encoding="utf8") as readme_file:
     README = readme_file.read()
 
 setup(
+    name='mqt.ddsim',
     author='Stefan Hillmich',
     author_email='stefan.hillmich@jku.at',
     description='MQT DDSIM - A quantum simulator based on decision diagrams written in C++',
@@ -118,5 +119,10 @@ setup(
         'Source': 'https://github.com/cda-tum/ddsim/',
         'Tracker': 'https://github.com/cda-tum/ddsim/issues',
         'Research': 'https://www.cda.cit.tum.de/research/quantum_simulation/',
+    },
+    extras_requires={
+        "tnflow": ["sparse", "opt-einsum", "quimb", "pandas", "numpy"],
+        "tests": ["pytest", "qiskit-terra>=0.19.2,<0.21.0"],
+        "docs": ["Sphinx==5.0.1", "sphinx-rtd-theme==1.0.0", "sphinxcontrib-bibtex==2.4.2", "sphinx-copybutton==0.5.0"],
     }
 )
