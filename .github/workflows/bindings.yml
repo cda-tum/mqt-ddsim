@@ -4,9 +4,9 @@ on:
   release:
     types: [ published ]
   push:
-    branches: [ master, main ]
+    branches: [ main ]
   pull_request:
-    branches: [ master, main ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -24,12 +24,9 @@ jobs:
       - name: Install package
         run:  |
               pip install -U pip setuptools wheel
-              pip install .
+              pip install .[tests]
       - name: Test package
-        run: |
-          pip install pytest
-          pip install -r requirements-test.txt
-          pytest test/python
+        run: pytest test/python
 
   build_sdist:
     name: Build source distribution
