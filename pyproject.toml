@@ -17,9 +17,9 @@ build = "cp3*"
 archs = "auto64"
 test-skip = "*_arm64 *-musllinux_x86_64 *_universal2:arm64"
 test-command = "python -c \"from mqt import ddsim\""
-test-requires = ["qiskit-terra>=0.19.2,<0.21.0"]
+test-requires = ["qiskit-terra"]
 environment = { DEPLOY = "ON" }
-build-verbosity = 0
+build-verbosity = 1
 
 
 [tool.cibuildwheel.linux]
