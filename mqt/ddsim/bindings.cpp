@@ -10,13 +10,13 @@
 #include "qiskit/QasmQobjExperiment.hpp"
 #include "qiskit/QuantumCircuit.hpp"
 
-#include "pybind11/complex.h"
 #include <pybind11/numpy.h>
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
-// clang-format on
 
 #include <memory>
+// clang-format on
+
 
 namespace py = pybind11;
 using namespace pybind11::literals;
@@ -210,8 +210,11 @@ PYBIND11_MODULE(pyddsim, m) {
     m.def("dump_tensor_network", &dump_tensor_network, "dump a tensor network representation of the given circuit",
           "circ"_a, "filename"_a);
 
+
+#define STRINGIFY(x) #x
+#define MACRO_STRINGIFY(x) STRINGIFY(x)
 #ifdef VERSION_INFO
-    m.attr("__version__") = VERSION_INFO;
+    m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 #else
     m.attr("__version__") = "dev";
 #endif

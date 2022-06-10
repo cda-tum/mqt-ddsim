@@ -1,25 +1,39 @@
 [build-system]
 requires = [
     "setuptools>=45",
+    "setuptools_scm[toml]>=6.4",
     "wheel>=0.37",
     "ninja>=1.10; sys_platform != 'win32'",
     "cmake>=3.14",
 ]
 build-backend = "setuptools.build_meta"
 
+
+[project.optional-dependencies]
+tnflow = ["sparse", "opt-einsum", "quimb", "pandas", "numpy"]
+tests = ["pytest", "qiskit-terra>=0.19.2,<0.21.0"]
+docs = ["Sphinx==5.0.1", "sphinx-rtd-theme==1.0.0", "sphinxcontrib-bibtex==2.4.2", "sphinx-copybutton==0.5.0"]
+
+
+[tool.setuptools_scm]
+
+
 [tool.cibuildwheel]
 build = "cp3*"
 archs = "auto64"
 test-skip = "*_arm64 *-musllinux_x86_64 *_universal2:arm64"
 test-command = "python -c \"from mqt import ddsim\""
-test-requires = ["qiskit-terra"]
+test-requires = ["qiskit-terra>=0.19.2,<0.21.0"]
 environment = { DEPLOY = "ON" }
-build-verbosity = 1
+build-verbosity = 0
+
 
 [tool.cibuildwheel.linux]
+
 
 [tool.cibuildwheel.macos]
 archs = "x86_64"
 environment = { MACOSX_DEPLOYMENT_TARGET = "10.15", DEPLOY = "ON" }
+
 
 [tool.cibuildwheel.windows]

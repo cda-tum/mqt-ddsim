@@ -1,10 +1,14 @@
+from importlib.metadata import version
+
+
 # -- Project information -----------------------------------------------------
 project = 'DDSIM'
 copyright = '2022, Stefan Hillmich'
 author = 'Stefan Hillmich'
 
 # The full version, including alpha/beta/rc tags
-release = '1.11.0'
+release = version('mqt.ddsim')
+version = '.'.join(release.split('.')[:3])
 
 # -- General configuration ---------------------------------------------------
 extensions = [
