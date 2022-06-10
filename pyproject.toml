@@ -8,6 +8,8 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "mqt.ddsim"
 
 [project.optional-dependencies]
 tnflow = ["sparse", "opt-einsum", "quimb", "pandas", "numpy"]

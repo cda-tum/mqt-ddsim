@@ -89,7 +89,6 @@ with open(README_PATH, encoding="utf8") as readme_file:
     README = readme_file.read()
 
 setup(
-    name='mqt.ddsim',
     author='Stefan Hillmich',
     author_email='stefan.hillmich@jku.at',
     description='MQT DDSIM - A quantum simulator based on decision diagrams written in C++',
