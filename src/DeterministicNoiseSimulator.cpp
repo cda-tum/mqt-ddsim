@@ -635,7 +635,7 @@ void DeterministicNoiseSimulator::applyDetNoiseSequential(const qc::Targets& tar
     for (auto target_qubit: targets) {
         for (auto const& type: gateNoiseTypes) {
             double probability;
-            if(type == 'A') {
+            if (type == 'A') {
                 probability = (targets.size() == 1) ? ampDampingProbSingleQubit : ampDampingProbMultiQubit;
             } else {
                 probability = (targets.size() == 1) ? noiseProbSingleQubit : noiseProbMultiQubit;

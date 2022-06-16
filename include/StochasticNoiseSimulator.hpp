@@ -140,14 +140,14 @@ private:
                                      const bool                              amplitudeDamping,
                                      const bool                              multiQubitOperation);
 
-    void applyNoiseOperation(const std::vector<dd::Qubit>& usedQubits,
-                             dd::mEdge dd_op,
-                             const std::unique_ptr<dd::Package<>>& localDD,
-                             dd::vEdge& localRootEdge,
-                             std::mt19937_64& generator,
+    void applyNoiseOperation(const std::vector<dd::Qubit>&           usedQubits,
+                             dd::mEdge                               dd_op,
+                             const std::unique_ptr<dd::Package<>>&   localDD,
+                             dd::vEdge&                              localRootEdge,
+                             std::mt19937_64&                        generator,
                              std::uniform_real_distribution<dd::fp>& dist,
-                             const dd::mEdge& identityDD,
-                             std::string& noiseOperation);
+                             const dd::mEdge&                        identityDD,
+                             std::string&                            noiseOperation);
 
     [[nodiscard]] qc::OpType ReturnNoiseOperation(char i, double prob, bool multi_qubit_noise) const;
 
