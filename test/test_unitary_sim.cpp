@@ -13,8 +13,8 @@ TEST(UnitarySimTest, ConstructSimpleCircuitSequential) {
     UnitarySimulator ddsim(std::move(quantumComputation), UnitarySimulator::Mode::Sequential);
     ASSERT_NO_THROW(ddsim.Construct());
     const auto& e = ddsim.getConstructedDD();
-    EXPECT_TRUE(e.p->e[0].p->ident);
-    EXPECT_TRUE(e.p->e[1].p->ident);
+    EXPECT_TRUE(e.p->e[0].p->isIdentity());
+    EXPECT_TRUE(e.p->e[1].p->isIdentity());
     auto finalNodes = ddsim.getFinalNodeCount();
     EXPECT_EQ(finalNodes, 6);
     auto maxNodes         = ddsim.getMaxNodeCount();
@@ -30,8 +30,8 @@ TEST(UnitarySimTest, ConstructSimpleCircuitRecursive) {
     UnitarySimulator ddsim(std::move(quantumComputation), UnitarySimulator::Mode::Recursive);
     ASSERT_NO_THROW(ddsim.Construct());
     const auto& e = ddsim.getConstructedDD();
-    EXPECT_TRUE(e.p->e[0].p->ident);
-    EXPECT_TRUE(e.p->e[1].p->ident);
+    EXPECT_TRUE(e.p->e[0].p->isIdentity());
+    EXPECT_TRUE(e.p->e[1].p->isIdentity());
     auto finalNodes = ddsim.getFinalNodeCount();
     EXPECT_EQ(finalNodes, 6);
     auto maxNodes         = ddsim.getMaxNodeCount();
@@ -47,8 +47,8 @@ TEST(UnitarySimTest, ConstructSimpleCircuitRecursiveWithSeed) {
     UnitarySimulator ddsim(std::move(quantumComputation), ApproximationInfo{}, 1337, UnitarySimulator::Mode::Recursive);
     ASSERT_NO_THROW(ddsim.Construct());
     const auto& e = ddsim.getConstructedDD();
-    EXPECT_TRUE(e.p->e[0].p->ident);
-    EXPECT_TRUE(e.p->e[1].p->ident);
+    EXPECT_TRUE(e.p->e[0].p->isIdentity());
+    EXPECT_TRUE(e.p->e[1].p->isIdentity());
 }
 
 TEST(UnitarySimTest, NonStandardOperation) {
