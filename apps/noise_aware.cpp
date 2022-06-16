@@ -27,17 +27,16 @@ int main(int argc, char** argv) {
         ("simulate_file", "simulate a quantum circuit given by file (detection by the file extension)", cxxopts::value<std::string>())
         ("step_fidelity", "target fidelity for each approximation run (>=1 = disable approximation)", cxxopts::value<double>()->default_value("1.0"))
         ("steps", "number of approximation steps", cxxopts::value<unsigned int>()->default_value("1"))
-
+        // Parameters for noise aware simulation
         ("noise_effects", "Noise effects (A (=amplitude damping),D (=depolarization),P (=phase flip)) in the form of a character string describing the noise effects (default=\"APD\")", cxxopts::value<std::string>()->default_value("APD"))
         ("noise_prob", "Probability for applying noise (default=0.001)", cxxopts::value<double>()->default_value("0.001"))
-//        ("confidence", "Confidence in the error bound of the stochastic simulation (default= 0.05)", cxxopts::value<double>()->default_value("0.05"))
-//        ("error_bound", "Error bound of the stochastic simulation (default=0.1)", cxxopts::value<double>()->default_value("0.1"))
+        ("noise_prob_t1", "Probability for applying amplitude damping noise (default=2 x noise_prob)", cxxopts::value<double>()->default_value("-1"))
+        ("noise_prob_multi", "Noise factor for multi qubit operations (default=2)", cxxopts::value<double>()->default_value("2"))
+        ("unoptimized_sim", "Use unoptimized scheme for stochastic/deterministic noise-aware simulation")
         ("stoch_runs", "Number of stochastic runs. When the value is 0, the deterministic simulator is started. (default = 0)", cxxopts::value<long>()->default_value("0"))
-        ("properties", R"(Comma separated list of tracked properties. Note that -1 is the fidelity and "-" can be used to specify a range.  (default="-3-1000"))", cxxopts::value<std::string>()->default_value("-3-1000"))
-        ("dm", "Don't use the density matrix data type for simulating with density matrices")
-        ("unoptimized_sim", "Use unoptimized scheme for stoch/det noise-aware simulation")
+        ("properties", R"(Comma separated list of tracked amplitudes. The "-" operator can be used to specify a range.  (default="0-100"))", cxxopts::value<std::string>()->default_value("0-100"))
 
-;
+    ; // end arguments list
     // clang-format on
     auto vm = options.parse(argc, argv);
 
@@ -61,9 +60,8 @@ int main(int argc, char** argv) {
         std::clog << "[WARNING] Quantum computation contains quite many qubits. You're jumping into the deep end.\n";
     }
 
-
-
     if (vm["stoch_runs"].as<long>() > 0) {
+        // Using stochastic simulator
         std::unique_ptr<StochasticNoiseSimulator> ddsim = std::make_unique<StochasticNoiseSimulator>(quantumComputation,
                                                                                                      vm["steps"].as<unsigned int>(),
                                                                                                      vm["step_fidelity"].as<double>(),
@@ -72,11 +70,13 @@ int main(int argc, char** argv) {
         if (vm.count("unoptimized_sim")) {
             ddsim->sequentialApplyNoise = true;
         }
+
         ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>());
-        ddsim->initializeWithNoiseProbability(vm["noise_prob"].as<double>());
-//        ddsim->stoch_confidence = vm["confidence"].as<double>();
+        ddsim->initializeNoiseProbabilities(vm["noise_prob"].as<double>(),
+                                            vm["noise_prob_t1"].as<double>(),
+                                            vm["noise_prob_multi"].as<double>());
+
         ddsim->setRecordedProperties(vm["properties"].as<std::string>());
-//        ddsim->stoch_error_margin = vm["error_bound"].as<double>();
         ddsim->stochasticRuns = vm["stoch_runs"].as<long>();
 
         auto t1 = std::chrono::steady_clock::now();
@@ -110,18 +110,21 @@ int main(int argc, char** argv) {
         if (vm.count("pm")) {
             output_obj["measurement_results"] = measurement_results;
         }
+
         std::cout << std::setw(2) << output_obj << std::endl;
     } else if (vm["stoch_runs"].as<long>() == 0) {
+        // Using deterministic simulator
         std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, seed);
         if (vm.count("unoptimized_sim")) {
-            ddsim->sequentialApplyNoise = true;
-        }
-        if (vm.count("dm")) {
+            ddsim->sequentialApplyNoise    = true;
             ddsim->use_density_matrix_type = false;
         }
 
         ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>());
-        ddsim->setAmplitudeDampingProbability(vm["noise_prob"].as<double>());
+
+        ddsim->initializeNoiseProbabilities(vm["noise_prob"].as<double>(),
+                                            vm["noise_prob_t1"].as<double>(),
+                                            vm["noise_prob_multi"].as<double>());
 
         auto t1 = std::chrono::steady_clock::now();
 

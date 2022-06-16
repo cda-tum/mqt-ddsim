@@ -30,26 +30,31 @@ public:
     DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const std::string& noise_effects, double noise_prob):
         qc(qc) {
         setNoiseEffects(noise_effects);
-        setAmplitudeDampingProbability(noise_prob);
+        initializeNoiseProbabilities(noise_prob);
     }
 
-    void setAmplitudeDampingProbability(double cGateNoiseProbability) {
-        //The probability of amplitude damping (t1) often is double the probability, of phase flip, which is why I double it here
-        noiseProbability   = cGateNoiseProbability;
-        noiseProbFromTable = dd->cn.lookup(noiseProbability, 0);
-        CN::incRef(noiseProbFromTable);
-        noiseProbFromTableAmp = dd->cn.lookup(noiseProbability * 2, 0);
-        CN::incRef(noiseProbFromTableAmp);
-        oneMinusNoiseProbFromTableAmp = dd->cn.lookup(1 - noiseProbability * 2, 0);
-        CN::incRef(oneMinusNoiseProbFromTableAmp);
-        sqrtOneMinusNoiseProbFromTableAmp = dd->cn.lookup(std::sqrt(1 - noiseProbability * 2), 0);
-        CN::incRef(sqrtOneMinusNoiseProbFromTableAmp);
-        oneMinusNoiseTwoProbFromTable = dd->cn.lookup(1 - noiseProbability * 2, 0);
-        CN::incRef(oneMinusNoiseTwoProbFromTable);
-        twoMinusNoiseProbFromTable = dd->cn.lookup(2 - noiseProbability, 0);
-        CN::incRef(twoMinusNoiseProbFromTable);
-        oneMinusNoiseProbFromTable = dd->cn.lookup(1 - noiseProbability, 0);
-        CN::incRef(oneMinusNoiseProbFromTable);
+    double noiseProb                 = 0.0;
+    double ampDampingProb            = 0.0;
+    double noiseProbSingleQubit      = 0.0;
+    double ampDampingProbSingleQubit = 0.0;
+    double noiseProbMultiQubit       = 0.0;
+    double ampDampingProbMultiQubit  = 0.0;
+
+    void initializeNoiseProbabilities(double cGateNoiseProbability, double cAmplitudeDampingProb = -1, double cMultiQubitGateFactor = 2) {
+        noiseProb            = cGateNoiseProbability;
+        noiseProbSingleQubit = cGateNoiseProbability;
+        noiseProbMultiQubit  = cGateNoiseProbability * cMultiQubitGateFactor;
+
+        if (cAmplitudeDampingProb < 0) {
+            // Default value for amplitude damping prob is double the general error probability
+            ampDampingProb            = cGateNoiseProbability * 2;
+            ampDampingProbSingleQubit = cGateNoiseProbability * 2;
+            ampDampingProbMultiQubit  = cGateNoiseProbability * 2 * cMultiQubitGateFactor;
+        } else {
+            ampDampingProb            = cAmplitudeDampingProb;
+            ampDampingProbSingleQubit = cAmplitudeDampingProb;
+            ampDampingProbMultiQubit  = cAmplitudeDampingProb * cMultiQubitGateFactor;
+        }
     }
 
     std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override {
@@ -57,14 +62,6 @@ public:
     };
 
     std::map<std::string, double> DeterministicSimulate();
-
-    //    std::map<std::string, std::string> AdditionalStatistics() override {
-    //        return {
-    //                {"step_fidelity", std::to_string(step_fidelity)},
-    //                {"approximation_runs", std::to_string(approximation_runs)},
-    //                {"final_fidelity", std::to_string(final_fidelity)},
-    //        };
-    //    };
 
     [[nodiscard]] std::string intToString(long target_number, char value) const;
 
@@ -87,47 +84,28 @@ public:
             {'D', 4}, //Depolarisation
     };
 
-    double      noiseProbability                  = 0.0;
-    dd::Complex noiseProbFromTable                = {};
-    dd::Complex noiseProbFromTableAmp             = {};
-    dd::Complex oneMinusNoiseProbFromTableAmp     = {};
-    dd::Complex sqrtOneMinusNoiseProbFromTableAmp = {};
-    dd::Complex oneMinusNoiseTwoProbFromTable     = {};
-    dd::Complex twoMinusNoiseProbFromTable        = {};
-    dd::Complex oneMinusNoiseProbFromTable        = {};
-
     dEdge density_root_edge{};
 
     bool sequentialApplyNoise    = false;
     bool use_density_matrix_type = true;
-    char MeasureOneCollapsing(dd::Qubit index);
-    long callCounter = 0;
+    //    char MeasureOneCollapsing(dd::Qubit index);
 
 private:
     std::unique_ptr<qc::QuantumComputation>& qc;
 
     std::string gateNoiseTypes;
-//    long        calls   = 0;
-    //    int         opCount = 0;
 
-    //    const unsigned int step_number;Q
-    //    const double       step_fidelity;
-    //    unsigned long long approximation_runs{0};
-    //    long double        final_fidelity{1.0L};
+    void ApplyAmplitudeDampingToNode(std::array<dEdge, 4>& e, double probability);
+    void ApplyPhaseFlipToNode(std::array<dEdge, 4>& e, double probability);
+    void ApplyDepolarisationToNode(std::array<dEdge, 4>& e, double probability);
 
-    void ApplyAmplitudeDampingToNode(std::array<dEdge, 4>& e);
-
-    void ApplyPhaseFlipToNode(std::array<dEdge, 4>& e);
-
-    void ApplyDepolarisationToNode(std::array<dEdge, 4>& e);
-
-    void generateGate(qc::MatrixDD* pointer_for_matrices, char noise_type, dd::Qubit target);
+    void generateGate(qc::MatrixDD* pointer_for_matrices, char noise_type, dd::Qubit target, double probability);
 
     dEdge makeZeroDensityOperator(dd::QubitCount n);
 
-    dEdge  ApplyNoiseEffects(dEdge& originalEdge, const std::vector<dd::Qubit>& used_qubits, bool firstPathEdge);
-    dd::fp probForIndexToBeZero(dEdge e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob);
-//    long opCounter = 0;
+    dEdge applyNoiseEffects(dEdge& originalEdge, const std::vector<dd::Qubit>& used_qubits, bool firstPathEdge);
+
+    //    dd::fp probForIndexToBeZero(dEdge e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob);
 };
 
 #endif //DDSIM_DETERMINISTICNOISESIMULATOR_HPP
