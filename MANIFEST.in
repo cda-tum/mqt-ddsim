@@ -19,9 +19,10 @@ graft   extern/qfr/extern/dd_package/include
 
 # Include necessary files from nlohmann and pybind11 (especially don't include the docs)
 graft   extern/qfr/extern/json
-prune   extern/qfr/extern/json/doc
-prune   extern/qfr/extern/json/test
+prune   extern/qfr/extern/json/docs
+prune   extern/qfr/extern/json/tests
 prune   extern/qfr/extern/json/benchmarks
+prune   extern/qfr/extern/json/tools
 prune   extern/qfr/extern/json/third_party
 prune   extern/qfr/extern/json/include
 
