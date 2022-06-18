@@ -12,32 +12,6 @@
 #include <thread>
 #include <vector>
 
-using StochasticNoiseSimulatorDDPackage = dd::Package<>;
-
-struct StochasticNoiseSimulatorDDPackageConfig: public dd::DDPackageConfig {
-    static constexpr std::size_t STOCHASTIC_CACHE_OPS = qc::opCount;
-};
-
-//using StochasticNoiseSimulatorDDPackage = dd::Package<StochasticNoiseSimulatorDDPackageConfig::UT_VEC_NBUCKET,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::UT_VEC_INITIAL_ALLOCATION_SIZE,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::UT_MAT_NBUCKET,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::UT_MAT_INITIAL_ALLOCATION_SIZE,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_VEC_ADD_NBUCKET,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_MAT_ADD_NBUCKET,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_MAT_TRANS_NBUCKET,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_MAT_CONJ_TRANS_NBUCKET,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_MAT_VEC_MULT_NBUCKET,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_MAT_MAT_MULT_NBUCKET,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_VEC_KRON_NBUCKET,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_MAT_KRON_NBUCKET,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_VEC_INNER_PROD_NBUCKET,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_DM_NOISE_NBUCKET,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::UT_DM_NBUCKET,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::UT_DM_INITIAL_ALLOCATION_SIZE,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_DM_DM_MULT_NBUCKET,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_DM_ADD_NBUCKET,
-//                                                      StochasticNoiseSimulatorDDPackageConfig::STOCHASTIC_CACHE_OPS>;
-
 class StochasticNoiseSimulator: public Simulator<StochasticNoiseSimulatorDDPackage> {
 public:
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity):
