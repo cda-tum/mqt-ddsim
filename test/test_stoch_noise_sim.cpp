@@ -6,6 +6,36 @@
 /**
  * These tests may have to be adjusted if something about the random-number generation changes.
  */
+using namespace dd::literals;
+
+std::unique_ptr<qc::QuantumComputation> stochTestsgetAdder4Circuit() {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 2_pc, 3, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::T);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::T);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::T);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::Tdag);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 0_pc, 1, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 2_pc, 3, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 3_pc, 0, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 1_pc, 2, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 0_pc, 1, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 2_pc, 3, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::Tdag);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::Tdag);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::Tdag);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::T);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 0_pc, 1, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 2_pc, 3, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 3_pc, 0, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
+
+    return quantumComputation;
+}
 
 TEST(StochNoiseSimTest, Reset) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
@@ -175,43 +205,43 @@ TEST(StochNoiseSimTest, Reordering) {
     ddsim.Simulate(1);
 }
 
-TEST(StochNoiseSimTest, SimulateAdder4TrackFidelityWithNoise) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{1}}, 2, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.01, 30000, 1, 1, "-3-1000");
-    auto                     m = ddsim.StochSimulate();
-
-    std::cout << ddsim.getName() << "\n";
-
-    EXPECT_GE(m.find("1000")->second, 0.13);
-    EXPECT_LE(m.find("1000")->second, 0.17);
-    EXPECT_GE(m.find("1001")->second, 0.53);
-    EXPECT_LE(m.find("1001")->second, 0.57);
-    EXPECT_GE(std::stod(ddsim.AdditionalStatistics().at("final_fidelity")), 0.53);
-    EXPECT_LE(std::stod(ddsim.AdditionalStatistics().at("final_fidelity")), 0.57);
-}
+//TEST(StochNoiseSimTest, SimulateAdder4TrackFidelityWithNoise) {
+//    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::X);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::X);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::T);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::T);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::T);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::Tdag);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{1}}, 2, qc::X);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::Tdag);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::Tdag);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::Tdag);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::T);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
+//    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
+//    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.01, 30000, 1, 1, "-3-1000");
+//    auto                     m = ddsim.StochSimulate();
+//
+//    std::cout << ddsim.getName() << "\n";
+//
+//    EXPECT_GE(m.find("1000")->second, 0.13);
+//    EXPECT_LE(m.find("1000")->second, 0.17);
+//    EXPECT_GE(m.find("1001")->second, 0.53);
+//    EXPECT_LE(m.find("1001")->second, 0.57);
+//    EXPECT_GE(std::stod(ddsim.AdditionalStatistics().at("final_fidelity")), 0.53);
+//    EXPECT_LE(std::stod(ddsim.AdditionalStatistics().at("final_fidelity")), 0.57);
+//}
 
 TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
@@ -222,8 +252,9 @@ TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
     auto                           classical_register = std::make_pair<unsigned short, unsigned short>(0, 1);
     quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classical_register, 1);
 
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.02, 30000, 1, 1, "-1-1000");
-    auto                     m = ddsim.StochSimulate();
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.02, 10000, 1, 1, "0-3");
+
+    auto m = ddsim.StochSimulate();
 
     EXPECT_GE(m.find("00")->second, 0.02);
     EXPECT_LE(m.find("00")->second, 0.07);
@@ -236,30 +267,7 @@ TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithoutNoise) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{1}}, 2, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
+    auto                     quantumComputation = stochTestsgetAdder4Circuit();
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
     ddsim.Simulate(1);
     auto m = ddsim.MeasureAll(false);
@@ -267,171 +275,74 @@ TEST(StochNoiseSimTest, SimulateAdder4WithoutNoise) {
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateError) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{1}}, 2, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 30000, 1, 1, "-3-1000");
+    auto                     quantumComputation = stochTestsgetAdder4Circuit();
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 1000, 1, 1, "0-16");
     auto                     m = ddsim.StochSimulate();
 
-    EXPECT_GE(m.find("0000")->second, 0.18);
-    EXPECT_LE(m.find("0000")->second, 0.24);
-    EXPECT_GE(m.find("0001")->second, 0.12);
-    EXPECT_LE(m.find("0001")->second, 0.16);
-    EXPECT_GE(m.find("0100")->second, 0.07);
-    EXPECT_LE(m.find("0100")->second, 0.11);
+    double tolerance = 0.1;
+
+    EXPECT_TRUE(std::abs(m.find("0000")->second - 0.25574412296741467) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("0001")->second - 0.177720207953642) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("0010")->second - 0.06386485600556026) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("0011")->second - 0.04438060064535747) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("0100")->second - 0.0898482618504159) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("0101")->second - 0.062436925904517736) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("0110")->second - 0.022981537137908348) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("0111")->second - 0.015970195341710985) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1000")->second - 0.08799481366902726) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1001")->second - 0.061149120043750206) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1010")->second - 0.02480081309590326) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1011")->second - 0.017234499727102268) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1100")->second - 0.03505400112419414) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1101")->second - 0.024359601507422463) < tolerance);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorSelectedProperties) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(4, std::vector<dd::Qubit>{0, 1, 2}, qc::OpType::Barrier);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{1}}, 2, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 30000, 1, 1, " -3-500,501,502");
-    auto                     m = ddsim.StochSimulate();
+    auto                     quantumComputation = stochTestsgetAdder4Circuit();
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 1000, 1, 1, "4,8-15");
+    auto                     m         = ddsim.StochSimulate();
+    double                   tolerance = 0.1;
 
-    EXPECT_GE(m.find("0000")->second, 0.18);
-    EXPECT_LE(m.find("0000")->second, 0.24);
-    EXPECT_GE(m.find("0001")->second, 0.12);
-    EXPECT_LE(m.find("0001")->second, 0.16);
-    EXPECT_GE(m.find("0100")->second, 0.07);
-    EXPECT_LE(m.find("0100")->second, 0.11);
+    EXPECT_TRUE(std::abs(m.find("0100")->second - 0.0898482618504159) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1000")->second - 0.08799481366902726) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1001")->second - 0.061149120043750206) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1010")->second - 0.02480081309590326) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1011")->second - 0.017234499727102268) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1100")->second - 0.03505400112419414) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1101")->second - 0.024359601507422463) < tolerance);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceError) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{1}}, 2, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("AP"), 0.3, 30000, 1, 1, "0-1000");
-    auto                     m = ddsim.StochSimulate();
+    auto                     quantumComputation = stochTestsgetAdder4Circuit();
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("AP"), 0.3, 1000, 1, 1, "0-1000");
+    auto                     m         = ddsim.StochSimulate();
+    double                   tolerance = 0.1;
 
-    EXPECT_GE(m.find("0000")->second, 0.77);
-    EXPECT_LE(m.find("0000")->second, 0.81);
-    EXPECT_GE(m.find("0001")->second, 0.17);
-    EXPECT_LE(m.find("0001")->second, 0.21);
+    EXPECT_TRUE(std::abs(m.find("0000")->second - 0.7996153532374554) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("0001")->second - 0.1999038383023455) < tolerance);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDepolarizationError) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{1}}, 2, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
+    auto                     quantumComputation = stochTestsgetAdder4Circuit();
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("D"), 0.01, 30000, 1, 1, "0-1000");
     auto                     m = ddsim.StochSimulate();
 
-    EXPECT_GE(m.find("1001")->second, 0.80);
-    EXPECT_LE(m.find("1001")->second, 0.85);
-    EXPECT_GE(m.find("0000")->second, 0.01);
-    EXPECT_LE(m.find("0000")->second, 0.04);
+    double tolerance = 0.1;
+
+    EXPECT_TRUE(std::abs(m.find("0000")->second - 0.03323287049319544) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("0001")->second - 0.03284348575778577) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("0010")->second - 0.01296430657356062) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1000")->second - 0.06839382801894367) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1001")->second - 0.7370101351171158) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1010")->second - 0.010781280290814215) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1011")->second - 0.02750867476569656) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1100")->second - 0.011706168989804651) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1101")->second - 0.01863469254111994) < tolerance);
+    EXPECT_TRUE(std::abs(m.find("1110")->second - 0.016008233100915176) < tolerance);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithNoiseAndApproximation) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{1}}, 2, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{2}}, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{dd::Control{3}}, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
+    auto                     quantumComputation = stochTestsgetAdder4Circuit();
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.01, 30000, 1, 0.9, "-3-1000");
     auto                     m = ddsim.StochSimulate();
 

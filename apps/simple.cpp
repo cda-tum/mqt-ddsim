@@ -75,10 +75,10 @@ int main(int argc, char** argv) {
         throw std::runtime_error("Unknown approximation method '" + vm["approx_when"].as<std::string>() + "'.");
     }
 
-    std::unique_ptr<qc::QuantumComputation> quantumComputation;
-    std::unique_ptr<Simulator>              ddsim{nullptr};
-    ApproximationInfo                       approx_info(step_fidelity, approx_steps, approx_when);
-    const bool                              verbose = vm.count("verbose") > 0;
+    std::unique_ptr<qc::QuantumComputation>   quantumComputation;
+    std::unique_ptr<Simulator<dd::Package<>>> ddsim{nullptr};
+    ApproximationInfo                         approx_info(step_fidelity, approx_steps, approx_when);
+    const bool                                verbose = vm.count("verbose") > 0;
 
     if (vm.count("simulate_file")) {
         const std::string fname = vm["simulate_file"].as<std::string>();
