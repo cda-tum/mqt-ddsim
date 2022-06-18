@@ -7,7 +7,7 @@
 #include <set>
 #include <stdexcept>
 
-using CN               = dd::ComplexNumbers;
+using CN = dd::ComplexNumbers;
 
 template<class DDPackage>
 std::map<std::string, std::size_t> Simulator<DDPackage>::SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, unsigned int shots) {
