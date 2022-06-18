@@ -12,7 +12,33 @@
 #include <thread>
 #include <vector>
 
-class StochasticNoiseSimulator: public Simulator {
+using StochasticNoiseSimulatorDDPackage = dd::Package<>;
+
+struct StochasticNoiseSimulatorDDPackageConfig: public dd::DDPackageConfig {
+    static constexpr std::size_t STOCHASTIC_CACHE_OPS = qc::opCount;
+};
+
+//using StochasticNoiseSimulatorDDPackage = dd::Package<StochasticNoiseSimulatorDDPackageConfig::UT_VEC_NBUCKET,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::UT_VEC_INITIAL_ALLOCATION_SIZE,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::UT_MAT_NBUCKET,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::UT_MAT_INITIAL_ALLOCATION_SIZE,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_VEC_ADD_NBUCKET,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_MAT_ADD_NBUCKET,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_MAT_TRANS_NBUCKET,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_MAT_CONJ_TRANS_NBUCKET,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_MAT_VEC_MULT_NBUCKET,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_MAT_MAT_MULT_NBUCKET,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_VEC_KRON_NBUCKET,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_MAT_KRON_NBUCKET,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_VEC_INNER_PROD_NBUCKET,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_DM_NOISE_NBUCKET,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::UT_DM_NBUCKET,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::UT_DM_INITIAL_ALLOCATION_SIZE,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_DM_DM_MULT_NBUCKET,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::CT_DM_ADD_NBUCKET,
+//                                                      StochasticNoiseSimulatorDDPackageConfig::STOCHASTIC_CACHE_OPS>;
+
+class StochasticNoiseSimulator: public Simulator<StochasticNoiseSimulatorDDPackage> {
 public:
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity):
         qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
@@ -131,23 +157,23 @@ private:
                                  std::map<std::string, int>&                 classicalMeasurementsMap,
                                  unsigned long long                          localSeed);
 
-    dd::mEdge generateNoiseOperation(const std::unique_ptr<dd::Package<>>&   localDD,
-                                     dd::mEdge                               dd_operation,
-                                     const signed char                       target,
-                                     std::string&                            noiseOperation,
-                                     std::mt19937_64&                        generator,
-                                     std::uniform_real_distribution<dd::fp>& distribution,
-                                     const bool                              amplitudeDamping,
-                                     const bool                              multiQubitOperation);
+    dd::mEdge generateNoiseOperation(const std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD,
+                                     dd::mEdge                                                 dd_operation,
+                                     signed char                                               target,
+                                     std::string&                                              noiseOperation,
+                                     std::mt19937_64&                                          generator,
+                                     std::uniform_real_distribution<dd::fp>&                   distribution,
+                                     bool                                                      amplitudeDamping,
+                                     bool                                                      multiQubitOperation);
 
-    void applyNoiseOperation(const std::vector<dd::Qubit>&           usedQubits,
-                             dd::mEdge                               dd_op,
-                             const std::unique_ptr<dd::Package<>>&   localDD,
-                             dd::vEdge&                              localRootEdge,
-                             std::mt19937_64&                        generator,
-                             std::uniform_real_distribution<dd::fp>& dist,
-                             const dd::mEdge&                        identityDD,
-                             std::string&                            noiseOperation);
+    void applyNoiseOperation(const std::vector<dd::Qubit>&                             usedQubits,
+                             dd::mEdge                                                 dd_op,
+                             const std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD,
+                             dd::vEdge&                                                localRootEdge,
+                             std::mt19937_64&                                          generator,
+                             std::uniform_real_distribution<dd::fp>&                   dist,
+                             const dd::mEdge&                                          identityDD,
+                             std::string&                                              noiseOperation);
 
     [[nodiscard]] qc::OpType ReturnNoiseOperation(char i, double prob, bool multi_qubit_noise) const;
 
@@ -156,7 +182,7 @@ private:
     //    double ApproximateEdgeByFidelity(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes);
     //
     //    dd::Package::vEdge RemoveNodesInPackage(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge e, std::map<dd::Package::vNode*, dd::Package::vEdge>& dag_edges);
-    void setMeasuredQubitToZero(signed char& at, dd::vEdge& e, std::unique_ptr<dd::Package<>>& localDD);
+    void setMeasuredQubitToZero(signed char& at, dd::vEdge& e, std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD);
 };
 
 #endif //DDSIM_STOCHASTICNOISESIMULATOR_HPP

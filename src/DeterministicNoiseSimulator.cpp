@@ -159,7 +159,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
             auto tmp1 = dd->multiply(reinterpret_cast<dEdge&>(density_root_edge), reinterpret_cast<dEdge&>(tmp0), 0, false);
             auto tmp2 = dd->multiply(reinterpret_cast<dEdge&>(dd_op), reinterpret_cast<dEdge&>(tmp1), 0, use_density_matrix_type);
             dd->incRef(tmp2);
-            dEdge::getAlignedDensityEdge(&density_root_edge);
+            dEdge::alignDensityEdge(&density_root_edge);
             dd->decRef(density_root_edge);
             density_root_edge = tmp2;
 
@@ -200,7 +200,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
 
                     dd->incRef(nodeAfterNoise);
 
-                    dEdge::getAlignedDensityEdge(&density_root_edge);
+                    dEdge::alignDensityEdge(&density_root_edge);
                     dd->decRef(density_root_edge);
                     density_root_edge = nodeAfterNoise;
                     if (use_density_matrix_type) {
@@ -213,7 +213,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
 
     dd->garbageCollect(true);
     printf("Multiplication cache");
-    dd->densityMul.printStatistics();
+    dd->densityDensityMultiplication.printStatistics();
     printf("Add cache\n");
     dd->densityAdd.printStatistics();
     printf("Noise cache\n");
@@ -505,7 +505,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(dd::Qubi
     double long                   global_probability;
     double                        statesToMeasure;
 
-    dEdge::getAlignedDensityEdge(&density_root_edge);
+    dEdge::alignDensityEdge(&density_root_edge);
 
     if (full_state) {
         statesToMeasure = pow(2, nr_qubits);
@@ -654,7 +654,7 @@ void DeterministicNoiseSimulator::applyDetNoiseSequential(const qc::Targets& tar
                 }
             }
             dd->incRef(tmp);
-            dEdge::getAlignedDensityEdge(&density_root_edge);
+            dEdge::alignDensityEdge(&density_root_edge);
             dd->decRef(density_root_edge);
             density_root_edge = tmp;
             if (use_density_matrix_type) {

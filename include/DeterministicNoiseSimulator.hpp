@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-class DeterministicNoiseSimulator: public Simulator {
+class DeterministicNoiseSimulator: public Simulator<dd::DensityMatrixSimulatorDDPackage> {
     using CN    = dd::ComplexNumbers;
     using dEdge = dd::dEdge;
 

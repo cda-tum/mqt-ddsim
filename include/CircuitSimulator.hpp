@@ -44,7 +44,7 @@ struct ApproximationInfo {
     const ApproximationWhen approx_when;
 };
 
-class CircuitSimulator: public Simulator {
+class CircuitSimulator: public Simulator<dd::Package<>> {
 public:
     explicit CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_):
         qc(std::move(qc_)), approx_info(ApproximationInfo(1.0, 1, ApproximationInfo::FidelityDriven)) {

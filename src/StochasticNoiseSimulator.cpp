@@ -3,6 +3,8 @@
 #include <queue>
 #include <stdexcept>
 
+using CN = dd::ComplexNumbers;
+
 std::map<std::string, std::size_t> StochasticNoiseSimulator::Simulate(unsigned int shots) {
     bool has_nonunitary = false;
     for (auto& op: *qc) {
@@ -186,7 +188,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
     for (unsigned long current_run = 0; current_run < numberOfRuns; current_run++) {
         const auto t1 = std::chrono::steady_clock::now();
 
-        std::unique_ptr<dd::Package<>> localDD = std::make_unique<dd::Package<>>(getNumberOfQubits());
+        std::unique_ptr<StochasticNoiseSimulatorDDPackage> localDD = std::make_unique<StochasticNoiseSimulatorDDPackage>(getNumberOfQubits());
 
         std::map<unsigned int, bool> classic_values;
 
@@ -292,8 +294,8 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                 }
 
                 if (step_fidelity < 1 && (op_count + 1) % approx_mod == 0) {
-                    ApproximateByFidelity(localDD, localRootEdge, step_fidelity, false, true);
                     approx_count++;
+                    ApproximateByFidelity(localDD, localRootEdge, step_fidelity, false, true);
                 }
             }
             localDD->garbageCollect();
@@ -331,7 +333,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
     }
 }
 
-void StochasticNoiseSimulator::applyNoiseOperation(const std::vector<dd::Qubit>& usedQubits, dd::mEdge dd_op, const std::unique_ptr<dd::Package<>>& localDD,
+void StochasticNoiseSimulator::applyNoiseOperation(const std::vector<dd::Qubit>& usedQubits, dd::mEdge dd_op, const std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD,
                                                    dd::vEdge& localRootEdge, std::mt19937_64& generator, std::uniform_real_distribution<dd::fp>& dist,
                                                    const dd::mEdge& identityDD, std::string& noiseOperation) {
     bool multiQubitOperation = usedQubits.size() > 1;
@@ -357,7 +359,7 @@ void StochasticNoiseSimulator::applyNoiseOperation(const std::vector<dd::Qubit>&
     }
 }
 
-dd::mEdge StochasticNoiseSimulator::generateNoiseOperation(const std::unique_ptr<dd::Package<>>& localDD, dd::mEdge dd_operation,
+dd::mEdge StochasticNoiseSimulator::generateNoiseOperation(const std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD, dd::mEdge dd_operation,
                                                            const signed char target, std::string& noiseOperation, std::mt19937_64& generator,
                                                            std::uniform_real_distribution<dd::fp>& distribution, const bool amplitudeDamping,
                                                            const bool multiQubitOperation) {
@@ -518,7 +520,7 @@ std::string StochasticNoiseSimulator::intToString(long target_number) const {
     }
     return path;
 }
-void StochasticNoiseSimulator::setMeasuredQubitToZero(signed char& at, dd::vEdge& e, std::unique_ptr<dd::Package<>>& localDD) {
+void StochasticNoiseSimulator::setMeasuredQubitToZero(signed char& at, dd::vEdge& e, std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD) {
     auto f = dd::mEdge::one;
 
     for (std::size_t p = 0; p < getNumberOfQubits(); p++) {
