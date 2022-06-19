@@ -16,13 +16,6 @@ class DeterministicNoiseSimulator: public Simulator<dd::DensityMatrixSimulatorDD
     using dEdge = dd::dEdge;
 
 public:
-    //    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity):
-    //        qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
-    //        if (step_number == 0) {
-    //            throw std::invalid_argument("step_number has to be greater than zero");
-    //        }
-    //    }
-
     DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, unsigned long long seed):
         Simulator(seed), qc(qc) {
     }
@@ -31,6 +24,12 @@ public:
         qc(qc) {
         setNoiseEffects(noise_effects);
         initializeNoiseProbabilities(noise_prob);
+    }
+
+    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const std::string& noise_effects, double noise_prob, double amp_noise_prob, double multiQubitGateFactor):
+        qc(qc) {
+        setNoiseEffects(noise_effects);
+        initializeNoiseProbabilities(noise_prob, amp_noise_prob, multiQubitGateFactor);
     }
 
     double noiseProb                 = 0.0;
@@ -55,6 +54,15 @@ public:
             ampDampingProbSingleQubit = cAmplitudeDampingProb;
             ampDampingProbMultiQubit  = cAmplitudeDampingProb * cMultiQubitGateFactor;
         }
+
+        if (noiseProb < 0 || ampDampingProb < 0 || ampDampingProbMultiQubit > 1 || noiseProbMultiQubit > 1) {
+            throw std::runtime_error("Error probabilities are faulty!"
+                                     "\n single qubit error probability: " +
+                                     std::to_string(noiseProbSingleQubit) +
+                                     " multi qubit error probability: " + std::to_string(noiseProbMultiQubit) +
+                                     "\n single qubit amplitude damping  probability: " + std::to_string(ampDampingProbSingleQubit) +
+                                     " multi qubit amplitude damping  probability: " + std::to_string(ampDampingProbMultiQubit));
+        }
     }
 
     std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override {
@@ -69,7 +77,14 @@ public:
 
     [[nodiscard]] std::map<std::string, double> AnalyseState(dd::QubitCount nr_qubits, bool full_state);
 
-    void setNoiseEffects(const std::string& cGateNoise) { gateNoiseTypes = cGateNoise; }
+    void setNoiseEffects(const std::string& cGateNoise) {
+        for (const auto& effect: cGateNoise) {
+            if (effect != 'A' && effect != 'P' && effect != 'D') {
+                throw std::runtime_error("Unknown noise operation '" + std::to_string(effect) + "'\n");
+            }
+        }
+        gateNoiseTypes = cGateNoise;
+    }
 
     [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
 
@@ -77,7 +92,7 @@ public:
 
     [[nodiscard]] std::string getName() const override { return qc->getName(); };
 
-    const std::map<char, int> noiseEffects = {
+    const std::map<char, int> gateNoiseEffects = {
             {'B', 2}, //Bit-flip
             {'P', 2}, //Phase-flip
             {'A', 2}, //Amplitude Damping

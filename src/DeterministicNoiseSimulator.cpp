@@ -15,6 +15,7 @@ dEdge DeterministicNoiseSimulator::makeZeroDensityOperator(dd::QubitCount n) {
     return f;
 }
 
+// todo functionality is not implemented yet for density matrices. To avoid buggy behaviour the code is commented out.
 //dd::fp DeterministicNoiseSimulator::probForIndexToBeZero(dEdge e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob) {
 //    throw std::invalid_argument("This function is currently not supported");
 ////    if (dEdge::isDensityMatrix((long)e.p)) {
@@ -643,7 +644,7 @@ void DeterministicNoiseSimulator::applyDetNoiseSequential(const qc::Targets& tar
             generateGate(idle_operation, type, target_qubit, probability);
             tmp.p = nullptr;
             //Apply all noise matrices of the current noise effect
-            for (int m = 0; m < noiseEffects.find(type)->second; m++) {
+            for (int m = 0; m < gateNoiseEffects.find(type)->second; m++) {
                 auto tmp0 = dd->conjugateTranspose(idle_operation[m]);
                 auto tmp1 = dd->multiply(density_root_edge, reinterpret_cast<dEdge&>(tmp0), 0, false);
                 auto tmp2 = dd->multiply(reinterpret_cast<dEdge&>(idle_operation[m]), tmp1, 0, use_density_matrix_type);

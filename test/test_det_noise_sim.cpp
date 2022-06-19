@@ -43,15 +43,12 @@ TEST(DeterministicNoiseSimTest, MeasurementOne) {
 
     {
         std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, 5);
-        auto                                         m     = ddsim->DeterministicSimulate();
-        ASSERT_EQ(m.find("11")->second, 1);
-        ASSERT_EQ(ddsim->Simulate(1).size(), 0);
+        EXPECT_THROW(ddsim->DeterministicSimulate();, std::invalid_argument);
     }
 
     {
         std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, 1);
-        auto                                         m     = ddsim->DeterministicSimulate();
-        ASSERT_EQ(m.find("00")->second, 1);
+        EXPECT_THROW(ddsim->DeterministicSimulate();, std::invalid_argument);
     }
 }
 
@@ -72,14 +69,9 @@ TEST(DeterministicNoiseSimTest, TestingResetGate) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, std::vector<dd::Qubit>(0), qc::Reset);
     std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
-    ddsim                  = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("A"), 0);
-    bool occurredException = false;
-    try {
-        auto m = ddsim->DeterministicSimulate();
-    } catch (const std::runtime_error& ex) {
-        occurredException = true;
-    }
-    ASSERT_EQ(occurredException, true);
+    ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("A"), 0);
+
+    EXPECT_THROW(ddsim->DeterministicSimulate(), std::runtime_error);
 }
 
 TEST(DeterministicNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
@@ -102,11 +94,11 @@ TEST(DeterministicNoiseSimTest, ClassicControlledOp) {
     quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classical_register, 1);
 
     std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, 0);
-    auto                                         m     = ddsim->DeterministicSimulate();
-
-    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
-
-    EXPECT_NEAR(m.find("11")->second, 1, 0.00001);
+    EXPECT_THROW(ddsim->DeterministicSimulate(), std::invalid_argument);
+    //    auto                                         m     = ddsim->DeterministicSimulate();
+    //    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+    //
+    //    EXPECT_NEAR(m.find("11")->second, 1, 0.00001);
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDApplySequential) {
@@ -118,57 +110,22 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDApplySequential) {
     auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    EXPECT_NEAR(m.find("0000")->second, 0.0616548, 0.00001);
-    EXPECT_NEAR(m.find("0001")->second, 0.0570879, 0.00001);
-    EXPECT_NEAR(m.find("0100")->second, 0.0155602, 0.00001);
-    EXPECT_NEAR(m.find("0101")->second, 0.0157508, 0.00001);
-    EXPECT_NEAR(m.find("0110")->second, 0.0301652, 0.00001);
-    EXPECT_NEAR(m.find("1000")->second, 0.1487735, 0.00001);
-    EXPECT_NEAR(m.find("1001")->second, 0.551925, 0.00001);
-    EXPECT_NEAR(m.find("1011")->second, 0.0132641, 0.00001);
-    EXPECT_NEAR(m.find("1100")->second, 0.0166178, 0.00001);
-    EXPECT_NEAR(m.find("1101")->second, 0.0187341, 0.00001);
-    EXPECT_NEAR(m.find("1110")->second, 0.0301853, 0.00001);
-}
-
-TEST(DeterministicNoiseSimTest, SimulateAdder4Track_A) {
-    auto                                         quantumComputation = getAdder4Circuit();
-    std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
-    ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("A"), 0.01);
-
-    auto m = ddsim->DeterministicSimulate();
-    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
-
-    EXPECT_NEAR(m.find("0000")->second, 0.0496435, 0.00001);
-    EXPECT_NEAR(m.find("0001")->second, 0.0454906, 0.00001);
-    EXPECT_NEAR(m.find("0100")->second, 0.0107246, 0.00001);
-    EXPECT_NEAR(m.find("0101")->second, 0.0108673, 0.00001);
-    EXPECT_NEAR(m.find("0110")->second, 0.031149, 0.00001);
-    EXPECT_NEAR(m.find("1000")->second, 0.0355728, 0.00001);
-    EXPECT_NEAR(m.find("1001")->second, 0.7588863, 0.00001);
-    EXPECT_NEAR(m.find("1101")->second, 0.0101381, 0.00001);
-    EXPECT_NEAR(m.find("1110")->second, 0.0287471, 0.00001);
-}
-
-TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPD) {
-    auto                                         quantumComputation = getAdder4Circuit();
-    std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
-    ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("APD"), 0.01);
-
-    auto m = ddsim->DeterministicSimulate();
-    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
-
-    EXPECT_NEAR(m.find("0000")->second, 0.0616548, 0.00001);
-    EXPECT_NEAR(m.find("0001")->second, 0.0570879, 0.00001);
-    EXPECT_NEAR(m.find("0100")->second, 0.0155602, 0.00001);
-    EXPECT_NEAR(m.find("0101")->second, 0.0157508, 0.00001);
-    EXPECT_NEAR(m.find("0110")->second, 0.0301652, 0.00001);
-    EXPECT_NEAR(m.find("1000")->second, 0.1487735, 0.00001);
-    EXPECT_NEAR(m.find("1001")->second, 0.551925, 0.00001);
-    EXPECT_NEAR(m.find("1011")->second, 0.0132641, 0.00001);
-    EXPECT_NEAR(m.find("1100")->second, 0.0166178, 0.00001);
-    EXPECT_NEAR(m.find("1101")->second, 0.0187341, 0.00001);
-    EXPECT_NEAR(m.find("1110")->second, 0.0301853, 0.00001);
+    double tolerance = 1e-10;
+    EXPECT_LT(std::abs(m.find("0000")->second - 0.0969332192741), tolerance);
+    EXPECT_LT(std::abs(m.find("0001")->second - 0.0907888041538), tolerance);
+    EXPECT_LT(std::abs(m.find("0010")->second - 0.0141409660985), tolerance);
+    EXPECT_LT(std::abs(m.find("0100")->second - 0.0238203475524), tolerance);
+    EXPECT_LT(std::abs(m.find("0101")->second - 0.0235097990017), tolerance);
+    EXPECT_LT(std::abs(m.find("0110")->second - 0.0244576087400), tolerance);
+    EXPECT_LT(std::abs(m.find("0111")->second - 0.0116282811276), tolerance);
+    EXPECT_LT(std::abs(m.find("1000")->second - 0.1731941264570), tolerance);
+    EXPECT_LT(std::abs(m.find("1001")->second - 0.4145855071998), tolerance);
+    EXPECT_LT(std::abs(m.find("1010")->second - 0.0138062113213), tolerance);
+    EXPECT_LT(std::abs(m.find("1011")->second - 0.0184033482066), tolerance);
+    EXPECT_LT(std::abs(m.find("1100")->second - 0.0242454336917), tolerance);
+    EXPECT_LT(std::abs(m.find("1101")->second - 0.0262779844799), tolerance);
+    EXPECT_LT(std::abs(m.find("1110")->second - 0.0239296920989), tolerance);
+    EXPECT_LT(std::abs(m.find("1111")->second - 0.0110373166627), tolerance);
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4Track_D) {
@@ -179,11 +136,82 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4Track_D) {
     auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    EXPECT_NEAR(m.find("0000")->second, 0.020155, 0.00001);
-    EXPECT_NEAR(m.find("0001")->second, 0.0199196, 0.00001);
-    EXPECT_NEAR(m.find("1000")->second, 0.0482997, 0.00001);
-    EXPECT_NEAR(m.find("1001")->second, 0.8264367, 0.00001);
-    EXPECT_NEAR(m.find("1011")->second, 0.0172063, 0.00001);
-    EXPECT_NEAR(m.find("1101")->second, 0.011233, 0.00001);
-    EXPECT_NEAR(m.find("1110")->second, 0.0129619, 0.00001);
+    double tolerance = 1e-10;
+    EXPECT_LT(std::abs(m.find("0000")->second - 0.0332328704931), tolerance);
+    EXPECT_LT(std::abs(m.find("0001")->second - 0.0328434857577), tolerance);
+    EXPECT_LT(std::abs(m.find("0010")->second - 0.0129643065735), tolerance);
+    EXPECT_LT(std::abs(m.find("1000")->second - 0.0683938280189), tolerance);
+    EXPECT_LT(std::abs(m.find("1001")->second - 0.7370101351171), tolerance);
+    EXPECT_LT(std::abs(m.find("1010")->second - 0.0107812802908), tolerance);
+    EXPECT_LT(std::abs(m.find("1011")->second - 0.0275086747656), tolerance);
+    EXPECT_LT(std::abs(m.find("1100")->second - 0.0117061689898), tolerance);
+    EXPECT_LT(std::abs(m.find("1101")->second - 0.0186346925411), tolerance);
+    EXPECT_LT(std::abs(m.find("1110")->second - 0.0160082331009), tolerance);
+}
+
+TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPD) {
+    auto                                         quantumComputation = getAdder4Circuit();
+    std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
+    ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("APD"), 0.01);
+
+    auto m = ddsim->DeterministicSimulate();
+    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+
+    double tolerance = 1e-10;
+    EXPECT_LT(std::abs(m.find("0000")->second - 0.0969332192741), tolerance);
+    EXPECT_LT(std::abs(m.find("0001")->second - 0.0907888041538), tolerance);
+    EXPECT_LT(std::abs(m.find("0010")->second - 0.0141409660985), tolerance);
+    EXPECT_LT(std::abs(m.find("0100")->second - 0.0238203475524), tolerance);
+    EXPECT_LT(std::abs(m.find("0101")->second - 0.0235097990017), tolerance);
+    EXPECT_LT(std::abs(m.find("0110")->second - 0.0244576087400), tolerance);
+    EXPECT_LT(std::abs(m.find("0111")->second - 0.0116282811276), tolerance);
+    EXPECT_LT(std::abs(m.find("1000")->second - 0.1731941264570), tolerance);
+    EXPECT_LT(std::abs(m.find("1001")->second - 0.4145855071998), tolerance);
+    EXPECT_LT(std::abs(m.find("1010")->second - 0.0138062113213), tolerance);
+    EXPECT_LT(std::abs(m.find("1011")->second - 0.0184033482066), tolerance);
+    EXPECT_LT(std::abs(m.find("1100")->second - 0.0242454336917), tolerance);
+    EXPECT_LT(std::abs(m.find("1101")->second - 0.0262779844799), tolerance);
+    EXPECT_LT(std::abs(m.find("1110")->second - 0.0239296920989), tolerance);
+    EXPECT_LT(std::abs(m.find("1111")->second - 0.0110373166627), tolerance);
+}
+
+TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAP) {
+    auto                                         quantumComputation = getAdder4Circuit();
+    std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
+    ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("AP"), 0.001);
+
+    auto m = ddsim->DeterministicSimulate();
+    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+
+    double tolerance = 1e-10;
+    EXPECT_LT(std::abs(m.find("1000")->second - 0.03008702498522842), tolerance);
+    EXPECT_LT(std::abs(m.find("1001")->second - 0.9364832248561167), tolerance);
+}
+
+TEST(DeterministicNoiseSimTest, SimulateRunWithBadParameters) {
+    auto quantumComputation = getAdder4Circuit();
+    EXPECT_THROW(std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("APD"), 0.3), std::runtime_error);
+    EXPECT_THROW(std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("APK"), 0.001), std::runtime_error);
+}
+
+TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDCustomProb) {
+    auto                                         quantumComputation = getAdder4Circuit();
+    std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
+    ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("APD"), 0.01, 0.02, 1);
+
+    auto m = ddsim->DeterministicSimulate();
+    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+
+    double tolerance = 1e-10;
+    EXPECT_LT(std::abs(m.find("0000")->second - 0.0616548044047), tolerance);
+    EXPECT_LT(std::abs(m.find("0001")->second - 0.0570878674208), tolerance);
+    EXPECT_LT(std::abs(m.find("0100")->second - 0.0155601736851), tolerance);
+    EXPECT_LT(std::abs(m.find("0101")->second - 0.0157508473593), tolerance);
+    EXPECT_LT(std::abs(m.find("0110")->second - 0.0301651684817), tolerance);
+    EXPECT_LT(std::abs(m.find("1000")->second - 0.1487734834937), tolerance);
+    EXPECT_LT(std::abs(m.find("1001")->second - 0.5519250213313), tolerance);
+    EXPECT_LT(std::abs(m.find("1011")->second - 0.0132640682125), tolerance);
+    EXPECT_LT(std::abs(m.find("1100")->second - 0.0166178042857), tolerance);
+    EXPECT_LT(std::abs(m.find("1101")->second - 0.0187340765889), tolerance);
+    EXPECT_LT(std::abs(m.find("1110")->second - 0.0301853251959), tolerance);
 }
