@@ -48,7 +48,7 @@ public:
                 {"step_fidelity", std::to_string(step_fidelity)},
                 {"approximation_runs", std::to_string(approximation_runs)},
                 //                {"final_fidelity", std::to_string(final_fidelity)},
-                //                {"perfect_run_time", std::to_string(perfect_run_time)},
+                {"perfect_run_time", std::to_string(perfect_run_time)},
                 {"stoch_wall_time", std::to_string(stoch_run_time)},
                 {"mean_stoch_run_time", std::to_string(mean_stoch_time)},
                 {"parallel_instances", std::to_string(max_instances)},

@@ -252,7 +252,7 @@ TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
     auto                           classical_register = std::make_pair<unsigned short, unsigned short>(0, 1);
     quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classical_register, 1);
 
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.02, 10000, 1, 1, "0-3");
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.02, 1000, 1, 1, "0-3");
 
     auto m = ddsim.StochSimulate();
 
@@ -404,4 +404,18 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorUnoptimizedSim)
     EXPECT_LT(std::abs(m.find("1011")->second - 0.017234499727102268), tolerance);
     EXPECT_LT(std::abs(m.find("1100")->second - 0.03505400112419414), tolerance);
     EXPECT_LT(std::abs(m.find("1101")->second - 0.024359601507422463), tolerance);
+}
+
+TEST(StochNoiseSimTest, ParseProperties) {
+    auto                     quantumComputation = stochTestsgetAdder4Circuit();
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 1000, 1, 1, "0, 6, 1");
+    auto                     m = ddsim.StochSimulate();
+
+    double tolerance = 0.1;
+
+    EXPECT_LT(std::abs(m.find("0000")->second - 0.25574412296741467), tolerance);
+    EXPECT_LT(std::abs(m.find("0110")->second - 0.022981537137908348), tolerance);
+    EXPECT_LT(std::abs(m.find("0001")->second - 0.177720207953642), tolerance);
+
+    EXPECT_EQ(m.size(), 3);
 }
