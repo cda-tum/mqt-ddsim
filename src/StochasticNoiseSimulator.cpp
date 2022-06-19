@@ -151,7 +151,7 @@ std::map<std::string, double> StochasticNoiseSimulator::StochSimulate() {
     std::map<std::string, double> measure_result;
     for (const std::pair<const std::basic_string<char>, int>& classical_measurements_map: classical_measurements_maps[max_instances]) {
         auto probability = (double)classical_measurements_map.second / stochasticRuns;
-        measure_result.insert({classical_measurements_map.first, probability});
+        measure_result.insert({classical_measurements_map.first, probability}); //todo maybe print both classical and quantum register ? classical register:"
     }
 
     //std::clog << "Probabilities are ... (probabilities < 0.001 are omitted)\n";
@@ -164,6 +164,7 @@ std::map<std::string, double> StochasticNoiseSimulator::StochSimulate() {
         } else if (std::get<0>(recorded_properties[m]) == -1) {
             final_fidelity = recorded_properties_per_instance[max_instances][m];
         } else if (recorded_properties_per_instance[max_instances][m] > 0 || m < 2) {
+            // Print all probabilities that are larger than 0, and always print the probabilities for state 0 and 1
             std::string amplitude = std::get<1>(recorded_properties[m]);
             std::replace(amplitude.begin(), amplitude.end(), '2', '1');
             measure_result.insert({amplitude, recorded_properties_per_instance[max_instances][m]});
@@ -306,21 +307,24 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
 
         //        for (bool classic_value : classic_values) {
         std::string classic_register_string;
-        for (unsigned long i = 0; i < classic_values.size(); i++) {
-            if (classic_values[i]) {
-                classic_register_string.push_back('0');
-            } else {
-                classic_register_string.push_back('1');
+        if (!classic_values.empty()) {
+            for (unsigned long i = 0; i < classic_values.size(); i++) {
+                if (classic_values[i]) {
+                    classic_register_string.push_back('0');
+                } else {
+                    classic_register_string.push_back('1');
+                }
             }
+            classicalMeasurementsMap[classic_register_string] += 1;
         }
-        classicalMeasurementsMap[classic_register_string] += 1;
 
         for (unsigned long i = 0; i < recordedPropertiesStorage.size(); i++) {
             if (std::get<0>(recordedPropertiesList[i]) == -3) {
                 recordedPropertiesStorage[i] += std::chrono::duration<float>(t2 - t1).count();
             } else if (std::get<0>(recordedPropertiesList[i]) == -2) {
                 recordedPropertiesStorage[i] += approx_count;
-                //            } else if (std::get<0>(recordedPropertiesList[i]) == -1) {
+            } else if (std::get<0>(recordedPropertiesList[i]) == -1) {
+                continue;
                 //                recordedPropertiesStorage[i] += localDD->fidelity(localRootEdge, rootEdgePerfectRun);
             } else {
                 // extract amplitude for state

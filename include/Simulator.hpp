@@ -112,7 +112,7 @@ public:
 protected:
     std::mt19937_64 mt;
 
-    const unsigned long long seed;
+    const unsigned long long seed = 0;
     const bool               has_fixed_seed;
     const dd::fp             epsilon = 0.001L;
 
