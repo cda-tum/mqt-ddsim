@@ -215,15 +215,15 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                             assert(result == '0' || result == '1');
                             classic_values[classic.at(i)] = (result == '1');
                         }
-                    } else if (op->getType() == qc::Reset) {
-                        // Reset qubit
-                        auto quantum = nu_op->getTargets();
-                        for (signed char i: quantum) {
-                            auto result = localDD->measureOneCollapsing(localRootEdge, i, true, generator);
-                            if (result == '1') {
-                                setMeasuredQubitToZero(i, localRootEdge, localDD);
-                            }
-                        }
+                        //                    }else if (op->getType() == qc::Reset) {
+                        //                        // Reset qubit
+                        //                        auto quantum = nu_op->getTargets();
+                        //                        for (signed char i: quantum) {
+                        //                            auto result = localDD->measureOneCollapsing(localRootEdge, i, true, generator);
+                        //                            if (result == '1') {
+                        //                                setMeasuredQubitToZero(i, localRootEdge, localDD);
+                        //                            }
+                        //                        }
                     } else {
                         //Skipping barrier
                         if (op->getType() == qc::Barrier) {
