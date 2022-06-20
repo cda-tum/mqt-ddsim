@@ -43,6 +43,12 @@ public:
 
     std::map<std::string, double> StochSimulate();
 
+    [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return 0; } // Not available for stochastic simulation
+
+    [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return 0; } // Not available for stochastic simulation
+
+    [[nodiscard]] std::size_t countNodesFromRoot() const override { return 0; } // Not available for stochastic simulation
+
     std::map<std::string, std::string> AdditionalStatistics() override {
         return {
                 {"step_fidelity", std::to_string(step_fidelity)},

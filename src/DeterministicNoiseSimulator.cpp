@@ -98,13 +98,12 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
             if (auto* nu_op = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
                 if (op->getType() == qc::Measure) {
                     throw std::invalid_argument("Measurements are currently not supported");
-                    auto quantum = nu_op->getTargets();
-                    auto classic = nu_op->getClassics();
-
-                    if (quantum.size() != classic.size()) {
-                        throw std::runtime_error("Measurement: Sizes of quantum and classic register mismatch.");
-                    }
-
+                    //                    auto quantum = nu_op->getTargets();
+                    //                    auto classic = nu_op->getClassics();
+                    //
+                    //                    if (quantum.size() != classic.size()) {
+                    //                        throw std::runtime_error("Measurement: Sizes of quantum and classic register mismatch.");
+                    //                    }
                     //                    for (unsigned int i = 0; i < quantum.size(); ++i) {
                     //                        auto result = MeasureOneCollapsing(quantum.at(i));
                     //                        assert(result == '0' || result == '1');
@@ -129,26 +128,27 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
             qc::Targets  targets;
             dd::Controls controls;
             if (op->isClassicControlledOperation()) {
-                // Check if the operation is controlled by a classical register
-                auto* classic_op    = dynamic_cast<qc::ClassicControlledOperation*>(op.get());
-                bool  conditionTrue = true;
-                auto  expValue      = classic_op->getExpectedValue();
-
-                for (unsigned int i = classic_op->getControlRegister().first;
-                     i < classic_op->getControlRegister().second; i++) {
-                    if (classic_values[i] != (expValue % 2)) {
-                        conditionTrue = false;
-                        break;
-                    } else {
-                        expValue = expValue >> 1u;
-                    }
-                }
-                if (!conditionTrue) {
-                    continue;
-                }
-                dd_op    = dd::getDD(classic_op->getOperation(), dd);
-                targets  = classic_op->getOperation()->getTargets();
-                controls = classic_op->getOperation()->getControls();
+                throw std::runtime_error("Classical controlled operations are not supported.");
+                //                // Check if the operation is controlled by a classical register
+                //                auto* classic_op    = dynamic_cast<qc::ClassicControlledOperation*>(op.get());
+                //                bool  conditionTrue = true;
+                //                auto  expValue      = classic_op->getExpectedValue();
+                //
+                //                for (unsigned int i = classic_op->getControlRegister().first;
+                //                     i < classic_op->getControlRegister().second; i++) {
+                //                    if (classic_values[i] != (expValue % 2)) {
+                //                        conditionTrue = false;
+                //                        break;
+                //                    } else {
+                //                        expValue = expValue >> 1u;
+                //                    }
+                //                }
+                //                if (!conditionTrue) {
+                //                    continue;
+                //                }
+                //                dd_op    = dd::getDD(classic_op->getOperation(), dd);
+                //                targets  = classic_op->getOperation()->getTargets();
+                //                controls = classic_op->getOperation()->getControls();
             } else {
                 dd_op    = dd::getDD(op.get(), dd);
                 targets  = op->getTargets();
