@@ -437,12 +437,3 @@ TEST(StochNoiseSimTest, TestingBarrierGate) {
     EXPECT_LT(std::abs(m.find("10")->second - 0.3853912629956448), tolerance);
     EXPECT_LT(std::abs(m.find("11")->second - 0.09500873700435522), tolerance);
 }
-
-TEST(StochNoiseSimTest, TestingResetGate) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, std::vector<dd::Qubit>(0), qc::Reset);
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.02, 1000, 1, 1, "0-3,5,4");
-
-    EXPECT_THROW(ddsim.StochSimulate(), std::runtime_error);
-}
