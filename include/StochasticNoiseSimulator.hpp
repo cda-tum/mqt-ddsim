@@ -3,6 +3,7 @@
 
 #include "QuantumComputation.hpp"
 #include "Simulator.hpp"
+#include "dd/NoiseFunctionality.hpp"
 
 #include <cstddef>
 #include <map>
@@ -19,7 +20,7 @@ public:
         dd->resize(qc->getNqubits());
     }
 
-    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity, unsigned long long seed):
+    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity, std::size_t seed):
         Simulator(seed), qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
         dd->resize(qc->getNqubits());
     }
@@ -34,12 +35,24 @@ public:
                              bool                                     unoptimizedSim,
                              unsigned int                             step_number,
                              double                                   step_fidelity,
-                             unsigned long long                       seed = 0):
+                             std::size_t                              seed = 0):
         Simulator(seed),
         qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
         // setNoiseEffects
-        if (cNoiseEffects.find_first_not_of("APD") != std::string::npos) {
-            throw std::runtime_error("Unknown noise operation in '" + cNoiseEffects + "'\n");
+        for (auto noise: cNoiseEffects) {
+            switch (noise) {
+                case 'A':
+                    gateNoiseEffects.push_back(dd::amplitudeDamping);
+                    break;
+                case 'P':
+                    gateNoiseEffects.push_back(dd::phaseFlip);
+                    break;
+                case 'D':
+                    gateNoiseEffects.push_back(dd::depolarization);
+                    break;
+                default:
+                    throw std::runtime_error("Unknown noise operation '" + cNoiseEffects + "'\n");
+            }
         }
 
         sequentialApplyNoise = unoptimizedSim;
@@ -51,12 +64,12 @@ public:
         }
         //The probability of amplitude damping (t1) often is double the probability , of phase flip, which is why I double it here
         noiseProbability                        = cGateNoiseProbability;
-        sqrtAmplitudeDampingProbability         = {sqrt(amplitudeDampingProb), 0};
-        oneMinusSqrtAmplitudeDampingProbability = {sqrt(1 - amplitudeDampingProb), 0};
+        sqrtAmplitudeDampingProbability         = {std::sqrt(amplitudeDampingProb), 0};
+        oneMinusSqrtAmplitudeDampingProbability = {std::sqrt(1 - amplitudeDampingProb), 0};
 
         noiseProbabilityMulti                        = cGateNoiseProbability * multiQubitGateFactor;
-        sqrtAmplitudeDampingProbabilityMulti         = {sqrt(noiseProbability) * multiQubitGateFactor, 0};
-        oneMinusSqrtAmplitudeDampingProbabilityMulti = {sqrt(1 - multiQubitGateFactor * amplitudeDampingProb), 0};
+        sqrtAmplitudeDampingProbabilityMulti         = {std::sqrt(noiseProbability) * multiQubitGateFactor, 0};
+        oneMinusSqrtAmplitudeDampingProbabilityMulti = {std::sqrt(1 - multiQubitGateFactor * amplitudeDampingProb), 0};
         ampDampingFalse                              = dd::GateMatrix({dd::complex_one, dd::complex_zero, dd::complex_zero, oneMinusSqrtAmplitudeDampingProbability});
         ampDampingFalseMulti                         = dd::GateMatrix({dd::complex_one, dd::complex_zero, dd::complex_zero, oneMinusSqrtAmplitudeDampingProbabilityMulti});
 
@@ -70,9 +83,7 @@ public:
                                      "\n single qubit amplitude damping  probability: " + std::to_string(amplitudeDampingProb) +
                                      " multi qubit amplitude damping  probability: " + std::to_string(amplitudeDampingProb * multiQubitGateFactor));
         }
-
-        gateNoiseEffects = cNoiseEffects;
-        stochasticRuns   = cStochRuns;
+        stochasticRuns = cStochRuns;
 
         setRecordedProperties(recorded_properties);
     }
@@ -102,7 +113,7 @@ public:
 
     [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
 
-    [[nodiscard]] std::string getName() const override { return "stoch_" + gateNoiseEffects + "_" + qc->getName(); };
+    [[nodiscard]] std::string getName() const override { return "stoch_" + qc->getName(); };
 
     double           noiseProbability = 0.0;
     dd::ComplexValue sqrtAmplitudeDampingProbability{};
@@ -127,10 +138,10 @@ public:
     std::vector<std::vector<double>>           recorded_properties_per_instance;
     std::vector<std::map<std::string, int>>    classical_measurements_maps;
 
-    std::string gateNoiseEffects;
+    std::vector<dd::noiseOperations> gateNoiseEffects;
 
-    const unsigned int max_instances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
-    //    const unsigned int max_instances = 1; // use for debugging only
+//    const unsigned int max_instances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
+        const unsigned int max_instances = 1; // use for debugging only
 
 private:
     std::unique_ptr<qc::QuantumComputation>& qc;
@@ -156,7 +167,7 @@ private:
     dd::mEdge generateNoiseOperation(const std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD,
                                      dd::mEdge                                                 dd_operation,
                                      signed char                                               target,
-                                     std::string&                                              noiseOperation,
+                                     const std::vector<dd::noiseOperations>&                   noiseOperation,
                                      std::mt19937_64&                                          generator,
                                      std::uniform_real_distribution<dd::fp>&                   distribution,
                                      bool                                                      amplitudeDamping,
@@ -169,13 +180,13 @@ private:
                              std::mt19937_64&                                          generator,
                              std::uniform_real_distribution<dd::fp>&                   dist,
                              const dd::mEdge&                                          identityDD,
-                             std::string&                                              noiseOperation);
+                             const std::vector<dd::noiseOperations>&                   noiseOperation);
 
-    [[nodiscard]] qc::OpType ReturnNoiseOperation(char i, double prob, bool multi_qubit_noise) const;
+    [[nodiscard]] qc::OpType ReturnNoiseOperation(dd::noiseOperations noiseOperation, double prob, bool multi_qubit_noise) const;
 
     [[nodiscard]] std::string intToString(long target_number) const;
 
-    void setMeasuredQubitToZero(signed char& at, dd::vEdge& e, std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD);
+    void setMeasuredQubitToZero(signed char& at, dd::vEdge& e, std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD) const;
 };
 
 #endif //DDSIM_STOCHASTICNOISESIMULATOR_HPP

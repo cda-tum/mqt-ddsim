@@ -3,6 +3,7 @@
 
 #include "QuantumComputation.hpp"
 #include "Simulator.hpp"
+#include "dd/NoiseFunctionality.hpp"
 
 #include <cstddef>
 #include <map>
@@ -35,7 +36,21 @@ public:
         if (cGateNoise.find_first_not_of("APD") != std::string::npos) {
             throw std::runtime_error("Unknown noise operation in '" + cGateNoise + "'\n");
         }
-        gateNoiseTypes = cGateNoise;
+        for (auto noise: cGateNoise) {
+            switch (noise) {
+                case 'A':
+                    gateNoiseTypes.push_back(dd::amplitudeDamping);
+                    break;
+                case 'P':
+                    gateNoiseTypes.push_back(dd::phaseFlip);
+                    break;
+                case 'D':
+                    gateNoiseTypes.push_back(dd::depolarization);
+                    break;
+                default:
+                    throw std::runtime_error("Unknown noise operation '" + cGateNoise + "'\n");
+            }
+        }
 
         // initializeNoiseProbabilities
         noiseProb            = cGateNoiseProbability;
@@ -103,24 +118,21 @@ public:
 
     bool sequentialApplyNoise = false;
     bool useDensityMatrixType = true;
-    //    char MeasureOneCollapsing(dd::Qubit index);
 
 private:
     std::unique_ptr<qc::QuantumComputation>& qc;
 
-    std::string gateNoiseTypes;
+    std::vector<dd::noiseOperations> gateNoiseTypes;
 
-    void ApplyAmplitudeDampingToNode(std::array<dEdge, 4>& e, double probability);
-    void ApplyPhaseFlipToNode(std::array<dEdge, 4>& e, double probability);
-    void ApplyDepolarisationToNode(std::array<dEdge, 4>& e, double probability);
+    void applyAmplitudeDampingToNode(std::array<dEdge, 4>& e, double probability);
+    void applyPhaseFlipToNode(std::array<dEdge, 4>& e, double probability);
+    void applyDepolarisationToNode(std::array<dEdge, 4>& e, double probability);
 
     void generateGate(qc::MatrixDD* pointer_for_matrices, char noise_type, dd::Qubit target, double probability);
 
     dEdge makeZeroDensityOperator(dd::QubitCount n);
 
     dEdge applyNoiseEffects(dEdge& originalEdge, const std::vector<dd::Qubit>& used_qubits, bool firstPathEdge);
-
-    //    dd::fp probForIndexToBeZero(dEdge e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob);
 };
 
 #endif //DDSIM_DETERMINISTICNOISESIMULATOR_HPP

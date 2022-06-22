@@ -182,17 +182,15 @@ dEdge DeterministicNoiseSimulator::applyNoiseEffects(dEdge& originalEdge, const 
 
         for (auto const& type: gateNoiseTypes) {
             switch (type) {
-                case 'A':
-                    ApplyAmplitudeDampingToNode(new_edges, (used_qubits.size() == 1) ? ampDampingProbSingleQubit : ampDampingProbMultiQubit);
+                case dd::amplitudeDamping:
+                    applyAmplitudeDampingToNode(new_edges, (used_qubits.size() == 1) ? ampDampingProbSingleQubit : ampDampingProbMultiQubit);
                     break;
-                case 'P':
-                    ApplyPhaseFlipToNode(new_edges, (used_qubits.size() == 1) ? noiseProbSingleQubit : noiseProbMultiQubit);
+                case dd::phaseFlip:
+                    applyPhaseFlipToNode(new_edges, (used_qubits.size() == 1) ? noiseProbSingleQubit : noiseProbMultiQubit);
                     break;
-                case 'D':
-                    ApplyDepolarisationToNode(new_edges, (used_qubits.size() == 1) ? noiseProbSingleQubit : noiseProbMultiQubit);
+                case dd::depolarization:
+                    applyDepolarisationToNode(new_edges, (used_qubits.size() == 1) ? noiseProbSingleQubit : noiseProbMultiQubit);
                     break;
-                default:
-                    throw std::runtime_error(std::string("Unknown gate noise type '") + type + "'");
             }
         }
 
@@ -229,7 +227,7 @@ dEdge DeterministicNoiseSimulator::applyNoiseEffects(dEdge& originalEdge, const 
     return e;
 }
 
-void DeterministicNoiseSimulator::ApplyPhaseFlipToNode(std::array<dEdge, 4>& e, double probability) {
+void DeterministicNoiseSimulator::applyPhaseFlipToNode(std::array<dEdge, 4>& e, double probability) {
     dd::Complex complex_prob = dd->cn.getCached();
 
     //e[0] = e[0]
@@ -255,7 +253,7 @@ void DeterministicNoiseSimulator::ApplyPhaseFlipToNode(std::array<dEdge, 4>& e, 
     dd->cn.returnToCache(complex_prob);
 }
 
-void DeterministicNoiseSimulator::ApplyAmplitudeDampingToNode(std::array<dEdge, 4>& e, double probability) {
+void DeterministicNoiseSimulator::applyAmplitudeDampingToNode(std::array<dEdge, 4>& e, double probability) {
     dd::Complex complex_prob = dd->cn.getCached();
     dEdge       helper_edge[1];
     helper_edge[0].w = dd->cn.getCached();
@@ -305,7 +303,7 @@ void DeterministicNoiseSimulator::ApplyAmplitudeDampingToNode(std::array<dEdge, 
     dd->cn.returnToCache(complex_prob);
 }
 
-void DeterministicNoiseSimulator::ApplyDepolarisationToNode(std::array<dEdge, 4>& e, double probability) {
+void DeterministicNoiseSimulator::applyDepolarisationToNode(std::array<dEdge, 4>& e, double probability) {
     dEdge       helper_edge[2];
     dd::Complex complex_prob = dd->cn.getCached();
     complex_prob.i->value    = 0;
@@ -450,7 +448,7 @@ void DeterministicNoiseSimulator::generateGate(qc::MatrixDD* pointer_for_matrice
     dd::ComplexValue              tmp = {};
 
     switch (noise_type) {
-        case 'P': {
+        case dd::phaseFlip: {
             tmp.r                 = std::sqrt(1 - probability) * dd::complex_one.r;
             idle_noise_gate[0][0] = idle_noise_gate[0][3] = tmp;
             idle_noise_gate[0][1] = idle_noise_gate[0][2] = dd::complex_zero;
@@ -468,7 +466,7 @@ void DeterministicNoiseSimulator::generateGate(qc::MatrixDD* pointer_for_matrice
             // amplitude damping
             //      (1      0           )       (0      sqrt(probability))
             //  e0= (0      sqrt(1-probability)   ), e1=  (0      0      )
-        case 'A': {
+        case dd::amplitudeDamping: {
             tmp.r                 = std::sqrt(1 - probability) * dd::complex_one.r;
             idle_noise_gate[0][0] = dd::complex_one;
             idle_noise_gate[0][1] = idle_noise_gate[0][2] = dd::complex_zero;
@@ -483,7 +481,7 @@ void DeterministicNoiseSimulator::generateGate(qc::MatrixDD* pointer_for_matrice
             break;
         }
             // depolarization
-        case 'D': {
+        case dd::depolarization: {
             tmp.r = std::sqrt(1 - ((3 * probability) / 4)) * dd::complex_one.r;
             //                   (1 0)
             // sqrt(1- ((3p)/4))*(0 1)

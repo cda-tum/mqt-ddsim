@@ -157,12 +157,10 @@ std::map<std::string, double> StochasticNoiseSimulator::StochSimulate() {
     //std::clog << "Probabilities are ... (probabilities < 0.001 are omitted)\n";
     //    std::map<std::string, double> measure_result;
     for (unsigned long m = 0; m < recorded_properties.size(); m++) {
-        if (std::get<0>(recorded_properties[m]) == -3) {
+        if (std::get<0>(recorded_properties[m]) == -2) {
             mean_stoch_time = recorded_properties_per_instance[max_instances][m];
-        } else if (std::get<0>(recorded_properties[m]) == -2) {
-            approximation_runs = recorded_properties_per_instance[max_instances][m];
         } else if (std::get<0>(recorded_properties[m]) == -1) {
-            final_fidelity = recorded_properties_per_instance[max_instances][m];
+            approximation_runs = recorded_properties_per_instance[max_instances][m];
         } else if (recorded_properties_per_instance[max_instances][m] > 0 || m < 2) {
             // Print all probabilities that are larger than 0, and always print the probabilities for state 0 and 1
             std::string amplitude = std::get<1>(recorded_properties[m]);
@@ -204,7 +202,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
         for (auto& op: *qc) {
             if (!op->isUnitary() && !(op->isClassicControlledOperation())) {
                 if (auto* nu_op = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
-                    if (nu_op->getName()[0] == 'M') {
+                    if (nu_op->getType() == qc::Measure) {
                         auto quantum = nu_op->getTargets();
                         auto classic = nu_op->getClassics();
 
@@ -213,17 +211,8 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                         for (unsigned int i = 0; i < quantum.size(); ++i) {
                             char result = localDD->measureOneCollapsing(localRootEdge, quantum.at(i), true, generator);
                             assert(result == '0' || result == '1');
-                            classic_values[classic.at(i)] = (result == '1');
+                            classic_values[classic.at(i)] = (result == '0');
                         }
-                        //                    }else if (op->getType() == qc::Reset) {
-                        //                        // Reset qubit
-                        //                        auto quantum = nu_op->getTargets();
-                        //                        for (signed char i: quantum) {
-                        //                            auto result = localDD->measureOneCollapsing(localRootEdge, i, true, generator);
-                        //                            if (result == '1') {
-                        //                                setMeasuredQubitToZero(i, localRootEdge, localDD);
-                        //                            }
-                        //                        }
                     } else {
                         //Skipping barrier
                         if (op->getType() == qc::Barrier) {
@@ -283,11 +272,10 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                     auto tmp0 = localDD->multiply(dd_op, localRootEdge);
                     localDD->incRef(tmp0);
                     localDD->decRef(localRootEdge);
-                    localRootEdge                    = tmp0;
-                    dd_op                            = identityDD;
-                    std::string tmp_gate_noise_types = "0";
-                    for (char gate_noise_type: gateNoiseEffects) {
-                        tmp_gate_noise_types[0] = gate_noise_type;
+                    localRootEdge = tmp0;
+                    dd_op         = identityDD;
+                    for (auto gate_noise_type: gateNoiseEffects) {
+                        std::vector<dd::noiseOperations> tmp_gate_noise_types = {gate_noise_type};
                         applyNoiseOperation(usedQubits, dd_op, localDD, localRootEdge, generator, dist, identityDD, tmp_gate_noise_types);
                     }
                 } else {
@@ -305,27 +293,18 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
         localDD->decRef(localRootEdge);
         const auto t2 = std::chrono::steady_clock::now();
 
-        //        for (bool classic_value : classic_values) {
         std::string classic_register_string;
         if (!classic_values.empty()) {
-            for (unsigned long i = 0; i < classic_values.size(); i++) {
-                if (classic_values[i]) {
-                    classic_register_string.push_back('0');
-                } else {
-                    classic_register_string.push_back('1');
-                }
-            }
+            for (const auto val: classic_values)
+                classic_register_string.push_back(val.second ? '0' : '1');
             classicalMeasurementsMap[classic_register_string] += 1;
         }
 
         for (unsigned long i = 0; i < recordedPropertiesStorage.size(); i++) {
-            if (std::get<0>(recordedPropertiesList[i]) == -3) {
+            if (std::get<0>(recordedPropertiesList[i]) == -2) {
                 recordedPropertiesStorage[i] += std::chrono::duration<float>(t2 - t1).count();
-            } else if (std::get<0>(recordedPropertiesList[i]) == -2) {
-                recordedPropertiesStorage[i] += approx_count;
             } else if (std::get<0>(recordedPropertiesList[i]) == -1) {
-                continue;
-                //                recordedPropertiesStorage[i] += localDD->fidelity(localRootEdge, rootEdgePerfectRun);
+                recordedPropertiesStorage[i] += approx_count;
             } else {
                 // extract amplitude for state
                 const auto basisVector = std::get<1>(recordedPropertiesList[i]);
@@ -339,7 +318,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
 
 void StochasticNoiseSimulator::applyNoiseOperation(const std::vector<dd::Qubit>& usedQubits, dd::mEdge dd_op, const std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD,
                                                    dd::vEdge& localRootEdge, std::mt19937_64& generator, std::uniform_real_distribution<dd::fp>& dist,
-                                                   const dd::mEdge& identityDD, std::string& noiseOperation) {
+                                                   const dd::mEdge& identityDD, const std::vector<dd::noiseOperations>& noiseOperation) {
     bool multiQubitOperation = usedQubits.size() > 1;
 
     for (auto& target: usedQubits) {
@@ -364,12 +343,12 @@ void StochasticNoiseSimulator::applyNoiseOperation(const std::vector<dd::Qubit>&
 }
 
 dd::mEdge StochasticNoiseSimulator::generateNoiseOperation(const std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD, dd::mEdge dd_operation,
-                                                           const signed char target, std::string& noiseOperation, std::mt19937_64& generator,
-                                                           std::uniform_real_distribution<dd::fp>& distribution, const bool amplitudeDamping,
-                                                           const bool multiQubitOperation) {
+                                                           signed char target, const std::vector<dd::noiseOperations>& noiseOperation, std::mt19937_64& generator,
+                                                           std::uniform_real_distribution<dd::fp>& distribution, bool amplitudeDamping,
+                                                           bool multiQubitOperation) {
     qc::OpType effect;
     for (const auto& noise_type: noiseOperation) {
-        if (noise_type != 'A') {
+        if (noise_type != dd::noiseOperations::amplitudeDamping) {
             effect = ReturnNoiseOperation(noise_type, distribution(generator), multiQubitOperation);
         } else {
             if (amplitudeDamping) {
@@ -381,7 +360,6 @@ dd::mEdge StochasticNoiseSimulator::generateNoiseOperation(const std::unique_ptr
         switch (effect) {
             case (dd::I): {
                 continue;
-                break;
             }
             case (qc::ATrue): {
                 auto tmp_op = localDD->stochasticNoiseOperationCache.lookup(multiQubitOperation ? qc::multiATrue : qc::ATrue, target);
@@ -437,9 +415,9 @@ dd::mEdge StochasticNoiseSimulator::generateNoiseOperation(const std::unique_ptr
     return dd_operation;
 }
 
-qc::OpType StochasticNoiseSimulator::ReturnNoiseOperation(const char i, const double prob, const bool multi_qubit_noise) const {
-    switch (i) {
-        case 'D': {
+qc::OpType StochasticNoiseSimulator::ReturnNoiseOperation(dd::noiseOperations noiseOperation, double prob, bool multi_qubit_noise) const {
+    switch (noiseOperation) {
+        case dd::noiseOperations::depolarization: {
             if (prob >= 3 * (multi_qubit_noise ? noiseProbabilityMulti : noiseProbability) / 4) {
                 return qc::I;
             } else if (prob < (multi_qubit_noise ? noiseProbabilityMulti : noiseProbability) / 4) {
@@ -450,7 +428,7 @@ qc::OpType StochasticNoiseSimulator::ReturnNoiseOperation(const char i, const do
                 return qc::Z;
             }
         }
-        case 'P': {
+        case dd::noiseOperations::phaseFlip: {
             if (prob > (multi_qubit_noise ? noiseProbabilityMulti : noiseProbability)) {
                 return dd::I;
             } else {
@@ -458,7 +436,7 @@ qc::OpType StochasticNoiseSimulator::ReturnNoiseOperation(const char i, const do
             }
         }
         default:
-            throw std::runtime_error(std::string{"Unknown noise effect '"} + i + "'");
+            throw std::runtime_error(std::string{"Unknown noise effect '"} + std::to_string(noiseOperation) + "'");
     }
 }
 
@@ -524,7 +502,7 @@ std::string StochasticNoiseSimulator::intToString(long target_number) const {
     }
     return path;
 }
-void StochasticNoiseSimulator::setMeasuredQubitToZero(signed char& at, dd::vEdge& e, std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD) {
+void StochasticNoiseSimulator::setMeasuredQubitToZero(signed char& at, dd::vEdge& e, std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD) const {
     auto f = dd::mEdge::one;
 
     for (std::size_t p = 0; p < getNumberOfQubits(); p++) {

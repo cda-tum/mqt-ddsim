@@ -19,7 +19,7 @@ int main(int argc, char** argv) {
     // clang-format off
     options.add_options()
         ("h,help", "produce help message")
-        ("seed", "seed for random number generator (default zero is possibly directly used as seed!)", cxxopts::value<unsigned long long>()->default_value("0"))
+        ("seed", "seed for random number generator (default zero is possibly directly used as seed!)", cxxopts::value<std::size_t>()->default_value("0"))
         ("pm", "print measurements")
         ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
         ("verbose", "Causes some simulators to print additional information to STDERR")
@@ -60,21 +60,19 @@ int main(int argc, char** argv) {
         std::clog << "[WARNING] Quantum computation contains quite many qubits. You're jumping into the deep end.\n";
     }
 
-    if (vm["stoch_runs"].as<long>() > 0) {
+    if (vm["stoch_runs"].as<std::size_t>() > 0) {
         // Using stochastic simulator
         std::unique_ptr<StochasticNoiseSimulator> ddsim = std::make_unique<StochasticNoiseSimulator>(quantumComputation,
                                                                                                      vm["noise_effects"].as<std::string>(),
                                                                                                      vm["noise_prob"].as<double>(),
                                                                                                      vm["noise_prob_t1"].as<double>(),
                                                                                                      vm["noise_prob_multi"].as<double>(),
-                                                                                                     vm["stoch_runs"].as<long>(),
+                                                                                                     vm["stoch_runs"].as<size_t>(),
                                                                                                      vm["properties"].as<std::string>(),
                                                                                                      vm.count("unoptimized_sim"),
                                                                                                      vm["steps"].as<unsigned int>(),
                                                                                                      vm["step_fidelity"].as<double>(),
-                                                                                                     vm["seed"].as<unsigned long long>());
-
-        ddsim->stochasticRuns = vm["stoch_runs"].as<long>();
+                                                                                                     vm["seed"].as<std::size_t>());
 
         auto t1 = std::chrono::steady_clock::now();
 
@@ -109,7 +107,7 @@ int main(int argc, char** argv) {
         }
 
         std::cout << std::setw(2) << output_obj << std::endl;
-    } else if (vm["stoch_runs"].as<long>() == 0) {
+    } else if (vm["stoch_runs"].as<std::size_t>() == 0) {
         // Using deterministic simulator
         std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, vm["noise_effects"].as<std::string>(),
                                                                                                            vm["noise_prob"].as<double>(),
@@ -133,8 +131,8 @@ int main(int argc, char** argv) {
                     {"benchmark", ddsim->getName()},
                     {"n_qubits", ddsim->getNumberOfQubits()},
                     {"applied_gates", ddsim->getNumberOfOps()},
-                    {"max_Matrix_nodes", ddsim->getMaxMatrixNodeCount()},
-                    {"active_Matrix_nodes", ddsim->getMatrixActiveNodeCount()},
+                    {"max_matrix_nodes", ddsim->getMaxMatrixNodeCount()},
+                    {"active_matrix_nodes", ddsim->getMatrixActiveNodeCount()},
                     {"seed", ddsim->getSeed()},
                     {"active_nodes", ddsim->getActiveNodeCount()},
             };
