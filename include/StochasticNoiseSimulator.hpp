@@ -182,7 +182,7 @@ private:
                              const dd::mEdge&                                          identityDD,
                              const std::vector<dd::noiseOperations>&                   noiseOperation);
 
-    [[nodiscard]] qc::OpType ReturnNoiseOperation(dd::noiseOperations noiseOperation, double prob, bool multi_qubit_noise) const;
+    [[nodiscard]] qc::OpType returnNoiseOperation(dd::noiseOperations noiseOperation, double prob, bool multi_qubit_noise) const;
 
     [[nodiscard]] std::string intToString(long target_number) const;
 

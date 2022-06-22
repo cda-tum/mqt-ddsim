@@ -349,7 +349,7 @@ dd::mEdge StochasticNoiseSimulator::generateNoiseOperation(const std::unique_ptr
     qc::OpType effect;
     for (const auto& noise_type: noiseOperation) {
         if (noise_type != dd::noiseOperations::amplitudeDamping) {
-            effect = ReturnNoiseOperation(noise_type, distribution(generator), multiQubitOperation);
+            effect = returnNoiseOperation(noise_type, distribution(generator), multiQubitOperation);
         } else {
             if (amplitudeDamping) {
                 effect = qc::ATrue;
@@ -415,7 +415,7 @@ dd::mEdge StochasticNoiseSimulator::generateNoiseOperation(const std::unique_ptr
     return dd_operation;
 }
 
-qc::OpType StochasticNoiseSimulator::ReturnNoiseOperation(dd::noiseOperations noiseOperation, double prob, bool multi_qubit_noise) const {
+qc::OpType StochasticNoiseSimulator::returnNoiseOperation(dd::noiseOperations noiseOperation, double prob, bool multi_qubit_noise) const {
     switch (noiseOperation) {
         case dd::noiseOperations::depolarization: {
             if (prob >= 3 * (multi_qubit_noise ? noiseProbabilityMulti : noiseProbability) / 4) {
