@@ -252,7 +252,7 @@ TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
     auto                           classical_register = std::make_pair<unsigned short, unsigned short>(0, 1);
     quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classical_register, 1);
 
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.02, 1000, 1, 1, "0-3");
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.02, -1, 2, 1000, std::string("0-3"), false, 1, 1);
 
     auto m = ddsim.StochSimulate();
 
@@ -276,8 +276,9 @@ TEST(StochNoiseSimTest, SimulateAdder4WithoutNoise) {
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateError) {
     auto                     quantumComputation = stochTestsgetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 1000, 1, 1, "0-16");
-    auto                     m = ddsim.StochSimulate();
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, -1, 2, 1000, std::string("0-16"), false, 1, 1);
+
+    auto m = ddsim.StochSimulate();
 
     double tolerance = 0.1;
 
@@ -299,7 +300,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateError) {
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorSelectedProperties) {
     auto                     quantumComputation = stochTestsgetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 1000, 1, 1, "4,8-15");
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, -1, 2, 1000, std::string("4,8-15"), false, 1, 1);
     auto                     m         = ddsim.StochSimulate();
     double                   tolerance = 0.1;
 
@@ -314,14 +315,13 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorSelectedPropert
 
 TEST(StochNoiseSimTest, SimulateRunWithBadParameters) {
     auto quantumComputation = stochTestsgetAdder4Circuit();
-    EXPECT_THROW(StochasticNoiseSimulator ddsim(quantumComputation, std::string("AP"), 0.3, 1000, 1, 1, "0-1000"), std::runtime_error);
-    EXPECT_THROW(StochasticNoiseSimulator ddsim(quantumComputation, std::string("APK"), 0.01, 1000, 1, 1, "0-1000"), std::runtime_error);
-    EXPECT_THROW(StochasticNoiseSimulator ddsim(quantumComputation, std::string("AP"), 0.01, -1, 1, 1, "0-1000"), std::runtime_error);
+    EXPECT_THROW(StochasticNoiseSimulator ddsim(quantumComputation, std::string("AP"), 0.3, -1, 2, 1000, std::string("0-1000"), false, 1, 1), std::runtime_error);
+    EXPECT_THROW(StochasticNoiseSimulator ddsim(quantumComputation, std::string("APK"), 0.01, -1, 2, 1000, std::string("0-1000"), false, 1, 1), std::runtime_error);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceError) {
     auto                     quantumComputation = stochTestsgetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("AP"), 0.01, 1000, 1, 1, "0-1000");
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("AP"), 0.01, -1, 2, 1000, std::string("0-1000"), false, 1, 1);
     auto                     m         = ddsim.StochSimulate();
     double                   tolerance = 0.1;
 
@@ -339,7 +339,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceError) {
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDepolarizationError) {
     auto                     quantumComputation = stochTestsgetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("D"), 0.01, 1000, 1, 1, "0-1000");
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("D"), 0.01, -1, 2, 1000, std::string("0-1000"), false, 1, 1);
     auto                     m = ddsim.StochSimulate();
 
     double tolerance = 0.1;
@@ -358,7 +358,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDepolarizationError) {
 
 TEST(StochNoiseSimTest, SimulateAdder4WithNoiseAndApproximation) {
     auto                     quantumComputation = stochTestsgetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.01, 1000, 1, 0.9, "-3-1000");
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.01, -1, 2, 1000, std::string("-3-1000"), false, 1, 0.9);
     auto                     m = ddsim.StochSimulate();
 
     double tolerance = 0.1;
@@ -384,7 +384,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithNoiseAndApproximation) {
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorUnoptimizedSim) {
     auto                     quantumComputation = stochTestsgetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 1000, 1, 1, "0-16");
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, -1, 2, 1000, std::string("0-16"), false, 1, 1);
     ddsim.sequentialApplyNoise = true;
     auto m                     = ddsim.StochSimulate();
 
@@ -424,7 +424,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorUnoptimizedSim)
 
 TEST(StochNoiseSimTest, ParseProperties) {
     auto                     quantumComputation = stochTestsgetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, 1000, 1, 1, "0, 6, 1");
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, -1, 2, 1000, std::string("0, 6, 1"), false, 1, 1);
     auto                     m = ddsim.StochSimulate();
 
     double tolerance = 0.1;
@@ -444,7 +444,7 @@ TEST(StochNoiseSimTest, TestingBarrierGate) {
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, std::vector<dd::Qubit>{0, 1}, qc::Barrier);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.02, 1000, 1, 1, "0-3, 23, 444, 2");
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.02, -1, 2, 1000, std::string("0-3, 23, 444, 2"), false, 1, 1);
     auto                     m = ddsim.StochSimulate();
 
     double tolerance = 0.01;

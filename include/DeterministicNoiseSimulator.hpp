@@ -19,8 +19,15 @@ public:
     explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, unsigned long long seed = 0):
         DeterministicNoiseSimulator(qc, std::string("APD"), 0.001, -1, 2, false, seed) {}
 
-    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const std::string& cGateNoise, double cGateNoiseProbability, double cAmplitudeDampingProb, double cMultiQubitGateFactor, bool unoptimizedSim = false, unsigned long long seed = 0):
-        Simulator(seed), qc(qc) {
+    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
+                                const std::string&                       cGateNoise,
+                                double                                   cGateNoiseProbability,
+                                double                                   cAmplitudeDampingProb,
+                                double                                   cMultiQubitGateFactor,
+                                bool                                     unoptimizedSim = false,
+                                unsigned long long                       seed           = 0):
+        Simulator(seed),
+        qc(qc) {
         useDensityMatrixType = !unoptimizedSim;
         sequentialApplyNoise = unoptimizedSim;
 

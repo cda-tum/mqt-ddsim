@@ -25,18 +25,56 @@ public:
     }
 
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
-                             const std::string&                       noise_effects,
-                             double                                   noise_prob,
-                             long                                     stoch_runs,
+                             const std::string&                       cNoiseEffects,
+                             double                                   cGateNoiseProbability,
+                             double                                   amplitudeDampingProb,
+                             double                                   multiQubitGateFactor,
+                             std::size_t                              cStochRuns,
+                             const std::string&                       recorded_properties,
+                             bool                                     unoptimizedSim,
                              unsigned int                             step_number,
                              double                                   step_fidelity,
-                             const std::string&                       recorded_properties):
-        qc(qc),
-        step_number(step_number), step_fidelity(step_fidelity) {
-        setNoiseEffects(noise_effects);
+                             unsigned long long                       seed = 0):
+        Simulator(seed),
+        qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
+        // setNoiseEffects
+        if (cNoiseEffects.find_first_not_of("APD") != std::string::npos) {
+            throw std::runtime_error("Unknown noise operation in '" + cNoiseEffects + "'\n");
+        }
+
+        sequentialApplyNoise = unoptimizedSim;
+
+        // initializeNoiseProbabilities
+        if (amplitudeDampingProb < 0) {
+            // Default value for amplitude damping prob is double the general error probability
+            amplitudeDampingProb = cGateNoiseProbability * 2;
+        }
+        //The probability of amplitude damping (t1) often is double the probability , of phase flip, which is why I double it here
+        noiseProbability                        = cGateNoiseProbability;
+        sqrtAmplitudeDampingProbability         = {sqrt(amplitudeDampingProb), 0};
+        oneMinusSqrtAmplitudeDampingProbability = {sqrt(1 - amplitudeDampingProb), 0};
+
+        noiseProbabilityMulti                        = cGateNoiseProbability * multiQubitGateFactor;
+        sqrtAmplitudeDampingProbabilityMulti         = {sqrt(noiseProbability) * multiQubitGateFactor, 0};
+        oneMinusSqrtAmplitudeDampingProbabilityMulti = {sqrt(1 - multiQubitGateFactor * amplitudeDampingProb), 0};
+        ampDampingFalse                              = dd::GateMatrix({dd::complex_one, dd::complex_zero, dd::complex_zero, oneMinusSqrtAmplitudeDampingProbability});
+        ampDampingFalseMulti                         = dd::GateMatrix({dd::complex_one, dd::complex_zero, dd::complex_zero, oneMinusSqrtAmplitudeDampingProbabilityMulti});
+
+        ampDampingTrue      = dd::GateMatrix({dd::complex_zero, sqrtAmplitudeDampingProbability, dd::complex_zero, dd::complex_zero});
+        ampDampingTrueMulti = dd::GateMatrix({dd::complex_zero, sqrtAmplitudeDampingProbabilityMulti, dd::complex_zero, dd::complex_zero});
+        if (amplitudeDampingProb * multiQubitGateFactor > 1 || noiseProbability < 0) {
+            throw std::runtime_error("Error probabilities are faulty!"
+                                     "\n single qubit error probability: " +
+                                     std::to_string(cGateNoiseProbability) +
+                                     " multi qubit error probability: " + std::to_string(cGateNoiseProbability * multiQubitGateFactor) +
+                                     "\n single qubit amplitude damping  probability: " + std::to_string(amplitudeDampingProb) +
+                                     " multi qubit amplitude damping  probability: " + std::to_string(amplitudeDampingProb * multiQubitGateFactor));
+        }
+
+        gateNoiseEffects = cNoiseEffects;
+        stochasticRuns   = cStochRuns;
+
         setRecordedProperties(recorded_properties);
-        initializeNoiseProbabilities(noise_prob);
-        setNumberOfRuns(stoch_runs);
     }
 
     std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
@@ -53,7 +91,6 @@ public:
         return {
                 {"step_fidelity", std::to_string(step_fidelity)},
                 {"approximation_runs", std::to_string(approximation_runs)},
-                //                {"final_fidelity", std::to_string(final_fidelity)},
                 {"perfect_run_time", std::to_string(perfect_run_time)},
                 {"stoch_wall_time", std::to_string(stoch_run_time)},
                 {"mean_stoch_run_time", std::to_string(mean_stoch_time)},
@@ -81,43 +118,8 @@ public:
     dd::GateMatrix ampDampingFalse      = {};
     dd::GateMatrix ampDampingFalseMulti = {};
 
-    void setNumberOfRuns(long stoch_run) {
-        if (stoch_run <= 0) {
-            throw std::runtime_error("Number of stochastic runs must be larger than 0. Provided value: " + std::to_string(stoch_run));
-        }
-        stochasticRuns = stoch_run;
-    }
-
-    void initializeNoiseProbabilities(double cGateNoiseProbability, double amplitudeDampingProb = -1, double multiQubitGateFactor = 2) {
-        if (amplitudeDampingProb < 0) {
-            // Default value for amplitude damping prob is double the general error probability
-            amplitudeDampingProb = cGateNoiseProbability * 2;
-        }
-        //The probability of amplitude damping (t1) often is double the probability , of phase flip, which is why I double it here
-        noiseProbability                        = cGateNoiseProbability;
-        sqrtAmplitudeDampingProbability         = {sqrt(amplitudeDampingProb), 0};
-        oneMinusSqrtAmplitudeDampingProbability = {sqrt(1 - amplitudeDampingProb), 0};
-
-        noiseProbabilityMulti                        = cGateNoiseProbability * multiQubitGateFactor;
-        sqrtAmplitudeDampingProbabilityMulti         = {sqrt(noiseProbability) * multiQubitGateFactor, 0};
-        oneMinusSqrtAmplitudeDampingProbabilityMulti = {sqrt(1 - multiQubitGateFactor * amplitudeDampingProb), 0};
-        ampDampingFalse                              = dd::GateMatrix({dd::complex_one, dd::complex_zero, dd::complex_zero, oneMinusSqrtAmplitudeDampingProbability});
-        ampDampingFalseMulti                         = dd::GateMatrix({dd::complex_one, dd::complex_zero, dd::complex_zero, oneMinusSqrtAmplitudeDampingProbabilityMulti});
-
-        ampDampingTrue      = dd::GateMatrix({dd::complex_zero, sqrtAmplitudeDampingProbability, dd::complex_zero, dd::complex_zero});
-        ampDampingTrueMulti = dd::GateMatrix({dd::complex_zero, sqrtAmplitudeDampingProbabilityMulti, dd::complex_zero, dd::complex_zero});
-        if (amplitudeDampingProb * multiQubitGateFactor > 1 || noiseProbability < 0) {
-            throw std::runtime_error("Error probabilities are faulty!"
-                                     "\n single qubit error probability: " +
-                                     std::to_string(cGateNoiseProbability) +
-                                     " multi qubit error probability: " + std::to_string(cGateNoiseProbability * multiQubitGateFactor) +
-                                     "\n single qubit amplitude damping  probability: " + std::to_string(amplitudeDampingProb) +
-                                     " multi qubit amplitude damping  probability: " + std::to_string(amplitudeDampingProb * multiQubitGateFactor));
-        }
-    }
-
-    unsigned int stochasticRuns       = 0;
-    bool         sequentialApplyNoise = false;
+    std::size_t stochasticRuns       = 0;
+    bool        sequentialApplyNoise = false;
 
     void setRecordedProperties(const std::string& input);
 
@@ -126,15 +128,6 @@ public:
     std::vector<std::map<std::string, int>>    classical_measurements_maps;
 
     std::string gateNoiseEffects;
-
-    void setNoiseEffects(const std::string& cGateNoise) {
-        for (const auto& effect: cGateNoise) {
-            if (effect != 'A' && effect != 'P' && effect != 'D') {
-                throw std::runtime_error("Unknown noise operation '" + std::to_string(effect) + "'\n");
-            }
-        }
-        gateNoiseEffects = cGateNoise;
-    }
 
     const unsigned int max_instances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
     //    const unsigned int max_instances = 1; // use for debugging only
@@ -182,9 +175,6 @@ private:
 
     [[nodiscard]] std::string intToString(long target_number) const;
 
-    //    double ApproximateEdgeByFidelity(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes);
-    //
-    //    dd::Package::vEdge RemoveNodesInPackage(std::unique_ptr<dd::Package>& localDD, dd::Package::vEdge e, std::map<dd::Package::vNode*, dd::Package::vEdge>& dag_edges);
     void setMeasuredQubitToZero(signed char& at, dd::vEdge& e, std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD);
 };
 
