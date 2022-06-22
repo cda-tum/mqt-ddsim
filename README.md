@@ -57,8 +57,8 @@ DDSIM has been developed based on methods proposed in the following papers:
 
 - A. Zulehner and R. Wille, "[Advanced Simulation of Quantum Computations](https://www.cda.cit.tum.de/files/eda/2018_tcad_advanced_simulation_quantum_computation.pdf)," Transactions on CAD of Integrated Circuits and Systems (TCAD), 2019
 - S. Hillmich, I.L. Markov, and R. Wille, "[Just Like the Real Thing: Fast Weak Simulation of Quantum Computation](https://www.cda.cit.tum.de/files/eda/2020_dac_weak_simulation_quantum_computation.pdf)," in Design Automation Conference (DAC), 2020
-- T. Grurl, R. Kueng, J. Fuß, and R. Wille, "[Stochastic Quantum Circuit Simulation Using Decision Diagrams](https://www.cda.cit.tum.de/files/eda/2021_stochastic_quantum_circuit_simulation_using_decision_diagrams.pdf)," in Design, Automation and Test in Europe (DATE), 2021
 - S. Hillmich, R. Kueng, I. L. Markov, and R. Wille, "[As Accurate as Needed, as Efficient as Possible: Approximations in DD-based Quantum Circuit Simulation](https://www.cda.cit.tum.de/files/eda/2021_date_approximations_dd_baed_quantum_circuit_simulation.pdf)," in Design, Automation and Test in Europe (DATE), 2021
 - L. Burgholzer, H. Bauer, and R. Wille, "[Hybrid Schrödinger-Feynman Simulation of Quantum Circuits With Decision Diagrams](https://www.cda.cit.tum.de/files/eda/2021_qce_hybrid_schrodinger_feynman_simulation_with_decision_diagrams.pdf)," Conference on Quantum Computing and Engineering (QCE), 2021
 - L. Burgholzer, A.Ploier, and R. Wille, "[Exploiting Arbitrary Paths for the Simulation of Quantum Circuits with Decision Diagrams](https://www.cda.cit.tum.de/files/eda/2022_date_exploiting_arbitrary_paths_simulation_quantum_circuits_decision_diagrams.pdf)," in Design, Automation and Test in Europe (DATE), 2022
+- T. Grurl, J. Fuß, and R. Wille, "Noise-aware Quantum Circuit Simulation With Decision Diagrams," Transactions on CAD of Integrated Circuits and Systems (TCAD), 2022. 
 
