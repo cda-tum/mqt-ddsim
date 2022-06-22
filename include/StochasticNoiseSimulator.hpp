@@ -5,11 +5,10 @@
 #include "Simulator.hpp"
 #include "dd/NoiseFunctionality.hpp"
 
-#include <cstddef>
-#include <map>
-#include <memory>
-#include <random>
-#include <string>
+//#include <cstddef>
+//#include <map>
+//#include <memory>
+//#include <string>
 #include <thread>
 #include <vector>
 
@@ -28,8 +27,8 @@ public:
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
                              const std::string&                       cNoiseEffects,
                              double                                   cGateNoiseProbability,
-                             double                                   amplitudeDampingProb,
-                             double                                   multiQubitGateFactor,
+                             double                                   cAmplitudeDampingProb,
+                             double                                   cMultiQubitGateFactor,
                              std::size_t                              cStochRuns,
                              const std::string&                       recorded_properties,
                              bool                                     unoptimizedSim,
@@ -55,27 +54,13 @@ public:
             }
         }
 
-        sequentialApplyNoise = unoptimizedSim;
-
         // initializeNoiseProbabilities
-        if (amplitudeDampingProb < 0) {
-            // Default value for amplitude damping prob is double the general error probability
-            amplitudeDampingProb = cGateNoiseProbability * 2;
-        }
-        //The probability of amplitude damping (t1) often is double the probability , of phase flip, which is why I double it here
-        noiseProbability                        = cGateNoiseProbability;
-        sqrtAmplitudeDampingProbability         = {std::sqrt(amplitudeDampingProb), 0};
-        oneMinusSqrtAmplitudeDampingProbability = {std::sqrt(1 - amplitudeDampingProb), 0};
+        noiseProbability = cGateNoiseProbability;
+        // Default value for amplitude damping prob is double the general error probability
+        amplitudeDampingProb = (cAmplitudeDampingProb < 0) ? noiseProbability * 2 : cAmplitudeDampingProb;
+        multiQubitGateFactor = cMultiQubitGateFactor;
 
-        noiseProbabilityMulti                        = cGateNoiseProbability * multiQubitGateFactor;
-        sqrtAmplitudeDampingProbabilityMulti         = {std::sqrt(noiseProbability) * multiQubitGateFactor, 0};
-        oneMinusSqrtAmplitudeDampingProbabilityMulti = {std::sqrt(1 - multiQubitGateFactor * amplitudeDampingProb), 0};
-        ampDampingFalse                              = dd::GateMatrix({dd::complex_one, dd::complex_zero, dd::complex_zero, oneMinusSqrtAmplitudeDampingProbability});
-        ampDampingFalseMulti                         = dd::GateMatrix({dd::complex_one, dd::complex_zero, dd::complex_zero, oneMinusSqrtAmplitudeDampingProbabilityMulti});
-
-        ampDampingTrue      = dd::GateMatrix({dd::complex_zero, sqrtAmplitudeDampingProbability, dd::complex_zero, dd::complex_zero});
-        ampDampingTrueMulti = dd::GateMatrix({dd::complex_zero, sqrtAmplitudeDampingProbabilityMulti, dd::complex_zero, dd::complex_zero});
-        if (amplitudeDampingProb * multiQubitGateFactor > 1 || noiseProbability < 0) {
+        if ((amplitudeDampingProb * multiQubitGateFactor) > 1 || noiseProbability < 0) {
             throw std::runtime_error("Error probabilities are faulty!"
                                      "\n single qubit error probability: " +
                                      std::to_string(cGateNoiseProbability) +
@@ -83,6 +68,15 @@ public:
                                      "\n single qubit amplitude damping  probability: " + std::to_string(amplitudeDampingProb) +
                                      " multi qubit amplitude damping  probability: " + std::to_string(amplitudeDampingProb * multiQubitGateFactor));
         }
+
+        sequentialApplyNoise = unoptimizedSim;
+
+        // initializeNoiseProbabilities
+        if (amplitudeDampingProb < 0) {
+            // Default value for amplitude damping prob is double the general error probability
+            amplitudeDampingProb = cGateNoiseProbability * 2;
+        }
+
         stochasticRuns = cStochRuns;
 
         setRecordedProperties(recorded_properties);
@@ -115,19 +109,9 @@ public:
 
     [[nodiscard]] std::string getName() const override { return "stoch_" + qc->getName(); };
 
-    double           noiseProbability = 0.0;
-    dd::ComplexValue sqrtAmplitudeDampingProbability{};
-    dd::ComplexValue oneMinusSqrtAmplitudeDampingProbability{};
-
-    double           noiseProbabilityMulti = 0.0;
-    dd::ComplexValue sqrtAmplitudeDampingProbabilityMulti{};
-    dd::ComplexValue oneMinusSqrtAmplitudeDampingProbabilityMulti{};
-
-    dd::GateMatrix ampDampingTrue      = {};
-    dd::GateMatrix ampDampingTrueMulti = {};
-
-    dd::GateMatrix ampDampingFalse      = {};
-    dd::GateMatrix ampDampingFalseMulti = {};
+    double noiseProbability     = 0.0;
+    double amplitudeDampingProb = 0.0;
+    double multiQubitGateFactor = 0.0;
 
     std::size_t stochasticRuns       = 0;
     bool        sequentialApplyNoise = false;
@@ -140,8 +124,8 @@ public:
 
     std::vector<dd::noiseOperations> gateNoiseEffects;
 
-//    const unsigned int max_instances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
-        const unsigned int max_instances = 1; // use for debugging only
+    //    const unsigned int max_instances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
+    const unsigned int max_instances = 1; // use for debugging only
 
 private:
     std::unique_ptr<qc::QuantumComputation>& qc;
@@ -158,31 +142,31 @@ private:
     void perfect_simulation_run();
 
     void runStochSimulationForId(unsigned int                                stochRun,
-                                 int                                         nQubits,
+                                 dd::Qubit                                   nQubits,
                                  std::vector<double>&                        recordedPropertiesStorage,
                                  std::vector<std::tuple<long, std::string>>& recordedPropertiesList,
                                  std::map<std::string, int>&                 classicalMeasurementsMap,
                                  unsigned long long                          localSeed);
-
-    dd::mEdge generateNoiseOperation(const std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD,
-                                     dd::mEdge                                                 dd_operation,
-                                     signed char                                               target,
-                                     const std::vector<dd::noiseOperations>&                   noiseOperation,
-                                     std::mt19937_64&                                          generator,
-                                     std::uniform_real_distribution<dd::fp>&                   distribution,
-                                     bool                                                      amplitudeDamping,
-                                     bool                                                      multiQubitOperation);
-
-    void applyNoiseOperation(const std::vector<dd::Qubit>&                             usedQubits,
-                             dd::mEdge                                                 dd_op,
-                             const std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD,
-                             dd::vEdge&                                                localRootEdge,
-                             std::mt19937_64&                                          generator,
-                             std::uniform_real_distribution<dd::fp>&                   dist,
-                             const dd::mEdge&                                          identityDD,
-                             const std::vector<dd::noiseOperations>&                   noiseOperation);
-
-    [[nodiscard]] qc::OpType returnNoiseOperation(dd::noiseOperations noiseOperation, double prob, bool multi_qubit_noise) const;
+    //
+    //    dd::mEdge generateNoiseOperation(const std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD,
+    //                                     dd::mEdge                                                 dd_operation,
+    //                                     signed char                                               target,
+    //                                     const std::vector<dd::noiseOperations>&                   noiseOperation,
+    //                                     std::mt19937_64&                                          generator,
+    //                                     std::uniform_real_distribution<dd::fp>&                   distribution,
+    //                                     bool                                                      amplitudeDamping,
+    //                                     bool                                                      multiQubitOperation);
+    //
+    //    void applyNoiseOperation(const std::vector<dd::Qubit>&                             usedQubits,
+    //                             dd::mEdge                                                 dd_op,
+    //                             const std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD,
+    //                             dd::vEdge&                                                localRootEdge,
+    //                             std::mt19937_64&                                          generator,
+    //                             std::uniform_real_distribution<dd::fp>&                   dist,
+    //                             const dd::mEdge&                                          identityDD,
+    //                             const std::vector<dd::noiseOperations>&                   noiseOperation);
+    //
+    //    [[nodiscard]] qc::OpType returnNoiseOperation(dd::noiseOperations noiseOperation, double prob, bool multi_qubit_noise) const;
 
     [[nodiscard]] std::string intToString(long target_number) const;
 

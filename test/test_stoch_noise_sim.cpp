@@ -219,14 +219,11 @@ TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
 
     auto m = ddsim.StochSimulate();
 
-    EXPECT_GE(m.find("00")->second, 0.02);
-    EXPECT_LE(m.find("00")->second, 0.07);
-    EXPECT_GE(m.find("01")->second, 0.45);
-    EXPECT_LE(m.find("01")->second, 0.49);
-    EXPECT_GE(m.find("10")->second, 0.02);
-    EXPECT_LE(m.find("10")->second, 0.06);
-    EXPECT_GE(m.find("11")->second, 0.41);
-    EXPECT_LE(m.find("11")->second, 0.45);
+    double tolerance = 0.1;
+    EXPECT_NEAR(m.find("00")->second, 0.496431, tolerance);
+    EXPECT_NEAR(m.find("01")->second, 0.0224184, tolerance);
+    EXPECT_NEAR(m.find("10")->second, 0.460269, tolerance);
+    EXPECT_NEAR(m.find("11")->second, 0.0208816, tolerance);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithoutNoise) {
