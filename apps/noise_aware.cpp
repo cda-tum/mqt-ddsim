@@ -131,10 +131,10 @@ int main(int argc, char** argv) {
             output_obj["statistics"] = {
                     {"simulation_time", duration_simulation.count()},
                     {"benchmark", ddsim->getName()},
-                    {"n_qubits", +ddsim->getNumberOfQubits()},
+                    {"n_qubits", ddsim->getNumberOfQubits()},
                     {"applied_gates", ddsim->getNumberOfOps()},
-                    {"max_matrix_nodes", ddsim->getMaxMatrixNodeCount()},
-                    {"active_matrix_nodes", ddsim->getMatrixActiveNodeCount()},
+                    {"max_Matrix_nodes", ddsim->getMaxMatrixNodeCount()},
+                    {"active_Matrix_nodes", ddsim->getMatrixActiveNodeCount()},
                     {"seed", ddsim->getSeed()},
                     {"active_nodes", ddsim->getActiveNodeCount()},
             };

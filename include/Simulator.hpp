@@ -69,9 +69,9 @@ public:
 
     [[nodiscard]] virtual std::size_t getMaxNodeCount() const { return dd->vUniqueTable.getMaxActiveNodes(); }
 
-    [[nodiscard]] virtual std::size_t getMaxMatrixNodeCount() const { return dd->dUniqueTable.getMaxActiveNodes(); }
+    [[nodiscard]] virtual std::size_t getMaxMatrixNodeCount() const { return dd->mUniqueTable.getMaxActiveNodes(); }
 
-    [[nodiscard]] virtual std::size_t getMatrixActiveNodeCount() const { return dd->dUniqueTable.getActiveNodeCount(); }
+    [[nodiscard]] virtual std::size_t getMatrixActiveNodeCount() const { return dd->mUniqueTable.getActiveNodeCount(); }
 
     [[nodiscard]] virtual std::size_t countNodesFromRoot() const { return dd->size(root_edge); }
 

@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 
-class DeterministicNoiseSimulator: public Simulator<dd::DensityMatrix> {
+class DeterministicNoiseSimulator: public Simulator<dd::DensityMatrixSimulatorDDPackage> {
     using CN    = dd::ComplexNumbers;
     using dEdge = dd::dEdge;
 
@@ -85,6 +85,12 @@ public:
     [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
 
     [[nodiscard]] std::string getName() const override { return qc->getName(); };
+
+    [[nodiscard]] std::size_t getActiveNodeCount() const override { return dd->dUniqueTable.getActiveNodeCount(); }
+    [[nodiscard]] std::size_t getMaxNodeCount() const override { return dd->dUniqueTable.getMaxActiveNodes(); }
+    [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return dd->mUniqueTable.getMaxActiveNodes(); }
+    [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return dd->mUniqueTable.getActiveNodeCount(); }
+    [[nodiscard]] std::size_t countNodesFromRoot() const override { return dd->size(root_edge); }
 
     const std::map<char, int> gateNoiseEffects = {
             {'B', 2}, //Bit-flip
