@@ -64,14 +64,7 @@ int main(int argc, char** argv) {
         // Using stochastic simulator
         std::unique_ptr<StochasticNoiseSimulator> ddsim = std::make_unique<StochasticNoiseSimulator>(quantumComputation,
                                                                                                      vm["noise_effects"].as<std::string>(),
-                                                                                                     vm["noise_prob"].as<double>(),
-                                                                                                     vm["noise_prob_t1"].as<double>(),
-                                                                                                     vm["noise_prob_multi"].as<double>(),
-                                                                                                     vm["stoch_runs"].as<long>(),
-                                                                                                     vm["properties"].as<std::string>(),
-                                                                                                     vm.count("unoptimized_sim"),
-                                                                                                     vm["steps"].as<unsigned int>(),
-                                                                                                     vm["step_fidelity"].as<double>(),
+                                                                                                     vm["noise_prob"].as<double>() vm["step_fidelity"].as<double>(),
                                                                                                      vm["seed"].as<unsigned long long>());
 
         ddsim->stochasticRuns = vm["stoch_runs"].as<long>();
@@ -95,7 +88,7 @@ int main(int argc, char** argv) {
                     {"n_qubits", +ddsim->getNumberOfQubits()},
                     {"applied_gates", ddsim->getNumberOfOps()},
                     {"max_nodes", ddsim->getMaxNodeCount()},
-                    {"max_Matrix_nodes", ddsim->getMaxMatrixNodeCount()},
+                    {"max_matrix_nodes", ddsim->getMaxMatrixNodeCount()},
                     {"seed", ddsim->getSeed()},
             };
 
@@ -133,9 +126,8 @@ int main(int argc, char** argv) {
                     {"benchmark", ddsim->getName()},
                     {"n_qubits", +ddsim->getNumberOfQubits()},
                     {"applied_gates", ddsim->getNumberOfOps()},
-                    //                    {"max_nodes", ddsim->getMaxNodeCount()},
-                    {"max_Matrix_nodes", ddsim->getMaxMatrixNodeCount()},
-                    {"active_Matrix_nodes", ddsim->getMatrixActiveNodeCount()},
+                    {"max_matrix_nodes", ddsim->getMaxMatrixNodeCount()},
+                    {"active_matrix_nodes", ddsim->getMatrixActiveNodeCount()},
                     {"seed", ddsim->getSeed()},
                     {"active_nodes", ddsim->getActiveNodeCount()},
             };
