@@ -64,7 +64,14 @@ int main(int argc, char** argv) {
         // Using stochastic simulator
         std::unique_ptr<StochasticNoiseSimulator> ddsim = std::make_unique<StochasticNoiseSimulator>(quantumComputation,
                                                                                                      vm["noise_effects"].as<std::string>(),
-                                                                                                     vm["noise_prob"].as<double>() vm["step_fidelity"].as<double>(),
+                                                                                                     vm["noise_prob"].as<double>(),
+                                                                                                     vm["noise_prob_t1"].as<double>(),
+                                                                                                     vm["noise_prob_multi"].as<double>(),
+                                                                                                     vm["stoch_runs"].as<long>(),
+                                                                                                     vm["properties"].as<std::string>(),
+                                                                                                     vm.count("unoptimized_sim"),
+                                                                                                     vm["steps"].as<unsigned int>(),
+                                                                                                     vm["step_fidelity"].as<double>(),
                                                                                                      vm["seed"].as<unsigned long long>());
 
         ddsim->stochasticRuns = vm["stoch_runs"].as<long>();
