@@ -16,30 +16,23 @@ class DeterministicNoiseSimulator: public Simulator<dd::DensityMatrixSimulatorDD
     using dEdge = dd::dEdge;
 
 public:
-    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, unsigned long long seed):
+    explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, unsigned long long seed = 0):
+        DeterministicNoiseSimulator(qc, std::string("APD"), 0.001, -1, 2, false, seed) {}
+
+    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const std::string& cGateNoise, double cGateNoiseProbability, double cAmplitudeDampingProb, double cMultiQubitGateFactor, bool unoptimizedSim = false, unsigned long long seed = 0):
         Simulator(seed), qc(qc) {
-    }
+        use_density_matrix_type = !unoptimizedSim;
+        sequentialApplyNoise    = unoptimizedSim;
 
-    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const std::string& noise_effects, double noise_prob):
-        qc(qc) {
-        setNoiseEffects(noise_effects);
-        initializeNoiseProbabilities(noise_prob);
-    }
+        // setNoiseEffects
+        for (const auto& effect: cGateNoise) {
+            if (effect != 'A' && effect != 'P' && effect != 'D') {
+                throw std::runtime_error("Unknown noise operation '" + std::to_string(effect) + "'\n");
+            }
+        }
+        gateNoiseTypes = cGateNoise;
 
-    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const std::string& noise_effects, double noise_prob, double amp_noise_prob, double multiQubitGateFactor):
-        qc(qc) {
-        setNoiseEffects(noise_effects);
-        initializeNoiseProbabilities(noise_prob, amp_noise_prob, multiQubitGateFactor);
-    }
-
-    double noiseProb                 = 0.0;
-    double ampDampingProb            = 0.0;
-    double noiseProbSingleQubit      = 0.0;
-    double ampDampingProbSingleQubit = 0.0;
-    double noiseProbMultiQubit       = 0.0;
-    double ampDampingProbMultiQubit  = 0.0;
-
-    void initializeNoiseProbabilities(double cGateNoiseProbability, double cAmplitudeDampingProb = -1, double cMultiQubitGateFactor = 2) {
+        // initializeNoiseProbabilities
         noiseProb            = cGateNoiseProbability;
         noiseProbSingleQubit = cGateNoiseProbability;
         noiseProbMultiQubit  = cGateNoiseProbability * cMultiQubitGateFactor;
@@ -65,6 +58,13 @@ public:
         }
     }
 
+    double noiseProb                 = 0.0;
+    double ampDampingProb            = 0.0;
+    double noiseProbSingleQubit      = 0.0;
+    double ampDampingProbSingleQubit = 0.0;
+    double noiseProbMultiQubit       = 0.0;
+    double ampDampingProbMultiQubit  = 0.0;
+
     std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override {
         return {};
     };
@@ -76,15 +76,6 @@ public:
     void applyDetNoiseSequential(const qc::Targets& targets);
 
     [[nodiscard]] std::map<std::string, double> AnalyseState(dd::QubitCount nr_qubits, bool full_state);
-
-    void setNoiseEffects(const std::string& cGateNoise) {
-        for (const auto& effect: cGateNoise) {
-            if (effect != 'A' && effect != 'P' && effect != 'D') {
-                throw std::runtime_error("Unknown noise operation '" + std::to_string(effect) + "'\n");
-            }
-        }
-        gateNoiseTypes = cGateNoise;
-    }
 
     [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
 
