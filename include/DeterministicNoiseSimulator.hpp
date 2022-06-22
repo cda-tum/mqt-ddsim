@@ -21,14 +21,12 @@ public:
 
     DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const std::string& cGateNoise, double cGateNoiseProbability, double cAmplitudeDampingProb, double cMultiQubitGateFactor, bool unoptimizedSim = false, unsigned long long seed = 0):
         Simulator(seed), qc(qc) {
-        use_density_matrix_type = !unoptimizedSim;
-        sequentialApplyNoise    = unoptimizedSim;
+        useDensityMatrixType = !unoptimizedSim;
+        sequentialApplyNoise = unoptimizedSim;
 
         // setNoiseEffects
-        for (const auto& effect: cGateNoise) {
-            if (effect != 'A' && effect != 'P' && effect != 'D') {
-                throw std::runtime_error("Unknown noise operation '" + std::to_string(effect) + "'\n");
-            }
+        if (cGateNoise.find_first_not_of("APD") != std::string::npos) {
+            throw std::runtime_error("Unknown noise operation in '" + cGateNoise + "'\n");
         }
         gateNoiseTypes = cGateNoise;
 
@@ -65,9 +63,7 @@ public:
     double noiseProbMultiQubit       = 0.0;
     double ampDampingProbMultiQubit  = 0.0;
 
-    std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override {
-        return {};
-    };
+    std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override { return {}; };
 
     std::map<std::string, double> DeterministicSimulate();
 
@@ -90,10 +86,10 @@ public:
             {'D', 4}, //Depolarisation
     };
 
-    dEdge density_root_edge{};
+    dEdge densityRootEdge{};
 
-    bool sequentialApplyNoise    = false;
-    bool use_density_matrix_type = true;
+    bool sequentialApplyNoise = false;
+    bool useDensityMatrixType = true;
     //    char MeasureOneCollapsing(dd::Qubit index);
 
 private:

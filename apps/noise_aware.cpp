@@ -114,17 +114,11 @@ int main(int argc, char** argv) {
         std::cout << std::setw(2) << output_obj << std::endl;
     } else if (vm["stoch_runs"].as<long>() == 0) {
         // Using deterministic simulator
-        std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, seed);
-        if (vm.count("unoptimized_sim")) {
-            ddsim->sequentialApplyNoise    = true;
-            ddsim->use_density_matrix_type = false;
-        }
-
-        ddsim->setNoiseEffects(vm["noise_effects"].as<std::string>());
-
-        ddsim->initializeNoiseProbabilities(vm["noise_prob"].as<double>(),
-                                            vm["noise_prob_t1"].as<double>(),
-                                            vm["noise_prob_multi"].as<double>());
+        std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, vm["noise_effects"].as<std::string>(),
+                                                                                                           vm["noise_prob"].as<double>(),
+                                                                                                           vm["noise_prob_t1"].as<double>(),
+                                                                                                           vm["noise_prob_multi"].as<double>(),
+                                                                                                           vm.count("unoptimized_sim"), seed);
 
         auto t1 = std::chrono::steady_clock::now();
 
