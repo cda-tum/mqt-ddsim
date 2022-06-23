@@ -124,8 +124,8 @@ public:
 
     std::vector<dd::noiseOperations> gateNoiseEffects;
 
-    //    const unsigned int max_instances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
-    const unsigned int max_instances = 1; // use for debugging only
+    const unsigned int max_instances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
+    //    const unsigned int max_instances = 1; // use for debugging only
 
 private:
     std::unique_ptr<qc::QuantumComputation>& qc;
@@ -147,26 +147,6 @@ private:
                                  std::vector<std::tuple<long, std::string>>& recordedPropertiesList,
                                  std::map<std::string, int>&                 classicalMeasurementsMap,
                                  unsigned long long                          localSeed);
-    //
-    //    dd::mEdge generateNoiseOperation(const std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD,
-    //                                     dd::mEdge                                                 dd_operation,
-    //                                     signed char                                               target,
-    //                                     const std::vector<dd::noiseOperations>&                   noiseOperation,
-    //                                     std::mt19937_64&                                          generator,
-    //                                     std::uniform_real_distribution<dd::fp>&                   distribution,
-    //                                     bool                                                      amplitudeDamping,
-    //                                     bool                                                      multiQubitOperation);
-    //
-    //    void applyNoiseOperation(const std::vector<dd::Qubit>&                             usedQubits,
-    //                             dd::mEdge                                                 dd_op,
-    //                             const std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD,
-    //                             dd::vEdge&                                                localRootEdge,
-    //                             std::mt19937_64&                                          generator,
-    //                             std::uniform_real_distribution<dd::fp>&                   dist,
-    //                             const dd::mEdge&                                          identityDD,
-    //                             const std::vector<dd::noiseOperations>&                   noiseOperation);
-    //
-    //    [[nodiscard]] qc::OpType returnNoiseOperation(dd::noiseOperations noiseOperation, double prob, bool multi_qubit_noise) const;
 
     [[nodiscard]] std::string intToString(long target_number) const;
 

@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-class DeterministicNoiseSimulator: public Simulator<dd::DensityMatrix> {
+class DeterministicNoiseSimulator: public Simulator<dd::DensityMatrixPackage> {
     using CN    = dd::ComplexNumbers;
     using dEdge = dd::dEdge;
 

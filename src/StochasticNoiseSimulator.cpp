@@ -177,12 +177,13 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                                                        std::vector<std::tuple<long, std::string>>& recordedPropertiesList,
                                                        std::map<std::string, int>&                 classicalMeasurementsMap,
                                                        unsigned long long                          localSeed) {
-    std::mt19937_64 generator(localSeed);
+    std::mt19937_64                        generator(localSeed);
+    std::uniform_real_distribution<dd::fp> dist(0.0, 1.0L);
 
     const unsigned long numberOfRuns = stochasticRuns / max_instances + (stochRun < stochasticRuns % max_instances ? 1 : 0);
     const int           approx_mod   = std::ceil(static_cast<double>(qc->getNops()) / (step_number + 1));
 
-    //printf("Running %d times and using the dd at %p, using the cn object at %p\n", numberOfRuns, (void *) &localDD, (void *) &localDD->cn);
+    //printf("Running %d times and using the dd at %p, using the cn object at %p\n", numberOfRuns, (void *) &package, (void *) &package->cn);
     for (unsigned long current_run = 0; current_run < numberOfRuns; current_run++) {
         const auto t1 = std::chrono::steady_clock::now();
 
@@ -249,7 +250,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                     targets  = classic_op->getOperation()->getTargets();
                     controls = classic_op->getOperation()->getControls();
                     if (!execute_op) {
-                        // applyNoiseOperation(targets.front(), controls, identityDD, (std::unique_ptr<dd::Package> &) localDD, localRootEdge, generator, dist, line, identityDD);
+                        // applyNoiseOperation(targets.front(), controls, identityDD, (std::unique_ptr<dd::Package> &) package, localRootEdge, generator, dist, line, identityDD);
                         continue;
                     }
                 } else {
@@ -272,20 +273,20 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                     usedQubits.push_back(control.qubit);
                 }
 
-                stochasticNoiseFunctionality.applyNoiseOperation(usedQubits, dd_op, localRootEdge);
+                stochasticNoiseFunctionality.applyNoiseOperation(usedQubits, dd_op, localRootEdge, generator);
 
                 //                if (sequentialApplyNoise) {
-                //                    auto tmp0 = localDD->multiply(dd_op, localRootEdge);
-                //                    localDD->incRef(tmp0);
-                //                    localDD->decRef(localRootEdge);
+                //                    auto tmp0 = package->multiply(dd_op, localRootEdge);
+                //                    package->incRef(tmp0);
+                //                    package->decRef(localRootEdge);
                 //                    localRootEdge = tmp0;
                 //                    dd_op         = identityDD;
-                //                    for (auto gate_noise_type: gateNoiseEffects) {
+                //                    for (auto gate_noise_type: noiseEffects) {
                 //                        std::vector<dd::noiseOperations> tmp_gate_noise_types = {gate_noise_type};
-                //                        applyNoiseOperation(usedQubits, dd_op, localDD, localRootEdge, generator, dist, identityDD, tmp_gate_noise_types);
+                //                        stochasticNoiseFunctionality.applyNoiseOperation(usedQubits, dd_op, package, localRootEdge, generator, dist, identityDD, tmp_gate_noise_types);
                 //                    }
                 //                } else {
-                //                    applyNoiseOperation(usedQubits, dd_op, localDD, localRootEdge, generator, dist, identityDD, gateNoiseEffects);
+                //                    stochasticNoiseFunctionality.applyNoiseOperation(usedQubits, dd_op, package, localRootEdge, generator, dist, identityDD, noiseEffects);
                 //                }
 
                 if (step_fidelity < 1 && (op_count + 1) % approx_mod == 0) {
