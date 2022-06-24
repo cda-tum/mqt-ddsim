@@ -41,13 +41,13 @@ public:
         for (auto noise: cNoiseEffects) {
             switch (noise) {
                 case 'A':
-                    gateNoiseEffects.push_back(dd::amplitudeDamping);
+                    noiseEffects.push_back(dd::amplitudeDamping);
                     break;
                 case 'P':
-                    gateNoiseEffects.push_back(dd::phaseFlip);
+                    noiseEffects.push_back(dd::phaseFlip);
                     break;
                 case 'D':
-                    gateNoiseEffects.push_back(dd::depolarization);
+                    noiseEffects.push_back(dd::depolarization);
                     break;
                 default:
                     throw std::runtime_error("Unknown noise operation '" + cNoiseEffects + "'\n");
@@ -122,7 +122,7 @@ public:
     std::vector<std::vector<double>>           recorded_properties_per_instance;
     std::vector<std::map<std::string, int>>    classical_measurements_maps;
 
-    std::vector<dd::noiseOperations> gateNoiseEffects;
+    std::vector<dd::NoiseOperations> noiseEffects;
 
     const unsigned int max_instances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
     //    const unsigned int max_instances = 1; // use for debugging only

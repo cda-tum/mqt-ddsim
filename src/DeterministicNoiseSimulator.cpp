@@ -191,6 +191,8 @@ dEdge DeterministicNoiseSimulator::applyNoiseEffects(dEdge& originalEdge, const 
                 case dd::depolarization:
                     applyDepolarisationToNode(new_edges, (used_qubits.size() == 1) ? noiseProbSingleQubit : noiseProbMultiQubit);
                     break;
+                case dd::identity:
+                    continue;
             }
         }
 

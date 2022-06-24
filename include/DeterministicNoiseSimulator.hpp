@@ -122,7 +122,7 @@ public:
 private:
     std::unique_ptr<qc::QuantumComputation>& qc;
 
-    std::vector<dd::noiseOperations> gateNoiseTypes;
+    std::vector<dd::NoiseOperations> gateNoiseTypes;
 
     void applyAmplitudeDampingToNode(std::array<dEdge, 4>& e, double probability);
     void applyPhaseFlipToNode(std::array<dEdge, 4>& e, double probability);
