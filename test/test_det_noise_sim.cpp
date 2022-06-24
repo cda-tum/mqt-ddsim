@@ -9,30 +9,29 @@ using namespace dd::literals;
 std::unique_ptr<qc::QuantumComputation> detGetAdder4Circuit() {
     // circuit taken from https://github.com/pnnl/qasmbench
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2_pc, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0_pc, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2_pc, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3_pc, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1_pc, 2, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0_pc, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2_pc, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0_pc, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2_pc, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3_pc, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-
+    quantumComputation->x(0);
+    quantumComputation->x(1);
+    quantumComputation->h(3);
+    quantumComputation->x(3, 2_pc);
+    quantumComputation->t(0);
+    quantumComputation->t(1);
+    quantumComputation->t(2);
+    quantumComputation->tdag(3);
+    quantumComputation->x(1, 0_pc);
+    quantumComputation->x(3, 2_pc);
+    quantumComputation->x(0, 3_pc);
+    quantumComputation->x(2, 1_pc);
+    quantumComputation->x(1, 0_pc);
+    quantumComputation->x(3, 2_pc);
+    quantumComputation->tdag(0);
+    quantumComputation->tdag(1);
+    quantumComputation->tdag(2);
+    quantumComputation->t(3);
+    quantumComputation->x(1, 0_pc);
+    quantumComputation->x(3, 2_pc);
+    quantumComputation->s(3);
+    quantumComputation->x(0, 3_pc);
+    quantumComputation->h(3);
     return quantumComputation;
 }
 
@@ -89,8 +88,8 @@ TEST(DeterministicNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDApplySequential) {
     auto                                         quantumComputation = detGetAdder4Circuit();
     std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
-    ddsim                       = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("APD"), 0.01, -1, 2);
-    ddsim->sequentialApplyNoise = true;
+    ddsim                         = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("APD"), 0.01, -1, 2);
+    ddsim->sequentiallyApplyNoise = true;
 
     auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";

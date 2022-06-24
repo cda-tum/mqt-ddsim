@@ -11,30 +11,29 @@ using namespace dd::literals;
 std::unique_ptr<qc::QuantumComputation> stochGetAdder4Circuit() {
     // circuit taken from https://github.com/pnnl/qasmbench
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2_pc, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0_pc, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2_pc, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3_pc, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1_pc, 2, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0_pc, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2_pc, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::Tdag);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::T);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 0_pc, 1, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 2_pc, 3, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::S);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3_pc, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(4, 3, qc::H);
-
+    quantumComputation->x(0);
+    quantumComputation->x(1);
+    quantumComputation->h(3);
+    quantumComputation->x(3, 2_pc);
+    quantumComputation->t(0);
+    quantumComputation->t(1);
+    quantumComputation->t(2);
+    quantumComputation->tdag(3);
+    quantumComputation->x(1, 0_pc);
+    quantumComputation->x(3, 2_pc);
+    quantumComputation->x(0, 3_pc);
+    quantumComputation->x(2, 1_pc);
+    quantumComputation->x(1, 0_pc);
+    quantumComputation->x(3, 2_pc);
+    quantumComputation->tdag(0);
+    quantumComputation->tdag(1);
+    quantumComputation->tdag(2);
+    quantumComputation->t(3);
+    quantumComputation->x(1, 0_pc);
+    quantumComputation->x(3, 2_pc);
+    quantumComputation->s(3);
+    quantumComputation->x(0, 3_pc);
+    quantumComputation->h(3);
     return quantumComputation;
 }
 
@@ -208,9 +207,9 @@ TEST(StochNoiseSimTest, Reordering) {
 
 TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, 0, 0);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
+    quantumComputation->x(0);
+    quantumComputation->measure(0, 0);
+    quantumComputation->h(0);
     std::unique_ptr<qc::Operation> op(new qc::StandardOperation(2, 1, qc::X));
     auto                           classical_register = std::make_pair<unsigned short, unsigned short>(0, 1);
     quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classical_register, 1);
@@ -345,7 +344,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithNoiseAndApproximation) {
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorUnoptimizedSim) {
     auto                     quantumComputation = stochGetAdder4Circuit();
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, -1, 2, 1000, std::string("0-16"), false, 1, 1);
-    ddsim.sequentialApplyNoise = true;
+    ddsim.sequentiallyApplyNoise = true;
     auto m                     = ddsim.StochSimulate();
 
     double tolerance = 0.1;

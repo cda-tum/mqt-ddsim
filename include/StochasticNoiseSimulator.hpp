@@ -12,7 +12,7 @@
 #include <thread>
 #include <vector>
 
-class StochasticNoiseSimulator: public Simulator<StochasticNoiseSimulatorDDPackage> {
+class StochasticNoiseSimulator: public Simulator<StochasticNoisePackage> {
 public:
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity):
         qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
@@ -69,7 +69,7 @@ public:
                                      " multi qubit amplitude damping  probability: " + std::to_string(amplitudeDampingProb * multiQubitGateFactor));
         }
 
-        sequentialApplyNoise = unoptimizedSim;
+        sequentiallyApplyNoise = unoptimizedSim;
 
         // initializeNoiseProbabilities
         if (amplitudeDampingProb < 0) {
@@ -99,7 +99,7 @@ public:
                 {"perfect_run_time", std::to_string(perfect_run_time)},
                 {"stoch_wall_time", std::to_string(stoch_run_time)},
                 {"mean_stoch_run_time", std::to_string(mean_stoch_time)},
-                {"parallel_instances", std::to_string(max_instances)},
+                {"parallel_instances", std::to_string(maxInstances)},
         };
     };
 
@@ -113,19 +113,19 @@ public:
     double amplitudeDampingProb = 0.0;
     double multiQubitGateFactor = 0.0;
 
-    std::size_t stochasticRuns       = 0;
-    bool        sequentialApplyNoise = false;
+    std::size_t stochasticRuns         = 0;
+    bool        sequentiallyApplyNoise = false;
 
     void setRecordedProperties(const std::string& input);
 
-    std::vector<std::tuple<long, std::string>> recorded_properties;
-    std::vector<std::vector<double>>           recorded_properties_per_instance;
-    std::vector<std::map<std::string, int>>    classical_measurements_maps;
+    std::vector<std::tuple<long, std::string>>       recordedProperties;
+    std::vector<std::vector<double>>                 recordedPropertiesPerInstance;
+    std::vector<std::map<std::string, unsigned int>> classicalMeasurementsMaps;
 
     std::vector<dd::NoiseOperations> noiseEffects;
 
-    const unsigned int max_instances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
-    //    const unsigned int max_instances = 1; // use for debugging only
+    const unsigned int maxInstances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
+    //    const unsigned int maxInstances = 1; // use for debugging only
 
 private:
     std::unique_ptr<qc::QuantumComputation>& qc;
@@ -141,16 +141,16 @@ private:
 
     void perfect_simulation_run();
 
-    void runStochSimulationForId(unsigned int                                stochRun,
+    void runStochSimulationForId(std::size_t                                 stochRun,
                                  dd::Qubit                                   nQubits,
                                  std::vector<double>&                        recordedPropertiesStorage,
                                  std::vector<std::tuple<long, std::string>>& recordedPropertiesList,
-                                 std::map<std::string, int>&                 classicalMeasurementsMap,
+                                 std::map<std::string, unsigned int>&        classicalMeasurementsMap,
                                  unsigned long long                          localSeed);
 
     [[nodiscard]] std::string intToString(long target_number) const;
 
-    void setMeasuredQubitToZero(signed char& at, dd::vEdge& e, std::unique_ptr<StochasticNoiseSimulatorDDPackage>& localDD) const;
+    void setMeasuredQubitToZero(dd::Qubit& at, dd::vEdge& e, std::unique_ptr<StochasticNoisePackage>& localDD) const;
 };
 
 #endif //DDSIM_STOCHASTICNOISESIMULATOR_HPP

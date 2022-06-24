@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
                     {"simulation_time", duration_simulation.count()},
                     {"benchmark", ddsim->getName()},
                     {"stoch_runs", ddsim->stochasticRuns},
-                    {"threads", ddsim->max_instances},
+                    {"threads", ddsim->maxInstances},
                     {"n_qubits", +ddsim->getNumberOfQubits()},
                     {"applied_gates", ddsim->getNumberOfOps()},
                     {"max_nodes", ddsim->getMaxNodeCount()},

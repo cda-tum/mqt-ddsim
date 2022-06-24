@@ -365,4 +365,4 @@ std::pair<dd::ComplexValue, std::string> Simulator<DDPackage>::getPathOfLeastRes
 }
 
 template class Simulator<dd::Package<>>;
-template class Simulator<StochasticNoiseSimulatorDDPackage>;
+template class Simulator<StochasticNoisePackage>;
