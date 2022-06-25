@@ -52,15 +52,6 @@ void StochasticNoiseSimulator::perfect_simulation_run() {
                         assert(result == '0' || result == '1');
                         classic_values[classic.at(i)] = (result == '1');
                     }
-                } else if (op->getType() == qc::Reset) {
-                    // Reset qubit
-                    auto quantum = nu_op->getTargets();
-                    for (dd::Qubit i: quantum) {
-                        auto result = MeasureOneCollapsing(i, true);
-                        if (result == '1') {
-                            setMeasuredQubitToZero(i, root_edge, dd);
-                        }
-                    }
                 } else if (op->getType() == qc::Barrier) {
                     continue;
                 } else {
@@ -378,20 +369,4 @@ std::string StochasticNoiseSimulator::intToString(long target_number) const {
         number = number >> 1u;
     }
     return path;
-}
-void StochasticNoiseSimulator::setMeasuredQubitToZero(dd::Qubit& at, dd::vEdge& e, std::unique_ptr<StochasticNoisePackage>& localDD) const {
-    auto f = dd::mEdge::one;
-
-    for (std::size_t p = 0; p < getNumberOfQubits(); p++) {
-        if (static_cast<dd::Qubit>(p) == at) {
-            f = localDD->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, f, dd::mEdge::zero, dd::mEdge::zero});
-            //                f = dd->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, dd::mEdge::zero, dd::mEdge::zero, dd::mEdge::zero});
-        } else {
-            f = localDD->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, dd::mEdge::zero, dd::mEdge::zero, f});
-        }
-    }
-    auto tmp = localDD->multiply(f, e);
-    localDD->incRef(tmp);
-    localDD->decRef(e);
-    e = tmp;
 }

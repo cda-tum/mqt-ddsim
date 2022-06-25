@@ -114,7 +114,7 @@ private:
 
     std::vector<dd::NoiseOperations> noiseEffects;
 
-    const unsigned int maxInstances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
+    const unsigned int maxInstances = std::max(1U, std::thread::hardware_concurrency() - 4U);
     //    const unsigned int maxInstances = 1; // use for debugging only
 
     std::unique_ptr<qc::QuantumComputation>& qc;
@@ -138,8 +138,6 @@ private:
                                  unsigned long long                          localSeed);
 
     [[nodiscard]] std::string intToString(long target_number) const;
-
-    void setMeasuredQubitToZero(dd::Qubit& at, dd::vEdge& e, std::unique_ptr<StochasticNoisePackage>& localDD) const;
 };
 
 #endif //DDSIM_STOCHASTICNOISESIMULATOR_HPP
