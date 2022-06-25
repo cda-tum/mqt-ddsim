@@ -108,7 +108,7 @@ std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate
             }
         }
     }
-    return AnalyseState(nQubits, false);
+    return analyseState(nQubits, false);
 }
 
 dEdge DeterministicNoiseSimulator::applyNoiseEffects(dEdge& originalEdge, const std::vector<dd::Qubit>& usedQubits, bool firstPathEdge) {
@@ -142,7 +142,7 @@ dEdge DeterministicNoiseSimulator::applyNoiseEffects(dEdge& originalEdge, const 
     //        return noiseLookUpResult;
     //    }
 
-    std::array<dEdge, 4> new_edges{};
+    std::array<dEdge, std::tuple_size_v<decltype(dd::dNode::e)>> new_edges{};
     for (short i = 0; i < 4; i++) {
         if (firstPathEdge || i == 1) {
             // If I am to the useDensityMatrix I cannot minimize the necessary operations anymore
@@ -256,7 +256,7 @@ void DeterministicNoiseSimulator::applyAmplitudeDampingToEdges(std::array<dEdge,
         if (!e[0].w.approximatelyZero()) {
             CN::mul(helperEdge.w, complexProb, e[3].w);
             helperEdge.p = e[3].p;
-            dd::Edge tmp = dd->add2(e[0], helperEdge);
+            auto tmp     = dd->add2(e[0], helperEdge);
             if (!e[0].w.exactlyZero()) {
                 dd->cn.returnToCache(e[0].w);
             }
@@ -389,7 +389,7 @@ void DeterministicNoiseSimulator::applyDepolarisationToEdges(std::array<dEdge, s
     dd->cn.returnToCache(complexProb);
 }
 
-std::map<std::string, double> DeterministicNoiseSimulator::AnalyseState(dd::QubitCount nQubits, bool fullState = false) {
+std::map<std::string, double> DeterministicNoiseSimulator::analyseState(dd::QubitCount nQubits, bool fullState = false) {
     std::map<std::string, double> measuredResult = {};
     double                        p0, p1;
     double                        globalProbability;

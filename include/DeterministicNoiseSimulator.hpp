@@ -80,7 +80,7 @@ public:
 
     [[nodiscard]] std::string intToString(long targetNumber, char value) const;
 
-    [[nodiscard]] std::map<std::string, double> AnalyseState(dd::QubitCount nQubits, bool fullState);
+    [[nodiscard]] std::map<std::string, double> analyseState(dd::QubitCount nQubits, bool fullState);
 
     [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
 
