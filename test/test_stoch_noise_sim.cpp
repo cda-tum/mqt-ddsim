@@ -343,9 +343,8 @@ TEST(StochNoiseSimTest, SimulateAdder4WithNoiseAndApproximation) {
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorUnoptimizedSim) {
     auto                     quantumComputation = stochGetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, -1, 2, 1000, std::string("0-16"), false, 1, 1);
-    ddsim.sequentiallyApplyNoise = true;
-    auto m                     = ddsim.StochSimulate();
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, -1, 2, 1000, std::string("0-16"), true, 1, 1);
+    auto                     m = ddsim.StochSimulate();
 
     double tolerance = 0.1;
 

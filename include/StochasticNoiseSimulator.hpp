@@ -26,8 +26,8 @@ public:
 
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
                              const std::string&                       cNoiseEffects,
-                             double                                   cGateNoiseProbability,
-                             double                                   cAmplitudeDampingProb,
+                             double                                   cNoiseProbability,
+                             double                                   cAmpDampingProbability,
                              double                                   cMultiQubitGateFactor,
                              std::size_t                              cStochRuns,
                              const std::string&                       recorded_properties,
@@ -55,42 +55,42 @@ public:
         }
 
         // initializeNoiseProbabilities
-        noiseProbability = cGateNoiseProbability;
+        noiseProbability = cNoiseProbability;
         // Default value for amplitude damping prob is double the general error probability
-        amplitudeDampingProb = (cAmplitudeDampingProb < 0) ? noiseProbability * 2 : cAmplitudeDampingProb;
+        amplitudeDampingProb = (cAmpDampingProbability < 0) ? noiseProbability * 2 : cAmpDampingProbability;
         multiQubitGateFactor = cMultiQubitGateFactor;
 
-        if ((amplitudeDampingProb * multiQubitGateFactor) > 1 || noiseProbability < 0) {
+        if (noiseProbability < 0 || amplitudeDampingProb < 0 || noiseProbability * multiQubitGateFactor > 1 || amplitudeDampingProb * multiQubitGateFactor > 1) {
             throw std::runtime_error("Error probabilities are faulty!"
                                      "\n single qubit error probability: " +
-                                     std::to_string(cGateNoiseProbability) +
-                                     " multi qubit error probability: " + std::to_string(cGateNoiseProbability * multiQubitGateFactor) +
+                                     std::to_string(cNoiseProbability) +
+                                     " multi qubit error probability: " + std::to_string(cNoiseProbability * multiQubitGateFactor) +
                                      "\n single qubit amplitude damping  probability: " + std::to_string(amplitudeDampingProb) +
                                      " multi qubit amplitude damping  probability: " + std::to_string(amplitudeDampingProb * multiQubitGateFactor));
         }
 
         sequentiallyApplyNoise = unoptimizedSim;
 
-        // initializeNoiseProbabilities
-        if (amplitudeDampingProb < 0) {
-            // Default value for amplitude damping prob is double the general error probability
-            amplitudeDampingProb = cGateNoiseProbability * 2;
-        }
-
         stochasticRuns = cStochRuns;
 
         setRecordedProperties(recorded_properties);
     }
 
+    std::vector<std::tuple<long, std::string>>       recordedProperties;
+    std::vector<std::vector<double>>                 recordedPropertiesPerInstance;
+    std::vector<std::map<std::string, unsigned int>> classicalMeasurementsMaps;
+
+    void setRecordedProperties(const std::string& input);
+
     std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
+    std::map<std::string, double>      StochSimulate();
 
-    std::map<std::string, double> StochSimulate();
-
-    [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return 0; } // Not available for stochastic simulation
-
-    [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return 0; } // Not available for stochastic simulation
-
-    [[nodiscard]] std::size_t countNodesFromRoot() const override { return 0; } // Not available for stochastic simulation
+    [[nodiscard]] std::size_t    getMaxMatrixNodeCount() const override { return 0; }    // Not available for stochastic simulation
+    [[nodiscard]] std::size_t    getMatrixActiveNodeCount() const override { return 0; } // Not available for stochastic simulation
+    [[nodiscard]] std::size_t    countNodesFromRoot() const override { return 0; }       // Not available for stochastic simulation
+    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
+    [[nodiscard]] std::size_t    getNumberOfOps() const override { return qc->getNops(); };
+    [[nodiscard]] std::string    getName() const override { return "stoch_" + qc->getName(); };
 
     std::map<std::string, std::string> AdditionalStatistics() override {
         return {
@@ -100,34 +100,23 @@ public:
                 {"stoch_wall_time", std::to_string(stoch_run_time)},
                 {"mean_stoch_run_time", std::to_string(mean_stoch_time)},
                 {"parallel_instances", std::to_string(maxInstances)},
+                {"stoch_runs", std::to_string(stochasticRuns)},
+                {"threads", std::to_string(maxInstances)},
         };
     };
 
-    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
-
-    [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
-
-    [[nodiscard]] std::string getName() const override { return "stoch_" + qc->getName(); };
-
-    double noiseProbability     = 0.0;
-    double amplitudeDampingProb = 0.0;
-    double multiQubitGateFactor = 0.0;
-
+private:
+    double      noiseProbability       = 0.0;
+    double      amplitudeDampingProb   = 0.0;
+    double      multiQubitGateFactor   = 0.0;
     std::size_t stochasticRuns         = 0;
     bool        sequentiallyApplyNoise = false;
-
-    void setRecordedProperties(const std::string& input);
-
-    std::vector<std::tuple<long, std::string>>       recordedProperties;
-    std::vector<std::vector<double>>                 recordedPropertiesPerInstance;
-    std::vector<std::map<std::string, unsigned int>> classicalMeasurementsMaps;
 
     std::vector<dd::NoiseOperations> noiseEffects;
 
     const unsigned int maxInstances = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) - 4);
     //    const unsigned int maxInstances = 1; // use for debugging only
 
-private:
     std::unique_ptr<qc::QuantumComputation>& qc;
 
     const unsigned int step_number;

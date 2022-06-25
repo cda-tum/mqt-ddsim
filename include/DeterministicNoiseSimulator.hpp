@@ -15,60 +15,56 @@
 class DeterministicNoiseSimulator: public Simulator<DensityMatrixPackage> {
     using CN    = dd::ComplexNumbers;
     using dEdge = dd::dEdge;
+    using dNode = dd::dNode;
 
 public:
     explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, unsigned long long seed = 0):
         DeterministicNoiseSimulator(qc, std::string("APD"), 0.001, -1, 2, false, seed) {}
 
     DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
-                                const std::string&                       cGateNoise,
-                                double                                   cGateNoiseProbability,
-                                double                                   cAmplitudeDampingProb,
+                                const std::string&                       cNoiseEffects,
+                                double                                   cNoiseProbability,
+                                double                                   cAmpDampingProbability,
                                 double                                   cMultiQubitGateFactor,
                                 bool                                     unoptimizedSim = false,
                                 unsigned long long                       seed           = 0):
         Simulator(seed),
-        qc(qc) {
-        useDensityMatrixType   = !unoptimizedSim;
-        sequentiallyApplyNoise = unoptimizedSim;
-
+        qc(qc),
+        noiseProbSingleQubit(cNoiseProbability),
+        noiseProbMultiQubit(cNoiseProbability * cMultiQubitGateFactor),
+        sequentiallyApplyNoise(unoptimizedSim),
+        useDensityMatrixType(!unoptimizedSim) {
         // setNoiseEffects
-        if (cGateNoise.find_first_not_of("APD") != std::string::npos) {
-            throw std::runtime_error("Unknown noise operation in '" + cGateNoise + "'\n");
-        }
-        for (auto noise: cGateNoise) {
+        for (auto noise: cNoiseEffects) {
             switch (noise) {
                 case 'A':
-                    gateNoiseTypes.push_back(dd::amplitudeDamping);
+                    noiseEffects.push_back(dd::amplitudeDamping);
                     break;
                 case 'P':
-                    gateNoiseTypes.push_back(dd::phaseFlip);
+                    noiseEffects.push_back(dd::phaseFlip);
                     break;
                 case 'D':
-                    gateNoiseTypes.push_back(dd::depolarization);
+                    noiseEffects.push_back(dd::depolarization);
                     break;
                 default:
-                    throw std::runtime_error("Unknown noise operation '" + cGateNoise + "'\n");
+                    throw std::runtime_error("Unknown noise operation '" + cNoiseEffects + "'\n");
             }
         }
 
         // initializeNoiseProbabilities
-        noiseProb            = cGateNoiseProbability;
-        noiseProbSingleQubit = cGateNoiseProbability;
-        noiseProbMultiQubit  = cGateNoiseProbability * cMultiQubitGateFactor;
+        noiseProbSingleQubit = cNoiseProbability;
+        noiseProbMultiQubit  = cNoiseProbability * cMultiQubitGateFactor;
 
-        if (cAmplitudeDampingProb < 0) {
+        if (cAmpDampingProbability < 0) {
             // Default value for amplitude damping prob is double the general error probability
-            ampDampingProb            = cGateNoiseProbability * 2;
-            ampDampingProbSingleQubit = cGateNoiseProbability * 2;
-            ampDampingProbMultiQubit  = cGateNoiseProbability * 2 * cMultiQubitGateFactor;
+            ampDampingProbSingleQubit = cNoiseProbability * 2;
+            ampDampingProbMultiQubit  = cNoiseProbability * 2 * cMultiQubitGateFactor;
         } else {
-            ampDampingProb            = cAmplitudeDampingProb;
-            ampDampingProbSingleQubit = cAmplitudeDampingProb;
-            ampDampingProbMultiQubit  = cAmplitudeDampingProb * cMultiQubitGateFactor;
+            ampDampingProbSingleQubit = cAmpDampingProbability;
+            ampDampingProbMultiQubit  = cAmpDampingProbability * cMultiQubitGateFactor;
         }
 
-        if (noiseProb < 0 || ampDampingProb < 0 || ampDampingProbMultiQubit > 1 || noiseProbMultiQubit > 1) {
+        if (noiseProbSingleQubit < 0 || ampDampingProbSingleQubit < 0 || ampDampingProbMultiQubit > 1 || noiseProbMultiQubit > 1) {
             throw std::runtime_error("Error probabilities are faulty!"
                                      "\n single qubit error probability: " +
                                      std::to_string(noiseProbSingleQubit) +
@@ -78,22 +74,11 @@ public:
         }
     }
 
-    double noiseProb                 = 0.0;
-    double ampDampingProb            = 0.0;
-    double noiseProbSingleQubit      = 0.0;
-    double ampDampingProbSingleQubit = 0.0;
-    double noiseProbMultiQubit       = 0.0;
-    double ampDampingProbMultiQubit  = 0.0;
-
-    double measurementThreshold = 0.01;
-
     std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override { return {}; };
 
     std::map<std::string, double> DeterministicSimulate();
 
     [[nodiscard]] std::string intToString(long targetNumber, char value) const;
-
-    void applyDetNoiseSequential(const qc::Targets& targets);
 
     [[nodiscard]] std::map<std::string, double> AnalyseState(dd::QubitCount nQubits, bool fullState);
 
@@ -109,31 +94,35 @@ public:
     [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return dd->mUniqueTable.getActiveNodeCount(); }
     [[nodiscard]] std::size_t countNodesFromRoot() const override { return dd->size(root_edge); }
 
+    dEdge densityRootEdge{};
+
+private:
+    std::unique_ptr<qc::QuantumComputation>& qc;
+    std::vector<dd::NoiseOperations>         noiseEffects;
+
+    double noiseProbSingleQubit      = 0.0;
+    double ampDampingProbSingleQubit = 0.0;
+    double noiseProbMultiQubit       = 0.0;
+    double ampDampingProbMultiQubit  = 0.0;
+
+    double measurementThreshold = 0.01;
+
+    bool sequentiallyApplyNoise;
+    bool useDensityMatrixType;
+
     const std::map<dd::NoiseOperations, int> sequentialNoiseMap = {
             {dd::phaseFlip, 2},        //Phase-flip
             {dd::amplitudeDamping, 2}, //Amplitude Damping
             {dd::depolarization, 4},   //Depolarisation
     };
 
-    dEdge densityRootEdge{};
-
-    bool sequentiallyApplyNoise = false;
-    bool useDensityMatrixType   = true;
-
-private:
-    std::unique_ptr<qc::QuantumComputation>& qc;
-
-    std::vector<dd::NoiseOperations> gateNoiseTypes;
-
-    void applyAmplitudeDampingToNode(std::array<dEdge, 4>& e, double probability);
-    void applyPhaseFlipToNode(std::array<dEdge, 4>& e, double probability);
-    void applyDepolarisationToNode(std::array<dEdge, 4>& e, double probability);
-
-    void generateGate(qc::MatrixDD* pointerForMatrices, dd::NoiseOperations noiseType, dd::Qubit target, double probability);
-
-    dEdge makeZeroDensityOperator(dd::QubitCount n);
-
+    void   applyAmplitudeDampingToEdges(std::array<dEdge, std::tuple_size_v<decltype(dd::dNode::e)>>& e, double probability);
+    void   applyPhaseFlipToEdges(std::array<dEdge, std::tuple_size_v<decltype(dd::dNode::e)>>& e, double probability);
+    void   applyDepolarisationToEdges(std::array<dEdge, std::tuple_size_v<decltype(dd::dNode::e)>>& e, double probability);
+    dEdge  makeZeroDensityOperator(dd::QubitCount n);
     dEdge  applyNoiseEffects(dEdge& originalEdge, const std::vector<dd::Qubit>& usedQubits, bool firstPathEdge);
+    void   applyDetNoiseSequential(const qc::Targets& targets);
+    void   generateGate(qc::MatrixDD* pointerForMatrices, dd::NoiseOperations noiseType, dd::Qubit target, double probability);
     double getNoiseProbability(dd::NoiseOperations type, const qc::Targets& targets);
 };
 
