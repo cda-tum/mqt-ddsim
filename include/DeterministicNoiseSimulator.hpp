@@ -19,12 +19,12 @@ class DeterministicNoiseSimulator: public Simulator<DensityMatrixPackage> {
 
 public:
     explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, unsigned long long seed = 0):
-        DeterministicNoiseSimulator(qc, std::string("APD"), 0.001, -1, 2, false, seed) {}
+        DeterministicNoiseSimulator(qc, std::string("APD"), 0.001, std::optional<double>{}, 2, false, seed) {}
 
     DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
                                 const std::string&                       cNoiseEffects,
                                 double                                   cNoiseProbability,
-                                double                                   cAmpDampingProbability,
+                                std::optional<double>                    cAmpDampingProbability,
                                 double                                   cMultiQubitGateFactor,
                                 bool                                     unoptimizedSim = false,
                                 unsigned long long                       seed           = 0):
@@ -55,13 +55,13 @@ public:
         noiseProbSingleQubit = cNoiseProbability;
         noiseProbMultiQubit  = cNoiseProbability * cMultiQubitGateFactor;
 
-        if (cAmpDampingProbability < 0) {
+        if (!cAmpDampingProbability) {
             // Default value for amplitude damping prob is double the general error probability
             ampDampingProbSingleQubit = cNoiseProbability * 2;
             ampDampingProbMultiQubit  = cNoiseProbability * 2 * cMultiQubitGateFactor;
         } else {
-            ampDampingProbSingleQubit = cAmpDampingProbability;
-            ampDampingProbMultiQubit  = cAmpDampingProbability * cMultiQubitGateFactor;
+            ampDampingProbSingleQubit = cAmpDampingProbability.value();
+            ampDampingProbMultiQubit  = cAmpDampingProbability.value() * cMultiQubitGateFactor;
         }
 
         if (noiseProbSingleQubit < 0 || ampDampingProbSingleQubit < 0 || ampDampingProbMultiQubit > 1 || noiseProbMultiQubit > 1) {

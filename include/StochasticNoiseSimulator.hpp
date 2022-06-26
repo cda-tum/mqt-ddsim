@@ -27,7 +27,7 @@ public:
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
                              const std::string&                       cNoiseEffects,
                              double                                   cNoiseProbability,
-                             double                                   cAmpDampingProbability,
+                             std::optional<double>                    cAmpDampingProbability,
                              double                                   cMultiQubitGateFactor,
                              std::size_t                              cStochRuns,
                              const std::string&                       recorded_properties,
@@ -57,7 +57,7 @@ public:
         // initializeNoiseProbabilities
         noiseProbability = cNoiseProbability;
         // Default value for amplitude damping prob is double the general error probability
-        amplitudeDampingProb = (cAmpDampingProbability < 0) ? noiseProbability * 2 : cAmpDampingProbability;
+        amplitudeDampingProb = (cAmpDampingProbability) ? cAmpDampingProbability.value() : noiseProbability * 2;
         multiQubitGateFactor = cMultiQubitGateFactor;
 
         if (noiseProbability < 0 || amplitudeDampingProb < 0 || noiseProbability * multiQubitGateFactor > 1 || amplitudeDampingProb * multiQubitGateFactor > 1) {
