@@ -13,8 +13,8 @@
 #include <string>
 #include <vector>
 
-class DeterministicNoiseSimulator: public Simulator<DensityMatrixPackage> {
-    using CN    = dd::ComplexNumbers;
+template<class DDPackage = DensityMatrixPackage>
+class DeterministicNoiseSimulator: public Simulator<DDPackage> {
     using dEdge = dd::dEdge;
     using dNode = dd::dNode;
 
@@ -29,7 +29,7 @@ public:
                                 double                                   cMultiQubitGateFactor,
                                 bool                                     unoptimizedSim = false,
                                 unsigned long long                       seed           = 0):
-        Simulator(seed),
+        Simulator<DDPackage>(seed),
         qc(qc),
         noiseProbSingleQubit(cNoiseProbability),
         noiseProbMultiQubit(cNoiseProbability * cMultiQubitGateFactor),
@@ -73,7 +73,7 @@ public:
                                      "\n single qubit amplitude damping  probability: " + std::to_string(ampDampingProbSingleQubit) +
                                      " multi qubit amplitude damping  probability: " + std::to_string(ampDampingProbMultiQubit));
         }
-        dd->resize(qc->getNqubits());
+        Simulator<DDPackage>::dd->resize(qc->getNqubits());
     }
 
     std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override { return {}; };
@@ -86,11 +86,11 @@ public:
 
     [[nodiscard]] std::string getName() const override { return qc->getName(); };
 
-    [[nodiscard]] std::size_t getActiveNodeCount() const override { return dd->dUniqueTable.getActiveNodeCount(); }
-    [[nodiscard]] std::size_t getMaxNodeCount() const override { return dd->dUniqueTable.getMaxActiveNodes(); }
-    [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return dd->mUniqueTable.getMaxActiveNodes(); }
-    [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return dd->mUniqueTable.getActiveNodeCount(); }
-    [[nodiscard]] std::size_t countNodesFromRoot() const override { return dd->size(rootEdge); }
+    [[nodiscard]] std::size_t getActiveNodeCount() const override { return Simulator<DDPackage>::dd->dUniqueTable.getActiveNodeCount(); }
+    [[nodiscard]] std::size_t getMaxNodeCount() const override { return Simulator<DDPackage>::dd->dUniqueTable.getMaxActiveNodes(); }
+    [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return Simulator<DDPackage>::dd->mUniqueTable.getMaxActiveNodes(); }
+    [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return Simulator<DDPackage>::dd->mUniqueTable.getActiveNodeCount(); }
+    [[nodiscard]] std::size_t countNodesFromRoot() const override { return Simulator<DDPackage>::dd->size(rootEdge); }
 
     dEdge rootEdge{};
 
