@@ -87,8 +87,8 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
     single_shots++;
     const dd::QubitCount n_qubits = qc->getNqubits();
 
-    root_edge = dd->makeZeroState(n_qubits);
-    dd->incRef(root_edge);
+    rootEdge = dd->makeZeroState(n_qubits);
+    dd->incRef(rootEdge);
 
     std::size_t                 op_num = 0;
     std::map<std::size_t, bool> classic_values;
@@ -143,18 +143,18 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
             }
             /*std::clog << "[INFO] op " << op_num << " is " << op->getName() << " on " << +op->getTargets().at(0)
                       << " #controls=" << op->getControls().size()
-                      << " statesize=" << dd->size(root_edge) << "\n";//*/
+                      << " statesize=" << dd->size(rootEdge) << "\n";//*/
 
             auto dd_op = dd::getDD(op.get(), dd);
-            auto tmp   = dd->multiply(dd_op, root_edge);
+            auto tmp   = dd->multiply(dd_op, rootEdge);
             dd->incRef(tmp);
-            dd->decRef(root_edge);
-            root_edge = tmp;
+            dd->decRef(rootEdge);
+            rootEdge = tmp;
 
             if (approx_info.step_number > 0 && approx_info.step_fidelity < 1.0) {
                 if (approx_info.approx_when == ApproximationInfo::FidelityDriven && (op_num + 1) % approx_mod == 0 &&
                     approximation_runs < approx_info.step_number) {
-                    //const unsigned int size_before = dd->size(root_edge);
+                    //const unsigned int size_before = dd->size(rootEdge);
                     const double ap_fid = ApproximateByFidelity(approx_info.step_fidelity, false, true);
                     approximation_runs++;
                     final_fidelity *= ap_fid;
@@ -166,7 +166,7 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
                               << "; #runs=" << approximation_runs
                               << "\n";//*/
                 } else if (approx_info.approx_when == ApproximationInfo::MemoryDriven) {
-                    [[maybe_unused]] const unsigned int size_before = dd->size(root_edge);
+                    [[maybe_unused]] const unsigned int size_before = dd->size(rootEdge);
                     if (dd->getUniqueTable<dd::vNode>().possiblyNeedsCollection()) {
                         const double ap_fid = ApproximateByFidelity(approx_info.step_fidelity, false, true);
                         approximation_runs++;

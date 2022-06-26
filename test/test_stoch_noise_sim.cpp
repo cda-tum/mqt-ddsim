@@ -121,7 +121,7 @@ TEST(StochNoiseSimTest, DestructiveMeasurementOneArbitraryNormalization) {
 
     std::mt19937_64 gen{};
 
-    char m = ddsim.dd->measureOneCollapsing(ddsim.root_edge, 0, false, gen);
+    char m = ddsim.dd->measureOneCollapsing(ddsim.rootEdge, 0, false, gen);
 
     const std::vector<dd::ComplexValue> v_after = ddsim.getVector();
 

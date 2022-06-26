@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
         // Parameters for noise aware simulation
         ("noise_effects", "Noise effects (A (=amplitude damping),D (=depolarization),P (=phase flip)) in the form of a character string describing the noise effects (default=\"APD\")", cxxopts::value<std::string>()->default_value("APD"))
         ("noise_prob", "Probability for applying noise (default=0.001)", cxxopts::value<double>()->default_value("0.001"))
-        ("noise_prob_t1", "Probability for applying amplitude damping noise (default=2 x noise_prob)", cxxopts::value<std::optional<double>>()->default_value({}))
+        ("noise_prob_t1", "Probability for applying amplitude damping noise (default=2 x noise_prob)", cxxopts::value<std::optional<double>>())
         ("noise_prob_multi", "Noise factor for multi qubit operations (default=2)", cxxopts::value<double>()->default_value("2"))
         ("unoptimized_sim", "Use unoptimized scheme for stochastic/deterministic noise-aware simulation")
         ("stoch_runs", "Number of stochastic runs. When the value is 0, the deterministic simulator is started. (default = 0)", cxxopts::value<std::size_t>()->default_value("0"))
@@ -60,12 +60,17 @@ int main(int argc, char** argv) {
         std::clog << "[WARNING] Quantum computation contains quite many qubits. You're jumping into the deep end.\n";
     }
 
+    std::optional<double> noise_prob_t1{};
+    if (vm.count("noise_prob_t1")) {
+        noise_prob_t1 = vm["noise_prob_t1"].as<std::optional<double>>();
+    }
+
     if (vm["stoch_runs"].as<std::size_t>() > 0) {
         // Using stochastic simulator
         std::unique_ptr<StochasticNoiseSimulator> ddsim = std::make_unique<StochasticNoiseSimulator>(quantumComputation,
                                                                                                      vm["noise_effects"].as<std::string>(),
                                                                                                      vm["noise_prob"].as<double>(),
-                                                                                                     vm["noise_prob_t1"].as<double>(),
+                                                                                                     noise_prob_t1,
                                                                                                      vm["noise_prob_multi"].as<double>(),
                                                                                                      vm["stoch_runs"].as<size_t>(),
                                                                                                      vm["properties"].as<std::string>(),
@@ -105,11 +110,12 @@ int main(int argc, char** argv) {
         }
 
         std::cout << std::setw(2) << output_obj << std::endl;
+
     } else if (vm["stoch_runs"].as<std::size_t>() == 0) {
         // Using deterministic simulator
         std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, vm["noise_effects"].as<std::string>(),
                                                                                                            vm["noise_prob"].as<double>(),
-                                                                                                           vm["noise_prob_t1"].as<double>(),
+                                                                                                           noise_prob_t1,
                                                                                                            vm["noise_prob_multi"].as<double>(),
                                                                                                            vm.count("unoptimized_sim"), seed);
 

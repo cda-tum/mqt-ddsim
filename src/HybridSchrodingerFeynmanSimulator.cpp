@@ -140,7 +140,7 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridTaskflow(const dd::Qubit s
     const int          actuallyUsedThreads = static_cast<std::size_t>(max_control) < nthreads ? static_cast<int>(max_control) : static_cast<int>(nthreads);
     const std::int64_t nslices_at_once     = std::min<std::int64_t>(16, max_control / static_cast<std::int64_t>(actuallyUsedThreads));
 
-    root_edge = qc::VectorDD::zero;
+    rootEdge = qc::VectorDD::zero;
 
     std::vector<std::vector<bool>> computed(ndecisions, std::vector<bool>(max_control, false));
 
@@ -195,8 +195,8 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridTaskflow(const dd::Qubit s
     }
     executor.wait_for_all();
 
-    root_edge = dd->deserialize<dd::vNode>("slice_" + std::to_string(ndecisions) + "_0.dd", true);
-    dd->incRef(root_edge);
+    rootEdge = dd->deserialize<dd::vNode>("slice_" + std::to_string(ndecisions) + "_0.dd", true);
+    dd->incRef(rootEdge);
 }
 
 void HybridSchrodingerFeynmanSimulator::SimulateHybridAmplitudes(dd::Qubit split_qubit) {
@@ -204,7 +204,7 @@ void HybridSchrodingerFeynmanSimulator::SimulateHybridAmplitudes(dd::Qubit split
     const std::int64_t max_control = 1LL << ndecisions;
 
     const int actuallyUsedThreads = static_cast<std::size_t>(max_control) < nthreads ? static_cast<int>(max_control) : static_cast<int>(nthreads);
-    root_edge                     = qc::VectorDD::zero;
+    rootEdge                      = qc::VectorDD::zero;
 
     const std::int64_t   nslices_on_one_cpu = std::min<std::int64_t>(64, max_control / actuallyUsedThreads);
     const dd::QubitCount nqubits            = getNumberOfQubits();

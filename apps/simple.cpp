@@ -247,7 +247,7 @@ int main(int argc, char** argv) {
     if (vm.count("dump_complex")) {
         auto filename = vm["dump_complex"].as<std::string>();
         auto ostream  = std::fstream(filename, std::fstream::out);
-        dd::exportEdgeWeights(ddsim->root_edge, ostream);
+        dd::exportEdgeWeights(ddsim->rootEdge, ostream);
     }
 
     std::cout << std::setw(2) << output_obj << std::endl;

@@ -286,7 +286,7 @@ void PathSimulator::constructTaskGraph() {
     const auto& steps = simulationPath.steps;
 
     if (path.empty()) {
-        root_edge = dd->makeZeroState(qc->getNqubits());
+        rootEdge = dd->makeZeroState(qc->getNqubits());
         return;
     }
 
@@ -342,7 +342,7 @@ void PathSimulator::constructTaskGraph() {
         if (i == path.size() - 1) {
             const auto runner = [this, resultStep]() {
                 if (auto res = std::get_if<qc::VectorDD>(&results.at(resultStep.id))) {
-                    root_edge = *res;
+                    rootEdge = *res;
                 } else {
                     throw std::runtime_error("Expected vector DD as result.");
                 }

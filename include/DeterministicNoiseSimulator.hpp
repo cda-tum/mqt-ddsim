@@ -72,15 +72,12 @@ public:
                                      "\n single qubit amplitude damping  probability: " + std::to_string(ampDampingProbSingleQubit) +
                                      " multi qubit amplitude damping  probability: " + std::to_string(ampDampingProbMultiQubit));
         }
+        dd->resize(qc->getNqubits());
     }
 
     std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override { return {}; };
 
     std::map<std::string, double> DeterministicSimulate();
-
-    [[nodiscard]] std::string intToString(long targetNumber, char value) const;
-
-    [[nodiscard]] std::map<std::string, double> analyseState(dd::QubitCount nQubits, bool fullState);
 
     [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
 
@@ -92,9 +89,9 @@ public:
     [[nodiscard]] std::size_t getMaxNodeCount() const override { return dd->dUniqueTable.getMaxActiveNodes(); }
     [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return dd->mUniqueTable.getMaxActiveNodes(); }
     [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return dd->mUniqueTable.getActiveNodeCount(); }
-    [[nodiscard]] std::size_t countNodesFromRoot() const override { return dd->size(root_edge); }
+    [[nodiscard]] std::size_t countNodesFromRoot() const override { return dd->size(rootEdge); }
 
-    dEdge densityRootEdge{};
+    dEdge rootEdge{};
 
 private:
     std::unique_ptr<qc::QuantumComputation>& qc;
@@ -110,20 +107,10 @@ private:
     bool sequentiallyApplyNoise;
     bool useDensityMatrixType;
 
-    const std::map<dd::NoiseOperations, int> sequentialNoiseMap = {
-            {dd::phaseFlip, 2},        //Phase-flip
-            {dd::amplitudeDamping, 2}, //Amplitude Damping
-            {dd::depolarization, 4},   //Depolarisation
-    };
-
-    void   applyAmplitudeDampingToEdges(std::array<dEdge, std::tuple_size_v<decltype(dd::dNode::e)>>& e, double probability);
-    void   applyPhaseFlipToEdges(std::array<dEdge, std::tuple_size_v<decltype(dd::dNode::e)>>& e, double probability);
-    void   applyDepolarisationToEdges(std::array<dEdge, std::tuple_size_v<decltype(dd::dNode::e)>>& e, double probability);
-    dEdge  makeZeroDensityOperator(dd::QubitCount n);
-    dEdge  applyNoiseEffects(dEdge& originalEdge, const std::vector<dd::Qubit>& usedQubits, bool firstPathEdge);
-    void   applyDetNoiseSequential(const qc::Targets& targets);
-    void   generateGate(qc::MatrixDD* pointerForMatrices, dd::NoiseOperations noiseType, dd::Qubit target, double probability);
-    double getNoiseProbability(dd::NoiseOperations type, const qc::Targets& targets);
+    dEdge makeZeroDensityOperator(dd::QubitCount n);
+    //    void   applyDetNoiseSequential(const qc::Targets& targets);
+    //    void   generateGate(qc::MatrixDD* pointerForMatrices, dd::NoiseOperations noiseType, dd::Qubit target, double probability);
+    //    double getNoiseProbability(dd::NoiseOperations type, const qc::Targets& targets);
 };
 
 #endif //DDSIM_DETERMINISTICNOISESIMULATOR_HPP

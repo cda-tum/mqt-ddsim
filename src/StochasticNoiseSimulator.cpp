@@ -32,8 +32,8 @@ std::map<std::string, std::size_t> StochasticNoiseSimulator::Simulate(unsigned i
 void StochasticNoiseSimulator::perfect_simulation_run() {
     const unsigned short n_qubits = qc->getNqubits();
 
-    root_edge = dd->makeZeroState(n_qubits);
-    dd->incRef(root_edge);
+    rootEdge = dd->makeZeroState(n_qubits);
+    dd->incRef(rootEdge);
 
     unsigned long       op_num = 0;
     std::map<int, bool> classic_values;
@@ -84,10 +84,10 @@ void StochasticNoiseSimulator::perfect_simulation_run() {
             }
 
             auto operation = dd::getDD(op.get(), dd);
-            auto tmp       = dd->multiply(operation, root_edge);
+            auto tmp       = dd->multiply(operation, rootEdge);
             dd->incRef(tmp);
-            dd->decRef(root_edge);
-            root_edge = tmp;
+            dd->decRef(rootEdge);
+            rootEdge = tmp;
 
             dd->garbageCollect();
         }

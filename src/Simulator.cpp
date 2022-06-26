@@ -41,7 +41,7 @@ std::vector<dd::ComplexValue> Simulator<DDPackage>::getVector() const {
     std::vector<dd::ComplexValue> results(1ull << getNumberOfQubits(), dd::complex_zero);
     for (unsigned long long i = 0; i < 1ull << getNumberOfQubits(); ++i) {
         const std::string corrected_path{path.rbegin(), path.rend()};
-        results[i] = dd->getValueByPath(root_edge, corrected_path);
+        results[i] = dd->getValueByPath(rootEdge, corrected_path);
         NextPath(path);
     }
     return results;
@@ -55,7 +55,7 @@ std::vector<std::pair<dd::fp, dd::fp>> Simulator<DDPackage>::getVectorPair() con
 
     for (unsigned long long i = 0; i < 1ull << getNumberOfQubits(); ++i) {
         const std::string      corrected_path{path.rbegin(), path.rend()};
-        const dd::ComplexValue cv = dd->getValueByPath(root_edge, corrected_path);
+        const dd::ComplexValue cv = dd->getValueByPath(rootEdge, corrected_path);
         results[i]                = std::make_pair(cv.r, cv.i);
         NextPath(path);
     }
@@ -70,7 +70,7 @@ std::vector<std::complex<dd::fp>> Simulator<DDPackage>::getVectorComplex() const
 
     for (unsigned long long i = 0; i < 1ull << getNumberOfQubits(); ++i) {
         const std::string      corrected_path{path.rbegin(), path.rend()};
-        const dd::ComplexValue cv = dd->getValueByPath(root_edge, corrected_path);
+        const dd::ComplexValue cv = dd->getValueByPath(rootEdge, corrected_path);
         results[i]                = std::complex<dd::fp>(cv.r, cv.i);
         NextPath(path);
     }
@@ -329,18 +329,18 @@ dd::vEdge Simulator<DDPackage>::RemoveNodes(std::unique_ptr<DDPackage>& localDD,
 
 template<class DDPackage>
 std::pair<dd::ComplexValue, std::string> Simulator<DDPackage>::getPathOfLeastResistance() const {
-    if (std::abs(dd::ComplexNumbers::mag2(root_edge.w) - 1.0L) > epsilon) {
-        if (root_edge.w.approximatelyZero()) {
+    if (std::abs(dd::ComplexNumbers::mag2(rootEdge.w) - 1.0L) > epsilon) {
+        if (rootEdge.w.approximatelyZero()) {
             throw std::runtime_error("Numerical instabilities led to a 0-vector! Abort simulation!");
         }
         std::cerr << "WARNING in PoLR: numerical instability occurred during simulation: |alpha|^2 + |beta|^2 - 1 = "
-                  << 1.0L - dd::ComplexNumbers::mag2(root_edge.w) << ", but should be 1!\n";
+                  << 1.0L - dd::ComplexNumbers::mag2(rootEdge.w) << ", but should be 1!\n";
     }
 
     std::string result(getNumberOfQubits(), '0');
-    dd::Complex path_value = dd->cn.getCached(dd::CTEntry::val(root_edge.w.r), dd::CTEntry::val(root_edge.w.i));
-    dd::vEdge   cur        = root_edge;
-    for (dd::Qubit i = root_edge.p->v; i >= 0; --i) {
+    dd::Complex path_value = dd->cn.getCached(dd::CTEntry::val(rootEdge.w.r), dd::CTEntry::val(rootEdge.w.i));
+    dd::vEdge   cur        = rootEdge;
+    for (dd::Qubit i = rootEdge.p->v; i >= 0; --i) {
         dd::fp p0  = dd::ComplexNumbers::mag2(cur.p->e.at(0).w);
         dd::fp p1  = dd::ComplexNumbers::mag2(cur.p->e.at(1).w);
         dd::fp tmp = p0 + p1;

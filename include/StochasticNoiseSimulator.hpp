@@ -74,6 +74,8 @@ public:
         stochasticRuns = cStochRuns;
 
         setRecordedProperties(recorded_properties);
+
+        dd->resize(qc->getNqubits());
     }
 
     std::vector<std::tuple<long, std::string>>       recordedProperties;

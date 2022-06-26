@@ -44,8 +44,8 @@ TEST(TaskBasedSimTest, SimpleCircuit) {
     // simulate circuit
     auto counts = tbs.Simulate(1024);
 
-    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.root_edge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
-    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.root_edge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
+    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
+    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
 
     for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;
@@ -63,8 +63,8 @@ TEST(TaskBasedSimTest, SimpleCircuitArgumentConstructor) {
     // simulate circuit
     auto counts = tbs.Simulate(1024);
 
-    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.root_edge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
-    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.root_edge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
+    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
+    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
 
     for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;
@@ -84,8 +84,8 @@ TEST(TaskBasedSimTest, SimpleCircuitAssumeFalseOrder) {
     // simulate circuit
     auto counts = tbs.Simulate(1024);
 
-    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.root_edge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
-    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.root_edge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
+    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
+    EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
 
     for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;
@@ -128,11 +128,11 @@ TEST(TaskBasedSimTest, GroverCircuitBracket) {
     auto counts = tbs.Simulate(4096);
 
     const auto target = targetValue.to_ullong() | (1ULL << 4);
-    auto       c      = tbs.dd->getValueByPath(tbs.root_edge, target);
+    auto       c      = tbs.dd->getValueByPath(tbs.rootEdge, target);
     auto       prob   = c.r * c.r + c.i * c.i;
     EXPECT_GT(prob, 0.9);
 
-    dd::export2Dot(tbs.root_edge, "result_grover.dot", true, true);
+    dd::export2Dot(tbs.rootEdge, "result_grover.dot", true, true);
 
     for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;
@@ -153,11 +153,11 @@ TEST(TaskBasedSimTest, GroverCircuitAlternatingMiddle) {
     auto counts = tbs.Simulate(4096);
 
     const auto target = targetValue.to_ullong() | (1ULL << 4);
-    auto       c      = tbs.dd->getValueByPath(tbs.root_edge, target);
+    auto       c      = tbs.dd->getValueByPath(tbs.rootEdge, target);
     auto       prob   = c.r * c.r + c.i * c.i;
     EXPECT_GT(prob, 0.9);
 
-    dd::export2Dot(tbs.root_edge, "result_grover.dot", true, true);
+    dd::export2Dot(tbs.rootEdge, "result_grover.dot", true, true);
 
     for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;
@@ -178,11 +178,11 @@ TEST(TaskBasedSimTest, GroverCircuitPairwiseGrouping) {
     auto counts = tbs.Simulate(4096);
 
     const auto target = targetValue.to_ullong() | (1ULL << 4);
-    auto       c      = tbs.dd->getValueByPath(tbs.root_edge, target);
+    auto       c      = tbs.dd->getValueByPath(tbs.rootEdge, target);
     auto       prob   = c.r * c.r + c.i * c.i;
     EXPECT_GT(prob, 0.9);
 
-    dd::export2Dot(tbs.root_edge, "result_grouping.dot", true, true);
+    dd::export2Dot(tbs.rootEdge, "result_grouping.dot", true, true);
 
     for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;
