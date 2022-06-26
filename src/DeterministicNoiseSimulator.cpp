@@ -7,20 +7,11 @@ using dEdge = dd::dEdge;
 using dNode = dd::dNode;
 using mEdge = dd::mEdge;
 
-dEdge DeterministicNoiseSimulator::makeZeroDensityOperator(dd::QubitCount n) {
-    auto f = dEdge::one;
-    assert((signed char)n == n);
-    for (dd::Qubit p = 0; p < (signed char)n; p++) {
-        f = dd->makeDDNode(p, std::array{f, dEdge::zero, dEdge::zero, dEdge::zero});
-    }
-    return f;
-}
-
 std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate() {
     const unsigned short         nQubits = qc->getNqubits();
     std::map<unsigned int, bool> classic_values;
 
-    rootEdge = makeZeroDensityOperator(nQubits);
+    rootEdge = dd->makeZeroDensityOperator();
     dd->incRef(rootEdge);
 
     auto deterministicNoiseFunctionality = dd::DeterministicNoiseFunctionality<DensityMatrixPackage>(

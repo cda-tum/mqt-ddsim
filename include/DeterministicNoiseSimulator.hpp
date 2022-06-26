@@ -106,11 +106,6 @@ private:
 
     bool sequentiallyApplyNoise;
     bool useDensityMatrixType;
-
-    dEdge makeZeroDensityOperator(dd::QubitCount n);
-    //    void   applyDetNoiseSequential(const qc::Targets& targets);
-    //    void   generateGate(qc::MatrixDD* pointerForMatrices, dd::NoiseOperations noiseType, dd::Qubit target, double probability);
-    //    double getNoiseProbability(dd::NoiseOperations type, const qc::Targets& targets);
 };
 
 #endif //DDSIM_DETERMINISTICNOISESIMULATOR_HPP

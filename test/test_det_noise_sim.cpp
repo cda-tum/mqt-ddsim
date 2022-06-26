@@ -54,8 +54,8 @@ TEST(DeterministicNoiseSimTest, MeasurementOne) {
 
 TEST(DeterministicNoiseSimTest, TestingBarrierGate) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, std::vector<dd::Qubit>(0), qc::Barrier);
+    quantumComputation->x(0);
+    quantumComputation->barrier(0);
     std::unique_ptr<DeterministicNoiseSimulator> ddsim{nullptr};
     ddsim  = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, std::string("A"), 0, 0, 1);
     auto m = ddsim->DeterministicSimulate();
