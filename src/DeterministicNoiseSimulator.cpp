@@ -8,7 +8,6 @@ using dNode = dd::dNode;
 using mEdge = dd::mEdge;
 
 std::map<std::string, double> DeterministicNoiseSimulator::DeterministicSimulate() {
-    const unsigned short         nQubits = qc->getNqubits();
     std::map<unsigned int, bool> classic_values;
 
     rootEdge = dd->makeZeroDensityOperator();

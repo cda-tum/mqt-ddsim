@@ -124,6 +124,7 @@ std::map<std::string, double> StochasticNoiseSimulator::StochSimulate() {
     const auto t2_stoch = std::chrono::steady_clock::now();
     stoch_run_time      = std::chrono::duration<float>(t2_stoch - t1_stoch).count();
 
+    // Adding the measured results from all instances into the last entry of classicalMeasurementsMaps (i.e, classicalMeasurementsMaps[maxInstances])
     for (unsigned long j = 0; j < maxInstances; j++) {
         for (const auto& classical_measurements_map: classicalMeasurementsMaps[j]) {
             classicalMeasurementsMaps[maxInstances][classical_measurements_map.first] += classical_measurements_map.second;
@@ -135,14 +136,14 @@ std::map<std::string, double> StochasticNoiseSimulator::StochSimulate() {
         for (unsigned int i = 0; i < maxInstances; i++) {
             recordedPropertiesPerInstance[maxInstances][j] += recordedPropertiesPerInstance[i][j];
         }
-        recordedPropertiesPerInstance[maxInstances][j] /= stochasticRuns;
+        recordedPropertiesPerInstance[maxInstances][j] /= (double)stochasticRuns;
     }
 
     // Adding the result of classical registers to the measure_result map
     std::map<std::string, double> measure_result;
-    for (const std::pair<const std::basic_string<char>, int>& classical_measurements_map: classicalMeasurementsMaps[maxInstances]) {
-        const auto probability = (double)classical_measurements_map.second / stochasticRuns;
-        measure_result.insert({classical_measurements_map.first, probability}); //todo maybe print both classical and quantum register ? classical register:"
+    for (auto& classical_measurements_map: classicalMeasurementsMaps[maxInstances]) {
+        const auto probability = (double)classical_measurements_map.second / (double)stochasticRuns;
+        measure_result.insert({classical_measurements_map.first, probability});
     }
 
     //std::clog << "Probabilities are ... (probabilities < 0.001 are omitted)\n";
