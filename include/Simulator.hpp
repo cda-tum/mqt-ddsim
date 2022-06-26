@@ -16,7 +16,7 @@
 #include <utility>
 #include <vector>
 
-template<class DDPackage>
+template<class DDPackage = dd::Package<>>
 class Simulator {
 public:
     explicit Simulator(unsigned long long seed):
