@@ -16,7 +16,7 @@ TEST(HybridSimTest, TrivialParallelDD) {
         return quantumComputation;
     };
 
-    HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::DD);
+    HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator<>::Mode::DD);
 
     auto resultDD = ddsim.Simulate(8192);
     for (const auto& entry: resultDD) {
@@ -50,7 +50,7 @@ TEST(HybridSimTest, TrivialParallelAmplitude) {
         return quantumComputation;
     };
 
-    HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
+    HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude);
 
     auto resultAmp = ddsim.Simulate(8192);
     for (const auto& entry: resultAmp) {
@@ -76,7 +76,7 @@ TEST(HybridSimTest, GRCSTestDD) {
     auto qc1 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
     auto qc2 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
 
-    HybridSchrodingerFeynmanSimulator ddsim_hybrid_dd(std::move(qc1), HybridSchrodingerFeynmanSimulator::Mode::DD);
+    HybridSchrodingerFeynmanSimulator ddsim_hybrid_dd(std::move(qc1), HybridSchrodingerFeynmanSimulator<>::Mode::DD);
     CircuitSimulator                  ddsim(std::move(qc2));
 
     ddsim_hybrid_dd.Simulate(1);
@@ -109,7 +109,7 @@ TEST(HybridSimTest, GRCSTestAmplitudes) {
     auto qc1 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
     auto qc2 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
 
-    HybridSchrodingerFeynmanSimulator ddsim_hybrid_amp(std::move(qc1), HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
+    HybridSchrodingerFeynmanSimulator ddsim_hybrid_amp(std::move(qc1), HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude);
     CircuitSimulator                  ddsim(std::move(qc2));
 
     ddsim_hybrid_amp.Simulate(0);
@@ -134,7 +134,7 @@ TEST(HybridSimTest, GRCSTestFixedSeed) {
     auto qc2 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
 
     HybridSchrodingerFeynmanSimulator ddsim_hybrid_amp(std::move(qc1), ApproximationInfo{}, 42);
-    EXPECT_TRUE(ddsim_hybrid_amp.getMode() == HybridSchrodingerFeynmanSimulator::Mode::Amplitude);
+    EXPECT_TRUE(ddsim_hybrid_amp.getMode() == HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude);
     CircuitSimulator ddsim(std::move(qc2));
 
     ddsim_hybrid_amp.Simulate(0);

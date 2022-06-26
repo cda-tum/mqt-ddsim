@@ -10,7 +10,7 @@ TEST(UnitarySimTest, ConstructSimpleCircuitSequential) {
     quantumComputation->emplace_back<qc::StandardOperation>(3, 2, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 2_pc, 1, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 2_pc, 0, qc::H);
-    UnitarySimulator ddsim(std::move(quantumComputation), UnitarySimulator::Mode::Sequential);
+    UnitarySimulator ddsim(std::move(quantumComputation), UnitarySimulator<>::Mode::Sequential);
     ASSERT_NO_THROW(ddsim.Construct());
     const auto& e = ddsim.getConstructedDD();
     EXPECT_TRUE(e.p->e[0].p->isIdentity());
@@ -27,7 +27,7 @@ TEST(UnitarySimTest, ConstructSimpleCircuitRecursive) {
     quantumComputation->emplace_back<qc::StandardOperation>(3, 2, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 2_pc, 1, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 2_pc, 0, qc::H);
-    UnitarySimulator ddsim(std::move(quantumComputation), UnitarySimulator::Mode::Recursive);
+    UnitarySimulator ddsim(std::move(quantumComputation), UnitarySimulator<>::Mode::Recursive);
     ASSERT_NO_THROW(ddsim.Construct());
     const auto& e = ddsim.getConstructedDD();
     EXPECT_TRUE(e.p->e[0].p->isIdentity());
@@ -44,7 +44,7 @@ TEST(UnitarySimTest, ConstructSimpleCircuitRecursiveWithSeed) {
     quantumComputation->emplace_back<qc::StandardOperation>(3, 2, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 2_pc, 1, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 2_pc, 0, qc::H);
-    UnitarySimulator ddsim(std::move(quantumComputation), ApproximationInfo{}, 1337, UnitarySimulator::Mode::Recursive);
+    UnitarySimulator ddsim(std::move(quantumComputation), ApproximationInfo{}, 1337, UnitarySimulator<>::Mode::Recursive);
     ASSERT_NO_THROW(ddsim.Construct());
     const auto& e = ddsim.getConstructedDD();
     EXPECT_TRUE(e.p->e[0].p->isIdentity());
@@ -60,6 +60,6 @@ TEST(UnitarySimTest, NonStandardOperation) {
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, 0, 0);
 
     UnitarySimulator ddsim(std::move(quantumComputation));
-    EXPECT_TRUE(ddsim.getMode() == UnitarySimulator::Mode::Recursive);
+    EXPECT_TRUE(ddsim.getMode() == UnitarySimulator<>::Mode::Recursive);
     EXPECT_THROW(ddsim.Construct(), std::invalid_argument);
 }
