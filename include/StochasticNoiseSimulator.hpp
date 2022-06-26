@@ -13,16 +13,17 @@
 #include <thread>
 #include <vector>
 
-class StochasticNoiseSimulator: public Simulator<StochasticNoisePackage> {
+template<class DDPackage = StochasticNoisePackage>
+class StochasticNoiseSimulator: public Simulator<DDPackage> {
 public:
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int stepNumber, const double stepFidelity):
         qc(qc), stepNumber(stepNumber), stepFidelity(stepFidelity) {
-        dd->resize(qc->getNqubits());
+        Simulator<DDPackage>::dd->resize(qc->getNqubits());
     }
 
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int stepNumber, const double stepFidelity, std::size_t seed):
-        Simulator(seed), qc(qc), stepNumber(stepNumber), stepFidelity(stepFidelity) {
-        dd->resize(qc->getNqubits());
+        Simulator<DDPackage>(seed), qc(qc), stepNumber(stepNumber), stepFidelity(stepFidelity) {
+        Simulator<DDPackage>::dd->resize(qc->getNqubits());
     }
 
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
@@ -36,7 +37,7 @@ public:
                              unsigned int                             stepNumber,
                              double                                   stepFidelity,
                              std::size_t                              seed = 0U):
-        Simulator(seed),
+        Simulator<DDPackage>(seed),
         qc(qc), stepNumber(stepNumber), stepFidelity(stepFidelity) {
         // setNoiseEffects
         for (const auto noise: cNoiseEffects) {
@@ -76,7 +77,7 @@ public:
 
         setRecordedProperties(recordedProperties);
 
-        dd->resize(qc->getNqubits());
+        Simulator<DDPackage>::dd->resize(qc->getNqubits());
     }
 
     std::vector<std::pair<long, std::string>>        recordedProperties;
