@@ -67,17 +67,17 @@ int main(int argc, char** argv) {
 
     if (vm["stoch_runs"].as<std::size_t>() > 0) {
         // Using stochastic simulator
-        std::unique_ptr<StochasticNoiseSimulator> ddsim = std::make_unique<StochasticNoiseSimulator>(quantumComputation,
-                                                                                                     vm["noise_effects"].as<std::string>(),
-                                                                                                     vm["noise_prob"].as<double>(),
-                                                                                                     noise_prob_t1,
-                                                                                                     vm["noise_prob_multi"].as<double>(),
-                                                                                                     vm["stoch_runs"].as<size_t>(),
-                                                                                                     vm["properties"].as<std::string>(),
-                                                                                                     vm.count("unoptimized_sim"),
-                                                                                                     vm["steps"].as<unsigned int>(),
-                                                                                                     vm["step_fidelity"].as<double>(),
-                                                                                                     vm["seed"].as<std::size_t>());
+        auto ddsim = std::make_unique<StochasticNoiseSimulator<>>(quantumComputation,
+                                                                  vm["noise_effects"].as<std::string>(),
+                                                                  vm["noise_prob"].as<double>(),
+                                                                  noise_prob_t1,
+                                                                  vm["noise_prob_multi"].as<double>(),
+                                                                  vm["stoch_runs"].as<size_t>(),
+                                                                  vm["properties"].as<std::string>(),
+                                                                  vm.count("unoptimized_sim"),
+                                                                  vm["steps"].as<unsigned int>(),
+                                                                  vm["step_fidelity"].as<double>(),
+                                                                  vm["seed"].as<std::size_t>());
 
         auto t1 = std::chrono::steady_clock::now();
 
@@ -113,11 +113,11 @@ int main(int argc, char** argv) {
 
     } else if (vm["stoch_runs"].as<std::size_t>() == 0) {
         // Using deterministic simulator
-        std::unique_ptr<DeterministicNoiseSimulator> ddsim = std::make_unique<DeterministicNoiseSimulator>(quantumComputation, vm["noise_effects"].as<std::string>(),
-                                                                                                           vm["noise_prob"].as<double>(),
-                                                                                                           noise_prob_t1,
-                                                                                                           vm["noise_prob_multi"].as<double>(),
-                                                                                                           vm.count("unoptimized_sim"), seed);
+        auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, vm["noise_effects"].as<std::string>(),
+                                                                     vm["noise_prob"].as<double>(),
+                                                                     noise_prob_t1,
+                                                                     vm["noise_prob_multi"].as<double>(),
+                                                                     vm.count("unoptimized_sim"), seed);
 
         auto t1 = std::chrono::steady_clock::now();
 
