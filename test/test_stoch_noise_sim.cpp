@@ -404,3 +404,13 @@ TEST(StochNoiseSimTest, TestingWithErrorProbZero) {
     EXPECT_NEAR(m.find("1001")->second, 1, tolerance);
     EXPECT_EQ(m.size(), 3);
 }
+
+TEST(StochNoiseSimTest, TestingWithEmpthyNoiseTypes) {
+    auto                     quantumComputation = stochGetAdder4Circuit();
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string(""), 0.1, std::optional<double>{}, 2, 1000, std::string("0-15"), false, 1, 1);
+    auto                     m         = ddsim.StochSimulate();
+    double                   tolerance = 0.1;
+
+    EXPECT_NEAR(m.find("1001")->second, 1, tolerance);
+    EXPECT_EQ(m.size(), 3);
+}
