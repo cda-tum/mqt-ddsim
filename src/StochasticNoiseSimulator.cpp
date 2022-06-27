@@ -170,21 +170,21 @@ void StochasticNoiseSimulator<DDPackage>::runStochSimulationForId(std::size_t   
     std::mt19937_64                        generator(localSeed);
     std::uniform_real_distribution<dd::fp> dist(0.0, 1.0);
 
-    auto localDD                      = std::make_unique<StochasticNoisePackage>(getNumberOfQubits());
-    auto stochasticNoiseFunctionality = dd::StochasticNoiseFunctionality<StochasticNoisePackage>(
-            localDD,
-            nQubits,
-            noiseProbability,
-            amplitudeDampingProb,
-            multiQubitGateFactor,
-            noiseEffects);
-
     const unsigned long numberOfRuns = stochasticRuns / maxInstances + (stochRun < stochasticRuns % maxInstances ? 1U : 0U);
     const int           approxMod    = std::ceil(static_cast<double>(qc->getNops()) / (stepNumber + 1));
 
     //printf("Running %d times and using the dd at %p, using the cn object at %p\n", numberOfRuns, (void *) &package, (void *) &package->cn);
     for (std::size_t currentRun = 0U; currentRun < numberOfRuns; currentRun++) {
         const auto t1 = std::chrono::steady_clock::now();
+
+        std::unique_ptr<StochasticNoisePackage> localDD                      = std::make_unique<StochasticNoisePackage>(getNumberOfQubits());
+        auto                                    stochasticNoiseFunctionality = dd::StochasticNoiseFunctionality<StochasticNoisePackage>(
+                localDD,
+                nQubits,
+                noiseProbability,
+                amplitudeDampingProb,
+                multiQubitGateFactor,
+                noiseEffects);
 
         std::map<std::size_t, bool> classicValues;
 
