@@ -19,11 +19,13 @@ public:
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int stepNumber, const double stepFidelity):
         qc(qc), stepNumber(stepNumber), stepFidelity(stepFidelity) {
         Simulator<DDPackage>::dd->resize(qc->getNqubits());
+        setMaxInstances();
     }
 
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int stepNumber, const double stepFidelity, std::size_t seed):
         Simulator<DDPackage>(seed), qc(qc), stepNumber(stepNumber), stepFidelity(stepFidelity) {
         Simulator<DDPackage>::dd->resize(qc->getNqubits());
+        setMaxInstances();
     }
 
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
@@ -72,12 +74,10 @@ public:
         }
 
         sequentiallyApplyNoise = unoptimizedSim;
-
-        stochasticRuns = cStochRuns;
-
+        stochasticRuns         = cStochRuns;
         setRecordedProperties(recordedProperties);
-
         Simulator<DDPackage>::dd->resize(qc->getNqubits());
+        setMaxInstances();
     }
 
     std::vector<std::pair<long, std::string>>        recordedProperties;
@@ -87,7 +87,7 @@ public:
     std::map<std::string, unsigned int>              finalClassicalMeasurementsMap;
 
     void setRecordedProperties(const std::string& input);
-    void setMaxInstances(unsigned int parallelInstances) { maxInstances = parallelInstances; };
+    void setMaxInstances() { maxInstances = std::thread::hardware_concurrency() > 4 ? std::thread::hardware_concurrency() - 4 : 1; };
 
     std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
     std::map<std::string, double>      StochSimulate();
@@ -121,8 +121,7 @@ private:
 
     std::vector<dd::NoiseOperations> noiseEffects;
 
-    unsigned int maxInstances = std::max(1U, std::thread::hardware_concurrency() - 4U);
-    //    unsigned int maxInstances = 1; // use for debugging only
+    unsigned int maxInstances = 1;
 
     std::unique_ptr<qc::QuantumComputation>& qc;
 

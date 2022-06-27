@@ -60,7 +60,6 @@ TEST(StochNoiseSimTest, ClassicControlledOp) {
     quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classical_register, 1);
 
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
 
     ddsim.Simulate(1);
 
@@ -74,7 +73,7 @@ TEST(StochNoiseSimTest, DestructiveMeasurementAll) {
     quantumComputation->h(0);
     quantumComputation->h(1);
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     ddsim.Simulate(1);
 
     const std::vector<dd::ComplexValue> v_before = ddsim.getVector();
@@ -95,7 +94,7 @@ TEST(StochNoiseSimTest, DestructiveMeasurementOne) {
     quantumComputation->h(0);
     quantumComputation->h(1);
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     ddsim.Simulate(1);
 
     const char                          m       = ddsim.MeasureOneCollapsing(0);
@@ -121,7 +120,7 @@ TEST(StochNoiseSimTest, DestructiveMeasurementOneArbitraryNormalization) {
     quantumComputation->h(0);
     quantumComputation->h(1);
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     ddsim.Simulate(1);
 
     std::mt19937_64 gen{};
@@ -156,7 +155,7 @@ TEST(StochNoiseSimTest, ApproximateByFidelity) {
     quantumComputation->h(1);
     quantumComputation->emplace_back<qc::StandardOperation>(3, dd::Controls{dd::Control{0}, dd::Control{1}}, 2, qc::X);
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
@@ -173,7 +172,7 @@ TEST(StochNoiseSimTest, ApproximateBySampling) {
     quantumComputation->h(1);
     quantumComputation->emplace_back<qc::StandardOperation>(3, dd::Controls{dd::Control{0}, dd::Control{1}}, 2, qc::X);
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
@@ -192,7 +191,7 @@ TEST(StochNoiseSimTest, Reordering) {
     quantumComputation->emplace_back<qc::StandardOperation>(3, dd::Controls{dd::Control{0}, dd::Control{1}}, 2, qc::X);
 
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     ddsim.Simulate(1);
 }
 
@@ -206,7 +205,7 @@ TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
     quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classical_register, 1);
 
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.02, std::optional<double>{}, 2, 1000, std::string("0-3"), false, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     auto m = ddsim.StochSimulate();
 
     double tolerance = 0.1;
@@ -219,7 +218,7 @@ TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
 TEST(StochNoiseSimTest, SimulateAdder4WithoutNoise) {
     auto                     quantumComputation = stochGetAdder4Circuit();
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     ddsim.Simulate(1);
     auto m = ddsim.MeasureAll(false);
     ASSERT_EQ("1001", m);
@@ -228,7 +227,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithoutNoise) {
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateError) {
     auto                     quantumComputation = stochGetAdder4Circuit();
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, std::optional<double>{}, 2, 1000, std::string("0-16"), false, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     auto m = ddsim.StochSimulate();
 
     double tolerance = 0.1;
@@ -252,7 +251,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateError) {
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorSelectedProperties) {
     auto                     quantumComputation = stochGetAdder4Circuit();
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, std::optional<double>{}, 2, 1000, std::string("4,8-15"), false, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     auto   m         = ddsim.StochSimulate();
     double tolerance = 0.1;
 
@@ -274,7 +273,7 @@ TEST(StochNoiseSimTest, SimulateRunWithBadParameters) {
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceError) {
     auto                     quantumComputation = stochGetAdder4Circuit();
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("AP"), 0.01, std::optional<double>{}, 2, 1000, std::string("0-1000"), false, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     auto   m         = ddsim.StochSimulate();
     double tolerance = 0.1;
 
@@ -293,7 +292,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceError) {
 TEST(StochNoiseSimTest, SimulateAdder4WithDepolarizationError) {
     auto                     quantumComputation = stochGetAdder4Circuit();
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("D"), 0.01, std::optional<double>{}, 2, 1000, std::string("0-1000"), false, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     auto m = ddsim.StochSimulate();
 
     double tolerance = 0.1;
@@ -313,7 +312,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDepolarizationError) {
 TEST(StochNoiseSimTest, SimulateAdder4WithNoiseAndApproximation) {
     auto                     quantumComputation = stochGetAdder4Circuit();
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.01, std::optional<double>{}, 2, 1000, std::string("-2-1000"), false, 1, 0.9);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     auto m = ddsim.StochSimulate();
 
     double tolerance = 0.1;
@@ -340,7 +339,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithNoiseAndApproximation) {
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorUnoptimizedSim) {
     auto                     quantumComputation = stochGetAdder4Circuit();
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, std::optional<double>{}, 2, 1000, std::string("0-16"), true, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     auto m = ddsim.StochSimulate();
 
     double tolerance = 0.1;
@@ -380,7 +379,6 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorUnoptimizedSim)
 TEST(StochNoiseSimTest, ParseProperties) {
     auto                     quantumComputation = stochGetAdder4Circuit();
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.1, std::optional<double>{}, 2, 1000, std::string("0, 6, 1"), false, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
     auto m = ddsim.StochSimulate();
 
     double tolerance = 0.1;
@@ -401,7 +399,7 @@ TEST(StochNoiseSimTest, TestingBarrierGate) {
     quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.02, std::optional<double>{}, 2, 1000, std::string("0-3, 23, 444, 2"), false, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     auto m = ddsim.StochSimulate();
 
     double tolerance = 0.01;
@@ -414,7 +412,7 @@ TEST(StochNoiseSimTest, TestingBarrierGate) {
 TEST(StochNoiseSimTest, TestingWithErrorProbZero) {
     auto                     quantumComputation = stochGetAdder4Circuit();
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0, std::optional<double>{}, 2, 1000, std::string("0-15"), false, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     auto   m         = ddsim.StochSimulate();
     double tolerance = 0.1;
 
@@ -425,7 +423,7 @@ TEST(StochNoiseSimTest, TestingWithErrorProbZero) {
 TEST(StochNoiseSimTest, TestingWithEmpthyNoiseTypes) {
     auto                     quantumComputation = stochGetAdder4Circuit();
     StochasticNoiseSimulator ddsim(quantumComputation, std::string(""), 0.1, std::optional<double>{}, 2, 1000, std::string("0-15"), false, 1, 1);
-    ddsim.setMaxInstances(2); // The tests in the CI otherwise crash.
+
     auto   m         = ddsim.StochSimulate();
     double tolerance = 0.1;
 
