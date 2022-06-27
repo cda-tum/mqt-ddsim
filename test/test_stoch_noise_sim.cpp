@@ -394,3 +394,13 @@ TEST(StochNoiseSimTest, TestingBarrierGate) {
     EXPECT_NEAR(m.find("10")->second, 0.3853912629956448, tolerance);
     EXPECT_NEAR(m.find("11")->second, 0.09500873700435522, tolerance);
 }
+
+TEST(StochNoiseSimTest, TestingWithErrorProbZero) {
+    auto                     quantumComputation = stochGetAdder4Circuit();
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0, std::optional<double>{}, 2, 1000, std::string("0-15"), false, 1, 1);
+    auto                     m         = ddsim.StochSimulate();
+    double                   tolerance = 0.1;
+
+    EXPECT_NEAR(m.find("1001")->second, 1, tolerance);
+    EXPECT_EQ(m.size(), 3);
+}
