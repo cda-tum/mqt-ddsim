@@ -120,8 +120,8 @@ private:
 
     std::vector<dd::NoiseOperations> noiseEffects;
 
-    const unsigned int maxInstances = std::max(1U, std::thread::hardware_concurrency() - 4U);
-    //    const unsigned int maxInstances = 1; // use for debugging only
+    //    const unsigned int maxInstances = std::max(1U, std::thread::hardware_concurrency() - 4U);
+    const unsigned int maxInstances = 1; // use for debugging only
 
     std::unique_ptr<qc::QuantumComputation>& qc;
 
