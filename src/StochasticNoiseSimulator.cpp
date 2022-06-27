@@ -107,7 +107,7 @@ std::map<std::string, double> StochasticNoiseSimulator<DDPackage>::StochSimulate
     //std::clog << "Starting " << maxInstances << " threads\n";
     const auto t1Stoch = std::chrono::steady_clock::now();
     for (std::size_t runID = 0U; runID < maxInstances; runID++) {
-        threadArray.emplace_back(&StochasticNoiseSimulator::runStochSimulationForId,
+        threadArray.emplace_back(&StochasticNoiseSimulator<DDPackage>::runStochSimulationForId,
                                  this,
                                  runID,
                                  qc->getNqubits(),
