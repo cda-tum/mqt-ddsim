@@ -177,8 +177,8 @@ void StochasticNoiseSimulator<DDPackage>::runStochSimulationForId(std::size_t   
     for (std::size_t currentRun = 0U; currentRun < numberOfRuns; currentRun++) {
         const auto t1 = std::chrono::steady_clock::now();
 
-        std::unique_ptr<StochasticNoisePackage> localDD                      = std::make_unique<StochasticNoisePackage>(getNumberOfQubits());
-        auto                                    stochasticNoiseFunctionality = dd::StochasticNoiseFunctionality<StochasticNoisePackage>(
+        auto localDD                      = std::make_unique<StochasticNoisePackage>(getNumberOfQubits());
+        auto stochasticNoiseFunctionality = dd::StochasticNoiseFunctionality<StochasticNoisePackage>(
                 localDD,
                 nQubits,
                 noiseProbability,
