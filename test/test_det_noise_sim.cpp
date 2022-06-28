@@ -190,3 +190,25 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDCustomProb) {
     EXPECT_NEAR(m.find("1101")->second, 0.0187340765889, tolerance);
     EXPECT_NEAR(m.find("1110")->second, 0.0301853251959, tolerance);
 }
+
+TEST(DeterministicNoiseSimTest, SimulateAdder4NoNoise_1) {
+    auto quantumComputation = detGetAdder4Circuit();
+    auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, std::string("I"), 0.01, 0.02, 1);
+
+    auto m = ddsim->DeterministicSimulate();
+    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+
+    double tolerance = 1e-10;
+    EXPECT_NEAR(m.find("1001")->second, 1, tolerance);
+}
+
+TEST(DeterministicNoiseSimTest, SimulateAdder4NoNoise_2) {
+    auto quantumComputation = detGetAdder4Circuit();
+    auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, std::string("APD"), 0, 0, 1);
+
+    auto m = ddsim->DeterministicSimulate();
+    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+
+    double tolerance = 1e-10;
+    EXPECT_NEAR(m.find("1001")->second, 1, tolerance);
+}
