@@ -239,8 +239,8 @@ TEST(CircuitSimTest, TestingProperties) {
     CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven), 1);
     ddsim.Simulate(1);
 
-    EXPECT_GT(ddsim.getActiveNodeCount(), 6);
-    EXPECT_GT(ddsim.getMaxMatrixNodeCount(), 0);
-    EXPECT_GT(ddsim.getMatrixActiveNodeCount(), 0);
-    EXPECT_GT(ddsim.countNodesFromRoot(), 7);
+    EXPECT_EQ(ddsim.getActiveNodeCount(), 6);
+    EXPECT_EQ(ddsim.getMaxMatrixNodeCount(), 0);
+    EXPECT_EQ(ddsim.getMatrixActiveNodeCount(), 0);
+    EXPECT_EQ(ddsim.countNodesFromRoot(), 7);
 }
