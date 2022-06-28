@@ -230,3 +230,17 @@ TEST(CircuitSimTest, GRCS4x4Test) {
         ddsim.dd->cn.complexTable.printStatistics();
     }
 }
+
+TEST(CircuitSimTest, TestingProperties) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
+    quantumComputation->emplace_back<qc::StandardOperation>(3, 0, qc::H);
+    quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::H);
+    quantumComputation->emplace_back<qc::StandardOperation>(3, dd::Controls{dd::Control{0}, dd::Control{1}}, 2, qc::X);
+    CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven), 1);
+    ddsim.Simulate(1);
+
+    EXPECT_GT(ddsim.getActiveNodeCount(), 6);
+    EXPECT_GT(ddsim.getMaxMatrixNodeCount(), 0);
+    EXPECT_GT(ddsim.getMatrixActiveNodeCount(), 0);
+    EXPECT_GT(ddsim.countNodesFromRoot(), 7);
+}

@@ -239,4 +239,20 @@ TEST(DeterministicNoiseSimTest, TestFunctionsUnOptimized) {
     EXPECT_EQ(ddsim->getMaxMatrixNodeCount(), 0);
     EXPECT_EQ(ddsim->getMatrixActiveNodeCount(), 0);
     EXPECT_EQ(ddsim->countNodesFromRoot(), 30);
+
+    EXPECT_TRUE(ddsim->toBinaryString(9, 6) == "100100");
+}
+
+TEST(DeterministicNoiseSimTest, TestingSimulatorFunctionality) {
+    auto quantumComputation = detGetAdder4Circuit();
+    auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, std::string("APD"), 0.01, 0.02, 1, true);
+    auto m                  = ddsim->DeterministicSimulate();
+    EXPECT_THROW(ddsim->Simulate(1), std::runtime_error);
+
+    EXPECT_EQ(ddsim->getNumberOfQubits(), 4);
+    EXPECT_EQ(ddsim->getActiveNodeCount(), 29);
+    EXPECT_EQ(ddsim->getMaxNodeCount(), 58);
+    EXPECT_EQ(ddsim->getMaxMatrixNodeCount(), 0);
+    EXPECT_EQ(ddsim->getMatrixActiveNodeCount(), 0);
+    EXPECT_EQ(ddsim->countNodesFromRoot(), 30);
 }
