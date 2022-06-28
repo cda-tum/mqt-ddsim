@@ -154,7 +154,7 @@ TEST(StochNoiseSimTest, ApproximateByFidelity) {
     quantumComputation->h(0);
     quantumComputation->h(1);
     quantumComputation->emplace_back<qc::StandardOperation>(3, dd::Controls{dd::Control{0}, dd::Control{1}}, 2, qc::X);
-    StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
+    StochasticNoiseSimulator ddsim(quantumComputation, 1, 1, 54);
 
     ddsim.Simulate(1);
 
