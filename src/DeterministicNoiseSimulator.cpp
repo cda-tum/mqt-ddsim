@@ -29,18 +29,11 @@ std::map<std::string, double> DeterministicNoiseSimulator<DDPackage>::Determinis
         Simulator<DDPackage>::dd->garbageCollect();
         if (!op->isUnitary() && !(op->isClassicControlledOperation())) {
             if (auto* nuOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
-                if (op->getType() == qc::Measure) {
-                    throw std::invalid_argument("Measurements are currently not supported");
-                } else if (op->getType() == qc::Reset) {
-                    //                    // Reset qubit
-                    throw std::runtime_error(std::string{"Unsupported non-unitary functionality: \""} + nuOp->getName() + "\"");
-                } else {
-                    //Skipping barrier
-                    if (op->getType() == qc::Barrier) {
-                        continue;
-                    }
-                    throw std::runtime_error(std::string{"Unsupported non-unitary functionality: \""} + nuOp->getName() + "\"");
+                //Skipping barrier
+                if (op->getType() == qc::Barrier) {
+                    continue;
                 }
+                throw std::runtime_error(std::string{"Unsupported non-unitary functionality: \""} + nuOp->getName() + "\"");
             } else {
                 throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
             }

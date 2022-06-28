@@ -79,7 +79,7 @@ public:
         Simulator<DDPackage>::dd->resize(qc->getNqubits());
     }
 
-    std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override { return {}; };
+    std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override { throw std::runtime_error("Not implemented. Use DeterministicSimulate() instead."); };
 
     std::map<std::string, double> DeterministicSimulate();
 
@@ -93,7 +93,17 @@ public:
     [[nodiscard]] std::size_t getMaxNodeCount() const override { return Simulator<DDPackage>::dd->dUniqueTable.getMaxActiveNodes(); }
     [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return Simulator<DDPackage>::dd->mUniqueTable.getMaxActiveNodes(); }
     [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return Simulator<DDPackage>::dd->mUniqueTable.getActiveNodeCount(); }
-    [[nodiscard]] std::size_t countNodesFromRoot() const override { return Simulator<DDPackage>::dd->size(rootEdge); }
+    [[nodiscard]] std::size_t countNodesFromRoot() {
+        size_t tmp;
+        if (useDensityMatrixType) {
+            dEdge::alignDensityEdge(&rootEdge);
+            tmp = Simulator<DDPackage>::dd->size(rootEdge);
+            dEdge::setDensityMatrixTrue(&rootEdge);
+        } else {
+            tmp = Simulator<DDPackage>::dd->size(rootEdge);
+        }
+        return tmp;
+    }
 
     dEdge rootEdge{};
 

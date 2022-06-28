@@ -43,12 +43,12 @@ TEST(DeterministicNoiseSimTest, MeasurementOne) {
 
     {
         auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, 5);
-        EXPECT_THROW(ddsim->DeterministicSimulate();, std::invalid_argument);
+        EXPECT_THROW(ddsim->DeterministicSimulate();, std::runtime_error);
     }
 
     {
         auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, 1);
-        EXPECT_THROW(ddsim->DeterministicSimulate();, std::invalid_argument);
+        EXPECT_THROW(ddsim->DeterministicSimulate();, std::runtime_error);
     }
 }
 
@@ -211,4 +211,32 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4NoNoise_2) {
 
     double tolerance = 1e-10;
     EXPECT_NEAR(m.find("1001")->second, 1, tolerance);
+}
+
+TEST(DeterministicNoiseSimTest, TestFunctionsOptimized) {
+    auto quantumComputation = detGetAdder4Circuit();
+    auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, std::string("APD"), 0.01, 0.02, 1);
+    auto m                  = ddsim->DeterministicSimulate();
+    EXPECT_THROW(ddsim->Simulate(1), std::runtime_error);
+
+    EXPECT_EQ(ddsim->getNumberOfQubits(), 4);
+    EXPECT_EQ(ddsim->getActiveNodeCount(), 22);
+    EXPECT_EQ(ddsim->getMaxNodeCount(), 44);
+    EXPECT_EQ(ddsim->getMaxMatrixNodeCount(), 0);
+    EXPECT_EQ(ddsim->getMatrixActiveNodeCount(), 0);
+    EXPECT_EQ(ddsim->countNodesFromRoot(), 23);
+}
+
+TEST(DeterministicNoiseSimTest, TestFunctionsUnOptimized) {
+    auto quantumComputation = detGetAdder4Circuit();
+    auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, std::string("APD"), 0.01, 0.02, 1, true);
+    auto m                  = ddsim->DeterministicSimulate();
+    EXPECT_THROW(ddsim->Simulate(1), std::runtime_error);
+
+    EXPECT_EQ(ddsim->getNumberOfQubits(), 4);
+    EXPECT_EQ(ddsim->getActiveNodeCount(), 29);
+    EXPECT_EQ(ddsim->getMaxNodeCount(), 58);
+    EXPECT_EQ(ddsim->getMaxMatrixNodeCount(), 0);
+    EXPECT_EQ(ddsim->getMatrixActiveNodeCount(), 0);
+    EXPECT_EQ(ddsim->countNodesFromRoot(), 30);
 }
