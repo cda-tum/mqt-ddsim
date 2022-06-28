@@ -47,6 +47,9 @@ public:
                 case 'D':
                     noiseEffects.push_back(dd::depolarization);
                     break;
+                case 'I':
+                    noiseEffects.push_back(dd::identity);
+                    break;
                 default:
                     throw std::runtime_error("Unknown noise operation '" + cNoiseEffects + "'\n");
             }
