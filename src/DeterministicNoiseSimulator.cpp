@@ -52,4 +52,29 @@ std::map<std::string, double> DeterministicNoiseSimulator<DDPackage>::Determinis
     return Simulator<DDPackage>::dd->getProbVectorFromDensityMatrix(rootEdge, measurementThreshold);
 }
 
+template<class DDPackage>
+std::map<std::string, std::size_t> DeterministicNoiseSimulator<DDPackage>::sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, unsigned int shots) {
+    // Create probability distribution from measure probabilities
+    std::vector<dd::fp> weights;
+    for (auto& res: resultProbabilityMap) {
+        weights.push_back(res.second);
+    }
+    std::discrete_distribution<> d(weights.begin(), weights.end());
+
+    //Sample n shots elements from the prob distribution
+    std::map<std::size_t, std::size_t>     results;
+    std::uniform_real_distribution<dd::fp> dist(0.0L, 1.0L);
+    for (size_t n = 0; n < shots; ++n) {
+        ++results[d(this->mt)];
+    }
+
+    // Create the final map containing the measurement results and the corresponding shots
+    std::map<std::string, std::size_t> resultShotsMap;
+    for (auto& res: results) {
+        resultShotsMap.insert({std::next(resultProbabilityMap.begin(), (long)res.first)->first, res.second});
+    }
+
+    return resultShotsMap;
+}
+
 template class DeterministicNoiseSimulator<DensityMatrixPackage>;

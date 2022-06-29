@@ -79,9 +79,17 @@ public:
         Simulator<DDPackage>::dd->resize(qc->getNqubits());
     }
 
-    std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override { throw std::runtime_error("Not implemented. Use DeterministicSimulate() instead."); };
+    std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override {
+        auto m = this->DeterministicSimulate();
 
-    std::map<std::string, double> DeterministicSimulate();
+        auto k = sampleFromProbabilityMap(m, shots);
+
+        return sampleFromProbabilityMap(m, shots);
+    };
+
+    std::map<std::string, dd::fp> DeterministicSimulate();
+
+    std::map<std::string, std::size_t> sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, unsigned int shots);
 
     [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
 
@@ -93,6 +101,7 @@ public:
     [[nodiscard]] std::size_t getMaxNodeCount() const override { return Simulator<DDPackage>::dd->dUniqueTable.getMaxActiveNodes(); }
     [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return Simulator<DDPackage>::dd->mUniqueTable.getMaxActiveNodes(); }
     [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return Simulator<DDPackage>::dd->mUniqueTable.getActiveNodeCount(); }
+
     [[nodiscard]] std::size_t countNodesFromRoot() {
         size_t tmp;
         if (useDensityMatrixType) {

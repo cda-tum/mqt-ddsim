@@ -217,7 +217,6 @@ TEST(DeterministicNoiseSimTest, TestFunctionsOptimized) {
     auto quantumComputation = detGetAdder4Circuit();
     auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, std::string("APD"), 0.01, 0.02, 1);
     auto m                  = ddsim->DeterministicSimulate();
-    EXPECT_THROW(ddsim->Simulate(1), std::runtime_error);
 
     EXPECT_EQ(ddsim->getNumberOfQubits(), 4);
     EXPECT_EQ(ddsim->getActiveNodeCount(), 22);
@@ -231,7 +230,6 @@ TEST(DeterministicNoiseSimTest, TestFunctionsUnOptimized) {
     auto quantumComputation = detGetAdder4Circuit();
     auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, std::string("APD"), 0.01, 0.02, 1, true);
     auto m                  = ddsim->DeterministicSimulate();
-    EXPECT_THROW(ddsim->Simulate(1), std::runtime_error);
 
     EXPECT_EQ(ddsim->getNumberOfQubits(), 4);
     EXPECT_EQ(ddsim->getActiveNodeCount(), 29);
@@ -247,7 +245,6 @@ TEST(DeterministicNoiseSimTest, TestingSimulatorFunctionality) {
     auto quantumComputation = detGetAdder4Circuit();
     auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, std::string("APD"), 0.01, 0.02, 1, true);
     auto m                  = ddsim->DeterministicSimulate();
-    EXPECT_THROW(ddsim->Simulate(1), std::runtime_error);
 
     EXPECT_EQ(ddsim->getNumberOfQubits(), 4);
     EXPECT_EQ(ddsim->getActiveNodeCount(), 29);
@@ -255,4 +252,39 @@ TEST(DeterministicNoiseSimTest, TestingSimulatorFunctionality) {
     EXPECT_EQ(ddsim->getMaxMatrixNodeCount(), 0);
     EXPECT_EQ(ddsim->getMatrixActiveNodeCount(), 0);
     EXPECT_EQ(ddsim->countNodesFromRoot(), 30);
+}
+
+TEST(DeterministicNoiseSimTest, sampleFromProbabilityMap1) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
+
+    auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, std::string("APD"), 0, 0, 1, true);
+    auto m     = ddsim->DeterministicSimulate();
+
+    std::vector<std::complex<dd::fp>> temp{};
+
+    size_t shots        = 100000;
+    auto   sampledShots = ddsim->sampleFromProbabilityMap(m, shots);
+
+    double tolerance = 0.01;
+    for (auto& result: m) {
+        EXPECT_NEAR(result.second, (dd::fp)sampledShots.find(result.first)->second / shots, tolerance);
+    }
+}
+
+TEST(DeterministicNoiseSimTest, sampleFromProbabilityMap2) {
+    auto quantumComputation = detGetAdder4Circuit();
+
+    auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, std::string("AP"), 0.1, 0.2, 1, true);
+
+    std::vector<std::complex<dd::fp>> temp{};
+
+    size_t shots        = 1000000;
+    auto   sampledShots = ddsim->Simulate(shots);
+    auto   m            = ddsim->DeterministicSimulate();
+
+    double tolerance = 0.01;
+    for (auto& result: m) {
+        EXPECT_NEAR(result.second, (dd::fp)sampledShots.find(result.first)->second / shots, tolerance);
+    }
 }
