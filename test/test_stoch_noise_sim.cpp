@@ -430,3 +430,18 @@ TEST(StochNoiseSimTest, TestingWithEmpthyNoiseTypes) {
     EXPECT_NEAR(m.find("1001")->second, 1, tolerance);
     EXPECT_EQ(m.size(), 3);
 }
+
+TEST(StochNoiseSimTest, TestingSimulatorFunctionality) {
+    auto                     quantumComputation = stochGetAdder4Circuit();
+    StochasticNoiseSimulator ddsim(quantumComputation, std::string(""), 0.1, std::optional<double>{}, 2, 1000, std::string("0-15"), false, 1, 1);
+
+    auto m = ddsim.StochSimulate();
+
+    EXPECT_EQ(ddsim.getNumberOfQubits(), 4);
+    EXPECT_EQ(ddsim.getActiveNodeCount(), 0);
+    EXPECT_EQ(ddsim.getMaxNodeCount(), 0);
+    EXPECT_EQ(ddsim.getMaxMatrixNodeCount(), 0);
+    EXPECT_EQ(ddsim.getMatrixActiveNodeCount(), 0);
+    EXPECT_EQ(ddsim.countNodesFromRoot(), 0);
+    std::cout << ddsim.getName() << "\n";
+}
