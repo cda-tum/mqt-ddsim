@@ -105,9 +105,9 @@ public:
     [[nodiscard]] std::size_t countNodesFromRoot() {
         size_t tmp;
         if (useDensityMatrixType) {
-            dEdge::alignDensityEdge(&rootEdge);
+            dEdge::alignDensityEdge(rootEdge);
             tmp = Simulator<DDPackage>::dd->size(rootEdge);
-            dEdge::setDensityMatrixTrue(&rootEdge);
+            dEdge::setDensityMatrixTrue(rootEdge);
         } else {
             tmp = Simulator<DDPackage>::dd->size(rootEdge);
         }

@@ -267,7 +267,7 @@ void StochasticNoiseSimulator<DDPackage>::runStochSimulationForId(std::size_t   
                     stochasticNoiseFunctionality.applyNoiseOperation(usedQubits, operation, localRootEdge, generator);
                     for (auto noiseEffect: noiseEffects) {
                         stochasticNoiseFunctionality.setNoiseEffects(std::vector<dd::NoiseOperations>{noiseEffect});
-                        stochasticNoiseFunctionality.applyNoiseOperation(usedQubits, stochasticNoiseFunctionality.identityDD, localRootEdge, generator);
+                        stochasticNoiseFunctionality.applyNoiseOperation(usedQubits, stochasticNoiseFunctionality.getIdentityDD(), localRootEdge, generator);
                     }
                 } else {
                     stochasticNoiseFunctionality.applyNoiseOperation(usedQubits, operation, localRootEdge, generator);

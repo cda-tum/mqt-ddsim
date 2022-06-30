@@ -11,7 +11,7 @@ template<class DDPackage>
 std::map<std::string, double> DeterministicNoiseSimulator<DDPackage>::DeterministicSimulate() {
     std::map<unsigned int, bool> classicValues;
 
-    rootEdge = Simulator<DDPackage>::dd->makeZeroDensityOperator();
+    rootEdge = Simulator<DDPackage>::dd->makeZeroDensityOperator(this->dd->qubits());
     Simulator<DDPackage>::dd->incRef(rootEdge);
 
     auto deterministicNoiseFunctionality = dd::DeterministicNoiseFunctionality<DensityMatrixPackage>(
@@ -71,7 +71,7 @@ std::map<std::string, std::size_t> DeterministicNoiseSimulator<DDPackage>::sampl
     // Create the final map containing the measurement results and the corresponding shots
     std::map<std::string, std::size_t> resultShotsMap;
     for (auto& res: results) {
-        resultShotsMap.insert({std::next(resultProbabilityMap.begin(), (long)res.first)->first, res.second});
+        resultShotsMap.insert({std::next(resultProbabilityMap.begin(), static_cast<long>(res.first))->first, res.second});
     }
 
     return resultShotsMap;
