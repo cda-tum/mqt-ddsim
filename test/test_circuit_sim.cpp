@@ -103,7 +103,7 @@ TEST(CircuitSimTest, DestructiveMeasurementAll) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::H);
-    CircuitSimulator ddsim(std::move(quantumComputation));
+    CircuitSimulator ddsim(std::move(quantumComputation), 42);
     ddsim.Simulate(1);
 
     const std::vector<dd::ComplexValue> v_before = ddsim.getVector();
