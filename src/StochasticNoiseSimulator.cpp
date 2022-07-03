@@ -123,7 +123,7 @@ std::map<std::string, double> StochasticNoiseSimulator<DDPackage>::StochSimulate
     const auto t2Stoch = std::chrono::steady_clock::now();
     stochRunTime       = std::chrono::duration<double>(t2Stoch - t1Stoch).count();
 
-    for (auto& classicalMeasurementsMap: classicalMeasurementsMaps) {
+    for (const auto& classicalMeasurementsMap: classicalMeasurementsMaps) {
         for (const auto& [state, count]: classicalMeasurementsMap) {
             finalClassicalMeasurementsMap[state] += count;
         }
