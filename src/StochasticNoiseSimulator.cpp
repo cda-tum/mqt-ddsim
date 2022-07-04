@@ -7,13 +7,7 @@ using CN = dd::ComplexNumbers;
 
 template<class DDPackage>
 std::map<std::string, std::size_t> StochasticNoiseSimulator<DDPackage>::Simulate(unsigned int shots) {
-    bool hasNonunitary = false;
-    for (auto& op: *qc) {
-        if (op->isNonUnitaryOperation()) {
-            hasNonunitary = true;
-            break;
-        }
-    }
+    bool hasNonunitary = std::any_of(qc->begin(), qc->end(), [&](const auto& p) { return p->isNonUnitaryOperation(); });
 
     if (!hasNonunitary) {
         perfectSimulationRun();
@@ -177,7 +171,7 @@ void StochasticNoiseSimulator<DDPackage>::runStochSimulationForId(std::size_t   
     for (std::size_t currentRun = 0U; currentRun < numberOfRuns; currentRun++) {
         const auto t1 = std::chrono::steady_clock::now();
 
-        auto localDD                      = std::make_unique<StochasticNoisePackage>(getNumberOfQubits());
+        auto localDD                      = std::make_unique<StochasticNoisePackage>(qc->getNqubits());
         auto stochasticNoiseFunctionality = dd::StochasticNoiseFunctionality<StochasticNoisePackage>(
                 localDD,
                 nQubits,
