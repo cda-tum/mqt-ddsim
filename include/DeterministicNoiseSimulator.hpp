@@ -7,9 +7,6 @@
 
 template<class DDPackage = DensityMatrixPackage>
 class DeterministicNoiseSimulator: public Simulator<DDPackage> {
-    using dEdge = dd::dEdge;
-    using dNode = dd::dNode;
-
 public:
     DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
                                 const std::string&                       noiseEffects,
@@ -54,16 +51,16 @@ public:
     [[nodiscard]] std::size_t countNodesFromRoot() {
         size_t tmp;
         if (useDensityMatrixType) {
-            dEdge::alignDensityEdge(rootEdge);
+            qc::DensityMatrixDD::alignDensityEdge(rootEdge);
             tmp = Simulator<DDPackage>::dd->size(rootEdge);
-            dEdge::setDensityMatrixTrue(rootEdge);
+            qc::DensityMatrixDD::setDensityMatrixTrue(rootEdge);
         } else {
             tmp = Simulator<DDPackage>::dd->size(rootEdge);
         }
         return tmp;
     }
 
-    dEdge rootEdge{};
+    qc::DensityMatrixDD rootEdge{};
 
 private:
     const std::unique_ptr<qc::QuantumComputation>& qc;

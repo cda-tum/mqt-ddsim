@@ -3,9 +3,6 @@
 #include "dd/Export.hpp"
 
 using CN    = dd::ComplexNumbers;
-using dEdge = dd::dEdge;
-using dNode = dd::dNode;
-using mEdge = dd::mEdge;
 
 template<class DDPackage>
 std::map<std::string, double> DeterministicNoiseSimulator<DDPackage>::DeterministicSimulate() {
