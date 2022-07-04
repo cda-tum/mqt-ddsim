@@ -2,7 +2,7 @@
 
 #include "dd/Export.hpp"
 
-using CN    = dd::ComplexNumbers;
+using CN = dd::ComplexNumbers;
 
 template<class DDPackage>
 std::map<std::string, double> DeterministicNoiseSimulator<DDPackage>::DeterministicSimulate() {
