@@ -257,10 +257,7 @@ void StochasticNoiseSimulator<DDPackage>::runStochSimulationForId(std::size_t   
                     }
                 }
 
-                auto usedQubits = targets;
-                for (auto control: controls) {
-                    usedQubits.emplace_back(control.qubit);
-                }
+                const auto usedQubits = op->getUsedQubits();
 
                 if (sequentiallyApplyNoise) {
                     stochasticNoiseFunctionality.setNoiseEffects(std::vector<dd::NoiseOperations>{dd::identity});
