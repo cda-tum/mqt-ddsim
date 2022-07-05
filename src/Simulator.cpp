@@ -9,7 +9,8 @@
 
 using CN = dd::ComplexNumbers;
 
-std::map<std::string, std::size_t> Simulator::SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, unsigned int shots) {
+template<class DDPackage>
+std::map<std::string, std::size_t> Simulator<DDPackage>::SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, unsigned int shots) {
     // in-place prefix-sum calculation of probabilities
     std::inclusive_scan(
             amplitudes.begin(), amplitudes.end(), amplitudes.begin(),
@@ -27,53 +28,57 @@ std::map<std::string, std::size_t> Simulator::SampleFromAmplitudeVectorInPlace(s
         auto m   = std::distance(amplitudes.begin(), mit);
 
         // construct basis state string
-        auto basisState = Simulator::toBinaryString(m, getNumberOfQubits());
+        auto basisState = toBinaryString(m, getNumberOfQubits());
         results[basisState]++;
     }
     return results;
 }
 
-std::vector<dd::ComplexValue> Simulator::getVector() const {
+template<class DDPackage>
+std::vector<dd::ComplexValue> Simulator<DDPackage>::getVector() const {
     assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
     std::string                   path(getNumberOfQubits(), '0');
     std::vector<dd::ComplexValue> results(1ull << getNumberOfQubits(), dd::complex_zero);
     for (unsigned long long i = 0; i < 1ull << getNumberOfQubits(); ++i) {
         const std::string corrected_path{path.rbegin(), path.rend()};
-        results[i] = dd->getValueByPath(root_edge, corrected_path);
+        results[i] = dd->getValueByPath(rootEdge, corrected_path);
         NextPath(path);
     }
     return results;
 }
 
-std::vector<std::pair<dd::fp, dd::fp>> Simulator::getVectorPair() const {
+template<class DDPackage>
+std::vector<std::pair<dd::fp, dd::fp>> Simulator<DDPackage>::getVectorPair() const {
     assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
     std::string                            path(getNumberOfQubits(), '0');
     std::vector<std::pair<dd::fp, dd::fp>> results{1ull << getNumberOfQubits()};
 
     for (unsigned long long i = 0; i < 1ull << getNumberOfQubits(); ++i) {
         const std::string      corrected_path{path.rbegin(), path.rend()};
-        const dd::ComplexValue cv = dd->getValueByPath(root_edge, corrected_path);
+        const dd::ComplexValue cv = dd->getValueByPath(rootEdge, corrected_path);
         results[i]                = std::make_pair(cv.r, cv.i);
         NextPath(path);
     }
     return results;
 }
 
-std::vector<std::complex<dd::fp>> Simulator::getVectorComplex() const {
+template<class DDPackage>
+std::vector<std::complex<dd::fp>> Simulator<DDPackage>::getVectorComplex() const {
     assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
     std::string                       path(getNumberOfQubits(), '0');
     std::vector<std::complex<dd::fp>> results(1ull << getNumberOfQubits());
 
     for (unsigned long long i = 0; i < 1ull << getNumberOfQubits(); ++i) {
         const std::string      corrected_path{path.rbegin(), path.rend()};
-        const dd::ComplexValue cv = dd->getValueByPath(root_edge, corrected_path);
+        const dd::ComplexValue cv = dd->getValueByPath(rootEdge, corrected_path);
         results[i]                = std::complex<dd::fp>(cv.r, cv.i);
         NextPath(path);
     }
     return results;
 }
 
-void Simulator::NextPath(std::string& s) {
+template<class DDPackage>
+void Simulator<DDPackage>::NextPath(std::string& s) {
     std::string::reverse_iterator iter = s.rbegin(), end = s.rend();
     int                           carry = 1;
     while (carry && iter != end) {
@@ -86,7 +91,8 @@ void Simulator::NextPath(std::string& s) {
         s.insert(0, "1");
 }
 
-double Simulator::ApproximateByFidelity(std::unique_ptr<dd::Package<>>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose) {
+template<class DDPackage>
+double Simulator<DDPackage>::ApproximateByFidelity(std::unique_ptr<DDPackage>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose) {
     std::queue<dd::vNode*>       q;
     std::map<dd::vNode*, dd::fp> probsMone;
 
@@ -200,7 +206,8 @@ double Simulator::ApproximateByFidelity(std::unique_ptr<dd::Package<>>& localDD,
     return fidelity;
 }
 
-double Simulator::ApproximateBySampling(std::unique_ptr<dd::Package<>>& localDD, dd::vEdge& edge, std::size_t nSamples, std::size_t threshold, bool removeNodes, bool verbose) {
+template<class DDPackage>
+double Simulator<DDPackage>::ApproximateBySampling(std::unique_ptr<DDPackage>& localDD, dd::vEdge& edge, std::size_t nSamples, std::size_t threshold, bool removeNodes, bool verbose) {
     assert(nSamples > threshold);
     std::map<dd::vNode*, unsigned int>     visited_nodes;
     std::uniform_real_distribution<dd::fp> dist(0.0, 1.0L);
@@ -290,7 +297,8 @@ double Simulator::ApproximateBySampling(std::unique_ptr<dd::Package<>>& localDD,
     return fidelity;
 }
 
-dd::vEdge Simulator::RemoveNodes(std::unique_ptr<dd::Package<>>& localDD, dd::vEdge e, std::map<dd::vNode*, dd::vEdge>& dag_edges) {
+template<class DDPackage>
+dd::vEdge Simulator<DDPackage>::RemoveNodes(std::unique_ptr<DDPackage>& localDD, dd::vEdge e, std::map<dd::vNode*, dd::vEdge>& dag_edges) {
     if (e.isTerminal()) {
         return e;
     }
@@ -319,19 +327,20 @@ dd::vEdge Simulator::RemoveNodes(std::unique_ptr<dd::Package<>>& localDD, dd::vE
     return r;
 }
 
-std::pair<dd::ComplexValue, std::string> Simulator::getPathOfLeastResistance() const {
-    if (std::abs(dd::ComplexNumbers::mag2(root_edge.w) - 1.0L) > epsilon) {
-        if (root_edge.w.approximatelyZero()) {
+template<class DDPackage>
+std::pair<dd::ComplexValue, std::string> Simulator<DDPackage>::getPathOfLeastResistance() const {
+    if (std::abs(dd::ComplexNumbers::mag2(rootEdge.w) - 1.0L) > epsilon) {
+        if (rootEdge.w.approximatelyZero()) {
             throw std::runtime_error("Numerical instabilities led to a 0-vector! Abort simulation!");
         }
         std::cerr << "WARNING in PoLR: numerical instability occurred during simulation: |alpha|^2 + |beta|^2 - 1 = "
-                  << 1.0L - dd::ComplexNumbers::mag2(root_edge.w) << ", but should be 1!\n";
+                  << 1.0L - dd::ComplexNumbers::mag2(rootEdge.w) << ", but should be 1!\n";
     }
 
     std::string result(getNumberOfQubits(), '0');
-    dd::Complex path_value = dd->cn.getCached(dd::CTEntry::val(root_edge.w.r), dd::CTEntry::val(root_edge.w.i));
-    dd::vEdge   cur        = root_edge;
-    for (dd::Qubit i = root_edge.p->v; i >= 0; --i) {
+    dd::Complex path_value = dd->cn.getCached(dd::CTEntry::val(rootEdge.w.r), dd::CTEntry::val(rootEdge.w.i));
+    dd::vEdge   cur        = rootEdge;
+    for (dd::Qubit i = rootEdge.p->v; i >= 0; --i) {
         dd::fp p0  = dd::ComplexNumbers::mag2(cur.p->e.at(0).w);
         dd::fp p1  = dd::ComplexNumbers::mag2(cur.p->e.at(1).w);
         dd::fp tmp = p0 + p1;
@@ -354,3 +363,6 @@ std::pair<dd::ComplexValue, std::string> Simulator::getPathOfLeastResistance() c
     return {{dd::CTEntry::val(path_value.r), dd::CTEntry::val(path_value.i)},
             std::string{result.rbegin(), result.rend()}};
 }
+
+template class Simulator<dd::Package<>>;
+template class Simulator<StochasticNoisePackage>;

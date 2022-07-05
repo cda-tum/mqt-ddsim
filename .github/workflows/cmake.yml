@@ -93,10 +93,10 @@ jobs:
       - name: Test
         working-directory: ${{github.workspace}}/build/test
         run: ctest -C Debug --output-on-failure
-      - name: Run gcov
-        run:  find . -type f -name '*.gcno' -exec gcov -p  {} +
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token:            ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
+          gcov:             true
+          gcov_ignore:      "extern/**/*"

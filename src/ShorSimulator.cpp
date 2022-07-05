@@ -14,17 +14,17 @@ std::map<std::string, std::size_t> ShorSimulator::Simulate([[maybe_unused]] unsi
     }
 
     if (emulate) {
-        n_qubits  = 3 * required_bits;
-        root_edge = dd->makeZeroState(n_qubits);
-        dd->incRef(root_edge);
+        n_qubits = 3 * required_bits;
+        rootEdge = dd->makeZeroState(n_qubits);
+        dd->incRef(rootEdge);
         //Initialize qubits
         //TODO: other init method where the initial value can be chosen
         ApplyGate(dd::Xmat, 0);
 
     } else {
-        n_qubits  = 2 * required_bits + 3;
-        root_edge = dd->makeZeroState(n_qubits);
-        dd->incRef(root_edge);
+        n_qubits = 2 * required_bits + 3;
+        rootEdge = dd->makeZeroState(n_qubits);
+        dd->incRef(rootEdge);
         //Initialize qubits
         //TODO: other init method where the initial value can be chosen
 
@@ -87,13 +87,13 @@ std::map<std::string, std::size_t> ShorSimulator::Simulate([[maybe_unused]] unsi
     }
 
     if (verbose) {
-        std::clog << "Nodes before QFT: " << dd->size(root_edge) << "\n";
+        std::clog << "Nodes before QFT: " << dd->size(rootEdge) << "\n";
     }
 
     //EXACT QFT
     for (unsigned int i = 0; i < 2 * required_bits; i++) {
         if (verbose) {
-            std::clog << "[ " << i + 1 << "/" << 2 * required_bits << " ] QFT Pass. dd size=" << dd->size(root_edge)
+            std::clog << "[ " << i + 1 << "/" << 2 * required_bits << " ] QFT Pass. dd size=" << dd->size(rootEdge)
                       << "\n";
         }
         double q = 2;
@@ -483,10 +483,10 @@ void ShorSimulator::u_a_emulate(unsigned long long a, int q) {
         }
     }
 
-    dd::vEdge tmp = dd->multiply(e, root_edge);
+    dd::vEdge tmp = dd->multiply(e, rootEdge);
     dd->incRef(tmp);
-    dd->decRef(root_edge);
-    root_edge = tmp;
+    dd->decRef(rootEdge);
+    rootEdge = tmp;
 
     dd->garbageCollect();
 }
@@ -678,30 +678,30 @@ void ShorSimulator::u_a(unsigned long long a, int N, int c) {
 
 void ShorSimulator::ApplyGate(dd::GateMatrix matrix, dd::Qubit target) {
     dd::Edge gate = dd->makeGateDD(matrix, n_qubits, target);
-    dd::Edge tmp  = dd->multiply(gate, root_edge);
+    dd::Edge tmp  = dd->multiply(gate, rootEdge);
     dd->incRef(tmp);
-    dd->decRef(root_edge);
-    root_edge = tmp;
+    dd->decRef(rootEdge);
+    rootEdge = tmp;
 
     dd->garbageCollect();
 }
 
 void ShorSimulator::ApplyGate(dd::GateMatrix matrix, dd::Qubit target, dd::Control control) {
     dd::Edge gate = dd->makeGateDD(matrix, n_qubits, control, target);
-    dd::Edge tmp  = dd->multiply(gate, root_edge);
+    dd::Edge tmp  = dd->multiply(gate, rootEdge);
     dd->incRef(tmp);
-    dd->decRef(root_edge);
-    root_edge = tmp;
+    dd->decRef(rootEdge);
+    rootEdge = tmp;
 
     dd->garbageCollect();
 }
 
 void ShorSimulator::ApplyGate(dd::GateMatrix matrix, dd::Qubit target, const dd::Controls& controls) {
     dd::Edge gate = dd->makeGateDD(matrix, n_qubits, controls, target);
-    dd::Edge tmp  = dd->multiply(gate, root_edge);
+    dd::Edge tmp  = dd->multiply(gate, rootEdge);
     dd->incRef(tmp);
-    dd->decRef(root_edge);
-    root_edge = tmp;
+    dd->decRef(rootEdge);
+    rootEdge = tmp;
 
     dd->garbageCollect();
 }

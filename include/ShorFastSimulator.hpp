@@ -4,7 +4,7 @@
 #include "QuantumComputation.hpp"
 #include "Simulator.hpp"
 
-class ShorFastSimulator: public Simulator {
+class ShorFastSimulator: public Simulator<dd::Package<>> {
     static unsigned long long modpow(unsigned long long base, unsigned long long exp, unsigned long long modulus) {
         base %= modulus;
         unsigned long long result = 1ull;
