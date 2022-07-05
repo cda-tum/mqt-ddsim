@@ -1,7 +1,7 @@
 [submodule "extern/qfr"]
 	path = extern/qfr
 	url = https://github.com/cda-tum/qfr.git
-    branch = noiseComputeTable
+    branch = main
     shallow = true
 [submodule "extern/taskflow"]
 	path = extern/taskflow
