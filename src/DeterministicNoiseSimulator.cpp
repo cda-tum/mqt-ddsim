@@ -2,10 +2,7 @@
 
 #include "dd/Export.hpp"
 
-using CN    = dd::ComplexNumbers;
-using dEdge = dd::dEdge;
-using dNode = dd::dNode;
-using mEdge = dd::mEdge;
+using CN = dd::ComplexNumbers;
 
 template<class DDPackage>
 std::map<std::string, double> DeterministicNoiseSimulator<DDPackage>::DeterministicSimulate() {
@@ -56,8 +53,10 @@ template<class DDPackage>
 std::map<std::string, std::size_t> DeterministicNoiseSimulator<DDPackage>::sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, unsigned int shots) {
     // Create probability distribution from measure probabilities
     std::vector<dd::fp> weights;
-    for (auto& res: resultProbabilityMap) {
-        weights.push_back(res.second);
+    weights.reserve(resultProbabilityMap.size());
+
+    for (const auto& [state, prob]: resultProbabilityMap) {
+        weights.push_back(prob);
     }
     std::discrete_distribution<> d(weights.begin(), weights.end());
 
@@ -70,8 +69,9 @@ std::map<std::string, std::size_t> DeterministicNoiseSimulator<DDPackage>::sampl
 
     // Create the final map containing the measurement results and the corresponding shots
     std::map<std::string, std::size_t> resultShotsMap;
-    for (auto& res: results) {
-        resultShotsMap.insert({std::next(resultProbabilityMap.begin(), static_cast<long>(res.first))->first, res.second});
+
+    for (const auto& [state, prob]: results) {
+        resultShotsMap.insert({std::next(resultProbabilityMap.begin(), static_cast<long>(state))->first, prob});
     }
 
     return resultShotsMap;
