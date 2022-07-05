@@ -7,7 +7,7 @@ using CN = dd::ComplexNumbers;
 
 template<class DDPackage>
 std::map<std::string, std::size_t> StochasticNoiseSimulator<DDPackage>::Simulate(unsigned int shots) {
-    bool hasNonunitary = std::any_of(qc->begin(), qc->end(), [&](const auto& p) { return p->isNonUnitaryOperation(); });
+    bool hasNonunitary = std::any_of(qc->cbegin(), qc->cend(), [&](const auto& p) { return p->isNonUnitaryOperation(); });
 
     if (!hasNonunitary) {
         perfectSimulationRun();

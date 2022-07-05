@@ -8,7 +8,7 @@ template<class DDPackage>
 std::map<std::string, double> DeterministicNoiseSimulator<DDPackage>::DeterministicSimulate() {
     std::map<unsigned int, bool> classicValues;
 
-    rootEdge = Simulator<DDPackage>::dd->makeZeroDensityOperator(this->dd->qubits());
+    rootEdge = Simulator<DDPackage>::dd->makeZeroDensityOperator(qc->getNqubits());
     Simulator<DDPackage>::dd->incRef(rootEdge);
 
     auto deterministicNoiseFunctionality = dd::DeterministicNoiseFunctionality<DensityMatrixPackage>(
@@ -56,7 +56,7 @@ std::map<std::string, std::size_t> DeterministicNoiseSimulator<DDPackage>::sampl
     weights.reserve(resultProbabilityMap.size());
 
     for (const auto& [state, prob]: resultProbabilityMap) {
-        weights.push_back(prob);
+        weights.emplace_back(prob);
     }
     std::discrete_distribution<> d(weights.begin(), weights.end());
 
@@ -71,7 +71,7 @@ std::map<std::string, std::size_t> DeterministicNoiseSimulator<DDPackage>::sampl
     std::map<std::string, std::size_t> resultShotsMap;
 
     for (const auto& [state, prob]: results) {
-        resultShotsMap.insert({std::next(resultProbabilityMap.begin(), static_cast<long>(state))->first, prob});
+        resultShotsMap.emplace(std::next(resultProbabilityMap.begin(), static_cast<long>(state))->first, prob);
     }
 
     return resultShotsMap;
