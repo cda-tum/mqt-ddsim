@@ -3,7 +3,7 @@ Executable Noise-aware Simulator
 
 The tool also supports noise-aware quantum circuit simulation, based on a stochastic approach. It currently supports
 global decoherence and gate error noise effects. A detailed summary of the simulator is presented
-in :cite:p:`grurl2020stochastic`. Note that the simulator currently does not support simulating the integrated
+in :cite:p:`grurl2022`. Note that the simulator currently does not support simulating the integrated
 algorithms.
 
 Building the simulator requires :code:`Threads::Threads`. It can be built by executing
