@@ -5,7 +5,7 @@ from qiskit import *
 from mqt import ddsim
 
 
-class JKQStandaloneHybridSimulatorTest(unittest.TestCase):
+class MQTStandaloneHybridSimulatorTest(unittest.TestCase):
     def setUp(self) -> None:
         q = QuantumRegister(4)
         circ = QuantumCircuit(q)

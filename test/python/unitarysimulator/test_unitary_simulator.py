@@ -7,7 +7,7 @@ from qiskit import execute
 import numpy as np
 
 
-class JKQUnitarySimulatorTest(unittest.TestCase):
+class MQTUnitarySimulatorTest(unittest.TestCase):
 
     def setUp(self):
         self.backend = UnitarySimulator()

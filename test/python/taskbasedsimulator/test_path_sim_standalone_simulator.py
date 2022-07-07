@@ -5,7 +5,7 @@ from qiskit import *
 from mqt import ddsim
 
 
-class JKQStandaloneSimulatorTests(unittest.TestCase):
+class MQTStandaloneSimulatorTests(unittest.TestCase):
     def test_standalone(self):
         circ = QuantumCircuit(3)
         circ.h(0)

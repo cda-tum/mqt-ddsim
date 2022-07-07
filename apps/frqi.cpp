@@ -14,7 +14,7 @@
 using namespace dd::literals;
 
 int main(int argc, char** argv) {
-    cxxopts::Options options("FRQI", "with JKQ DDSIM by https://iic.jku.at/eda/ -- Allowed options");
+    cxxopts::Options options("FRQI", "with MQT DDSIM by https://www.cda.cit.tum.de/ -- Allowed options");
     // clang-format off
     options.add_options()
             ("h,help", "produce help message")

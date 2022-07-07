@@ -4,9 +4,9 @@ on:
   release:
     types: [ published ]
   push:
-    branches: [ master, main ]
+    branches: [ main ]
   pull_request:
-    branches: [ master, main ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -17,19 +17,16 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         name: Install Python
         with:
           python-version: '3.9'
       - name: Install package
         run:  |
               pip install -U pip setuptools wheel
-              pip install .
+          pip install .[tests]
       - name: Test package
-        run: |
-          pip install pytest
-          pip install -r requirements-test.txt
-          pytest test/python
+        run: pytest test/python
 
   build_sdist:
     name: Build source distribution
@@ -38,7 +35,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         name: Install Python
         with:
           python-version: '3.9'
@@ -51,26 +48,43 @@ jobs:
         env:
           CC: "gcc-10"
           CXX: "g++-10"
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: dist/*.tar.gz
 
+
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
+    name: Build ${{ matrix.os }}${{ matrix.archname }}${{ matrix.libc }} wheels
     needs: [ test_bindings, build_sdist ]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
+        arch: [ x86_64 ]
+        archname: [ "" ]
+        skip: [ "*-musllinux_*" ]
+        libc: [ "" ]
+        include:
+          - arch: arm64
+            archname: "-arm64"
+            os: macos-latest
+          - arch: x86_64
+            os: ubuntu-latest
+            skip: "*-manylinux_*"
+            libc: "-musl"
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.3.1
-      - uses: actions/upload-artifact@v2
+        uses: pypa/cibuildwheel@2.6.0
+        env:
+          CIBW_ARCHS_MACOS: ${{ matrix.arch }}
+          CIBW_ARCHS_LINUX: ${{ matrix.arch }}
+          CIBW_SKIP: ${{ matrix.skip }}
+      - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
 
@@ -80,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     if:      github.event_name == 'release' && github.event.action == 'published'
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
           name: artifact
           path: dist

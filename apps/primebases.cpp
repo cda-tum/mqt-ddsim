@@ -52,7 +52,7 @@ void output_primes(const unsigned int composite_number, const unsigned int lengt
 }
 
 int main(int argc, char** argv) {
-    cxxopts::Options options("JKQ DDSIM", "see for more information https://iic.jku.at/eda/");
+    cxxopts::Options options("MQT DDSIM", "see for more information https://www.cda.cit.tum.de/");
     // clang-format off
     options.add_options()
         ("h,help", "produce help message")

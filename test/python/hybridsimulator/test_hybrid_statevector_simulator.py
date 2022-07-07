@@ -5,7 +5,7 @@ from qiskit import execute
 from mqt.ddsim.hybridstatevectorsimulator import HybridStatevectorSimulator
 
 
-class JKQHybridStatevectorSimulatorTest(unittest.TestCase):
+class MQTHybridStatevectorSimulatorTest(unittest.TestCase):
     """Runs backend checks and some very basic functionality tests"""
 
     def setUp(self):

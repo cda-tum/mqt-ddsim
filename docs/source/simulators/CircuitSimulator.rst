@@ -8,7 +8,7 @@ The standalone executable is launched in the following way, showing available op
 .. code-block:: console
 
     $ ./ddsim_simple --help
-    MQT DDSIM by https://iic.jku.at/eda/ -- Allowed options:
+    MQT DDSIM by https://www.cda.cit.tum.de/ -- Allowed options:
     -h [ --help ]                         produce help message
     --seed arg (=0)                       seed for random number generator (default zero is possibly directly used as seed!)
     --shots arg (=0)                      number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)
@@ -83,7 +83,7 @@ Execute the following lines to get the simulator running in no time:
     [100%] Built target ddsim_simple
 
     ddsim/ $ build/ddsim_simple --help
-    MQT DDSIM by https://iic.jku.at/eda/ -- Allowed options:
+    MQT DDSIM by https://www.cda.cit.tum.de/ -- Allowed options:
       -h [ --help ]                         produce help message
     [...]
 

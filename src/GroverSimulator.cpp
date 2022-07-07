@@ -1,6 +1,7 @@
 #include "GroverSimulator.hpp"
 
 #include "QuantumComputation.hpp"
+#include "dd/FunctionalityConstruction.hpp"
 
 #include <chrono>
 
@@ -12,7 +13,7 @@ std::map<std::string, std::size_t> GroverSimulator::Simulate(unsigned int shots)
         qc_setup.emplace_back<qc::StandardOperation>(n_qubits + n_anciallae, i, qc::H);
     }
     //qc_setup.print();
-    dd::Edge setup_op{qc_setup.buildFunctionality(dd)};
+    dd::Edge setup_op{dd::buildFunctionality(&qc_setup, dd)};
 
     // Build the oracle
     qc::QuantumComputation qc_oracle(n_qubits + n_anciallae);
@@ -22,7 +23,7 @@ std::map<std::string, std::size_t> GroverSimulator::Simulate(unsigned int shots)
     }
     qc_oracle.emplace_back<qc::StandardOperation>(n_qubits + n_anciallae, controls, n_qubits, qc::Z);
     //qc_oracle.print();
-    dd::Edge oracle_op{qc_oracle.buildFunctionality(dd)};
+    dd::Edge oracle_op{dd::buildFunctionality(&qc_oracle, dd)};
 
     // Build the diffusion stage.
     qc::QuantumComputation qc_diffusion(n_qubits + n_anciallae);
@@ -51,7 +52,7 @@ std::map<std::string, std::size_t> GroverSimulator::Simulate(unsigned int shots)
         qc_diffusion.emplace_back<qc::StandardOperation>(n_qubits + n_anciallae, i, qc::H);
     }
     //qc_diffusion.print();
-    dd::Edge diffusion_op{qc_diffusion.buildFunctionality(dd)};
+    dd::Edge diffusion_op{dd::buildFunctionality(&qc_diffusion, dd)};
 
     dd::Edge full_iteration{dd->multiply(oracle_op, diffusion_op)};
     dd->incRef(full_iteration);
