@@ -146,6 +146,15 @@ int main(int argc, char** argv) {
 
     auto t1 = std::chrono::high_resolution_clock::now();
     auto m  = ddsim->Simulate(shots);
+    std::cout << "final state vector " << std::endl;
+    auto result = ddsim->dd->getVector(ddsim->rootEdge);
+    for (int i = 0; i < result.size(); i++) {
+        if (abs(result[i]) > 0.001) {
+            std::bitset<32> a = i;
+            std::cout << a << ": " << abs(result[i]) * abs(result[i]) << std::endl;
+        }
+    }
+
     auto t2 = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<float> duration_simulation = t2 - t1;
