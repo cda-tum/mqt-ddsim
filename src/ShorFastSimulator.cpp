@@ -11,8 +11,8 @@ std::map<std::string, std::size_t> ShorFastSimulator::Simulate([[maybe_unused]] 
     if (verbose) {
         std::clog << "Simulate Shor's algorithm for n=" << n;
     }
-    root_edge = dd->makeZeroState(n_qubits);
-    dd->incRef(root_edge);
+    rootEdge = dd->makeZeroState(n_qubits);
+    dd->incRef(rootEdge);
     //Initialize qubits
     //TODO: other init method where the initial value can be chosen
     ApplyGate(dd::Xmat, 0);
@@ -60,7 +60,7 @@ std::map<std::string, std::size_t> ShorFastSimulator::Simulate([[maybe_unused]] 
         u_a_emulate2(as[i]);
 
         if (verbose) {
-            std::clog << "[ " << i + 1 << "/" << 2 * required_bits << " ] QFT Pass. dd size=" << dd->size(root_edge)
+            std::clog << "[ " << i + 1 << "/" << 2 * required_bits << " ] QFT Pass. dd size=" << dd->size(rootEdge)
                       << "\n";
         }
 
@@ -331,10 +331,10 @@ dd::mEdge ShorFastSimulator::addConstMod(unsigned long long a) {
 void ShorFastSimulator::ApplyGate(dd::GateMatrix matrix, dd::Qubit target) {
     number_of_operations++;
     dd::Edge gate = dd->makeGateDD(matrix, n_qubits, target);
-    dd::Edge tmp  = dd->multiply(gate, root_edge);
+    dd::Edge tmp  = dd->multiply(gate, rootEdge);
     dd->incRef(tmp);
-    dd->decRef(root_edge);
-    root_edge = tmp;
+    dd->decRef(rootEdge);
+    rootEdge = tmp;
 
     dd->garbageCollect();
 }
@@ -361,7 +361,7 @@ void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
         m = std::map<dd::vNode*, dd::vEdge>();
     }
 
-    u_a_emulate2_rec(root_edge.p->e[0]);
+    u_a_emulate2_rec(rootEdge.p->e[0]);
 
     //dd->setMode(dd::Matrix);
 
@@ -427,7 +427,7 @@ void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
             dd->decRef(it.second);
         }
         dd->garbageCollect();
-        saveEdges.push_back(root_edge);
+        saveEdges.push_back(rootEdge);
         nodesOnLevel.at(i - 1).clear();
     }
 
@@ -435,25 +435,25 @@ void ShorFastSimulator::u_a_emulate2(unsigned long long int a) {
         throw std::runtime_error("error occurred");
     }
 
-    dd::vEdge result = nodesOnLevel.at(n_qubits - 2)[root_edge.p->e[0].p];
+    dd::vEdge result = nodesOnLevel.at(n_qubits - 2)[rootEdge.p->e[0].p];
 
     dd->decRef(result);
 
-    result.w = dd->cn.mulCached(result.w, root_edge.p->e[0].w);
+    result.w = dd->cn.mulCached(result.w, rootEdge.p->e[0].w);
     auto tmp = result.w;
 
-    result = dd->makeDDNode(root_edge.p->v, std::array<dd::vEdge, dd::RADIX>{root_edge.p->e[0], result});
+    result = dd->makeDDNode(rootEdge.p->v, std::array<dd::vEdge, dd::RADIX>{rootEdge.p->e[0], result});
     dd->cn.returnToCache(tmp);
 
     //dd->setMode(dd::Vector);
 
-    result.w = dd->cn.mulCached(result.w, root_edge.w);
+    result.w = dd->cn.mulCached(result.w, rootEdge.w);
     tmp      = result.w;
     result.w = dd->cn.lookup(result.w);
     dd->cn.returnToCache(tmp);
-    dd->decRef(root_edge);
+    dd->decRef(rootEdge);
     dd->incRef(result);
-    root_edge = result;
+    rootEdge = result;
     dd->garbageCollect();
     assert(dd->cn.cacheCount() == cache_count_before);
 }

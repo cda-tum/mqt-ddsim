@@ -85,8 +85,8 @@ int main(int argc, char** argv) {
 
     std::clog << "Elapsed time for quantum circuit preparation: " << std::chrono::duration<float>(t0end - t0start).count() << "s" << std::endl;
 
-    const auto       t1start = std::chrono::steady_clock::now();
-    CircuitSimulator ddsim(std::move(qc));
+    const auto         t1start = std::chrono::steady_clock::now();
+    CircuitSimulator<> ddsim(std::move(qc));
 
     std::vector<unsigned int> counts(1024, 0);
     int                       cols    = dest.cols;

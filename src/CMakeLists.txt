@@ -51,7 +51,7 @@ endif ()
 if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE "/W4" "/utf-8")
 else ()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic $<$<CONFIG:DEBUG>:-Og>)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 
     if (BINDINGS)
         # adjust visibility settings for building Python bindings

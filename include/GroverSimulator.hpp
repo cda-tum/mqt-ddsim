@@ -7,7 +7,7 @@
 #include <cmath>
 #include <utility>
 
-class GroverSimulator: public Simulator {
+class GroverSimulator: public Simulator<dd::Package<>> {
 public:
     explicit GroverSimulator(const std::string& oracle, const unsigned long long seed):
         Simulator(seed),

@@ -57,25 +57,25 @@ std::map<std::string, std::size_t> GroverSimulator::Simulate(unsigned int shots)
     dd::Edge full_iteration{dd->multiply(oracle_op, diffusion_op)};
     dd->incRef(full_iteration);
 
-    root_edge = dd->makeZeroState(n_qubits + n_anciallae);
-    root_edge = dd->multiply(setup_op, root_edge);
-    dd->incRef(root_edge);
+    rootEdge = dd->makeZeroState(n_qubits + n_anciallae);
+    rootEdge = dd->multiply(setup_op, rootEdge);
+    dd->incRef(rootEdge);
 
     unsigned int j_pre = 0;
 
     while ((iterations - j_pre) % 8 != 0) {
-        //std::clog << "[INFO]  Pre-Iteration " << j_pre+1 << " of " << iterations%8 << " -- size:" << dd->size(root_edge)  << "\n";
-        auto tmp = dd->multiply(full_iteration, root_edge);
+        //std::clog << "[INFO]  Pre-Iteration " << j_pre+1 << " of " << iterations%8 << " -- size:" << dd->size(rootEdge)  << "\n";
+        auto tmp = dd->multiply(full_iteration, rootEdge);
         dd->incRef(tmp);
-        dd->decRef(root_edge);
-        root_edge = tmp;
+        dd->decRef(rootEdge);
+        rootEdge = tmp;
         dd->garbageCollect();
         j_pre++;
     }
 
     for (unsigned long long j = j_pre; j < iterations; j += 8) {
-        //std::clog << "[INFO]  Iteration " << j+1 << " of " << iterations << " -- size:" << dd->size(root_edge)  << "\n";
-        auto tmp = dd->multiply(full_iteration, root_edge);
+        //std::clog << "[INFO]  Iteration " << j+1 << " of " << iterations << " -- size:" << dd->size(rootEdge)  << "\n";
+        auto tmp = dd->multiply(full_iteration, rootEdge);
         tmp      = dd->multiply(full_iteration, tmp);
         tmp      = dd->multiply(full_iteration, tmp);
         tmp      = dd->multiply(full_iteration, tmp);
@@ -84,8 +84,8 @@ std::map<std::string, std::size_t> GroverSimulator::Simulate(unsigned int shots)
         tmp      = dd->multiply(full_iteration, tmp);
         tmp      = dd->multiply(full_iteration, tmp);
         dd->incRef(tmp);
-        dd->decRef(root_edge);
-        root_edge = tmp;
+        dd->decRef(rootEdge);
+        rootEdge = tmp;
         dd->garbageCollect();
     }
 

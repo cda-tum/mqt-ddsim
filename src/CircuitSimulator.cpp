@@ -2,7 +2,8 @@
 
 #include "dd/Export.hpp"
 
-std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int shots) {
+template<class DDPackage>
+std::map<std::string, std::size_t> CircuitSimulator<DDPackage>::Simulate(const unsigned int shots) {
     bool has_nonmeasurement_nonunitary = false;
     bool has_measurements              = false;
     bool measurements_last             = true;
@@ -39,7 +40,7 @@ std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int
     // easiest case: all gates are unitary --> simulate once and sample away on all qubits
     if (!has_nonmeasurement_nonunitary && !has_measurements) {
         single_shot(false);
-        return MeasureAllNonCollapsing(shots);
+        return Simulator<DDPackage>::MeasureAllNonCollapsing(shots);
     }
 
     // single shot is enough, but the sampling should only return actually measured qubits
@@ -50,7 +51,7 @@ std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int
         const auto                         n_cbits  = qc->getNcbits();
 
         // MeasureAllNonCollapsing returns a map from measurement over all qubits to the number of occurrences
-        for (const auto& item: MeasureAllNonCollapsing(shots)) {
+        for (const auto& item: Simulator<DDPackage>::MeasureAllNonCollapsing(shots)) {
             std::string result_string(qc->getNcbits(), '0');
 
             for (auto const& m: measurement_map) {
@@ -83,12 +84,13 @@ std::map<std::string, std::size_t> CircuitSimulator::Simulate(const unsigned int
     return m_counter;
 }
 
-std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonunitaries) {
+template<class DDPackage>
+std::map<std::size_t, bool> CircuitSimulator<DDPackage>::single_shot(const bool ignore_nonunitaries) {
     single_shots++;
     const dd::QubitCount n_qubits = qc->getNqubits();
 
-    root_edge = dd->makeZeroState(n_qubits);
-    dd->incRef(root_edge);
+    Simulator<DDPackage>::rootEdge = Simulator<DDPackage>::dd->makeZeroState(n_qubits);
+    Simulator<DDPackage>::dd->incRef(Simulator<DDPackage>::rootEdge);
 
     std::size_t                 op_num = 0;
     std::map<std::size_t, bool> classic_values;
@@ -108,7 +110,7 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
                     assert(quantum.size() == classic.size()); // this should not happen do to check in Simulate
 
                     for (unsigned int i = 0; i < quantum.size(); ++i) {
-                        auto result = MeasureOneCollapsing(quantum.at(i));
+                        auto result = Simulator<DDPackage>::MeasureOneCollapsing(quantum.at(i));
                         assert(result == '0' || result == '1');
                         classic_values[classic.at(i)] = (result == '1');
                     }
@@ -120,7 +122,7 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
             } else {
                 throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
             }
-            dd->garbageCollect();
+            Simulator<DDPackage>::dd->garbageCollect();
         } else {
             if (op->isClassicControlledOperation()) {
                 if (auto* cc_op = dynamic_cast<qc::ClassicControlledOperation*>(op.get())) {
@@ -143,19 +145,19 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
             }
             /*std::clog << "[INFO] op " << op_num << " is " << op->getName() << " on " << +op->getTargets().at(0)
                       << " #controls=" << op->getControls().size()
-                      << " statesize=" << dd->size(root_edge) << "\n";//*/
+                      << " statesize=" << dd->size(rootEdge) << "\n";//*/
 
-            auto dd_op = dd::getDD(op.get(), dd);
-            auto tmp   = dd->multiply(dd_op, root_edge);
-            dd->incRef(tmp);
-            dd->decRef(root_edge);
-            root_edge = tmp;
+            auto dd_op = dd::getDD(op.get(), Simulator<DDPackage>::dd);
+            auto tmp   = Simulator<DDPackage>::dd->multiply(dd_op, Simulator<DDPackage>::rootEdge);
+            Simulator<DDPackage>::dd->incRef(tmp);
+            Simulator<DDPackage>::dd->decRef(Simulator<DDPackage>::rootEdge);
+            Simulator<DDPackage>::rootEdge = tmp;
 
             if (approx_info.step_number > 0 && approx_info.step_fidelity < 1.0) {
                 if (approx_info.approx_when == ApproximationInfo::FidelityDriven && (op_num + 1) % approx_mod == 0 &&
                     approximation_runs < approx_info.step_number) {
-                    //const unsigned int size_before = dd->size(root_edge);
-                    const double ap_fid = ApproximateByFidelity(approx_info.step_fidelity, false, true);
+                    //const unsigned int size_before = dd->size(rootEdge);
+                    const double ap_fid = Simulator<DDPackage>::ApproximateByFidelity(approx_info.step_fidelity, false, true);
                     approximation_runs++;
                     final_fidelity *= ap_fid;
                     /*std::clog << "[INFO] Fidelity-driven ApproximationInfo run finished. "
@@ -166,9 +168,9 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
                               << "; #runs=" << approximation_runs
                               << "\n";//*/
                 } else if (approx_info.approx_when == ApproximationInfo::MemoryDriven) {
-                    [[maybe_unused]] const unsigned int size_before = dd->size(root_edge);
-                    if (dd->getUniqueTable<dd::vNode>().possiblyNeedsCollection()) {
-                        const double ap_fid = ApproximateByFidelity(approx_info.step_fidelity, false, true);
+                    [[maybe_unused]] const unsigned int size_before = Simulator<DDPackage>::dd->size(Simulator<DDPackage>::rootEdge);
+                    if (Simulator<DDPackage>::dd->template getUniqueTable<dd::vNode>().possiblyNeedsCollection()) {
+                        const double ap_fid = Simulator<DDPackage>::ApproximateByFidelity(approx_info.step_fidelity, false, true);
                         approximation_runs++;
                         final_fidelity *= ap_fid;
                         /*std::clog << "[INFO] Memory-driven ApproximationInfo run finished. "
@@ -180,9 +182,11 @@ std::map<std::size_t, bool> CircuitSimulator::single_shot(const bool ignore_nonu
                     }
                 }
             }
-            dd->garbageCollect();
+            Simulator<DDPackage>::dd->garbageCollect();
         }
         op_num++;
     }
     return classic_values;
 }
+
+template class CircuitSimulator<dd::Package<>>;
