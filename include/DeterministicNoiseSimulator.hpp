@@ -1,63 +1,43 @@
-#ifndef DDSIM_DETERMINISTICNOISESIMULATOR_HPP
-#define DDSIM_DETERMINISTICNOISESIMULATOR_HPP
+#pragma once
 
 #include "QuantumComputation.hpp"
 #include "Simulator.hpp"
+#include "StochasticNoiseSimulator.hpp"
+#include "dd/NoiseFunctionality.hpp"
 
-#include <cstddef>
-#include <map>
-#include <memory>
-#include <random>
-#include <string>
-#include <vector>
-
-class DeterministicNoiseSimulator: public Simulator {
+template<class DDPackage = DensityMatrixPackage>
+class DeterministicNoiseSimulator: public Simulator<DDPackage> {
 public:
-    //    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int step_number, const double step_fidelity):
-    //        qc(qc), step_number(step_number), step_fidelity(step_fidelity) {
-    //        if (step_number == 0) {
-    //            throw std::invalid_argument("step_number has to be greater than zero");
-    //        }
-    //    }
-
-    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, unsigned long long seed):
-        Simulator(seed), qc(qc) {
+    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
+                                const std::string&                       noiseEffects,
+                                double                                   noiseProbability,
+                                std::optional<double>                    ampDampingProbability,
+                                double                                   multiQubitGateFactor,
+                                bool                                     unoptimizedSim = false,
+                                unsigned long long                       seed           = 0):
+        Simulator<DDPackage>(seed),
+        qc(qc),
+        noiseEffects(StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>::initializeNoiseEffects(noiseEffects)),
+        noiseProbSingleQubit(noiseProbability),
+        ampDampingProbSingleQubit(ampDampingProbability ? ampDampingProbability.value() : noiseProbability * 2),
+        noiseProbMultiQubit(noiseProbability * multiQubitGateFactor),
+        ampDampingProbMultiQubit(ampDampingProbSingleQubit * multiQubitGateFactor),
+        sequentiallyApplyNoise(unoptimizedSim),
+        useDensityMatrixType(!unoptimizedSim) {
+        StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>::sanityCheckOfNoiseProbabilities(noiseProbability, ampDampingProbSingleQubit, multiQubitGateFactor);
+        Simulator<DDPackage>::dd->resize(qc->getNqubits());
     }
 
-    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const std::string& noise_effects, double noise_prob):
-        qc(qc) {
-        setNoiseEffects(noise_effects);
-        setAmplitudeDampingProbability(noise_prob);
-    }
+    explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, unsigned long long seed = 0):
+        DeterministicNoiseSimulator(qc, std::string("APD"), 0.001, std::optional<double>{}, 2, false, seed) {}
 
-    void setAmplitudeDampingProbability(double cGateNoiseProbability) {
-        //The probability of amplitude damping (t1) often is double the probability , of phase flip, which is why I double it here
-        noiseProbability                             = cGateNoiseProbability;
-        sqrt_amplitude_damping_probability           = {sqrt(noiseProbability * 2), 0};
-        one_minus_sqrt_amplitude_damping_probability = {sqrt(1 - noiseProbability * 2), 0};
-    }
-
-    std::map<std::string, std::size_t> Simulate([[maybe_unused]] unsigned int shots) override {
-        return {};
+    std::map<std::string, std::size_t> Simulate(unsigned int shots) override {
+        return sampleFromProbabilityMap(this->DeterministicSimulate(), shots);
     };
 
-    std::map<std::string, double> DeterministicSimulate();
+    std::map<std::string, dd::fp> DeterministicSimulate();
 
-    //    std::map<std::string, std::string> AdditionalStatistics() override {
-    //        return {
-    //                {"step_fidelity", std::to_string(step_fidelity)},
-    //                {"approximation_runs", std::to_string(approximation_runs)},
-    //                {"final_fidelity", std::to_string(final_fidelity)},
-    //        };
-    //    };
-
-    [[nodiscard]] std::string intToString(long target_number, char value) const;
-
-    void applyDetNoiseSequential(const qc::Targets& targets);
-
-    [[nodiscard]] std::map<std::string, double> AnalyseState(dd::QubitCount nr_qubits, bool full_state) const;
-
-    void setNoiseEffects(const std::string& cGateNoise) { gateNoiseTypes = cGateNoise; }
+    std::map<std::string, std::size_t> sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, unsigned int shots);
 
     [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
 
@@ -65,61 +45,34 @@ public:
 
     [[nodiscard]] std::string getName() const override { return qc->getName(); };
 
-    const std::map<char, int> noiseEffects = {
-            {'B', 2}, //Bit-flip
-            {'P', 2}, //Phase-flip
-            {'A', 2}, //Amplitude Damping
-            {'D', 4}, //Depolarisation
-    };
+    [[nodiscard]] std::size_t getActiveNodeCount() const override { return Simulator<DDPackage>::dd->dUniqueTable.getActiveNodeCount(); }
+    [[nodiscard]] std::size_t getMaxNodeCount() const override { return Simulator<DDPackage>::dd->dUniqueTable.getMaxActiveNodes(); }
 
-    double           noiseProbability = 0.0;
-    dd::ComplexValue sqrt_amplitude_damping_probability{};
-    dd::ComplexValue one_minus_sqrt_amplitude_damping_probability{};
+    [[nodiscard]] std::size_t countNodesFromRoot() {
+        size_t tmp;
+        if (useDensityMatrixType) {
+            qc::DensityMatrixDD::alignDensityEdge(rootEdge);
+            tmp = Simulator<DDPackage>::dd->size(rootEdge);
+            qc::DensityMatrixDD::setDensityMatrixTrue(rootEdge);
+        } else {
+            tmp = Simulator<DDPackage>::dd->size(rootEdge);
+        }
+        return tmp;
+    }
 
-    //todo implement a new structure for density matrices
-    qc::MatrixDD density_root_edge{};
-
-    bool noiseApplicationWithKrausMatrices = false;
-    char MeasureOneCollapsing(dd::Qubit index);
+    qc::DensityMatrixDD rootEdge{};
 
 private:
-    // TODO integrate the NoiseCacheTable into the ddPackage
-    static constexpr unsigned short NoiseSLOTS = 16384;
-    static constexpr unsigned short NoiseMASK  = NoiseSLOTS - 1;
-    struct NoiseEntry {
-        dd::mNode *            a, *r; // a is the argument, r is the result
-        dd::ComplexValue       aw, rw;
-        dd::NoiseOperationKind which; // type of operation
-        signed char            usedQubits[std::numeric_limits<dd::Qubit>::max() + 1];
-        // TODO change to a more compact data structure
-    };
+    const std::unique_ptr<qc::QuantumComputation>& qc;
+    const std::vector<dd::NoiseOperations>         noiseEffects;
 
-    std::unique_ptr<qc::QuantumComputation>& qc;
+    const double noiseProbSingleQubit{};
+    const double ampDampingProbSingleQubit{};
+    const double noiseProbMultiQubit{};
+    const double ampDampingProbMultiQubit{};
 
-    std::string gateNoiseTypes;
+    const double measurementThreshold = 0.01;
 
-    std::array<NoiseEntry, NoiseSLOTS> NoiseTable{};
-
-    //    const unsigned int step_number;Q
-    //    const double       step_fidelity;
-    //    unsigned long long approximation_runs{0};
-    //    long double        final_fidelity{1.0L};
-
-    void ApplyAmplitudeDampingToNode(std::array<qc::MatrixDD, 4>& e);
-
-    void ApplyPhaseFlipToNode(std::array<qc::MatrixDD, 4>& e);
-
-    void ApplyDepolaritationToNode(std::array<qc::MatrixDD, 4>& e);
-
-    void generateGate(qc::MatrixDD* pointer_for_matrices, char noise_type, dd::Qubit target);
-
-    qc::MatrixDD makeZeroDensityOperator(dd::QubitCount n);
-
-    qc::MatrixDD         ApplyNoiseEffects(qc::MatrixDD density_op, const std::unique_ptr<qc::Operation>& op, unsigned char maxDepth);
-    static unsigned long noiseHash(dd::mNode* a, const dd::ComplexValue& aw, const std::vector<signed char>& usedQubits);
-    qc::MatrixDD         noiseLookup(const qc::MatrixDD& a, const std::vector<signed char>& usedQubits);
-    void                 noiseInsert(const qc::MatrixDD& a, const std::vector<signed char>& usedQubits, const qc::MatrixDD& r);
-    dd::fp               probForIndexToBeZero(qc::MatrixDD e, dd::Qubit index, dd::fp pathProb, dd::fp global_prob);
+    const bool sequentiallyApplyNoise{};
+    const bool useDensityMatrixType{};
 };
-
-#endif //DDSIM_DETERMINISTICNOISESIMULATOR_HPP

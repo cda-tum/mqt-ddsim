@@ -25,6 +25,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${${PROJECT_
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
 
+set(JSON_MultipleHeaders OFF CACHE INTERNAL "")
 add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr")
 target_link_libraries(${PROJECT_NAME} PUBLIC MQT::qfr)
 
@@ -50,7 +51,7 @@ endif ()
 if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE "/W4" "/utf-8")
 else ()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic $<$<CONFIG:DEBUG>:-Og>)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 
     if (BINDINGS)
         # adjust visibility settings for building Python bindings

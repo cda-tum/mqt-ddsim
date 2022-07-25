@@ -9,7 +9,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "friday"
-      time: "06:00"
+      time: "05:00"
+      timezone: "Europe/Vienna"
     assignees:
       - "hillmich"
 
@@ -21,7 +22,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "friday"
-      time: "06:00"
+      time: "05:00"
+      timezone: "Europe/Vienna"
     assignees:
       - "hillmich"
 
@@ -30,6 +32,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "friday"
-      time: "06:00"
+      time: "05:00"
+      timezone: "Europe/Vienna"
     assignees:
       - "hillmich"

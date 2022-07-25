@@ -15,7 +15,8 @@
 #include <variant>
 #include <vector>
 
-class PathSimulator: public CircuitSimulator {
+template<class DDPackage = dd::Package<>>
+class PathSimulator: public CircuitSimulator<DDPackage> {
 public:
     struct SimulationPath {
         struct Step {
@@ -129,10 +130,10 @@ public:
     };
 
     explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration configuration = Configuration()):
-        CircuitSimulator(std::move(qc)), executor(1) {
+        CircuitSimulator<DDPackage>(std::move(qc)), executor(1) {
         if (configuration.seed != 0) {
             // override seed in case a non-trivial one is given
-            mt.seed(seed);
+            Simulator<DDPackage>::mt.seed(Simulator<DDPackage>::seed);
         }
 
         // remove final measurements implement measurement support for task-based simulation
@@ -166,7 +167,7 @@ public:
         }
     }
 
-    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration::Mode mode, std::size_t bracketSize, std::size_t alternatingStart, std::list<std::size_t> gateCost, std::size_t seed):
+    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, typename Configuration::Mode mode, std::size_t bracketSize, std::size_t alternatingStart, std::list<std::size_t> gateCost, std::size_t seed):
         PathSimulator(std::move(qc), Configuration{mode, bracketSize, alternatingStart, gateCost, seed}) {}
 
     std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
@@ -177,8 +178,8 @@ public:
     void setSimulationPath(const SimulationPath& path) {
         simulationPath = path;
     }
-    void setSimulationPath(const SimulationPath::Components& components, bool assumeCorrectOrder = false) {
-        simulationPath = SimulationPath(qc->getNops() + 1, components, qc.get(), assumeCorrectOrder);
+    void setSimulationPath(const typename SimulationPath::Components& components, bool assumeCorrectOrder = false) {
+        simulationPath = SimulationPath(CircuitSimulator<DDPackage>::qc->getNops() + 1, components, CircuitSimulator<DDPackage>::qc.get(), assumeCorrectOrder);
     }
 
     // Add new strategies here
@@ -186,7 +187,6 @@ public:
     void generatePairwiseRecursiveGroupingSimulationPath();
     void generateBracketSimulationPath(std::size_t bracketSize);
     void generateAlternatingSimulationPath(std::size_t startingPoint);
-    void generateGatecostSimulationPath(std::size_t startingPoint, std::list<std::size_t> gateCosts);
 
 private:
     std::unordered_map<std::size_t, tf::Task>                                 tasks{};

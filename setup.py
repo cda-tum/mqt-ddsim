@@ -1,11 +1,11 @@
 import os
 import sys
-import platform
 import re
 import subprocess
 
 from setuptools import setup, Extension, find_namespace_packages
 from setuptools.command.build_ext import build_ext
+from setuptools_scm import get_version
 
 
 class CMakeExtension(Extension):
@@ -17,57 +17,70 @@ class CMakeExtension(Extension):
 
 class CMakeBuild(build_ext):
     def build_extension(self, ext):
+        version = get_version(root='.', relative_to=__file__)
+
         self.package = ext.namespace
         extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
         # required for auto-detection of auxiliary "native" libs
         if not extdir.endswith(os.path.sep):
             extdir += os.path.sep
 
-        cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-                      '-DPYTHON_EXECUTABLE=' + sys.executable,
-                      '-DBINDINGS=ON']
+        cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
+        cfg = 'Debug' if self.debug else 'Release'
+
+        cmake_args = [
+            f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
+            f"-DPYTHON_EXECUTABLE={sys.executable}",
+            f"-DDDSIM_VERSION_INFO={version}",
+            f"-DCMAKE_BUILD_TYPE={cfg}",
+            f"-DBINDINGS=ON"
+        ]
+        build_args = []
+
         if self.compiler.compiler_type != "msvc":
-            # Using Ninja-build since it a) is available as a wheel and b)
-            # multithreads automatically. MSVC would require all variables be
-            # exported for Ninja to pick it up, which is a little tricky to do.
-            # Users can override the generator with CMAKE_GENERATOR in CMake
-            # 3.15+.
-            cmake_generator = os.environ.get("CMAKE_GENERATOR", "")
             if not cmake_generator:
                 cmake_args += ["-GNinja"]
-
-        cfg = 'Debug' if self.debug else 'Release'
-        build_args = ['--config', cfg]
-
-        if platform.system() == "Windows":
-            cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(cfg.upper(), extdir)]
-            cmake_args += ['-T', 'ClangCl']
-            if sys.maxsize > 2 ** 32:
-                cmake_args += ['-A', 'x64']
-            build_args += ['--', '/m']
         else:
-            cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-            cpus = os.cpu_count()
-            if cpus is None:
-                cpus = 2
-            build_args += ['--', f'-j{cpus}']
+            # Single config generators are handled "normally"
+            single_config = any(x in cmake_generator for x in {"NMake", "Ninja"})
+            # CMake allows an arch-in-generator style for backward compatibility
+            contains_arch = any(x in cmake_generator for x in {"ARM", "Win64"})
+            # Convert distutils Windows platform specifiers to CMake -A arguments
+            plat_to_cmake = {
+                "win32": "Win32",
+                "win-amd64": "x64",
+                "win-arm32": "ARM",
+                "win-arm64": "ARM64",
+            }
+            # Specify the arch if using MSVC generator, but only if it doesn't
+            # contain a backward-compatibility arch spec already in the
+            # generator name.
+            if not single_config and not contains_arch:
+                cmake_args += ["-A", plat_to_cmake[self.plat_name]]
+            # Multi-config generators have a different way to specify configs
+            if not single_config:
+                cmake_args += ["-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}".format(cfg.upper(), extdir)]
+                build_args += ["--config", cfg]
 
         # cross-compile support for macOS - respect ARCHFLAGS if set
         if sys.platform.startswith("darwin"):
             archs = re.findall(r"-arch (\S+)", os.environ.get("ARCHFLAGS", ""))
             if archs:
-                arch_argument = "-DCMAKE_OSX_ARCHITECTURES={}".format(";".join(archs))
-                print('macOS building with: ', arch_argument, flush=True)
-                cmake_args += [arch_argument]
+                cmake_args += ["-DCMAKE_OSX_ARCHITECTURES={}".format(";".join(archs))]
 
-        env = os.environ.copy()
-        env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(env.get('CXXFLAGS', ''),
-                                                              self.distribution.get_version())
+        # Set CMAKE_BUILD_PARALLEL_LEVEL to control the parallel build level across all generators.
+        if "CMAKE_BUILD_PARALLEL_LEVEL" not in os.environ:
+            if hasattr(self, "parallel") and self.parallel:
+                build_args += ["-j{}".format(self.parallel)]
+
+        if sys.platform == "win32":
+            cmake_args += ['-T', 'ClangCl']
+
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         else:
             os.remove(os.path.join(self.build_temp, 'CMakeCache.txt'))
-        subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env)
+        subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp)
         subprocess.check_call(['cmake', '--build', '.', '--target', ext.name] + build_args, cwd=self.build_temp)
 
 
@@ -77,7 +90,6 @@ with open(README_PATH, encoding="utf8") as readme_file:
 
 setup(
     name='mqt.ddsim',
-    version='1.12.1',
     author='Stefan Hillmich',
     author_email='stefan.hillmich@jku.at',
     description='MQT DDSIM - A quantum simulator based on decision diagrams written in C++',
@@ -109,6 +121,8 @@ setup(
         'Research': 'https://www.cda.cit.tum.de/research/quantum_simulation/',
     },
     extras_require={
-        "tnflow": ["sparse", "opt-einsum", "quimb", "pandas", "numpy"]
+        "tnflow": ["sparse", "opt-einsum", "quimb", "pandas", "numpy"],
+        "tests": ["pytest", "qiskit-terra>=0.19.2,<0.22.0"],
+        "docs": ["Sphinx==5.0.2", "sphinx-rtd-theme==1.0.0", "sphinxcontrib-bibtex==2.4.2", "sphinx-copybutton==0.5.0"],
     }
 )

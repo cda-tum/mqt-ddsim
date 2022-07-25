@@ -3,61 +3,48 @@
 #include <queue>
 #include <stdexcept>
 
-std::map<std::string, std::size_t> StochasticNoiseSimulator::Simulate(unsigned int shots) {
-    bool has_nonunitary = false;
-    for (auto& op: *qc) {
-        if (op->isNonUnitaryOperation()) {
-            has_nonunitary = true;
-            break;
-        }
+using CN = dd::ComplexNumbers;
+
+template<class DDPackage>
+std::map<std::string, std::size_t> StochasticNoiseSimulator<DDPackage>::Simulate(unsigned int shots) {
+    bool hasNonunitary = std::any_of(qc->cbegin(), qc->cend(), [&](const auto& p) { return p->isNonUnitaryOperation(); });
+
+    if (!hasNonunitary) {
+        perfectSimulationRun();
+        return Simulator<DDPackage>::MeasureAllNonCollapsing(shots);
     }
 
-    if (!has_nonunitary) {
-        perfect_simulation_run();
-        return MeasureAllNonCollapsing(shots);
-    }
-
-    std::map<std::string, std::size_t> m_counter;
+    std::map<std::string, std::size_t> mCounter;
 
     for (unsigned int i = 0; i < shots; i++) {
-        perfect_simulation_run();
-        m_counter[MeasureAll()]++;
+        perfectSimulationRun();
+        mCounter[Simulator<DDPackage>::MeasureAll()]++;
     }
 
-    return m_counter;
+    return mCounter;
 }
 
-void StochasticNoiseSimulator::perfect_simulation_run() {
-    const unsigned short n_qubits = qc->getNqubits();
+template<class DDPackage>
+void StochasticNoiseSimulator<DDPackage>::perfectSimulationRun() {
+    const auto nQubits = qc->getNqubits();
 
-    root_edge = dd->makeZeroState(n_qubits);
-    dd->incRef(root_edge);
+    Simulator<DDPackage>::rootEdge = Simulator<DDPackage>::dd->makeZeroState(nQubits);
+    Simulator<DDPackage>::dd->incRef(Simulator<DDPackage>::rootEdge);
 
-    unsigned long       op_num = 0;
-    std::map<int, bool> classic_values;
-
+    std::map<std::size_t, bool> classicValues;
     for (auto& op: *qc) {
         if (op->isNonUnitaryOperation()) {
-            if (auto* nu_op = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
+            if (auto* nuOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
                 if (op->getType() == qc::Measure) {
-                    auto quantum = nu_op->getTargets();
-                    auto classic = nu_op->getClassics();
+                    const auto& quantum = nuOp->getTargets();
+                    const auto& classic = nuOp->getClassics();
 
                     assert(quantum.size() == classic.size()); // this should not happen do to check in Simulate
 
-                    for (unsigned int i = 0; i < quantum.size(); ++i) {
-                        auto result = MeasureOneCollapsing(quantum.at(i));
+                    for (std::size_t i = 0U; i < quantum.size(); ++i) {
+                        const auto result = Simulator<DDPackage>::MeasureOneCollapsing(quantum.at(i));
                         assert(result == '0' || result == '1');
-                        classic_values[classic.at(i)] = (result == '1');
-                    }
-                } else if (op->getType() == qc::Reset) {
-                    // Reset qubit
-                    auto quantum = nu_op->getTargets();
-                    for (signed char i: quantum) {
-                        auto result = MeasureOneCollapsing(i, true);
-                        if (result == '1') {
-                            setMeasuredQubitToZero(quantum.at(i), root_edge, dd);
-                        }
+                        classicValues[classic.at(i)] = (result == '1');
                     }
                 } else if (op->getType() == qc::Barrier) {
                     continue;
@@ -67,22 +54,22 @@ void StochasticNoiseSimulator::perfect_simulation_run() {
             } else {
                 throw std::runtime_error(std::string("Dynamic cast to NonUnitaryOperation failed for '") + op->getName() + "'.");
             }
-            dd->garbageCollect();
+            Simulator<DDPackage>::dd->garbageCollect();
         } else {
             if (op->isClassicControlledOperation()) {
-                if (auto* cc_op = dynamic_cast<qc::ClassicControlledOperation*>(op.get())) {
-                    const auto         start_index    = static_cast<unsigned short>(cc_op->getParameter().at(0));
-                    const auto         length         = static_cast<unsigned short>(cc_op->getParameter().at(1));
-                    const unsigned int expected_value = cc_op->getExpectedValue();
+                if (auto* ccOp = dynamic_cast<qc::ClassicControlledOperation*>(op.get())) {
+                    const auto startIndex    = static_cast<unsigned short>(ccOp->getParameter().at(0U));
+                    const auto length        = static_cast<unsigned short>(ccOp->getParameter().at(1U));
+                    const auto expectedValue = ccOp->getExpectedValue();
 
-                    unsigned int actual_value = 0;
-                    for (unsigned int i = 0; i < length; i++) {
-                        actual_value |= (classic_values[start_index + i] ? 1u : 0u) << i;
+                    std::size_t actualValue = 0U;
+                    for (std::size_t i = 0U; i < length; i++) {
+                        actualValue |= (classicValues[startIndex + i] ? 1U : 0U) << i;
                     }
 
                     //std::clog << "expected " << expected_value << " and actual value was " << actual_value << "\n";
 
-                    if (actual_value != expected_value) {
+                    if (actualValue != expectedValue) {
                         continue;
                     }
                 } else {
@@ -90,132 +77,131 @@ void StochasticNoiseSimulator::perfect_simulation_run() {
                 }
             }
 
-            auto dd_op = dd::getDD(op.get(), dd);
-            auto tmp   = dd->multiply(dd_op, root_edge);
-            dd->incRef(tmp);
-            dd->decRef(root_edge);
-            root_edge = tmp;
+            auto operation = dd::getDD(op.get(), Simulator<DDPackage>::dd);
+            auto tmp       = Simulator<DDPackage>::dd->multiply(operation, Simulator<DDPackage>::rootEdge);
+            Simulator<DDPackage>::dd->incRef(tmp);
+            Simulator<DDPackage>::dd->decRef(Simulator<DDPackage>::rootEdge);
+            Simulator<DDPackage>::rootEdge = tmp;
 
-            dd->garbageCollect();
+            Simulator<DDPackage>::dd->garbageCollect();
         }
-        op_num++;
     }
 }
 
-std::map<std::string, double> StochasticNoiseSimulator::StochSimulate() {
-    const unsigned short n_qubits = qc->getNqubits();
-
-    //Ceiling[(Log[estimatesProp] + Log[(2/confidence)])/(2*errorBound^2)]
-    if (stochastic_runs == 0) {
-        stochastic_runs = std::ceil((std::log(recorded_properties.size()) + std::log(2 / stoch_confidence)) / (2 * stoch_error_margin * stoch_error_margin));
-    }
-    //std::clog << "Conducting perfect run...\n";
-    const auto t1_perfect = std::chrono::steady_clock::now();
-    perfect_simulation_run();
-    const auto t2_perfect = std::chrono::steady_clock::now();
-    perfect_run_time      = std::chrono::duration<float>(t2_perfect - t1_perfect).count();
-
-    dd::Edge noiseless_root_edge = root_edge;
-
-    // Generate a vector for each instance + 1. the final vector stores the average of all runs and is calculated
-    // after the runs have finished
-    for (unsigned int i = 0; i < max_instances + 1; i++) {
-        recorded_properties_per_instance.emplace_back(std::vector<double>(recorded_properties.size(), 0));
-    }
-    //std::clog << "Conducting " << stochastic_runs << " runs using " << max_instances << " cores...\n";
+template<class DDPackage>
+std::map<std::string, double> StochasticNoiseSimulator<DDPackage>::StochSimulate() {
+    // Generate a vector for each instance.
+    recordedPropertiesPerInstance.resize(maxInstances, std::vector<double>(recordedProperties.size(), 0.0));
+    classicalMeasurementsMaps.resize(maxInstances);
+    // the final vector stores the average of all runs and is calculated after the runs have finished
+    finalProperties.resize(recordedProperties.size(), 0);
+    //std::clog << "Conducting " << stochasticRuns << " runs using " << maxInstances << " cores...\n";
     std::vector<std::thread> threadArray;
     // The stochastic runs are applied in parallel
-    //std::clog << "Starting " << max_instances << " threads\n";
-    const auto t1_stoch = std::chrono::steady_clock::now();
-    for (unsigned int runID = 0; runID < max_instances; runID++) {
-        threadArray.emplace_back(&StochasticNoiseSimulator::runStochSimulationForId,
+    //std::clog << "Starting " << maxInstances << " threads\n";
+    const auto t1Stoch = std::chrono::steady_clock::now();
+    for (std::size_t runID = 0U; runID < maxInstances; runID++) {
+        threadArray.emplace_back(&StochasticNoiseSimulator<DDPackage>::runStochSimulationForId,
                                  this,
                                  runID,
-                                 n_qubits,
-                                 noiseless_root_edge,
-                                 std::ref(recorded_properties_per_instance[runID]),
-                                 std::ref(recorded_properties),
-                                 static_cast<unsigned long long>(mt()));
+                                 qc->getNqubits(),
+                                 std::ref(recordedPropertiesPerInstance[runID]),
+                                 std::ref(recordedProperties),
+                                 std::ref(classicalMeasurementsMaps[runID]),
+                                 static_cast<unsigned long long>(Simulator<DDPackage>::mt()));
     }
     // wait for threads to finish
     for (auto& thread: threadArray) {
         thread.join();
     }
-    const auto t2_stoch = std::chrono::steady_clock::now();
-    stoch_run_time      = std::chrono::duration<float>(t2_stoch - t1_stoch).count();
-    //std::clog <<"Calculating amplitudes from all runs...\n";
-    for (unsigned long j = 0; j < recorded_properties.size(); j++) {
-        for (unsigned int i = 0; i < max_instances; i++) {
-            recorded_properties_per_instance[max_instances][j] += recorded_properties_per_instance[i][j];
+    const auto t2Stoch = std::chrono::steady_clock::now();
+    stochRunTime       = std::chrono::duration<double>(t2Stoch - t1Stoch).count();
+
+    for (const auto& classicalMeasurementsMap: classicalMeasurementsMaps) {
+        for (const auto& [state, count]: classicalMeasurementsMap) {
+            finalClassicalMeasurementsMap[state] += count;
         }
-        recorded_properties_per_instance[max_instances][j] /= stochastic_runs;
+    }
+
+    //std::clog <<"Calculating amplitudes from all runs...\n";
+    for (unsigned long j = 0U; j < recordedProperties.size(); j++) {
+        for (const auto& instanceProperties: recordedPropertiesPerInstance) {
+            finalProperties[j] += instanceProperties[j];
+        }
+        finalProperties[j] /= static_cast<double>(stochasticRuns);
+    }
+
+    // Adding the result of classical registers to the measureResult map
+    std::map<std::string, double> measureResult;
+    for (const auto& [state, count]: finalClassicalMeasurementsMap) {
+        const auto probability = count / static_cast<double>(stochasticRuns);
+        measureResult.emplace(state, probability); //todo maybe print both classical and quantum register ? classical register:"
     }
 
     //std::clog << "Probabilities are ... (probabilities < 0.001 are omitted)\n";
-    std::map<std::string, double> measure_result;
-    for (unsigned long m = 0; m < recorded_properties.size(); m++) {
-        if (std::get<0>(recorded_properties[m]) == -3) {
-            mean_stoch_time = recorded_properties_per_instance[max_instances][m];
-        } else if (std::get<0>(recorded_properties[m]) == -2) {
-            approximation_runs = recorded_properties_per_instance[max_instances][m];
-        } else if (std::get<0>(recorded_properties[m]) == -1) {
-            final_fidelity = recorded_properties_per_instance[max_instances][m];
-        } else if (recorded_properties_per_instance[max_instances][m] > 0.001 || m < 2) {
-            std::string amplitude = std::get<1>(recorded_properties[m]);
+    for (std::size_t m = 0U; m < recordedProperties.size(); m++) {
+        if (recordedProperties[m].first == -2) {
+            meanStochTime = finalProperties[m];
+        } else if (recordedProperties[m].first == -1) {
+            approximationRuns = finalProperties[m];
+        } else if (finalProperties[m] > 0 || m < 2U) {
+            // Print all probabilities that are larger than 0, and always print the probabilities for state 0 and 1
+            std::string amplitude = recordedProperties[m].second;
             std::replace(amplitude.begin(), amplitude.end(), '2', '1');
-            measure_result.insert({amplitude, recorded_properties_per_instance[max_instances][m]});
+            measureResult.emplace(amplitude, finalProperties[m]);
         }
     }
-    return measure_result;
+    return measureResult;
 }
 
-void StochasticNoiseSimulator::runStochSimulationForId(unsigned int                                stochRun,
-                                                       int                                         n_qubits,
-                                                       dd::vEdge                                   rootEdgePerfectRun,
-                                                       std::vector<double>&                        recordedPropertiesStorage,
-                                                       std::vector<std::tuple<long, std::string>>& recordedPropertiesList,
-                                                       unsigned long long                          localSeed) {
+template<class DDPackage>
+void StochasticNoiseSimulator<DDPackage>::runStochSimulationForId(std::size_t                                stochRun,
+                                                                  dd::Qubit                                  nQubits,
+                                                                  std::vector<double>&                       recordedPropertiesStorage,
+                                                                  std::vector<std::pair<long, std::string>>& recordedPropertiesList,
+                                                                  std::map<std::string, unsigned int>&       classicalMeasurementsMap,
+                                                                  unsigned long long                         localSeed) {
     std::mt19937_64                        generator(localSeed);
-    std::uniform_real_distribution<dd::fp> dist(0.0, 1.0L);
+    std::uniform_real_distribution<dd::fp> dist(0.0, 1.0);
 
-    const unsigned long numberOfRuns = stochastic_runs / max_instances + (stochRun < stochastic_runs % max_instances ? 1 : 0);
-    const int           approx_mod   = std::ceil(static_cast<double>(qc->getNops()) / (step_number + 1));
+    const unsigned long numberOfRuns = stochasticRuns / maxInstances + (stochRun < stochasticRuns % maxInstances ? 1U : 0U);
+    const int           approxMod    = std::ceil(static_cast<double>(qc->getNops()) / (stepNumber + 1));
 
-    //        dd::NoiseOperationTable<dd::mEdge> noiseOperationTable(getNumberOfQubits());
-
-    //printf("Running %d times and using the dd at %p, using the cn object at %p\n", numberOfRuns, (void *) &localDD, (void *) &localDD->cn);
-    for (unsigned long current_run = 0; current_run < numberOfRuns; current_run++) {
+    //printf("Running %d times and using the dd at %p, using the cn object at %p\n", numberOfRuns, (void *) &package, (void *) &package->cn);
+    for (std::size_t currentRun = 0U; currentRun < numberOfRuns; currentRun++) {
         const auto t1 = std::chrono::steady_clock::now();
 
-        std::unique_ptr<dd::Package<>> localDD = std::make_unique<dd::Package<>>(getNumberOfQubits());
+        auto localDD                      = std::make_unique<StochasticNoisePackage>(qc->getNqubits());
+        auto stochasticNoiseFunctionality = dd::StochasticNoiseFunctionality<StochasticNoisePackage>(
+                localDD,
+                nQubits,
+                noiseProbability,
+                amplitudeDampingProb,
+                multiQubitGateFactor,
+                noiseEffects);
 
-        std::map<unsigned int, bool> classic_values;
+        std::map<std::size_t, bool> classicValues;
 
-        unsigned int op_count     = 0;
-        unsigned int approx_count = 0;
+        std::size_t opCount     = 0U;
+        std::size_t approxCount = 0U;
 
-        dd::mEdge identity_DD = localDD->makeIdent(n_qubits);
-        localDD->incRef(identity_DD);
-        dd::vEdge localRootEdge = localDD->makeZeroState(n_qubits);
+        dd::vEdge localRootEdge = localDD->makeZeroState(nQubits);
         localDD->incRef(localRootEdge);
 
         for (auto& op: *qc) {
             if (!op->isUnitary() && !(op->isClassicControlledOperation())) {
-                if (auto* nu_op = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
-                    if (nu_op->getName()[0] == 'M') {
-                        auto quantum = nu_op->getTargets();
-                        auto classic = nu_op->getClassics();
+                if (auto* nuOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
+                    if (nuOp->getType() == qc::Measure) {
+                        auto quantum = nuOp->getTargets();
+                        auto classic = nuOp->getClassics();
 
                         assert(quantum.size() == classic.size()); // this should not happen do to check in Simulate
 
-                        for (unsigned int i = 0; i < quantum.size(); ++i) {
-                            char result = localDD->measureOneCollapsing(localRootEdge, quantum.at(i), true, generator);
+                        for (std::size_t i = 0U; i < quantum.size(); ++i) {
+                            const auto result = localDD->measureOneCollapsing(localRootEdge, quantum.at(i), true, generator);
                             assert(result == '0' || result == '1');
-                            classic_values[classic.at(i)] = (result == '1');
+                            classicValues[classic.at(i)] = (result == '0');
                         }
-                    } else if (nu_op->getName()[0] == 'R' && nu_op->getName()[1] == 's' && nu_op->getName()[2] == 't') {
-                        // Reset qubit
-                        throw std::runtime_error("Warning: Reset is currently not supported");
                     } else {
                         //Skipping barrier
                         if (op->getType() == qc::Barrier) {
@@ -227,273 +213,157 @@ void StochasticNoiseSimulator::runStochSimulationForId(unsigned int             
                     throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
                 }
             } else {
-                dd::mEdge    dd_op{};
+                dd::mEdge    operation{};
                 qc::Targets  targets;
                 dd::Controls controls;
                 if (op->isClassicControlledOperation()) {
                     // Check if the operation is controlled by a classical register
-                    auto* classic_op = dynamic_cast<qc::ClassicControlledOperation*>(op.get());
-                    bool  execute_op = true;
-                    auto  expValue   = classic_op->getExpectedValue();
+                    auto* classicOp = dynamic_cast<qc::ClassicControlledOperation*>(op.get());
+                    bool  executeOp = true;
+                    auto  expValue  = classicOp->getExpectedValue();
 
-                    for (unsigned int i = classic_op->getControlRegister().first; i < classic_op->getControlRegister().second; i++) {
-                        if (classic_values[i] != (expValue % 2)) {
-                            execute_op = false;
+                    for (auto i = static_cast<std::size_t>(classicOp->getControlRegister().first); i < classicOp->getControlRegister().second; i++) {
+                        if (classicValues[i] != (expValue % 2U)) {
+                            executeOp = false;
                             break;
                         } else {
-                            expValue = expValue >> 1u;
+                            expValue = expValue >> 1U;
                         }
                     }
-                    dd_op    = dd::getDD(classic_op->getOperation(), localDD);
-                    targets  = classic_op->getOperation()->getTargets();
-                    controls = classic_op->getOperation()->getControls();
-                    if (!execute_op) {
-                        // applyNoiseOperation(targets.front(), controls, identity_DD, (std::unique_ptr<dd::Package> &) localDD, localRootEdge, generator, dist, line, identity_DD);
+                    operation = dd::getDD(classicOp->getOperation(), localDD);
+                    targets   = classicOp->getOperation()->getTargets();
+                    controls  = classicOp->getOperation()->getControls();
+                    if (!executeOp) {
                         continue;
                     }
                 } else {
-                    dd_op    = dd::getDD(op.get(), localDD);
                     targets  = op->getTargets();
                     controls = op->getControls();
+
+                    if (targets.size() == 1 && controls.empty()) {
+                        operation = localDD->stochasticNoiseOperationCache.lookup(op->getType(), targets.front());
+                        if (operation.p == nullptr) {
+                            operation = dd::getDD(op.get(), localDD);
+                            localDD->stochasticNoiseOperationCache.insert(op->getType(), targets.front(), operation);
+                        }
+                    } else {
+                        operation = dd::getDD(op.get(), localDD);
+                    }
                 }
 
-                applyNoiseOperation(targets, controls, dd_op, localDD, localRootEdge, generator, dist, identity_DD);
-                if (step_fidelity < 1 && (op_count + 1) % approx_mod == 0) {
-                    ApproximateByFidelity(localDD, localRootEdge, step_fidelity, false, true);
-                    approx_count++;
+                const auto usedQubits = op->getUsedQubits();
+
+                if (sequentiallyApplyNoise) {
+                    stochasticNoiseFunctionality.setNoiseEffects(std::vector<dd::NoiseOperations>{dd::identity});
+                    stochasticNoiseFunctionality.applyNoiseOperation(usedQubits, operation, localRootEdge, generator);
+                    for (auto noiseEffect: noiseEffects) {
+                        stochasticNoiseFunctionality.setNoiseEffects(std::vector<dd::NoiseOperations>{noiseEffect});
+                        stochasticNoiseFunctionality.applyNoiseOperation(usedQubits, stochasticNoiseFunctionality.getIdentityDD(), localRootEdge, generator);
+                    }
+                } else {
+                    stochasticNoiseFunctionality.applyNoiseOperation(usedQubits, operation, localRootEdge, generator);
+                }
+
+                if (stepFidelity < 1. && (opCount + 1U) % approxMod == 0U) {
+                    approxCount++;
+                    Simulator<DDPackage>::ApproximateByFidelity(localDD, localRootEdge, stepFidelity, false, true);
                 }
             }
             localDD->garbageCollect();
-            op_count++;
+            opCount++;
         }
         localDD->decRef(localRootEdge);
         const auto t2 = std::chrono::steady_clock::now();
 
-        for (unsigned long i = 0; i < recordedPropertiesStorage.size(); i++) {
-            if (std::get<0>(recordedPropertiesList[i]) == -3) {
-                recordedPropertiesStorage[i] += std::chrono::duration<float>(t2 - t1).count();
-            } else if (std::get<0>(recordedPropertiesList[i]) == -2) {
-                recordedPropertiesStorage[i] += approx_count;
-            } else if (std::get<0>(recordedPropertiesList[i]) == -1) {
-                recordedPropertiesStorage[i] += localDD->fidelity(localRootEdge, rootEdgePerfectRun);
+        if (!classicValues.empty()) {
+            std::string classicRegisterString;
+            for (const auto& [val, isSet]: classicValues) {
+                classicRegisterString.push_back(isSet ? '0' : '1');
+            }
+            classicalMeasurementsMap[classicRegisterString] += 1U;
+        }
+
+        for (std::size_t i = 0U; i < recordedPropertiesStorage.size(); i++) {
+            if (recordedPropertiesList[i].first == -2) {
+                recordedPropertiesStorage[i] += std::chrono::duration<double>(t2 - t1).count();
+            } else if (recordedPropertiesList[i].first == -1) {
+                recordedPropertiesStorage[i] += static_cast<double>(approxCount);
             } else {
                 // extract amplitude for state
-                const auto basisVector = std::get<1>(recordedPropertiesList[i]);
-                auto       amplitude   = localDD->getValueByPath(localRootEdge, basisVector);
-                auto       prob        = amplitude.r * amplitude.r + amplitude.i * amplitude.i;
+                const auto basisVector = recordedPropertiesList[i].second;
+                const auto amplitude   = localDD->getValueByPath(localRootEdge, basisVector);
+                const auto prob        = amplitude.r * amplitude.r + amplitude.i * amplitude.i;
                 recordedPropertiesStorage[i] += prob;
             }
         }
     }
 }
 
-void StochasticNoiseSimulator::applyNoiseOperation(const qc::Targets&                      targets,
-                                                   const dd::Controls&                     control_qubits,
-                                                   dd::mEdge                               dd_op,
-                                                   std::unique_ptr<dd::Package<>>&         localDD,
-                                                   dd::vEdge&                              localRootEdge,
-                                                   std::mt19937_64&                        generator,
-                                                   std::uniform_real_distribution<dd::fp>& dist,
-                                                   dd::mEdge                               identityDD) {
-    std::vector usedQubits = targets;
-    for (auto control: control_qubits) {
-        usedQubits.push_back(control.qubit);
-    }
-
-    for (auto& target: usedQubits) {
-        auto operation = generateNoiseOperation(false, target, generator, dist, dd_op, localDD);
-        auto tmp       = localDD->multiply(operation, localRootEdge);
-
-        if (dd::ComplexNumbers::mag2(tmp.w) < dist(generator)) {
-            operation = generateNoiseOperation(true, target, generator, dist, dd_op, localDD);
-            tmp       = localDD->multiply(operation, localRootEdge);
-        }
-
-        if (tmp.w != dd::Complex::one) {
-            tmp.w = dd::Complex::one;
-        }
-        localDD->incRef(tmp);
-        localDD->decRef(localRootEdge);
-        localRootEdge = tmp;
-
-        // I only need to apply the operations once
-        dd_op = identityDD;
-    }
-}
-
-dd::mEdge StochasticNoiseSimulator::generateNoiseOperation(bool                                    amplitudeDamping,
-                                                           dd::Qubit                               target,
-                                                           std::mt19937_64&                        engine,
-                                                           std::uniform_real_distribution<dd::fp>& distribution,
-                                                           dd::mEdge                               dd_operation,
-                                                           std::unique_ptr<dd::Package<>>&         localDD) {
-    dd::NoiseOperationKind effect;
-
-    for (const auto& noise_type: gate_noise_types) {
-        if (noise_type != 'A') {
-            effect = ReturnNoiseOperation(noise_type, distribution(engine));
-        } else {
-            if (amplitudeDamping) {
-                effect = dd::ATrue;
-            } else {
-                effect = dd::AFalse;
-            }
-        }
-        if (effect != dd::I) {
-            switch (effect) {
-                case (dd::ATrue): {
-                    auto tmp_op = localDD->noiseOperationTable.lookup(getNumberOfQubits(), dd::ATrue, target);
-                    if (tmp_op.p == nullptr) {
-                        tmp_op = localDD->makeGateDD(dd::GateMatrix({dd::complex_zero, sqrt_amplitude_damping_probability, dd::complex_zero, dd::complex_zero}), getNumberOfQubits(), target);
-                        localDD->noiseOperationTable.insert(dd::ATrue, target, tmp_op);
-                    }
-                    dd_operation = localDD->multiply(tmp_op, dd_operation);
-                    break;
-                }
-                case (dd::AFalse): {
-                    auto tmp_op = localDD->noiseOperationTable.lookup(getNumberOfQubits(), dd::AFalse, target);
-                    if (tmp_op.p == nullptr) {
-                        tmp_op = localDD->makeGateDD(dd::GateMatrix({dd::complex_one, dd::complex_zero, dd::complex_zero, one_minus_sqrt_amplitude_damping_probability}), getNumberOfQubits(), target);
-                        localDD->noiseOperationTable.insert(dd::AFalse, target, tmp_op);
-                    }
-                    dd_operation = localDD->multiply(tmp_op, dd_operation);
-                    break;
-                }
-                case (dd::X): {
-                    dd_operation = localDD->multiply(localDD->makeGateDD(dd::Xmat, getNumberOfQubits(), target), dd_operation);
-                    break;
-                }
-                case (dd::Y): {
-                    dd_operation = localDD->multiply(localDD->makeGateDD(dd::Ymat, getNumberOfQubits(), target), dd_operation);
-                    break;
-                }
-                case (dd::Z): {
-                    dd_operation = localDD->multiply(localDD->makeGateDD(dd::Zmat, getNumberOfQubits(), target), dd_operation);
-                    break;
-                }
-                default: {
-                    throw std::runtime_error("Unknown noise operation '" + std::to_string(effect) + "'\n");
-                }
-            }
-        }
-    }
-    return dd_operation;
-}
-
-dd::NoiseOperationKind StochasticNoiseSimulator::ReturnNoiseOperation(char i, double prob) const {
-    //    if (forcedResult.size() > currentResult) {
-    //        auto tmp = forcedResult[currentResult];
-    //        currentResult += 1;
-    //        return tmp;
-    //    }
-    switch (i) {
-        case 'D': {
-            if (prob >= 3 * noise_probability / 4) {
-                //                printf("T");
-                return dd::I;
-            } else if (prob < noise_probability / 4) {
-                //                printf("X");
-                return dd::X;
-            } else if (prob < noise_probability / 2) {
-                //                printf("Y");
-                return dd::Y;
-            } else { //if (prob < 3 * noiseProbability / 4) {
-                     //                printf("Z");
-                return dd::Z;
-            }
-        }
-        case 'A': {
-            return dd::AFalse;
-        }
-        case 'P': {
-            if (prob > noise_probability) {
-                //                printf("B");
-                return dd::I;
-            } else {
-                //                printf("P");
-                return dd::Z; // A phase flip is represented by a Z operation
-            }
-        }
-        default:
-            throw std::runtime_error(std::string{"Unknown noise effect '"} + i + "'");
-    }
-}
-
-void StochasticNoiseSimulator::setRecordedProperties(const std::string& input) {
+template<class DDPackage>
+void StochasticNoiseSimulator<DDPackage>::setRecordedProperties(const std::string& input) {
     std::string subString;
-    int         list_begin = std::numeric_limits<decltype(list_begin)>::min();
-    int         list_end   = std::numeric_limits<decltype(list_begin)>::min();
-    for (char i: input) {
+    const int   min = std::numeric_limits<int>::min();
+
+    auto listBegin = min;
+    auto listEnd   = min;
+    for (const auto i: input) {
         if (i == ' ') {
             continue;
         }
         if (i == ',') {
-            if (list_begin > std::numeric_limits<decltype(list_begin)>::min()) {
-                list_end = std::stoi(subString);
-                if (list_end > std::pow(2, getNumberOfQubits())) {
-                    list_end = (int)std::pow(2, getNumberOfQubits());
+            if (listBegin > min) {
+                listEnd = std::stoi(subString);
+                if (listEnd > std::pow(2, getNumberOfQubits())) {
+                    listEnd = static_cast<int>(std::pow(2, getNumberOfQubits()));
                 }
-                assert(list_begin < list_end);
-                for (int m = list_begin; m <= list_end; m++) {
-                    recorded_properties.emplace_back(std::make_tuple(m, intToString(m)));
+                assert(listBegin < listEnd);
+                for (int m = listBegin; m <= listEnd; m++) {
+                    recordedProperties.emplace_back(m, intToString(m));
                 }
             } else {
-                recorded_properties.emplace_back(std::make_tuple(std::stoi(subString), intToString(std::stoi(subString))));
+                recordedProperties.emplace_back(std::stoi(subString), intToString(std::stoi(subString)));
             }
-            subString  = "";
-            list_begin = std::numeric_limits<decltype(list_begin)>::min();
-            list_end   = std::numeric_limits<decltype(list_begin)>::min();
+            subString = "";
+            listBegin = min;
+            listEnd   = min;
             continue;
         }
-        if (i == '-' && subString.length() > 0) {
-            list_begin = std::stoi(subString);
-            subString  = "";
+        if (i == '-' && !subString.empty()) {
+            listBegin = std::stoi(subString);
+            subString = "";
             continue;
         }
         subString += i;
     }
-    if (list_begin > std::numeric_limits<decltype(list_begin)>::min()) {
-        list_end = std::stoi(subString);
-        if (list_end > std::pow(2, getNumberOfQubits())) {
-            list_end = (int)std::pow(2, getNumberOfQubits()) - 1;
+    if (listBegin > min) {
+        listEnd = std::stoi(subString);
+        if (listEnd > std::pow(2, getNumberOfQubits())) {
+            listEnd = static_cast<int>(std::pow(2, getNumberOfQubits()) - 1);
         }
-        assert(list_begin < list_end);
-        for (int m = list_begin; m <= list_end; m++) {
-            recorded_properties.emplace_back(std::make_tuple(m, intToString(m)));
+        assert(listBegin < listEnd);
+        for (int m = listBegin; m <= listEnd; m++) {
+            recordedProperties.emplace_back(m, intToString(m));
         }
     } else {
-        recorded_properties.emplace_back(std::make_tuple(std::stoi(subString), intToString(std::stoi(subString))));
+        recordedProperties.emplace_back(std::stoi(subString), intToString(std::stoi(subString)));
     }
 }
 
-std::string StochasticNoiseSimulator::intToString(long target_number) const {
-    if (target_number < 0) {
+template<class DDPackage>
+std::string StochasticNoiseSimulator<DDPackage>::intToString(long targetNumber) const {
+    if (targetNumber < 0) {
         return "X";
     }
     auto        qubits = getNumberOfQubits();
     std::string path(qubits, '0');
-    auto        number = (unsigned long)target_number;
-    for (int i = 1; i <= qubits; i++) {
-        if (number % 2) {
+    auto        number = static_cast<unsigned long>(targetNumber);
+    for (std::size_t i = 1U; i <= qubits; i++) {
+        if (number % 2U) {
             path[qubits - i] = '1';
         }
-        number = number >> 1u;
+        number = number >> 1U;
     }
     return path;
 }
-void StochasticNoiseSimulator::setMeasuredQubitToZero(signed char& at, dd::vEdge& e, std::unique_ptr<dd::Package<>>& localDD) {
-    auto f = dd::mEdge::one;
 
-    for (std::size_t p = 0; p < getNumberOfQubits(); p++) {
-        if (static_cast<dd::Qubit>(p) == at) {
-            f = localDD->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, f, dd::mEdge::zero, dd::mEdge::zero});
-            //                f = dd->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, dd::mEdge::zero, dd::mEdge::zero, dd::mEdge::zero});
-        } else {
-            f = localDD->makeDDNode(static_cast<dd::Qubit>(p), std::array{f, dd::mEdge::zero, dd::mEdge::zero, f});
-        }
-    }
-    auto tmp = localDD->multiply(f, e);
-    localDD->incRef(tmp);
-    localDD->decRef(e);
-    e = tmp;
-}
+template class StochasticNoiseSimulator<StochasticNoisePackage>;
