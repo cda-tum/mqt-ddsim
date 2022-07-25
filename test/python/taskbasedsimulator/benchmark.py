@@ -1,6 +1,7 @@
 import csv
 import datetime
 import math
+import os.path
 import time
 
 import numpy
@@ -104,9 +105,14 @@ if __name__ == '__main__':
     basis_gates = ["id", "rz", "sx", "x", "cx", "reset"]
     basis_gates_transpile = configuration_dict['basis_gates']
     # loading the Gatecost LUT
+    script_path = os.path.abspath(__file__)
+    script_dir = os.path.split(script_path)[0]
+    print(script_dir)
+    rel_path = "qiskit_O2_nonancilla.profile"
+    abs_file_path = os.path.join(script_dir, rel_path)
     lut_gatecost = {}
     with open(
-            "/home/alexander/Dropbox/Arbeit/IIC/Testcode/ddsimtum/ddsim/test/python/taskbasedsimulator/qiskit_O2_nonancilla.profile",
+            abs_file_path,
             'r') as f:
         for line in f.readlines():
             line = line.split(" ")
