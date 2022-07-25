@@ -96,9 +96,11 @@ PathSimulator::SimulationPath::SimulationPath(std::size_t nleaves, PathSimulator
 }
 
 std::map<std::string, std::size_t> PathSimulator::Simulate(unsigned int shots) {
+    // printing the circuit
+    //std::cout<< *qc << std::endl;
     // build task graph from simulation path
     constructTaskGraph();
-    //std::cout<< *qc << std::endl;
+
     /// Enable the following statements to generate a .dot file of the resulting taskflow
     //        std::ofstream ofs("taskflow.dot");
     //        taskflow.dump(ofs);
@@ -281,12 +283,76 @@ void PathSimulator::generateAlternatingSimulationPath(std::size_t startingPoint)
     setSimulationPath(components, true);
 }
 
+
+
+void PathSimulator::generateGatecostSimulationPath (std::size_t startingPoint, std::list<std::size_t> gateCosts){
+    SimulationPath::Components components{};
+    components.reserve(qc->getNops());
+    std::size_t startElem = startingPoint;
+    components.emplace_back(startElem, startElem + 1);
+    std::size_t leftID   = startElem - 1;
+    std::size_t leftEnd  = 0;
+    std::size_t rightID  = startElem + 2;
+    std::size_t rightEnd = qc->getNops() + 1;
+    std::size_t nextID   = rightEnd;
+    std::size_t runID = 0;
+    while (leftID != leftEnd && rightID != rightEnd) {
+        if (runID==0){
+            for (auto i=0U; i < gateCosts.front()-1;i++){
+                components.emplace_back(nextID, rightID);
+                nextID++;
+                rightID++;
+            }
+            gateCosts.pop_front();
+            runID++;
+        }
+        else{
+            components.emplace_back(leftID, nextID);
+            nextID++;
+            leftID--;
+            for (auto i=0U; i < gateCosts.front();i++){
+                components.emplace_back(nextID, rightID);
+                nextID++;
+                rightID++;
+                if (rightID == rightEnd){
+                    break;
+                }
+            }
+            gateCosts.pop_front();
+            runID++;
+            if (rightID == rightEnd){
+                break;
+            }
+        }
+    }
+
+    //Finish the left-hand side
+    while (leftID != leftEnd) {
+        components.emplace_back(leftID, nextID);
+        nextID++;
+        leftID--;
+    }
+
+    //Finish the right-hand side
+    while (rightID != rightEnd) {
+        components.emplace_back(nextID, rightID);
+        nextID++;
+        rightID++;
+    }
+
+    //Add the remaining matrix-vector multiplication
+    components.emplace_back(0, nextID);
+    setSimulationPath(components, true);
+}
+
 void PathSimulator::constructTaskGraph() {
     const auto& path  = simulationPath.components;
     const auto& steps = simulationPath.steps;
 
-    if (path.empty())
+    if (path.empty()) {
+        root_edge = dd->makeZeroState(qc->getNqubits());
         return;
+    }
 
     const std::size_t nleaves = qc->getNops() + 1;
 
