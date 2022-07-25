@@ -287,9 +287,8 @@ void PathSimulator<DDPackage>::generateAlternatingSimulationPath(std::size_t sta
     setSimulationPath(components, true);
 }
 
-
 template<class DDPackage>
-void PathSimulator<DDPackage>::generateGatecostSimulationPath (std::size_t startingPoint, std::list<std::size_t> gateCosts){
+void PathSimulator<DDPackage>::generateGatecostSimulationPath(std::size_t startingPoint, std::list<std::size_t> gateCosts) {
     typename SimulationPath::Components components{};
     components.reserve(CircuitSimulator<DDPackage>::qc->getNops());
     std::size_t startElem = startingPoint;
@@ -299,32 +298,31 @@ void PathSimulator<DDPackage>::generateGatecostSimulationPath (std::size_t start
     std::size_t rightID  = startElem + 2;
     std::size_t rightEnd = CircuitSimulator<DDPackage>::qc->getNops() + 1;
     std::size_t nextID   = rightEnd;
-    std::size_t runID = 0;
+    std::size_t runID    = 0;
     while (leftID != leftEnd && rightID != rightEnd) {
-        if (runID==0){
-            for (auto i=0U; i < gateCosts.front()-1;i++){
+        if (runID == 0) {
+            for (auto i = 0U; i < gateCosts.front() - 1; i++) {
                 components.emplace_back(nextID, rightID);
                 nextID++;
                 rightID++;
             }
             gateCosts.pop_front();
             runID++;
-        }
-        else{
+        } else {
             components.emplace_back(leftID, nextID);
             nextID++;
             leftID--;
-            for (auto i=0U; i < gateCosts.front();i++){
+            for (auto i = 0U; i < gateCosts.front(); i++) {
                 components.emplace_back(nextID, rightID);
                 nextID++;
                 rightID++;
-                if (rightID == rightEnd){
+                if (rightID == rightEnd) {
                     break;
                 }
             }
             gateCosts.pop_front();
             runID++;
-            if (rightID == rightEnd){
+            if (rightID == rightEnd) {
                 break;
             }
         }

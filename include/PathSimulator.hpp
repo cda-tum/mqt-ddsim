@@ -116,7 +116,7 @@ public:
                 conf["alternating_start"] = alternatingStart;
             } else if (mode == Mode::Gatecost) {
                 conf["alternating_start"] = alternatingStart;
-                conf["gate_cost"] = gateCost;
+                conf["gate_cost"]         = gateCost;
             }
             if (seed != 0) {
                 conf["seed"] = seed;
