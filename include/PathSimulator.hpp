@@ -187,6 +187,7 @@ public:
     void generatePairwiseRecursiveGroupingSimulationPath();
     void generateBracketSimulationPath(std::size_t bracketSize);
     void generateAlternatingSimulationPath(std::size_t startingPoint);
+    void generateGatecostSimulationPath(std::size_t startingPoint, std::list<std::size_t> gateCosts);
 
 private:
     std::unordered_map<std::size_t, tf::Task>                                 tasks{};
