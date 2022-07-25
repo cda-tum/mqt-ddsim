@@ -58,7 +58,7 @@ TEST(TaskBasedSimTest, SimpleCircuitArgumentConstructor) {
     qc->x(0U, 1_pc);
 
     // construct simulator and generate sequential contraction plan
-    PathSimulator tbs(std::move(qc), PathSimulator<>::Configuration::Mode::Sequential, 2, 0, NULL, 12345U);
+    PathSimulator tbs(std::move(qc), PathSimulator<>::Configuration::Mode::Sequential, 2, 0, {}, 12345U);
 
     // simulate circuit
     auto counts = tbs.Simulate(1024);
