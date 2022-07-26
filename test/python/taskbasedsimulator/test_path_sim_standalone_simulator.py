@@ -73,3 +73,19 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         self.assertEqual(len(result.keys()), 2)
         self.assertIn('000', result.keys())
         self.assertIn('111', result.keys())
+
+    def test_standalone_gatecost_only(self):
+        circ = QuantumCircuit(3)
+        circ.h(0)
+        circ.cx(0, 1)
+        circ.cx(0, 2)
+
+        config = ddsim.PathSimulatorConfiguration()
+        config.mode = ddsim.PathSimulatorMode.gatecost
+        config.gate_cost = [1, 1]
+        config.alternating_start = 2
+        sim = ddsim.PathCircuitSimulator(circ, config)
+        result = sim.simulate(1000)
+        self.assertEqual(len(result.keys()), 2)
+        self.assertIn('000', result.keys())
+        self.assertIn('111', result.keys())
