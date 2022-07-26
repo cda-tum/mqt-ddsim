@@ -223,3 +223,25 @@ TEST(TaskBasedSimTest, SimpleCircuitGatecost) {
         std::cout << state << ": " << count << std::endl;
     }
 }
+
+TEST(TaskBasedSimTest, SimpleCircuitGatecostConfigurationObject) {
+    auto qc = std::make_unique<qc::QuantumComputation>(2);
+    qc->h(1U);
+    qc->x(0U, 1_pc);
+    qc->x(0U, 1_pc);
+    qc->x(0U, 1_pc);
+
+    // construct simulator and generate gatecost contraction plan
+    auto config = PathSimulator<>::Configuration{};
+    config.mode = PathSimulator<>::Configuration::Mode::Gatecost;
+    config.alternatingStart = 2;
+    config.gateCost = {1, 1};
+    PathSimulator tbs(std::move(qc), config);
+
+    // simulate circuit
+    auto counts = tbs.Simulate(1024);
+
+    for (const auto& [state, count]: counts) {
+        std::cout << state << ": " << count << std::endl;
+    }
+}
