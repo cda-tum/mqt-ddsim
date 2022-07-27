@@ -14,12 +14,14 @@ TEST(TaskBasedSimTest, Configuration) {
     EXPECT_EQ(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode::BracketGrouping), "bracket");
     EXPECT_EQ(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode::Alternating), "alternating");
     EXPECT_EQ(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode::Cotengra), "cotengra");
+    EXPECT_EQ(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode::Gatecost), "gatecost");
 
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("sequential"), PathSimulator<>::Configuration::Mode::Sequential);
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("pairwise_recursive"), PathSimulator<>::Configuration::Mode::PairwiseRecursiveGrouping);
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("bracket"), PathSimulator<>::Configuration::Mode::BracketGrouping);
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("alternating"), PathSimulator<>::Configuration::Mode::Alternating);
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("cotengra"), PathSimulator<>::Configuration::Mode::Cotengra);
+    EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("gatecost"), PathSimulator<>::Configuration::Mode::Gatecost);
 
     auto config = PathSimulator<>::Configuration{};
     config.seed = 12345U;
@@ -30,6 +32,11 @@ TEST(TaskBasedSimTest, Configuration) {
 
     config.mode             = PathSimulator<>::Configuration::Mode::Alternating;
     config.alternatingStart = 13;
+    std::cout << config.toString() << std::endl;
+
+    config.mode             = PathSimulator<>::Configuration::Mode::Gatecost;
+    config.alternatingStart = 2;
+    config.gateCost         = {1, 1, 1, 1};
     std::cout << config.toString() << std::endl;
 }
 
