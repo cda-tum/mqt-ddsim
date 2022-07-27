@@ -247,7 +247,7 @@ TEST(TaskBasedSimTest, SimpleCircuitGatecostConfigurationObject) {
     // construct simulator and generate gatecost contraction plan
     auto config             = PathSimulator<>::Configuration{};
     config.mode             = PathSimulator<>::Configuration::Mode::Gatecost;
-    config.alternatingStart = 2;
+    config.alternatingStart = 5;
     config.gateCost         = {1, 1};
     PathSimulator tbs(std::move(qc), config);
 
