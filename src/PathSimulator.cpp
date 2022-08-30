@@ -293,35 +293,35 @@ void PathSimulator<DDPackage>::generateGatecostSimulationPath(std::size_t starti
     components.reserve(CircuitSimulator<DDPackage>::qc->getNops());
     std::size_t startElem = startingPoint;
     components.emplace_back(startElem, startElem + 1);
-    std::size_t leftID   = startElem - 1;
-    std::size_t leftEnd  = 0;
-    std::size_t rightID  = startElem + 2;
-    std::size_t rightEnd = CircuitSimulator<DDPackage>::qc->getNops() + 1;
-    std::size_t nextID   = rightEnd;
-    std::size_t runID    = 0;
+    std::size_t       leftID   = startElem - 1;
+    const std::size_t leftEnd  = 0;
+    std::size_t       rightID  = startElem + 2;
+    const std::size_t rightEnd = CircuitSimulator<DDPackage>::qc->getNops() + 1;
+    std::size_t       nextID   = rightEnd;
+    std::size_t       runID    = 0;
     while (leftID != leftEnd && rightID != rightEnd) {
         if (runID == 0) {
-            for (auto i = 0U; i < gateCosts.front() - 1; i++) {
+            for (auto i = 0U; i < gateCosts.front() - 1; ++i) {
                 components.emplace_back(nextID, rightID);
-                nextID++;
-                rightID++;
+                ++nextID;
+                ++rightID;
             }
             gateCosts.pop_front();
-            runID++;
+            ++runID;
         } else {
             components.emplace_back(leftID, nextID);
-            nextID++;
-            leftID--;
-            for (auto i = 0U; i < gateCosts.front(); i++) {
+            ++nextID;
+            --leftID;
+            for (auto i = 0U; i < gateCosts.front(); ++i) {
                 components.emplace_back(nextID, rightID);
-                nextID++;
-                rightID++;
+                ++nextID;
+                ++rightID;
                 if (rightID == rightEnd) {
                     break;
                 }
             }
             gateCosts.pop_front();
-            runID++;
+            ++runID;
             if (rightID == rightEnd) {
                 break;
             }
@@ -331,15 +331,15 @@ void PathSimulator<DDPackage>::generateGatecostSimulationPath(std::size_t starti
     //Finish the left-hand side
     while (leftID != leftEnd) {
         components.emplace_back(leftID, nextID);
-        nextID++;
-        leftID--;
+        ++nextID;
+        --leftID;
     }
 
     //Finish the right-hand side
     while (rightID != rightEnd) {
         components.emplace_back(nextID, rightID);
-        nextID++;
-        rightID++;
+        ++nextID;
+        ++rightID;
     }
 
     //Add the remaining matrix-vector multiplication

@@ -30,13 +30,13 @@ TEST(TaskBasedSimTest, Configuration) {
     config.bracketSize = 3;
     std::cout << config.toString() << std::endl;
 
-    config.mode             = PathSimulator<>::Configuration::Mode::Alternating;
-    config.alternatingStart = 13;
+    config.mode          = PathSimulator<>::Configuration::Mode::Alternating;
+    config.startingPoint = 13;
     std::cout << config.toString() << std::endl;
 
-    config.mode             = PathSimulator<>::Configuration::Mode::Gatecost;
-    config.alternatingStart = 2;
-    config.gateCost         = {1, 1, 1, 1};
+    config.mode          = PathSimulator<>::Configuration::Mode::Gatecost;
+    config.startingPoint = 2;
+    config.gateCost      = {2, 2, 1, 1};
     std::cout << config.toString() << std::endl;
 }
 
@@ -245,10 +245,10 @@ TEST(TaskBasedSimTest, SimpleCircuitGatecostConfigurationObject) {
     qc->x(0U, 1_pc);
 
     // construct simulator and generate gatecost contraction plan
-    auto config             = PathSimulator<>::Configuration{};
-    config.mode             = PathSimulator<>::Configuration::Mode::Gatecost;
-    config.alternatingStart = 5;
-    config.gateCost         = {1, 1};
+    auto config          = PathSimulator<>::Configuration{};
+    config.mode          = PathSimulator<>::Configuration::Mode::Gatecost;
+    config.startingPoint = 5;
+    config.gateCost      = {1, 1};
     PathSimulator tbs(std::move(qc), config);
 
     // simulate circuit

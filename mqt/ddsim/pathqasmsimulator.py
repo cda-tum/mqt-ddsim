@@ -122,7 +122,7 @@ class PathQasmSimulator(BackendV1):
             mode=None,
             bracket_size=None,
             alternating_start=None,
-            gate_cost = None,
+            gate_cost=None,
             seed=None,
             cotengra_max_time=60,
             cotengra_max_repeats=1024,
