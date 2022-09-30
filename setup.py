@@ -123,6 +123,6 @@ setup(
     extras_require={
         "tnflow": ["sparse", "opt-einsum", "quimb", "pandas", "numpy"],
         "tests": ["pytest", "qiskit-terra>=0.19.2,<0.22.0"],
-        "docs": ["Sphinx==5.1.1", "sphinx-rtd-theme==1.0.0", "sphinxcontrib-bibtex==2.5.0", "sphinx-copybutton==0.5.0"],
+        "docs": ["Sphinx==5.2.2", "sphinx-rtd-theme==1.0.0", "sphinxcontrib-bibtex==2.5.0", "sphinx-copybutton==0.5.0"],
     }
 )
