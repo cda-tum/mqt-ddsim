@@ -146,15 +146,6 @@ int main(int argc, char** argv) {
 
     auto t1 = std::chrono::high_resolution_clock::now();
     auto m  = ddsim->Simulate(shots);
-    std::cout << "final state vector " << std::endl;
-    auto result = ddsim->dd->getVector(ddsim->rootEdge);
-    for (int i = 0; i < result.size(); i++) {
-        if (abs(result[i]) > 0.001) {
-            std::bitset<32> a = i;
-            std::cout << a << ": " << abs(result[i]) * abs(result[i]) << std::endl;
-        }
-    }
-
     auto t2 = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<float> duration_simulation = t2 - t1;
@@ -232,6 +223,8 @@ int main(int argc, char** argv) {
         output_obj["state_vector"] = ddsim->getVectorPair();
     }
 
+
+
     if (vm.count("ps")) {
         output_obj["statistics"] = {
                 {"simulation_time", duration_simulation.count()},
@@ -242,7 +235,13 @@ int main(int argc, char** argv) {
                 {"shots", shots},
                 {"distinct_results", m.size()},
                 {"seed", ddsim->getSeed()},
+		{"active_nodes", ddsim->dd->size(ddsim->rootEdge)},
+		{"number_of_lims", ddsim->dd->limCount(ddsim->rootEdge)},
+		{"number_of_number", ddsim->dd->numberCount(ddsim->rootEdge)},
+		{"size_of_a_single_node", sizeof(*ddsim->rootEdge.p)},
         };
+
+
 
         for (const auto& [stat, value]: ddsim->AdditionalStatistics()) {
             output_obj["statistics"][stat] = value;
