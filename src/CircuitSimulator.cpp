@@ -207,10 +207,10 @@ std::map<std::size_t, bool> CircuitSimulator<DDPackage>::single_shot(const bool 
             Simulator<DDPackage>::dd->garbageCollect();
         }
 
-        op_num++;
-        if (op_num % 100 == 0) {
-            std::cout << "Applied operation number " << op_num << std::endl;
-        }
+        //        op_num++;
+        //        if (op_num % 100 == 0) {
+        //            std::cout << "Applied operation number " << op_num << std::endl;
+        //        }
     }
     //    dd::export2Dot(Simulator<DDPackage>::rootEdge, "/home/user/Desktop/finalState.dot", false, true, true, false, true);
     return classic_values;
