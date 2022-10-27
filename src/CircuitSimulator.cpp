@@ -97,7 +97,7 @@ std::map<std::size_t, bool> CircuitSimulator<DDPackage>::single_shot(const bool 
 
     const int approx_mod = std::ceil(static_cast<double>(qc->getNops()) / (approx_info.step_number + 1));
 
-    for (auto& op: *qc) {
+    for (auto const& op: *qc) {
         if (op->isNonUnitaryOperation()) {
             if (ignore_nonunitaries) {
                 continue;
@@ -147,11 +147,33 @@ std::map<std::size_t, bool> CircuitSimulator<DDPackage>::single_shot(const bool 
                       << " #controls=" << op->getControls().size()
                       << " statesize=" << dd->size(rootEdge) << "\n";//*/
 
-            auto dd_op = dd::getDD(op.get(), Simulator<DDPackage>::dd);
-            auto tmp   = Simulator<DDPackage>::dd->multiply(dd_op, Simulator<DDPackage>::rootEdge);
+            dd::vEdge tmp;
+            if (auto target = op->getTargets(); op->getControls().empty() && target.size() == 1 && op->getType() == qc::X) {
+                tmp = Simulator<DDPackage>::dd->applyPauliGate(dd::X, target.at(0), Simulator<DDPackage>::rootEdge);
+            } else if (op->getControls().empty() && target.size() == 1 && op->getType() == qc::Y) {
+                tmp = Simulator<DDPackage>::dd->applyPauliGate(dd::Y, target.at(0), Simulator<DDPackage>::rootEdge);
+            } else if (op->getControls().empty() && target.size() == 1 && op->getType() == qc::Z) {
+                tmp = Simulator<DDPackage>::dd->applyPauliGate(dd::Z, target.at(0), Simulator<DDPackage>::rootEdge);
+            } else {
+                auto dd_op = dd::getDD(op.get(), Simulator<DDPackage>::dd);
+                tmp        = Simulator<DDPackage>::dd->multiply(dd_op, Simulator<DDPackage>::rootEdge);
+            }
             Simulator<DDPackage>::dd->incRef(tmp);
             Simulator<DDPackage>::dd->decRef(Simulator<DDPackage>::rootEdge);
             Simulator<DDPackage>::rootEdge = tmp;
+
+            //            auto dd_op = dd::getDD(op.get(), Simulator<DDPackage>::dd);
+            //            auto tmp   = Simulator<DDPackage>::dd->multiply(dd_op, Simulator<DDPackage>::rootEdge);
+            //            Simulator<DDPackage>::dd->incRef(tmp);
+            //            Simulator<DDPackage>::dd->decRef(Simulator<DDPackage>::rootEdge);
+            //            Simulator<DDPackage>::rootEdge = tmp;
+
+            //            auto vectorE = Simulator<DDPackage>::dd->getVector(Simulator<DDPackage>::rootEdge);
+            //            std::cout << "[";
+            //            for (unsigned int i = 0; i < vectorE.size(); i++) {
+            //                std::cout << vectorE[i] << ", ";
+            //            }
+            //            std::cout << "]" << std::endl;
 
             if (approx_info.step_number > 0 && approx_info.step_fidelity < 1.0) {
                 if (approx_info.approx_when == ApproximationInfo::FidelityDriven && (op_num + 1) % approx_mod == 0 &&
@@ -184,8 +206,13 @@ std::map<std::size_t, bool> CircuitSimulator<DDPackage>::single_shot(const bool 
             }
             Simulator<DDPackage>::dd->garbageCollect();
         }
+
         op_num++;
+        if (op_num % 100 == 0) {
+            std::cout << "Applied operation number " << op_num << std::endl;
+        }
     }
+    //    dd::export2Dot(Simulator<DDPackage>::rootEdge, "/home/user/Desktop/finalState.dot", false, true, true, false, true);
     return classic_values;
 }
 
