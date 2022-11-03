@@ -1,7 +1,7 @@
 [submodule "extern/qfr"]
 	path = extern/qfr
 	url = https://github.com/cda-tum/qfr.git
-    branch = main
+    branch = mbqc
     shallow = true
 [submodule "extern/taskflow"]
 	path = extern/taskflow
