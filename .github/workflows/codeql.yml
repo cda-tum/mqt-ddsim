@@ -32,7 +32,7 @@ jobs:
         if: ${{ matrix.language == 'cpp' }}
         run: |
           sudo apt-get update
-          sudo apt-get install --yes python-pip
+          sudo apt-get install --yes python3-pip
 
       - name: Install Dependencies (python)
         if: ${{ matrix.language == 'python' }}
