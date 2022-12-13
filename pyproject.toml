@@ -32,6 +32,9 @@ classifiers=[
     'Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)',
 ]
 requires-python = ">=3.7"
+dependencies = [
+    "qiskit-terra>=0.19.2,<0.23.0"
+]
 dynamic = ["version"]
 
 [project.optional-dependencies]
@@ -40,10 +43,10 @@ tnflow = [
     "opt-einsum",
     "quimb",
     "pandas",
-    "numpy"]
+    "numpy"
+]
 tests = [
-    "pytest",
-    "qiskit-terra>=0.19.2,<0.23.0"
+    "pytest"
 ]
 docs = [
     "Sphinx==5.3.0",
