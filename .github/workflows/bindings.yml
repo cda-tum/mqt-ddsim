@@ -65,18 +65,6 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
-        arch: [ x86_64 ]
-        archname: [ "" ]
-        skip: [ "*-musllinux_*" ]
-        libc: [ "" ]
-        include:
-          - arch:     arm64
-            archname: "-arm64"
-            os:       macos-latest
-          - arch: x86_64
-            os:   ubuntu-latest
-            skip: "*-manylinux_*"
-            libc: "-musl"
     steps:
       - uses: actions/checkout@v3
         with:
@@ -84,10 +72,6 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.11.3
-        env:
-          CIBW_ARCHS_MACOS: ${{ matrix.arch }}
-          CIBW_ARCHS_LINUX: ${{ matrix.arch }}
-          CIBW_SKIP:        ${{ matrix.skip }}
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
