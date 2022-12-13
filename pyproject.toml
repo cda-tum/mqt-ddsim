@@ -73,6 +73,7 @@ include = ["mqt.*"]
 
 [tool.cibuildwheel]
 build = "cp3*"
+skip = "*-musllinux_*"
 archs = "auto64"
 test-extras = ["test"]
 test-command = "python -c \"from mqt import ddsim\""
