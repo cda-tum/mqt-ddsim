@@ -6,6 +6,13 @@
 [![Documentation](https://img.shields.io/readthedocs/ddsim?logo=readthedocs&style=flat-square)](https://ddsim.readthedocs.io/en/latest/)
 [![codecov](https://img.shields.io/codecov/c/github/cda-tum/ddsim?style=flat-square&logo=codecov)](https://codecov.io/gh/cda-tum/ddsim)
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cda-tum/qmap/main/docs/source/_static/mqt_light.png" width="60%">
+    <img src="https://raw.githubusercontent.com/cda-tum/qmap/main/docs/source/_static/mqt_dark.png" width="60%">
+  </picture>
+</p>
+
 # MQT DDSIM - A quantum circuit simulator based on decision diagrams written in C++
 
 A tool for classical quantum circuit simulation by the [Chair for Design Automation](https://www.cda.cit.tum.de/) at the [Technical University of Munich](https://www.tum.de/).
