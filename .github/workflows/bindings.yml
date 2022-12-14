@@ -9,6 +9,10 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 jobs:
   test_bindings:
     name:    Test Python bindings
@@ -54,36 +58,26 @@ jobs:
 
 
   build_wheels:
-    name: Build ${{ matrix.os }}${{ matrix.archname }}${{ matrix.libc }} wheels
+    name: Build ${{ matrix.config.os }}-${{ matrix.config.arch }} wheels
     needs: [ test_bindings, build_sdist ]
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
-        arch: [ x86_64 ]
-        archname: [ "" ]
-        skip: [ "*-musllinux_*" ]
-        libc: [ "" ]
-        include:
-          - arch:     arm64
-            archname: "-arm64"
-            os:       macos-latest
-          - arch: x86_64
-            os:   ubuntu-latest
-            skip: "*-manylinux_*"
-            libc: "-musl"
+        config:
+          - { os: ubuntu-latest, arch: x64 }
+          - { os: macos-latest, arch: x64 }
+          - { os: macos-latest, arch: arm64 }
+          - { os: windows-latest, arch: x64 }
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
       - uses: ilammy/msvc-dev-cmd@v1
+      - if: ${{ matrix.config.arch }} == 'arm64'
+        run: echo "CIBW_ARCHS_MACOS=arm64" >> $GITHUB_ENV
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.11.3
-        env:
-          CIBW_ARCHS_MACOS: ${{ matrix.arch }}
-          CIBW_ARCHS_LINUX: ${{ matrix.arch }}
-          CIBW_SKIP:        ${{ matrix.skip }}
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
