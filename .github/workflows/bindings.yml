@@ -58,7 +58,7 @@ jobs:
 
 
   build_wheels:
-    name: Build ${{ matrix.config.os }}-${{ matrix.config.arch }}} wheels
+    name: Build ${{ matrix.config.os }}-${{ matrix.config.arch }} wheels
     needs: [ test_bindings, build_sdist ]
     runs-on: ${{ matrix.config.os }}
     strategy:
