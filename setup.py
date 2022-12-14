@@ -29,7 +29,7 @@ class CMakeBuild(build_ext):
         cmake_args = [
             f"-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={extdir}",
             f"-DPYTHON_EXECUTABLE={sys.executable}",
-            f"-DDSIM_VERSION_INFO={version}",
+            f"-DDDSIM_VERSION_INFO={version}",
             f"-DCMAKE_BUILD_TYPE={cfg}",
             "-DBINDINGS=ON",
         ]
