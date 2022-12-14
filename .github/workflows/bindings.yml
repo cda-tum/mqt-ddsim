@@ -64,12 +64,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        config:
+          - { os: ubuntu-latest, arch: x64 }
+          - { os: macos-latest, arch: x64 }
+          - { os: macos-latest, arch: arm64 }
+          - { os: windows-latest, arch: x64 }
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
       - uses: ilammy/msvc-dev-cmd@v1
+      - if: ${{ matrix.config.arch }} == 'arm64'
+        run: echo "CIBW_ARCHS_MACOS=arm64" >> $GITHUB_ENV
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.11.3
       - uses: actions/upload-artifact@v3
