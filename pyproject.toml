@@ -20,7 +20,7 @@ keywords = ["MQT", "quantum computing", "design automation", "quantum circuit si
 license = { file = "LICENSE.md" }
 
 classifiers=[
-    'Development Status :: 4 - Beta',
+    "Development Status :: 5 - Production/Stable",
     'Programming Language :: Python :: 3',
     'Programming Language :: C++',
     'License :: OSI Approved :: MIT License',
@@ -33,7 +33,7 @@ classifiers=[
 ]
 requires-python = ">=3.7"
 dependencies = [
-    "qiskit-terra>=0.19.2,<0.23.0"
+    "qiskit-terra>=0.19.2"
 ]
 dynamic = ["version"]
 
@@ -49,11 +49,11 @@ tests = [
     "pytest"
 ]
 docs = [
-    "Sphinx==5.3.0",
-    "sphinx-rtd-theme==1.1.1",
+    "sphinx>=5",
+    "sphinx-rtd-theme",
     "sphinx-rtd-dark-mode",
-    "sphinxcontrib-bibtex==2.5.0",
-    "sphinx-copybutton==0.5.1",
+    "sphinxcontrib-bibtex>=2.4.2",
+    "sphinx-copybutton",
     "sphinxext-opengraph"
 ]
 
