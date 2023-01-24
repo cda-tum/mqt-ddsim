@@ -84,8 +84,8 @@ void getNumpyMatrixRec(const qc::MatrixDD& e, const std::complex<dd::fp>& amp, s
         getNumpyMatrixRec(e.p->e[3], c, x, y, dim, mat);
 }
 
-template<class DDPackage = dd::Package<>>
-void getNumpyMatrix(UnitarySimulator<DDPackage>& sim, py::array_t<std::complex<dd::fp>>& matrix) {
+template<class Config = dd::DDPackageConfig>
+void getNumpyMatrix(UnitarySimulator<Config>& sim, py::array_t<std::complex<dd::fp>>& matrix) {
     const auto&     e            = sim.getConstructedDD();
     py::buffer_info matrixBuffer = matrix.request();
     auto*           dataPtr      = static_cast<std::complex<dd::fp>*>(matrixBuffer.ptr);
