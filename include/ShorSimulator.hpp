@@ -76,7 +76,7 @@ class ShorSimulator: public Simulator<Config> {
     /// composite number to be factored
     const std::size_t n;
     /// coprime number to `n`. Setting this to zero will randomly generate a suitable number
-    std::size_t       coprime_a;
+    std::size_t        coprime_a;
     const unsigned int required_bits;
     dd::QubitCount     n_qubits{};
 

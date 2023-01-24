@@ -1,7 +1,8 @@
 import unittest
+
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit import execute
-from mqt import ddsim
+
 from mqt.ddsim.pathstatevectorsimulator import PathStatevectorSimulator
 
 

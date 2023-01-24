@@ -3,8 +3,8 @@
 #include "QuantumComputation.hpp"
 #include "Simulator.hpp"
 #include "StochasticNoiseSimulator.hpp"
-#include "dd/Package.hpp"
 #include "dd/NoiseFunctionality.hpp"
+#include "dd/Package.hpp"
 
 template<class Config = DensityMatrixSimulatorDDPackageConfig>
 class DeterministicNoiseSimulator: public Simulator<Config> {

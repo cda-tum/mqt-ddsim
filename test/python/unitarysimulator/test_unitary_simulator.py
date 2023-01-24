@@ -1,10 +1,10 @@
 import unittest
 
+import numpy as np
 from qiskit import QuantumCircuit
-from mqt.ddsim.unitarysimulator import UnitarySimulator
 from qiskit import execute
 
-import numpy as np
+from mqt.ddsim.unitarysimulator import UnitarySimulator
 
 
 class MQTUnitarySimulatorTest(unittest.TestCase):

@@ -1,8 +1,9 @@
 import unittest
 
 from qiskit import QuantumCircuit, BasicAer
-from mqt.ddsim.qasmsimulator import QasmSimulator
 from qiskit import execute
+
+from mqt.ddsim.qasmsimulator import QasmSimulator
 
 
 class MQTQasmSimulatorTest(unittest.TestCase):

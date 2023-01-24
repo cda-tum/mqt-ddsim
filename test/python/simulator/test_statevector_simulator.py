@@ -1,4 +1,5 @@
 import unittest
+
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit import execute
 
@@ -38,4 +39,4 @@ class MQTStatevectorSimulatorTest(unittest.TestCase):
         self.assertAlmostEqual((abs(actual[0])) ** 2, 1 / 2, places=5)
         self.assertEqual(actual[1], 0)
         self.assertEqual(actual[2], 0)
-        self.assertAlmostEqual((abs(actual[3]))**2, 1/2, places=5)
+        self.assertAlmostEqual((abs(actual[3])) ** 2, 1 / 2, places=5)

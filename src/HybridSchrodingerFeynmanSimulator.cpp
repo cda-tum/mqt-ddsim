@@ -209,8 +209,8 @@ void HybridSchrodingerFeynmanSimulator<Config>::SimulateHybridAmplitudes(dd::Qub
     const auto         ndecisions  = getNDecisions(split_qubit);
     const std::int64_t max_control = 1LL << ndecisions;
 
-    const int actuallyUsedThreads  = static_cast<std::size_t>(max_control) < nthreads ? static_cast<int>(max_control) : static_cast<int>(nthreads);
-    Simulator<Config>::rootEdge = qc::VectorDD::zero;
+    const int actuallyUsedThreads = static_cast<std::size_t>(max_control) < nthreads ? static_cast<int>(max_control) : static_cast<int>(nthreads);
+    Simulator<Config>::rootEdge   = qc::VectorDD::zero;
 
     const std::int64_t   nslices_on_one_cpu = std::min<std::int64_t>(64, max_control / actuallyUsedThreads);
     const dd::QubitCount nqubits            = CircuitSimulator<Config>::getNumberOfQubits();

@@ -1,8 +1,10 @@
-from qiskit.algorithms import Grover
-from qiskit.algorithms import AmplificationProblem
-from qiskit.circuit.library import PhaseOracle
 from qiskit import BasicAer
+from qiskit.algorithms import AmplificationProblem
+from qiskit.algorithms import Grover
+from qiskit.circuit.library import PhaseOracle
+
 from mqt.ddsim import DDSIMProvider
+
 input_3sat_instance = '''
 c example DIMACS-CNF 3-SAT
 p cnf 3 5
@@ -37,4 +39,3 @@ problem = AmplificationProblem(oracle, is_good_state=oracle.evaluate_bitstring)
 result = grover.amplify(problem)
 
 print(result.assignment)
-

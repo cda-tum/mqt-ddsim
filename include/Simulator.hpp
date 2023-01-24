@@ -107,7 +107,7 @@ public:
     dd::vEdge static RemoveNodes(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge edge, std::map<dd::vNode*, dd::vEdge>& dag_edges);
 
     std::unique_ptr<dd::Package<Config>> dd = std::make_unique<dd::Package<Config>>();
-    dd::vEdge                  rootEdge{};
+    dd::vEdge                            rootEdge{};
 
 protected:
     std::mt19937_64 mt;

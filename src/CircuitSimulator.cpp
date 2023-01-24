@@ -127,10 +127,10 @@ std::map<std::size_t, bool> CircuitSimulator<DDPackage>::single_shot(const bool 
         } else {
             if (op->isClassicControlledOperation()) {
                 if (auto* cc_op = dynamic_cast<qc::ClassicControlledOperation*>(op.get())) {
-                    const auto         start_index    = static_cast<unsigned short>(cc_op->getParameter().at(0));
-                    const auto         length         = static_cast<unsigned short>(cc_op->getParameter().at(1));
-                    const auto expected_value = cc_op->getExpectedValue();
-                    unsigned int       actual_value   = 0;
+                    const auto   start_index    = static_cast<unsigned short>(cc_op->getParameter().at(0));
+                    const auto   length         = static_cast<unsigned short>(cc_op->getParameter().at(1));
+                    const auto   expected_value = cc_op->getExpectedValue();
+                    unsigned int actual_value   = 0;
                     for (std::size_t i = 0; i < length; i++) {
                         actual_value |= (classic_values[start_index + i] ? 1u : 0u) << i;
                     }

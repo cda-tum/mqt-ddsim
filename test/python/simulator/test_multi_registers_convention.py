@@ -1,9 +1,10 @@
+import unittest
+
 from qiskit import QuantumRegister, ClassicalRegister, QuantumCircuit
 from qiskit import execute
 from qiskit.quantum_info import state_fidelity, Statevector
-from mqt.ddsim.statevectorsimulator import StatevectorSimulator
 
-import unittest
+from mqt.ddsim.statevectorsimulator import StatevectorSimulator
 
 
 class CircuitMultiRegsTest(unittest.TestCase):
