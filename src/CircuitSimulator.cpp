@@ -1,9 +1,10 @@
 #include "CircuitSimulator.hpp"
 
+#include "Operations.hpp"
 #include "dd/Export.hpp"
 
-template<class DDPackage>
-std::map<std::string, std::size_t> CircuitSimulator<DDPackage>::Simulate(const unsigned int shots) {
+template<class Config>
+std::map<std::string, std::size_t> CircuitSimulator<Config>::Simulate(const unsigned int shots) {
     bool has_nonmeasurement_nonunitary = false;
     bool has_measurements              = false;
     bool measurements_last             = true;
@@ -40,7 +41,7 @@ std::map<std::string, std::size_t> CircuitSimulator<DDPackage>::Simulate(const u
     // easiest case: all gates are unitary --> simulate once and sample away on all qubits
     if (!has_nonmeasurement_nonunitary && !has_measurements) {
         single_shot(false);
-        return Simulator<DDPackage>::MeasureAllNonCollapsing(shots);
+        return this->MeasureAllNonCollapsing(shots);
     }
 
     // single shot is enough, but the sampling should only return actually measured qubits
@@ -51,7 +52,7 @@ std::map<std::string, std::size_t> CircuitSimulator<DDPackage>::Simulate(const u
         const auto                         n_cbits  = qc->getNcbits();
 
         // MeasureAllNonCollapsing returns a map from measurement over all qubits to the number of occurrences
-        for (const auto& item: Simulator<DDPackage>::MeasureAllNonCollapsing(shots)) {
+        for (const auto& item: Simulator<Config>::MeasureAllNonCollapsing(shots)) {
             std::string result_string(qc->getNcbits(), '0');
 
             for (auto const& m: measurement_map) {
@@ -189,4 +190,4 @@ std::map<std::size_t, bool> CircuitSimulator<DDPackage>::single_shot(const bool 
     return classic_values;
 }
 
-template class CircuitSimulator<dd::Package<>>;
+template class CircuitSimulator<dd::DDPackageConfig>;

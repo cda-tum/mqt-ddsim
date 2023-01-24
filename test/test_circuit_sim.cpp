@@ -59,7 +59,7 @@ TEST(CircuitSimTest, SingleOneQubitMultiShots) {
 TEST(CircuitSimTest, BarrierStatement) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(1);
     quantumComputation->emplace_back<qc::StandardOperation>(1, 0, qc::H);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, std::vector<dd::Qubit>{0}, qc::Barrier);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, std::vector<qc::Qubit>{0}, qc::Barrier);
     quantumComputation->emplace_back<qc::StandardOperation>(1, 0, qc::H);
     CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo());
 
@@ -157,7 +157,7 @@ TEST(CircuitSimTest, ApproximateByFidelity) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(3, dd::Controls{dd::Control{0}, dd::Control{1}}, 2, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(3, qc::Controls{qc::Control{0}, qc::Control{1}}, 2, qc::X);
     CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
     std::cout << ddsim.getActiveNodeCount() << "\n";
     ddsim.Simulate(1);
@@ -173,7 +173,7 @@ TEST(CircuitSimTest, ApproximateBySampling) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(3, dd::Controls{dd::Control{0}, dd::Control{1}}, 2, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(3, qc::Controls{qc::Control{0}, qc::Control{1}}, 2, qc::X);
     CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
     ddsim.Simulate(1);
 
@@ -198,7 +198,7 @@ TEST(CircuitSimTest, ApproximationByFidelityInSimulator) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(3, dd::Controls{dd::Control{0}, dd::Control{1}}, 2, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(3, qc::Controls{qc::Control{0}, qc::Control{1}}, 2, qc::X);
 
     quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::I); // some dummy operations
     quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::I);
@@ -235,7 +235,7 @@ TEST(CircuitSimTest, TestingProperties) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 0, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 1, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(3, dd::Controls{dd::Control{0}, dd::Control{1}}, 2, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(3, qc::Controls{qc::Control{0}, qc::Control{1}}, 2, qc::X);
     CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven), 1);
     ddsim.Simulate(1);
 

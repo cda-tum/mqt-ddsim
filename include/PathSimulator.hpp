@@ -3,6 +3,7 @@
 
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
+#include "Operations.hpp"
 #include "nlohmann/json.hpp"
 
 #include <future>
@@ -15,8 +16,8 @@
 #include <variant>
 #include <vector>
 
-template<class DDPackage = dd::Package<>>
-class PathSimulator: public CircuitSimulator<DDPackage> {
+template<class Config = dd::DDPackageConfig>
+class PathSimulator: public CircuitSimulator<Config> {
 public:
     struct SimulationPath {
         struct Step {
@@ -121,10 +122,10 @@ public:
     };
 
     explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration configuration = Configuration()):
-        CircuitSimulator<DDPackage>(std::move(qc)), executor(1) {
+        CircuitSimulator<Config>(std::move(qc)), executor(1) {
         if (configuration.seed != 0) {
             // override seed in case a non-trivial one is given
-            Simulator<DDPackage>::mt.seed(Simulator<DDPackage>::seed);
+            Simulator<Config>::mt.seed(Simulator<Config>::seed);
         }
 
         // remove final measurements implement measurement support for task-based simulation
@@ -156,7 +157,7 @@ public:
     }
 
     PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, typename Configuration::Mode mode, std::size_t bracketSize, std::size_t alternatingStart, std::size_t seed):
-        PathSimulator(std::move(qc), Configuration{mode, bracketSize, alternatingStart, seed}) {}
+        PathSimulator<Config>(std::move(qc), Configuration{mode, bracketSize, alternatingStart, seed}) {}
 
     std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
 
@@ -167,7 +168,7 @@ public:
         simulationPath = path;
     }
     void setSimulationPath(const typename SimulationPath::Components& components, bool assumeCorrectOrder = false) {
-        simulationPath = SimulationPath(CircuitSimulator<DDPackage>::qc->getNops() + 1, components, CircuitSimulator<DDPackage>::qc.get(), assumeCorrectOrder);
+        simulationPath = SimulationPath(CircuitSimulator<Config>::qc->getNops() + 1, components, CircuitSimulator<Config>::qc.get(), assumeCorrectOrder);
     }
 
     // Add new strategies here

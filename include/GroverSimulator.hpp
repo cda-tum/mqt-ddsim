@@ -7,10 +7,11 @@
 #include <cmath>
 #include <utility>
 
-class GroverSimulator: public Simulator<dd::Package<>> {
+template<class Config = dd::DDPackageConfig>
+class GroverSimulator: public Simulator<Config> {
 public:
     explicit GroverSimulator(const std::string& oracle, const unsigned long long seed):
-        Simulator(seed),
+        Simulator<Config>(seed),
         oracle{oracle.rbegin(), oracle.rend()},
         n_qubits(oracle.length()),
         iterations(CalculateIterations(n_qubits)) {
@@ -23,13 +24,13 @@ public:
     }
 
     explicit GroverSimulator(const dd::QubitCount n_qubits, const unsigned long long seed):
-        Simulator(seed),
+        Simulator<Config>(seed),
         n_qubits{n_qubits},
         iterations(CalculateIterations(n_qubits)) {
         std::uniform_int_distribution<int> dist(0, 1); // range is inclusive
         oracle = std::string(n_qubits, '0');
         for (dd::Qubit i = 0; i < n_qubits; i++) {
-            if (dist(mt) == 1) {
+            if (dist(this->mt) == 1) {
                 oracle[i] = '1';
             }
         }

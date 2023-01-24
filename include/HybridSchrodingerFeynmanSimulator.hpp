@@ -3,6 +3,7 @@
 
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
+#include "Operations.hpp"
 #include "QuantumComputation.hpp"
 #include "dd/Export.hpp"
 #include "dd/Package.hpp"
@@ -10,8 +11,8 @@
 #include <complex>
 #include <memory>
 
-template<class DDPackage = dd::Package<>>
-class HybridSchrodingerFeynmanSimulator: public CircuitSimulator<DDPackage> {
+template<class Config = dd::DDPackageConfig>
+class HybridSchrodingerFeynmanSimulator: public CircuitSimulator<Config> {
 public:
     enum class Mode {
         DD,
@@ -19,13 +20,13 @@ public:
     };
 
     explicit HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Amplitude, const std::size_t nthreads = 2):
-        CircuitSimulator<DDPackage>(std::move(qc)), mode(mode), nthreads(nthreads) {
+        CircuitSimulator<Config>(std::move(qc)), mode(mode), nthreads(nthreads) {
         // remove final measurements
         qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
     }
 
     HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, const ApproximationInfo approx_info, const unsigned long long seed, Mode mode = Mode::Amplitude, const std::size_t nthreads = 2):
-        CircuitSimulator<DDPackage>(std::move(qc), approx_info, seed), mode(mode), nthreads(nthreads) {
+        CircuitSimulator<Config>(std::move(qc), approx_info, seed), mode(mode), nthreads(nthreads) {
         // remove final measurements
         qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
     }

@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 #include <memory>
 
-using namespace dd::literals;
+using namespace qc::literals;
 
 std::unique_ptr<qc::QuantumComputation> detGetAdder4Circuit() {
     // circuit taken from https://github.com/pnnl/qasmbench
@@ -38,7 +38,7 @@ std::unique_ptr<qc::QuantumComputation> detGetAdder4Circuit() {
 TEST(DeterministicNoiseSimTest, MeasurementOne) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, dd::Controls{dd::Control{0}}, 1, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(2, qc::Controls{qc::Control{0}}, 1, qc::X);
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, 0, qc::Measure);
 
     {
@@ -66,7 +66,7 @@ TEST(DeterministicNoiseSimTest, TestingBarrierGate) {
 
 TEST(DeterministicNoiseSimTest, TestingResetGate) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, std::vector<dd::Qubit>(0), qc::Reset);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, std::vector<qc::Qubit>(0), qc::Reset);
     auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation);
 
     EXPECT_THROW(ddsim->DeterministicSimulate(), std::runtime_error);

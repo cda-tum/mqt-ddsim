@@ -16,12 +16,12 @@
 #include <utility>
 #include <vector>
 
-template<class DDPackage = dd::Package<>>
+template<class Config = dd::DDPackageConfig>
 class Simulator {
 public:
-    explicit Simulator(unsigned long long seed):
-        seed(seed), has_fixed_seed(true) {
-        mt.seed(seed);
+    explicit Simulator(unsigned long long random_seed):
+        seed(random_seed), has_fixed_seed(true) {
+        mt.seed(random_seed);
     };
 
     explicit Simulator():
@@ -94,19 +94,19 @@ public:
         return binary;
     }
 
-    double ApproximateByFidelity(std::unique_ptr<DDPackage>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose = false);
+    double ApproximateByFidelity(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose = false);
     double ApproximateByFidelity(double targetFidelity, bool allLevels, bool removeNodes, bool verbose = false) {
         return ApproximateByFidelity(dd, rootEdge, targetFidelity, allLevels, removeNodes, verbose);
     }
 
-    double ApproximateBySampling(std::unique_ptr<DDPackage>& localDD, dd::vEdge& edge, std::size_t nSamples, std::size_t threshold, bool removeNodes, bool verbose = false);
+    double ApproximateBySampling(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, std::size_t nSamples, std::size_t threshold, bool removeNodes, bool verbose = false);
     double ApproximateBySampling(std::size_t nSamples, std::size_t threshold, bool removeNodes, bool verbose = false) {
         return ApproximateBySampling(dd, rootEdge, nSamples, threshold, removeNodes, verbose);
     }
 
-    dd::vEdge static RemoveNodes(std::unique_ptr<DDPackage>& localDD, dd::vEdge edge, std::map<dd::vNode*, dd::vEdge>& dag_edges);
+    dd::vEdge static RemoveNodes(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge edge, std::map<dd::vNode*, dd::vEdge>& dag_edges);
 
-    std::unique_ptr<DDPackage> dd = std::make_unique<DDPackage>();
+    std::unique_ptr<dd::Package<Config>> dd = std::make_unique<dd::Package<Config>>();
     dd::vEdge                  rootEdge{};
 
 protected:
@@ -114,7 +114,7 @@ protected:
 
     const unsigned long long seed = 0;
     const bool               has_fixed_seed;
-    const dd::fp             epsilon = 0.001L;
+    const dd::fp             epsilon = 0.001;
 
     static void NextPath(std::string& s);
 };
@@ -122,26 +122,6 @@ protected:
 struct StochasticNoiseSimulatorDDPackageConfig: public dd::DDPackageConfig {
     static constexpr std::size_t STOCHASTIC_CACHE_OPS = qc::OpType::OpCount;
 };
-
-using StochasticNoisePackage = dd::Package<StochasticNoiseSimulatorDDPackageConfig::UT_VEC_NBUCKET,
-                                           StochasticNoiseSimulatorDDPackageConfig::UT_VEC_INITIAL_ALLOCATION_SIZE,
-                                           StochasticNoiseSimulatorDDPackageConfig::UT_MAT_NBUCKET,
-                                           StochasticNoiseSimulatorDDPackageConfig::UT_MAT_INITIAL_ALLOCATION_SIZE,
-                                           StochasticNoiseSimulatorDDPackageConfig::CT_VEC_ADD_NBUCKET,
-                                           StochasticNoiseSimulatorDDPackageConfig::CT_MAT_ADD_NBUCKET,
-                                           StochasticNoiseSimulatorDDPackageConfig::CT_MAT_TRANS_NBUCKET,
-                                           StochasticNoiseSimulatorDDPackageConfig::CT_MAT_CONJ_TRANS_NBUCKET,
-                                           StochasticNoiseSimulatorDDPackageConfig::CT_MAT_VEC_MULT_NBUCKET,
-                                           StochasticNoiseSimulatorDDPackageConfig::CT_MAT_MAT_MULT_NBUCKET,
-                                           StochasticNoiseSimulatorDDPackageConfig::CT_VEC_KRON_NBUCKET,
-                                           StochasticNoiseSimulatorDDPackageConfig::CT_MAT_KRON_NBUCKET,
-                                           StochasticNoiseSimulatorDDPackageConfig::CT_VEC_INNER_PROD_NBUCKET,
-                                           StochasticNoiseSimulatorDDPackageConfig::CT_DM_NOISE_NBUCKET,
-                                           StochasticNoiseSimulatorDDPackageConfig::UT_DM_NBUCKET,
-                                           StochasticNoiseSimulatorDDPackageConfig::UT_DM_INITIAL_ALLOCATION_SIZE,
-                                           StochasticNoiseSimulatorDDPackageConfig::CT_DM_DM_MULT_NBUCKET,
-                                           StochasticNoiseSimulatorDDPackageConfig::CT_DM_ADD_NBUCKET,
-                                           StochasticNoiseSimulatorDDPackageConfig::STOCHASTIC_CACHE_OPS>;
 
 struct DensityMatrixSimulatorDDPackageConfig: public dd::DDPackageConfig {
     static constexpr std::size_t UT_DM_NBUCKET                 = 65536U;
@@ -167,25 +147,5 @@ struct DensityMatrixSimulatorDDPackageConfig: public dd::DDPackageConfig {
     static constexpr std::size_t CT_VEC_INNER_PROD_NBUCKET      = 1U;
     static constexpr std::size_t STOCHASTIC_CACHE_OPS           = 1U;
 };
-
-using DensityMatrixPackage = dd::Package<DensityMatrixSimulatorDDPackageConfig::UT_VEC_NBUCKET,
-                                         DensityMatrixSimulatorDDPackageConfig::UT_VEC_INITIAL_ALLOCATION_SIZE,
-                                         DensityMatrixSimulatorDDPackageConfig::UT_MAT_NBUCKET,
-                                         DensityMatrixSimulatorDDPackageConfig::UT_MAT_INITIAL_ALLOCATION_SIZE,
-                                         DensityMatrixSimulatorDDPackageConfig::CT_VEC_ADD_NBUCKET,
-                                         DensityMatrixSimulatorDDPackageConfig::CT_MAT_ADD_NBUCKET,
-                                         DensityMatrixSimulatorDDPackageConfig::CT_MAT_TRANS_NBUCKET,
-                                         DensityMatrixSimulatorDDPackageConfig::CT_MAT_CONJ_TRANS_NBUCKET,
-                                         DensityMatrixSimulatorDDPackageConfig::CT_MAT_VEC_MULT_NBUCKET,
-                                         DensityMatrixSimulatorDDPackageConfig::CT_MAT_MAT_MULT_NBUCKET,
-                                         DensityMatrixSimulatorDDPackageConfig::CT_VEC_KRON_NBUCKET,
-                                         DensityMatrixSimulatorDDPackageConfig::CT_MAT_KRON_NBUCKET,
-                                         DensityMatrixSimulatorDDPackageConfig::CT_VEC_INNER_PROD_NBUCKET,
-                                         DensityMatrixSimulatorDDPackageConfig::CT_DM_NOISE_NBUCKET,
-                                         DensityMatrixSimulatorDDPackageConfig::UT_DM_NBUCKET,
-                                         DensityMatrixSimulatorDDPackageConfig::UT_DM_INITIAL_ALLOCATION_SIZE,
-                                         DensityMatrixSimulatorDDPackageConfig::CT_DM_DM_MULT_NBUCKET,
-                                         DensityMatrixSimulatorDDPackageConfig::CT_DM_ADD_NBUCKET,
-                                         DensityMatrixSimulatorDDPackageConfig::STOCHASTIC_CACHE_OPS>;
 
 #endif //DDSIMULATOR_H

@@ -6,7 +6,7 @@
 /**
  * These tests may have to be adjusted if something about the random-number generation changes.
  */
-using namespace dd::literals;
+using namespace qc::literals;
 
 std::unique_ptr<qc::QuantumComputation> stochGetAdder4Circuit() {
     // circuit taken from https://github.com/pnnl/qasmbench
@@ -153,7 +153,7 @@ TEST(StochNoiseSimTest, ApproximateByFidelity) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
     quantumComputation->h(0);
     quantumComputation->h(1);
-    quantumComputation->emplace_back<qc::StandardOperation>(3, dd::Controls{dd::Control{0}, dd::Control{1}}, 2, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(3, qc::Controls{qc::Control{0}, qc::Control{1}}, 2, qc::X);
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1, 54);
 
     ddsim.Simulate(1);
@@ -170,7 +170,7 @@ TEST(StochNoiseSimTest, ApproximateBySampling) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
     quantumComputation->h(0);
     quantumComputation->h(1);
-    quantumComputation->emplace_back<qc::StandardOperation>(3, dd::Controls{dd::Control{0}, dd::Control{1}}, 2, qc::X);
+    quantumComputation->emplace_back<qc::StandardOperation>(3, qc::Controls{qc::Control{0}, qc::Control{1}}, 2, qc::X);
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
 
     ddsim.Simulate(1);
@@ -187,8 +187,8 @@ TEST(StochNoiseSimTest, Reordering) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
     quantumComputation->h(0);
     quantumComputation->h(1);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(3, std::vector<dd::Qubit>{0, 1, 2}, qc::OpType::Barrier);
-    quantumComputation->emplace_back<qc::StandardOperation>(3, dd::Controls{dd::Control{0}, dd::Control{1}}, 2, qc::X);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(3, std::vector<qc::Qubit>{0, 1, 2}, qc::OpType::Barrier);
+    quantumComputation->emplace_back<qc::StandardOperation>(3, qc::Controls{qc::Control{0}, qc::Control{1}}, 2, qc::X);
 
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
 
@@ -395,7 +395,7 @@ TEST(StochNoiseSimTest, TestingBarrierGate) {
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::T);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, std::vector<dd::Qubit>{0, 1}, qc::Barrier);
+    quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, std::vector<qc::Qubit>{0, 1}, qc::Barrier);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.02, std::optional<double>{}, 2, 1000, std::string("0-3, 23, 444, 2"), false, 1, 1);

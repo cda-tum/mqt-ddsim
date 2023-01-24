@@ -3,10 +3,11 @@
 #include "QuantumComputation.hpp"
 #include "Simulator.hpp"
 #include "StochasticNoiseSimulator.hpp"
+#include "dd/Package.hpp"
 #include "dd/NoiseFunctionality.hpp"
 
-template<class DDPackage = DensityMatrixPackage>
-class DeterministicNoiseSimulator: public Simulator<DDPackage> {
+template<class Config = DensityMatrixSimulatorDDPackageConfig>
+class DeterministicNoiseSimulator: public Simulator<Config> {
 public:
     DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
                                 const std::string&                       noiseEffects,
@@ -15,7 +16,7 @@ public:
                                 double                                   multiQubitGateFactor,
                                 bool                                     unoptimizedSim = false,
                                 unsigned long long                       seed           = 0):
-        Simulator<DDPackage>(seed),
+        Simulator<Config>(seed),
         qc(qc),
         noiseEffects(StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>::initializeNoiseEffects(noiseEffects)),
         noiseProbSingleQubit(noiseProbability),
@@ -25,7 +26,7 @@ public:
         sequentiallyApplyNoise(unoptimizedSim),
         useDensityMatrixType(!unoptimizedSim) {
         StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>::sanityCheckOfNoiseProbabilities(noiseProbability, ampDampingProbSingleQubit, multiQubitGateFactor);
-        Simulator<DDPackage>::dd->resize(qc->getNqubits());
+        this->dd->resize(qc->getNqubits());
     }
 
     explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, unsigned long long seed = 0):
@@ -45,17 +46,17 @@ public:
 
     [[nodiscard]] std::string getName() const override { return qc->getName(); };
 
-    [[nodiscard]] std::size_t getActiveNodeCount() const override { return Simulator<DDPackage>::dd->dUniqueTable.getActiveNodeCount(); }
-    [[nodiscard]] std::size_t getMaxNodeCount() const override { return Simulator<DDPackage>::dd->dUniqueTable.getMaxActiveNodes(); }
+    [[nodiscard]] std::size_t getActiveNodeCount() const override { return Simulator<Config>::dd->dUniqueTable.getActiveNodeCount(); }
+    [[nodiscard]] std::size_t getMaxNodeCount() const override { return Simulator<Config>::dd->dUniqueTable.getMaxActiveNodes(); }
 
     [[nodiscard]] std::size_t countNodesFromRoot() {
         size_t tmp;
         if (useDensityMatrixType) {
             qc::DensityMatrixDD::alignDensityEdge(rootEdge);
-            tmp = Simulator<DDPackage>::dd->size(rootEdge);
+            tmp = Simulator<Config>::dd->size(rootEdge);
             qc::DensityMatrixDD::setDensityMatrixTrue(rootEdge);
         } else {
-            tmp = Simulator<DDPackage>::dd->size(rootEdge);
+            tmp = Simulator<Config>::dd->size(rootEdge);
         }
         return tmp;
     }

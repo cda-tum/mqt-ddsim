@@ -44,29 +44,29 @@ struct ApproximationInfo {
     const ApproximationWhen approx_when;
 };
 
-template<class DDPackage = dd::Package<>>
-class CircuitSimulator: public Simulator<DDPackage> {
+template<class Config = dd::DDPackageConfig>
+class CircuitSimulator: public Simulator<Config> {
 public:
     explicit CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_):
         qc(std::move(qc_)), approx_info(ApproximationInfo(1.0, 1, ApproximationInfo::FidelityDriven)) {
-        Simulator<DDPackage>::dd->resize(qc->getNqubits());
+        Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
     CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const unsigned long long seed):
-        Simulator<DDPackage>(seed),
+        Simulator<Config>(seed),
         qc(std::move(qc_)), approx_info(ApproximationInfo(1.0, 1, ApproximationInfo::FidelityDriven)) {
-        Simulator<DDPackage>::dd->resize(qc->getNqubits());
+        Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
     CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info):
         qc(std::move(qc_)), approx_info(approx_info) {
-        Simulator<DDPackage>::dd->resize(qc->getNqubits());
+        Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
     CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info, const unsigned long long seed):
-        Simulator<DDPackage>(seed),
+        Simulator<Config>(seed),
         qc(std::move(qc_)), approx_info(approx_info) {
-        Simulator<DDPackage>::dd->resize(qc->getNqubits());
+        Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
     std::map<std::string, std::size_t> Simulate(unsigned int shots) override;

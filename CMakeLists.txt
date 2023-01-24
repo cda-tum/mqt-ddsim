@@ -1,30 +1,16 @@
-cmake_minimum_required(VERSION 3.14...3.22)
+# set required cmake version
+cmake_minimum_required(VERSION 3.19)
+
+# This avoids googletest complaining that this (IPO) policy is not set
+cmake_policy(SET CMP0069 NEW)
+set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 
 project(ddsim
         LANGUAGES CXX
-        DESCRIPTION "DDSIM - A JKQ quantum simulator based on decision diagrams"
+        DESCRIPTION "MQT DDSIM - A quantum simulator based on decision diagrams"
         )
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-option(COVERAGE "Configure for coverage report generation")
-option(BINDINGS "Configure for building Python bindings")
-option(DEPLOY "Configure for deployment")
-
 message("-- Generator is set to ${CMAKE_GENERATOR}")
-
-if (DEFINED ENV{DEPLOY})
-    set(DEPLOY $ENV{DEPLOY} CACHE BOOL "Use deployment configuration from environment" FORCE)
-    message(STATUS "Setting deployment configuration to '${DEPLOY}' from environment")
-endif ()
-
-set(default_build_type "Release")
-if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-    message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
-    set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
-            STRING "Choose the type of build." FORCE)
-    # Set the possible values of build type for cmake-gui
-    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
-endif ()
 
 macro(check_submodule_present MODULENAME)
     if (NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/${MODULENAME}/CMakeLists.txt")
@@ -54,7 +40,8 @@ if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     add_subdirectory(apps)
 endif ()
 
-# add Python binding code
+option(BINDINGS "Configure for building Python bindings")
 if (BINDINGS)
+    # add Python binding code
     add_subdirectory(mqt/ddsim)
 endif ()

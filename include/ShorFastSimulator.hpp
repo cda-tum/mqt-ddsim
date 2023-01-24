@@ -4,7 +4,8 @@
 #include "QuantumComputation.hpp"
 #include "Simulator.hpp"
 
-class ShorFastSimulator: public Simulator<dd::Package<>> {
+template<class Config = dd::DDPackageConfig>
+class ShorFastSimulator: public Simulator<Config> {
     static unsigned long long modpow(unsigned long long base, unsigned long long exp, unsigned long long modulus) {
         base %= modulus;
         unsigned long long result = 1ull;
@@ -69,7 +70,7 @@ class ShorFastSimulator: public Simulator<dd::Package<>> {
 
 public:
     ShorFastSimulator(int composite_number, int coprime_a, bool verbose = false):
-        Simulator(), n(composite_number), coprime_a(coprime_a),
+        Simulator<Config>(), n(composite_number), coprime_a(coprime_a),
         required_bits(std::ceil(std::log2(composite_number))), n_qubits(std::ceil(std::log2(n)) + 1),
         verbose(verbose) {
         ts.resize(n_qubits);
@@ -77,7 +78,7 @@ public:
     };
 
     ShorFastSimulator(int composite_number, int coprime_a, unsigned long long seed, bool verbose = false):
-        Simulator(seed), n(composite_number), coprime_a(coprime_a),
+        Simulator<Config>(seed), n(composite_number), coprime_a(coprime_a),
         required_bits(std::ceil(std::log2(composite_number))), n_qubits(std::ceil(std::log2(n)) + 1),
         verbose(verbose) {
         ts.resize(n_qubits);

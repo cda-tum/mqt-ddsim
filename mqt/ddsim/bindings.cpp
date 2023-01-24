@@ -107,19 +107,20 @@ void dump_tensor_network(const py::object& circ, const std::string& filename) {
     py::object QuantumCircuit       = py::module::import("qiskit").attr("QuantumCircuit");
     py::object pyQasmQobjExperiment = py::module::import("qiskit.qobj").attr("QasmQobjExperiment");
 
+    std::unique_ptr<qc::QuantumComputation> qc    = std::make_unique<qc::QuantumComputation>();
+
     if (py::isinstance<py::str>(circ)) {
         auto&&                                  file1 = circ.cast<std::string>();
-        std::unique_ptr<qc::QuantumComputation> qc    = std::make_unique<qc::QuantumComputation>();
-        std::ofstream                           ofs(filename);
         qc->import(file1);
-        qc->dump(ofs, qc::Tensor);
     } else if (py::isinstance(circ, QuantumCircuit)) {
-        qc::qiskit::QuantumCircuit::dumpTensorNetwork(circ, filename);
+        qc::qiskit::QuantumCircuit::import(*qc, circ);
     } else if (py::isinstance(circ, pyQasmQobjExperiment)) {
-        qc::qiskit::QasmQobjExperiment::dumpTensorNetwork(circ, filename);
+        qc::qiskit::QasmQobjExperiment::import(*qc, circ);
     } else {
         throw std::runtime_error("PyObject is neither py::str, QuantumCircuit, nor QasmQobjExperiment");
     }
+    std::ofstream ofs(filename);
+    qc->dump(ofs, qc::Format::Tensor);
 }
 
 PYBIND11_MODULE(pyddsim, m) {

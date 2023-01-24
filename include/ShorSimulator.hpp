@@ -4,7 +4,8 @@
 #include "QuantumComputation.hpp"
 #include "Simulator.hpp"
 
-class ShorSimulator: public Simulator<dd::Package<>> {
+template<class Config = dd::DDPackageConfig>
+class ShorSimulator: public Simulator<Config> {
     static unsigned long long modpow(unsigned long long base, unsigned long long exp, unsigned long long modulus) {
         base %= modulus;
         unsigned long long result = 1ull;
@@ -98,19 +99,19 @@ class ShorSimulator: public Simulator<dd::Package<>> {
 
 public:
     ShorSimulator(int composite_number, int coprime_a):
-        Simulator(), n(composite_number), coprime_a(coprime_a),
+        Simulator<Config>(), n(composite_number), coprime_a(coprime_a),
         required_bits(std::ceil(std::log2(composite_number))), emulate(true), verbose(false), approximate(false) {
         ts.resize(n_qubits);
     };
 
     ShorSimulator(int composite_number, int coprime_a, unsigned long long seed):
-        Simulator(seed), n(composite_number), coprime_a(coprime_a),
+        Simulator<Config>(seed), n(composite_number), coprime_a(coprime_a),
         required_bits(std::ceil(std::log2(composite_number))), emulate(true), verbose(false), approximate(false) {
         ts.resize(n_qubits);
     };
 
     ShorSimulator(int composite_number, int coprime_a, bool emulate, bool verbose, bool approximate):
-        Simulator(), n(composite_number), coprime_a(coprime_a),
+        Simulator<Config>(), n(composite_number), coprime_a(coprime_a),
         required_bits(std::ceil(std::log2(composite_number))), emulate(emulate), verbose(verbose),
         approximate(approximate) {
         ts.resize(n_qubits);
@@ -118,7 +119,7 @@ public:
 
     ShorSimulator(int composite_number, int coprime_a, unsigned long long seed, bool emulate, bool verbose,
                   bool approximate):
-        Simulator(seed),
+        Simulator<Config>(seed),
         n(composite_number), coprime_a(coprime_a),
         required_bits(std::ceil(std::log2(composite_number))), emulate(emulate), verbose(verbose),
         approximate(approximate) {

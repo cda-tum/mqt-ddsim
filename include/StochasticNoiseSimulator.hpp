@@ -8,8 +8,8 @@
 #include <thread>
 #include <vector>
 
-template<class DDPackage = StochasticNoisePackage>
-class StochasticNoiseSimulator: public Simulator<DDPackage> {
+template<class Config = StochasticNoiseSimulatorDDPackageConfig>
+class StochasticNoiseSimulator: public Simulator<Config> {
 public:
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
                              const std::string&                       noiseEffects,
@@ -22,7 +22,7 @@ public:
                              unsigned int                             stepNumber,
                              double                                   stepFidelity,
                              std::size_t                              seed = 0U):
-        Simulator<DDPackage>(seed),
+        Simulator<Config>(seed),
         qc(qc),
         stepNumber(stepNumber),
         stepFidelity(stepFidelity),
@@ -35,7 +35,7 @@ public:
         noiseEffects(initializeNoiseEffects(noiseEffects)) {
         sanityCheckOfNoiseProbabilities(this->noiseProbability, this->amplitudeDampingProb, this->multiQubitGateFactor);
         setRecordedProperties(recordedProperties);
-        Simulator<DDPackage>::dd->resize(qc->getNqubits());
+        this->dd->resize(qc->getNqubits());
     }
 
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int stepNumber, const double stepFidelity):
@@ -76,16 +76,16 @@ public:
         for (const auto noise: cNoiseEffects) {
             switch (noise) {
                 case 'A':
-                    noiseOperationVector.push_back(dd::amplitudeDamping);
+                    noiseOperationVector.push_back(dd::AmplitudeDamping);
                     break;
                 case 'P':
-                    noiseOperationVector.push_back(dd::phaseFlip);
+                    noiseOperationVector.push_back(dd::PhaseFlip);
                     break;
                 case 'D':
-                    noiseOperationVector.push_back(dd::depolarization);
+                    noiseOperationVector.push_back(dd::Depolarization);
                     break;
                 case 'I':
-                    noiseOperationVector.push_back(dd::identity);
+                    noiseOperationVector.push_back(dd::Identity);
                     break;
                 default:
                     throw std::runtime_error("Unknown noise operation '" + cNoiseEffects + "'\n");

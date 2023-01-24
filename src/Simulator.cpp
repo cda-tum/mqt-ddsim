@@ -47,8 +47,8 @@ std::vector<dd::ComplexValue> Simulator<DDPackage>::getVector() const {
     return results;
 }
 
-template<class DDPackage>
-std::vector<std::pair<dd::fp, dd::fp>> Simulator<DDPackage>::getVectorPair() const {
+template<class Config>
+std::vector<std::pair<dd::fp, dd::fp>> Simulator<Config>::getVectorPair() const {
     assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
     std::string                            path(getNumberOfQubits(), '0');
     std::vector<std::pair<dd::fp, dd::fp>> results{1ull << getNumberOfQubits()};
@@ -62,8 +62,8 @@ std::vector<std::pair<dd::fp, dd::fp>> Simulator<DDPackage>::getVectorPair() con
     return results;
 }
 
-template<class DDPackage>
-std::vector<std::complex<dd::fp>> Simulator<DDPackage>::getVectorComplex() const {
+template<class Config>
+std::vector<std::complex<dd::fp>> Simulator<Config>::getVectorComplex() const {
     assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
     std::string                       path(getNumberOfQubits(), '0');
     std::vector<std::complex<dd::fp>> results(1ull << getNumberOfQubits());
@@ -91,8 +91,8 @@ void Simulator<DDPackage>::NextPath(std::string& s) {
         s.insert(0, "1");
 }
 
-template<class DDPackage>
-double Simulator<DDPackage>::ApproximateByFidelity(std::unique_ptr<DDPackage>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose) {
+template<class Config>
+double Simulator<Config>::ApproximateByFidelity(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose) {
     std::queue<dd::vNode*>       q;
     std::map<dd::vNode*, dd::fp> probsMone;
 
@@ -138,7 +138,7 @@ double Simulator<DDPackage>::ApproximateByFidelity(std::unique_ptr<DDPackage>& l
     std::vector<dd::vNode*> nodes_to_remove;
 
     int max_remove = 0;
-    for (int i = 0; i < getNumberOfQubits(); i++) {
+    for (dd::QubitCount i = 0; i < getNumberOfQubits(); i++) {
         double                  sum    = 0.0;
         int                     remove = 0;
         std::vector<dd::vNode*> tmp;
@@ -206,8 +206,8 @@ double Simulator<DDPackage>::ApproximateByFidelity(std::unique_ptr<DDPackage>& l
     return fidelity;
 }
 
-template<class DDPackage>
-double Simulator<DDPackage>::ApproximateBySampling(std::unique_ptr<DDPackage>& localDD, dd::vEdge& edge, std::size_t nSamples, std::size_t threshold, bool removeNodes, bool verbose) {
+template<class Config>
+double Simulator<Config>::ApproximateBySampling(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, std::size_t nSamples, std::size_t threshold, bool removeNodes, bool verbose) {
     assert(nSamples > threshold);
     std::map<dd::vNode*, unsigned int>     visited_nodes;
     std::uniform_real_distribution<dd::fp> dist(0.0, 1.0L);
@@ -297,8 +297,8 @@ double Simulator<DDPackage>::ApproximateBySampling(std::unique_ptr<DDPackage>& l
     return fidelity;
 }
 
-template<class DDPackage>
-dd::vEdge Simulator<DDPackage>::RemoveNodes(std::unique_ptr<DDPackage>& localDD, dd::vEdge e, std::map<dd::vNode*, dd::vEdge>& dag_edges) {
+template<class Config>
+dd::vEdge Simulator<Config>::RemoveNodes(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge e, std::map<dd::vNode*, dd::vEdge>& dag_edges) {
     if (e.isTerminal()) {
         return e;
     }
@@ -364,5 +364,5 @@ std::pair<dd::ComplexValue, std::string> Simulator<DDPackage>::getPathOfLeastRes
             std::string{result.rbegin(), result.rend()}};
 }
 
-template class Simulator<dd::Package<>>;
-template class Simulator<StochasticNoisePackage>;
+template class Simulator<dd::DDPackageConfig>;
+template class Simulator<StochasticNoiseSimulatorDDPackageConfig>;

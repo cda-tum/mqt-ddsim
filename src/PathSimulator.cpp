@@ -404,4 +404,4 @@ void PathSimulator<DDPackage>::addSimulationTask(std::size_t leftID, std::size_t
     tasks.emplace(resultID, resultTask);
 }
 
-template class PathSimulator<dd::Package<>>;
+template class PathSimulator<dd::DDPackageConfig>;

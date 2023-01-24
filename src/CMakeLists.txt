@@ -1,3 +1,6 @@
+add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr" EXCLUDE_FROM_ALL)
+
+
 add_library(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/include/Simulator.hpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Simulator.cpp
@@ -26,8 +29,7 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
 
 set(JSON_MultipleHeaders OFF CACHE INTERNAL "")
-add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr")
-target_link_libraries(${PROJECT_NAME} PUBLIC MQT::qfr)
+target_link_libraries(${PROJECT_NAME} PUBLIC MQT::qfr_dd)
 
 set(TF_BUILD_TESTS OFF CACHE BOOL "")
 set(TF_BUILD_EXAMPLES OFF CACHE BOOL "")
