@@ -107,10 +107,10 @@ void dump_tensor_network(const py::object& circ, const std::string& filename) {
     py::object QuantumCircuit       = py::module::import("qiskit").attr("QuantumCircuit");
     py::object pyQasmQobjExperiment = py::module::import("qiskit.qobj").attr("QasmQobjExperiment");
 
-    std::unique_ptr<qc::QuantumComputation> qc    = std::make_unique<qc::QuantumComputation>();
+    std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>();
 
     if (py::isinstance<py::str>(circ)) {
-        auto&&                                  file1 = circ.cast<std::string>();
+        auto&& file1 = circ.cast<std::string>();
         qc->import(file1);
     } else if (py::isinstance(circ, QuantumCircuit)) {
         qc::qiskit::QuantumCircuit::import(*qc, circ);

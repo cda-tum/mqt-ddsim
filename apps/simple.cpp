@@ -75,10 +75,10 @@ int main(int argc, char** argv) {
         throw std::runtime_error("Unknown approximation method '" + vm["approx_when"].as<std::string>() + "'.");
     }
 
-    std::unique_ptr<qc::QuantumComputation>   quantumComputation;
+    std::unique_ptr<qc::QuantumComputation>         quantumComputation;
     std::unique_ptr<Simulator<dd::DDPackageConfig>> ddsim{nullptr};
-    ApproximationInfo                         approx_info(step_fidelity, approx_steps, approx_when);
-    const bool                                verbose = vm.count("verbose") > 0;
+    ApproximationInfo                               approx_info(step_fidelity, approx_steps, approx_when);
+    const bool                                      verbose = vm.count("verbose") > 0;
 
     if (vm.count("simulate_file")) {
         const std::string fname = vm["simulate_file"].as<std::string>();
@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
             ddsim = std::make_unique<ShorSimulator<dd::DDPackageConfig>>(composite_number, coprime, emulate, verbose, step_fidelity < 1);
         } else {
             ddsim = std::make_unique<ShorSimulator<dd::DDPackageConfig>>(composite_number, coprime, seed, emulate, verbose,
-                                                    step_fidelity < 1);
+                                                                         step_fidelity < 1);
         }
     } else if (vm.count("simulate_grover")) {
         const unsigned int n_qubits = vm["simulate_grover"].as<unsigned int>();
