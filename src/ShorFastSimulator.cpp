@@ -8,7 +8,7 @@
 #include <random>
 
 template<class Config>
-std::map<std::string, std::size_t> ShorFastSimulator<Config>::Simulate([[maybe_unused]] unsigned int shots) {
+std::map<std::string, std::size_t> ShorFastSimulator<Config>::Simulate(unsigned int shots) {
     if (verbose) {
         std::clog << "Simulate Shor's algorithm for n=" << n;
     }

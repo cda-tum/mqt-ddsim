@@ -21,8 +21,8 @@ struct ApproximationInfo {
     ApproximationInfo():
         step_fidelity(1), step_number(1), approx_when(ApproximationWhen::FidelityDriven) {}
 
-    ApproximationInfo(double step_fidelity, unsigned int step_number, ApproximationWhen approx_when):
-        step_fidelity(step_fidelity), step_number(step_number), approx_when(approx_when) {}
+    ApproximationInfo(double step_fidelity_, unsigned int step_number_, ApproximationWhen approx_when_):
+        step_fidelity(step_fidelity_), step_number(step_number_), approx_when(approx_when_) {}
 
     friend std::istream& operator>>(std::istream& in, ApproximationWhen& when) {
         std::string token;
@@ -52,20 +52,20 @@ public:
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const unsigned long long seed):
-        Simulator<Config>(seed),
+    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const unsigned long long seed_):
+        Simulator<Config>(seed_),
         qc(std::move(qc_)), approx_info(ApproximationInfo(1.0, 1, ApproximationInfo::FidelityDriven)) {
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info):
-        qc(std::move(qc_)), approx_info(approx_info) {
+    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approximation_info):
+        qc(std::move(qc_)), approx_info(approximation_info) {
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info, const unsigned long long seed):
-        Simulator<Config>(seed),
-        qc(std::move(qc_)), approx_info(approx_info) {
+    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approximation_info, const unsigned long long seed_):
+        Simulator<Config>(seed_),
+        qc(std::move(qc_)), approx_info(approximation_info) {
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
@@ -80,7 +80,7 @@ public:
         };
     };
 
-    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
+    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return static_cast<dd::QubitCount>(qc->getNqubits()); };
 
     [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
 

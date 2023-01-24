@@ -10,21 +10,21 @@
 template<class Config = dd::DDPackageConfig>
 class GroverSimulator: public Simulator<Config> {
 public:
-    explicit GroverSimulator(const std::string& oracle, const unsigned long long seed):
-        Simulator<Config>(seed),
-        oracle{oracle.rbegin(), oracle.rend()},
-        n_qubits(oracle.length()),
+    explicit GroverSimulator(const std::string& oracle_, const unsigned long long seed_):
+        Simulator<Config>(seed_),
+        oracle{oracle_.rbegin(), oracle_.rend()},
+        n_qubits(oracle_.length()),
         iterations(CalculateIterations(n_qubits)) {
     }
 
-    explicit GroverSimulator(const std::string& oracle):
-        oracle{oracle.rbegin(), oracle.rend()},
-        n_qubits(oracle.length()),
+    explicit GroverSimulator(const std::string& oracle_):
+        oracle{oracle_.rbegin(), oracle_.rend()},
+        n_qubits(oracle_.length()),
         iterations(CalculateIterations(n_qubits)) {
     }
 
-    explicit GroverSimulator(const dd::QubitCount n_qubits, const unsigned long long seed):
-        Simulator<Config>(seed),
+    explicit GroverSimulator(const dd::QubitCount n_qubits, const unsigned long long seed_):
+        Simulator<Config>(seed_),
         n_qubits{n_qubits},
         iterations(CalculateIterations(n_qubits)) {
         std::uniform_int_distribution<int> dist(0, 1); // range is inclusive

@@ -184,31 +184,31 @@ int main(int argc, char** argv) {
         ddsim->ApproximateByFidelity(1000 / 1000.0, true, false, true);
 
         // Traversal
-        for (int i = 1; i < 10; i += 1) {
+        for (std::size_t i = 1; i < 10; i += 1) {
             ddsim->ApproximateBySampling(i, 0, false, true);
         }
-        for (int i = 10; i < 100; i += 10) {
+        for (std::size_t i = 10; i < 100; i += 10) {
             ddsim->ApproximateBySampling(i, 0, false, true);
         }
-        for (int i = 100; i < 1000; i += 100) {
+        for (std::size_t i = 100; i < 1000; i += 100) {
             ddsim->ApproximateBySampling(i, 0, false, true);
         }
-        for (int i = 1000; i < 100000; i += 1000) {
+        for (std::size_t i = 1000; i < 100000; i += 1000) {
             ddsim->ApproximateBySampling(i, 0, false, true);
         }
-        for (int i = 100000; i <= 1000000; i += 10000) {
+        for (std::size_t i = 100000; i <= 1000000; i += 10000) {
             ddsim->ApproximateBySampling(i, 0, false, true);
         }
 
         // Traversal+Threshold
-        for (int i = 1; i < 10; i += 1) {
+        for (std::size_t i = 1; i < 10; i += 1) {
             ddsim->ApproximateBySampling(1000000, i, false, true);
         }
-        for (int i = 10; i < 100; i += 10) {
+        for (std::size_t i = 10; i < 100; i += 10) {
             ddsim->ApproximateBySampling(1000000, i, false, true);
         }
 
-        for (int i = 100; i <= 5000; i += 100) {
+        for (std::size_t i = 100; i <= 5000; i += 100) {
             ddsim->ApproximateBySampling(1000000, i, false, true);
         }
     }

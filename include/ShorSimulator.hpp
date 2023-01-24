@@ -37,21 +37,21 @@ class ShorSimulator: public Simulator<Config> {
 
     void u_a(unsigned long long a, int N, int c);
 
-    void cmult_inv(int a, int N, int c);
+    void cmult_inv(unsigned long long int a, unsigned int N, int c);
 
-    void cmult(int a, int N, int c);
+    void cmult(unsigned long long int a, unsigned int N, int c);
 
     void mod_add_phi_inv(int a, int N, int c1, int c2);
 
-    void mod_add_phi(int a, int N, int c1, int c2);
+    void mod_add_phi(unsigned long long int a, unsigned int N, int c1, int c2);
 
     void qft_inv();
 
     void qft();
 
-    void add_phi_inv(int a, int c1, int c2);
+    void add_phi_inv(unsigned long long int a, int c1, int c2);
 
-    void add_phi(int a, int c1, int c2);
+    void add_phi(unsigned long long int a, int c1, int c2);
 
     static int inverse_mod(int a, int n);
 
@@ -74,9 +74,9 @@ class ShorSimulator: public Simulator<Config> {
     [[nodiscard]] std::pair<unsigned int, unsigned int> post_processing(const std::string& sample) const;
 
     /// composite number to be factored
-    const unsigned int n;
+    const std::size_t n;
     /// coprime number to `n`. Setting this to zero will randomly generate a suitable number
-    unsigned int       coprime_a;
+    std::size_t       coprime_a;
     const unsigned int required_bits;
     dd::QubitCount     n_qubits{};
 
@@ -98,31 +98,30 @@ class ShorSimulator: public Simulator<Config> {
     std::map<dd::vNode*, dd::mEdge> dag_edges;
 
 public:
-    ShorSimulator(int composite_number, int coprime_a):
-        Simulator<Config>(), n(composite_number), coprime_a(coprime_a),
-        required_bits(std::ceil(std::log2(composite_number))), emulate(true), verbose(false), approximate(false) {
+    ShorSimulator(std::size_t composite_number, std::size_t coprime_number):
+        Simulator<Config>(), n(composite_number), coprime_a(coprime_number),
+        required_bits(static_cast<unsigned int>(std::ceil(std::log2(composite_number)))), emulate(true), verbose(false), approximate(false) {
         ts.resize(n_qubits);
     };
 
-    ShorSimulator(int composite_number, int coprime_a, unsigned long long seed):
-        Simulator<Config>(seed), n(composite_number), coprime_a(coprime_a),
-        required_bits(std::ceil(std::log2(composite_number))), emulate(true), verbose(false), approximate(false) {
+    ShorSimulator(std::size_t composite_number, std::size_t coprime_number, unsigned long long seed_):
+        Simulator<Config>(seed_), n(composite_number), coprime_a(coprime_number),
+        required_bits(static_cast<unsigned int>(std::ceil(std::log2(composite_number)))), emulate(true), verbose(false), approximate(false) {
         ts.resize(n_qubits);
     };
 
-    ShorSimulator(int composite_number, int coprime_a, bool emulate, bool verbose, bool approximate):
-        Simulator<Config>(), n(composite_number), coprime_a(coprime_a),
-        required_bits(std::ceil(std::log2(composite_number))), emulate(emulate), verbose(verbose),
-        approximate(approximate) {
+    ShorSimulator(std::size_t composite_number, std::size_t coprime_number, bool emulate_, bool verbose_, bool approximate_):
+        Simulator<Config>(), n(composite_number), coprime_a(coprime_number),
+        required_bits(static_cast<unsigned int>(std::ceil(std::log2(composite_number)))), emulate(emulate_), verbose(verbose_),
+        approximate(approximate_) {
         ts.resize(n_qubits);
     };
 
-    ShorSimulator(int composite_number, int coprime_a, unsigned long long seed, bool emulate, bool verbose,
-                  bool approximate):
-        Simulator<Config>(seed),
-        n(composite_number), coprime_a(coprime_a),
-        required_bits(std::ceil(std::log2(composite_number))), emulate(emulate), verbose(verbose),
-        approximate(approximate) {
+    ShorSimulator(std::size_t composite_number, std::size_t coprime_number, unsigned long long seed_, bool emulate_, bool verbose_, bool approximate_):
+        Simulator<Config>(seed_),
+        n(composite_number), coprime_a(coprime_number),
+        required_bits(static_cast<unsigned int>(std::ceil(std::log2(composite_number)))), emulate(emulate_), verbose(verbose_),
+        approximate(approximate_) {
         ts.resize(n_qubits);
     };
 
