@@ -9,8 +9,8 @@
 
 using CN = dd::ComplexNumbers;
 
-template<class DDPackage>
-std::map<std::string, std::size_t> Simulator<DDPackage>::SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, unsigned int shots) {
+template<class Config>
+std::map<std::string, std::size_t> Simulator<Config>::SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, unsigned int shots) {
     // in-place prefix-sum calculation of probabilities
     std::inclusive_scan(
             amplitudes.begin(), amplitudes.end(), amplitudes.begin(),
@@ -34,8 +34,8 @@ std::map<std::string, std::size_t> Simulator<DDPackage>::SampleFromAmplitudeVect
     return results;
 }
 
-template<class DDPackage>
-std::vector<dd::ComplexValue> Simulator<DDPackage>::getVector() const {
+template<class Config>
+std::vector<dd::ComplexValue> Simulator<Config>::getVector() const {
     assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
     std::string                   path(getNumberOfQubits(), '0');
     std::vector<dd::ComplexValue> results(1ull << getNumberOfQubits(), dd::complex_zero);
@@ -77,8 +77,8 @@ std::vector<std::complex<dd::fp>> Simulator<Config>::getVectorComplex() const {
     return results;
 }
 
-template<class DDPackage>
-void Simulator<DDPackage>::NextPath(std::string& s) {
+template<class Config>
+void Simulator<Config>::NextPath(std::string& s) {
     std::string::reverse_iterator iter = s.rbegin(), end = s.rend();
     int                           carry = 1;
     while (carry && iter != end) {
@@ -91,6 +91,17 @@ void Simulator<DDPackage>::NextPath(std::string& s) {
         s.insert(0, "1");
 }
 
+/**
+ * Approximate a quantum state to a given fidelity.
+ * @tparam Config Configuration for the underlying DD package
+ * @param localDD pointer to the DD package where the quantum state lives
+ * @param edge reference to the root node of the quantum state, will point to the new state afterwards if removeNodes is true
+ * @param targetFidelity the fidelity that should be achieved
+ * @param allLevels if true, apply approximation to targetFidely to each level, if false, only apply to the most suitable level
+ * @param removeNodes if true, actually remove the nodes that are identified as unnecessary for the targetFidelity, if false, don't remove anything
+ * @param verbose output information about the process and result
+ * @return fidelity of the resulting quantum state
+ */
 template<class Config>
 double Simulator<Config>::ApproximateByFidelity(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose) {
     std::queue<dd::vNode*>       q;
@@ -130,8 +141,8 @@ double Simulator<Config>::ApproximateByFidelity(std::unique_ptr<dd::Package<Conf
         if (it.first->v < 0) {
             continue; // ignore the terminal node which has v == -1
         }
-        nodes.at(it.first->v)++;
-        qq.at(it.first->v).emplace(1 - it.second, it.first);
+        nodes.at(static_cast<std::size_t>(it.first->v))++;
+        qq.at(static_cast<std::size_t>(it.first->v)).emplace(1 - it.second, it.first);
     }
 
     probsMone.clear();
@@ -327,14 +338,14 @@ dd::vEdge Simulator<Config>::RemoveNodes(std::unique_ptr<dd::Package<Config>>& l
     return r;
 }
 
-template<class DDPackage>
-std::pair<dd::ComplexValue, std::string> Simulator<DDPackage>::getPathOfLeastResistance() const {
-    if (std::abs(dd::ComplexNumbers::mag2(rootEdge.w) - 1.0L) > epsilon) {
+template<class Config>
+std::pair<dd::ComplexValue, std::string> Simulator<Config>::getPathOfLeastResistance() const {
+    if (std::abs(dd::ComplexNumbers::mag2(rootEdge.w) - 1.0) > epsilon) {
         if (rootEdge.w.approximatelyZero()) {
             throw std::runtime_error("Numerical instabilities led to a 0-vector! Abort simulation!");
         }
         std::cerr << "WARNING in PoLR: numerical instability occurred during simulation: |alpha|^2 + |beta|^2 - 1 = "
-                  << 1.0L - dd::ComplexNumbers::mag2(rootEdge.w) << ", but should be 1!\n";
+                  << 1.0 - dd::ComplexNumbers::mag2(rootEdge.w) << ", but should be 1!\n";
     }
 
     std::string result(getNumberOfQubits(), '0');
@@ -345,8 +356,8 @@ std::pair<dd::ComplexValue, std::string> Simulator<DDPackage>::getPathOfLeastRes
         dd::fp p1  = dd::ComplexNumbers::mag2(cur.p->e.at(1).w);
         dd::fp tmp = p0 + p1;
 
-        if (std::abs(tmp - 1.0L) > epsilon) {
-            throw std::runtime_error("Added probabilities differ from 1 by " + std::to_string(std::abs(tmp - 1.0L)));
+        if (std::abs(tmp - 1.0) > epsilon) {
+            throw std::runtime_error("Added probabilities differ from 1 by " + std::to_string(std::abs(tmp - 1.0)));
         }
         p0 /= tmp;
 
