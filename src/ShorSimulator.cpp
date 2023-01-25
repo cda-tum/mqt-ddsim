@@ -160,133 +160,100 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::Simulate([[maybe_unuse
  */
 template<class Config>
 std::pair<unsigned int, unsigned int> ShorSimulator<Config>::post_processing(const std::string& sample) const {
+    std::ostream log{nullptr};
+    if (verbose) {
+        log.rdbuf(std::clog.rdbuf());
+    }
     unsigned long long res = 0;
-    if (verbose) {
-        std::clog << "measurement: ";
-    }
+
+    log << "measurement: ";
     for (unsigned int i = 0; i < 2 * required_bits; i++) {
-        if (verbose) {
-            std::clog << sample.at(required_bits + i);
-        }
-        res = (res << 1u) + (sample.at(required_bits + i) == '1');
+        log << sample.at(2 * required_bits - 1 - i);
+        res = (res << 1u) + (sample.at(2 * required_bits - 1 - i) == '1');
     }
 
-    if (verbose) {
-        std::clog << " = " << res << "\n";
-    }
-    unsigned long long denom = 1ull << (2 * required_bits);
+    log << " = " << res << "\n";
 
-    bool               success = false;
-    unsigned long long f1{0}, f2{0};
     if (res == 0) {
-        if (verbose) {
-            std::clog << "Factorization failed (measured 0)!" << std::endl;
-        }
-    } else {
-        if (verbose) {
-            std::clog << "Continued fraction expansion of " << res << "/" << denom << " = " << std::flush;
-        }
-        std::vector<unsigned long long> cf;
-
-        unsigned long long old_res   = res;
-        unsigned long long old_denom = denom;
-        while (res != 0) {
-            cf.push_back(denom / res);
-            unsigned long long tmp = denom % res;
-            denom                  = res;
-            res                    = tmp;
-        }
-
-        if (verbose) {
-            for (const auto i: cf) {
-                std::clog << i << " ";
-            }
-            std::clog << "\n";
-        }
-
-        for (unsigned int i = 0; i < cf.size(); i++) {
-            //determine candidate
-            unsigned long long denominator = cf[i];
-            unsigned long long numerator   = 1;
-
-            for (int j = i - 1; j >= 0; j--) {
-                unsigned long long tmp = numerator + cf[j] * denominator;
-                numerator              = denominator;
-                denominator            = tmp;
-            }
-            if (verbose) {
-                std::clog << "  Candidate " << numerator << "/" << denominator << ": ";
-            }
-            if (denominator > n) {
-                if (verbose) {
-                    std::clog << " denominator too large (greater than " << n << ")!\n";
-                }
-                success = false;
-                if (verbose) {
-                    std::clog << "Factorization failed!\n";
-                }
-                break;
-            } else {
-                double delta = static_cast<double>(old_res) / static_cast<double>(old_denom) - static_cast<double>(numerator) / static_cast<double>(denominator);
-                if (std::abs(delta) < 1.0 / (2.0 * static_cast<double>(old_denom))) {
-                    unsigned long long fact = 1;
-                    while (denominator * fact < n && modpow(coprime_a, denominator * fact, n) != 1) {
-                        fact++;
-                    }
-                    if (modpow(coprime_a, denominator * fact, n) == 1) {
-                        if (verbose) {
-                            std::clog << "found period: " << denominator << " * " << fact << " = "
-                                      << (denominator * fact) << "\n";
-                        }
-                        if ((denominator * fact) & 1u) {
-                            if (verbose) {
-                                std::clog << "Factorization failed (period is odd)!\n";
-                            }
-                        } else {
-                            f1 = modpow(coprime_a, (denominator * fact) >> 1u, n);
-                            f2 = (f1 + 1) % n;
-                            f1 = (f1 == 0) ? n - 1 : f1 - 1;
-                            f1 = gcd(f1, n);
-                            f2 = gcd(f2, n);
-
-                            if (f1 == 1ull || f2 == 1ull) {
-                                if (verbose) {
-                                    std::clog << "Factorization failed: found trivial factors " << f1 << " and " << f2
-                                              << "\n";
-                                }
-                            } else {
-                                if (verbose) {
-                                    std::clog << "Factorization succeeded! Non-trivial factors are: \n"
-                                              << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)-1"
-                                              << "," << n
-                                              << ") = " << f1 << "\n"
-                                              << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)+1"
-                                              << "," << n
-                                              << ") = " << f2 << "\n";
-                                }
-                                success = true;
-                            }
-                        }
-
-                        break;
-                    } else {
-                        if (verbose) {
-                            std::clog << "failed\n";
-                        }
-                    }
-                } else {
-                    if (verbose) {
-                        std::clog << "delta is too big (" << delta << ")\n";
-                    }
-                }
-            }
-        }
-    }
-    if (success) {
-        return {f1, f2};
-    } else {
+        log << "Factorization failed (measured 0)!\n";
         return {0, 0};
     }
+    std::vector<unsigned long long> cf;
+    auto                            denom     = 1ull << (2 * required_bits);
+    const auto                      old_denom = denom;
+    const auto                      old_res   = res;
+
+    log << "Continued fraction expansion of " << res << "/" << denom << " = " << std::flush;
+
+    while (res != 0) {
+        cf.push_back(denom / res);
+        const auto tmp = denom % res;
+        denom          = res;
+        res            = tmp;
+    }
+
+    for (const auto i: cf) {
+        log << i << " ";
+    }
+    log << "\n";
+
+    for (unsigned int i = 0; i < cf.size(); i++) {
+        //determine candidate
+        unsigned long long denominator = cf[i];
+        unsigned long long numerator   = 1;
+
+        for (int j = i - 1; j >= 0; j--) {
+            const auto tmp = numerator + cf[j] * denominator;
+            numerator      = denominator;
+            denominator    = tmp;
+        }
+
+        log << "  Candidate " << numerator << "/" << denominator << ": ";
+
+        if (denominator > n) {
+            log << " denominator too large (greater than " << n << ")!\nFactorization failed!\n";
+            return {0, 0};
+        }
+
+        const double delta = static_cast<double>(old_res) / static_cast<double>(old_denom) - static_cast<double>(numerator) / static_cast<double>(denominator);
+        if (std::abs(delta) >= 1.0 / (2.0 * static_cast<double>(old_denom))) {
+            log << "delta is too big (" << delta << ")\n";
+            continue;
+        }
+
+        unsigned long long fact = 1;
+        while (denominator * fact < n && modpow(coprime_a, denominator * fact, n) != 1) {
+            fact++;
+        }
+
+        if (modpow(coprime_a, denominator * fact, n) != 1) {
+            log << "failed\n";
+            continue;
+        }
+
+        log << "found period: " << denominator << " * " << fact << " = " << (denominator * fact) << "\n";
+
+        if ((denominator * fact) & 1u) {
+            log << "Factorization failed (period is odd)!\n";
+            return {0, 0};
+        }
+
+        auto f1 = modpow(coprime_a, (denominator * fact) / 2, n);
+        auto f2 = (f1 + 1) % n;
+        f1      = (f1 == 0) ? n - 1 : f1 - 1;
+        f1      = gcd(f1, n);
+        f2      = gcd(f2, n);
+
+        if (f1 == 1ull || f2 == 1ull) {
+            log << "Factorization failed: found trivial factors " << f1 << " and " << f2 << "\n";
+            return {0, 0};
+        }
+        log << "Factorization succeeded! Non-trivial factors are: \n"
+            << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)-1" << "," << n << ") = " << f1 << "\n"
+            << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)+1" << "," << n << ") = " << f2 << "\n";
+        return {f1, f2};
+    }
+    return {0, 0};
 }
 
 template<class Config>

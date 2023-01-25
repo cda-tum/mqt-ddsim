@@ -107,25 +107,22 @@ std::map<std::string, std::size_t> ShorFastSimulator<Config>::Simulate(unsigned 
  */
 template<class Config>
 std::pair<unsigned int, unsigned int> ShorFastSimulator<Config>::post_processing(const std::string& sample) const {
-    unsigned long long res = 0;
+    std::ostream log{nullptr};
     if (verbose) {
-        std::clog << "measurement: ";
+        log.rdbuf(std::clog.rdbuf());
     }
+    unsigned long long res = 0;
+
+    log << "measurement: ";
     for (unsigned int i = 0; i < 2 * required_bits; i++) {
-        if (verbose) {
-            std::clog << sample.at(2 * required_bits - 1 - i);
-        }
+        log << sample.at(2 * required_bits - 1 - i);
         res = (res << 1u) + (sample.at(2 * required_bits - 1 - i) == '1');
     }
 
-    if (verbose) {
-        std::clog << " = " << res << "\n";
-    }
+    log << " = " << res << "\n";
 
     if (res == 0) {
-        if (verbose) {
-            std::clog << "Factorization failed (measured 0)!\n";
-        }
+        log << "Factorization failed (measured 0)!\n";
         return {0, 0};
     }
     std::vector<unsigned long long> cf;
@@ -133,9 +130,7 @@ std::pair<unsigned int, unsigned int> ShorFastSimulator<Config>::post_processing
     const auto                      old_denom = denom;
     const auto                      old_res   = res;
 
-    if (verbose) {
-        std::clog << "Continued fraction expansion of " << res << "/" << denom << " = " << std::flush;
-    }
+    log << "Continued fraction expansion of " << res << "/" << denom << " = " << std::flush;
 
     while (res != 0) {
         cf.push_back(denom / res);
@@ -144,12 +139,10 @@ std::pair<unsigned int, unsigned int> ShorFastSimulator<Config>::post_processing
         res            = tmp;
     }
 
-    if (verbose) {
-        for (const auto i: cf) {
-            std::clog << i << " ";
-        }
-        std::clog << "\n";
+    for (const auto i: cf) {
+        log << i << " ";
     }
+    log << "\n";
 
     for (unsigned int i = 0; i < cf.size(); i++) {
         //determine candidate
@@ -162,22 +155,16 @@ std::pair<unsigned int, unsigned int> ShorFastSimulator<Config>::post_processing
             denominator    = tmp;
         }
 
-        if (verbose) {
-            std::clog << "  Candidate " << numerator << "/" << denominator << ": ";
-        }
+        log << "  Candidate " << numerator << "/" << denominator << ": ";
 
         if (denominator > n) {
-            if (verbose) {
-                std::clog << " denominator too large (greater than " << n << ")!\nFactorization failed!\n";
-            }
+            log << " denominator too large (greater than " << n << ")!\nFactorization failed!\n";
             return {0, 0};
         }
 
         const double delta = static_cast<double>(old_res) / static_cast<double>(old_denom) - static_cast<double>(numerator) / static_cast<double>(denominator);
         if (std::abs(delta) >= 1.0 / (2.0 * static_cast<double>(old_denom))) {
-            if (verbose) {
-                std::clog << "delta is too big (" << delta << ")\n";
-            }
+            log << "delta is too big (" << delta << ")\n";
             continue;
         }
 
@@ -187,20 +174,14 @@ std::pair<unsigned int, unsigned int> ShorFastSimulator<Config>::post_processing
         }
 
         if (modpow(coprime_a, denominator * fact, n) != 1) {
-            if (verbose) {
-                std::clog << "failed\n";
-            }
+            log << "failed\n";
             continue;
         }
 
-        if (verbose) {
-            std::clog << "found period: " << denominator << " * " << fact << " = " << (denominator * fact) << "\n";
-        }
+        log << "found period: " << denominator << " * " << fact << " = " << (denominator * fact) << "\n";
 
         if ((denominator * fact) & 1u) {
-            if (verbose) {
-                std::clog << "Factorization failed (period is odd)!\n";
-            }
+            log << "Factorization failed (period is odd)!\n";
             return {0, 0};
         }
 
@@ -211,25 +192,14 @@ std::pair<unsigned int, unsigned int> ShorFastSimulator<Config>::post_processing
         f2      = gcd(f2, n);
 
         if (f1 == 1ull || f2 == 1ull) {
-            if (verbose) {
-                std::clog << "Factorization failed: found trivial factors " << f1 << " and " << f2
-                          << "\n";
-            }
+            log << "Factorization failed: found trivial factors " << f1 << " and " << f2 << "\n";
             return {0, 0};
         }
-
-        if (verbose) {
-            std::clog << "Factorization succeeded! Non-trivial factors are: \n"
-                      << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)-1"
-                      << "," << n
-                      << ") = " << f1 << "\n"
-                      << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)+1"
-                      << "," << n
-                      << ") = " << f2 << "\n";
-        }
+        log << "Factorization succeeded! Non-trivial factors are: \n"
+            << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)-1" << "," << n << ") = " << f1 << "\n"
+            << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)+1" << "," << n << ") = " << f2 << "\n";
         return {f1, f2};
     }
-
     return {0, 0};
 }
 
