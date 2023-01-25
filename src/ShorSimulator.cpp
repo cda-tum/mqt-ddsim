@@ -249,8 +249,10 @@ std::pair<unsigned int, unsigned int> ShorSimulator<Config>::post_processing(con
             return {0, 0};
         }
         log << "Factorization succeeded! Non-trivial factors are: \n"
-            << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)-1" << "," << n << ") = " << f1 << "\n"
-            << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)+1" << "," << n << ") = " << f2 << "\n";
+            << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)-1"
+            << "," << n << ") = " << f1 << "\n"
+            << "  -- gcd(" << n << "^(" << (denominator * fact) << "/2)+1"
+            << "," << n << ") = " << f2 << "\n";
         return {f1, f2};
     }
     return {0, 0};
