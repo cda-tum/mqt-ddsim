@@ -28,7 +28,7 @@ std::map<std::string, std::size_t> Simulator<Config>::SampleFromAmplitudeVectorI
         auto m   = std::distance(amplitudes.begin(), mit);
 
         // construct basis state string
-        auto basisState = toBinaryString(m, getNumberOfQubits());
+        auto basisState = toBinaryString(static_cast<std::size_t>(m), getNumberOfQubits());
         results[basisState]++;
     }
     return results;
@@ -84,11 +84,12 @@ void Simulator<Config>::NextPath(std::string& s) {
     while (carry && iter != end) {
         int value = (*iter - '0') + carry;
         carry     = (value / 2);
-        *iter     = '0' + (value % 2);
+        *iter     = static_cast<char>('0' + (value % 2));
         ++iter;
     }
-    if (carry)
+    if (carry) {
         s.insert(0, "1");
+    }
 }
 
 /**
@@ -373,7 +374,7 @@ std::pair<dd::ComplexValue, std::string> Simulator<Config>::getPathOfLeastResist
             CN::mul(path_value, path_value, cur.w);
             cur = cur.p->e.at(0);
         } else {
-            result[cur.p->v] = '1';
+            result[static_cast<std::size_t>(cur.p->v)] = '1';
             CN::mul(path_value, path_value, cur.w);
             cur = cur.p->e.at(1);
         }
