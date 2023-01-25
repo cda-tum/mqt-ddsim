@@ -156,22 +156,22 @@ double Simulator<Config>::ApproximateByFidelity(std::unique_ptr<dd::Package<Conf
     auto                    qq = GetNodeContributions(edge);
     std::vector<dd::vNode*> nodes_to_remove;
 
-    int max_remove = 0;
+    std::size_t max_remove = 0;
     for (dd::QubitCount i = 0; i < getNumberOfQubits(); i++) {
         double                  sum    = 0.0;
-        int                     remove = 0;
+        std::size_t             remove = 0;
         std::vector<dd::vNode*> tmp;
 
         while (!qq.at(i).empty()) {
-            auto p = qq.at(i).top();
+            const auto [fidelity, node] = qq.at(i).top();
             qq.at(i).pop();
-            sum += 1 - p.first;
+            sum += 1 - fidelity;
             if (sum < 1 - targetFidelity) {
                 remove++;
                 if (allLevels) {
-                    nodes_to_remove.push_back(p.second);
+                    nodes_to_remove.push_back(node);
                 } else {
-                    tmp.push_back(p.second);
+                    tmp.push_back(node);
                 }
             } else {
                 break;
