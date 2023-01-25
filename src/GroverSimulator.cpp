@@ -13,7 +13,7 @@ std::map<std::string, std::size_t> GroverSimulator<Config>::Simulate(unsigned in
     for (unsigned short i = 0; i < n_qubits; ++i) {
         qc_setup.emplace_back<qc::StandardOperation>(n_qubits + n_anciallae, i, qc::H);
     }
-    //qc_setup.print();
+
     dd::Edge setup_op{dd::buildFunctionality(&qc_setup, this->dd)};
 
     // Build the oracle
@@ -23,7 +23,7 @@ std::map<std::string, std::size_t> GroverSimulator<Config>::Simulate(unsigned in
         controls.emplace(qc::Control{i, oracle.at(i) == '1' ? qc::Control::Type::Pos : qc::Control::Type::Neg});
     }
     qc_oracle.z(static_cast<qc::Qubit>(n_qubits), controls);
-    //qc_oracle.print();
+
     dd::Edge oracle_op{dd::buildFunctionality(&qc_oracle, this->dd)};
 
     // Build the diffusion stage.
@@ -52,7 +52,7 @@ std::map<std::string, std::size_t> GroverSimulator<Config>::Simulate(unsigned in
     for (dd::QubitCount i = 0; i < n_qubits; ++i) {
         qc_diffusion.h(i);
     }
-    //qc_diffusion.print();
+
     dd::Edge diffusion_op{dd::buildFunctionality(&qc_diffusion, this->dd)};
 
     dd::Edge full_iteration{this->dd->multiply(oracle_op, diffusion_op)};

@@ -157,7 +157,7 @@ std::map<std::size_t, bool> CircuitSimulator<DDPackage>::single_shot(const bool 
             if (approx_info.step_number > 0 && approx_info.step_fidelity < 1.0) {
                 if (approx_info.approx_when == ApproximationInfo::FidelityDriven && (op_num + 1) % approx_mod == 0 &&
                     approximation_runs < approx_info.step_number) {
-                    //const unsigned int size_before = dd->size(rootEdge);
+                    [[maybe_unused]] const unsigned int size_before = this->dd->size(this->rootEdge);
                     const auto ap_fid = Simulator<DDPackage>::ApproximateByFidelity(approx_info.step_fidelity, false, true);
                     approximation_runs++;
                     final_fidelity *= static_cast<long double>(ap_fid);

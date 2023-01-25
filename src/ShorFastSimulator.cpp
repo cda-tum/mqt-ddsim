@@ -449,8 +449,6 @@ void ShorFastSimulator<Config>::u_a_emulate2(unsigned long long int a) {
     result = this->dd->makeDDNode(this->rootEdge.p->v, std::array<dd::vEdge, dd::RADIX>{this->rootEdge.p->e[0], result});
     this->dd->cn.returnToCache(tmp);
 
-    //dd->setMode(dd::Vector);
-
     result.w = this->dd->cn.mulCached(result.w, this->rootEdge.w);
     tmp      = result.w;
     result.w = this->dd->cn.lookup(result.w);
