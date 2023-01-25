@@ -169,7 +169,7 @@ std::pair<unsigned int, unsigned int> ShorSimulator<Config>::post_processing(con
     log << "measurement: ";
     for (unsigned int i = 0; i < 2 * required_bits; i++) {
         log << sample.at(2 * required_bits - 1 - i);
-        res = (res << 1u) + (sample.at(2 * required_bits - 1 - i) == '1');
+        res = (res << 1u) + (sample.at(required_bits + i) == '1');
     }
 
     log << " = " << res << "\n";
