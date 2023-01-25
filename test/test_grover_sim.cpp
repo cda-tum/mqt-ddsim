@@ -25,7 +25,6 @@ TEST(GroverSimTest, EmulatedFixedOracleFixedSeedTest) {
     ASSERT_EQ(ddsim.getPathOfLeastResistance().second.substr(1), ddsim.AdditionalStatistics().at("oracle"));
 }
 
-
 TEST(GroverSimTest, EmulatedFixedOracleTest) {
     GroverSimulator ddsim("0110001");
     ddsim.Simulate(1);

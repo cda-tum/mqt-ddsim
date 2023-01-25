@@ -152,6 +152,12 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::Simulate([[maybe_unuse
     return {};
 }
 
+/**
+ * Post process the result of the simulation, i.e. try to find two non-trivial factors
+ * @tparam Config Configuration for the underlying DD package
+ * @param sample string with the measurement results (consisting of only 0s and 1s)
+ * @return pair of integers with the factors in case of success or pair of zeros in case of errors
+ */
 template<class Config>
 std::pair<unsigned int, unsigned int> ShorSimulator<Config>::post_processing(const std::string& sample) const {
     unsigned long long res = 0;

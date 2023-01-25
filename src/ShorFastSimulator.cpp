@@ -99,6 +99,12 @@ std::map<std::string, std::size_t> ShorFastSimulator<Config>::Simulate(unsigned 
     return {};
 }
 
+/**
+ * Post process the result of the simulation, i.e. try to find two non-trivial factors
+ * @tparam Config Configuration for the underlying DD package
+ * @param sample string with the measurement results (consisting of only 0s and 1s)
+ * @return pair of integers with the factors in case of success or pair of zeros in case of errors
+ */
 template<class Config>
 std::pair<unsigned int, unsigned int> ShorFastSimulator<Config>::post_processing(const std::string& sample) const {
     unsigned long long res = 0;
@@ -342,6 +348,11 @@ void ShorFastSimulator<Config>::ApplyGate(dd::GateMatrix matrix, dd::Qubit targe
     this->dd->garbageCollect();
 }
 
+/**
+ * Emulate the modular exponentiation by directly building the appropriate decision diagram for the operation
+ * @tparam Config Configuration for the underlying DD package
+ * @param a the exponent
+ */
 template<class Config>
 void ShorFastSimulator<Config>::u_a_emulate2(unsigned long long int a) {
     [[maybe_unused]] const std::size_t cache_count_before = this->dd->cn.cacheCount();
@@ -366,8 +377,6 @@ void ShorFastSimulator<Config>::u_a_emulate2(unsigned long long int a) {
     }
 
     u_a_emulate2_rec(this->rootEdge.p->e[0]);
-
-    //dd->setMode(dd::Matrix);
 
     for (const auto& entry: nodesOnLevel.at(0)) {
         dd::vEdge left = f;
@@ -399,7 +408,7 @@ void ShorFastSimulator<Config>::u_a_emulate2(unsigned long long int a) {
         nodesOnLevel[0][entry.first] = result;
     }
 
-    for (int i = 1; i < n_qubits - 1; i++) {
+    for (dd::QubitCount i = 1; i < n_qubits - 1; i++) {
         std::vector<dd::vEdge> saveEdges;
         for (auto it = nodesOnLevel.at(i).begin(); it != nodesOnLevel.at(i).end(); it++) {
             dd::vEdge left = dd::vEdge::zero;
