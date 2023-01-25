@@ -153,7 +153,7 @@ std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::
  */
 template<class Config>
 double Simulator<Config>::ApproximateByFidelity(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose) {
-    auto qq = GetNodeContributions(edge);
+    auto                    qq = GetNodeContributions(edge);
     std::vector<dd::vNode*> nodes_to_remove;
 
     int max_remove = 0;
