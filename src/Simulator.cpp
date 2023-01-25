@@ -92,18 +92,13 @@ void Simulator<Config>::NextPath(std::string& s) {
 }
 
 /**
- * Approximate a quantum state to a given fidelity.
+ * Calculate the contributions of each node and return as vector of priority queues (each queue corresponds to a level in the decision diagram)
  * @tparam Config Configuration for the underlying DD package
- * @param localDD pointer to the DD package where the quantum state lives
- * @param edge reference to the root node of the quantum state, will point to the new state afterwards if removeNodes is true
- * @param targetFidelity the fidelity that should be achieved
- * @param allLevels if true, apply approximation to targetFidely to each level, if false, only apply to the most suitable level
- * @param removeNodes if true, actually remove the nodes that are identified as unnecessary for the targetFidelity, if false, don't remove anything
- * @param verbose output information about the process and result
- * @return fidelity of the resulting quantum state
+ * @param edge root edge to the decision diagram
+ * @return vector of priority queues with each queue corresponding to a level of the decision diagram
  */
 template<class Config>
-double Simulator<Config>::ApproximateByFidelity(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose) {
+std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::pair<double, dd::vNode*>>>> Simulator<Config>::GetNodeContributions(const dd::vEdge& edge) const {
     std::queue<dd::vNode*>       q;
     std::map<dd::vNode*, dd::fp> probsMone;
 
@@ -133,19 +128,32 @@ double Simulator<Config>::ApproximateByFidelity(std::unique_ptr<dd::Package<Conf
         }
     }
 
-    std::vector<int> nodes(getNumberOfQubits(), 0);
-
     std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::pair<double, dd::vNode*>>>> qq(getNumberOfQubits());
 
-    for (auto& it: probsMone) {
-        if (it.first->v < 0) {
+    for (auto& [node, probability]: probsMone) {
+        if (node->v < 0) {
             continue; // ignore the terminal node which has v == -1
         }
-        nodes.at(static_cast<std::size_t>(it.first->v))++;
-        qq.at(static_cast<std::size_t>(it.first->v)).emplace(1 - it.second, it.first);
+        qq.at(static_cast<std::size_t>(node->v)).emplace(1 - probability, node);
     }
 
-    probsMone.clear();
+    return qq;
+}
+
+/**
+ * Approximate a quantum state to a given fidelity.
+ * @tparam Config Configuration for the underlying DD package
+ * @param localDD pointer to the DD package where the quantum state lives
+ * @param edge reference to the root node of the quantum state, will point to the new state afterwards if removeNodes is true
+ * @param targetFidelity the fidelity that should be achieved
+ * @param allLevels if true, apply approximation to targetFidely to each level, if false, only apply to the most suitable level
+ * @param removeNodes if true, actually remove the nodes that are identified as unnecessary for the targetFidelity, if false, don't remove anything
+ * @param verbose output information about the process and result
+ * @return fidelity of the resulting quantum state
+ */
+template<class Config>
+double Simulator<Config>::ApproximateByFidelity(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose) {
+    auto qq = GetNodeContributions(edge);
     std::vector<dd::vNode*> nodes_to_remove;
 
     int max_remove = 0;

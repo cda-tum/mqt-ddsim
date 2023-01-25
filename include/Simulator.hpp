@@ -94,6 +94,8 @@ public:
         return binary;
     }
 
+    [[nodiscard]] std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::pair<double, dd::vNode*>>>> GetNodeContributions(const dd::vEdge& edge) const;
+
     double ApproximateByFidelity(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose = false);
     double ApproximateByFidelity(double targetFidelity, bool allLevels, bool removeNodes, bool verbose = false) {
         return ApproximateByFidelity(dd, rootEdge, targetFidelity, allLevels, removeNodes, verbose);
