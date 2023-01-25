@@ -16,8 +16,18 @@ TEST(GroverSimTest, EmulatedOracle14Test) {
     ASSERT_EQ(ddsim.getPathOfLeastResistance().second.substr(1), ddsim.AdditionalStatistics().at("oracle"));
 }
 
-TEST(GroverSimTest, EmulatedFixedOracleTest) {
+TEST(GroverSimTest, EmulatedFixedOracleFixedSeedTest) {
     GroverSimulator ddsim("0110011", 0);
+    ddsim.Simulate(1);
+
+    EXPECT_EQ(ddsim.getNumberOfOps(), 0);
+    EXPECT_EQ(ddsim.getName(), "emulated_grover_7");
+    ASSERT_EQ(ddsim.getPathOfLeastResistance().second.substr(1), ddsim.AdditionalStatistics().at("oracle"));
+}
+
+
+TEST(GroverSimTest, EmulatedFixedOracleTest) {
+    GroverSimulator ddsim("0110001");
     ddsim.Simulate(1);
 
     EXPECT_EQ(ddsim.getNumberOfOps(), 0);
