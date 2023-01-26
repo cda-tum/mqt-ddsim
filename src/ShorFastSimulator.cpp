@@ -380,7 +380,7 @@ void ShorFastSimulator<Config>::u_a_emulate2(unsigned long long int a) {
         nodesOnLevel[0][entry.first] = result;
     }
 
-    for (dd::QubitCount i = 1; i < n_qubits - 1; i++) {
+    for (std::size_t i = 1; i < n_qubits - 1; i++) {
         std::vector<dd::vEdge> saveEdges;
         for (auto it = nodesOnLevel.at(i).begin(); it != nodesOnLevel.at(i).end(); it++) {
             dd::vEdge left = dd::vEdge::zero;
@@ -391,7 +391,7 @@ void ShorFastSimulator<Config>::u_a_emulate2(unsigned long long int a) {
 
             dd::vEdge right = dd::vEdge::zero;
             if (it->first->e.at(1).w != dd::Complex::zero) {
-                right   = this->dd->multiply(addConstMod(ts.at(it->first->v)), nodesOnLevel.at(i - 1)[it->first->e.at(1).p]);
+                right   = this->dd->multiply(addConstMod(ts.at(static_cast<std::size_t>(it->first->v))), nodesOnLevel.at(i - 1)[it->first->e.at(1).p]);
                 right.w = this->dd->cn.mulCached(right.w, it->first->e.at(1).w);
             }
 

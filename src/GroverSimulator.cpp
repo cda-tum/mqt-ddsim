@@ -19,7 +19,7 @@ std::map<std::string, std::size_t> GroverSimulator<Config>::Simulate(std::size_t
     // Build the oracle
     qc::QuantumComputation qc_oracle(n_qubits + n_anciallae);
     qc::Controls           controls{};
-    for (dd::QubitCount i = 0; i < n_qubits; i++) {
+    for (qc::Qubit i = 0; i < n_qubits; i++) {
         controls.emplace(qc::Control{i, oracle.at(i) == '1' ? qc::Control::Type::Pos : qc::Control::Type::Neg});
     }
     qc_oracle.z(n_qubits, controls);
@@ -46,10 +46,10 @@ std::map<std::string, std::size_t> GroverSimulator<Config>::Simulate(std::size_t
 
     qc_diffusion.h(n_qubits - 1);
 
-    for (dd::QubitCount i = 0; i < n_qubits; ++i) {
+    for (qc::Qubit i = 0; i < n_qubits; ++i) {
         qc_diffusion.x(i);
     }
-    for (dd::QubitCount i = 0; i < n_qubits; ++i) {
+    for (qc::Qubit i = 0; i < n_qubits; ++i) {
         qc_diffusion.h(i);
     }
 
