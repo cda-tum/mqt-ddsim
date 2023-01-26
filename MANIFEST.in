@@ -2,7 +2,6 @@ include README.md LICENSE CMakeLists.txt
 include src/*
 include include/*
 include apps/*
-graft jkq/*
 graft mqt/*
 global-exclude __pycache__/
 global-exclude *.py[cod]
