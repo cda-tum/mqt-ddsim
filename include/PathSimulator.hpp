@@ -26,8 +26,8 @@ public:
             std::size_t                         parent;
             std::pair<std::size_t, std::size_t> children;
 
-            explicit Step(std::size_t id, std::vector<std::size_t> operations = {}, std::size_t parent = UNKNOWN, std::pair<std::size_t, std::size_t> children = {UNKNOWN, UNKNOWN}):
-                id(id), operations(std::move(operations)), parent(parent), children(std::move(children)){};
+            explicit Step(std::size_t id_, std::vector<std::size_t> operations_ = {}, std::size_t parent_ = UNKNOWN, std::pair<std::size_t, std::size_t> children_ = {UNKNOWN, UNKNOWN}):
+                id(id_), operations(std::move(operations_)), parent(parent_), children(std::move(children_)){};
 
             static constexpr size_t UNKNOWN = std::numeric_limits<size_t>::max();
         };
@@ -36,7 +36,7 @@ public:
         using Steps      = std::vector<Step>;
 
         SimulationPath() = default;
-        SimulationPath(std::size_t nleaves, Components components, const qc::QuantumComputation* qc, bool assumeCorrectOrder = false);
+        SimulationPath(std::size_t nleaves_, Components components_, const qc::QuantumComputation* qc_, bool assumeCorrectOrder = false);
 
         Components                    components{};
         Steps                         steps{};
@@ -66,8 +66,8 @@ public:
         std::size_t seed;
 
         //Add new variables here
-        explicit Configuration(Mode mode = Mode::Sequential, std::size_t bracketSize = 2, std::size_t alternatingStart = 0, std::size_t seed = 0):
-            mode(mode), bracketSize(bracketSize), alternatingStart(alternatingStart), seed(seed){};
+        explicit Configuration(Mode mode_ = Mode::Sequential, std::size_t bracketSize_ = 2, std::size_t alternatingStart_ = 0, std::size_t seed_ = 0):
+            mode(mode_), bracketSize(bracketSize_), alternatingStart(alternatingStart_), seed(seed_){};
 
         static Mode modeFromString(const std::string& mode) {
             if (mode == "sequential" || mode == "0") {
@@ -121,8 +121,8 @@ public:
         }
     };
 
-    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration configuration = Configuration()):
-        CircuitSimulator<Config>(std::move(qc)), executor(1) {
+    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, Configuration configuration = Configuration()):
+        CircuitSimulator<Config>(std::move(qc_)), executor(1) {
         if (configuration.seed != 0) {
             // override seed in case a non-trivial one is given
             Simulator<Config>::mt.seed(Simulator<Config>::seed);
@@ -156,8 +156,8 @@ public:
         }
     }
 
-    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, typename Configuration::Mode mode, std::size_t bracketSize, std::size_t alternatingStart, std::size_t seed):
-        PathSimulator<Config>(std::move(qc), Configuration{mode, bracketSize, alternatingStart, seed}) {}
+    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, typename Configuration::Mode mode, std::size_t bracketSize, std::size_t alternatingStart, std::size_t seed_):
+        PathSimulator<Config>(std::move(qc_), Configuration{mode, bracketSize, alternatingStart, seed_}) {}
 
     std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
 

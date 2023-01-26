@@ -88,8 +88,8 @@ void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
     }
 }
 
-template<class DDPackage>
-std::map<std::string, double> StochasticNoiseSimulator<DDPackage>::StochSimulate() {
+template<class Config>
+std::map<std::string, double> StochasticNoiseSimulator<Config>::StochSimulate() {
     // Generate a vector for each instance.
     recordedPropertiesPerInstance.resize(maxInstances, std::vector<double>(recordedProperties.size(), 0.0));
     classicalMeasurementsMaps.resize(maxInstances);
@@ -101,7 +101,7 @@ std::map<std::string, double> StochasticNoiseSimulator<DDPackage>::StochSimulate
     //std::clog << "Starting " << maxInstances << " threads\n";
     const auto t1Stoch = std::chrono::steady_clock::now();
     for (std::size_t runID = 0U; runID < maxInstances; runID++) {
-        threadArray.emplace_back(&StochasticNoiseSimulator<DDPackage>::runStochSimulationForId,
+        threadArray.emplace_back(&StochasticNoiseSimulator<Config>::runStochSimulationForId,
                                  this,
                                  runID,
                                  qc->getNqubits(),
@@ -154,8 +154,8 @@ std::map<std::string, double> StochasticNoiseSimulator<DDPackage>::StochSimulate
     return measureResult;
 }
 
-template<class DDPackage>
-void StochasticNoiseSimulator<DDPackage>::runStochSimulationForId(std::size_t                                stochRun,
+template<class Config>
+void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t                                stochRun,
                                                                   qc::Qubit                                  nQubits,
                                                                   std::vector<double>&                       recordedPropertiesStorage,
                                                                   std::vector<std::pair<long, std::string>>& recordedPropertiesList,
@@ -299,8 +299,8 @@ void StochasticNoiseSimulator<DDPackage>::runStochSimulationForId(std::size_t   
     }
 }
 
-template<class DDPackage>
-void StochasticNoiseSimulator<DDPackage>::setRecordedProperties(const std::string& input) {
+template<class Config>
+void StochasticNoiseSimulator<Config>::setRecordedProperties(const std::string& input) {
     std::string subString;
     const int   min = std::numeric_limits<int>::min();
 

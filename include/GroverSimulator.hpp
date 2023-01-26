@@ -45,7 +45,7 @@ public:
         };
     }
 
-    static unsigned long long CalculateIterations(const unsigned short n_qubits) {
+    static unsigned long long CalculateIterations(const qc::Qubit n_qubits) {
         constexpr long double PI_4 = 0.785398163397448309615660845819875721049292349843776455243L; // dd::PI_4 is of type fp and hence possibly smaller than long double
         if (n_qubits <= 3) {
             return 1;

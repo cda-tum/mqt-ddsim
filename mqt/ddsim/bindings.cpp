@@ -89,14 +89,14 @@ void getNumpyMatrix(UnitarySimulator<Config>& sim, py::array_t<std::complex<dd::
     const auto&     e            = sim.getConstructedDD();
     py::buffer_info matrixBuffer = matrix.request();
     auto*           dataPtr      = static_cast<std::complex<dd::fp>*>(matrixBuffer.ptr);
-    py::size_t      rows         = matrixBuffer.shape[0];
-    py::size_t      cols         = matrixBuffer.shape[1];
+    const auto      rows         = matrixBuffer.shape[0];
+    const auto      cols         = matrixBuffer.shape[1];
     if (rows != cols) {
         throw std::runtime_error("Provided matrix is not a square matrix.");
     }
 
-    py::size_t dim = 1 << (e.p->v + 1);
-    if (rows != dim) {
+    std::size_t dim = 1 << (e.p->v + 1);
+    if (static_cast<std::size_t>(rows) != dim) {
         throw std::runtime_error("Provided matrix does not have the right size.");
     }
 

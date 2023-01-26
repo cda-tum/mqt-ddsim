@@ -10,7 +10,7 @@
 using CN = dd::ComplexNumbers;
 
 template<class Config>
-std::map<std::string, std::size_t> Simulator<Config>::SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, unsigned int shots) {
+std::map<std::string, std::size_t> Simulator<Config>::SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, std::size_t shots) {
     // in-place prefix-sum calculation of probabilities
     std::inclusive_scan(
             amplitudes.begin(), amplitudes.end(), amplitudes.begin(),

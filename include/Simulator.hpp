@@ -56,10 +56,10 @@ public:
 
     char MeasureOneCollapsing(qc::Qubit index, bool assume_probability_normalization = true) {
         assert(index < getNumberOfQubits());
-        return dd->measureOneCollapsing(rootEdge, index, assume_probability_normalization, mt, epsilon);
+        return dd->measureOneCollapsing(rootEdge, static_cast<dd::Qubit>(index), assume_probability_normalization, mt, epsilon);
     }
 
-    std::map<std::string, std::size_t> SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, unsigned int shots);
+    std::map<std::string, std::size_t> SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, std::size_t shots);
 
     [[nodiscard]] std::vector<dd::ComplexValue> getVector() const;
 
@@ -87,10 +87,10 @@ public:
 
     [[nodiscard]] virtual std::string getName() const = 0;
 
-    [[nodiscard]] static inline std::string toBinaryString(std::size_t m, qc::Qubit nq) {
-        std::string binary(nq, '0');
-        for (std::size_t j = 0; j < nq; ++j) {
-            if (m & (1 << j))
+    [[nodiscard]] static inline std::string toBinaryString(const std::size_t value, const std::size_t number_of_qubits) {
+        std::string binary(number_of_qubits, '0');
+        for (std::size_t j = 0; j < number_of_qubits; ++j) {
+            if (value & (1 << j))
                 binary[j] = '1';
         }
         return binary;
