@@ -156,11 +156,11 @@ std::map<std::string, double> StochasticNoiseSimulator<Config>::StochSimulate() 
 
 template<class Config>
 void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t                                stochRun,
-                                                                  qc::Qubit                                  nQubits,
-                                                                  std::vector<double>&                       recordedPropertiesStorage,
-                                                                  std::vector<std::pair<long, std::string>>& recordedPropertiesList,
-                                                                  std::map<std::string, unsigned int>&       classicalMeasurementsMap,
-                                                                  unsigned long long                         localSeed) {
+                                                               qc::Qubit                                  nQubits,
+                                                               std::vector<double>&                       recordedPropertiesStorage,
+                                                               std::vector<std::pair<long, std::string>>& recordedPropertiesList,
+                                                               std::map<std::string, unsigned int>&       classicalMeasurementsMap,
+                                                               unsigned long long                         localSeed) {
     std::mt19937_64                        generator(localSeed);
     std::uniform_real_distribution<dd::fp> dist(0.0, 1.0);
 
