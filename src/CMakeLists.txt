@@ -36,6 +36,11 @@ set(TF_BUILD_EXAMPLES OFF CACHE BOOL "")
 set(TF_BUILD_PROFILER OFF CACHE BOOL "")
 add_subdirectory("${PROJECT_SOURCE_DIR}/extern/taskflow" "extern/taskflow")
 target_link_libraries(${PROJECT_NAME} PUBLIC Taskflow)
+# the following sets the SYSTEM flag for the include dirs of the taskflow libs to suppress warnings
+# cmake-lint: disable=C0307
+set_target_properties(
+        Taskflow PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+        $<TARGET_PROPERTY:Taskflow,INTERFACE_INCLUDE_DIRECTORIES>)
 
 # add coverage compiler and linker flag if COVERAGE is set
 if (COVERAGE)

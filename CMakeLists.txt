@@ -19,7 +19,7 @@ macro(check_submodule_present MODULENAME)
 endmacro()
 
 check_submodule_present(qfr)
-check_submodule_present(cxxopts)
+check_submodule_present(taskflow)
 
 add_subdirectory(src)
 
@@ -37,6 +37,7 @@ if (BUILD_DDSIM_TESTS)
 endif ()
 
 if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    check_submodule_present(cxxopts)
     add_subdirectory(apps)
 endif ()
 

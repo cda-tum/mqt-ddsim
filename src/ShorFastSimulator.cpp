@@ -8,7 +8,7 @@
 #include <random>
 
 template<class Config>
-std::map<std::string, std::size_t> ShorFastSimulator<Config>::Simulate(unsigned int shots) {
+std::map<std::string, std::size_t> ShorFastSimulator<Config>::Simulate([[maybe_unused]] std::size_t shots) {
     if (verbose) {
         std::clog << "Simulate Shor's algorithm for n=" << n;
     }
@@ -144,7 +144,7 @@ std::pair<unsigned int, unsigned int> ShorFastSimulator<Config>::post_processing
     }
     log << "\n";
 
-    for (unsigned int i = 0; i < cf.size(); i++) {
+    for (int i = 0; static_cast<std::size_t>(i) < cf.size(); i++) {
         //determine candidate
         unsigned long long denominator = cf[i];
         unsigned long long numerator   = 1;
@@ -309,7 +309,7 @@ dd::mEdge ShorFastSimulator<Config>::addConstMod(unsigned long long a) {
 }
 
 template<class Config>
-void ShorFastSimulator<Config>::ApplyGate(dd::GateMatrix matrix, dd::Qubit target) {
+void ShorFastSimulator<Config>::ApplyGate(dd::GateMatrix matrix, qc::Qubit target) {
     number_of_operations++;
     dd::Edge gate = this->dd->makeGateDD(matrix, n_qubits, target);
     dd::Edge tmp  = this->dd->multiply(gate, this->rootEdge);
@@ -335,7 +335,7 @@ void ShorFastSimulator<Config>::u_a_emulate2(unsigned long long int a) {
             dd::vEdge::zero, dd::vEdge::zero};
 
     unsigned long long t = a;
-    for (dd::Qubit p = 0; p < n_qubits - 1; ++p) {
+    for (qc::Qubit p = 0; p < n_qubits - 1; ++p) {
         edges[0] = f;
         f        = this->dd->makeDDNode(p, edges);
         ts[p]    = t;

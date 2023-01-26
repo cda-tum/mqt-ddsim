@@ -69,7 +69,7 @@ public:
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
+    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
 
     std::map<std::string, std::string> AdditionalStatistics() override {
         return {
@@ -80,7 +80,7 @@ public:
         };
     };
 
-    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return static_cast<dd::QubitCount>(qc->getNqubits()); };
+    [[nodiscard]] std::size_t getNumberOfQubits() const override { return qc->getNqubits(); };
 
     [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
 

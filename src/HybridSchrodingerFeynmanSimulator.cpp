@@ -4,7 +4,7 @@
 #include <taskflow/taskflow.hpp>
 
 template<class Config>
-std::size_t HybridSchrodingerFeynmanSimulator<Config>::getNDecisions(dd::Qubit split_qubit) {
+std::size_t HybridSchrodingerFeynmanSimulator<Config>::getNDecisions(qc::Qubit split_qubit) {
     std::size_t ndecisions = 0;
     // calculate number of decisions
     for (const auto& op: *CircuitSimulator<Config>::qc) {
@@ -120,7 +120,7 @@ bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(std::unique_ptr<dd:
 }
 
 template<class Config>
-std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator<Config>::Simulate(unsigned int shots) {
+std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator<Config>::Simulate(std::size_t shots) {
     auto nqubits    = CircuitSimulator<Config>::getNumberOfQubits();
     auto splitQubit = static_cast<dd::Qubit>(nqubits / 2);
     if (mode == Mode::DD) {

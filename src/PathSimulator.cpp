@@ -3,8 +3,8 @@
 #include <iterator>
 #include <utility>
 
-template<class DDPackage>
-PathSimulator<DDPackage>::SimulationPath::SimulationPath(std::size_t nleaves, PathSimulator::SimulationPath::Components components, const qc::QuantumComputation* qc, bool assumeCorrectOrder):
+template<class Config>
+PathSimulator<Config>::SimulationPath::SimulationPath(std::size_t nleaves, PathSimulator::SimulationPath::Components components, const qc::QuantumComputation* qc, bool assumeCorrectOrder):
     components(std::move(components)), nleaves(nleaves), qc(qc) {
     steps.reserve(nleaves);
     // create empty vector of steps
@@ -97,7 +97,7 @@ PathSimulator<DDPackage>::SimulationPath::SimulationPath(std::size_t nleaves, Pa
 }
 
 template<class DDPackage>
-std::map<std::string, std::size_t> PathSimulator<DDPackage>::Simulate(unsigned int shots) {
+std::map<std::string, std::size_t> PathSimulator<DDPackage>::Simulate(std::size_t shots) {
     // build task graph from simulation path
     constructTaskGraph();
     //std::cout<< *qc << std::endl;

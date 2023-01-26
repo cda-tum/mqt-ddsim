@@ -31,13 +31,13 @@ public:
         qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
     }
 
-    std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
+    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
 
     Mode                                                   mode = Mode::Amplitude;
     [[nodiscard]] const std::vector<std::complex<dd::fp>>& getFinalAmplitudes() const { return finalAmplitudes; }
 
     //  Get # of decisions for given split_qubit, so that lower slice: q0 < i < qubit; upper slice: qubit <= i < nqubits
-    std::size_t getNDecisions(dd::Qubit split_qubit);
+    std::size_t getNDecisions(qc::Qubit split_qubit);
 
     [[nodiscard]] Mode getMode() const { return mode; }
 
@@ -61,12 +61,12 @@ private:
         }
 
     public:
-        const dd::Qubit      start;
-        const dd::Qubit      end;
-        const std::size_t    controls;
-        const dd::QubitCount nqubits;
-        std::size_t          nDecisionsExecuted = 0;
-        qc::VectorDD         edge{};
+        const qc::Qubit   start;
+        const qc::Qubit   end;
+        const std::size_t controls;
+        const qc::Qubit   nqubits;
+        std::size_t       nDecisionsExecuted = 0;
+        qc::VectorDD      edge{};
 
         explicit Slice(std::unique_ptr<dd::Package<>>& dd, dd::Qubit start, dd::Qubit end, const std::size_t controls):
             start(start), end(end), controls(controls), nqubits(end - start + 1) {

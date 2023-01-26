@@ -41,7 +41,7 @@ class ShorFastSimulator: public Simulator<Config> {
 
     [[nodiscard]] std::pair<unsigned int, unsigned int> post_processing(const std::string& sample) const;
 
-    void ApplyGate(dd::GateMatrix matrix, dd::Qubit target);
+    void ApplyGate(dd::GateMatrix matrix, qc::Qubit target);
 
     std::vector<unsigned long long>              ts;
     std::vector<std::map<dd::vNode*, dd::vEdge>> nodesOnLevel;
@@ -55,9 +55,9 @@ class ShorFastSimulator: public Simulator<Config> {
     /// composite number to be factored
     const unsigned int n;
     /// coprime number to `n`. Setting this to zero will randomly generate a suitable number
-    unsigned int         coprime_a;
-    const std::size_t    required_bits;
-    const dd::QubitCount n_qubits;
+    unsigned int      coprime_a;
+    const std::size_t required_bits;
+    const std::size_t n_qubits;
 
     std::string                   sim_result = "did not start";
     std::pair<unsigned, unsigned> sim_factors{0, 0};
@@ -85,13 +85,13 @@ public:
         nodesOnLevel.resize(n_qubits);
     };
 
-    std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
+    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
 
     [[nodiscard]] std::string getName() const override {
         return "fast_shor_" + std::to_string(n) + "_" + std::to_string(coprime_a);
     }
 
-    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override {
+    [[nodiscard]] std::size_t getNumberOfQubits() const override {
         return n_qubits;
     }
 

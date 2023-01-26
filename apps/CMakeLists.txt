@@ -1,8 +1,14 @@
-add_subdirectory("${PROJECT_SOURCE_DIR}/extern/cxxopts" "extern/cxxopts")
+add_subdirectory("${PROJECT_SOURCE_DIR}/extern/cxxopts" "extern/cxxopts" EXCLUDE_FROM_ALL)
+# the following sets the SYSTEM flag for the include dirs of the cxxopts libs to suppress warnings
+# cmake-lint: disable=C0307
+set_target_properties(
+        cxxopts PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+        $<TARGET_PROPERTY:cxxopts,INTERFACE_INCLUDE_DIRECTORIES>)
 
 macro(add_sim_executable APPNAME)
     add_executable(${PROJECT_NAME}_${APPNAME} ${CMAKE_CURRENT_SOURCE_DIR}/${APPNAME}.cpp)
-    target_link_libraries(${PROJECT_NAME}_${APPNAME} PUBLIC ${PROJECT_NAME} ${ARGN})
+    target_compile_options(${PROJECT_NAME}_${APPNAME} PRIVATE -Wall -Wextra -Wpedantic)
+    target_link_libraries(${PROJECT_NAME}_${APPNAME} PRIVATE ${PROJECT_NAME} ${ARGN})
     add_custom_command(TARGET ${PROJECT_NAME}_${APPNAME}
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE_DIR:${PROJECT_NAME}_${APPNAME}>/${PROJECT_NAME}_${APPNAME} ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_${APPNAME}

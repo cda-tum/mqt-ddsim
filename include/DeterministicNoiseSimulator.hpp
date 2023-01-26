@@ -32,7 +32,7 @@ public:
     explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, unsigned long long seed = 0):
         DeterministicNoiseSimulator(qc, std::string("APD"), 0.001, std::optional<double>{}, 2, false, seed) {}
 
-    std::map<std::string, std::size_t> Simulate(unsigned int shots) override {
+    std::map<std::string, std::size_t> Simulate(std::size_t shots) override {
         return sampleFromProbabilityMap(this->DeterministicSimulate(), shots);
     };
 
@@ -40,7 +40,7 @@ public:
 
     std::map<std::string, std::size_t> sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, unsigned int shots);
 
-    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
+    [[nodiscard]] std::size_t getNumberOfQubits() const override { return qc->getNqubits(); };
 
     [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
 

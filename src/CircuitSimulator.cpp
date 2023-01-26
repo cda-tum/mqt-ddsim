@@ -4,7 +4,7 @@
 #include "dd/Export.hpp"
 
 template<class Config>
-std::map<std::string, std::size_t> CircuitSimulator<Config>::Simulate(const unsigned int shots) {
+std::map<std::string, std::size_t> CircuitSimulator<Config>::Simulate(std::size_t shots) {
     bool has_nonmeasurement_nonunitary = false;
     bool has_measurements              = false;
     bool measurements_last             = true;

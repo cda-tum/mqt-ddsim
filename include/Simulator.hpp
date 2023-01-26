@@ -1,6 +1,7 @@
 #ifndef DDSIMULATOR_H
 #define DDSIMULATOR_H
 
+#include "Definitions.hpp"
 #include "dd/Package.hpp"
 #include "operations/OpType.hpp"
 
@@ -36,7 +37,7 @@ public:
 
     virtual ~Simulator() = default;
 
-    virtual std::map<std::string, std::size_t> Simulate(unsigned int shots) = 0;
+    virtual std::map<std::string, std::size_t> Simulate(std::size_t shots) = 0;
 
     virtual std::map<std::string, std::string> AdditionalStatistics() { return {}; };
 
@@ -44,16 +45,17 @@ public:
         return dd->measureAll(rootEdge, collapse, mt, epsilon);
     }
 
-    std::map<std::string, std::size_t> MeasureAllNonCollapsing(unsigned int shots) {
+    std::map<std::string, std::size_t> MeasureAllNonCollapsing(std::size_t shots) {
         std::map<std::string, std::size_t> results;
-        for (unsigned int i = 0; i < shots; i++) {
+        for (std::size_t i = 0; i < shots; i++) {
             const auto m = MeasureAll(false);
             results[m]++;
         }
         return results;
     }
 
-    char MeasureOneCollapsing(dd::Qubit index, bool assume_probability_normalization = true) {
+    char MeasureOneCollapsing(qc::Qubit index, bool assume_probability_normalization = true) {
+        assert(index < getNumberOfQubits());
         return dd->measureOneCollapsing(rootEdge, index, assume_probability_normalization, mt, epsilon);
     }
 
@@ -79,13 +81,13 @@ public:
 
     [[nodiscard]] std::string getSeed() const { return has_fixed_seed ? std::to_string(seed) : "-1"; }
 
-    [[nodiscard]] virtual dd::QubitCount getNumberOfQubits() const = 0;
+    [[nodiscard]] virtual std::size_t getNumberOfQubits() const = 0;
 
     [[nodiscard]] virtual std::size_t getNumberOfOps() const = 0;
 
     [[nodiscard]] virtual std::string getName() const = 0;
 
-    [[nodiscard]] static inline std::string toBinaryString(std::size_t m, dd::QubitCount nq) {
+    [[nodiscard]] static inline std::string toBinaryString(std::size_t m, qc::Qubit nq) {
         std::string binary(nq, '0');
         for (std::size_t j = 0; j < nq; ++j) {
             if (m & (1 << j))

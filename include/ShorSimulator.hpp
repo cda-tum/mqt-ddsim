@@ -76,9 +76,9 @@ class ShorSimulator: public Simulator<Config> {
     /// composite number to be factored
     const std::size_t n;
     /// coprime number to `n`. Setting this to zero will randomly generate a suitable number
-    std::size_t        coprime_a;
-    const unsigned int required_bits;
-    dd::QubitCount     n_qubits{};
+    std::size_t coprime_a;
+    std::size_t required_bits;
+    std::size_t n_qubits{};
 
     std::string                   sim_result = "did not start";
     std::pair<unsigned, unsigned> sim_factors{0, 0};
@@ -125,13 +125,13 @@ public:
         ts.resize(n_qubits);
     };
 
-    std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
+    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
 
     [[nodiscard]] std::string getName() const override {
         return "shor_" + std::to_string(n) + "_" + std::to_string(coprime_a);
     }
 
-    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override {
+    [[nodiscard]] std::size_t getNumberOfQubits() const override {
         return n_qubits;
     }
 

@@ -13,30 +13,30 @@ public:
     explicit GroverSimulator(const std::string& oracle_, const unsigned long long seed_):
         Simulator<Config>(seed_),
         oracle{oracle_.rbegin(), oracle_.rend()},
-        n_qubits(oracle_.length()),
+        n_qubits(static_cast<qc::Qubit>(oracle_.length())),
         iterations(CalculateIterations(n_qubits)) {
     }
 
     explicit GroverSimulator(const std::string& oracle_):
         oracle{oracle_.rbegin(), oracle_.rend()},
-        n_qubits(oracle_.length()),
+        n_qubits(static_cast<qc::Qubit>(oracle_.length())),
         iterations(CalculateIterations(n_qubits)) {
     }
 
-    explicit GroverSimulator(const dd::QubitCount n_qubits, const unsigned long long seed_):
+    explicit GroverSimulator(const qc::Qubit n_qubits_, const unsigned long long seed_):
         Simulator<Config>(seed_),
-        n_qubits{n_qubits},
-        iterations(CalculateIterations(n_qubits)) {
+        n_qubits{n_qubits_},
+        iterations(CalculateIterations(n_qubits_)) {
         std::uniform_int_distribution<int> dist(0, 1); // range is inclusive
-        oracle = std::string(n_qubits, '0');
-        for (dd::Qubit i = 0; i < n_qubits; i++) {
+        oracle = std::string(n_qubits_, '0');
+        for (qc::Qubit i = 0; i < n_qubits_; i++) {
             if (dist(this->mt) == 1) {
                 oracle[i] = '1';
             }
         }
     }
 
-    std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
+    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
 
     std::map<std::string, std::string> AdditionalStatistics() override {
         return {
@@ -54,19 +54,19 @@ public:
         }
     }
 
-    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return n_qubits + 1; };
+    [[nodiscard]] std::size_t getNumberOfQubits() const override { return n_qubits + 1; };
 
     [[nodiscard]] std::size_t getNumberOfOps() const override { return 0; };
 
     [[nodiscard]] std::string getName() const override { return "emulated_grover_" + std::to_string(n_qubits); };
 
-    [[nodiscard]] std::string getOracle() const { return oracle; }
+    [[nodiscard]] std::string getOracle() const { return {oracle.rbegin(), oracle.rend()}; }
 
 protected:
-    std::string          oracle; // due to how qubits and std::string are indexed, this is stored in *reversed* order
-    const dd::QubitCount n_qubits;
-    const dd::QubitCount n_anciallae = 1;
-    const std::size_t    iterations;
+    std::string       oracle; // due to how qubits and std::string are indexed, this is stored in *reversed* order
+    const qc::Qubit   n_qubits;
+    const qc::Qubit   n_anciallae = 1;
+    const std::size_t iterations;
 };
 
 #endif //DDSIM_GROVERSIMULATOR_HPP

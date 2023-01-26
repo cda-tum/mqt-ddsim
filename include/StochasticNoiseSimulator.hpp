@@ -50,15 +50,15 @@ public:
     std::vector<std::map<std::string, unsigned int>> classicalMeasurementsMaps;
     std::map<std::string, unsigned int>              finalClassicalMeasurementsMap;
 
-    std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
+    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
     std::map<std::string, double>      StochSimulate();
 
-    [[nodiscard]] std::size_t    getMaxMatrixNodeCount() const override { return 0U; }    // Not available for stochastic simulation
-    [[nodiscard]] std::size_t    getMatrixActiveNodeCount() const override { return 0U; } // Not available for stochastic simulation
-    [[nodiscard]] std::size_t    countNodesFromRoot() const override { return 0U; }       // Not available for stochastic simulation
-    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
-    [[nodiscard]] std::size_t    getNumberOfOps() const override { return qc->getNops(); };
-    [[nodiscard]] std::string    getName() const override { return "stoch_" + qc->getName(); };
+    [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return 0U; }    // Not available for stochastic simulation
+    [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return 0U; } // Not available for stochastic simulation
+    [[nodiscard]] std::size_t countNodesFromRoot() const override { return 0U; }       // Not available for stochastic simulation
+    [[nodiscard]] std::size_t getNumberOfQubits() const override { return qc->getNqubits(); };
+    [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
+    [[nodiscard]] std::string getName() const override { return "stoch_" + qc->getName(); };
 
     [[maybe_unused]] static void sanityCheckOfNoiseProbabilities(double noiseProbability, double amplitudeDampingProb, double multiQubitGateFactor) {
         if (noiseProbability < 0 || amplitudeDampingProb < 0 || noiseProbability * multiQubitGateFactor > 1 || amplitudeDampingProb * multiQubitGateFactor > 1) {
@@ -132,7 +132,7 @@ private:
     void perfectSimulationRun();
 
     void runStochSimulationForId(std::size_t                                stochRun,
-                                 dd::Qubit                                  nQubits,
+                                 qc::Qubit                                  nQubits,
                                  std::vector<double>&                       recordedPropertiesStorage,
                                  std::vector<std::pair<long, std::string>>& recordedPropertiesList,
                                  std::map<std::string, unsigned int>&       classicalMeasurementsMap,
