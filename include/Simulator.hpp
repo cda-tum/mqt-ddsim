@@ -20,7 +20,7 @@
 template<class Config = dd::DDPackageConfig>
 class Simulator {
 public:
-    explicit Simulator(unsigned long long random_seed):
+    explicit Simulator(const unsigned long long random_seed):
         seed(random_seed), has_fixed_seed(true) {
         mt.seed(random_seed);
     };
@@ -54,7 +54,7 @@ public:
         return results;
     }
 
-    char MeasureOneCollapsing(qc::Qubit index, bool assume_probability_normalization = true) {
+    char MeasureOneCollapsing(const qc::Qubit index, const bool assume_probability_normalization = true) {
         assert(index < getNumberOfQubits());
         return dd->measureOneCollapsing(rootEdge, static_cast<dd::Qubit>(index), assume_probability_normalization, mt, epsilon);
     }

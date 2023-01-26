@@ -6,7 +6,7 @@
 using CN = dd::ComplexNumbers;
 
 template<class Config>
-std::map<std::string, std::size_t> StochasticNoiseSimulator<Config>::Simulate(std::size_t shots) {
+std::map<std::string, std::size_t> StochasticNoiseSimulator<Config>::Simulate(const std::size_t shots) {
     bool hasNonunitary = std::any_of(qc->cbegin(), qc->cend(), [&](const auto& p) { return p->isNonUnitaryOperation(); });
 
     if (!hasNonunitary) {

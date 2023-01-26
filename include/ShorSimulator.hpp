@@ -98,26 +98,26 @@ class ShorSimulator: public Simulator<Config> {
     std::map<dd::vNode*, dd::mEdge> dag_edges;
 
 public:
-    ShorSimulator(std::size_t composite_number, std::size_t coprime_number):
+    ShorSimulator(const std::size_t composite_number, const std::size_t coprime_number):
         Simulator<Config>(), n(composite_number), coprime_a(coprime_number),
         required_bits(static_cast<unsigned int>(std::ceil(std::log2(composite_number)))), emulate(true), verbose(false), approximate(false) {
         ts.resize(n_qubits);
     };
 
-    ShorSimulator(std::size_t composite_number, std::size_t coprime_number, unsigned long long seed_):
+    ShorSimulator(const std::size_t composite_number, const std::size_t coprime_number, const unsigned long long seed_):
         Simulator<Config>(seed_), n(composite_number), coprime_a(coprime_number),
         required_bits(static_cast<unsigned int>(std::ceil(std::log2(composite_number)))), emulate(true), verbose(false), approximate(false) {
         ts.resize(n_qubits);
     };
 
-    ShorSimulator(std::size_t composite_number, std::size_t coprime_number, bool emulate_, bool verbose_, bool approximate_):
+    ShorSimulator(const std::size_t composite_number, const std::size_t coprime_number, const bool emulate_, const bool verbose_, const bool approximate_):
         Simulator<Config>(), n(composite_number), coprime_a(coprime_number),
         required_bits(static_cast<unsigned int>(std::ceil(std::log2(composite_number)))), emulate(emulate_), verbose(verbose_),
         approximate(approximate_) {
         ts.resize(n_qubits);
     };
 
-    ShorSimulator(std::size_t composite_number, std::size_t coprime_number, unsigned long long seed_, bool emulate_, bool verbose_, bool approximate_):
+    ShorSimulator(const std::size_t composite_number, const std::size_t coprime_number, const unsigned long long seed_, const bool emulate_, const bool verbose_, const bool approximate_):
         Simulator<Config>(seed_),
         n(composite_number), coprime_a(coprime_number),
         required_bits(static_cast<unsigned int>(std::ceil(std::log2(composite_number)))), emulate(emulate_), verbose(verbose_),
