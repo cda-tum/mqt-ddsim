@@ -10,8 +10,6 @@ project(ddsim
         DESCRIPTION "MQT DDSIM - A quantum simulator based on decision diagrams"
         )
 
-message("-- Generator is set to ${CMAKE_GENERATOR}")
-
 macro(check_submodule_present MODULENAME)
     if (NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/${MODULENAME}/CMakeLists.txt")
         message(FATAL_ERROR "${MODULENAME} submodule not cloned properly. Please run `git submodule update --init --recursive` from the main project directory")

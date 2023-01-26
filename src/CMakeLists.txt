@@ -55,11 +55,7 @@ if (ipo_supported)
     set_target_properties(${PROJECT_NAME} PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
 # set compiler flags depending on compiler
-if (MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE "/W4" "/utf-8")
-else ()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
-
+if (NOT MSVC)
     if (BINDINGS)
         # adjust visibility settings for building Python bindings
         include(CheckPIESupported)
