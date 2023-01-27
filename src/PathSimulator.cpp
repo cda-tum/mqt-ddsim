@@ -12,7 +12,7 @@ PathSimulator<Config>::SimulationPath::SimulationPath(std::size_t nleaves_, Path
         steps.emplace_back(id, std::vector{id});
     }
 
-    for (auto& [leftID, rightID]: this->components) {
+    for (auto& [leftID, rightID]: components) {
         if (leftID >= steps.size())
             throw std::runtime_error("Left simulation path index out of range.");
         if (rightID >= steps.size())

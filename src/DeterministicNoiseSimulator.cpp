@@ -6,13 +6,11 @@ using CN = dd::ComplexNumbers;
 
 template<class Config>
 std::map<std::string, double> DeterministicNoiseSimulator<Config>::DeterministicSimulate() {
-    std::map<unsigned int, bool> classicValues;
-
-    rootEdge = this->dd->makeZeroDensityOperator(qc->getNqubits());
-    this->dd->incRef(rootEdge);
+    rootEdge = Simulator<Config>::dd->makeZeroDensityOperator(qc->getNqubits());
+    Simulator<Config>::dd->incRef(rootEdge);
 
     auto deterministicNoiseFunctionality = dd::DeterministicNoiseFunctionality<Config>(
-            this->dd,
+            Simulator<Config>::dd,
             qc->getNqubits(),
             noiseProbSingleQubit,
             noiseProbMultiQubit,
@@ -23,7 +21,7 @@ std::map<std::string, double> DeterministicNoiseSimulator<Config>::Deterministic
             sequentiallyApplyNoise);
 
     for (auto const& op: *qc) {
-        this->dd->garbageCollect();
+        Simulator<Config>::dd->garbageCollect();
         if (!op->isUnitary() && !(op->isClassicControlledOperation())) {
             if (auto* nuOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
                 //Skipping barrier
@@ -64,7 +62,7 @@ std::map<std::string, std::size_t> DeterministicNoiseSimulator<Config>::sampleFr
     std::map<std::size_t, std::size_t>     results;
     std::uniform_real_distribution<dd::fp> dist(0.0L, 1.0L);
     for (size_t n = 0; n < shots; ++n) {
-        ++results[d(this->mt)];
+        ++results[d(Simulator<Config>::mt)];
     }
 
     // Create the final map containing the measurement results and the corresponding shots

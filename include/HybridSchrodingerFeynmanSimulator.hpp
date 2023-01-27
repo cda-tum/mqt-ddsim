@@ -38,7 +38,7 @@ public:
     [[nodiscard]] const std::vector<std::complex<dd::fp>>& getFinalAmplitudes() const { return finalAmplitudes; }
 
     //  Get # of decisions for given split_qubit, so that lower slice: q0 < i < qubit; upper slice: qubit <= i < nqubits
-    std::size_t getNDecisions(qc::Qubit split_qubit);
+    std::size_t getNDecisions(qc::Qubit splitQubit);
 
     [[nodiscard]] Mode getMode() const { return mode; }
 
@@ -46,18 +46,18 @@ private:
     std::size_t                       nthreads = 2;
     std::vector<std::complex<dd::fp>> finalAmplitudes{};
 
-    void SimulateHybridTaskflow(qc::Qubit split_qubit);
-    void SimulateHybridAmplitudes(qc::Qubit split_qubit);
+    void SimulateHybridTaskflow(qc::Qubit splitQubit);
+    void SimulateHybridAmplitudes(qc::Qubit splitQubit);
 
-    qc::VectorDD SimulateSlicing(std::unique_ptr<dd::Package<Config>>& dd, qc::Qubit split_qubit, std::size_t controls);
+    qc::VectorDD SimulateSlicing(std::unique_ptr<dd::Package<Config>>& sliceDD, qc::Qubit splitQubit, std::size_t controls);
 
     class Slice {
     protected:
-        qc::Qubit next_control_idx = 0;
+        qc::Qubit nextControlIdx = 0;
 
         std::size_t getNextControl() {
-            std::size_t idx = 1UL << next_control_idx;
-            next_control_idx++;
+            std::size_t idx = 1UL << nextControlIdx;
+            nextControlIdx++;
             return controls & idx;
         }
 
@@ -81,7 +81,7 @@ private:
         }
 
         // returns true if this operation was a split operation
-        bool apply(std::unique_ptr<dd::Package<Config>>& dd, const std::unique_ptr<qc::Operation>& op);
+        bool apply(std::unique_ptr<dd::Package<Config>>& sliceDD, const std::unique_ptr<qc::Operation>& op);
     };
 };
 

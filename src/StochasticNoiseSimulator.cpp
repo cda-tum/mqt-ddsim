@@ -11,14 +11,14 @@ std::map<std::string, std::size_t> StochasticNoiseSimulator<Config>::Simulate(co
 
     if (!hasNonunitary) {
         perfectSimulationRun();
-        return this->MeasureAllNonCollapsing(shots);
+        return Simulator<Config>::MeasureAllNonCollapsing(shots);
     }
 
     std::map<std::string, std::size_t> mCounter;
 
     for (unsigned int i = 0; i < shots; i++) {
         perfectSimulationRun();
-        mCounter[this->MeasureAll()]++;
+        mCounter[Simulator<Config>::MeasureAll()]++;
     }
 
     return mCounter;
@@ -28,8 +28,8 @@ template<class Config>
 void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
     const auto nQubits = qc->getNqubits();
 
-    this->rootEdge = this->dd->makeZeroState(nQubits);
-    this->dd->incRef(this->rootEdge);
+    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(nQubits);
+    Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
 
     std::map<std::size_t, bool> classicValues;
     for (auto& op: *qc) {
@@ -42,7 +42,7 @@ void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
                     assert(quantum.size() == classic.size()); // this should not happen do to check in Simulate
 
                     for (std::size_t i = 0U; i < quantum.size(); ++i) {
-                        const auto result = this->MeasureOneCollapsing(quantum.at(i));
+                        const auto result = Simulator<Config>::MeasureOneCollapsing(quantum.at(i));
                         assert(result == '0' || result == '1');
                         classicValues[classic.at(i)] = (result == '1');
                     }
@@ -54,7 +54,7 @@ void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
             } else {
                 throw std::runtime_error(std::string("Dynamic cast to NonUnitaryOperation failed for '") + op->getName() + "'.");
             }
-            this->dd->garbageCollect();
+            Simulator<Config>::dd->garbageCollect();
         } else {
             if (op->isClassicControlledOperation()) {
                 if (auto* ccOp = dynamic_cast<qc::ClassicControlledOperation*>(op.get())) {
@@ -77,13 +77,13 @@ void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
                 }
             }
 
-            auto operation = dd::getDD(op.get(), this->dd);
-            auto tmp       = this->dd->multiply(operation, this->rootEdge);
-            this->dd->incRef(tmp);
-            this->dd->decRef(this->rootEdge);
-            this->rootEdge = tmp;
+            auto operation = dd::getDD(op.get(), Simulator<Config>::dd);
+            auto tmp       = Simulator<Config>::dd->multiply(operation, Simulator<Config>::rootEdge);
+            Simulator<Config>::dd->incRef(tmp);
+            Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
+            Simulator<Config>::rootEdge = tmp;
 
-            this->dd->garbageCollect();
+            Simulator<Config>::dd->garbageCollect();
         }
     }
 }
@@ -108,7 +108,7 @@ std::map<std::string, double> StochasticNoiseSimulator<Config>::StochSimulate() 
                                  std::ref(recordedPropertiesPerInstance[runID]),
                                  std::ref(recordedProperties),
                                  std::ref(classicalMeasurementsMaps[runID]),
-                                 static_cast<unsigned long long>(this->mt()));
+                                 static_cast<unsigned long long>(Simulator<Config>::mt()));
     }
     // wait for threads to finish
     for (auto& thread: threadArray) {
@@ -266,7 +266,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
 
                 if (stepFidelity < 1. && (opCount + 1U) % approxMod == 0U) {
                     approxCount++;
-                    this->ApproximateByFidelity(localDD, localRootEdge, stepFidelity, false, true);
+                    Simulator<Config>::ApproximateByFidelity(localDD, localRootEdge, stepFidelity, false, true);
                 }
             }
             localDD->garbageCollect();

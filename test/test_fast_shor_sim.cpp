@@ -36,14 +36,14 @@ TEST(FastShorSimTest, Factorize15NoSeedBaseTest) {
 }
 
 TEST(FastShorSimTest, Factorize15BaseTestNoFixedCoPrime) {
-    ShorFastSimulator ddsim(15, 0, 1ull);
+    ShorFastSimulator ddsim(15, 0, static_cast<std::uint64_t>(1));
     ddsim.Simulate(1);
 
     SUCCEED() << "Successfully executed this path. Testing for values is flaky...";
 }
 
 TEST(FastShorSimTest, Factorize15NegTest) {
-    ShorFastSimulator ddsim(15, 2, 1ull);
+    ShorFastSimulator ddsim(15, 2, static_cast<std::uint64_t>(1));
     ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getFactors().first, 0);
@@ -52,7 +52,7 @@ TEST(FastShorSimTest, Factorize15NegTest) {
 }
 
 TEST(FastShorSimTest, Factorize55Test) {
-    ShorFastSimulator ddsim(55, 2, 3ull);
+    ShorFastSimulator ddsim(55, 2, static_cast<std::uint64_t>(3));
     ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getFactors().first, 11);
@@ -60,7 +60,7 @@ TEST(FastShorSimTest, Factorize55Test) {
 }
 
 TEST(FastShorSimTest, Factorize221Test) {
-    ShorFastSimulator ddsim(221, 2, 4ull);
+    ShorFastSimulator ddsim(221, 2, static_cast<std::uint64_t>(4));
     ddsim.Simulate(1);
 
     ASSERT_EQ(ddsim.getFactors().first, 13);

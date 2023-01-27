@@ -20,13 +20,13 @@
 template<class Config = dd::DDPackageConfig>
 class Simulator {
 public:
-    explicit Simulator(const unsigned long long random_seed):
-        seed(random_seed), has_fixed_seed(true) {
-        mt.seed(random_seed);
+    explicit Simulator(const unsigned long long randomSeed):
+        seed(randomSeed), hasFixedSeed(true) {
+        mt.seed(randomSeed);
     };
 
     explicit Simulator():
-        seed(0), has_fixed_seed(false) {
+        seed(0), hasFixedSeed(false) {
         // this is probably overkill but better safe than sorry
         std::array<std::mt19937_64::result_type, std::mt19937_64::state_size> random_data{};
         std::random_device                                                    rd;
@@ -79,7 +79,7 @@ public:
 
     [[nodiscard]] std::pair<dd::ComplexValue, std::string> getPathOfLeastResistance() const;
 
-    [[nodiscard]] std::string getSeed() const { return has_fixed_seed ? std::to_string(seed) : "-1"; }
+    [[nodiscard]] std::string getSeed() const { return hasFixedSeed ? std::to_string(seed) : "-1"; }
 
     [[nodiscard]] virtual std::size_t getNumberOfQubits() const = 0;
 
@@ -116,8 +116,8 @@ public:
 protected:
     std::mt19937_64 mt;
 
-    const unsigned long long seed = 0;
-    const bool               has_fixed_seed;
+    const std::uint64_t seed = 0;
+    const bool               hasFixedSeed;
     const dd::fp             epsilon = 0.001;
 
     static void NextPath(std::string& s);

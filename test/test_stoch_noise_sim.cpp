@@ -39,7 +39,7 @@ std::unique_ptr<qc::QuantumComputation> stochGetAdder4Circuit() {
 
 TEST(StochNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
+    quantumComputation->x(0);
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
 
     ASSERT_EQ(ddsim.getNumberOfOps(), 1);
@@ -53,8 +53,8 @@ TEST(StochNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
 
 TEST(StochNoiseSimTest, ClassicControlledOp) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, 0, 0);
+    quantumComputation->x(0);
+    quantumComputation->measure(0, 0);
     std::unique_ptr<qc::Operation> op(new qc::StandardOperation(2, 1, qc::X));
     auto                           classical_register = std::make_pair<unsigned short, unsigned short>(0, 1);
     quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classical_register, 1);
@@ -153,7 +153,7 @@ TEST(StochNoiseSimTest, ApproximateByFidelity) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
     quantumComputation->h(0);
     quantumComputation->h(1);
-    quantumComputation->emplace_back<qc::StandardOperation>(3, qc::Controls{qc::Control{0}, qc::Control{1}}, 2, qc::X);
+    quantumComputation->x(2, {0_pc, 1_pc});
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1, 54);
 
     ddsim.Simulate(1);
@@ -170,7 +170,7 @@ TEST(StochNoiseSimTest, ApproximateBySampling) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
     quantumComputation->h(0);
     quantumComputation->h(1);
-    quantumComputation->emplace_back<qc::StandardOperation>(3, qc::Controls{qc::Control{0}, qc::Control{1}}, 2, qc::X);
+    quantumComputation->x(2, {0_pc, 1_pc});
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
 
     ddsim.Simulate(1);
@@ -187,8 +187,8 @@ TEST(StochNoiseSimTest, Reordering) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
     quantumComputation->h(0);
     quantumComputation->h(1);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(3, std::vector<qc::Qubit>{0, 1, 2}, qc::OpType::Barrier);
-    quantumComputation->emplace_back<qc::StandardOperation>(3, qc::Controls{qc::Control{0}, qc::Control{1}}, 2, qc::X);
+    quantumComputation->barrier({0, 1, 2});
+    quantumComputation->x(2, {0_pc, 1_pc});
 
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
 
@@ -392,12 +392,12 @@ TEST(StochNoiseSimTest, ParseProperties) {
 
 TEST(StochNoiseSimTest, TestingBarrierGate) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::T);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, std::vector<qc::Qubit>{0, 1}, qc::Barrier);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
+    quantumComputation->x(0);
+    quantumComputation->h(1);
+    quantumComputation->t(1);
+    quantumComputation->barrier({0, 1});
+    quantumComputation->h(1);
+    quantumComputation->h(0);
     StochasticNoiseSimulator ddsim(quantumComputation, std::string("APD"), 0.02, std::optional<double>{}, 2, 1000, std::string("0-3, 23, 444, 2"), false, 1, 1);
 
     auto m = ddsim.StochSimulate();

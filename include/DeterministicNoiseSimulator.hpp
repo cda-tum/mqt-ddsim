@@ -26,7 +26,7 @@ public:
         sequentiallyApplyNoise(unoptimizedSim),
         useDensityMatrixType(!unoptimizedSim) {
         StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>::sanityCheckOfNoiseProbabilities(noiseProbability, ampDampingProbSingleQubit, multiQubitGateFactor);
-        this->dd->resize(qc->getNqubits());
+        Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
     explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, unsigned long long seed = 0):

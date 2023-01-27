@@ -6,9 +6,9 @@
 
 template<class Config = dd::DDPackageConfig>
 class ShorFastSimulator: public Simulator<Config> {
-    static unsigned long long modpow(unsigned long long base, unsigned long long exp, unsigned long long modulus) {
+    static std::uint64_t modpow(std::uint64_t base, std::uint64_t exp, std::uint64_t modulus) {
         base %= modulus;
-        unsigned long long result = 1ull;
+        std::uint64_t result = 1ull;
         while (exp > 0) {
             if (exp & 1ull) result = (result * base) % modulus;
             base = (base * base) % modulus;
@@ -17,8 +17,8 @@ class ShorFastSimulator: public Simulator<Config> {
         return result;
     }
 
-    static unsigned long long gcd(unsigned long long a, unsigned long long b) {
-        unsigned long long c;
+    static std::uint64_t gcd(std::uint64_t a, std::uint64_t b) {
+        std::uint64_t c;
         while (a != 0) {
             c = a;
             a = b % a;
@@ -35,81 +35,81 @@ class ShorFastSimulator: public Simulator<Config> {
         return std::sin((dd::PI * fac) / div);
     }
 
-    void u_a_emulate2(unsigned long long a);
+    void u_a_emulate2(std::uint64_t a);
 
     void u_a_emulate2_rec(dd::vEdge e);
 
-    [[nodiscard]] std::pair<unsigned int, unsigned int> post_processing(const std::string& sample) const;
+    [[nodiscard]] std::pair<std::uint32_t, std::uint32_t> post_processing(const std::string& sample) const;
 
     void ApplyGate(dd::GateMatrix matrix, qc::Qubit target);
 
     std::vector<unsigned long long>              ts;
     std::vector<std::map<dd::vNode*, dd::vEdge>> nodesOnLevel;
 
-    dd::mEdge addConst(unsigned long long a);
+    dd::mEdge addConst(std::uint64_t a);
 
-    dd::mEdge addConstMod(unsigned long long a);
+    dd::mEdge addConstMod(std::uint64_t a);
 
-    dd::mEdge limitTo(unsigned long long a);
+    dd::mEdge limitTo(std::uint64_t a);
 
     /// composite number to be factored
-    const unsigned int n;
-    /// coprime number to `n`. Setting this to zero will randomly generate a suitable number
-    unsigned int      coprime_a;
-    const std::size_t required_bits;
-    const std::size_t n_qubits;
+    const std::uint32_t compositeN;
+    /// coprime number to `compositeN`. Setting this to zero will randomly generate a suitable number
+    std::uint32_t     coprimeA;
+    const std::size_t requiredBits;
+    const std::size_t nQubits;
 
-    std::string                   sim_result = "did not start";
-    std::pair<unsigned, unsigned> sim_factors{0, 0};
+    std::string                             simResult = "did not start";
+    std::pair<std::uint32_t, std::uint32_t> simFactors{0, 0};
 
-    unsigned long number_of_operations{};
+    std::size_t numberOfOperations{};
 
     const bool verbose;
 
-    std::map<dd::vNode*, dd::vEdge> dag_edges;
+    std::map<dd::vNode*, dd::vEdge> dagEdges;
 
 public:
-    ShorFastSimulator(unsigned int composite_number, unsigned int coprime_a, bool verbose = false):
-        Simulator<Config>(), n(composite_number), coprime_a(coprime_a),
-        required_bits(static_cast<size_t>(std::ceil(std::log2(composite_number)))), n_qubits(std::ceil(std::log2(n)) + 1),
+    ShorFastSimulator(const std::uint32_t compositeNumber, const std::uint32_t coprimeA_, const bool verbose = false):
+        Simulator<Config>(), compositeN(compositeNumber), coprimeA(coprimeA_),
+        requiredBits(static_cast<std::size_t>(std::ceil(std::log2(compositeNumber)))), nQubits(std::ceil(std::log2(compositeN)) + 1),
         verbose(verbose) {
-        ts.resize(n_qubits);
-        nodesOnLevel.resize(n_qubits);
+        ts.resize(nQubits);
+        nodesOnLevel.resize(nQubits);
     };
 
-    ShorFastSimulator(unsigned int composite_number, unsigned int coprime_a, unsigned long long seed, bool verbose = false):
-        Simulator<Config>(seed), n(composite_number), coprime_a(coprime_a),
-        required_bits(static_cast<size_t>(std::ceil(std::log2(composite_number)))), n_qubits(std::ceil(std::log2(n)) + 1),
+    ShorFastSimulator(const std::uint32_t compositeNumber, const std::uint32_t coprimeA_, const std::uint64_t seed, const bool verbose = false):
+        Simulator<Config>(seed), compositeN(compositeNumber), coprimeA(coprimeA_),
+        requiredBits(static_cast<std::size_t>(std::ceil(std::log2(compositeNumber)))), nQubits(std::ceil(std::log2(compositeN)) + 1),
         verbose(verbose) {
-        ts.resize(n_qubits);
-        nodesOnLevel.resize(n_qubits);
+        ts.resize(nQubits);
+        nodesOnLevel.resize(nQubits);
     };
 
     std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
 
     [[nodiscard]] std::string getName() const override {
-        return "fast_shor_" + std::to_string(n) + "_" + std::to_string(coprime_a);
+        return "fast_shor_" + std::to_string(compositeN) + "_" + std::to_string(coprimeA);
     }
 
     [[nodiscard]] std::size_t getNumberOfQubits() const override {
-        return n_qubits;
+        return nQubits;
     }
 
     [[nodiscard]] std::size_t getNumberOfOps() const override {
-        return number_of_operations;
+        return numberOfOperations;
     }
 
-    std::pair<unsigned, unsigned> getFactors() {
-        return sim_factors;
+    std::pair<std::uint32_t , std::uint32_t> getFactors() {
+        return simFactors;
     }
 
     std::map<std::string, std::string> AdditionalStatistics() override {
         return {
-                {"composite_number", std::to_string(n)},
-                {"coprime_a", std::to_string(coprime_a)},
-                {"sim_result", sim_result},
-                {"sim_factor1", std::to_string(sim_factors.first)},
-                {"sim_factor2", std::to_string(sim_factors.second)}};
+                {"composite_number", std::to_string(compositeN)},
+                {"coprime_a", std::to_string(coprimeA)},
+                {"sim_result", simResult},
+                {"sim_factor1", std::to_string(simFactors.first)},
+                {"sim_factor2", std::to_string(simFactors.second)}};
     }
 };
 

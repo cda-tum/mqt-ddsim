@@ -37,10 +37,9 @@ std::unique_ptr<qc::QuantumComputation> detGetAdder4Circuit() {
 
 TEST(DeterministicNoiseSimTest, MeasurementOne) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, qc::Controls{qc::Control{0}}, 1, qc::X);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, 0, qc::Measure);
-
+    quantumComputation->h(0);
+    quantumComputation->x(1, 0_pc);
+    quantumComputation->measure(0, 0);
     {
         auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, 5);
         EXPECT_THROW(ddsim->DeterministicSimulate();, std::runtime_error);
@@ -66,7 +65,7 @@ TEST(DeterministicNoiseSimTest, TestingBarrierGate) {
 
 TEST(DeterministicNoiseSimTest, TestingResetGate) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, std::vector<qc::Qubit>(0), qc::Reset);
+    quantumComputation->reset(0);
     auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation);
 
     EXPECT_THROW(ddsim->DeterministicSimulate(), std::runtime_error);
@@ -74,7 +73,7 @@ TEST(DeterministicNoiseSimTest, TestingResetGate) {
 
 TEST(DeterministicNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
+    quantumComputation->x(0);
     auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, std::string("A"), 0, 0, 1);
     auto m     = ddsim->DeterministicSimulate();
 
@@ -89,7 +88,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDApplySequential) {
     auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    double tolerance = 1e-10;
+    const double tolerance = 1e-10;
     EXPECT_NEAR(m.find("0000")->second, 0.0969332192741, tolerance);
     EXPECT_NEAR(m.find("0001")->second, 0.0907888041538, tolerance);
     EXPECT_NEAR(m.find("0010")->second, 0.0141409660985, tolerance);
@@ -114,7 +113,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4Track_D) {
     auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    double tolerance = 1e-10;
+    const double tolerance = 1e-10;
     EXPECT_NEAR(m.find("0000")->second, 0.0332328704931, tolerance);
     EXPECT_NEAR(m.find("0001")->second, 0.0328434857577, tolerance);
     EXPECT_NEAR(m.find("0010")->second, 0.0129643065735, tolerance);
@@ -134,7 +133,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPD) {
     auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    double tolerance = 1e-10;
+    const double tolerance = 1e-10;
     EXPECT_NEAR(m.find("0000")->second, 0.0969332192741, tolerance);
     EXPECT_NEAR(m.find("0001")->second, 0.0907888041538, tolerance);
     EXPECT_NEAR(m.find("0010")->second, 0.0141409660985, tolerance);
@@ -159,7 +158,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAP) {
     auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    double tolerance = 1e-10;
+    const double tolerance = 1e-10;
     EXPECT_NEAR(m.find("1000")->second, 0.03008702498522842, tolerance);
     EXPECT_NEAR(m.find("1001")->second, 0.9364832248561167, tolerance);
 }
@@ -177,7 +176,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDCustomProb) {
     auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    double tolerance = 1e-10;
+    const double tolerance = 1e-10;
     EXPECT_NEAR(m.find("0000")->second, 0.0616548044047, tolerance);
     EXPECT_NEAR(m.find("0001")->second, 0.0570878674208, tolerance);
     EXPECT_NEAR(m.find("0100")->second, 0.0155601736851, tolerance);
@@ -198,7 +197,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4NoNoise_1) {
     auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    double tolerance = 1e-10;
+    const double tolerance = 1e-10;
     EXPECT_NEAR(m.find("1001")->second, 1, tolerance);
 }
 
@@ -209,7 +208,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4NoNoise_2) {
     auto m = ddsim->DeterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    double tolerance = 1e-10;
+    const double tolerance = 1e-10;
     EXPECT_NEAR(m.find("1001")->second, 1, tolerance);
 }
 
@@ -263,12 +262,12 @@ TEST(DeterministicNoiseSimTest, sampleFromProbabilityMap1) {
 
     std::vector<std::complex<dd::fp>> temp{};
 
-    size_t shots        = 100000;
-    auto   sampledShots = ddsim->sampleFromProbabilityMap(m, shots);
+    const std::size_t shots        = 100000;
+    auto              sampledShots = ddsim->sampleFromProbabilityMap(m, shots);
 
     double tolerance = 0.01;
     for (auto& result: m) {
-        EXPECT_NEAR(result.second, (dd::fp)sampledShots.find(result.first)->second / shots, tolerance);
+        EXPECT_NEAR(result.second, static_cast<dd::fp>(sampledShots.find(result.first)->second) / shots, tolerance);
     }
 }
 
@@ -279,12 +278,12 @@ TEST(DeterministicNoiseSimTest, sampleFromProbabilityMap2) {
 
     std::vector<std::complex<dd::fp>> temp{};
 
-    size_t shots        = 1000000;
-    auto   sampledShots = ddsim->Simulate(shots);
-    auto   m            = ddsim->DeterministicSimulate();
+    const std::size_t shots        = 1000000;
+    auto              sampledShots = ddsim->Simulate(shots);
+    auto              m            = ddsim->DeterministicSimulate();
 
     double tolerance = 0.01;
     for (auto& result: m) {
-        EXPECT_NEAR(result.second, (dd::fp)sampledShots.find(result.first)->second / shots, tolerance);
+        EXPECT_NEAR(result.second, static_cast<dd::fp>(sampledShots.find(result.first)->second) / shots, tolerance);
     }
 }
