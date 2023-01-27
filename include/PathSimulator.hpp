@@ -129,11 +129,11 @@ public:
         }
 
         // remove final measurements implement measurement support for task-based simulation
-        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
+        qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator<Config>::qc));
 
         // case distinction for the starting point of the alternating strategy
         if (configuration.alternatingStart == 0) {
-            configuration.alternatingStart = (this->qc->getNops()) / 2;
+            configuration.alternatingStart = (CircuitSimulator<Config>::qc->getNops()) / 2;
         }
 
         // Add new strategies here

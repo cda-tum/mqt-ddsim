@@ -33,7 +33,7 @@ public:
         DeterministicNoiseSimulator(qc, std::string("APD"), 0.001, std::optional<double>{}, 2, false, seed) {}
 
     std::map<std::string, std::size_t> Simulate(const std::size_t shots) override {
-        return sampleFromProbabilityMap(this->DeterministicSimulate(), shots);
+        return sampleFromProbabilityMap(DeterministicSimulate(), shots);
     };
 
     std::map<std::string, dd::fp> DeterministicSimulate();

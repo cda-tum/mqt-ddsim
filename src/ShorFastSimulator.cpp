@@ -12,8 +12,8 @@ std::map<std::string, std::size_t> ShorFastSimulator<Config>::Simulate([[maybe_u
     if (verbose) {
         std::clog << "Simulate Shor's algorithm for n=" << compositeN;
     }
-    this->rootEdge = this->dd->makeZeroState(nQubits);
-    this->dd->incRef(this->rootEdge);
+    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(nQubits);
+    Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
     //Initialize qubits
     //TODO: other init method where the initial value can be chosen
     ApplyGate(dd::Xmat, 0);
@@ -30,7 +30,7 @@ std::map<std::string, std::size_t> ShorFastSimulator<Config>::Simulate([[maybe_u
     if (coprimeA == 0) {
         std::uniform_int_distribution<std::uint32_t> distribution(1, compositeN - 1); // range is inclusive
         do {
-            coprimeA = distribution(this->mt);
+            coprimeA = distribution(Simulator<Config>::mt);
         } while (gcd(coprimeA, compositeN) != 1 || coprimeA == 1);
     }
 
@@ -61,7 +61,7 @@ std::map<std::string, std::size_t> ShorFastSimulator<Config>::Simulate([[maybe_u
         u_a_emulate2(as[i]);
 
         if (verbose) {
-            std::clog << "[ " << i + 1 << "/" << 2 * requiredBits << " ] QFT Pass. dd size=" << this->dd->size(this->rootEdge)
+            std::clog << "[ " << i + 1 << "/" << 2 * requiredBits << " ] QFT Pass. dd size=" << Simulator<Config>::dd->size(Simulator<Config>::rootEdge)
                       << "\n";
         }
 
@@ -78,8 +78,8 @@ std::map<std::string, std::size_t> ShorFastSimulator<Config>::Simulate([[maybe_u
 
         ApplyGate(dd::Hmat, nQubits - 1);
 
-        measurements[i] = this->MeasureOneCollapsing(nQubits - 1, false);
-        this->dd->garbageCollect();
+        measurements[i] = Simulator<Config>::MeasureOneCollapsing(nQubits - 1, false);
+        Simulator<Config>::dd->garbageCollect();
 
         if (measurements[i] == '1') {
             ApplyGate(dd::Xmat, nQubits - 1);
@@ -216,18 +216,18 @@ dd::mEdge ShorFastSimulator<Config>::limitTo(std::uint64_t a) {
     } else {
         edges[0] = dd::mEdge::one;
     }
-    dd::Edge f = this->dd->makeDDNode(0, edges, false);
+    dd::Edge f = Simulator<Config>::dd->makeDDNode(0, edges, false);
 
     edges[0] = edges[1] = edges[2] = edges[3] = dd::mEdge::zero;
 
     for (std::uint32_t p = 1; p < requiredBits + 1; p++) {
         if ((a >> p) & 1u) {
-            edges[0] = this->dd->makeIdent(0, p - 1);
+            edges[0] = Simulator<Config>::dd->makeIdent(0, p - 1);
             edges[3] = f;
         } else {
             edges[0] = f;
         }
-        f        = this->dd->makeDDNode(p, edges, false);
+        f        = Simulator<Config>::dd->makeDDNode(p, edges, false);
         edges[3] = dd::mEdge::zero;
     }
 
@@ -245,38 +245,38 @@ dd::mEdge ShorFastSimulator<Config>::addConst(std::uint64_t a) {
     while (!((a >> p) & 1u)) {
         edges[0] = f;
         edges[3] = f;
-        f        = this->dd->makeDDNode(p, edges, false);
+        f        = Simulator<Config>::dd->makeDDNode(p, edges, false);
         p++;
     }
 
     edges[0] = edges[1] = edges[2] = edges[3] = dd::mEdge::zero;
     edges[2]                                  = f;
-    dd::Edge left                             = this->dd->makeDDNode(p, edges, false);
+    dd::Edge left                             = Simulator<Config>::dd->makeDDNode(p, edges, false);
     edges[2]                                  = dd::mEdge::zero;
     edges[1]                                  = f;
-    dd::Edge right                            = this->dd->makeDDNode(p, edges, false);
+    dd::Edge right                            = Simulator<Config>::dd->makeDDNode(p, edges, false);
     p++;
 
     for (; p < requiredBits; p++) {
         edges[0] = edges[1] = edges[2] = edges[3] = dd::mEdge::zero;
         if ((a >> p) & 1u) {
             edges[2]           = left;
-            dd::Edge new_left  = this->dd->makeDDNode(p, edges, false);
+            dd::Edge new_left  = Simulator<Config>::dd->makeDDNode(p, edges, false);
             edges[2]           = dd::mEdge::zero;
             edges[0]           = right;
             edges[1]           = left;
             edges[3]           = right;
-            dd::Edge new_right = this->dd->makeDDNode(p, edges, false);
+            dd::Edge new_right = Simulator<Config>::dd->makeDDNode(p, edges, false);
             left               = new_left;
             right              = new_right;
         } else {
             edges[1]           = right;
-            dd::Edge new_right = this->dd->makeDDNode(p, edges, false);
+            dd::Edge new_right = Simulator<Config>::dd->makeDDNode(p, edges, false);
             edges[1]           = dd::mEdge::zero;
             edges[0]           = left;
             edges[2]           = right;
             edges[3]           = left;
-            dd::Edge new_left  = this->dd->makeDDNode(p, edges, false);
+            dd::Edge new_left  = Simulator<Config>::dd->makeDDNode(p, edges, false);
             left               = new_left;
             right              = new_right;
         }
@@ -287,7 +287,7 @@ dd::mEdge ShorFastSimulator<Config>::addConst(std::uint64_t a) {
     edges[2] = right;
     edges[3] = left;
 
-    return this->dd->makeDDNode(p, edges, false);
+    return Simulator<Config>::dd->makeDDNode(p, edges, false);
 }
 
 template<class Config>
@@ -301,9 +301,9 @@ dd::mEdge ShorFastSimulator<Config>::addConstMod(std::uint64_t a) {
     dd::mEdge f4 = limitTo(compositeN - 1 - a);
 
     f4.w           = dd::ComplexNumbers::neg(f4.w);
-    dd::Edge diff2 = this->dd->add(f3, f4);
+    dd::Edge diff2 = Simulator<Config>::dd->add(f3, f4);
     f4.w           = dd::ComplexNumbers::neg(f4.w);
-    dd::Edge tmp   = this->dd->add(this->dd->multiply(f, f4), this->dd->multiply(this->dd->multiply(this->dd->transpose(f2), f), diff2));
+    dd::Edge tmp   = Simulator<Config>::dd->add(Simulator<Config>::dd->multiply(f, f4), Simulator<Config>::dd->multiply(Simulator<Config>::dd->multiply(Simulator<Config>::dd->transpose(f2), f), diff2));
 
     return tmp.p->e[0];
 }
@@ -311,13 +311,13 @@ dd::mEdge ShorFastSimulator<Config>::addConstMod(std::uint64_t a) {
 template<class Config>
 void ShorFastSimulator<Config>::ApplyGate(dd::GateMatrix matrix, qc::Qubit target) {
     numberOfOperations++;
-    dd::Edge gate = this->dd->makeGateDD(matrix, nQubits, target);
-    dd::Edge tmp  = this->dd->multiply(gate, this->rootEdge);
-    this->dd->incRef(tmp);
-    this->dd->decRef(this->rootEdge);
-    this->rootEdge = tmp;
+    dd::Edge gate = Simulator<Config>::dd->makeGateDD(matrix, nQubits, target);
+    dd::Edge tmp  = Simulator<Config>::dd->multiply(gate, Simulator<Config>::rootEdge);
+    Simulator<Config>::dd->incRef(tmp);
+    Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
+    Simulator<Config>::rootEdge = tmp;
 
-    this->dd->garbageCollect();
+    Simulator<Config>::dd->garbageCollect();
 }
 
 /**
@@ -327,7 +327,7 @@ void ShorFastSimulator<Config>::ApplyGate(dd::GateMatrix matrix, qc::Qubit targe
  */
 template<class Config>
 void ShorFastSimulator<Config>::u_a_emulate2(std::uint64_t a) {
-    [[maybe_unused]] const std::size_t cache_count_before = this->dd->cn.cacheCount();
+    [[maybe_unused]] const std::size_t cache_count_before = Simulator<Config>::dd->cn.cacheCount();
     dagEdges.clear();
 
     dd::vEdge                        f = dd::vEdge::one;
@@ -337,45 +337,45 @@ void ShorFastSimulator<Config>::u_a_emulate2(std::uint64_t a) {
     std::uint64_t t = a;
     for (qc::Qubit p = 0; p < nQubits - 1; ++p) {
         edges[0] = f;
-        f        = this->dd->makeDDNode(p, edges);
+        f        = Simulator<Config>::dd->makeDDNode(p, edges);
         ts[p]    = t;
         t        = (2 * t) % compositeN;
     }
 
-    this->dd->incRef(f);
+    Simulator<Config>::dd->incRef(f);
 
     for (auto& m: nodesOnLevel) {
         m = std::map<dd::vNode*, dd::vEdge>();
     }
 
-    u_a_emulate2_rec(this->rootEdge.p->e[0]);
+    u_a_emulate2_rec(Simulator<Config>::rootEdge.p->e[0]);
 
     for (const auto& entry: nodesOnLevel.at(0)) {
         dd::vEdge left = f;
         if (entry.first->e[0].w == dd::Complex::zero) {
             left = dd::vEdge::zero;
         } else {
-            left.w = this->dd->cn.mulCached(left.w, entry.first->e[0].w);
+            left.w = Simulator<Config>::dd->cn.mulCached(left.w, entry.first->e[0].w);
         }
 
-        dd::vEdge right = this->dd->multiply(addConstMod(ts[entry.first->v]), f);
+        dd::vEdge right = Simulator<Config>::dd->multiply(addConstMod(ts[entry.first->v]), f);
 
         if (entry.first->e[1].w == dd::Complex::zero) {
             right = dd::vEdge::zero;
         } else {
-            right.w = this->dd->cn.mulCached(right.w, entry.first->e[1].w);
+            right.w = Simulator<Config>::dd->cn.mulCached(right.w, entry.first->e[1].w);
         }
 
-        dd::vEdge result = this->dd->add(left, right);
+        dd::vEdge result = Simulator<Config>::dd->add(left, right);
 
         if (left.w != dd::Complex::zero) {
-            this->dd->cn.returnToCache(left.w);
+            Simulator<Config>::dd->cn.returnToCache(left.w);
         }
         if (right.w != dd::Complex::zero) {
-            this->dd->cn.returnToCache(right.w);
+            Simulator<Config>::dd->cn.returnToCache(right.w);
         }
 
-        this->dd->incRef(result);
+        Simulator<Config>::dd->incRef(result);
 
         nodesOnLevel[0][entry.first] = result;
     }
@@ -386,33 +386,33 @@ void ShorFastSimulator<Config>::u_a_emulate2(std::uint64_t a) {
             dd::vEdge left = dd::vEdge::zero;
             if (it->first->e.at(0).w != dd::Complex::zero) {
                 left   = nodesOnLevel.at(i - 1)[it->first->e.at(0).p];
-                left.w = this->dd->cn.mulCached(left.w, it->first->e.at(0).w);
+                left.w = Simulator<Config>::dd->cn.mulCached(left.w, it->first->e.at(0).w);
             }
 
             dd::vEdge right = dd::vEdge::zero;
             if (it->first->e.at(1).w != dd::Complex::zero) {
-                right   = this->dd->multiply(addConstMod(ts.at(static_cast<std::size_t>(it->first->v))), nodesOnLevel.at(i - 1)[it->first->e.at(1).p]);
-                right.w = this->dd->cn.mulCached(right.w, it->first->e.at(1).w);
+                right   = Simulator<Config>::dd->multiply(addConstMod(ts.at(static_cast<std::size_t>(it->first->v))), nodesOnLevel.at(i - 1)[it->first->e.at(1).p]);
+                right.w = Simulator<Config>::dd->cn.mulCached(right.w, it->first->e.at(1).w);
             }
 
-            dd::vEdge result = this->dd->add(left, right);
+            dd::vEdge result = Simulator<Config>::dd->add(left, right);
 
             if (left.w != dd::Complex::zero) {
-                this->dd->cn.returnToCache(left.w);
+                Simulator<Config>::dd->cn.returnToCache(left.w);
             }
             if (right.w != dd::Complex::zero) {
-                this->dd->cn.returnToCache(right.w);
+                Simulator<Config>::dd->cn.returnToCache(right.w);
             }
 
-            this->dd->incRef(result);
+            Simulator<Config>::dd->incRef(result);
             nodesOnLevel.at(i)[it->first] = result;
             saveEdges.push_back(result);
         }
         for (auto& it: nodesOnLevel.at(i - 1)) {
-            this->dd->decRef(it.second);
+            Simulator<Config>::dd->decRef(it.second);
         }
-        this->dd->garbageCollect();
-        saveEdges.push_back(this->rootEdge);
+        Simulator<Config>::dd->garbageCollect();
+        saveEdges.push_back(Simulator<Config>::rootEdge);
         nodesOnLevel.at(i - 1).clear();
     }
 
@@ -420,25 +420,25 @@ void ShorFastSimulator<Config>::u_a_emulate2(std::uint64_t a) {
         throw std::runtime_error("error occurred");
     }
 
-    dd::vEdge result = nodesOnLevel.at(nQubits - 2)[this->rootEdge.p->e[0].p];
+    dd::vEdge result = nodesOnLevel.at(nQubits - 2)[Simulator<Config>::rootEdge.p->e[0].p];
 
-    this->dd->decRef(result);
+    Simulator<Config>::dd->decRef(result);
 
-    result.w = this->dd->cn.mulCached(result.w, this->rootEdge.p->e[0].w);
+    result.w = Simulator<Config>::dd->cn.mulCached(result.w, Simulator<Config>::rootEdge.p->e[0].w);
     auto tmp = result.w;
 
-    result = this->dd->makeDDNode(this->rootEdge.p->v, std::array<dd::vEdge, dd::RADIX>{this->rootEdge.p->e[0], result});
-    this->dd->cn.returnToCache(tmp);
+    result = Simulator<Config>::dd->makeDDNode(Simulator<Config>::rootEdge.p->v, std::array<dd::vEdge, dd::RADIX>{Simulator<Config>::rootEdge.p->e[0], result});
+    Simulator<Config>::dd->cn.returnToCache(tmp);
 
-    result.w = this->dd->cn.mulCached(result.w, this->rootEdge.w);
+    result.w = Simulator<Config>::dd->cn.mulCached(result.w, Simulator<Config>::rootEdge.w);
     tmp      = result.w;
-    result.w = this->dd->cn.lookup(result.w);
-    this->dd->cn.returnToCache(tmp);
-    this->dd->decRef(this->rootEdge);
-    this->dd->incRef(result);
-    this->rootEdge = result;
-    this->dd->garbageCollect();
-    assert(this->dd->cn.cacheCount() == cache_count_before);
+    result.w = Simulator<Config>::dd->cn.lookup(result.w);
+    Simulator<Config>::dd->cn.returnToCache(tmp);
+    Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
+    Simulator<Config>::dd->incRef(result);
+    Simulator<Config>::rootEdge = result;
+    Simulator<Config>::dd->garbageCollect();
+    assert(Simulator<Config>::dd->cn.cacheCount() == cache_count_before);
 }
 
 template<class Config>

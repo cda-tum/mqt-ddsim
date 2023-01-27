@@ -42,36 +42,5 @@ set_target_properties(
         Taskflow PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
         $<TARGET_PROPERTY:Taskflow,INTERFACE_INCLUDE_DIRECTORIES>)
 
-# add coverage compiler and linker flag if COVERAGE is set
-if (COVERAGE)
-    target_compile_options(${PROJECT_NAME} PUBLIC --coverage)
-    target_link_libraries(${PROJECT_NAME} PUBLIC --coverage)
-endif ()
-
-# check if interprocedural optimization is supported
-include(CheckIPOSupported)
-check_ipo_supported(RESULT ipo_supported)
-if (ipo_supported)
-    set_target_properties(${PROJECT_NAME} PROPERTIES INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif ()
-# set compiler flags depending on compiler
-if (NOT MSVC)
-    if (BINDINGS)
-        # adjust visibility settings for building Python bindings
-        include(CheckPIESupported)
-        check_pie_supported()
-        set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
-        target_compile_options(${PROJECT_NAME} PUBLIC -fvisibility=hidden)
-    endif ()
-    if (NOT DEPLOY)
-        # only include machine-specific optimizations when building for the host machine
-        target_compile_options(${PROJECT_NAME} PUBLIC -mtune=native)
-        include(CheckCXXCompilerFlag)
-        check_cxx_compiler_flag(-march=native HAS_MARCH_NATIVE)
-        if (HAS_MARCH_NATIVE)
-            target_compile_options(${PROJECT_NAME} PUBLIC -march=native)
-        endif ()
-    endif ()
-endif ()
 
 add_library(MQT::${PROJECT_NAME} ALIAS ${PROJECT_NAME})

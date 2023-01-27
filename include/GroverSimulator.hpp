@@ -30,7 +30,7 @@ public:
         std::uniform_int_distribution<int> dist(0, 1); // range is inclusive
         oracle = std::string(n_qubits_, '0');
         for (qc::Qubit i = 0; i < n_qubits_; i++) {
-            if (dist(this->mt) == 1) {
+            if (dist(Simulator<Config>::mt) == 1) {
                 oracle[i] = '1';
             }
         }

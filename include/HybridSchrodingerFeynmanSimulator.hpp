@@ -22,13 +22,13 @@ public:
     explicit HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, Mode mode_ = Mode::Amplitude, const std::size_t nthreads_ = 2):
         CircuitSimulator<Config>(std::move(qc_)), mode(mode_), nthreads(nthreads_) {
         // remove final measurements
-        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
+        qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator<Config>::qc));
     }
 
     HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info_, const unsigned long long seed_, Mode mode_ = Mode::Amplitude, const std::size_t nthreads_ = 2):
         CircuitSimulator<Config>(std::move(qc_), approx_info_, seed_), mode(mode_), nthreads(nthreads_) {
         // remove final measurements
-        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
+        qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator<Config>::qc));
     }
 
     std::map<std::string, std::size_t> Simulate(std::size_t shots) override;

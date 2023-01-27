@@ -11,31 +11,31 @@
 template<class Config = StochasticNoiseSimulatorDDPackageConfig>
 class StochasticNoiseSimulator: public Simulator<Config> {
 public:
-    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
-                             const std::string&                       noiseEffects,
-                             double                                   noiseProbability,
+    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc_,
+                             const std::string&                       noiseEffects_,
+                             double                                   noiseProbability_,
                              std::optional<double>                    ampDampingProbability,
-                             double                                   multiQubitGateFactor,
+                             double                                   multiQubitGateFactor_,
                              std::size_t                              stochRuns,
                              const std::string&                       recordedProperties,
                              bool                                     unoptimizedSim,
-                             unsigned int                             stepNumber,
-                             double                                   stepFidelity,
+                             std::uint32_t                            stepNumber_,
+                             double                                   stepFidelity_,
                              std::size_t                              seed = 0U):
         Simulator<Config>(seed),
-        qc(qc),
-        stepNumber(stepNumber),
-        stepFidelity(stepFidelity),
-        noiseProbability(noiseProbability),
-        amplitudeDampingProb((ampDampingProbability) ? ampDampingProbability.value() : noiseProbability * 2),
-        multiQubitGateFactor(multiQubitGateFactor),
+        qc(qc_),
+        stepNumber(stepNumber_),
+        stepFidelity(stepFidelity_),
+        noiseProbability(noiseProbability_),
+        amplitudeDampingProb((ampDampingProbability) ? ampDampingProbability.value() : noiseProbability_ * 2),
+        multiQubitGateFactor(multiQubitGateFactor_),
         sequentiallyApplyNoise(unoptimizedSim),
         stochasticRuns(stochRuns),
         maxInstances(std::thread::hardware_concurrency() > 4 ? std::thread::hardware_concurrency() - 4 : 1),
-        noiseEffects(initializeNoiseEffects(noiseEffects)) {
-        sanityCheckOfNoiseProbabilities(this->noiseProbability, this->amplitudeDampingProb, this->multiQubitGateFactor);
+        noiseEffects(initializeNoiseEffects(noiseEffects_)) {
+        sanityCheckOfNoiseProbabilities(noiseProbability, amplitudeDampingProb, multiQubitGateFactor);
         setRecordedProperties(recordedProperties);
-        this->dd->resize(qc->getNqubits());
+        Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int stepNumber, const double stepFidelity):
