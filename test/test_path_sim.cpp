@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-using namespace dd::literals;
+using namespace qc::literals;
 
 TEST(TaskBasedSimTest, Configuration) {
     EXPECT_EQ(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode::Sequential), "sequential");

@@ -4,15 +4,13 @@
 
 using CN = dd::ComplexNumbers;
 
-template<class DDPackage>
-std::map<std::string, double> DeterministicNoiseSimulator<DDPackage>::DeterministicSimulate() {
-    std::map<unsigned int, bool> classicValues;
+template<class Config>
+std::map<std::string, double> DeterministicNoiseSimulator<Config>::DeterministicSimulate() {
+    rootEdge = Simulator<Config>::dd->makeZeroDensityOperator(qc->getNqubits());
+    Simulator<Config>::dd->incRef(rootEdge);
 
-    rootEdge = Simulator<DDPackage>::dd->makeZeroDensityOperator(qc->getNqubits());
-    Simulator<DDPackage>::dd->incRef(rootEdge);
-
-    auto deterministicNoiseFunctionality = dd::DeterministicNoiseFunctionality<DensityMatrixPackage>(
-            Simulator<DDPackage>::dd,
+    auto deterministicNoiseFunctionality = dd::DeterministicNoiseFunctionality<Config>(
+            Simulator<Config>::dd,
             qc->getNqubits(),
             noiseProbSingleQubit,
             noiseProbMultiQubit,
@@ -23,7 +21,7 @@ std::map<std::string, double> DeterministicNoiseSimulator<DDPackage>::Determinis
             sequentiallyApplyNoise);
 
     for (auto const& op: *qc) {
-        Simulator<DDPackage>::dd->garbageCollect();
+        Simulator<Config>::dd->garbageCollect();
         if (!op->isUnitary() && !(op->isClassicControlledOperation())) {
             if (auto* nuOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
                 //Skipping barrier
@@ -38,19 +36,19 @@ std::map<std::string, double> DeterministicNoiseSimulator<DDPackage>::Determinis
             if (op->isClassicControlledOperation()) {
                 throw std::runtime_error("Classical controlled operations are not supported.");
             }
-            auto operation = dd::getDD(op.get(), Simulator<DDPackage>::dd);
+            auto operation = dd::getDD(op.get(), Simulator<Config>::dd);
 
             // Applying the operation to the density matrix
-            Simulator<DDPackage>::dd->applyOperationToDensity(rootEdge, operation, useDensityMatrixType);
+            Simulator<Config>::dd->applyOperationToDensity(rootEdge, operation, useDensityMatrixType);
 
             deterministicNoiseFunctionality.applyNoiseEffects(rootEdge, op);
         }
     }
-    return Simulator<DDPackage>::dd->getProbVectorFromDensityMatrix(rootEdge, measurementThreshold);
+    return Simulator<Config>::dd->getProbVectorFromDensityMatrix(rootEdge, measurementThreshold);
 }
 
-template<class DDPackage>
-std::map<std::string, std::size_t> DeterministicNoiseSimulator<DDPackage>::sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, unsigned int shots) {
+template<class Config>
+std::map<std::string, std::size_t> DeterministicNoiseSimulator<Config>::sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, unsigned int shots) {
     // Create probability distribution from measure probabilities
     std::vector<dd::fp> weights;
     weights.reserve(resultProbabilityMap.size());
@@ -64,7 +62,7 @@ std::map<std::string, std::size_t> DeterministicNoiseSimulator<DDPackage>::sampl
     std::map<std::size_t, std::size_t>     results;
     std::uniform_real_distribution<dd::fp> dist(0.0L, 1.0L);
     for (size_t n = 0; n < shots; ++n) {
-        ++results[d(this->mt)];
+        ++results[d(Simulator<Config>::mt)];
     }
 
     // Create the final map containing the measurement results and the corresponding shots
@@ -77,4 +75,4 @@ std::map<std::string, std::size_t> DeterministicNoiseSimulator<DDPackage>::sampl
     return resultShotsMap;
 }
 
-template class DeterministicNoiseSimulator<DensityMatrixPackage>;
+template class DeterministicNoiseSimulator<DensityMatrixSimulatorDDPackageConfig>;

@@ -84,19 +84,19 @@ void getNumpyMatrixRec(const qc::MatrixDD& e, const std::complex<dd::fp>& amp, s
         getNumpyMatrixRec(e.p->e[3], c, x, y, dim, mat);
 }
 
-template<class DDPackage = dd::Package<>>
-void getNumpyMatrix(UnitarySimulator<DDPackage>& sim, py::array_t<std::complex<dd::fp>>& matrix) {
+template<class Config = dd::DDPackageConfig>
+void getNumpyMatrix(UnitarySimulator<Config>& sim, py::array_t<std::complex<dd::fp>>& matrix) {
     const auto&     e            = sim.getConstructedDD();
     py::buffer_info matrixBuffer = matrix.request();
     auto*           dataPtr      = static_cast<std::complex<dd::fp>*>(matrixBuffer.ptr);
-    py::size_t      rows         = matrixBuffer.shape[0];
-    py::size_t      cols         = matrixBuffer.shape[1];
+    const auto      rows         = matrixBuffer.shape[0];
+    const auto      cols         = matrixBuffer.shape[1];
     if (rows != cols) {
         throw std::runtime_error("Provided matrix is not a square matrix.");
     }
 
-    py::size_t dim = 1 << (e.p->v + 1);
-    if (rows != dim) {
+    std::size_t dim = 1 << (e.p->v + 1);
+    if (static_cast<std::size_t>(rows) != dim) {
         throw std::runtime_error("Provided matrix does not have the right size.");
     }
 
@@ -107,19 +107,20 @@ void dump_tensor_network(const py::object& circ, const std::string& filename) {
     py::object QuantumCircuit       = py::module::import("qiskit").attr("QuantumCircuit");
     py::object pyQasmQobjExperiment = py::module::import("qiskit.qobj").attr("QasmQobjExperiment");
 
+    std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>();
+
     if (py::isinstance<py::str>(circ)) {
-        auto&&                                  file1 = circ.cast<std::string>();
-        std::unique_ptr<qc::QuantumComputation> qc    = std::make_unique<qc::QuantumComputation>();
-        std::ofstream                           ofs(filename);
+        auto&& file1 = circ.cast<std::string>();
         qc->import(file1);
-        qc->dump(ofs, qc::Tensor);
     } else if (py::isinstance(circ, QuantumCircuit)) {
-        qc::qiskit::QuantumCircuit::dumpTensorNetwork(circ, filename);
+        qc::qiskit::QuantumCircuit::import(*qc, circ);
     } else if (py::isinstance(circ, pyQasmQobjExperiment)) {
-        qc::qiskit::QasmQobjExperiment::dumpTensorNetwork(circ, filename);
+        qc::qiskit::QasmQobjExperiment::import(*qc, circ);
     } else {
         throw std::runtime_error("PyObject is neither py::str, QuantumCircuit, nor QasmQobjExperiment");
     }
+    std::ofstream ofs(filename);
+    qc->dump(ofs, qc::Format::Tensor);
 }
 
 PYBIND11_MODULE(pyddsim, m) {

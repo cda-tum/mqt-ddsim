@@ -8,34 +8,34 @@
 #include <thread>
 #include <vector>
 
-template<class DDPackage = StochasticNoisePackage>
-class StochasticNoiseSimulator: public Simulator<DDPackage> {
+template<class Config = StochasticNoiseSimulatorDDPackageConfig>
+class StochasticNoiseSimulator: public Simulator<Config> {
 public:
-    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
-                             const std::string&                       noiseEffects,
-                             double                                   noiseProbability,
+    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc_,
+                             const std::string&                       noiseEffects_,
+                             double                                   noiseProbability_,
                              std::optional<double>                    ampDampingProbability,
-                             double                                   multiQubitGateFactor,
+                             double                                   multiQubitGateFactor_,
                              std::size_t                              stochRuns,
                              const std::string&                       recordedProperties,
                              bool                                     unoptimizedSim,
-                             unsigned int                             stepNumber,
-                             double                                   stepFidelity,
+                             std::uint32_t                            stepNumber_,
+                             double                                   stepFidelity_,
                              std::size_t                              seed = 0U):
-        Simulator<DDPackage>(seed),
-        qc(qc),
-        stepNumber(stepNumber),
-        stepFidelity(stepFidelity),
-        noiseProbability(noiseProbability),
-        amplitudeDampingProb((ampDampingProbability) ? ampDampingProbability.value() : noiseProbability * 2),
-        multiQubitGateFactor(multiQubitGateFactor),
+        Simulator<Config>(seed),
+        qc(qc_),
+        stepNumber(stepNumber_),
+        stepFidelity(stepFidelity_),
+        noiseProbability(noiseProbability_),
+        amplitudeDampingProb((ampDampingProbability) ? ampDampingProbability.value() : noiseProbability_ * 2),
+        multiQubitGateFactor(multiQubitGateFactor_),
         sequentiallyApplyNoise(unoptimizedSim),
         stochasticRuns(stochRuns),
         maxInstances(std::thread::hardware_concurrency() > 4 ? std::thread::hardware_concurrency() - 4 : 1),
-        noiseEffects(initializeNoiseEffects(noiseEffects)) {
-        sanityCheckOfNoiseProbabilities(this->noiseProbability, this->amplitudeDampingProb, this->multiQubitGateFactor);
+        noiseEffects(initializeNoiseEffects(noiseEffects_)) {
+        sanityCheckOfNoiseProbabilities(noiseProbability, amplitudeDampingProb, multiQubitGateFactor);
         setRecordedProperties(recordedProperties);
-        Simulator<DDPackage>::dd->resize(qc->getNqubits());
+        Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int stepNumber, const double stepFidelity):
@@ -50,15 +50,15 @@ public:
     std::vector<std::map<std::string, unsigned int>> classicalMeasurementsMaps;
     std::map<std::string, unsigned int>              finalClassicalMeasurementsMap;
 
-    std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
+    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
     std::map<std::string, double>      StochSimulate();
 
-    [[nodiscard]] std::size_t    getMaxMatrixNodeCount() const override { return 0U; }    // Not available for stochastic simulation
-    [[nodiscard]] std::size_t    getMatrixActiveNodeCount() const override { return 0U; } // Not available for stochastic simulation
-    [[nodiscard]] std::size_t    countNodesFromRoot() const override { return 0U; }       // Not available for stochastic simulation
-    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
-    [[nodiscard]] std::size_t    getNumberOfOps() const override { return qc->getNops(); };
-    [[nodiscard]] std::string    getName() const override { return "stoch_" + qc->getName(); };
+    [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return 0U; }    // Not available for stochastic simulation
+    [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return 0U; } // Not available for stochastic simulation
+    [[nodiscard]] std::size_t countNodesFromRoot() const override { return 0U; }       // Not available for stochastic simulation
+    [[nodiscard]] std::size_t getNumberOfQubits() const override { return qc->getNqubits(); };
+    [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
+    [[nodiscard]] std::string getName() const override { return "stoch_" + qc->getName(); };
 
     [[maybe_unused]] static void sanityCheckOfNoiseProbabilities(double noiseProbability, double amplitudeDampingProb, double multiQubitGateFactor) {
         if (noiseProbability < 0 || amplitudeDampingProb < 0 || noiseProbability * multiQubitGateFactor > 1 || amplitudeDampingProb * multiQubitGateFactor > 1) {
@@ -76,16 +76,16 @@ public:
         for (const auto noise: cNoiseEffects) {
             switch (noise) {
                 case 'A':
-                    noiseOperationVector.push_back(dd::amplitudeDamping);
+                    noiseOperationVector.push_back(dd::AmplitudeDamping);
                     break;
                 case 'P':
-                    noiseOperationVector.push_back(dd::phaseFlip);
+                    noiseOperationVector.push_back(dd::PhaseFlip);
                     break;
                 case 'D':
-                    noiseOperationVector.push_back(dd::depolarization);
+                    noiseOperationVector.push_back(dd::Depolarization);
                     break;
                 case 'I':
-                    noiseOperationVector.push_back(dd::identity);
+                    noiseOperationVector.push_back(dd::Identity);
                     break;
                 default:
                     throw std::runtime_error("Unknown noise operation '" + cNoiseEffects + "'\n");
@@ -132,7 +132,7 @@ private:
     void perfectSimulationRun();
 
     void runStochSimulationForId(std::size_t                                stochRun,
-                                 dd::Qubit                                  nQubits,
+                                 qc::Qubit                                  nQubits,
                                  std::vector<double>&                       recordedPropertiesStorage,
                                  std::vector<std::pair<long, std::string>>& recordedPropertiesList,
                                  std::map<std::string, unsigned int>&       classicalMeasurementsMap,

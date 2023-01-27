@@ -3,6 +3,7 @@
 
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
+#include "Operations.hpp"
 #include "QuantumComputation.hpp"
 #include "dd/Export.hpp"
 #include "dd/Package.hpp"
@@ -10,33 +11,34 @@
 #include <complex>
 #include <memory>
 
-template<class DDPackage = dd::Package<>>
-class HybridSchrodingerFeynmanSimulator: public CircuitSimulator<DDPackage> {
+template<class Config = dd::DDPackageConfig>
+class HybridSchrodingerFeynmanSimulator: public CircuitSimulator<Config> {
 public:
     enum class Mode {
         DD,
         Amplitude
     };
 
-    explicit HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Mode mode = Mode::Amplitude, const std::size_t nthreads = 2):
-        CircuitSimulator<DDPackage>(std::move(qc)), mode(mode), nthreads(nthreads) {
+    explicit HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, Mode mode_ = Mode::Amplitude, const std::size_t nthreads_ = 2):
+        CircuitSimulator<Config>(std::move(qc_)), mode(mode_), nthreads(nthreads_) {
         // remove final measurements
-        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
+        qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator<Config>::qc));
     }
 
-    HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, const ApproximationInfo approx_info, const unsigned long long seed, Mode mode = Mode::Amplitude, const std::size_t nthreads = 2):
-        CircuitSimulator<DDPackage>(std::move(qc), approx_info, seed), mode(mode), nthreads(nthreads) {
+    HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info_, const unsigned long long seed_, Mode mode_ = Mode::Amplitude, const std::size_t nthreads_ = 2):
+        CircuitSimulator<Config>(std::move(qc_), approx_info_, seed_), mode(mode_), nthreads(nthreads_) {
         // remove final measurements
-        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
+        qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator<Config>::qc));
     }
 
-    std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
+    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
 
-    Mode                                                   mode = Mode::Amplitude;
+    Mode mode = Mode::Amplitude;
+
     [[nodiscard]] const std::vector<std::complex<dd::fp>>& getFinalAmplitudes() const { return finalAmplitudes; }
 
     //  Get # of decisions for given split_qubit, so that lower slice: q0 < i < qubit; upper slice: qubit <= i < nqubits
-    std::size_t getNDecisions(dd::Qubit split_qubit);
+    std::size_t getNDecisions(qc::Qubit splitQubit);
 
     [[nodiscard]] Mode getMode() const { return mode; }
 
@@ -44,42 +46,42 @@ private:
     std::size_t                       nthreads = 2;
     std::vector<std::complex<dd::fp>> finalAmplitudes{};
 
-    void SimulateHybridTaskflow(dd::Qubit split_qubit);
-    void SimulateHybridAmplitudes(dd::Qubit split_qubit);
+    void SimulateHybridTaskflow(qc::Qubit splitQubit);
+    void SimulateHybridAmplitudes(qc::Qubit splitQubit);
 
-    qc::VectorDD SimulateSlicing(std::unique_ptr<dd::Package<>>& dd, dd::Qubit split_qubit, std::size_t controls);
+    qc::VectorDD SimulateSlicing(std::unique_ptr<dd::Package<Config>>& sliceDD, qc::Qubit splitQubit, std::size_t controls);
 
     class Slice {
     protected:
-        dd::Qubit next_control_idx = 0;
+        qc::Qubit nextControlIdx = 0;
 
         std::size_t getNextControl() {
-            std::size_t idx = 1UL << next_control_idx;
-            next_control_idx++;
+            std::size_t idx = 1UL << nextControlIdx;
+            nextControlIdx++;
             return controls & idx;
         }
 
     public:
-        const dd::Qubit      start;
-        const dd::Qubit      end;
-        const std::size_t    controls;
-        const dd::QubitCount nqubits;
-        std::size_t          nDecisionsExecuted = 0;
-        qc::VectorDD         edge{};
+        const qc::Qubit   start;
+        const qc::Qubit   end;
+        const std::size_t controls;
+        const qc::Qubit   nqubits;
+        std::size_t       nDecisionsExecuted = 0;
+        qc::VectorDD      edge{};
 
-        explicit Slice(std::unique_ptr<dd::Package<>>& dd, dd::Qubit start, dd::Qubit end, const std::size_t controls):
-            start(start), end(end), controls(controls), nqubits(end - start + 1) {
-            edge = dd->makeZeroState(nqubits, start);
+        explicit Slice(std::unique_ptr<dd::Package<Config>>& dd, const qc::Qubit start_, const qc::Qubit end_, const std::size_t controls_):
+            start(start_), end(end_), controls(controls_), nqubits(end - start + 1) {
+            edge = dd->makeZeroState(static_cast<dd::QubitCount>(nqubits), start_);
             dd->incRef(edge);
         }
 
-        explicit Slice(std::unique_ptr<dd::Package<>>& dd, qc::VectorDD edge, dd::Qubit start, dd::Qubit end, const std::size_t controls):
-            start(start), end(end), controls(controls), nqubits(end - start + 1), edge(edge) {
+        explicit Slice(std::unique_ptr<dd::Package<Config>>& dd, qc::VectorDD edge_, const qc::Qubit start_, const qc::Qubit end_, const std::size_t controls_):
+            start(start_), end(end_), controls(controls_), nqubits(end - start + 1), edge(edge_) {
             dd->incRef(edge);
         }
 
         // returns true if this operation was a split operation
-        bool apply(std::unique_ptr<dd::Package<>>& dd, const std::unique_ptr<qc::Operation>& op);
+        bool apply(std::unique_ptr<dd::Package<Config>>& sliceDD, const std::unique_ptr<qc::Operation>& op);
     };
 };
 

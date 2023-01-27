@@ -2,7 +2,6 @@ include README.md LICENSE CMakeLists.txt
 include src/*
 include include/*
 include apps/*
-graft jkq/*
 graft mqt/*
 global-exclude __pycache__/
 global-exclude *.py[cod]
@@ -12,10 +11,10 @@ global-exclude *.so
 include extern/qfr/CMakeLists.txt
 graft   extern/qfr/include
 graft   extern/qfr/src
-graft   extern/qfr/jkq/qfr
 graft   extern/qfr/mqt/qfr
 include extern/qfr/extern/dd_package/CMakeLists.txt
 graft   extern/qfr/extern/dd_package/include
+graft   extern/qfr/extern/dd_package/cmake
 graft   extern/qfr/extern/zx
 
 # Include necessary files from nlohmann and pybind11 (especially don't include the docs)

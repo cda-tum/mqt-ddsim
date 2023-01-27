@@ -1,6 +1,7 @@
+import numpy as np
 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, AncillaRegister
 from qiskit.circuit.library import QFT, GraphState, GroverOperator
-import numpy as np
+
 
 # measure qubits in reverse order which is better suited for DD-based simulation
 def measure(qc: QuantumCircuit, q: QuantumRegister, c: ClassicalRegister):

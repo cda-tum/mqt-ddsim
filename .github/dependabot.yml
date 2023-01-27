@@ -7,12 +7,10 @@ updates:
     directory:         "/"
     # Check the submodules for updates every week
     schedule:
-      interval: "weekly"
+      interval: "monthly"
       day: "friday"
       time: "05:00"
       timezone: "Europe/Vienna"
-    assignees:
-      - "hillmich"
 
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
@@ -20,19 +18,15 @@ updates:
     directory:         "/"
     # Check for updates to GitHub Actions every week
     schedule:
-      interval: "weekly"
+      interval: "monthly"
       day: "friday"
       time: "05:00"
       timezone: "Europe/Vienna"
-    assignees:
-      - "hillmich"
 
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
       day: "friday"
       time: "05:00"
       timezone: "Europe/Vienna"
-    assignees:
-      - "hillmich"

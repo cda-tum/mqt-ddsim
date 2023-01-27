@@ -1,10 +1,9 @@
 import unittest
 
+import numpy as np
 from qiskit import *
 
 from mqt import ddsim
-
-import numpy as np
 
 
 class MQTStandaloneUnitarySimulatorTests(unittest.TestCase):

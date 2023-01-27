@@ -12,7 +12,7 @@ class DDSIMProviderTestCase(unittest.TestCase):
         """Test the provider has backends."""
         backends = self.provider.backends()
         self.assertTrue(len(backends) > 0)
-    
+
     def test_get_backend(self):
         """Test getting a backend from the provider."""
         backend = self.provider.get_backend(name=self.backend_name)
