@@ -15,7 +15,7 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::Simulate([[maybe_unuse
     }
 
     if (emulate) {
-        nQubits        = static_cast<dd::QubitCount>(3 * requiredBits);
+        nQubits                     = static_cast<dd::QubitCount>(3 * requiredBits);
         Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(nQubits);
         Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
         //Initialize qubits
@@ -23,7 +23,7 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::Simulate([[maybe_unuse
         ApplyGate(dd::Xmat, 0);
 
     } else {
-        nQubits        = static_cast<dd::QubitCount>(2 * requiredBits + 3);
+        nQubits                     = static_cast<dd::QubitCount>(2 * requiredBits + 3);
         Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(nQubits);
         Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
         //Initialize qubits
