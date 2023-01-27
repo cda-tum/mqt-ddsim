@@ -43,7 +43,7 @@ TEST(ShorSimTest, Factorize15EmulationNoSeedTest) {
     ASSERT_EQ(ddsim.AdditionalStatistics().at("polr_result"), "SUCCESS(3*5)");
 }
 
-TEST(ShorSimTest, Factorize15EmulationNoOptionalParametersgiTest) {
+TEST(ShorSimTest, Factorize15EmulationNoOptionalParametersTest) {
     // add verbose = true for coverage
     ShorSimulator ddsim(15, 2);
 
