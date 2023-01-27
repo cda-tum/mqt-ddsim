@@ -28,7 +28,7 @@ jobs:
           submodules: recursive
       - uses: DoozyX/clang-format-lint-action@v0.15
         with:
-          source:             'apps include jkq mqt src test'
+          source:             'apps include mqt src test'
           extensions:         'h,hpp,c,cpp'
           clangFormatVersion: 12
 
