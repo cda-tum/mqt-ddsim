@@ -1,6 +1,5 @@
 import datetime
 import time
-from typing import Union
 
 from qiskit import transpile
 
@@ -9,7 +8,7 @@ from mqt.ddsim.pathqasmsimulator import PathQasmSimulator, get_simulation_path
 from test.python.generate_benchmarks import *
 
 
-def execute_circuit(qc: QuantumCircuit, backend, shots: int, mode: Union[str, ddsim.PathSimulatorMode] = 'sequential',
+def execute_circuit(qc: QuantumCircuit, backend, shots: int, mode: str | ddsim.PathSimulatorMode = 'sequential',
                     **options):
     print('Starting execution of circuit', qc.name)
     result = execute_verification(qc, backend, shots=shots, mode=mode, optimization_level=0, **options).result()
@@ -29,7 +28,7 @@ def execute_circuit(qc: QuantumCircuit, backend, shots: int, mode: Union[str, dd
 
 
 def execute_verification(qc: QuantumCircuit, backend, shots: int,
-                         mode: Union[str, ddsim.PathSimulatorMode] = 'sequential', **options):
+                         mode: str | ddsim.PathSimulatorMode = 'sequential', **options):
     print('Starting execution of circuit', qc.name)
     configuration_dict = backend.configuration().to_dict()
     basis_gates = configuration_dict['basis_gates']
