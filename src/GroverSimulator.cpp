@@ -78,13 +78,9 @@ std::map<std::string, std::size_t> GroverSimulator<Config>::Simulate(std::size_t
     for (std::size_t j = j_pre; j < iterations; j += 8) {
         //std::clog << "[INFO]  Iteration " << j+1 << " of " << iterations << " -- size:" << dd->size(rootEdge)  << "\n";
         auto tmp = this->dd->multiply(full_iteration, this->rootEdge);
-        tmp      = this->dd->multiply(full_iteration, tmp);
-        tmp      = this->dd->multiply(full_iteration, tmp);
-        tmp      = this->dd->multiply(full_iteration, tmp);
-        tmp      = this->dd->multiply(full_iteration, tmp);
-        tmp      = this->dd->multiply(full_iteration, tmp);
-        tmp      = this->dd->multiply(full_iteration, tmp);
-        tmp      = this->dd->multiply(full_iteration, tmp);
+        for (std::size_t i=0; i<7; ++i) {
+          tmp      = this->dd->multiply(full_iteration, tmp);
+        }
         this->dd->incRef(tmp);
         this->dd->decRef(this->rootEdge);
         this->rootEdge = tmp;
