@@ -99,7 +99,7 @@ public:
         return numberOfOperations;
     }
 
-    std::pair<std::uint32_t , std::uint32_t> getFactors() {
+    std::pair<std::uint32_t, std::uint32_t> getFactors() {
         return simFactors;
     }
 

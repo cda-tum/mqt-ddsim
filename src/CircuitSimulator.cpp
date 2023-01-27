@@ -127,10 +127,10 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
         } else {
             if (op->isClassicControlledOperation()) {
                 if (auto* classicallyControlledOp = dynamic_cast<qc::ClassicControlledOperation*>(op.get())) {
-                    const auto   startIndex     = static_cast<unsigned short>(classicallyControlledOp->getParameter().at(0));
-                    const auto   length         = static_cast<unsigned short>(classicallyControlledOp->getParameter().at(1));
-                    const auto   expectedValue  = classicallyControlledOp->getExpectedValue();
-                    unsigned int actualValue    = 0;
+                    const auto   startIndex    = static_cast<unsigned short>(classicallyControlledOp->getParameter().at(0));
+                    const auto   length        = static_cast<unsigned short>(classicallyControlledOp->getParameter().at(1));
+                    const auto   expectedValue = classicallyControlledOp->getExpectedValue();
+                    unsigned int actualValue   = 0;
                     for (std::size_t i = 0; i < length; i++) {
                         actualValue |= (classicValues[startIndex + i] ? 1u : 0u) << i;
                     }
@@ -148,8 +148,8 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
                       << " #controls=" << op->getControls().size()
                       << " statesize=" << dd->size(rootEdge) << "\n";//*/
 
-            auto ddOp  = dd::getDD(op.get(), Simulator<Config>::dd);
-            auto tmp   = Simulator<Config>::dd->multiply(ddOp, Simulator<Config>::rootEdge);
+            auto ddOp = dd::getDD(op.get(), Simulator<Config>::dd);
+            auto tmp  = Simulator<Config>::dd->multiply(ddOp, Simulator<Config>::rootEdge);
             Simulator<Config>::dd->incRef(tmp);
             Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
             Simulator<Config>::rootEdge = tmp;

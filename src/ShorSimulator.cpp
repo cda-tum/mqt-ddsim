@@ -52,9 +52,9 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::Simulate([[maybe_unuse
         std::clog << "Find a coprime to N=" << compositeN << ": " << coprimeA << "\n";
     }
 
-    auto* as                  = new std::uint64_t[2 * requiredBits];
+    auto* as                 = new std::uint64_t[2 * requiredBits];
     as[2 * requiredBits - 1] = coprimeA;
-    std::uint64_t new_a       = coprimeA;
+    std::uint64_t new_a      = coprimeA;
     for (std::int32_t i = 2 * requiredBits - 2; i >= 0; i--) {
         new_a = new_a * new_a;
         new_a = new_a % compositeN;
@@ -143,7 +143,7 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::Simulate([[maybe_unuse
 
         if (polrFactors.first != 0 && polrFactors.second != 0) {
             polrResult = std::string("SUCCESS(") + std::to_string(polrFactors.first) + "*" +
-                          std::to_string(polrFactors.second) + ")";
+                         std::to_string(polrFactors.second) + ")";
         } else {
             polrResult = "FAILURE";
         }
@@ -387,7 +387,7 @@ dd::mEdge ShorSimulator<Config>::limitStateVector(dd::vEdge e) {
             limitStateVector(e.p->e.at(1))};
 
     dd::Edge result = this->dd->makeDDNode(e.p->v, edges, false);
-    dagEdges[e.p]  = result;
+    dagEdges[e.p]   = result;
     return result;
 }
 

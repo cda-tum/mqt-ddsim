@@ -38,9 +38,9 @@ std::map<std::string, std::size_t> ShorFastSimulator<Config>::Simulate([[maybe_u
         std::clog << "Find a coprime to N=" << compositeN << ": " << coprimeA << "\n";
     }
 
-    auto* as                  = new std::uint64_t[2 * requiredBits]; // replace with stl container
+    auto* as                 = new std::uint64_t[2 * requiredBits]; // replace with stl container
     as[2 * requiredBits - 1] = coprimeA;
-    std::uint64_t new_a  = coprimeA;
+    std::uint64_t new_a      = coprimeA;
     for (std::int32_t i = 2 * requiredBits - 2; i >= 0; i--) {
         new_a = new_a * new_a;
         new_a = new_a % compositeN;
@@ -126,9 +126,9 @@ std::pair<std::uint32_t, std::uint32_t> ShorFastSimulator<Config>::post_processi
         return {0, 0};
     }
     std::vector<std::uint64_t> cf;
-    auto                            denom     = 1ull << (2 * requiredBits);
-    const auto                      old_denom = denom;
-    const auto                      old_res   = res;
+    auto                       denom     = 1ull << (2 * requiredBits);
+    const auto                 old_denom = denom;
+    const auto                 old_res   = res;
 
     log << "Continued fraction expansion of " << res << "/" << denom << " = " << std::flush;
 

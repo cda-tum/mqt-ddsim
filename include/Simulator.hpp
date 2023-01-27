@@ -117,8 +117,8 @@ protected:
     std::mt19937_64 mt;
 
     const std::uint64_t seed = 0;
-    const bool               hasFixedSeed;
-    const dd::fp             epsilon = 0.001;
+    const bool          hasFixedSeed;
+    const dd::fp        epsilon = 0.001;
 
     static void NextPath(std::string& s);
 };
