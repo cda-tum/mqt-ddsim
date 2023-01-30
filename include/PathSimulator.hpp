@@ -170,7 +170,6 @@ public:
     PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, typename Configuration::Mode mode_, std::size_t bracketSize_, std::size_t startingPoint_, std::list<std::size_t> gateCost_, std::size_t seed_):
         PathSimulator(std::move(qc_), Configuration{mode_, bracketSize_, startingPoint_, std::move(gateCost_), seed_}) {}
 
-
     std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
 
     const SimulationPath& getSimulationPath() const {
