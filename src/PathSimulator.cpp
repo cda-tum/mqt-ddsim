@@ -288,7 +288,7 @@ void PathSimulator<DDPackage>::generateAlternatingSimulationPath(std::size_t sta
 }
 
 template<class DDPackage>
-void PathSimulator<DDPackage>::generateGatecostSimulationPath(std::size_t startingPoint, std::list<std::size_t> gateCosts) {
+void PathSimulator<DDPackage>::generateGatecostSimulationPath(std::size_t startingPoint, std::list<std::size_t>& gateCosts) {
     typename SimulationPath::Components components{};
     components.reserve(CircuitSimulator<DDPackage>::qc->getNops());
     std::size_t startElem = startingPoint;

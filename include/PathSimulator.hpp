@@ -116,7 +116,7 @@ public:
                 conf["starting_point"] = startingPoint;
             } else if (mode == Mode::GateCost) {
                 conf["starting_point"] = startingPoint;
-                conf["gate_cost"]         = gateCost;
+                conf["gate_cost"]      = gateCost;
             }
             if (seed != 0) {
                 conf["seed"] = seed;
@@ -157,7 +157,7 @@ public:
             case Configuration::Mode::Alternating:
                 generateAlternatingSimulationPath(configuration.startingPoint);
                 break;
-            case Configuration::Mode::Gatecost:
+            case Configuration::Mode::GateCost:
                 generateGatecostSimulationPath(configuration.startingPoint, configuration.gateCost);
                 break;
             default:
@@ -186,7 +186,7 @@ public:
     void generatePairwiseRecursiveGroupingSimulationPath();
     void generateBracketSimulationPath(std::size_t bracketSize);
     void generateAlternatingSimulationPath(std::size_t startingPoint);
-    void generateGatecostSimulationPath(std::size_t startingPoint, const std::list<std::size_t>& gateCosts);
+    void generateGatecostSimulationPath(std::size_t startingPoint, std::list<std::size_t>& gateCosts);
 
 private:
     std::unordered_map<std::size_t, tf::Task>                                 tasks{};
