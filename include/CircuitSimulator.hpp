@@ -19,10 +19,10 @@ struct ApproximationInfo {
 
     /* Default to no approximation */
     ApproximationInfo():
-        step_fidelity(1), step_number(1), approx_when(ApproximationWhen::FidelityDriven) {}
+        stepFidelity(1), stepNumber(1), approxWhen(ApproximationWhen::FidelityDriven) {}
 
-    ApproximationInfo(double step_fidelity, unsigned int step_number, ApproximationWhen approx_when):
-        step_fidelity(step_fidelity), step_number(step_number), approx_when(approx_when) {}
+    ApproximationInfo(double stepFidelity_, unsigned int stepNumber_, ApproximationWhen approxWhen_):
+        stepFidelity(stepFidelity_), stepNumber(stepNumber_), approxWhen(approxWhen_) {}
 
     friend std::istream& operator>>(std::istream& in, ApproximationWhen& when) {
         std::string token;
@@ -39,48 +39,48 @@ struct ApproximationInfo {
         return in;
     }
 
-    const double            step_fidelity;
-    const unsigned int      step_number;
-    const ApproximationWhen approx_when;
+    const double            stepFidelity;
+    const unsigned int      stepNumber;
+    const ApproximationWhen approxWhen;
 };
 
-template<class DDPackage = dd::Package<>>
-class CircuitSimulator: public Simulator<DDPackage> {
+template<class Config = dd::DDPackageConfig>
+class CircuitSimulator: public Simulator<Config> {
 public:
     explicit CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_):
-        qc(std::move(qc_)), approx_info(ApproximationInfo(1.0, 1, ApproximationInfo::FidelityDriven)) {
-        Simulator<DDPackage>::dd->resize(qc->getNqubits());
+        qc(std::move(qc_)), approximationInfo(ApproximationInfo(1.0, 1, ApproximationInfo::FidelityDriven)) {
+        Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const unsigned long long seed):
-        Simulator<DDPackage>(seed),
-        qc(std::move(qc_)), approx_info(ApproximationInfo(1.0, 1, ApproximationInfo::FidelityDriven)) {
-        Simulator<DDPackage>::dd->resize(qc->getNqubits());
+    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const unsigned long long seed_):
+        Simulator<Config>(seed_),
+        qc(std::move(qc_)), approximationInfo(ApproximationInfo(1.0, 1, ApproximationInfo::FidelityDriven)) {
+        Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info):
-        qc(std::move(qc_)), approx_info(approx_info) {
-        Simulator<DDPackage>::dd->resize(qc->getNqubits());
+    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approximation_info):
+        qc(std::move(qc_)), approximationInfo(approximation_info) {
+        Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info, const unsigned long long seed):
-        Simulator<DDPackage>(seed),
-        qc(std::move(qc_)), approx_info(approx_info) {
-        Simulator<DDPackage>::dd->resize(qc->getNqubits());
+    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approximation_info, const unsigned long long seed_):
+        Simulator<Config>(seed_),
+        qc(std::move(qc_)), approximationInfo(approximation_info) {
+        Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
+    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
 
     std::map<std::string, std::string> AdditionalStatistics() override {
         return {
-                {"step_fidelity", std::to_string(approx_info.step_fidelity)},
-                {"approximation_runs", std::to_string(approximation_runs)},
-                {"final_fidelity", std::to_string(final_fidelity)},
-                {"single_shots", std::to_string(single_shots)},
+                {"step_fidelity", std::to_string(approximationInfo.stepFidelity)},
+                {"approximation_runs", std::to_string(approximationRuns)},
+                {"final_fidelity", std::to_string(finalFidelity)},
+                {"single_shots", std::to_string(singleShots)},
         };
     };
 
-    [[nodiscard]] dd::QubitCount getNumberOfQubits() const override { return qc->getNqubits(); };
+    [[nodiscard]] std::size_t getNumberOfQubits() const override { return qc->getNqubits(); };
 
     [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
 
@@ -88,13 +88,13 @@ public:
 
 protected:
     std::unique_ptr<qc::QuantumComputation> qc;
-    std::size_t                             single_shots{0};
+    std::size_t                             singleShots{0};
 
-    const ApproximationInfo approx_info;
-    std::size_t             approximation_runs{0};
-    long double             final_fidelity{1.0L};
+    const ApproximationInfo approximationInfo;
+    std::size_t             approximationRuns{0};
+    long double             finalFidelity{1.0L};
 
-    std::map<std::size_t, bool> single_shot(bool ignore_nonunitaries);
+    std::map<std::size_t, bool> singleShot(bool ignore_nonunitaries);
 };
 
 #endif //DDSIM_CIRCUITSIMULATOR_HPP

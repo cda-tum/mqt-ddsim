@@ -3,6 +3,7 @@
 
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
+#include "Operations.hpp"
 #include "nlohmann/json.hpp"
 
 #include <future>
@@ -15,8 +16,8 @@
 #include <variant>
 #include <vector>
 
-template<class DDPackage = dd::Package<>>
-class PathSimulator: public CircuitSimulator<DDPackage> {
+template<class Config = dd::DDPackageConfig>
+class PathSimulator: public CircuitSimulator<Config> {
 public:
     struct SimulationPath {
         struct Step {
@@ -25,8 +26,8 @@ public:
             std::size_t                         parent;
             std::pair<std::size_t, std::size_t> children;
 
-            explicit Step(std::size_t id, std::vector<std::size_t> operations = {}, std::size_t parent = UNKNOWN, std::pair<std::size_t, std::size_t> children = {UNKNOWN, UNKNOWN}):
-                id(id), operations(std::move(operations)), parent(parent), children(std::move(children)){};
+            explicit Step(const std::size_t id_, std::vector<std::size_t> operations_ = {}, const std::size_t parent_ = UNKNOWN, std::pair<std::size_t, std::size_t> children_ = {UNKNOWN, UNKNOWN}):
+                id(id_), operations(std::move(operations_)), parent(parent_), children(std::move(children_)){};
 
             static constexpr size_t UNKNOWN = std::numeric_limits<size_t>::max();
         };
@@ -35,7 +36,7 @@ public:
         using Steps      = std::vector<Step>;
 
         SimulationPath() = default;
-        SimulationPath(std::size_t nleaves, Components components, const qc::QuantumComputation* qc, bool assumeCorrectOrder = false);
+        SimulationPath(std::size_t nleaves_, Components components_, const qc::QuantumComputation* qc_, bool assumeCorrectOrder = false);
 
         Components                    components{};
         Steps                         steps{};
@@ -67,8 +68,8 @@ public:
         std::size_t seed;
 
         //Add new variables here
-        explicit Configuration(const Mode mode = Mode::Sequential, const std::size_t bracketSize = 2, const std::size_t startingPoint = 0, std::list<std::size_t> gateCost = {}, const std::size_t seed = 0):
-            mode(mode), bracketSize(bracketSize), startingPoint(startingPoint), gateCost(std::move(gateCost)), seed(seed){};
+        explicit Configuration(const Mode mode_ = Mode::Sequential, const std::size_t bracketSize_ = 2, const std::size_t startingPoint_ = 0, std::list<std::size_t> gateCost_ = {}, const std::size_t seed_ = 0):
+            mode(mode_), bracketSize(bracketSize_), startingPoint(startingPoint_), gateCost(std::move(gateCost_)), seed(seed_){};
 
         static Mode modeFromString(const std::string& mode) {
             if (mode == "sequential" || mode == "0") {
@@ -129,19 +130,19 @@ public:
         }
     };
 
-    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, Configuration configuration = Configuration()):
-        CircuitSimulator<DDPackage>(std::move(qc)), executor(1) {
+    explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, Configuration configuration = Configuration()):
+        CircuitSimulator<Config>(std::move(qc_)), executor(1) {
         if (configuration.seed != 0) {
             // override seed in case a non-trivial one is given
-            Simulator<DDPackage>::mt.seed(Simulator<DDPackage>::seed);
+            Simulator<Config>::mt.seed(Simulator<Config>::seed);
         }
 
         // remove final measurements implement measurement support for task-based simulation
-        qc::CircuitOptimizer::removeFinalMeasurements(*(this->qc));
+        qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator<Config>::qc));
 
         // case distinction for the starting point of the alternating strategy
         if (configuration.startingPoint == 0) {
-            configuration.startingPoint = (this->qc->getNops()) / 2;
+            configuration.startingPoint = (CircuitSimulator<Config>::qc->getNops()) / 2;
         }
 
         // Add new strategies here
@@ -166,10 +167,11 @@ public:
         }
     }
 
-    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, typename Configuration::Mode mode, std::size_t bracketSize, std::size_t startingPoint, std::list<std::size_t> gateCost, std::size_t seed):
-        PathSimulator(std::move(qc), Configuration{mode, bracketSize, startingPoint, std::move(gateCost), seed}) {}
+    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, typename Configuration::Mode mode_, std::size_t bracketSize_, std::size_t startingPoint_, std::list<std::size_t> gateCost_, std::size_t seed_):
+        PathSimulator(std::move(qc_), Configuration{mode_, bracketSize_, startingPoint_, std::move(gateCost_), seed_}) {}
 
-    std::map<std::string, std::size_t> Simulate(unsigned int shots) override;
+
+    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
 
     const SimulationPath& getSimulationPath() const {
         return simulationPath;
@@ -178,7 +180,7 @@ public:
         simulationPath = path;
     }
     void setSimulationPath(const typename SimulationPath::Components& components, bool assumeCorrectOrder = false) {
-        simulationPath = SimulationPath(CircuitSimulator<DDPackage>::qc->getNops() + 1, components, CircuitSimulator<DDPackage>::qc.get(), assumeCorrectOrder);
+        simulationPath = SimulationPath(CircuitSimulator<Config>::qc->getNops() + 1, components, CircuitSimulator<Config>::qc.get(), assumeCorrectOrder);
     }
 
     // Add new strategies here

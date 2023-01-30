@@ -7,6 +7,10 @@ on:
     branches: [ master, main ]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
 env:
   BUILD_TYPE: Release
   MAKEFLAGS: "-j2"
@@ -22,9 +26,9 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - uses: DoozyX/clang-format-lint-action@v0.14
+      - uses: DoozyX/clang-format-lint-action@v0.15
         with:
-          source:             'apps include jkq mqt src test'
+          source:             'apps include mqt src test'
           extensions:         'h,hpp,c,cpp'
           clangFormatVersion: 12
 

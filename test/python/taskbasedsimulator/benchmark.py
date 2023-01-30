@@ -1,19 +1,46 @@
+from future import __annotations__
 import datetime
 import os.path
 import time
+from pathlib import Path
 
 from mqt.ddsim.pathqasmsimulator import PathQasmSimulator, get_simulation_path
 from mqt import ddsim
 from qiskit import *
 from mqt.bench import get_one_benchmark
-from pathlib import Path
+from test.python.generate_benchmarks import *
 
-from typing import Union
+
+def execute_circuit(qc: QuantumCircuit, backend, shots: int, mode: str | ddsim.PathSimulatorMode = 'sequential',
+                    **options):
+    print('Starting execution of circuit', qc.name)
+    result = execute_verification(qc, backend, shots=shots, mode=mode, optimization_level=0, **options).result()
+    counts = result.get_counts()
+    # just for debugging
+    print("Counts:", counts)
+    result_dict = result.to_dict()
+    run_results = result_dict['results'][0]
+
+    # print resulting csv string
+    with open('results_comparison.csv', 'a+') as file:
+        file.write(';{};{};{};{};{}\n'.format(qc.name, qc.num_qubits, mode, run_results['time_setup'],
+                                              run_results['time_sim']))
+
+    print(qc.name, qc.num_qubits, mode, run_results['time_taken'], run_results['time_setup'], run_results['time_sim'],
+          sep=';')
 
 
 def execute_verification(qc: QuantumCircuit, qcog: QuantumCircuit, gatecost, backend, shots: int,
-                         mode: Union[str, ddsim.PathSimulatorMode] = 'sequential', **options):
+                         mode: str | ddsim.PathSimulatorMode = 'sequential', **options):
     print('Starting execution of circuit', qc.name)
+    configuration_dict = backend.configuration().to_dict()
+    basis_gates = configuration_dict['basis_gates']
+    print('Transpiling circuit')
+    qc = transpile(qc, basis_gates=basis_gates, optimization_level=0)
+    # Compose G G'^{-1}
+    qcinv = qc.inverse()
+    qccomp = qc.compose(qcinv)
+
     print('Starting setup')
     start_time = time.time()
     if mode == 'alternating':

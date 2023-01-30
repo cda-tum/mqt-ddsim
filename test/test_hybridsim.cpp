@@ -3,17 +3,17 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-using namespace dd::literals;
+using namespace qc::literals;
 
 TEST(HybridSimTest, TrivialParallelDD) {
     auto quantumComputation = [] {
-        auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
-        quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::H);
-        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::H);
-        quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{2_pc, 1_pc}, 0, qc::X);
-        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I); // some dummy operations
-        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I);
-        return quantumComputation;
+        auto qc = std::make_unique<qc::QuantumComputation>(4);
+        qc->h(2);
+        qc->h(1);
+        qc->x(0, {2_pc, 1_pc});
+        qc->i(1); // some dummy operations
+        qc->i(1);
+        return qc;
     };
 
     HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator<>::Mode::DD);
@@ -27,27 +27,27 @@ TEST(HybridSimTest, TrivialParallelDD) {
     ASSERT_EQ(resultDD.size(), 4);
     auto it = resultDD.find("0000");
     ASSERT_TRUE(it != resultDD.end());
-    EXPECT_NEAR(it->second, 2048, 128);
+    EXPECT_NEAR(static_cast<double>(it->second), 2048, 128);
     it = resultDD.find("0010");
     ASSERT_TRUE(it != resultDD.end());
-    EXPECT_NEAR(it->second, 2048, 128);
+    EXPECT_NEAR(static_cast<double>(it->second), 2048, 128);
     it = resultDD.find("0100");
     ASSERT_TRUE(it != resultDD.end());
-    EXPECT_NEAR(it->second, 2048, 128);
+    EXPECT_NEAR(static_cast<double>(it->second), 2048, 128);
     it = resultDD.find("0111");
     ASSERT_TRUE(it != resultDD.end());
-    EXPECT_NEAR(it->second, 2048, 128);
+    EXPECT_NEAR(static_cast<double>(it->second), 2048, 128);
 }
 
 TEST(HybridSimTest, TrivialParallelAmplitude) {
     auto quantumComputation = [] {
-        auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
-        quantumComputation->emplace_back<qc::StandardOperation>(4, 2, qc::H);
-        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::H);
-        quantumComputation->emplace_back<qc::StandardOperation>(4, dd::Controls{2_pc, 1_pc}, 0, qc::X);
-        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I); // some dummy operations
-        quantumComputation->emplace_back<qc::StandardOperation>(4, 1, qc::I);
-        return quantumComputation;
+        auto qc = std::make_unique<qc::QuantumComputation>(4);
+        qc->h(2);
+        qc->h(1);
+        qc->x(0, {2_pc, 1_pc});
+        qc->i(1); // some dummy operations
+        qc->i(1);
+        return qc;
     };
 
     HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude);
@@ -60,16 +60,16 @@ TEST(HybridSimTest, TrivialParallelAmplitude) {
     ASSERT_EQ(resultAmp.size(), 4);
     auto it = resultAmp.find("0000");
     ASSERT_TRUE(it != resultAmp.end());
-    EXPECT_NEAR(it->second, 2048, 128);
+    EXPECT_NEAR(static_cast<double>(it->second), 2048, 128);
     it = resultAmp.find("0010");
     ASSERT_TRUE(it != resultAmp.end());
-    EXPECT_NEAR(it->second, 2048, 128);
+    EXPECT_NEAR(static_cast<double>(it->second), 2048, 128);
     it = resultAmp.find("0100");
     ASSERT_TRUE(it != resultAmp.end());
-    EXPECT_NEAR(it->second, 2048, 128);
+    EXPECT_NEAR(static_cast<double>(it->second), 2048, 128);
     it = resultAmp.find("1110");
     ASSERT_TRUE(it != resultAmp.end());
-    EXPECT_NEAR(it->second, 2048, 128);
+    EXPECT_NEAR(static_cast<double>(it->second), 2048, 128);
 }
 
 TEST(HybridSimTest, GRCSTestDD) {
@@ -156,11 +156,11 @@ TEST(HybridSimTest, GRCSTestFixedSeed) {
 
 TEST(HybridSimTest, NonStandardOperation) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(1);
-    quantumComputation->emplace_back<qc::StandardOperation>(1, 0, qc::H);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, 0, 0);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, 0, qc::Barrier);
-    quantumComputation->emplace_back<qc::StandardOperation>(1, 0, qc::H);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, 0, 0);
+    quantumComputation->h(0);
+    quantumComputation->measure(0, 0);
+    quantumComputation->barrier(0);
+    quantumComputation->h(0);
+    quantumComputation->measure(0, 0);
 
     HybridSchrodingerFeynmanSimulator ddsim(std::move(quantumComputation));
     EXPECT_THROW(ddsim.Simulate(0), std::invalid_argument);

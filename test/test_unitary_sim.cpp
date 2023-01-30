@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-using namespace dd::literals;
+using namespace qc::literals;
 
 TEST(UnitarySimTest, ConstructSimpleCircuitSequential) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
