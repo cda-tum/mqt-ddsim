@@ -83,7 +83,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         config = ddsim.PathSimulatorConfiguration()
         config.mode = ddsim.PathSimulatorMode.gate_cost
         config.gate_cost = [1, 1]
-        config.alternating_start = 2
+        config.starting_point = 2
         sim = ddsim.PathCircuitSimulator(circ, config)
         result = sim.simulate(1000)
         self.assertEqual(len(result.keys()), 2)
