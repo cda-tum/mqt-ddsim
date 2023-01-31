@@ -288,44 +288,43 @@ void PathSimulator<Config>::generateAlternatingSimulationPath(std::size_t starti
 }
 
 template<class Config>
-void PathSimulator<Config>::generateGatecostSimulationPath(std::size_t startingPoint, std::list<std::size_t>& gateCosts) {
+void PathSimulator<Config>::generateGatecostSimulationPath(const std::size_t startingPoint, std::list<std::size_t>& gateCosts) {
     typename SimulationPath::Components components{};
     components.reserve(CircuitSimulator<Config>::qc->getNops());
-    std::size_t startElem = startingPoint;
-    components.emplace_back(startElem, startElem + 1);
-    std::size_t       leftID   = startElem - 1;
+
     const std::size_t leftEnd  = 0;
-    std::size_t       rightID  = startElem + 2;
     const std::size_t rightEnd = CircuitSimulator<Config>::qc->getNops() + 1;
+
+    components.emplace_back(startingPoint, startingPoint + 1);
+
+    std::size_t       leftID   = startingPoint - 1;
+    std::size_t       rightID  = startingPoint + 2;
     std::size_t       nextID   = rightEnd;
-    std::size_t       runID    = 0;
+
+    if (leftID != leftEnd && rightID != rightEnd) {
+        for (auto i = 0U; i < gateCosts.front() - 1; ++i) {
+            components.emplace_back(nextID, rightID);
+            ++nextID;
+            ++rightID;
+        }
+        gateCosts.pop_front();
+    }
 
     while (leftID != leftEnd && rightID != rightEnd) {
-        if (runID == 0) {
-            for (auto i = 0U; i < gateCosts.front() - 1; ++i) {
-                components.emplace_back(nextID, rightID);
-                ++nextID;
-                ++rightID;
-            }
-            gateCosts.pop_front();
-            ++runID;
-        } else {
-            components.emplace_back(leftID, nextID);
+        components.emplace_back(leftID, nextID);
+        ++nextID;
+        --leftID;
+        for (auto i = 0U; i < gateCosts.front(); ++i) {
+            components.emplace_back(nextID, rightID);
             ++nextID;
-            --leftID;
-            for (auto i = 0U; i < gateCosts.front(); ++i) {
-                components.emplace_back(nextID, rightID);
-                ++nextID;
-                ++rightID;
-                if (rightID == rightEnd) {
-                    break;
-                }
-            }
-            gateCosts.pop_front();
-            ++runID;
+            ++rightID;
             if (rightID == rightEnd) {
                 break;
             }
+        }
+        gateCosts.pop_front();
+        if (rightID == rightEnd) {
+            break;
         }
     }
 
