@@ -4,10 +4,10 @@ import os.path
 import time
 from pathlib import Path
 
-from mqt.ddsim.pathqasmsimulator import PathQasmSimulator, get_simulation_path
 from mqt import ddsim
+from mqt.ddsim.pathqasmsimulator import PathQasmSimulator, get_simulation_path
+from mqt.bench import get_benchmark
 from qiskit import *
-from mqt.bench import get_one_benchmark
 from test.python.generate_benchmarks import *
 
 
@@ -75,8 +75,7 @@ def execute_verification(qc: QuantumCircuit, qcog: QuantumCircuit, gatecost, bac
     with p.open('a+') as file:
         file.write(';{};{};{};{};{};{}\n'.format(qc.name, qc.num_qubits, qc.size(), mode, run_results['time_setup'],
                                                  run_results['time_sim']))
-    print(qc.name, qc.num_qubits, qc.size(), mode, run_results['time_setup'], run_results['time_sim'],
-          sep=';')
+    print(qc.name, qc.num_qubits, qc.size(), mode, run_results['time_setup'], run_results['time_sim'], sep=';')
 
 
 def execute_verification_all(qc, qcog, gatecosts, backend, shots, include_cotengra, max_time, max_repeats, plot_ring):
@@ -92,19 +91,49 @@ def execute_verification_all(qc, qcog, gatecosts, backend, shots, include_coteng
                              cotengra_max_repeats=max_repeats, cotengra_plot_ring=plot_ring)
 
 
-def generate_lookup_table(lookup_table):
+def generate_lookup_table(profile_file: str) -> dict:
     # loading the Gatecost LUT
     script_path = os.path.abspath(__file__)
     script_dir = os.path.split(script_path)[0]
-    print(script_dir)
-    rel_path = "qiskit_O2_nonancilla.profile"
-    abs_file_path = os.path.join(script_dir, rel_path)
-    with open(
-            abs_file_path,
-            'r') as f:
+    abs_file_path = os.path.join(script_dir, profile_file)
+    lookup_table = {}
+    with open(abs_file_path, 'r') as f:
         for line in f.readlines():
             line = line.split(" ")
-            lookup_table[line[0] + line[1]] = str(line[2][:-1])
+            lookup_table[line[0] + line[1]] = int(line[2][:-1])
+    return lookup_table
+
+
+def run_benchmark(benchmark_name: str,  circuit_size: int, lut_gatecost: dict, backend, basis_gates_transpile: list,
+                  basis_gates_optimize: list, shots: int=0, max_time: int=3600, max_repeats: int=256,
+                  plot_ring: bool=False):
+    gatecosts = []
+    qc = get_benchmark(benchmark_name, "alg", circuit_size)
+    qc.remove_final_measurements(inplace=True)
+    qc = transpile(qc, basis_gates=basis_gates_transpile, optimization_level=0)
+    for i in range(qc.size()):
+        if qc[i][0].name == 'u2':
+            index = 'u' + str(len(qc[i][1]) - 1)
+        elif qc[i][0].name == 'u3':
+            index = 'u' + str(len(qc[i][1]) - 1)
+        elif qc[i][0].name == 'cx' or qc[i][0].name == "ccx" or qc[i][0].name.startswith('mcx'):
+            index = 'x' + str(len(qc[i][1]) - 1)
+        elif qc[i][0].name == 'mcphase' or qc[i][0].name == 'cp':
+            index = 'p' + str(len(qc[i][1]) - 1)
+        elif qc[i][0].name == 'cz':
+            index = 'z' + str(len(qc[i][1]) - 1)
+        else:
+            index = str(qc[i][0].name) + str(len(qc[i][1]) - 1)
+
+        gatecosts.append(lut_gatecost[index])
+
+    qctwo = transpile(qc, basis_gates=basis_gates_optimize, optimization_level=2)
+    qcinv = qctwo.inverse()
+    qccomp = qc.compose(qcinv)
+    qccomp.name = f"{benchmark_name}_{circuit_size}"
+
+    execute_verification_all(qc=qccomp, qcog=qc, gatecosts=gatecosts, backend=backend, shots=shots,
+                             include_cotengra=True, max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
 
 
 if __name__ == '__main__':
@@ -116,323 +145,26 @@ if __name__ == '__main__':
     # settings to create to versions of the same quantum circuit
     backend = PathQasmSimulator()
     configuration_dict = backend.configuration().to_dict()
-    basis_gates = ["id", "rz", "sx", "x", "cx", "reset"]
     basis_gates_transpile = configuration_dict['basis_gates']
+    basis_gates_optimize = ["id", "rz", "sx", "x", "cx", "reset"]
 
     # generating the lookup table
-    lut_gatecost = {}
-    generate_lookup_table(lut_gatecost)
+    lut_gatecost = generate_lookup_table("qiskit_O2_nonancilla.profile")
 
-    shots = 0
-    max_time = 3600
-    max_repeats = 256
-    plot_ring = False
     # run benchmarks
-    for n in [10, 11, 12, 13, 14]:
-        gatecosts = []
-        qc = get_one_benchmark("ae", "alg", n)
-        qc.remove_final_measurements(inplace=True)
-        qc = transpile(qc, basis_gates=basis_gates_transpile, optimization_level=0)
-        # print(qc.draw(fold=-1))
-        for i in range(qc.size()):
-            if qc[i][0].name == 'u3':
-                index = 'u' + str(len(qc[i][1]) - 1)
-            elif qc[i][0].name == 'cx' or qc[i][0].name == 'mcx' or qc[i][0].name == 'mcx_gray':
-                index = 'x' + str(len(qc[i][1]) - 1)
-            elif qc[i][0].name == 'mcphase' or qc[i][0].name == 'cp':
-                index = 'p' + str(len(qc[i][1]) - 1)
-            else:
-                index = str(qc[i][0].name) + str(len(qc[i][1]) - 1)
-            # print(index)
-            # print(lut_gatecost[index])
-            gatecosts.append(lut_gatecost[index])
-        # print(gatecosts)
-        for i in range(0, len(gatecosts)):
-            gatecosts[i] = int(gatecosts[i])
-        qctwo = transpile(qc, basis_gates=basis_gates, optimization_level=2)
-        qcinv = qctwo.inverse()
-        qccomp = qc.compose(qcinv)
-        qccomp.name = "ae_" + str(n)
-        # sim = ddsim.PathCircuitSimulator(qccomp)
-        # result = sim.simulate(1000)
-        # print(result)
-        execute_verification_all(qc=qccomp, qcog=qc, backend=backend, gatecosts=gatecosts, shots=shots,
-                                 include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
+    benchmarks = {
+        "ae": [10, 11, 12, 13, 14],
+        "qpeinexact": [14, 15, 16, 17, 18],
+        "graphstate": [46, 48, 50, 52, 54, 56],
+        "ghz": [64, 96, 128],
+        "wstate": [64, 96, 128],
+        "dj": [64, 96, 128],
+        "qftentangled": [14, 15, 16, 17, 18],
+        "su2random":  [10, 11, 12, 13, 14, 15, 16, 17],
+        "realamprandom":  [10, 11, 12, 13, 14, 15, 16, 17],
+        "twolocalrandom":  [14, 15, 16, 17],
+    }
 
-    for n in [14, 15, 16, 17, 18]:
-        gatecosts = []
-        qc = get_one_benchmark("qpeinexact", "alg", n)
-        qc.remove_final_measurements(inplace=True)
-        qc = transpile(qc, basis_gates=basis_gates_transpile, optimization_level=0)
-        for i in range(qc.size()):
-            if qc[i][0].name == 'cp':
-                index = 'p' + str(len(qc[i][1]) - 1)
-            else:
-                index = str(qc[i][0].name) + str(len(qc[i][1]) - 1)
-            # print(index)
-            # print(lut_gatecost[index])
-            gatecosts.append(lut_gatecost[index])
-        # print(gatecosts)
-        for i in range(0, len(gatecosts)):
-            gatecosts[i] = int(gatecosts[i])
-        qctwo = transpile(qc, basis_gates=basis_gates, optimization_level=2)
-        qcinv = qctwo.inverse()
-        qccomp = qc.compose(qcinv)
-        qccomp.name = "qpeinexacte_" + str(n)
-        # execute_circuit(qccomp, backend, shots)
-        # sim = ddsim.PathCircuitSimulator(qccomp)
-        # result = sim.simulate(1000)
-        # print(result)
-        execute_verification_all(qc=qccomp, qcog=qc, gatecosts=gatecosts, backend=backend, shots=shots,
-                                 include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for n in [46, 48, 50, 52, 54, 56]:
-        gatecosts = []
-        qc = get_one_benchmark("graphstate", "alg", n)
-        qc.remove_final_measurements(inplace=True)
-        qc = transpile(qc, basis_gates=basis_gates_transpile, optimization_level=0)
-        for i in range(qc.size()):
-            if qc[i][0].name == 'cz':
-                index = 'z' + str(len(qc[i][1]) - 1)
-            else:
-                index = str(qc[i][0].name) + str(len(qc[i][1]) - 1)
-            # print(index)
-            # print(lut_gatecost[index])
-            gatecosts.append(lut_gatecost[index])
-        # print(gatecosts)
-        for i in range(0, len(gatecosts)):
-            gatecosts[i] = int(gatecosts[i])
-        qctwo = transpile(qc, basis_gates=basis_gates, optimization_level=2)
-        # print(qctwo.draw())
-        qcinv = qctwo.inverse()
-        qccomp = qc.compose(qcinv)
-        qccomp.name = "graphstate_" + str(n)
-        # print(qccomp.draw(fold=-1))
-        # print(qccomp.size())
-        # sim = ddsim.PathCircuitSimulator(qccomp)
-        # result = sim.simulate(1000)
-        # print(result)
-        execute_verification_all(qccomp, qc, gatecosts, backend, shots, include_cotengra=True, max_time=max_time,
-                                 max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for n in [64, 96, 128]:
-        gatecosts = []
-        qc = get_one_benchmark("ghz", "alg", n)
-        qc.remove_final_measurements(inplace=True)
-        for i in range(qc.size()):
-            if qc[i][0].name == 'cx':
-                index = 'x' + str(len(qc[i][1]) - 1)
-            else:
-                index = str(qc[i][0].name) + str(len(qc[i][1]) - 1)
-            # print(index)
-            # print(lut_gatecost[index])
-            gatecosts.append(lut_gatecost[index])
-        # print(gatecosts)
-        for i in range(0, len(gatecosts)):
-            gatecosts[i] = int(gatecosts[i])
-        qctwo = transpile(qc, basis_gates=basis_gates, optimization_level=2)
-        qcinv = qctwo.inverse()
-        qccomp = qc.compose(qcinv)
-        qccomp.name = "ghz_" + str(n)
-        # print(qccomp.size())
-        # print(qccomp.draw(fold=-1))
-        # sim = ddsim.PathCircuitSimulator(qccomp)
-        # result = sim.simulate(1000)
-        # print(result)
-        execute_verification_all(qccomp, qc, gatecosts, backend, shots, include_cotengra=True, max_time=max_time,
-                                 max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for n in [64, 96, 128]:
-        gatecosts = []
-        qc = get_one_benchmark("wstate", "alg", n)
-        qc.remove_final_measurements(inplace=True)
-        qc = transpile(qc, basis_gates=basis_gates_transpile, optimization_level=0)
-        # print(qc.draw(fold=-1))
-        for i in range(qc.size()):
-            if qc[i][0].name == 'cz':
-                index = 'z' + str(len(qc[i][1]) - 1)
-            elif qc[i][0].name == 'cx':
-                index = 'x' + str(len(qc[i][1]) - 1)
-            else:
-                index = str(qc[i][0].name) + str(len(qc[i][1]) - 1)
-            # print(index)
-            # print(lut_gatecost[index])
-            gatecosts.append(lut_gatecost[index])
-        # print(gatecosts)
-        for i in range(0, len(gatecosts)):
-            gatecosts[i] = int(gatecosts[i])
-        qctwo = transpile(qc, basis_gates=basis_gates, optimization_level=2)
-        qcinv = qctwo.inverse()
-        qccomp = qc.compose(qcinv)
-        qccomp.name = "wstate_" + str(n)
-        # sim = ddsim.PathCircuitSimulator(qccomp)
-        # result = sim.simulate(1000)
-        # print(result)
-        # print(qccomp.draw(fold=-1))
-        execute_verification_all(qccomp, qc, gatecosts, backend, shots, include_cotengra=True, max_time=max_time,
-                                 max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for n in [64, 96, 128]:
-        gatecosts = []
-        qc = get_one_benchmark("dj", "alg", n)
-        qc.remove_final_measurements(inplace=True)
-        qc = transpile(qc, basis_gates=basis_gates_transpile, optimization_level=0)
-        # print(qc.draw(fold=-1))
-        for i in range(qc.size()):
-            if qc[i][0].name == 'u3':
-                index = 'u' + str(len(qc[i][1]) - 1)
-            elif qc[i][0].name == 'cx' or qc[i][0].name == 'mcx' or qc[i][0].name == 'mcx_gray':
-                index = 'x' + str(len(qc[i][1]) - 1)
-            elif qc[i][0].name == 'mcphase' or qc[i][0].name == 'cp':
-                index = 'p' + str(len(qc[i][1]) - 1)
-            else:
-                index = str(qc[i][0].name) + str(len(qc[i][1]) - 1)
-            # print(index)
-            # print(lut_gatecost[index])
-            gatecosts.append(lut_gatecost[index])
-        # print(gatecosts)
-        for i in range(0, len(gatecosts)):
-            gatecosts[i] = int(gatecosts[i])
-        qctwo = transpile(qc, basis_gates=basis_gates, optimization_level=2)
-        qcinv = qctwo.inverse()
-        qccomp = qc.compose(qcinv)
-        qccomp.name = "dj_" + str(n)
-        # sim = ddsim.PathCircuitSimulator(qccomp)
-        # result = sim.simulate(1000)
-        # print(result)
-        execute_verification_all(qc=qccomp, qcog=qc, backend=backend, gatecosts=gatecosts, shots=shots,
-                                 include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for n in [14, 15, 16, 17, 18]:
-        gatecosts = []
-        qc = get_one_benchmark("qftentangled", "alg", n)
-        qc.remove_final_measurements(inplace=True)
-        qc = qc.decompose()
-        qc = transpile(qc, basis_gates=basis_gates_transpile, optimization_level=0)
-        for i in range(qc.size()):
-            if qc[i][0].name == 'u2':
-                index = 'u' + str(len(qc[i][1]) - 1)
-            elif qc[i][0].name == 'cx':
-                index = 'x' + str(len(qc[i][1]) - 1)
-            elif qc[i][0].name == 'cp':
-                index = 'p' + str(len(qc[i][1]) - 1)
-            else:
-                index = str(qc[i][0].name) + str(len(qc[i][1]) - 1)
-            # print(index)
-            # print(lut_gatecost[index])
-            gatecosts.append(lut_gatecost[index])
-        # print(gatecosts)
-        for i in range(0, len(gatecosts)):
-            gatecosts[i] = int(gatecosts[i])
-        qctwo = transpile(qc, basis_gates=basis_gates, optimization_level=2)
-        qcinv = qctwo.inverse()
-        qccomp = qc.compose(qcinv)
-        qccomp.name = "qftentangled_" + str(n)
-        # sim = ddsim.PathCircuitSimulator(qccomp)
-        # result = sim.simulate(1000)
-        # print(result)
-        execute_verification_all(qc=qccomp, qcog=qc, gatecosts=gatecosts, backend=backend, shots=shots,
-                                 include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for n in [10, 11, 12, 13, 14, 15, 16, 17]:
-        gatecosts = []
-        qc = get_one_benchmark("su2random", "alg", n)
-        qc.remove_final_measurements(inplace=True)
-        qc = transpile(qc, basis_gates=basis_gates_transpile, optimization_level=0)
-        # print(qc.draw(fold=-1))
-        for i in range(qc.size()):
-            if qc[i][0].name == 'u3':
-                index = 'u' + str(len(qc[i][1]) - 1)
-            elif qc[i][0].name == 'cx' or qc[i][0].name == 'mcx' or qc[i][0].name == 'mcx_gray' or qc[i][
-                0].name == 'ccx' or qc[i][0].name == 'mcx_vchain':
-                index = 'x' + str(len(qc[i][1]) - 1)
-            elif qc[i][0].name == 'mcphase' or qc[i][0].name == 'cp':
-                index = 'p' + str(len(qc[i][1]) - 1)
-            else:
-                index = str(qc[i][0].name) + str(len(qc[i][1]) - 1)
-            # print(index)
-            # print(lut_gatecost[index])
-            gatecosts.append(lut_gatecost[index])
-        # print(gatecosts)
-        for i in range(0, len(gatecosts)):
-            gatecosts[i] = int(gatecosts[i])
-        qctwo = transpile(qc, basis_gates=basis_gates, optimization_level=2)
-        qcinv = qctwo.inverse()
-        qccomp = qc.compose(qcinv)
-        qccomp.name = "su2random_" + str(n)
-        # sim = ddsim.PathCircuitSimulator(qccomp)
-        # result = sim.simulate(1000)
-        # print(result)
-        execute_verification_all(qc=qccomp, qcog=qc, backend=backend, gatecosts=gatecosts, shots=shots,
-                                 include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for n in [10, 11, 12, 13, 14, 15, 16, 17]:
-        gatecosts = []
-        qc = get_one_benchmark("realamprandom", "alg", n)
-        qc.remove_final_measurements(inplace=True)
-        qc = transpile(qc, basis_gates=basis_gates_transpile, optimization_level=0)
-        # print(qc.draw(fold=-1))
-        for i in range(qc.size()):
-            if qc[i][0].name == 'u3':
-                index = 'u' + str(len(qc[i][1]) - 1)
-            elif qc[i][0].name == 'cx' or qc[i][0].name == 'mcx' or qc[i][0].name == 'mcx_gray' or qc[i][
-                0].name == 'ccx' or qc[i][0].name == 'mcx_vchain':
-                index = 'x' + str(len(qc[i][1]) - 1)
-            elif qc[i][0].name == 'mcphase' or qc[i][0].name == 'cp':
-                index = 'p' + str(len(qc[i][1]) - 1)
-            else:
-                index = str(qc[i][0].name) + str(len(qc[i][1]) - 1)
-            # print(index)
-            # print(lut_gatecost[index])
-            gatecosts.append(lut_gatecost[index])
-        # print(gatecosts)
-        for i in range(0, len(gatecosts)):
-            gatecosts[i] = int(gatecosts[i])
-        qctwo = transpile(qc, basis_gates=basis_gates, optimization_level=2)
-        qcinv = qctwo.inverse()
-        qccomp = qc.compose(qcinv)
-        qccomp.name = "realamprandom_" + str(n)
-        # sim = ddsim.PathCircuitSimulator(qccomp)
-        # result = sim.simulate(1000)
-        # print(result)
-        execute_verification_all(qc=qccomp, qcog=qc, backend=backend, gatecosts=gatecosts, shots=shots,
-                                 include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for n in [14, 15, 16, 17]:
-        gatecosts = []
-        qc = get_one_benchmark("twolocalrandom", "alg", n)
-        qc.remove_final_measurements(inplace=True)
-        qc = transpile(qc, basis_gates=basis_gates_transpile, optimization_level=0)
-        # print(qc.draw(fold=-1))
-        for i in range(qc.size()):
-            if qc[i][0].name == 'u3':
-                index = 'u' + str(len(qc[i][1]) - 1)
-            elif qc[i][0].name == 'cx' or qc[i][0].name == 'mcx' or qc[i][0].name == 'mcx_gray' or qc[i][
-                0].name == 'ccx' or qc[i][0].name == 'mcx_vchain':
-                index = 'x' + str(len(qc[i][1]) - 1)
-            elif qc[i][0].name == 'mcphase' or qc[i][0].name == 'cp':
-                index = 'p' + str(len(qc[i][1]) - 1)
-            else:
-                index = str(qc[i][0].name) + str(len(qc[i][1]) - 1)
-            # print(index)
-            # print(lut_gatecost[index])
-            gatecosts.append(lut_gatecost[index])
-        # print(gatecosts)
-        for i in range(0, len(gatecosts)):
-            gatecosts[i] = int(gatecosts[i])
-        qctwo = transpile(qc, basis_gates=basis_gates, optimization_level=2)
-        qcinv = qctwo.inverse()
-        qccomp = qc.compose(qcinv)
-        qccomp.name = "twolocalrandom_" + str(n)
-        # sim = ddsim.PathCircuitSimulator(qccomp)
-        # result = sim.simulate(1000)
-        # print(result)
-        execute_verification_all(qc=qccomp, qcog=qc, backend=backend, gatecosts=gatecosts, shots=shots,
-                                 include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
+    for benchmark_name, qubit_counts in benchmarks.items():
+        for qubits in qubit_counts:
+            run_benchmark(benchmark_name, qubits, lut_gatecost, backend, basis_gates_transpile, basis_gates_optimize)
