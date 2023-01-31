@@ -8,7 +8,7 @@ from mqt import ddsim
 from mqt.ddsim.pathqasmsimulator import PathQasmSimulator, get_simulation_path
 from mqt.bench import get_benchmark
 from qiskit import *
-from test.python.generate_benchmarks import *
+from ..generate_benchmarks import *
 
 
 def execute_circuit(qc: QuantumCircuit, backend, shots: int, mode: str | ddsim.PathSimulatorMode = 'sequential',
@@ -91,13 +91,10 @@ def execute_verification_all(qc, qcog, gatecosts, backend, shots, include_coteng
                              cotengra_max_repeats=max_repeats, cotengra_plot_ring=plot_ring)
 
 
-def generate_lookup_table(profile_file: str) -> dict:
+def generate_lookup_table(profile_path: Path) -> dict:
     # loading the Gatecost LUT
-    script_path = os.path.abspath(__file__)
-    script_dir = os.path.split(script_path)[0]
-    abs_file_path = os.path.join(script_dir, profile_file)
     lookup_table = {}
-    with open(abs_file_path, 'r') as f:
+    with profile_path.open("r") as f:
         for line in f.readlines():
             line = line.split(" ")
             lookup_table[line[0] + line[1]] = int(line[2][:-1])
@@ -149,7 +146,8 @@ if __name__ == '__main__':
     basis_gates_optimize = ["id", "rz", "sx", "x", "cx", "reset"]
 
     # generating the lookup table
-    lut_gatecost = generate_lookup_table("qiskit_O2_nonancilla.profile")
+    profile_path = Path(__file__).with_name("qiskit_O2_nonancilla.profile").absolute()
+    lut_gatecost = generate_lookup_table(profile_path)
 
     # run benchmarks
     benchmarks = {
