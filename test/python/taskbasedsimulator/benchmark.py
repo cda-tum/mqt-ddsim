@@ -37,20 +37,18 @@ def execute_verification(qc: QuantumCircuit, qcog: QuantumCircuit, gatecost, bac
     basis_gates = configuration_dict['basis_gates']
     print('Transpiling circuit')
     qc = transpile(qc, basis_gates=basis_gates, optimization_level=0)
-    # Compose G G'^{-1}
-    qcinv = qc.inverse()
 
     print('Starting setup')
     start_time = time.time()
     if mode == 'alternating':
         print('number of gates in the original circuit and starting point', qcog.size())
         alt_start = qcog.size()
-        sim = ddsim.PathCircuitSimulator(circ=qc, mode=ddsim.PathSimulatorMode(mode), alternating_start=alt_start,
+        sim = ddsim.PathCircuitSimulator(circ=qc, mode=ddsim.PathSimulatorMode(mode), starting_point=alt_start,
                                          gate_cost=gatecost)
     elif mode == 'gatecost':
         print('number of gates in the original circuit and starting point', qcog.size())
         alt_start = qcog.size()
-        sim = ddsim.PathCircuitSimulator(circ=qc, mode=ddsim.PathSimulatorMode(mode), alternating_start=alt_start,
+        sim = ddsim.PathCircuitSimulator(circ=qc, mode=ddsim.PathSimulatorMode(mode), starting_point=alt_start,
                                          gate_cost=gatecost)
     else:
         sim = ddsim.PathCircuitSimulator(circ=qc, mode=ddsim.PathSimulatorMode(mode),
@@ -158,7 +156,7 @@ if __name__ == '__main__':
         # sim = ddsim.PathCircuitSimulator(qccomp)
         # result = sim.simulate(1000)
         # print(result)
-        execute_verification_all(qc=qccomp, qcog=qc, backend=backend, gate_costs=gatecosts, shots=shots,
+        execute_verification_all(qc=qccomp, qcog=qc, backend=backend, gatecosts=gatecosts, shots=shots,
                                  include_cotengra=True,
                                  max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
 
@@ -186,7 +184,7 @@ if __name__ == '__main__':
         # sim = ddsim.PathCircuitSimulator(qccomp)
         # result = sim.simulate(1000)
         # print(result)
-        execute_verification_all(qc=qccomp, qcog=qc, gate_costs=gatecosts, backend=backend, shots=shots,
+        execute_verification_all(qc=qccomp, qcog=qc, gatecosts=gatecosts, backend=backend, shots=shots,
                                  include_cotengra=True,
                                  max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
 
@@ -304,7 +302,7 @@ if __name__ == '__main__':
         # sim = ddsim.PathCircuitSimulator(qccomp)
         # result = sim.simulate(1000)
         # print(result)
-        execute_verification_all(qc=qccomp, qcog=qc, backend=backend, gate_costs=gatecosts, shots=shots,
+        execute_verification_all(qc=qccomp, qcog=qc, backend=backend, gatecosts=gatecosts, shots=shots,
                                  include_cotengra=True,
                                  max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
 
@@ -336,7 +334,7 @@ if __name__ == '__main__':
         # sim = ddsim.PathCircuitSimulator(qccomp)
         # result = sim.simulate(1000)
         # print(result)
-        execute_verification_all(qc=qccomp, qcog=qc, gate_costs=gatecosts, backend=backend, shots=shots,
+        execute_verification_all(qc=qccomp, qcog=qc, gatecosts=gatecosts, backend=backend, shots=shots,
                                  include_cotengra=True,
                                  max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
 
@@ -369,7 +367,7 @@ if __name__ == '__main__':
         # sim = ddsim.PathCircuitSimulator(qccomp)
         # result = sim.simulate(1000)
         # print(result)
-        execute_verification_all(qc=qccomp, qcog=qc, backend=backend, gate_costs=gatecosts, shots=shots,
+        execute_verification_all(qc=qccomp, qcog=qc, backend=backend, gatecosts=gatecosts, shots=shots,
                                  include_cotengra=True,
                                  max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
 
@@ -402,7 +400,7 @@ if __name__ == '__main__':
         # sim = ddsim.PathCircuitSimulator(qccomp)
         # result = sim.simulate(1000)
         # print(result)
-        execute_verification_all(qc=qccomp, qcog=qc, backend=backend, gate_costs=gatecosts, shots=shots,
+        execute_verification_all(qc=qccomp, qcog=qc, backend=backend, gatecosts=gatecosts, shots=shots,
                                  include_cotengra=True,
                                  max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
 
@@ -435,6 +433,6 @@ if __name__ == '__main__':
         # sim = ddsim.PathCircuitSimulator(qccomp)
         # result = sim.simulate(1000)
         # print(result)
-        execute_verification_all(qc=qccomp, qcog=qc, backend=backend, gate_costs=gatecosts, shots=shots,
+        execute_verification_all(qc=qccomp, qcog=qc, backend=backend, gatecosts=gatecosts, shots=shots,
                                  include_cotengra=True,
                                  max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
