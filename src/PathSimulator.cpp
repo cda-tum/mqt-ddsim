@@ -299,6 +299,7 @@ void PathSimulator<Config>::generateGatecostSimulationPath(std::size_t startingP
     const std::size_t rightEnd = CircuitSimulator<Config>::qc->getNops() + 1;
     std::size_t       nextID   = rightEnd;
     std::size_t       runID    = 0;
+
     while (leftID != leftEnd && rightID != rightEnd) {
         if (runID == 0) {
             for (auto i = 0U; i < gateCosts.front() - 1; ++i) {
