@@ -297,9 +297,9 @@ void PathSimulator<Config>::generateGatecostSimulationPath(const std::size_t sta
 
     components.emplace_back(startingPoint, startingPoint + 1);
 
-    std::size_t       leftID   = startingPoint - 1;
-    std::size_t       rightID  = startingPoint + 2;
-    std::size_t       nextID   = rightEnd;
+    std::size_t leftID  = startingPoint - 1;
+    std::size_t rightID = startingPoint + 2;
+    std::size_t nextID  = rightEnd;
 
     if (leftID != leftEnd && rightID != rightEnd) {
         for (auto i = 0U; i < gateCosts.front() - 1; ++i) {
