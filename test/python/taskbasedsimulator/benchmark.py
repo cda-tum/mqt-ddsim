@@ -1,12 +1,13 @@
 from future import __annotations__
 import datetime
 import time
-
-from qiskit import transpile
+from pathlib import Path
 
 from mqt import ddsim
 from mqt.ddsim.pathqasmsimulator import PathQasmSimulator, get_simulation_path
-from test.python.generate_benchmarks import *
+from mqt.bench import get_benchmark
+from qiskit import *
+from ..generate_benchmarks import *
 
 
 def execute_circuit(qc: QuantumCircuit, backend, shots: int, mode: str | ddsim.PathSimulatorMode = 'sequential',
@@ -28,124 +29,139 @@ def execute_circuit(qc: QuantumCircuit, backend, shots: int, mode: str | ddsim.P
           sep=';')
 
 
-def execute_verification(qc: QuantumCircuit, backend, shots: int,
+def execute_verification(qc: QuantumCircuit, qcog: QuantumCircuit, gatecost, backend, shots: int,
                          mode: str | ddsim.PathSimulatorMode = 'sequential', **options):
     print('Starting execution of circuit', qc.name)
     configuration_dict = backend.configuration().to_dict()
     basis_gates = configuration_dict['basis_gates']
     print('Transpiling circuit')
     qc = transpile(qc, basis_gates=basis_gates, optimization_level=0)
-    # Compose G G'^{-1}
-    qcinv = qc.inverse()
-    qccomp = qc.compose(qcinv)
 
     print('Starting setup')
     start_time = time.time()
-
-    sim = ddsim.PathCircuitSimulator(circ=qccomp, mode=ddsim.PathSimulatorMode(mode))
+    if mode == 'alternating':
+        print('number of gates in the original circuit and starting point', qcog.size())
+        alt_start = qcog.size()
+        sim = ddsim.PathCircuitSimulator(circ=qc, mode=ddsim.PathSimulatorMode(mode), starting_point=alt_start,
+                                         gate_cost=gatecost)
+    elif mode == 'gatecost':
+        print('number of gates in the original circuit and starting point', qcog.size())
+        alt_start = qcog.size()
+        sim = ddsim.PathCircuitSimulator(circ=qc, mode=ddsim.PathSimulatorMode(mode), starting_point=alt_start,
+                                         gate_cost=gatecost)
+    else:
+        sim = ddsim.PathCircuitSimulator(circ=qc, mode=ddsim.PathSimulatorMode(mode),
+                                         gate_cost=gatecost)  # ccomp changed to qc
     if mode == 'cotengra':
         max_time = options.get('cotengra_max_time', 60)
         max_repeats = options.get('cotengra_max_repeats', 1024)
         dump_path = options.get('cotengra_dump_path', False)
         plot_ring = options.get('cotengra_plot_ring', False)
-        path = get_simulation_path(qccomp, max_time=max_time, max_repeats=max_repeats, dump_path=dump_path,
-                                   plot_ring=plot_ring)
+        path = get_simulation_path(qc, max_time=max_time, max_repeats=max_repeats, dump_path=dump_path,
+                                   plot_ring=plot_ring)  # qccomp changed to qc
         sim.set_simulation_path(path, False)
 
     setup_time = time.time()
-
+    # print(qc.count_ops())
     print('Simulating circuit')
-    sim.simulate(shots)
+    results = sim.simulate(shots)
+    print("results are in: ", results)
     end_time = time.time()
     run_results = {'time_setup': setup_time - start_time, 'time_sim': end_time - setup_time}
 
     # print resulting csv string
-    with open('results_verification.csv', 'a+') as file:
+    p = Path(__file__).with_name('results_verification.csv')
+    with p.open('a+') as file:
         file.write(';{};{};{};{};{};{}\n'.format(qc.name, qc.num_qubits, qc.size(), mode, run_results['time_setup'],
                                                  run_results['time_sim']))
-
-    print(qc.name, qc.num_qubits, qc.size(), mode, run_results['time_setup'], run_results['time_sim'],
-          sep=';')
+    print(qc.name, qc.num_qubits, qc.size(), mode, run_results['time_setup'], run_results['time_sim'], sep=';')
 
 
-def execute_verification_all(qc, backend, basis_gates, shots, include_cotengra, max_time, max_repeats, plot_ring):
-    print('Transpiling circuit')
-    qc = transpile(qc, basis_gates=basis_gates, optimization_level=0)
-    execute_verification(qc, backend, shots)
-    execute_verification(qc, backend, shots, 'alternating')
+def execute_verification_all(qc, qcog, gatecosts, backend, shots, include_cotengra, max_time, max_repeats, plot_ring):
+    print('Running sequential')
+    execute_verification(qc, qcog, gatecosts, backend, shots)
+    # print('Running naive')
+    # execute_verification(qc, qcog, gatecosts, backend, shots, 'alternating')
+    print('Running gatecost')
+    execute_verification(qc, qcog, gatecosts, backend, shots, 'gatecost')
+    print('Running CoTenGra')
     if include_cotengra:
-        execute_verification(qc, backend, shots, 'cotengra', cotengra_max_time=max_time,
+        execute_verification(qc, qcog, gatecosts, backend, shots, 'cotengra', cotengra_max_time=max_time,
                              cotengra_max_repeats=max_repeats, cotengra_plot_ring=plot_ring)
 
 
+def generate_lookup_table(profile_path: Path) -> dict:
+    # loading the Gatecost LUT
+    lookup_table = {}
+    with profile_path.open("r") as f:
+        for line in f.readlines():
+            line = line.split(" ")
+            lookup_table[line[0] + line[1]] = int(line[2][:-1])
+    return lookup_table
+
+
+def run_benchmark(benchmark_name: str,  circuit_size: int, lut_gatecost: dict, backend, basis_gates_transpile: list,
+                  basis_gates_optimize: list, shots: int=0, max_time: int=3600, max_repeats: int=256,
+                  plot_ring: bool=False):
+    gatecosts = []
+    qc = get_benchmark(benchmark_name, "alg", circuit_size)
+    qc.remove_final_measurements(inplace=True)
+    qc = transpile(qc, basis_gates=basis_gates_transpile, optimization_level=0)
+    for i in range(qc.size()):
+        if qc[i][0].name == 'u2':
+            index = 'u' + str(len(qc[i][1]) - 1)
+        elif qc[i][0].name == 'u3':
+            index = 'u' + str(len(qc[i][1]) - 1)
+        elif qc[i][0].name == 'cx' or qc[i][0].name == "ccx" or qc[i][0].name.startswith('mcx'):
+            index = 'x' + str(len(qc[i][1]) - 1)
+        elif qc[i][0].name == 'mcphase' or qc[i][0].name == 'cp':
+            index = 'p' + str(len(qc[i][1]) - 1)
+        elif qc[i][0].name == 'cz':
+            index = 'z' + str(len(qc[i][1]) - 1)
+        else:
+            index = str(qc[i][0].name) + str(len(qc[i][1]) - 1)
+
+        gatecosts.append(lut_gatecost[index])
+
+    qctwo = transpile(qc, basis_gates=basis_gates_optimize, optimization_level=2)
+    qcinv = qctwo.inverse()
+    qccomp = qc.compose(qcinv)
+    qccomp.name = f"{benchmark_name}_{circuit_size}"
+
+    execute_verification_all(qc=qccomp, qcog=qc, gatecosts=gatecosts, backend=backend, shots=shots,
+                             include_cotengra=True, max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
+
+
 if __name__ == '__main__':
-    with open('results_verification.csv', 'a+') as file:
+    p = Path(__file__).with_name('results_verification.csv')
+    with p.open('a+') as file:
         file.write(
             datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S") + ';name;nqubits;ngates;mode;time_setup;time_sim\n')
 
-    # settings
+    # settings to create to versions of the same quantum circuit
     backend = PathQasmSimulator()
     configuration_dict = backend.configuration().to_dict()
-    basis_gates = configuration_dict['basis_gates']
+    basis_gates_transpile = configuration_dict['basis_gates']
+    basis_gates_optimize = ["id", "rz", "sx", "x", "cx", "reset"]
 
-    shots = 0
-    max_time = 3600
-    max_repeats = 256
-    plot_ring = False
+    # generating the lookup table
+    profile_path = Path(__file__).with_name("qiskit_O2_nonancilla.profile").absolute()
+    lut_gatecost = generate_lookup_table(profile_path)
 
     # run benchmarks
-    for n in [48, 64, 96, 128]:
-        qc = ghz(n, include_measurements=False)
-        execute_verification_all(qc=qc, backend=backend, basis_gates=basis_gates, shots=shots, include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
+    benchmarks = {
+        "ae": [10, 11, 12, 13, 14],
+        "qpeinexact": [14, 15, 16, 17, 18],
+        "graphstate": [46, 48, 50, 52, 54, 56],
+        "ghz": [64, 96, 128],
+        "wstate": [64, 96, 128],
+        "dj": [64, 96, 128],
+        "qftentangled": [14, 15, 16, 17, 18],
+        "su2random":  [10, 11, 12, 13, 14, 15, 16, 17],
+        "realamprandom":  [10, 11, 12, 13, 14, 15, 16, 17],
+        "twolocalrandom":  [14, 15, 16, 17],
+    }
 
-    for n in [48, 64, 96, 128]:
-        qc = w_state(n, include_measurements=False)
-        execute_verification_all(qc=qc, backend=backend, basis_gates=basis_gates, shots=shots, include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for n in [14, 15, 16, 17, 18, 19]:
-        qc = qft_entangled(n, include_measurements=False)
-        execute_verification_all(qc=qc, backend=backend, basis_gates=basis_gates, shots=shots, include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for n in [25, 26, 27, 28, 29]:
-        qc = qpe_exact(n, include_measurements=False)
-        execute_verification_all(qc=qc, backend=backend, basis_gates=basis_gates, shots=shots, include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for n in [15, 16, 17, 18]:
-        qc = qpe_inexact(n, include_measurements=False)
-        execute_verification_all(qc=qc, backend=backend, basis_gates=basis_gates, shots=shots, include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for n in [42, 44, 46, 48, 50, 52]:
-        qc = graph_state(n, include_measurements=False)
-        execute_verification_all(qc=qc, backend=backend, basis_gates=basis_gates, shots=shots, include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for n in [8, 9, 10]:
-        qc = grover(n, include_measurements=False)
-        execute_verification_all(qc=qc, backend=backend, basis_gates=basis_gates, shots=shots, include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for n in [24, 25, 26, 27, 28, 29, 30]:
-        qc = grover(n, include_measurements=False)
-        execute_verification_all(qc=qc, backend=backend, basis_gates=basis_gates, shots=shots, include_cotengra=False,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for [i, j] in [[15, 7], [21, 2]]:
-        qc = shor(i, j, include_measurements=False)
-        execute_verification_all(qc=qc, backend=backend, basis_gates=basis_gates, shots=shots, include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
-
-    for [i, j] in [[35, 3], [65, 2], [129, 2]]:
-        qc = shor(i, j, include_measurements=False)
-        execute_verification_all(qc=qc, backend=backend, basis_gates=basis_gates, shots=shots, include_cotengra=False,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
-
-    # # this most certainly fails due to the low PARAMETER_TOLERANCE configured in the QFR library
-    for n in [16, 32, 48, 64]:
-        qc = qft(n, include_measurements=False)
-        execute_verification_all(qc=qc, backend=backend, basis_gates=basis_gates, shots=shots, include_cotengra=True,
-                                 max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
+    for benchmark_name, qubit_counts in benchmarks.items():
+        for qubits in qubit_counts:
+            run_benchmark(benchmark_name, qubits, lut_gatecost, backend, basis_gates_transpile, basis_gates_optimize)

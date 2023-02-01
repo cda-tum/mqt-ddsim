@@ -160,6 +160,7 @@ PYBIND11_MODULE(pyddsim, m) {
             .value("cotengra", PathSimulator<>::Configuration::Mode::Cotengra)
             .value("bracket", PathSimulator<>::Configuration::Mode::BracketGrouping)
             .value("alternating", PathSimulator<>::Configuration::Mode::Alternating)
+            .value("gate_cost", PathSimulator<>::Configuration::Mode::GateCost)
             .export_values()
             .def(py::init([](const std::string& str) -> PathSimulator<>::Configuration::Mode { return PathSimulator<>::Configuration::modeFromString(str); }));
 
@@ -169,8 +170,10 @@ PYBIND11_MODULE(pyddsim, m) {
                            R"pbdoc(Setting the mode used for determining a simulation path)pbdoc")
             .def_readwrite("bracket_size", &PathSimulator<>::Configuration::bracketSize,
                            R"pbdoc(Size of the brackets one wants to combine)pbdoc")
-            .def_readwrite("alternating_start", &PathSimulator<>::Configuration::alternatingStart,
-                           R"pbdoc(Start of the alternating strategy)pbdoc")
+            .def_readwrite("starting_point", &PathSimulator<>::Configuration::startingPoint,
+                           R"pbdoc(Start of the alternating or gate_cost strategy)pbdoc")
+            .def_readwrite("gate_cost", &PathSimulator<>::Configuration::gateCost,
+                           R"pbdoc(A list that contains the number of gates which are considered in each step)pbdoc")
             .def_readwrite("seed", &PathSimulator<>::Configuration::seed,
                            R"pbdoc(Seed for the simulator)pbdoc")
             .def("json", &PathSimulator<>::Configuration::json)
@@ -179,8 +182,8 @@ PYBIND11_MODULE(pyddsim, m) {
     py::class_<PathSimulator<>>(m, "PathCircuitSimulator")
             .def(py::init<>(&create_simulator_without_seed<PathSimulator<>, PathSimulator<>::Configuration&>),
                  "circ"_a, "config"_a = PathSimulator<>::Configuration())
-            .def(py::init<>(&create_simulator_without_seed<PathSimulator<>, PathSimulator<>::Configuration::Mode&, const std::size_t&, const std::size_t&, const std::size_t&>),
-                 "circ"_a, "mode"_a = PathSimulator<>::Configuration::Mode::Sequential, "bracket_size"_a = 2, "alternating_start"_a = 0, "seed"_a = 0)
+            .def(py::init<>(&create_simulator_without_seed<PathSimulator<>, PathSimulator<>::Configuration::Mode&, const std::size_t&, const std::size_t&, const std::list<std::size_t>&, const std::size_t&>),
+                 "circ"_a, "mode"_a = PathSimulator<>::Configuration::Mode::Sequential, "bracket_size"_a = 2, "starting_point"_a = 0, "gate_cost"_a = std::list<std::size_t>{}, "seed"_a = 0)
             .def("set_simulation_path", py::overload_cast<const PathSimulator<>::SimulationPath::Components&, bool>(&PathSimulator<>::setSimulationPath))
             .def("get_number_of_qubits", &CircuitSimulator<>::getNumberOfQubits)
             .def("get_name", &CircuitSimulator<>::getName)

@@ -14,12 +14,14 @@ TEST(TaskBasedSimTest, Configuration) {
     EXPECT_EQ(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode::BracketGrouping), "bracket");
     EXPECT_EQ(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode::Alternating), "alternating");
     EXPECT_EQ(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode::Cotengra), "cotengra");
+    EXPECT_EQ(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode::GateCost), "gate_cost");
 
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("sequential"), PathSimulator<>::Configuration::Mode::Sequential);
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("pairwise_recursive"), PathSimulator<>::Configuration::Mode::PairwiseRecursiveGrouping);
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("bracket"), PathSimulator<>::Configuration::Mode::BracketGrouping);
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("alternating"), PathSimulator<>::Configuration::Mode::Alternating);
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("cotengra"), PathSimulator<>::Configuration::Mode::Cotengra);
+    EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("gate_cost"), PathSimulator<>::Configuration::Mode::GateCost);
 
     auto config = PathSimulator<>::Configuration{};
     config.seed = 12345U;
@@ -28,8 +30,13 @@ TEST(TaskBasedSimTest, Configuration) {
     config.bracketSize = 3;
     std::cout << config.toString() << std::endl;
 
-    config.mode             = PathSimulator<>::Configuration::Mode::Alternating;
-    config.alternatingStart = 13;
+    config.mode          = PathSimulator<>::Configuration::Mode::Alternating;
+    config.startingPoint = 13;
+    std::cout << config.toString() << std::endl;
+
+    config.mode          = PathSimulator<>::Configuration::Mode::GateCost;
+    config.startingPoint = 2;
+    config.gateCost      = {2, 2, 1, 1};
     std::cout << config.toString() << std::endl;
 }
 
@@ -58,7 +65,7 @@ TEST(TaskBasedSimTest, SimpleCircuitArgumentConstructor) {
     qc->x(0U, 1_pc);
 
     // construct simulator and generate sequential contraction plan
-    PathSimulator tbs(std::move(qc), PathSimulator<>::Configuration::Mode::Sequential, 2, 0, 12345U);
+    PathSimulator tbs(std::move(qc), PathSimulator<>::Configuration::Mode::Sequential, 2, 0, {}, 12345U);
 
     // simulate circuit
     auto counts = tbs.Simulate(1024);
@@ -202,6 +209,52 @@ TEST(TaskBasedSimTest, EmptyCircuit) {
     for (const auto& [state, count]: counts) {
         EXPECT_EQ(state, "00");
         EXPECT_EQ(count, shots);
+        std::cout << state << ": " << count << std::endl;
+    }
+}
+
+TEST(TaskBasedSimTest, SimpleCircuitGatecost) {
+    auto qc = std::make_unique<qc::QuantumComputation>(2);
+    qc->h(1U);
+    qc->x(0U, 1_pc);
+    qc->x(0U, 1_pc);
+    qc->x(0U, 1_pc);
+    qc->x(0U, 1_pc);
+    qc->x(0U, 1_pc);
+    qc->x(0U, 1_pc);
+
+    // construct simulator and generate gatecost contraction plan
+    PathSimulator tbs(std::move(qc), PathSimulator<>::Configuration::Mode::GateCost, 2, 2, {1, 1}, 12345U);
+
+    // simulate circuit
+    auto counts = tbs.Simulate(1024);
+
+    for (const auto& [state, count]: counts) {
+        std::cout << state << ": " << count << std::endl;
+    }
+}
+
+TEST(TaskBasedSimTest, SimpleCircuitGatecostConfigurationObject) {
+    auto qc = std::make_unique<qc::QuantumComputation>(2);
+    qc->h(1U);
+    qc->x(0U, 1_pc);
+    qc->x(0U, 1_pc);
+    qc->x(0U, 1_pc);
+    qc->x(0U, 1_pc);
+    qc->x(0U, 1_pc);
+    qc->x(0U, 1_pc);
+
+    // construct simulator and generate gatecost contraction plan
+    auto config          = PathSimulator<>::Configuration{};
+    config.mode          = PathSimulator<>::Configuration::Mode::GateCost;
+    config.startingPoint = 5;
+    config.gateCost      = {1, 1};
+    PathSimulator tbs(std::move(qc), config);
+
+    // simulate circuit
+    auto counts = tbs.Simulate(1024);
+
+    for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;
     }
 }

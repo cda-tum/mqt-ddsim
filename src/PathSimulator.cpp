@@ -288,6 +288,66 @@ void PathSimulator<Config>::generateAlternatingSimulationPath(std::size_t starti
 }
 
 template<class Config>
+void PathSimulator<Config>::generateGatecostSimulationPath(const std::size_t startingPoint, std::list<std::size_t>& gateCosts) {
+    typename SimulationPath::Components components{};
+    components.reserve(CircuitSimulator<Config>::qc->getNops());
+
+    const std::size_t leftEnd  = 0;
+    const std::size_t rightEnd = CircuitSimulator<Config>::qc->getNops() + 1;
+
+    components.emplace_back(startingPoint, startingPoint + 1);
+
+    std::size_t leftID  = startingPoint - 1;
+    std::size_t rightID = startingPoint + 2;
+    std::size_t nextID  = rightEnd;
+
+    if (leftID != leftEnd && rightID != rightEnd) {
+        for (auto i = 0U; i < gateCosts.front() - 1; ++i) {
+            components.emplace_back(nextID, rightID);
+            ++nextID;
+            ++rightID;
+        }
+        gateCosts.pop_front();
+    }
+
+    while (leftID != leftEnd && rightID != rightEnd) {
+        components.emplace_back(leftID, nextID);
+        ++nextID;
+        --leftID;
+        for (auto i = 0U; i < gateCosts.front(); ++i) {
+            components.emplace_back(nextID, rightID);
+            ++nextID;
+            ++rightID;
+            if (rightID == rightEnd) {
+                break;
+            }
+        }
+        gateCosts.pop_front();
+        if (rightID == rightEnd) {
+            break;
+        }
+    }
+
+    //Finish the left-hand side
+    while (leftID != leftEnd) {
+        components.emplace_back(leftID, nextID);
+        ++nextID;
+        --leftID;
+    }
+
+    //Finish the right-hand side
+    while (rightID != rightEnd) {
+        components.emplace_back(nextID, rightID);
+        ++nextID;
+        ++rightID;
+    }
+
+    //Add the remaining matrix-vector multiplication
+    components.emplace_back(0, nextID);
+    setSimulationPath(components, true);
+}
+
+template<class Config>
 void PathSimulator<Config>::constructTaskGraph() {
     const auto& path  = simulationPath.components;
     const auto& steps = simulationPath.steps;

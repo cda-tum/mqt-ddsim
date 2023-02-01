@@ -122,6 +122,7 @@ class PathQasmSimulator(BackendV1):
             mode=None,
             bracket_size=None,
             alternating_start=None,
+            gate_cost=None,
             seed=None,
             cotengra_max_time=60,
             cotengra_max_repeats=1024,
@@ -216,6 +217,10 @@ class PathQasmSimulator(BackendV1):
         alternating_start = options.get('alternating_start')
         if alternating_start is not None:
             pathsim_configuration.alternating_start = alternating_start
+
+        gate_cost = options.get('gate_cost')
+        if gate_cost is not None:
+            pathsim_configuration.gate_cost = gate_cost
 
         seed = options.get('seed')
         if seed is not None:

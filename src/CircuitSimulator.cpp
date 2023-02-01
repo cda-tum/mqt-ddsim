@@ -81,7 +81,6 @@ std::map<std::string, std::size_t> CircuitSimulator<Config>::Simulate(std::size_
         }
         m_counter[result_string]++;
     }
-
     return m_counter;
 }
 

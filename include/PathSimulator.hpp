@@ -51,7 +51,8 @@ public:
             PairwiseRecursiveGrouping,
             BracketGrouping,
             Alternating,
-            Cotengra
+            Cotengra,
+            GateCost
         };
 
         // mode to use
@@ -59,15 +60,16 @@ public:
 
         // settings for the bracket size
         std::size_t bracketSize;
-        // settings for the alternating mode
-        std::size_t alternatingStart;
-
+        // settings for the alternating and gatecost mode, which need a starting point
+        std::size_t startingPoint;
+        // settings for the gate costs mode
+        std::list<std::size_t> gateCost;
         // random seed
         std::size_t seed;
 
         //Add new variables here
-        explicit Configuration(const Mode mode_ = Mode::Sequential, const std::size_t bracketSize_ = 2, const std::size_t alternatingStart_ = 0, const std::size_t seed_ = 0):
-            mode(mode_), bracketSize(bracketSize_), alternatingStart(alternatingStart_), seed(seed_){};
+        explicit Configuration(const Mode mode_ = Mode::Sequential, const std::size_t bracketSize_ = 2, const std::size_t startingPoint_ = 0, std::list<std::size_t> gateCost_ = {}, const std::size_t seed_ = 0):
+            mode(mode_), bracketSize(bracketSize_), startingPoint(startingPoint_), gateCost(std::move(gateCost_)), seed(seed_){};
 
         static Mode modeFromString(const std::string& mode) {
             if (mode == "sequential" || mode == "0") {
@@ -80,6 +82,8 @@ public:
                 return Mode::Alternating;
             } else if (mode == "cotengra" || mode == "4") {
                 return Mode::Cotengra;
+            } else if (mode == "gate_cost" || mode == "5") {
+                return Mode::GateCost;
             } else {
                 throw std::invalid_argument("Invalid simulation path mode: " + mode);
             }
@@ -97,6 +101,8 @@ public:
                     return "alternating";
                 case Mode::Cotengra:
                     return "cotengra";
+                case Mode::GateCost:
+                    return "gate_cost";
                 default:
                     throw std::invalid_argument("Invalid simulation path mode");
             }
@@ -108,7 +114,10 @@ public:
             if (mode == Mode::BracketGrouping) {
                 conf["bracket_size"] = bracketSize;
             } else if (mode == Mode::Alternating) {
-                conf["alternating_start"] = alternatingStart;
+                conf["starting_point"] = startingPoint;
+            } else if (mode == Mode::GateCost) {
+                conf["starting_point"] = startingPoint;
+                conf["gate_cost"]      = gateCost;
             }
             if (seed != 0) {
                 conf["seed"] = seed;
@@ -132,8 +141,8 @@ public:
         qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator<Config>::qc));
 
         // case distinction for the starting point of the alternating strategy
-        if (configuration.alternatingStart == 0) {
-            configuration.alternatingStart = (CircuitSimulator<Config>::qc->getNops()) / 2;
+        if (configuration.startingPoint == 0) {
+            configuration.startingPoint = (CircuitSimulator<Config>::qc->getNops()) / 2;
         }
 
         // Add new strategies here
@@ -147,17 +156,19 @@ public:
             case Configuration::Mode::Cotengra:
                 break;
             case Configuration::Mode::Alternating:
-                generateAlternatingSimulationPath(configuration.alternatingStart);
+                generateAlternatingSimulationPath(configuration.startingPoint);
                 break;
-            case Configuration::Mode::Sequential:
+            case Configuration::Mode::GateCost:
+                generateGatecostSimulationPath(configuration.startingPoint, configuration.gateCost);
+                break;
             default:
                 generateSequentialSimulationPath();
                 break;
         }
     }
 
-    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, typename Configuration::Mode mode, std::size_t bracketSize, std::size_t alternatingStart, std::size_t seed_):
-        PathSimulator<Config>(std::move(qc_), Configuration{mode, bracketSize, alternatingStart, seed_}) {}
+    PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, typename Configuration::Mode mode_, std::size_t bracketSize_, std::size_t startingPoint_, std::list<std::size_t> gateCost_, std::size_t seed_):
+        PathSimulator(std::move(qc_), Configuration{mode_, bracketSize_, startingPoint_, std::move(gateCost_), seed_}) {}
 
     std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
 
@@ -176,6 +187,7 @@ public:
     void generatePairwiseRecursiveGroupingSimulationPath();
     void generateBracketSimulationPath(std::size_t bracketSize);
     void generateAlternatingSimulationPath(std::size_t startingPoint);
+    void generateGatecostSimulationPath(std::size_t startingPoint, std::list<std::size_t>& gateCosts);
 
 private:
     std::unordered_map<std::size_t, tf::Task>                                 tasks{};
