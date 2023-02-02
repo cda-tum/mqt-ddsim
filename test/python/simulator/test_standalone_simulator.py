@@ -29,3 +29,20 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         self.assertEqual(len(result.keys()), 2)
         self.assertIn('000', result.keys())
         self.assertIn('111', result.keys())
+
+    def test_standalone_simple_approximation(self):
+        import numpy as np
+
+        # creates a state with <2% probability of measuring |1x>
+        circ = QuantumCircuit(2)
+        circ.h(0)
+        circ.cry(np.pi / 8, 0, 1)
+
+        # create a simulator that approximates once and by at most 2%
+        sim = ddsim.CircuitSimulator(circ, approximation_step_fidelity=0.98, approximation_steps=2)
+        result = sim.simulate(4096)
+
+        # the result should always be 0
+        self.assertEqual(len(result.keys()), 2)
+        self.assertIn('00', result.keys())
+        self.assertIn('01', result.keys())

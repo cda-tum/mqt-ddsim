@@ -244,3 +244,17 @@ TEST(CircuitSimTest, TestingProperties) {
     EXPECT_EQ(ddsim.getMatrixActiveNodeCount(), 0);
     EXPECT_EQ(ddsim.countNodesFromRoot(), 7);
 }
+
+TEST(CircuitSimTest, ApproximationTest) {
+    // the following creates a state where the first qubit has a <2% probability of being 1
+    auto qc = std::make_unique<qc::QuantumComputation>(2);
+    qc->h(0);
+    qc->ry(1, qc::Control{0}, qc::PI / 8);
+
+    // approximating the state with fidelity 0.98 should allow to eliminate the 1-successor of the first qubit
+    CircuitSimulator ddsim(std::move(qc), ApproximationInfo(0.98, 2, ApproximationInfo::FidelityDriven));
+    ddsim.Simulate(4096);
+    const auto vec = ddsim.getVectorComplex();
+    EXPECT_EQ(abs(vec[2]), 0);
+    EXPECT_EQ(abs(vec[3]), 0);
+}
