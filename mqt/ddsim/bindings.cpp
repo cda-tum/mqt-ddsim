@@ -141,6 +141,7 @@ void dump_tensor_network(const py::object& circ, const std::string& filename) {
 PYBIND11_MODULE(pyddsim, m) {
     m.doc() = "Python interface for the MQT DDSIM quantum circuit simulator";
 
+    // Circuit Simulator
     py::class_<CircuitSimulator<>>(m, "CircuitSimulator")
             .def(py::init<>(&create_simulator<CircuitSimulator<>>),
                  "circ"_a,
@@ -154,6 +155,7 @@ PYBIND11_MODULE(pyddsim, m) {
             .def("statistics", &CircuitSimulator<>::AdditionalStatistics)
             .def("get_vector", &CircuitSimulator<>::getVectorComplex);
 
+    // Hybrid Schrödinger-Feynman Simulator
     py::enum_<HybridSchrodingerFeynmanSimulator<>::Mode>(m, "HybridMode")
             .value("DD", HybridSchrodingerFeynmanSimulator<>::Mode::DD)
             .value("amplitude", HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude)
@@ -176,7 +178,7 @@ PYBIND11_MODULE(pyddsim, m) {
             .def("get_mode", &HybridSchrodingerFeynmanSimulator<>::getMode)
             .def("get_final_amplitudes", &HybridSchrodingerFeynmanSimulator<>::getFinalAmplitudes);
 
-    // TODO: Add new strategies here
+    // Path Simulator
     py::enum_<PathSimulator<>::Configuration::Mode>(m, "PathSimulatorMode")
             .value("sequential", PathSimulator<>::Configuration::Mode::Sequential)
             .value("pairwise_recursive", PathSimulator<>::Configuration::Mode::PairwiseRecursiveGrouping)
@@ -214,6 +216,7 @@ PYBIND11_MODULE(pyddsim, m) {
             .def("statistics", &CircuitSimulator<>::AdditionalStatistics)
             .def("get_vector", &CircuitSimulator<>::getVectorComplex);
 
+    // Unitary Simulator
     py::enum_<UnitarySimulator<>::Mode>(m, "ConstructionMode")
             .value("recursive", UnitarySimulator<>::Mode::Recursive)
             .value("sequential", UnitarySimulator<>::Mode::Sequential)
@@ -235,6 +238,7 @@ PYBIND11_MODULE(pyddsim, m) {
             .def("get_final_node_count", &UnitarySimulator<>::getFinalNodeCount)
             .def("get_max_node_count", &UnitarySimulator<>::getMaxNodeCount);
 
+    // Miscellaneous functions
     m.def("get_matrix", &getNumpyMatrix<>, "sim"_a, "mat"_a);
 
     m.def("dump_tensor_network", &dump_tensor_network, "dump a tensor network representation of the given circuit",
