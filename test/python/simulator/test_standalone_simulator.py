@@ -24,7 +24,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.CircuitSimulator(circ, 1337)
+        sim = ddsim.CircuitSimulator(circ, seed=1337)
         result = sim.simulate(1000)
         self.assertEqual(len(result.keys()), 2)
         self.assertIn('000', result.keys())
