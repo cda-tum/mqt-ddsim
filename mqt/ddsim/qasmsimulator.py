@@ -104,7 +104,16 @@ class QasmSimulator(BackendV1):
 
     def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options):
         start_time = time.time()
-        sim = ddsim.CircuitSimulator(qobj_experiment, options.get('seed', -1))
+        approximation_step_fidelity = options.get('approximation_step_fidelity', 1.0)
+        approximation_steps = options.get('approximation_steps', 1)
+        approximation_method = options.get('approximation_method', 'fidelity')
+        seed = options.get('seed', -1)
+
+        sim = ddsim.CircuitSimulator(qobj_experiment,
+                                     approximation_step_fidelity=approximation_step_fidelity,
+                                     approximation_steps=approximation_steps,
+                                     approximation_method=approximation_method,
+                                     seed=seed)
         counts = sim.simulate(options.get('shots', 1024))
         end_time = time.time()
         counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
