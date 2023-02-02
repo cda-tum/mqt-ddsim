@@ -165,8 +165,8 @@ TEST(CircuitSimTest, ApproximateByFidelity) {
 
     double resulting_fidelity = ddsim.ApproximateByFidelity(0.3, false, true, true);
 
-    ASSERT_EQ(ddsim.getActiveNodeCount(), 4);
-    ASSERT_DOUBLE_EQ(resulting_fidelity, 0.75); //equal up to 4 ULP
+    ASSERT_EQ(ddsim.getActiveNodeCount(), 3);
+    ASSERT_DOUBLE_EQ(resulting_fidelity, 0.5); //equal up to 4 ULP
 }
 
 TEST(CircuitSimTest, ApproximateBySampling) {
@@ -206,8 +206,8 @@ TEST(CircuitSimTest, ApproximationByFidelityInSimulator) {
     CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo(0.3, 1, ApproximationInfo::FidelityDriven));
     ddsim.Simulate(1);
 
-    ASSERT_EQ(ddsim.getActiveNodeCount(), 4);
-    ASSERT_LE(std::stod(ddsim.AdditionalStatistics()["final_fidelity"]), 0.75); // the least contributing path has .25
+    ASSERT_EQ(ddsim.getActiveNodeCount(), 3);
+    ASSERT_DOUBLE_EQ(std::stod(ddsim.AdditionalStatistics()["final_fidelity"]), 0.5);
 }
 
 TEST(CircuitSimTest, GRCS4x4Test) {
