@@ -125,7 +125,7 @@ class HybridQasmSimulator(BackendV1):
         else:
             raise DDSIMError('Simulation mode', mode, 'not supported by MQT hybrid simulator. Available modes are \'amplitude\' and \'dd\'')
 
-        sim = ddsim.HybridCircuitSimulator(qobj_experiment, seed, hybrid_mode, nthreads)
+        sim = ddsim.HybridCircuitSimulator(qobj_experiment, seed=seed, mode=hybrid_mode, nthreads=nthreads)
 
         shots = options.get('shots', 1024)
         if self.SHOW_STATE_VECTOR and shots > 0:

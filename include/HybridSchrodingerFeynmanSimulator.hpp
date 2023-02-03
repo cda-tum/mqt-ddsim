@@ -19,14 +19,28 @@ public:
         Amplitude
     };
 
-    explicit HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, Mode mode_ = Mode::Amplitude, const std::size_t nthreads_ = 2):
-        CircuitSimulator<Config>(std::move(qc_)), mode(mode_), nthreads(nthreads_) {
+    HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
+                                      const ApproximationInfo&                  approxInfo_,
+                                      Mode                                      mode_     = Mode::Amplitude,
+                                      const std::size_t                         nthreads_ = 2):
+        CircuitSimulator<Config>(std::move(qc_), approxInfo_),
+        mode(mode_), nthreads(nthreads_) {
         // remove final measurements
         qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator<Config>::qc));
     }
 
-    HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approx_info_, const unsigned long long seed_, Mode mode_ = Mode::Amplitude, const std::size_t nthreads_ = 2):
-        CircuitSimulator<Config>(std::move(qc_), approx_info_, seed_), mode(mode_), nthreads(nthreads_) {
+    explicit HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
+                                               Mode                                      mode_     = Mode::Amplitude,
+                                               const std::size_t                         nthreads_ = 2):
+        HybridSchrodingerFeynmanSimulator(std::move(qc_), {}, mode_, nthreads_) {}
+
+    HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
+                                      const ApproximationInfo&                  approxInfo_,
+                                      const unsigned long long                  seed_,
+                                      Mode                                      mode_     = Mode::Amplitude,
+                                      const std::size_t                         nthreads_ = 2):
+        CircuitSimulator<Config>(std::move(qc_), approxInfo_, seed_),
+        mode(mode_), nthreads(nthreads_) {
         // remove final measurements
         qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator<Config>::qc));
     }

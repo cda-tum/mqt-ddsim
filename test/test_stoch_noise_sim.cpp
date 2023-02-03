@@ -162,8 +162,8 @@ TEST(StochNoiseSimTest, ApproximateByFidelity) {
 
     double resulting_fidelity = ddsim.ApproximateByFidelity(0.3, false, true);
 
-    ASSERT_EQ(ddsim.getActiveNodeCount(), 4);
-    ASSERT_DOUBLE_EQ(resulting_fidelity, 0.75); //equal up to 4 ULP
+    ASSERT_EQ(ddsim.getActiveNodeCount(), 3);
+    ASSERT_DOUBLE_EQ(resulting_fidelity, 0.5); //equal up to 4 ULP
 }
 
 TEST(StochNoiseSimTest, ApproximateBySampling) {

@@ -24,7 +24,7 @@ class MQTStandaloneUnitarySimulatorTests(unittest.TestCase):
         self.assertEqual(np.count_nonzero(self.unitary), 16)
 
     def test_standalone_sequential_mode_with_seed(self):
-        sim = ddsim.UnitarySimulator(self.circuit, 1337, mode=ddsim.ConstructionMode.sequential)
+        sim = ddsim.UnitarySimulator(self.circuit, seed=1337, mode=ddsim.ConstructionMode.sequential)
         sim.construct()
 
         ddsim.get_matrix(sim, self.unitary)
@@ -40,7 +40,7 @@ class MQTStandaloneUnitarySimulatorTests(unittest.TestCase):
         self.assertEqual(np.count_nonzero(self.unitary), 16)
 
     def test_standalone_recursive_mode_with_seed(self):
-        sim = ddsim.UnitarySimulator(self.circuit, 1337, mode=ddsim.ConstructionMode.recursive)
+        sim = ddsim.UnitarySimulator(self.circuit, seed=1337, mode=ddsim.ConstructionMode.recursive)
         sim.construct()
 
         ddsim.get_matrix(sim, self.unitary)

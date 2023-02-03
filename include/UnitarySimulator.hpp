@@ -17,14 +17,25 @@ public:
         Recursive
     };
 
-    explicit UnitarySimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, Mode simMode = Mode::Recursive):
-        CircuitSimulator<Config>(std::move(qc_)), mode(simMode) {
+    UnitarySimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
+                     const ApproximationInfo&                  approximationInfo_,
+                     Mode                                      simMode = Mode::Recursive):
+        CircuitSimulator<Config>(std::move(qc_), approximationInfo_),
+        mode(simMode) {
         // remove final measurements
         qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator<Config>::qc));
     }
 
-    UnitarySimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const ApproximationInfo approximation_info, const unsigned long long seed_, Mode simMode = Mode::Recursive):
-        CircuitSimulator<Config>(std::move(qc_), approximation_info, seed_), mode(simMode) {
+    explicit UnitarySimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
+                              Mode                                      simMode = Mode::Recursive):
+        UnitarySimulator(std::move(qc_), {}, simMode) {}
+
+    UnitarySimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
+                     const ApproximationInfo&                  approximationInfo_,
+                     const unsigned long long                  seed_,
+                     const Mode                                simMode = Mode::Recursive):
+        CircuitSimulator<Config>(std::move(qc_), approximationInfo_, seed_),
+        mode(simMode) {
         // remove final measurements
         qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator<Config>::qc));
     }

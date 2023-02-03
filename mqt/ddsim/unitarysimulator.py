@@ -114,7 +114,7 @@ class UnitarySimulator(BackendV1):
         else:
             raise DDSIMError('Construction mode', mode, 'not supported by DDSIM unitary simulator. Available modes are \'recursive\' and \'sequential\'')
 
-        sim = ddsim.UnitarySimulator(qobj_experiment, seed, construction_mode)
+        sim = ddsim.UnitarySimulator(qobj_experiment, seed=seed, mode=construction_mode)
         sim.construct()
         # Add extract resulting matrix from final DD and write data
         unitary = np.zeros((2 ** qobj_experiment.header.n_qubits, 2 ** qobj_experiment.header.n_qubits), dtype=complex)

@@ -178,9 +178,16 @@ double Simulator<Config>::ApproximateByFidelity(std::unique_ptr<dd::Package<Conf
                 break;
             }
         }
-        if (!allLevels && remove * i > max_remove) {
-            max_remove      = remove * i;
-            nodes_to_remove = tmp;
+        if (!allLevels) {
+            if (i == 0) {
+                if (remove > max_remove) {
+                    max_remove      = remove;
+                    nodes_to_remove = tmp;
+                }
+            } else if (remove * i > max_remove) {
+                max_remove      = remove * i;
+                nodes_to_remove = tmp;
+            }
         }
     }
 
