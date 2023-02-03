@@ -12,36 +12,36 @@
 #include <string>
 
 struct ApproximationInfo {
-    enum ApproximationMethod {
+    enum ApproximationStrategy {
         FidelityDriven,
         MemoryDriven
     };
 
     /* Default to no approximation */
     ApproximationInfo() = default;
-    ApproximationInfo(const double stepFidelity_, const std::size_t stepNumber_, const ApproximationMethod method_):
-        stepFidelity(stepFidelity_), stepNumber(stepNumber_), method(method_) {}
+    ApproximationInfo(const double stepFidelity_, const std::size_t stepNumber_, const ApproximationStrategy strategy_):
+        stepFidelity(stepFidelity_), stepNumber(stepNumber_), strategy(strategy_) {}
 
-    static ApproximationMethod fromString(const std::string& str) {
+    static ApproximationStrategy fromString(const std::string& str) {
         if (str == "fidelity") {
             return FidelityDriven;
         } else if (str == "memory") {
             return MemoryDriven;
         } else {
-            throw std::runtime_error("Unknown approximation method '" + str + "'.");
+            throw std::runtime_error("Unknown approximation strategy '" + str + "'.");
         }
     }
 
-    friend std::istream& operator>>(std::istream& in, ApproximationMethod& method_) {
+    friend std::istream& operator>>(std::istream& in, ApproximationStrategy& strategy_) {
         std::string token;
         in >> token;
-        method_ = fromString(token);
+        strategy_ = fromString(token);
         return in;
     }
 
-    const double              stepFidelity = 1.;
-    const std::size_t         stepNumber   = 1;
-    const ApproximationMethod method       = FidelityDriven;
+    const double                stepFidelity = 1.;
+    const std::size_t           stepNumber   = 1;
+    const ApproximationStrategy strategy     = FidelityDriven;
 };
 
 template<class Config = dd::DDPackageConfig>

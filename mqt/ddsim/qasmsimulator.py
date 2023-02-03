@@ -106,13 +106,13 @@ class QasmSimulator(BackendV1):
         start_time = time.time()
         approximation_step_fidelity = options.get('approximation_step_fidelity', 1.0)
         approximation_steps = options.get('approximation_steps', 1)
-        approximation_method = options.get('approximation_method', 'fidelity')
+        approximation_strategy = options.get('approximation_strategy', 'fidelity')
         seed = options.get('seed', -1)
 
         sim = ddsim.CircuitSimulator(qobj_experiment,
                                      approximation_step_fidelity=approximation_step_fidelity,
                                      approximation_steps=approximation_steps,
-                                     approximation_method=approximation_method,
+                                     approximation_strategy=approximation_strategy,
                                      seed=seed)
         counts = sim.simulate(options.get('shots', 1024))
         end_time = time.time()

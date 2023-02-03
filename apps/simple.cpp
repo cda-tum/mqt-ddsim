@@ -40,7 +40,7 @@ int main(int argc, char** argv) {
         ("simulate_ghz", "simulate state preparation of GHZ state for given number of qubits", cxxopts::value<unsigned int>())
         ("step_fidelity", "target fidelity for each approximation run (>=1 = disable approximation)", cxxopts::value<double>()->default_value("1.0"))
         ("steps", "number of approximation steps", cxxopts::value<unsigned int>()->default_value("1"))
-        ("approx_when", "approximation method ('fidelity' (default) or 'memory'", cxxopts::value<std::string>()->default_value("fidelity"))
+        ("approx_when", "approximation strategy ('fidelity' (default) or 'memory'", cxxopts::value<std::string>()->default_value("fidelity"))
         ("approx_state", "do excessive approximation runs at the end of the simulation to see how the quantum state behaves")
         ("simulate_grover", "simulate Grover's search for given number of qubits with random oracle", cxxopts::value<unsigned int>())
         ("simulate_grover_emulated", "simulate Grover's search for given number of qubits with random oracle and emulation", cxxopts::value<unsigned int>())
@@ -66,18 +66,11 @@ int main(int argc, char** argv) {
 
     auto mode = HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude;
 
-    ApproximationInfo::ApproximationMethod method;
-    if (vm["approx_when"].as<std::string>() == "fidelity") {
-        method = ApproximationInfo::FidelityDriven;
-    } else if (vm["approx_when"].as<std::string>() == "memory") {
-        method = ApproximationInfo::MemoryDriven;
-    } else {
-        throw std::runtime_error("Unknown approximation method '" + vm["approx_when"].as<std::string>() + "'.");
-    }
+    const auto strategy = ApproximationInfo::fromString(vm["approx_when"].as<std::string>());
 
     std::unique_ptr<qc::QuantumComputation>         quantumComputation;
     std::unique_ptr<Simulator<dd::DDPackageConfig>> ddsim{nullptr};
-    ApproximationInfo                               approximationInfo(stepFidelity, approxSteps, method);
+    ApproximationInfo                               approximationInfo(stepFidelity, approxSteps, strategy);
     const bool                                      verbose = vm.count("verbose") > 0;
 
     if (vm.count("simulate_file")) {

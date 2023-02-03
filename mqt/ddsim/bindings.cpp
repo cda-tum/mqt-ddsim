@@ -47,11 +47,11 @@ template<class Simulator, typename... Args>
 std::unique_ptr<Simulator> create_simulator(const py::object&   circ,
                                             const double        stepFidelity,
                                             const unsigned int  stepNumber,
-                                            const std::string&  approximationMethod,
+                                            const std::string&  approximationStrategy,
                                             const long long int seed,
                                             Args&&... args) {
     auto       qc     = std::make_unique<qc::QuantumComputation>(importCircuit(circ));
-    const auto approx = ApproximationInfo{stepFidelity, stepNumber, ApproximationInfo::fromString(approximationMethod)};
+    const auto approx = ApproximationInfo{stepFidelity, stepNumber, ApproximationInfo::fromString(approximationStrategy)};
     if constexpr (std::is_same_v<Simulator, PathSimulator<>>) {
         return std::make_unique<Simulator>(std::move(qc),
                                            std::forward<Args>(args)...);
@@ -147,7 +147,7 @@ PYBIND11_MODULE(pyddsim, m) {
                  "circ"_a,
                  "approximation_step_fidelity"_a = 1.,
                  "approximation_steps"_a         = 1,
-                 "approximation_method"_a        = "fidelity",
+                 "approximation_strategy"_a      = "fidelity",
                  "seed"_a                        = -1)
             .def("get_number_of_qubits", &CircuitSimulator<>::getNumberOfQubits)
             .def("get_name", &CircuitSimulator<>::getName)
@@ -166,7 +166,7 @@ PYBIND11_MODULE(pyddsim, m) {
                  "circ"_a,
                  "approximation_step_fidelity"_a = 1.,
                  "approximation_steps"_a         = 1,
-                 "approximation_method"_a        = "fidelity",
+                 "approximation_strategy"_a      = "fidelity",
                  "seed"_a                        = -1,
                  "mode"_a                        = HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude,
                  "nthreads"_a                    = 2)
@@ -227,7 +227,7 @@ PYBIND11_MODULE(pyddsim, m) {
                  "circ"_a,
                  "approximation_step_fidelity"_a = 1.,
                  "approximation_steps"_a         = 1,
-                 "approximation_method"_a        = "fidelity",
+                 "approximation_strategy"_a      = "fidelity",
                  "seed"_a                        = -1,
                  "mode"_a                        = UnitarySimulator<>::Mode::Recursive)
             .def("get_number_of_qubits", &CircuitSimulator<>::getNumberOfQubits)
