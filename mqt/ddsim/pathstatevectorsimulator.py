@@ -4,13 +4,12 @@ import logging
 
 from qiskit.providers.models import BackendConfiguration
 
-from mqt import ddsim
-from mqt.ddsim.pathqasmsimulator import PathQasmSimulator
+from mqt.ddsim import PathQasmSimulatorBackend, __version__
 
 logger = logging.getLogger(__name__)
 
 
-class PathStatevectorSimulator(PathQasmSimulator):
+class PathStatevectorSimulatorBackend(PathQasmSimulatorBackend):
     """Python interface to MQT DDSIM Simulation Path Framework"""
 
     SHOW_STATE_VECTOR = True
@@ -18,7 +17,7 @@ class PathStatevectorSimulator(PathQasmSimulator):
     def __init__(self, configuration=None, provider=None):
         conf = {
             "backend_name": "path_sim_statevector_simulator",
-            "backend_version": ddsim.__version__,
+            "backend_version": __version__,
             "url": "https://github.com/cda-tum/ddsim",
             "simulator": True,
             "local": True,

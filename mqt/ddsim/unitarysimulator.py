@@ -16,21 +16,20 @@ from qiskit.qobj import PulseQobj, QasmQobj, QasmQobjExperiment, Qobj
 from qiskit.result import Result
 from qiskit.utils.multiprocessing import local_hardware_info
 
-from mqt import ddsim
-
-from .error import DDSIMError
-from .job import DDSIMJob
+from mqt.ddsim import ConstructionMode, UnitarySimulator, __version__, get_matrix
+from mqt.ddsim.error import DDSIMError
+from mqt.ddsim.job import DDSIMJob
 
 logger = logging.getLogger(__name__)
 
 
-class UnitarySimulator(BackendV1):
+class UnitarySimulatorBackend(BackendV1):
     """Decision diagram-based unitary simulator."""
 
     def __init__(self, configuration=None, provider=None, **fields):
         conf = {
             "backend_name": "unitary_simulator",
-            "backend_version": ddsim.__version__,
+            "backend_version": __version__,
             "n_qubits": min(24, int(log2(sqrt(local_hardware_info()["memory"] * (1024 ** 3) / 16)))),
             "url": "https://github.com/cda-tum/ddsim",
             "simulator": True,
@@ -110,19 +109,19 @@ class UnitarySimulator(BackendV1):
         mode = options.get("mode", "recursive")
 
         if mode == "sequential":
-            construction_mode = ddsim.ConstructionMode.sequential
+            construction_mode = ConstructionMode.sequential
         elif mode == "recursive":
-            construction_mode = ddsim.ConstructionMode.recursive
+            construction_mode = ConstructionMode.recursive
         else:
             msg = (f"Construction mode {mode} not supported by DDSIM unitary simulator. Available modes are "
                    "'recursive' and 'sequential'")
             raise DDSIMError(msg)
 
-        sim = ddsim.UnitarySimulator(qobj_experiment, seed=seed, mode=construction_mode)
+        sim = UnitarySimulator(qobj_experiment, seed=seed, mode=construction_mode)
         sim.construct()
         # Add extract resulting matrix from final DD and write data
         unitary = np.zeros((2 ** qobj_experiment.header.n_qubits, 2 ** qobj_experiment.header.n_qubits), dtype=complex)
-        ddsim.get_matrix(sim, unitary)
+        get_matrix(sim, unitary)
         data = {
             "unitary": unitary,
             "construction_time": sim.get_construction_time(),

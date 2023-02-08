@@ -4,13 +4,12 @@ import logging
 
 from qiskit.providers.models import BackendConfiguration
 
-from mqt import ddsim
-from mqt.ddsim.qasmsimulator import QasmSimulator
+from mqt.ddsim import QasmSimulatorBackend, __version__
 
 logger = logging.getLogger(__name__)
 
 
-class StatevectorSimulator(QasmSimulator):
+class StatevectorSimulatorBackend(QasmSimulatorBackend):
     """Python interface to MQT DDSIM"""
 
     SHOW_STATE_VECTOR = True
@@ -18,7 +17,7 @@ class StatevectorSimulator(QasmSimulator):
     def __init__(self, configuration=None, provider=None):
         conf = {
             "backend_name": "statevector_simulator",
-            "backend_version": ddsim.__version__,
+            "backend_version": __version__,
             "url": "https://github.com/cda-tum/ddsim",
             "simulator": True,
             "local": True,

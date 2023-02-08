@@ -13,14 +13,13 @@ from qiskit.providers.models import BackendConfiguration, BackendStatus
 from qiskit.qobj import PulseQobj, QasmQobj, QasmQobjExperiment, Qobj
 from qiskit.result import Result
 
-from mqt import ddsim
-
-from .job import DDSIMJob
+from mqt.ddsim import CircuitSimulator, __version__
+from mqt.ddsim.job import DDSIMJob
 
 logger = logging.getLogger(__name__)
 
 
-class QasmSimulator(BackendV1):
+class QasmSimulatorBackend(BackendV1):
     """Python interface to MQT DDSIM"""
 
     SHOW_STATE_VECTOR = False
@@ -36,7 +35,7 @@ class QasmSimulator(BackendV1):
     def __init__(self, configuration=None, provider=None):
         conf = {
             "backend_name": "qasm_simulator",
-            "backend_version": ddsim.__version__,
+            "backend_version": __version__,
             "url": "https://github.com/cda-tum/ddsim",
             "simulator": True,
             "local": True,
@@ -111,7 +110,7 @@ class QasmSimulator(BackendV1):
         approximation_strategy = options.get("approximation_strategy", "fidelity")
         seed = options.get("seed", -1)
 
-        sim = ddsim.CircuitSimulator(qobj_experiment,
+        sim = CircuitSimulator(qobj_experiment,
                                      approximation_step_fidelity=approximation_step_fidelity,
                                      approximation_steps=approximation_steps,
                                      approximation_strategy=approximation_strategy,

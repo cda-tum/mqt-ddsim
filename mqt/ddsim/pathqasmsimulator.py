@@ -14,9 +14,8 @@ from qiskit.providers.models import BackendConfiguration, BackendStatus
 from qiskit.qobj import PulseQobj, QasmQobj, QasmQobjExperiment, Qobj
 from qiskit.result import Result
 
-from mqt import ddsim
-
-from .job import DDSIMJob
+from mqt.ddsim import PathCircuitSimulator, PathSimulatorConfiguration, PathSimulatorMode, __version__
+from mqt.ddsim.job import DDSIMJob
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +104,7 @@ def get_simulation_path(qc, max_time: int = 60, max_repeats: int = 1024, paralle
     return path
 
 
-class PathQasmSimulator(BackendV1):
+class PathQasmSimulatorBackend(BackendV1):
     """Python interface to MQT DDSIM Simulation Path Framework"""
 
     SHOW_STATE_VECTOR = False
@@ -116,7 +115,7 @@ class PathQasmSimulator(BackendV1):
             shots=None,
             parameter_binds=None,
             simulator_seed=None,
-            pathsim_configuration=ddsim.PathSimulatorConfiguration(),
+            pathsim_configuration=PathSimulatorConfiguration(),
             mode=None,
             bracket_size=None,
             alternating_start=None,
@@ -131,7 +130,7 @@ class PathQasmSimulator(BackendV1):
     def __init__(self, configuration=None, provider=None):
         conf = {
             "backend_name": "path_sim_qasm_simulator",
-            "backend_version": ddsim.__version__,
+            "backend_version": __version__,
             "url": "https://github.com/cda-tum/ddsim",
             "simulator": True,
             "local": True,
@@ -203,11 +202,11 @@ class PathQasmSimulator(BackendV1):
     def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options):
         start_time = time.time()
 
-        pathsim_configuration = options.get("pathsim_configuration", ddsim.PathSimulatorConfiguration())
+        pathsim_configuration = options.get("pathsim_configuration", PathSimulatorConfiguration())
 
         mode = options.get("mode")
         if mode is not None:
-            pathsim_configuration.mode = ddsim.PathSimulatorMode(mode)
+            pathsim_configuration.mode = PathSimulatorMode(mode)
 
         bracket_size = options.get("bracket_size")
         if bracket_size is not None:
@@ -225,10 +224,10 @@ class PathQasmSimulator(BackendV1):
         if seed is not None:
             pathsim_configuration.seed = seed
 
-        sim = ddsim.PathCircuitSimulator(qobj_experiment, config=pathsim_configuration)
+        sim = PathCircuitSimulator(qobj_experiment, config=pathsim_configuration)
 
         # determine the contraction path using cotengra in case this is requested
-        if pathsim_configuration.mode == ddsim.PathSimulatorMode.cotengra:
+        if pathsim_configuration.mode == PathSimulatorMode.cotengra:
             max_time = options.get("cotengra_max_time", 60)
             max_repeats = options.get("cotengra_max_repeats", 1024)
             dump_path = options.get("cotengra_dump_path", False)

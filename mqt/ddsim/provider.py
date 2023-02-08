@@ -1,13 +1,15 @@
 from qiskit.providers import ProviderV1
 from qiskit.providers.providerutils import filter_backends
 
-from .hybridqasmsimulator import HybridQasmSimulator
-from .hybridstatevectorsimulator import HybridStatevectorSimulator
-from .pathqasmsimulator import PathQasmSimulator
-from .pathstatevectorsimulator import PathStatevectorSimulator
-from .qasmsimulator import QasmSimulator
-from .statevectorsimulator import StatevectorSimulator
-from .unitarysimulator import UnitarySimulator
+from mqt.ddsim import (
+    HybridQasmSimulatorBackend,
+    HybridStatevectorSimulatorBackend,
+    PathQasmSimulatorBackend,
+    PathStatevectorSimulatorBackend,
+    QasmSimulatorBackend,
+    StatevectorSimulatorBackend,
+    UnitarySimulatorBackend,
+)
 
 
 class DDSIMProvider(ProviderV1):
@@ -16,13 +18,13 @@ class DDSIMProvider(ProviderV1):
     def __init__(self):
         if DDSIMProvider._BACKENDS is None:
             DDSIMProvider._BACKENDS = [
-                ("qasm_simulator", QasmSimulator, None, None),
-                ("statevector_simulator", StatevectorSimulator, None, None),
-                ("hybrid_qasm_simulator", HybridQasmSimulator, None, None),
-                ("hybrid_statevector_simulator", HybridStatevectorSimulator, None, None),
-                ("path_sim_qasm_simulator", PathQasmSimulator, None, None),
-                ("path_sim_statevector_simulator", PathStatevectorSimulator, None, None),
-                ("unitary_simulator", UnitarySimulator, None, None)
+                ("qasm_simulator", QasmSimulatorBackend, None, None),
+                ("statevector_simulator", StatevectorSimulatorBackend, None, None),
+                ("hybrid_qasm_simulator", HybridQasmSimulatorBackend, None, None),
+                ("hybrid_statevector_simulator", HybridStatevectorSimulatorBackend, None, None),
+                ("path_sim_qasm_simulator", PathQasmSimulatorBackend, None, None),
+                ("path_sim_statevector_simulator", PathStatevectorSimulatorBackend, None, None),
+                ("unitary_simulator", UnitarySimulatorBackend, None, None)
             ]
 
     def get_backend(self, name=None, **kwargs):

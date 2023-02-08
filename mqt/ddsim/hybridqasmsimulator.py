@@ -15,15 +15,14 @@ from qiskit.qobj import PulseQobj, QasmQobj, QasmQobjExperiment, Qobj
 from qiskit.result import Result
 from qiskit.utils.multiprocessing import local_hardware_info
 
-from mqt import ddsim
-
-from .error import DDSIMError
-from .job import DDSIMJob
+from mqt.ddsim import HybridCircuitSimulator, HybridMode, __version__
+from mqt.ddsim.error import DDSIMError
+from mqt.ddsim.job import DDSIMJob
 
 logger = logging.getLogger(__name__)
 
 
-class HybridQasmSimulator(BackendV1):
+class HybridQasmSimulatorBackend(BackendV1):
     """Python interface to MQT DDSIM Hybrid Schrodinger-Feynman Simulator"""
 
     SHOW_STATE_VECTOR = False
@@ -41,7 +40,7 @@ class HybridQasmSimulator(BackendV1):
     def __init__(self, configuration=None, provider=None):
         conf = {
             "backend_name": "hybrid_qasm_simulator",
-            "backend_version": ddsim.__version__,
+            "backend_version": __version__,
             "url": "https://github.com/cda-tum/ddsim",
             "simulator": True,
             "local": True,
@@ -115,7 +114,7 @@ class HybridQasmSimulator(BackendV1):
         mode = options.get("mode", "amplitude")
         nthreads = int(options.get("nthreads", local_hardware_info()["cpus"]))
         if mode == "amplitude":
-            hybrid_mode = ddsim.HybridMode.amplitude
+            hybrid_mode = HybridMode.amplitude
             max_qubits = int(log2(local_hardware_info()["memory"] * (1024 ** 3) / 16))
             algorithm_qubits = qobj_experiment.header.n_qubits
             if algorithm_qubits > max_qubits:
@@ -124,12 +123,12 @@ class HybridQasmSimulator(BackendV1):
             qubit_diff = max_qubits - algorithm_qubits
             nthreads = int(min(2 ** qubit_diff, nthreads))
         elif mode == "dd":
-            hybrid_mode = ddsim.HybridMode.DD
+            hybrid_mode = HybridMode.DD
         else:
             msg = f"Simulation mode{mode} not supported by hybrid simulator. Available modes are 'amplitude' and 'dd'."
             raise DDSIMError(msg)
 
-        sim = ddsim.HybridCircuitSimulator(qobj_experiment, seed=seed, mode=hybrid_mode, nthreads=nthreads)
+        sim = HybridCircuitSimulator(qobj_experiment, seed=seed, mode=hybrid_mode, nthreads=nthreads)
 
         shots = options.get("shots", 1024)
         if self.SHOW_STATE_VECTOR and shots > 0:
@@ -152,7 +151,7 @@ class HybridQasmSimulator(BackendV1):
                   "success": True,
                   }
         if self.SHOW_STATE_VECTOR:
-            if sim.get_mode() == ddsim.HybridMode.DD:
+            if sim.get_mode() == HybridMode.DD:
                 result["data"]["statevector"] = sim.get_vector()
             else:
                 result["data"]["statevector"] = sim.get_final_amplitudes()
