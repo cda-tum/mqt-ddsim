@@ -1,11 +1,13 @@
 import unittest
 
-from qiskit import *
+from qiskit import QuantumCircuit
 
 from mqt import ddsim
 
 
 class MQTStandaloneSimulatorTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.nonzero_states_ghz = 2
     def test_standalone(self):
         circ = QuantumCircuit(3)
         circ.h(0)
@@ -14,9 +16,9 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
 
         sim = ddsim.CircuitSimulator(circ)
         result = sim.simulate(1000)
-        self.assertEqual(len(result.keys()), 2)
-        self.assertIn('000', result.keys())
-        self.assertIn('111', result.keys())
+        assert len(result.keys()) == self.nonzero_states_ghz
+        assert "000" in result
+        assert "111" in result
 
     def test_standalone_with_seed(self):
         circ = QuantumCircuit(3)
@@ -26,9 +28,9 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
 
         sim = ddsim.CircuitSimulator(circ, seed=1337)
         result = sim.simulate(1000)
-        self.assertEqual(len(result.keys()), 2)
-        self.assertIn('000', result.keys())
-        self.assertIn('111', result.keys())
+        assert len(result.keys()) == self.nonzero_states_ghz
+        assert "000" in result
+        assert "111" in result
 
     def test_standalone_simple_approximation(self):
         import numpy as np
@@ -43,6 +45,6 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         result = sim.simulate(4096)
 
         # the result should always be 0
-        self.assertEqual(len(result.keys()), 2)
-        self.assertIn('00', result.keys())
-        self.assertIn('01', result.keys())
+        assert len(result.keys()) == self.nonzero_states_ghz
+        assert "00" in result
+        assert "01" in result

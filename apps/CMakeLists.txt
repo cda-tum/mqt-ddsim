@@ -1,15 +1,21 @@
-add_subdirectory("${PROJECT_SOURCE_DIR}/extern/cxxopts" "extern/cxxopts" EXCLUDE_FROM_ALL)
-# the following sets the SYSTEM flag for the include dirs of the cxxopts libs to suppress warnings
+add_subdirectory("${PROJECT_SOURCE_DIR}/extern/cxxopts" "extern/cxxopts"
+                 EXCLUDE_FROM_ALL)
+# the following sets the SYSTEM flag for the include dirs of the cxxopts libs to
 # cmake-lint: disable=C0307
 set_target_properties(
-        cxxopts PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
-        $<TARGET_PROPERTY:cxxopts,INTERFACE_INCLUDE_DIRECTORIES>)
+  cxxopts PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+                     $<TARGET_PROPERTY:cxxopts,INTERFACE_INCLUDE_DIRECTORIES>)
 
-macro(add_sim_executable APPNAME)
-    add_executable(${PROJECT_NAME}_${APPNAME} ${CMAKE_CURRENT_SOURCE_DIR}/${APPNAME}.cpp)
-    target_compile_options(${PROJECT_NAME}_${APPNAME} PRIVATE -Wall -Wextra -Wpedantic)
-    target_link_libraries(${PROJECT_NAME}_${APPNAME} PRIVATE ${PROJECT_NAME} ${ARGN})
-    set_target_properties(${PROJECT_NAME}_${APPNAME} PROPERTIES EXPORT_NAME ${PROJECT_NAME}_${APPNAME})
+# macro to add a executable with the given libraries
+macro(ADD_SIM_EXECUTABLE appname)
+  add_executable(${PROJECT_NAME}_${appname}
+                 ${CMAKE_CURRENT_SOURCE_DIR}/${appname}.cpp)
+  target_compile_options(${PROJECT_NAME}_${appname} PRIVATE -Wall -Wextra
+                                                            -Wpedantic)
+  target_link_libraries(${PROJECT_NAME}_${appname} PRIVATE ${PROJECT_NAME}
+                                                           ${ARGN})
+  set_target_properties(${PROJECT_NAME}_${appname}
+                        PROPERTIES EXPORT_NAME ${PROJECT_NAME}_${appname})
 endmacro()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -18,13 +24,12 @@ link_libraries(Threads::Threads)
 
 add_sim_executable(simple cxxopts::cxxopts)
 add_sim_executable(primebases cxxopts::cxxopts)
-if (Threads_FOUND)
-    add_sim_executable(noise_aware cxxopts::cxxopts)
-    target_link_libraries(${PROJECT_NAME}_noise_aware PUBLIC Threads::Threads)
-endif ()
+if(Threads_FOUND)
+  add_sim_executable(noise_aware cxxopts::cxxopts)
+  target_link_libraries(${PROJECT_NAME}_noise_aware PUBLIC Threads::Threads)
+endif()
 find_package(OpenCV QUIET)
-if (OpenCV_FOUND)
-    add_sim_executable(frqi cxxopts::cxxopts ${OpenCV_LIBRARIES})
-endif ()
+if(OpenCV_FOUND)
+  add_sim_executable(frqi cxxopts::cxxopts ${OpenCV_LIBRARIES})
+endif()
 add_sim_executable(vectors)
-

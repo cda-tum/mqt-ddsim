@@ -1,9 +1,8 @@
-from concurrent import futures
-import logging
 import functools
+import logging
+from concurrent import futures
 
-from qiskit.providers import JobV1
-from qiskit.providers import JobStatus, JobError
+from qiskit.providers import JobError, JobStatus, JobV1
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +19,8 @@ def requires_submit(func):
     @functools.wraps(func)
     def _wrapper(self, *args, **kwargs):
         if self._future is None:
-            raise JobError("Job not submitted yet!. You have to .submit() first!")
+            msg = "Job not submitted yet!. You have to .submit() first!"
+            raise JobError(msg)
         return func(self, *args, **kwargs)
     return _wrapper
 
@@ -48,7 +48,8 @@ class DDSIMJob(JobV1):
             JobError: if trying to re-submit the job.
         """
         if self._future is not None:
-            raise JobError("We have already submitted the job!")
+            msg = "We have already submitted the job!"
+            raise JobError(msg)
 
         self._future = self._executor.submit(self._fn,
                                              self._job_id,
@@ -86,18 +87,17 @@ class DDSIMJob(JobV1):
         """
         # The order is important here
         if self._future.running():
-            _status = JobStatus.RUNNING
-        elif self._future.cancelled():
-            _status = JobStatus.CANCELLED
-        elif self._future.done():
-            _status = JobStatus.DONE if self._future.exception() is None else JobStatus.ERROR
-        else:
-            # Note: There is an undocumented Future state: PENDING, that seems to show up when
-            # the job is enqueued, waiting for someone to pick it up. We need to deal with this
-            # state but there's no public API for it, so we are assuming that if the job is not
-            # in any of the previous states, is PENDING, ergo INITIALIZING for us.
-            _status = JobStatus.INITIALIZING
-        return _status
+            return JobStatus.RUNNING
+        if self._future.cancelled():
+            return JobStatus.CANCELLED
+        if self._future.done():
+            return JobStatus.DONE if self._future.exception() is None else JobStatus.ERROR
+
+        # Note: There is an undocumented Future state: PENDING, that seems to show up when
+        # the job is enqueued, waiting for someone to pick it up. We need to deal with this
+        # state but there's no public API for it, so we are assuming that if the job is not
+        # in any of the previous states, is PENDING, ergo INITIALIZING for us.
+        return JobStatus.INITIALIZING
 
     def backend(self):
         """Return the instance of the backend used for this job."""

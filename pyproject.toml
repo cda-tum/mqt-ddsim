@@ -93,3 +93,58 @@ environment = { MACOSX_DEPLOYMENT_TARGET = "10.15", DEPLOY = "ON" }
 [tool.cibuildwheel.windows]
 before-build = "pip install delvewheel"
 repair-wheel-command = "delvewheel repair -v -w {dest_dir} {wheel}"
+
+
+[tool.ruff]
+select = [
+    "E", "F", "W", # flake8
+    "A",           # flake8-builtins
+    "B",  "B904",  # flake8-bugbear
+    "I",           # isort
+    "ARG",         # flake8-unused-arguments
+    "C4",          # flake8-comprehensions
+    "EM",          # flake8-errmsg
+    "EXE",         # flake8-executable
+    "ICN",         # flake8-import-conventions
+    "ISC",         # flake8-implicit-str-concat
+    "PGH",         # pygrep-hooks
+    "PIE",         # flake8-pie
+    "PL",          # pylint
+    "PT",          # flake8-pytest-style
+    "PTH",         # flake8-use-pathlib
+    "Q",           # flake8-quotes
+    "RET",         # flake8-return
+    "RUF",         # Ruff-specific
+    "SIM",         # flake8-simplify
+    "TCH",         # flake8-type-checking
+    "UP",          # pyupgrade
+    "YTT",         # flake8-2020
+]
+ignore = ["E501"]
+target-version = "py38"
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "extern",
+]
+
+line-length = 120
