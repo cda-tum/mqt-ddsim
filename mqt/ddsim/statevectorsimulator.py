@@ -4,7 +4,8 @@ import logging
 
 from qiskit.providers.models import BackendConfiguration
 
-from mqt.ddsim import QasmSimulatorBackend, __version__
+from mqt.ddsim import __version__
+from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
 logger = logging.getLogger(__name__)
 

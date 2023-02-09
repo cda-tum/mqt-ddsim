@@ -2,14 +2,14 @@ import unittest
 
 from qiskit import BasicAer, QuantumCircuit, QuantumRegister, execute
 
-from mqt.ddsim.hybridqasmsimulator import HybridQasmSimulator
+from mqt.ddsim.hybridqasmsimulator import HybridQasmSimulatorBackend
 
 
 class MQTHybridQasmSimulatorTest(unittest.TestCase):
     """Runs backend checks, the Basic qasm_simulator tests from Qiskit Terra, and some additional tests for the Hybrid DDSIM QasmSimulator."""
 
     def setUp(self):
-        self.backend = HybridQasmSimulator()
+        self.backend = HybridQasmSimulatorBackend()
         self.circuit = QuantumCircuit.from_qasm_str("""OPENQASM 2.0;
             include "qelib1.inc";
             qreg q[3];

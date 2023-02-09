@@ -1,15 +1,13 @@
 from qiskit.providers import ProviderV1
 from qiskit.providers.providerutils import filter_backends
 
-from mqt.ddsim import (
-    HybridQasmSimulatorBackend,
-    HybridStatevectorSimulatorBackend,
-    PathQasmSimulatorBackend,
-    PathStatevectorSimulatorBackend,
-    QasmSimulatorBackend,
-    StatevectorSimulatorBackend,
-    UnitarySimulatorBackend,
-)
+from mqt.ddsim.hybridqasmsimulator import HybridQasmSimulatorBackend
+from mqt.ddsim.hybridstatevectorsimulator import HybridStatevectorSimulatorBackend
+from mqt.ddsim.pathqasmsimulator import PathQasmSimulatorBackend
+from mqt.ddsim.pathstatevectorsimulator import PathStatevectorSimulatorBackend
+from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
+from mqt.ddsim.statevectorsimulator import StatevectorSimulatorBackend
+from mqt.ddsim.unitarysimulator import UnitarySimulatorBackend
 
 
 class DDSIMProvider(ProviderV1):

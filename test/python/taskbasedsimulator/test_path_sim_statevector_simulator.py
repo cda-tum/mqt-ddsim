@@ -3,12 +3,12 @@ import unittest
 
 from qiskit import QuantumCircuit, QuantumRegister, execute
 
-from mqt.ddsim.pathstatevectorsimulator import PathStatevectorSimulator
+from mqt.ddsim.pathstatevectorsimulator import PathStatevectorSimulatorBackend
 
 
 class MQTStatevectorSimulatorTest(unittest.TestCase):
     def setUp(self):
-        self.backend = PathStatevectorSimulator()
+        self.backend = PathStatevectorSimulatorBackend()
         qr = QuantumRegister(2)
         self.q_circuit = QuantumCircuit(qr)
         self.q_circuit.h(qr[0])

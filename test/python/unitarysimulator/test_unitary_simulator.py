@@ -3,13 +3,13 @@ import unittest
 import numpy as np
 from qiskit import QuantumCircuit, execute
 
-from mqt.ddsim.unitarysimulator import UnitarySimulator
+from mqt.ddsim.unitarysimulator import UnitarySimulatorBackend
 
 
 class MQTUnitarySimulatorTest(unittest.TestCase):
 
     def setUp(self):
-        self.backend = UnitarySimulator()
+        self.backend = UnitarySimulatorBackend()
         circ = QuantumCircuit(3)
         circ.h(0)
         circ.cx(0, 1)

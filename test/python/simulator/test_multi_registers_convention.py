@@ -4,7 +4,7 @@ import unittest
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister, execute
 from qiskit.quantum_info import Statevector, state_fidelity
 
-from mqt.ddsim.statevectorsimulator import StatevectorSimulator
+from mqt.ddsim.statevectorsimulator import StatevectorSimulatorBackend
 
 
 class CircuitMultiRegsTest(unittest.TestCase):
@@ -29,7 +29,7 @@ class CircuitMultiRegsTest(unittest.TestCase):
 
         qc = meas.compose(circ, front=True)
 
-        backend_sim = StatevectorSimulator()
+        backend_sim = StatevectorSimulatorBackend()
 
         result = execute(qc, backend_sim).result()
         counts = result.get_counts(qc)

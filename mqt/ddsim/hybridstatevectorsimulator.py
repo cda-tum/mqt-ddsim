@@ -6,12 +6,13 @@ from math import log2
 from qiskit.providers.models import BackendConfiguration
 from qiskit.utils.multiprocessing import local_hardware_info
 
-from mqt.ddsim import HybridQasmSimulator, __version__
+from mqt.ddsim import __version__
+from mqt.ddsim.hybridqasmsimulator import HybridQasmSimulatorBackend
 
 logger = logging.getLogger(__name__)
 
 
-class HybridStatevectorSimulatorBackend(HybridQasmSimulator):
+class HybridStatevectorSimulatorBackend(HybridQasmSimulatorBackend):
     """Python interface to MQT DDSIM Hybrid Schrodinger-Feynman Simulator"""
 
     SHOW_STATE_VECTOR = True

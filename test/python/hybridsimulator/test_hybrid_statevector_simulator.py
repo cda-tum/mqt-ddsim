@@ -3,14 +3,14 @@ import unittest
 
 from qiskit import QuantumCircuit, QuantumRegister, execute
 
-from mqt.ddsim.hybridstatevectorsimulator import HybridStatevectorSimulator
+from mqt.ddsim.hybridstatevectorsimulator import HybridStatevectorSimulatorBackend
 
 
 class MQTHybridStatevectorSimulatorTest(unittest.TestCase):
     """Runs backend checks and some very basic functionality tests"""
 
     def setUp(self):
-        self.backend = HybridStatevectorSimulator()
+        self.backend = HybridStatevectorSimulatorBackend()
         qr = QuantumRegister(2)
         self.q_circuit = QuantumCircuit(qr)
         self.q_circuit.h(qr[0])
