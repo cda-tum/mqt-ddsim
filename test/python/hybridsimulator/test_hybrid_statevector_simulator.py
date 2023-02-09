@@ -32,7 +32,7 @@ class MQTHybridStatevectorSimulatorTest(unittest.TestCase):
     def test_statevector_output(self):
         """Test final state vector for single circuit run."""
         result = execute(self.q_circuit, backend=self.backend, shots=0).result()
-        assert result.success is True
+        assert result.success
         actual = result.get_statevector(self.q_circuit)
 
         assert len(actual) == 2**2  # state vector has 2**(#qubits) length

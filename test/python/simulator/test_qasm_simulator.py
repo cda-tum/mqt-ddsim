@@ -39,7 +39,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
     def test_qasm_simulator_single_shot(self):
         """Test single shot run."""
         result = execute(self.circuit, self.backend, shots=1).result()
-        assert result.success is True
+        assert result.success
 
     def test_qasm_simulator(self):
         """Test data counts output for single circuit run against reference."""

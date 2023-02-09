@@ -30,7 +30,7 @@ class MQTStatevectorSimulatorTest(unittest.TestCase):
     def test_statevector_output(self):
         """Test final state vector for single circuit run."""
         result = execute(self.q_circuit, backend=self.backend).result()
-        assert result.success is True
+        assert result.success
         actual = result.get_statevector(self.q_circuit)
 
         # state is 1/sqrt(2)|00> + 1/sqrt(2)|11>, up to a global phase
@@ -43,7 +43,7 @@ class MQTStatevectorSimulatorTest(unittest.TestCase):
         """Test final state vector for single circuit run."""
         mode = "pairwise_recursive"
         result = execute(self.q_circuit, backend=self.backend, mode=mode).result()
-        assert result.success is True
+        assert result.success
         actual = result.get_statevector(self.q_circuit)
 
         # state is 1/sqrt(2)|00> + 1/sqrt(2)|11>, up to a global phase

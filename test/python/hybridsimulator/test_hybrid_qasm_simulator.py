@@ -39,7 +39,7 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
     def test_qasm_simulator_single_shot(self):
         """Test single shot run."""
         result = execute(self.circuit, self.backend, shots=1).result()
-        assert result.success is True
+        assert result.success
 
     def test_qasm_simulator(self):
         """Test data counts output for single circuit run against reference."""
@@ -84,7 +84,7 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
         print(circ.draw(fold=-1))
         self.circuit = circ
         result = execute(self.circuit, self.backend, mode="dd").result()
-        assert result.success is True
+        assert result.success
         return result
 
     def test_amplitude_mode_simulation(self):
@@ -98,5 +98,5 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
         print(circ.draw(fold=-1))
         self.circuit = circ
         result = execute(self.circuit, self.backend, mode="amplitude").result()
-        assert result.success is True
+        assert result.success
         return result
