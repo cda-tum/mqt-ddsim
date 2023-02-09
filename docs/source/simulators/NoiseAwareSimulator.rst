@@ -81,7 +81,7 @@ An example run of the stochastic simulator, with 1000 samples, amplitude damping
         "threads": "8"
       }
     }
-    
+
 The deterministic simulator is run when "stochastic_runs" is set to 0. The same run from above, using the deterministic simulator would look like this:
 
 .. code-block:: console
@@ -105,6 +105,3 @@ The deterministic simulator is run when "stochastic_runs" is set to 0. The same 
         "simulation_time": 0.003795960918068886
       }
     }
-
-
-

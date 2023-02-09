@@ -78,11 +78,11 @@ class CMakeBuild(build_ext):
         with suppress(FileNotFoundError):
             Path(build_dir / "CMakeCache.txt").unlink()
 
-        subprocess.check_call(["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp)
+        subprocess.check_call(["cmake", ext.sourcedir, *cmake_args], cwd=self.build_temp)
         subprocess.check_call(
-            ["cmake", "--build", ".", "--target", ext.name.split(".")[-1]] + build_args,
+            ["cmake", "--build", ".", "--target", ext.name.split(".")[-1], *build_args],
             cwd=self.build_temp,
-            )
+        )
 
 
 setup(

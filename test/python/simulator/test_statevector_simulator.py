@@ -1,14 +1,14 @@
+import math
 import unittest
 
-from qiskit import QuantumCircuit, QuantumRegister
-from qiskit import execute
+from qiskit import QuantumCircuit, QuantumRegister, execute
 
-from mqt.ddsim.statevectorsimulator import StatevectorSimulator
+from mqt.ddsim.statevectorsimulator import StatevectorSimulatorBackend
 
 
 class MQTStatevectorSimulatorTest(unittest.TestCase):
     def setUp(self):
-        self.backend = StatevectorSimulator()
+        self.backend = StatevectorSimulatorBackend()
         qr = QuantumRegister(2)
         self.q_circuit = QuantumCircuit(qr)
         self.q_circuit.h(qr[0])
@@ -16,27 +16,25 @@ class MQTStatevectorSimulatorTest(unittest.TestCase):
 
     def test_configuration(self):
         """Test backend.configuration()."""
-        configuration = self.backend.configuration()
-        return configuration
+        return self.backend.configuration()
 
     def test_properties(self):
         """Test backend.properties()."""
         properties = self.backend.properties()
-        self.assertEqual(properties, None)
+        assert properties is None
 
     def test_status(self):
         """Test backend.status()."""
-        status = self.backend.status()
-        return status
+        return self.backend.status()
 
     def test_statevector_output(self):
         """Test final state vector for single circuit run."""
         result = execute(self.q_circuit, backend=self.backend).result()
-        self.assertEqual(result.success, True)
+        assert result.success
         actual = result.get_statevector(self.q_circuit)
 
         # state is 1/sqrt(2)|00> + 1/sqrt(2)|11>, up to a global phase
-        self.assertAlmostEqual((abs(actual[0])) ** 2, 1 / 2, places=5)
-        self.assertEqual(actual[1], 0)
-        self.assertEqual(actual[2], 0)
-        self.assertAlmostEqual((abs(actual[3])) ** 2, 1 / 2, places=5)
+        assert math.isclose((abs(actual[0])) ** 2, 0.5, abs_tol=0.0001)
+        assert actual[1] == 0
+        assert actual[2] == 0
+        assert math.isclose((abs(actual[3])) ** 2, 0.5, abs_tol=0.0001)

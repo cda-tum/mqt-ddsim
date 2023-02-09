@@ -5,7 +5,7 @@ ignore:
   - "mqt/**/*"
 
 coverage:
-  range:     60..95
+  range: 60..95
   precision: 1
   status:
     project:
@@ -19,4 +19,4 @@ parsers:
   gcov:
     branch_detection:
       conditional: no
-      loop:        no
+      loop: no

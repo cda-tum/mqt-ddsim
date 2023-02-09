@@ -1,5 +1,5 @@
 import numpy as np
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, AncillaRegister
+from qiskit import AncillaRegister, ClassicalRegister, QuantumCircuit, QuantumRegister
 from qiskit.circuit.library import QFT, GraphState, GroverOperator
 
 
@@ -10,9 +10,9 @@ def measure(qc: QuantumCircuit, q: QuantumRegister, c: ClassicalRegister):
 
 
 def ghz(n: int, include_measurements: bool = True):
-    q = QuantumRegister(n, 'q')
-    c = ClassicalRegister(n, 'c')
-    qc = QuantumCircuit(q, c, name='ghz_state')
+    q = QuantumRegister(n, "q")
+    c = ClassicalRegister(n, "c")
+    qc = QuantumCircuit(q, c, name="ghz_state")
     qc.h(q[-1])
     for i in range(1, n):
         qc.cx(q[n - i], q[n - i - 1])
@@ -22,9 +22,9 @@ def ghz(n: int, include_measurements: bool = True):
 
 
 def qft(n: int, include_measurements: bool = True):
-    q = QuantumRegister(n, 'q')
-    c = ClassicalRegister(n, 'c')
-    qc = QuantumCircuit(q, c, name='qft')
+    q = QuantumRegister(n, "q")
+    c = ClassicalRegister(n, "c")
+    qc = QuantumCircuit(q, c, name="qft")
     qc.compose(QFT(num_qubits=n), inplace=True)
     if include_measurements:
         measure(qc, q, c)
@@ -41,8 +41,8 @@ def qft_entangled(n: int, include_measurements: bool = True):
 def grover(n: int, include_measurements: bool = True):
     from qiskit.algorithms import Grover
 
-    q = QuantumRegister(n, 'q')
-    flag = AncillaRegister(1, 'flag')
+    q = QuantumRegister(n, "q")
+    flag = AncillaRegister(1, "flag")
     c = ClassicalRegister(n)
 
     state_preparation = QuantumCircuit(q, flag)
@@ -55,7 +55,7 @@ def grover(n: int, include_measurements: bool = True):
     operator = GroverOperator(oracle)
     iterations = Grover.optimal_num_iterations(1, n)
 
-    qc = QuantumCircuit(q, flag, c, name='grover')
+    qc = QuantumCircuit(q, flag, c, name="grover")
     qc.compose(state_preparation, inplace=True)
 
     qc.compose(operator.power(iterations), inplace=True)
@@ -68,8 +68,8 @@ def grover(n: int, include_measurements: bool = True):
 def graph_state(n, include_measurements: bool = True):
     import networkx as nx
 
-    q = QuantumRegister(n, 'q')
-    c = ClassicalRegister(n, 'c')
+    q = QuantumRegister(n, "q")
+    c = ClassicalRegister(n, "c")
     qc = QuantumCircuit(q, c, name="graph_state")
 
     G = nx.random_regular_graph(3, n)
@@ -81,8 +81,8 @@ def graph_state(n, include_measurements: bool = True):
 
 
 def w_state(n: int, include_measurements: bool = True):
-    q = QuantumRegister(n, 'q')
-    c = ClassicalRegister(n, 'c')
+    q = QuantumRegister(n, "q")
+    c = ClassicalRegister(n, "c")
     qc = QuantumCircuit(q, c, name="w_state")
 
     def f_gate(qc: QuantumCircuit, q: QuantumRegister, i: int, j: int, n: int, k: int):
@@ -92,10 +92,10 @@ def w_state(n: int, include_measurements: bool = True):
         qc.ry(theta, q[j])
 
     qc.x(q[-1])
-    for l in range(1, n):
-        f_gate(qc, q, n - l, n - l - 1, n, l)
-    for l in reversed(range(1, n)):
-        qc.cx(l - 1, l)
+    for p in range(1, n):
+        f_gate(qc, q, n - p, n - p - 1, n, p)
+    for p in reversed(range(1, n)):
+        qc.cx(p - 1, p)
 
     if include_measurements:
         measure(qc, q, c)
@@ -105,18 +105,19 @@ def w_state(n: int, include_measurements: bool = True):
 
 def shor(N: int, a: int = 2, include_measurements: bool = True):
     from qiskit.algorithms.factorizers import Shor
+
     qc = Shor().construct_circuit(N, a, include_measurements)
-    qc.name = "shor_" + str(N) + '_' + str(a)
+    qc.name = "shor_" + str(N) + "_" + str(a)
     return qc
 
 
 def qpe_exact(n: int, include_measurements: bool = True):
-    from fractions import Fraction
     import random
+    from fractions import Fraction
 
-    q = QuantumRegister(n, 'q')
-    psi = QuantumRegister(1, 'psi')
-    c = ClassicalRegister(n + 1, 'c')
+    q = QuantumRegister(n, "q")
+    psi = QuantumRegister(1, "psi")
+    c = ClassicalRegister(n + 1, "c")
     qc = QuantumCircuit(q, psi, c, name="qpe_exact")
 
     # get random n-bit string as target phase
@@ -148,12 +149,12 @@ def qpe_exact(n: int, include_measurements: bool = True):
 
 
 def qpe_inexact(n: int, include_measurements: bool = True):
-    from fractions import Fraction
     import random
+    from fractions import Fraction
 
-    q = QuantumRegister(n, 'q')
-    psi = QuantumRegister(1, 'psi')
-    c = ClassicalRegister(n + 1, 'c')
+    q = QuantumRegister(n, "q")
+    psi = QuantumRegister(1, "psi")
+    c = ClassicalRegister(n + 1, "c")
     qc = QuantumCircuit(q, psi, c, name="qpe_inexact")
 
     # get random n+1-bit string as target phase

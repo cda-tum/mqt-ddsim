@@ -1,93 +1,136 @@
-from future import __annotations__
+from __future__ import annotations
+
 import datetime
 import time
 from pathlib import Path
 
+from qiskit import QuantumCircuit, transpile
+
 from mqt import ddsim
-from mqt.ddsim.pathqasmsimulator import PathQasmSimulator, get_simulation_path
 from mqt.bench import get_benchmark
-from qiskit import *
-from ..generate_benchmarks import *
+from mqt.ddsim.pathqasmsimulator import PathQasmSimulator, get_simulation_path
 
 
-def execute_circuit(qc: QuantumCircuit, backend, shots: int, mode: str | ddsim.PathSimulatorMode = 'sequential',
-                    **options):
-    print('Starting execution of circuit', qc.name)
+def execute_circuit(
+    qc: QuantumCircuit, backend, shots: int, mode: str | ddsim.PathSimulatorMode = "sequential", **options
+):
+    print("Starting execution of circuit", qc.name)
     result = execute_verification(qc, backend, shots=shots, mode=mode, optimization_level=0, **options).result()
     counts = result.get_counts()
     # just for debugging
     print("Counts:", counts)
     result_dict = result.to_dict()
-    run_results = result_dict['results'][0]
+    run_results = result_dict["results"][0]
 
     # print resulting csv string
-    with open('results_comparison.csv', 'a+') as file:
-        file.write(';{};{};{};{};{}\n'.format(qc.name, qc.num_qubits, mode, run_results['time_setup'],
-                                              run_results['time_sim']))
+    with Path("results_comparison.csv").open("a+") as file:
+        file.write(
+            ";{};{};{};{};{}\n".format(qc.name, qc.num_qubits, mode, run_results["time_setup"], run_results["time_sim"])
+        )
 
-    print(qc.name, qc.num_qubits, mode, run_results['time_taken'], run_results['time_setup'], run_results['time_sim'],
-          sep=';')
+    print(
+        qc.name,
+        qc.num_qubits,
+        mode,
+        run_results["time_taken"],
+        run_results["time_setup"],
+        run_results["time_sim"],
+        sep=";",
+    )
 
 
-def execute_verification(qc: QuantumCircuit, qcog: QuantumCircuit, gatecost, backend, shots: int,
-                         mode: str | ddsim.PathSimulatorMode = 'sequential', **options):
-    print('Starting execution of circuit', qc.name)
+def execute_verification(
+    qc: QuantumCircuit,
+    qcog: QuantumCircuit,
+    gatecost,
+    backend,
+    shots: int,
+    mode: str | ddsim.PathSimulatorMode = "sequential",
+    **options,
+):
+    print("Starting execution of circuit", qc.name)
     configuration_dict = backend.configuration().to_dict()
-    basis_gates = configuration_dict['basis_gates']
-    print('Transpiling circuit')
+    basis_gates = configuration_dict["basis_gates"]
+    print("Transpiling circuit")
     qc = transpile(qc, basis_gates=basis_gates, optimization_level=0)
 
-    print('Starting setup')
+    print("Starting setup")
     start_time = time.time()
-    if mode == 'alternating':
-        print('number of gates in the original circuit and starting point', qcog.size())
+    if mode == "alternating":
+        print("number of gates in the original circuit and starting point", qcog.size())
         alt_start = qcog.size()
-        sim = ddsim.PathCircuitSimulator(circ=qc, mode=ddsim.PathSimulatorMode(mode), starting_point=alt_start,
-                                         gate_cost=gatecost)
-    elif mode == 'gatecost':
-        print('number of gates in the original circuit and starting point', qcog.size())
+        sim = ddsim.PathCircuitSimulator(
+            circ=qc, mode=ddsim.PathSimulatorMode(mode), starting_point=alt_start, gate_cost=gatecost
+        )
+    elif mode == "gatecost":
+        print("number of gates in the original circuit and starting point", qcog.size())
         alt_start = qcog.size()
-        sim = ddsim.PathCircuitSimulator(circ=qc, mode=ddsim.PathSimulatorMode(mode), starting_point=alt_start,
-                                         gate_cost=gatecost)
+        sim = ddsim.PathCircuitSimulator(
+            circ=qc, mode=ddsim.PathSimulatorMode(mode), starting_point=alt_start, gate_cost=gatecost
+        )
     else:
-        sim = ddsim.PathCircuitSimulator(circ=qc, mode=ddsim.PathSimulatorMode(mode),
-                                         gate_cost=gatecost)  # ccomp changed to qc
-    if mode == 'cotengra':
-        max_time = options.get('cotengra_max_time', 60)
-        max_repeats = options.get('cotengra_max_repeats', 1024)
-        dump_path = options.get('cotengra_dump_path', False)
-        plot_ring = options.get('cotengra_plot_ring', False)
-        path = get_simulation_path(qc, max_time=max_time, max_repeats=max_repeats, dump_path=dump_path,
-                                   plot_ring=plot_ring)  # qccomp changed to qc
+        sim = ddsim.PathCircuitSimulator(
+            circ=qc, mode=ddsim.PathSimulatorMode(mode), gate_cost=gatecost
+        )  # ccomp changed to qc
+    if mode == "cotengra":
+        max_time = options.get("cotengra_max_time", 60)
+        max_repeats = options.get("cotengra_max_repeats", 1024)
+        dump_path = options.get("cotengra_dump_path", False)
+        plot_ring = options.get("cotengra_plot_ring", False)
+        path = get_simulation_path(
+            qc, max_time=max_time, max_repeats=max_repeats, dump_path=dump_path, plot_ring=plot_ring
+        )  # qccomp changed to qc
         sim.set_simulation_path(path, False)
 
     setup_time = time.time()
     # print(qc.count_ops())
-    print('Simulating circuit')
+    print("Simulating circuit")
     results = sim.simulate(shots)
     print("results are in: ", results)
     end_time = time.time()
-    run_results = {'time_setup': setup_time - start_time, 'time_sim': end_time - setup_time}
+    run_results = {"time_setup": setup_time - start_time, "time_sim": end_time - setup_time}
 
     # print resulting csv string
-    p = Path(__file__).with_name('results_verification.csv')
-    with p.open('a+') as file:
-        file.write(';{};{};{};{};{};{}\n'.format(qc.name, qc.num_qubits, qc.size(), mode, run_results['time_setup'],
-                                                 run_results['time_sim']))
-    print(qc.name, qc.num_qubits, qc.size(), mode, run_results['time_setup'], run_results['time_sim'], sep=';')
+    p = Path(__file__).with_name("results_verification.csv")
+    with p.open("a+") as file:
+        file.write(
+            ";{};{};{};{};{};{}\n".format(
+                qc.name, qc.num_qubits, qc.size(), mode, run_results["time_setup"], run_results["time_sim"]
+            )
+        )
+    print(qc.name, qc.num_qubits, qc.size(), mode, run_results["time_setup"], run_results["time_sim"], sep=";")
 
 
-def execute_verification_all(qc, qcog, gatecosts, backend, shots, include_cotengra, max_time, max_repeats, plot_ring):
-    print('Running sequential')
+def execute_verification_all(
+    qc: QuantumCircuit,
+    qcog: QuantumCircuit,
+    gatecosts,
+    backend,
+    shots,
+    include_cotengra,
+    max_time,
+    max_repeats,
+    plot_ring,
+):
+    print("Running sequential")
     execute_verification(qc, qcog, gatecosts, backend, shots)
     # print('Running naive')
     # execute_verification(qc, qcog, gatecosts, backend, shots, 'alternating')
-    print('Running gatecost')
-    execute_verification(qc, qcog, gatecosts, backend, shots, 'gatecost')
-    print('Running CoTenGra')
+    print("Running gatecost")
+    execute_verification(qc, qcog, gatecosts, backend, shots, "gatecost")
+    print("Running CoTenGra")
     if include_cotengra:
-        execute_verification(qc, qcog, gatecosts, backend, shots, 'cotengra', cotengra_max_time=max_time,
-                             cotengra_max_repeats=max_repeats, cotengra_plot_ring=plot_ring)
+        execute_verification(
+            qc,
+            qcog,
+            gatecosts,
+            backend,
+            shots,
+            "cotengra",
+            cotengra_max_time=max_time,
+            cotengra_max_repeats=max_repeats,
+            cotengra_plot_ring=plot_ring,
+        )
 
 
 def generate_lookup_table(profile_path: Path) -> dict:
@@ -100,24 +143,33 @@ def generate_lookup_table(profile_path: Path) -> dict:
     return lookup_table
 
 
-def run_benchmark(benchmark_name: str,  circuit_size: int, lut_gatecost: dict, backend, basis_gates_transpile: list,
-                  basis_gates_optimize: list, shots: int=0, max_time: int=3600, max_repeats: int=256,
-                  plot_ring: bool=False):
+def run_benchmark(
+    benchmark_name: str,
+    circuit_size: int,
+    lut_gatecost: dict,
+    backend,
+    basis_gates_transpile: list,
+    basis_gates_optimize: list,
+    shots: int = 0,
+    max_time: int = 3600,
+    max_repeats: int = 256,
+    plot_ring: bool = False,
+):
     gatecosts = []
     qc = get_benchmark(benchmark_name, "alg", circuit_size)
     qc.remove_final_measurements(inplace=True)
     qc = transpile(qc, basis_gates=basis_gates_transpile, optimization_level=0)
     for i in range(qc.size()):
-        if qc[i][0].name == 'u2':
-            index = 'u' + str(len(qc[i][1]) - 1)
-        elif qc[i][0].name == 'u3':
-            index = 'u' + str(len(qc[i][1]) - 1)
-        elif qc[i][0].name == 'cx' or qc[i][0].name == "ccx" or qc[i][0].name.startswith('mcx'):
-            index = 'x' + str(len(qc[i][1]) - 1)
-        elif qc[i][0].name == 'mcphase' or qc[i][0].name == 'cp':
-            index = 'p' + str(len(qc[i][1]) - 1)
-        elif qc[i][0].name == 'cz':
-            index = 'z' + str(len(qc[i][1]) - 1)
+        if qc[i][0].name == "u2":
+            index = "u" + str(len(qc[i][1]) - 1)
+        elif qc[i][0].name == "u3":
+            index = "u" + str(len(qc[i][1]) - 1)
+        elif qc[i][0].name == "cx" or qc[i][0].name == "ccx" or qc[i][0].name.startswith("mcx"):
+            index = "x" + str(len(qc[i][1]) - 1)
+        elif qc[i][0].name == "mcphase" or qc[i][0].name == "cp":
+            index = "p" + str(len(qc[i][1]) - 1)
+        elif qc[i][0].name == "cz":
+            index = "z" + str(len(qc[i][1]) - 1)
         else:
             index = str(qc[i][0].name) + str(len(qc[i][1]) - 1)
 
@@ -128,20 +180,30 @@ def run_benchmark(benchmark_name: str,  circuit_size: int, lut_gatecost: dict, b
     qccomp = qc.compose(qcinv)
     qccomp.name = f"{benchmark_name}_{circuit_size}"
 
-    execute_verification_all(qc=qccomp, qcog=qc, gatecosts=gatecosts, backend=backend, shots=shots,
-                             include_cotengra=True, max_time=max_time, max_repeats=max_repeats, plot_ring=plot_ring)
+    execute_verification_all(
+        qc=qccomp,
+        qcog=qc,
+        gatecosts=gatecosts,
+        backend=backend,
+        shots=shots,
+        include_cotengra=True,
+        max_time=max_time,
+        max_repeats=max_repeats,
+        plot_ring=plot_ring,
+    )
 
 
-if __name__ == '__main__':
-    p = Path(__file__).with_name('results_verification.csv')
-    with p.open('a+') as file:
+if __name__ == "__main__":
+    p = Path(__file__).with_name("results_verification.csv")
+    with p.open("a+") as file:
         file.write(
-            datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S") + ';name;nqubits;ngates;mode;time_setup;time_sim\n')
+            datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S") + ";name;nqubits;ngates;mode;time_setup;time_sim\n"
+        )
 
     # settings to create to versions of the same quantum circuit
     backend = PathQasmSimulator()
     configuration_dict = backend.configuration().to_dict()
-    basis_gates_transpile = configuration_dict['basis_gates']
+    basis_gates_transpile = configuration_dict["basis_gates"]
     basis_gates_optimize = ["id", "rz", "sx", "x", "cx", "reset"]
 
     # generating the lookup table
@@ -157,9 +219,9 @@ if __name__ == '__main__':
         "wstate": [64, 96, 128],
         "dj": [64, 96, 128],
         "qftentangled": [14, 15, 16, 17, 18],
-        "su2random":  [10, 11, 12, 13, 14, 15, 16, 17],
-        "realamprandom":  [10, 11, 12, 13, 14, 15, 16, 17],
-        "twolocalrandom":  [14, 15, 16, 17],
+        "su2random": [10, 11, 12, 13, 14, 15, 16, 17],
+        "realamprandom": [10, 11, 12, 13, 14, 15, 16, 17],
+        "twolocalrandom": [14, 15, 16, 17],
     }
 
     for benchmark_name, qubit_counts in benchmarks.items():
