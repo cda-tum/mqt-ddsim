@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master, main ]
+    branches: [master, main]
   pull_request:
-    branches: [ master, main ]
+    branches: [master, main]
   workflow_dispatch:
 
 concurrency:
@@ -28,8 +28,8 @@ jobs:
           submodules: recursive
       - uses: DoozyX/clang-format-lint-action@v0.15
         with:
-          source:             'apps include mqt src test'
-          extensions:         'h,hpp,c,cpp'
+          source: "apps include mqt src test"
+          extensions: "h,hpp,c,cpp"
           clangFormatVersion: 12
 
   build-ubuntu:
@@ -49,7 +49,7 @@ jobs:
 
   build-macos:
     name: Build and Test on MacOS
-    needs: [ build-ubuntu, codestyle ]
+    needs: [build-ubuntu, codestyle]
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -66,7 +66,7 @@ jobs:
 
   build-windows:
     name: Build and Test on Windows
-    needs: [ build-ubuntu, codestyle ]
+    needs: [build-ubuntu, codestyle]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
@@ -81,10 +81,9 @@ jobs:
         working-directory: ${{github.workspace}}/build/test
         run: cd $BUILD_TYPE && ./ddsim_test
 
-
   coverage:
     name: Coverage
-    needs: [ build-ubuntu, codestyle ]
+    needs: [build-ubuntu, codestyle]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -100,7 +99,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          token:            ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
-          gcov:             true
-          gcov_ignore:      "extern/**/*"
+          gcov: true
+          gcov_ignore: "extern/**/*"

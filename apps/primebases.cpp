@@ -72,6 +72,6 @@ int main(int argc, char** argv) {
     } else if (vm["strategy"].as<std::string>() == "primes") {
         output_primes(vm["composite_number"].as<unsigned int>(), vm["length"].as<unsigned int>());
     } else {
-        std::cerr << "Invalid stragety.\n";
+        std::cerr << "Invalid strategy.\n";
     }
 }

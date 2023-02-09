@@ -7,24 +7,6 @@ if(NOT TARGET gtest OR NOT TARGET gmock)
   add_subdirectory(
     "${PROJECT_SOURCE_DIR}/extern/qfr/extern/dd_package/extern/googletest"
     "extern/qfr/extern/dd_package/extern/googletest" EXCLUDE_FROM_ALL)
-  mark_as_advanced(
-    BUILD_GMOCK
-    BUILD_GTEST
-    BUILD_SHARED_LIBS
-    gmock_build_tests
-    gtest_build_samples
-    gtest_build_tests
-    gtest_disable_pthreads
-    gtest_force_shared_crt
-    gtest_hide_internal_symbols)
-  # cmake-lint: disable=C0307
-  set_target_properties(gtest gtest_main gmock gmock_main PROPERTIES FOLDER
-                                                                     extern)
-  if(BINDINGS)
-    # adjust visibility settings for building Python bindings
-    target_compile_options(gtest PUBLIC -fvisibility=hidden)
-    target_compile_options(gmock PUBLIC -fvisibility=hidden)
-  endif()
 endif()
 
 package_add_test(
@@ -66,12 +48,6 @@ if(NOT TARGET benchmark::benchmark)
   add_subdirectory(
     "${PROJECT_SOURCE_DIR}/extern/qfr/extern/dd_package/extern/benchmark"
     "extern/qfr/extern/dd_package/extern/benchmark" EXCLUDE_FROM_ALL)
-  set_target_properties(benchmark benchmark_main
-                        PROPERTIES FOLDER extern/qfr/extern/dd_package/extern)
-  if(BINDINGS)
-    # adjust visibility settings for building Python bindings
-    target_compile_options(benchmark PUBLIC -fvisibility=hidden)
-  endif()
 endif()
 
 add_executable(ddsim_benchmark EXCLUDE_FROM_ALL
@@ -79,11 +55,6 @@ add_executable(ddsim_benchmark EXCLUDE_FROM_ALL
 target_link_libraries(ddsim_benchmark PRIVATE ${PROJECT_NAME}
                                               benchmark::benchmark_main)
 set_target_properties(ddsim_benchmark PROPERTIES EXPORT_NAME ddsim_benchmark)
-set_target_properties(
-  ddsim_benchmark
-  PROPERTIES FOLDER tests
-             CMAKE_CXX_STANDARD_REQUIRED ON
-             CXX_EXTENSIONS OFF)
 
 add_custom_command(
   TARGET ${PROJECT_NAME}_benchmark

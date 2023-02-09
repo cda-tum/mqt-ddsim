@@ -34,7 +34,7 @@ def read_tensor_network_file(filename):
         data = np.array(tens_data).reshape(tens_shape)
         inds = df["tensors"][i][1]
         tags = df["tensors"][i][0]
-        tensors.append(qtn.Tensor(data, inds, tags, left_inds=inds[:len(inds) // 2]))
+        tensors.append(qtn.Tensor(data, inds, tags, left_inds=inds[: len(inds) // 2]))
     return tensors
 
 
@@ -77,18 +77,22 @@ def create_tensor_network(qc):
     return qtn.TensorNetwork(tensors)
 
 
-def get_simulation_path(qc, max_time: int = 60, max_repeats: int = 1024, parallel_runs: int = 1, dump_path: bool = True,  # noqa: PLR0913
-                        plot_ring: bool = False):
+def get_simulation_path(  # noqa: PLR0913
+    qc,
+    max_time: int = 60,
+    max_repeats: int = 1024,
+    parallel_runs: int = 1,
+    dump_path: bool = True,
+    plot_ring: bool = False,
+):
     import cotengra as ctg
     from opt_einsum.paths import linear_to_ssa
 
     tn = create_tensor_network(qc)
 
-    opt = ctg.HyperOptimizer(max_time=max_time,
-                             max_repeats=max_repeats,
-                             progbar=True,
-                             parallel=parallel_runs,
-                             minimize="flops")
+    opt = ctg.HyperOptimizer(
+        max_time=max_time, max_repeats=max_repeats, progbar=True, parallel=parallel_runs, minimize="flops"
+    )
     info = tn.contract(all, get="path-info", optimize=opt)
     path = linear_to_ssa(info.path)
 
@@ -124,7 +128,7 @@ class PathQasmSimulatorBackend(BackendV1):
             cotengra_max_time=60,
             cotengra_max_repeats=1024,
             cotengra_plot_ring=False,
-            cotengra_dump_path=True
+            cotengra_dump_path=True,
         )
 
     def __init__(self, configuration=None, provider=None):
@@ -135,27 +139,58 @@ class PathQasmSimulatorBackend(BackendV1):
             "simulator": True,
             "local": True,
             "description": "MQT DDSIM C++ simulation path framework",
-            "basis_gates": ["id", "u0", "u1", "u2", "u3", "cu3",
-                            "x", "cx", "ccx", "mcx_gray", "mcx_recursive", "mcx_vchain", "mcx",
-                            "y", "cy",
-                            "z", "cz",
-                            "h", "ch",
-                            "s", "sdg", "t", "tdg",
-                            "rx", "crx", "mcrx",
-                            "ry", "cry", "mcry",
-                            "rz", "crz", "mcrz",
-                            "p", "cp", "cu1", "mcphase",
-                            "sx", "csx",
-                            "sxdg",
-                            "swap", "cswap", "iswap",
-                            "snapshot"],
+            "basis_gates": [
+                "id",
+                "u0",
+                "u1",
+                "u2",
+                "u3",
+                "cu3",
+                "x",
+                "cx",
+                "ccx",
+                "mcx_gray",
+                "mcx_recursive",
+                "mcx_vchain",
+                "mcx",
+                "y",
+                "cy",
+                "z",
+                "cz",
+                "h",
+                "ch",
+                "s",
+                "sdg",
+                "t",
+                "tdg",
+                "rx",
+                "crx",
+                "mcrx",
+                "ry",
+                "cry",
+                "mcry",
+                "rz",
+                "crz",
+                "mcrz",
+                "p",
+                "cp",
+                "cu1",
+                "mcphase",
+                "sx",
+                "csx",
+                "sxdg",
+                "swap",
+                "cswap",
+                "iswap",
+                "snapshot",
+            ],
             "memory": False,
             "n_qubits": 128,
             "coupling_map": None,
             "conditional": False,
             "max_shots": 1000000000,
             "open_pulse": False,
-            "gates": []
+            "gates": [],
         }
         super().__init__(configuration=configuration or BackendConfiguration.from_dict(conf), provider=provider)
 
@@ -187,16 +222,17 @@ class PathQasmSimulatorBackend(BackendV1):
         result_list = [self.run_experiment(qobj_exp, **options) for qobj_exp in qobj_instance.experiments]
         end = time.time()
 
-        result = {"backend_name": self.configuration().backend_name,
-                  "backend_version": self.configuration().backend_version,
-                  "qobj_id": qobj_instance.qobj_id,
-                  "job_id": job_id,
-                  "results": result_list,
-                  "status": "COMPLETED",
-                  "success": True,
-                  "time_taken": (end - start),
-                  "header": qobj_instance.header.to_dict()
-                  }
+        result = {
+            "backend_name": self.configuration().backend_name,
+            "backend_version": self.configuration().backend_version,
+            "qobj_id": qobj_instance.qobj_id,
+            "job_id": job_id,
+            "results": result_list,
+            "status": "COMPLETED",
+            "success": True,
+            "time_taken": (end - start),
+            "header": qobj_instance.header.to_dict(),
+        }
         return Result.from_dict(result)
 
     def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options):
@@ -232,8 +268,9 @@ class PathQasmSimulatorBackend(BackendV1):
             max_repeats = options.get("cotengra_max_repeats", 1024)
             dump_path = options.get("cotengra_dump_path", False)
             plot_ring = options.get("cotengra_plot_ring", False)
-            path = get_simulation_path(qobj_experiment, max_time=max_time, max_repeats=max_repeats,
-                                       dump_path=dump_path, plot_ring=plot_ring)
+            path = get_simulation_path(
+                qobj_experiment, max_time=max_time, max_repeats=max_repeats, dump_path=dump_path, plot_ring=plot_ring
+            )
             sim.set_simulation_path(path, False)
 
         shots = options.get("shots", 1024)
@@ -242,17 +279,18 @@ class PathQasmSimulatorBackend(BackendV1):
         end_time = time.time()
         counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
 
-        result = {"header": qobj_experiment.header.to_dict(),
-                  "name": qobj_experiment.header.name,
-                  "status": "DONE",
-                  "time_taken": end_time - start_time,
-                  "time_setup": setup_time - start_time,
-                  "time_sim": end_time - setup_time,
-                  "config": pathsim_configuration,
-                  "shots": shots,
-                  "data": {"counts": counts_hex},
-                  "success": True,
-                  }
+        result = {
+            "header": qobj_experiment.header.to_dict(),
+            "name": qobj_experiment.header.name,
+            "status": "DONE",
+            "time_taken": end_time - start_time,
+            "time_setup": setup_time - start_time,
+            "time_sim": end_time - setup_time,
+            "config": pathsim_configuration,
+            "shots": shots,
+            "data": {"counts": counts_hex},
+            "success": True,
+        }
         if self.SHOW_STATE_VECTOR:
             result["data"]["statevector"] = sim.get_vector()
 
@@ -266,8 +304,10 @@ class PathQasmSimulatorBackend(BackendV1):
         Returns:
             BackendStatus: the status of the backend.
         """
-        return BackendStatus(backend_name=self.name(),
-                             backend_version=self.configuration().backend_version,
-                             operational=True,
-                             pending_jobs=0,
-                             status_msg="")
+        return BackendStatus(
+            backend_name=self.name(),
+            backend_version=self.configuration().backend_version,
+            operational=True,
+            pending_jobs=0,
+            status_msg="",
+        )

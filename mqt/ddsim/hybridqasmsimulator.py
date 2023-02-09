@@ -34,7 +34,7 @@ class HybridQasmSimulatorBackend(BackendV1):
             parameter_binds=None,
             simulator_seed=None,
             mode="amplitude",
-            nthreads=local_hardware_info()["cpus"]
+            nthreads=local_hardware_info()["cpus"],
         )
 
     def __init__(self, configuration=None, provider=None):
@@ -45,26 +45,47 @@ class HybridQasmSimulatorBackend(BackendV1):
             "simulator": True,
             "local": True,
             "description": "MQT DDSIM Hybrid Schrodinger-Feynman C++ simulator",
-            "basis_gates": ["id", "u0", "u1", "u2", "u3", "cu3",
-                            "x", "cx",
-                            "y", "cy",
-                            "z", "cz",
-                            "h", "ch",
-                            "s", "sdg", "t", "tdg",
-                            "rx", "crx",
-                            "ry", "cry",
-                            "rz", "crz",
-                            "p", "cp", "cu1",
-                            "sx", "csx", "sxdg",
-                            # 'swap', 'cswap', 'iswap',
-                            "snapshot"],
+            "basis_gates": [
+                "id",
+                "u0",
+                "u1",
+                "u2",
+                "u3",
+                "cu3",
+                "x",
+                "cx",
+                "y",
+                "cy",
+                "z",
+                "cz",
+                "h",
+                "ch",
+                "s",
+                "sdg",
+                "t",
+                "tdg",
+                "rx",
+                "crx",
+                "ry",
+                "cry",
+                "rz",
+                "crz",
+                "p",
+                "cp",
+                "cu1",
+                "sx",
+                "csx",
+                "sxdg",
+                # 'swap', 'cswap', 'iswap',
+                "snapshot",
+            ],
             "memory": False,
             "n_qubits": 128,
             "coupling_map": None,
             "conditional": False,
             "max_shots": 1000000000,
             "open_pulse": False,
-            "gates": []
+            "gates": [],
         }
         super().__init__(configuration=configuration or BackendConfiguration.from_dict(conf), provider=provider)
 
@@ -96,16 +117,17 @@ class HybridQasmSimulatorBackend(BackendV1):
         result_list = [self.run_experiment(qobj_exp, **options) for qobj_exp in qobj_instance.experiments]
         end = time.time()
 
-        result = {"backend_name": self.configuration().backend_name,
-                  "backend_version": self.configuration().backend_version,
-                  "qobj_id": qobj_instance.qobj_id,
-                  "job_id": job_id,
-                  "results": result_list,
-                  "status": "COMPLETED",
-                  "success": True,
-                  "time_taken": (end - start),
-                  "header": qobj_instance.header.to_dict()
-                  }
+        result = {
+            "backend_name": self.configuration().backend_name,
+            "backend_version": self.configuration().backend_version,
+            "qobj_id": qobj_instance.qobj_id,
+            "job_id": job_id,
+            "results": result_list,
+            "status": "COMPLETED",
+            "success": True,
+            "time_taken": (end - start),
+            "header": qobj_instance.header.to_dict(),
+        }
         return Result.from_dict(result)
 
     def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options):
@@ -115,13 +137,13 @@ class HybridQasmSimulatorBackend(BackendV1):
         nthreads = int(options.get("nthreads", local_hardware_info()["cpus"]))
         if mode == "amplitude":
             hybrid_mode = HybridMode.amplitude
-            max_qubits = int(log2(local_hardware_info()["memory"] * (1024 ** 3) / 16))
+            max_qubits = int(log2(local_hardware_info()["memory"] * (1024**3) / 16))
             algorithm_qubits = qobj_experiment.header.n_qubits
             if algorithm_qubits > max_qubits:
                 msg = "Not enough memory available to simulate the circuit even on a single thread"
                 raise DDSIMError(msg)
             qubit_diff = max_qubits - algorithm_qubits
-            nthreads = int(min(2 ** qubit_diff, nthreads))
+            nthreads = int(min(2**qubit_diff, nthreads))
         elif mode == "dd":
             hybrid_mode = HybridMode.DD
         else:
@@ -132,24 +154,27 @@ class HybridQasmSimulatorBackend(BackendV1):
 
         shots = options.get("shots", 1024)
         if self.SHOW_STATE_VECTOR and shots > 0:
-            logger.info("Statevector can only be shown if shots == 0 when using the amplitude hybrid simulation mode. Setting shots=0.")
+            logger.info(
+                "Statevector can only be shown if shots == 0 when using the amplitude hybrid simulation mode. Setting shots=0."
+            )
             shots = 0
 
         counts = sim.simulate(shots)
         end_time = time.time()
         counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
 
-        result = {"header": qobj_experiment.header.to_dict(),
-                  "name": qobj_experiment.header.name,
-                  "status": "DONE",
-                  "time_taken": end_time - start_time,
-                  "seed": seed,
-                  "mode": mode,
-                  "nthreads": nthreads,
-                  "shots": shots,
-                  "data": {"counts": counts_hex},
-                  "success": True,
-                  }
+        result = {
+            "header": qobj_experiment.header.to_dict(),
+            "name": qobj_experiment.header.name,
+            "status": "DONE",
+            "time_taken": end_time - start_time,
+            "seed": seed,
+            "mode": mode,
+            "nthreads": nthreads,
+            "shots": shots,
+            "data": {"counts": counts_hex},
+            "success": True,
+        }
         if self.SHOW_STATE_VECTOR:
             if sim.get_mode() == HybridMode.DD:
                 result["data"]["statevector"] = sim.get_vector()
@@ -166,8 +191,10 @@ class HybridQasmSimulatorBackend(BackendV1):
         Returns:
             BackendStatus: the status of the backend.
         """
-        return BackendStatus(backend_name=self.name(),
-                             backend_version=self.configuration().backend_version,
-                             operational=True,
-                             pending_jobs=0,
-                             status_msg="")
+        return BackendStatus(
+            backend_name=self.name(),
+            backend_version=self.configuration().backend_version,
+            operational=True,
+            pending_jobs=0,
+            status_msg="",
+        )

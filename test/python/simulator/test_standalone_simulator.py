@@ -8,6 +8,7 @@ from mqt import ddsim
 class MQTStandaloneSimulatorTests(unittest.TestCase):
     def setUp(self) -> None:
         self.nonzero_states_ghz = 2
+
     def test_standalone(self):
         circ = QuantumCircuit(3)
         circ.h(0)

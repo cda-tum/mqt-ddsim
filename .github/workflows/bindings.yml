@@ -2,11 +2,11 @@ name: Deploy to PyPI
 
 on:
   release:
-    types: [ published ]
+    types: [published]
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   test_bindings:
-    name:    Test Python bindings
+    name: Test Python bindings
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -24,11 +24,11 @@ jobs:
       - uses: actions/setup-python@v4
         name: Install Python
         with:
-          python-version: '3.9'
+          python-version: "3.9"
       - name: Install package
-        run:  |
-              pip install -U pip setuptools wheel
-              pip install .[tests]
+        run: |
+          pip install -U pip setuptools wheel
+          pip install .[tests]
       - name: Test package
         run: pytest test/python
 
@@ -42,7 +42,7 @@ jobs:
       - uses: actions/setup-python@v4
         name: Install Python
         with:
-          python-version: '3.9'
+          python-version: "3.9"
       - name: Install dependencies
         run: pip install -q build
       - name: Build sdist
@@ -56,10 +56,9 @@ jobs:
         with:
           path: dist/*.tar.gz
 
-
   build_wheels:
     name: Build ${{ matrix.config.os }}-${{ matrix.config.arch }} wheels
-    needs: [ test_bindings, build_sdist ]
+    needs: [test_bindings, build_sdist]
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
@@ -84,10 +83,10 @@ jobs:
           path: ./wheelhouse/*.whl
 
   upload_pypi:
-    name:    Upload dists to PyPi
-    needs: [ build_wheels, build_sdist ]
+    name: Upload dists to PyPi
+    needs: [build_wheels, build_sdist]
     runs-on: ubuntu-latest
-    if:      github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'release' && github.event.action == 'published'
     steps:
       - uses: actions/download-artifact@v3
         with:

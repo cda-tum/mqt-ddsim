@@ -16,12 +16,14 @@ def requires_submit(func):
     Returns:
         callable: the decorated function.
     """
+
     @functools.wraps(func)
     def _wrapper(self, *args, **kwargs):
         if self._future is None:
             msg = "Job not submitted yet!. You have to .submit() first!"
             raise JobError(msg)
         return func(self, *args, **kwargs)
+
     return _wrapper
 
 
@@ -51,10 +53,7 @@ class DDSIMJob(JobV1):
             msg = "We have already submitted the job!"
             raise JobError(msg)
 
-        self._future = self._executor.submit(self._fn,
-                                             self._job_id,
-                                             self.qobj_experiment,
-                                             **self._args)
+        self._future = self._executor.submit(self._fn, self._job_id, self.qobj_experiment, **self._args)
 
     @requires_submit
     def result(self, timeout=None):

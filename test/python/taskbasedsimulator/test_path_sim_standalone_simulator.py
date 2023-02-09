@@ -75,8 +75,9 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.PathCircuitSimulator(circ, mode=ddsim.PathSimulatorMode.gate_cost, starting_point=2,
-                                         gate_cost=[1, 1])
+        sim = ddsim.PathCircuitSimulator(
+            circ, mode=ddsim.PathSimulatorMode.gate_cost, starting_point=2, gate_cost=[1, 1]
+        )
         result = sim.simulate(1000)
         assert len(result.keys()) == self.nonzero_states_ghz
         assert "000" in result

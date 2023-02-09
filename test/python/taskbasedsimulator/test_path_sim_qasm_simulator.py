@@ -10,7 +10,8 @@ class MQTQasmSimulatorTest(unittest.TestCase):
 
     def setUp(self):
         self.backend = PathQasmSimulatorBackend()
-        self.circuit = QuantumCircuit.from_qasm_str("""OPENQASM 2.0;
+        self.circuit = QuantumCircuit.from_qasm_str(
+            """OPENQASM 2.0;
             include "qelib1.inc";
             qreg q[3];
             qreg r[3];
@@ -20,7 +21,8 @@ class MQTQasmSimulatorTest(unittest.TestCase):
             creg d[3];
             barrier q;
             measure q->c;
-            measure r->d;""")
+            measure r->d;"""
+        )
         self.circuit.name = "test"
 
     def test_configuration(self):
@@ -47,10 +49,16 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         result = execute(self.circuit, self.backend, shots=shots).result()
         threshold = 0.04 * shots
         counts = result.get_counts("test")
-        target = {"100 100": shots / 8, "011 011": shots / 8,
-                  "101 101": shots / 8, "111 111": shots / 8,
-                  "000 000": shots / 8, "010 010": shots / 8,
-                  "110 110": shots / 8, "001 001": shots / 8}
+        target = {
+            "100 100": shots / 8,
+            "011 011": shots / 8,
+            "101 101": shots / 8,
+            "111 111": shots / 8,
+            "000 000": shots / 8,
+            "010 010": shots / 8,
+            "110 110": shots / 8,
+            "001 001": shots / 8,
+        }
 
         assert len(target) == len(counts)
         for key in target:
@@ -63,10 +71,16 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         result = execute(self.circuit, self.backend, shots=shots, mode="pairwise_recursive").result()
         threshold = 0.04 * shots
         counts = result.get_counts("test")
-        target = {"100 100": shots / 8, "011 011": shots / 8,
-                  "101 101": shots / 8, "111 111": shots / 8,
-                  "000 000": shots / 8, "010 010": shots / 8,
-                  "110 110": shots / 8, "001 001": shots / 8}
+        target = {
+            "100 100": shots / 8,
+            "011 011": shots / 8,
+            "101 101": shots / 8,
+            "111 111": shots / 8,
+            "000 000": shots / 8,
+            "010 010": shots / 8,
+            "110 110": shots / 8,
+            "001 001": shots / 8,
+        }
 
         assert len(target) == len(counts)
         for key in target:
@@ -81,10 +95,16 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         print(result)
         threshold = 0.04 * shots
         counts = result.get_counts("test")
-        target = {"100 100": shots / 8, "011 011": shots / 8,
-                  "101 101": shots / 8, "111 111": shots / 8,
-                  "000 000": shots / 8, "010 010": shots / 8,
-                  "110 110": shots / 8, "001 001": shots / 8}
+        target = {
+            "100 100": shots / 8,
+            "011 011": shots / 8,
+            "101 101": shots / 8,
+            "111 111": shots / 8,
+            "000 000": shots / 8,
+            "010 010": shots / 8,
+            "110 110": shots / 8,
+            "001 001": shots / 8,
+        }
 
         assert len(target) == len(counts)
         for key in target:
@@ -99,10 +119,16 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         print(result)
         threshold = 0.04 * shots
         counts = result.get_counts("test")
-        target = {"100 100": shots / 8, "011 011": shots / 8,
-                  "101 101": shots / 8, "111 111": shots / 8,
-                  "000 000": shots / 8, "010 010": shots / 8,
-                  "110 110": shots / 8, "001 001": shots / 8}
+        target = {
+            "100 100": shots / 8,
+            "011 011": shots / 8,
+            "101 101": shots / 8,
+            "111 111": shots / 8,
+            "000 000": shots / 8,
+            "010 010": shots / 8,
+            "110 110": shots / 8,
+            "001 001": shots / 8,
+        }
 
         assert len(target) == len(counts)
         for key in target:

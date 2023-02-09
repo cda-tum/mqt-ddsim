@@ -22,7 +22,7 @@ class DDSIMProvider(ProviderV1):
                 ("hybrid_statevector_simulator", HybridStatevectorSimulatorBackend, None, None),
                 ("path_sim_qasm_simulator", PathQasmSimulatorBackend, None, None),
                 ("path_sim_statevector_simulator", PathStatevectorSimulatorBackend, None, None),
-                ("unitary_simulator", UnitarySimulatorBackend, None, None)
+                ("unitary_simulator", UnitarySimulatorBackend, None, None),
             ]
 
     def get_backend(self, name=None, **kwargs):

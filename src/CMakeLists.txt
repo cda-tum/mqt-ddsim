@@ -26,10 +26,6 @@ add_library(
 target_include_directories(
   ${PROJECT_NAME}
   PUBLIC $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>)
-# set required C++ standard and disable compiler specific extensions
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
-set_target_properties(${PROJECT_NAME} PROPERTIES CMAKE_CXX_STANDARD_REQUIRED ON
-                                                 CXX_EXTENSIONS OFF)
 
 # cmake-lint: disable=C0103
 set(JSON_MultipleHeaders

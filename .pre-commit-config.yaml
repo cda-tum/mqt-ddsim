@@ -58,9 +58,36 @@ repos:
       - id: clang-format
         types_or: [c++, c, cuda]
 
-
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.0.244
     hooks:
       - id: ruff
         args: ["--fix"]
+
+  # Run code formatting with Black
+  - repo: https://github.com/psf/black
+    rev: 23.1.0 # Keep in sync with blacken-docs
+    hooks:
+      - id: black-jupyter
+
+  # Also run Black on examples in the documentation
+  - repo: https://github.com/asottile/blacken-docs
+    rev: 1.13.0
+    hooks:
+      - id: blacken-docs
+        additional_dependencies:
+          - black==23.1.0 # keep in sync with black hook
+
+  # Format configuration files with prettier
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v3.0.0-alpha.4"
+    hooks:
+      - id: prettier
+        types_or: [yaml, markdown, html, css, scss, javascript, json]
+
+  # Check for spelling
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.2
+    hooks:
+      - id: codespell
+        args: ["-L", "wille,linz,braket,coo", "--skip", "*.ipynb"]

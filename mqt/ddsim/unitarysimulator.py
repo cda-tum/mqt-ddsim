@@ -30,7 +30,7 @@ class UnitarySimulatorBackend(BackendV1):
         conf = {
             "backend_name": "unitary_simulator",
             "backend_version": __version__,
-            "n_qubits": min(24, int(log2(sqrt(local_hardware_info()["memory"] * (1024 ** 3) / 16)))),
+            "n_qubits": min(24, int(log2(sqrt(local_hardware_info()["memory"] * (1024**3) / 16)))),
             "url": "https://github.com/cda-tum/ddsim",
             "simulator": True,
             "local": True,
@@ -40,28 +40,58 @@ class UnitarySimulatorBackend(BackendV1):
             "max_shots": 1000000000,
             "coupling_map": None,
             "description": "MQT DDSIM C++ Unitary Simulator",
-            "basis_gates": ["id", "u0", "u1", "u2", "u3", "cu3",
-                            "x", "cx", "ccx", "mcx_gray", "mcx_recursive", "mcx_vchain",
-                            "y", "cy",
-                            "z", "cz",
-                            "h", "ch",
-                            "s", "sdg", "t", "tdg",
-                            "rx", "crx", "mcrx",
-                            "ry", "cry", "mcry",
-                            "rz", "crz", "mcrz",
-                            "p", "cp", "cu1", "mcphase",
-                            "sx", "csx", "sxdg",
-                            "swap", "cswap", "iswap"],
-            "gates": []
+            "basis_gates": [
+                "id",
+                "u0",
+                "u1",
+                "u2",
+                "u3",
+                "cu3",
+                "x",
+                "cx",
+                "ccx",
+                "mcx_gray",
+                "mcx_recursive",
+                "mcx_vchain",
+                "y",
+                "cy",
+                "z",
+                "cz",
+                "h",
+                "ch",
+                "s",
+                "sdg",
+                "t",
+                "tdg",
+                "rx",
+                "crx",
+                "mcrx",
+                "ry",
+                "cry",
+                "mcry",
+                "rz",
+                "crz",
+                "mcrz",
+                "p",
+                "cp",
+                "cu1",
+                "mcphase",
+                "sx",
+                "csx",
+                "sxdg",
+                "swap",
+                "cswap",
+                "iswap",
+            ],
+            "gates": [],
         }
-        super().__init__(configuration=(configuration or QasmBackendConfiguration.from_dict(conf)), provider=provider,
-                         **fields)
+        super().__init__(
+            configuration=(configuration or QasmBackendConfiguration.from_dict(conf)), provider=provider, **fields
+        )
 
     @classmethod
     def _default_options(cls):
-        return Options(shots=1,
-                       mode="recursive",
-                       parameter_binds=None)
+        return Options(shots=1, mode="recursive", parameter_binds=None)
 
     def run(self, quantum_circuits: Union[QuantumCircuit, List[QuantumCircuit]], **options):
         if isinstance(quantum_circuits, (QasmQobj, PulseQobj)):
@@ -91,16 +121,17 @@ class UnitarySimulatorBackend(BackendV1):
         result_list = [self.run_experiment(qobj_exp, **options) for qobj_exp in qobj_instance.experiments]
         end = time.time()
 
-        result = {"backend_name": self.configuration().backend_name,
-                  "backend_version": self.configuration().backend_version,
-                  "qobj_id": qobj_instance.qobj_id,
-                  "job_id": job_id,
-                  "results": result_list,
-                  "status": "COMPLETED",
-                  "success": True,
-                  "time_taken": (end - start),
-                  "header": qobj_instance.header.to_dict()
-                  }
+        result = {
+            "backend_name": self.configuration().backend_name,
+            "backend_version": self.configuration().backend_version,
+            "qobj_id": qobj_instance.qobj_id,
+            "job_id": job_id,
+            "results": result_list,
+            "status": "COMPLETED",
+            "success": True,
+            "time_taken": (end - start),
+            "header": qobj_instance.header.to_dict(),
+        }
         return Result.from_dict(result)
 
     def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options):
@@ -113,29 +144,33 @@ class UnitarySimulatorBackend(BackendV1):
         elif mode == "recursive":
             construction_mode = ConstructionMode.recursive
         else:
-            msg = (f"Construction mode {mode} not supported by DDSIM unitary simulator. Available modes are "
-                   "'recursive' and 'sequential'")
+            msg = (
+                f"Construction mode {mode} not supported by DDSIM unitary simulator. Available modes are "
+                "'recursive' and 'sequential'"
+            )
             raise DDSIMError(msg)
 
         sim = UnitarySimulator(qobj_experiment, seed=seed, mode=construction_mode)
         sim.construct()
         # Add extract resulting matrix from final DD and write data
-        unitary = np.zeros((2 ** qobj_experiment.header.n_qubits, 2 ** qobj_experiment.header.n_qubits), dtype=complex)
+        unitary = np.zeros((2**qobj_experiment.header.n_qubits, 2**qobj_experiment.header.n_qubits), dtype=complex)
         get_matrix(sim, unitary)
         data = {
             "unitary": unitary,
             "construction_time": sim.get_construction_time(),
             "max_dd_nodes": sim.get_max_node_count(),
-            "dd_nodes": sim.get_final_node_count()
+            "dd_nodes": sim.get_final_node_count(),
         }
         end = time.time()
-        return {"name": qobj_experiment.header.name,
-                "shots": 1,
-                "data": data,
-                "status": "DONE",
-                "success": True,
-                "time_taken": (end - start),
-                "header": qobj_experiment.header.to_dict()}
+        return {
+            "name": qobj_experiment.header.name,
+            "shots": 1,
+            "data": data,
+            "status": "DONE",
+            "success": True,
+            "time_taken": (end - start),
+            "header": qobj_experiment.header.to_dict(),
+        }
 
     def _validate(self, qobj):
         """Semantic validations of the qobj which cannot be done via schemas.
@@ -149,15 +184,12 @@ class UnitarySimulatorBackend(BackendV1):
             msg = f"Number of qubits {n_qubits} is greater than maximum ({max_qubits}) for '{self.name()}'."
             raise DDSIMError(msg)
         if hasattr(qobj.config, "shots") and qobj.config.shots != 1:
-            logger.info('"%s" only supports 1 shot. Setting shots=1.',
-                        self.name())
+            logger.info('"%s" only supports 1 shot. Setting shots=1.', self.name())
             qobj.config.shots = 1
         for experiment in qobj.experiments:
             name = experiment.header.name
             if getattr(experiment.config, "shots", 1) != 1:
-                logger.info('"%s" only supports 1 shot. '
-                            'Setting shots=1 for circuit "%s".',
-                            self.name(), name)
+                logger.info('"%s" only supports 1 shot. Setting shots=1 for circuit "%s".', self.name(), name)
                 experiment.config.shots = 1
             for operation in experiment.instructions:
                 if operation.name in ["measure", "reset"]:

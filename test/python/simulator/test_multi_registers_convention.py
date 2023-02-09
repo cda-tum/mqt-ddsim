@@ -11,8 +11,7 @@ class CircuitMultiRegsTest(unittest.TestCase):
     """QuantumCircuit Qasm tests."""
 
     def test_circuit_multi(self):
-        """Test circuit multi regs declared at start.
-        """
+        """Test circuit multi regs declared at start."""
         qreg0 = QuantumRegister(2, "q0")
         creg0 = ClassicalRegister(2, "c0")
 

@@ -7,7 +7,6 @@ from mqt.ddsim.unitarysimulator import UnitarySimulatorBackend
 
 
 class MQTUnitarySimulatorTest(unittest.TestCase):
-
     def setUp(self):
         self.backend = UnitarySimulatorBackend()
         circ = QuantumCircuit(3)
