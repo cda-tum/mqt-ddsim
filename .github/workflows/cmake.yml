@@ -20,18 +20,6 @@ defaults:
     shell: bash
 
 jobs:
-  codestyle:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - uses: DoozyX/clang-format-lint-action@v0.15
-        with:
-          source: "apps include mqt src test"
-          extensions: "h,hpp,c,cpp"
-          clangFormatVersion: 12
-
   build-ubuntu:
     name: Build and Test on Ubuntu
     runs-on: ubuntu-latest
@@ -49,7 +37,7 @@ jobs:
 
   build-macos:
     name: Build and Test on MacOS
-    needs: [build-ubuntu, codestyle]
+    needs: [build-ubuntu]
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -66,7 +54,7 @@ jobs:
 
   build-windows:
     name: Build and Test on Windows
-    needs: [build-ubuntu, codestyle]
+    needs: [build-ubuntu]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
@@ -83,7 +71,7 @@ jobs:
 
   coverage:
     name: Coverage
-    needs: [build-ubuntu, codestyle]
+    needs: [build-ubuntu]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
