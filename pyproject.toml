@@ -120,7 +120,11 @@ select = [
     "UP",          # pyupgrade
     "YTT",         # flake8-2020
 ]
-ignore = ["E501"]
+ignore = [
+  "PLR2004", # Magic values
+  "PLR0913", # Too many arguments
+  "E501",    # Line too long (Black is enough)
+]
 target-version = "py38"
 
 # Exclude a variety of commonly ignored directories.
