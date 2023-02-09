@@ -77,7 +77,7 @@ def create_tensor_network(qc):
     return qtn.TensorNetwork(tensors)
 
 
-def get_simulation_path(  # noqa: PLR0913
+def get_simulation_path(
     qc,
     max_time: int = 60,
     max_repeats: int = 1024,

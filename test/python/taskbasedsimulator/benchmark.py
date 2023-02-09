@@ -39,7 +39,7 @@ def execute_circuit(
     )
 
 
-def execute_verification(  # noqa: PLR0913
+def execute_verification(
     qc: QuantumCircuit,
     qcog: QuantumCircuit,
     gatecost,
@@ -101,7 +101,7 @@ def execute_verification(  # noqa: PLR0913
     print(qc.name, qc.num_qubits, qc.size(), mode, run_results["time_setup"], run_results["time_sim"], sep=";")
 
 
-def execute_verification_all(  # noqa: PLR0913
+def execute_verification_all(
     qc: QuantumCircuit,
     qcog: QuantumCircuit,
     gatecosts,
@@ -143,7 +143,7 @@ def generate_lookup_table(profile_path: Path) -> dict:
     return lookup_table
 
 
-def run_benchmark(  # noqa: PLR0913
+def run_benchmark(
     benchmark_name: str,
     circuit_size: int,
     lut_gatecost: dict,

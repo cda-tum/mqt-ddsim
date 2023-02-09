@@ -85,7 +85,7 @@ def w_state(n: int, include_measurements: bool = True):
     c = ClassicalRegister(n, "c")
     qc = QuantumCircuit(q, c, name="w_state")
 
-    def f_gate(qc: QuantumCircuit, q: QuantumRegister, i: int, j: int, n: int, k: int):  # noqa: PLR0913
+    def f_gate(qc: QuantumCircuit, q: QuantumRegister, i: int, j: int, n: int, k: int):
         theta = np.arccos(np.sqrt(1 / (n - k + 1)))
         qc.ry(-theta, q[j])
         qc.cz(q[i], q[j])
