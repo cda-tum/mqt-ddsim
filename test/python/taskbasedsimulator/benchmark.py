@@ -56,13 +56,7 @@ def execute_verification(
 
     print("Starting setup")
     start_time = time.time()
-    if mode == "alternating":
-        print("number of gates in the original circuit and starting point", qcog.size())
-        alt_start = qcog.size()
-        sim = ddsim.PathCircuitSimulator(
-            circ=qc, mode=ddsim.PathSimulatorMode(mode), starting_point=alt_start, gate_cost=gatecost
-        )
-    elif mode == "gatecost":
+    if mode == "alternating" or mode == "gatecost":
         print("number of gates in the original circuit and starting point", qcog.size())
         alt_start = qcog.size()
         sim = ddsim.PathCircuitSimulator(
@@ -160,9 +154,7 @@ def run_benchmark(
     qc.remove_final_measurements(inplace=True)
     qc = transpile(qc, basis_gates=basis_gates_transpile, optimization_level=0)
     for i in range(qc.size()):
-        if qc[i][0].name == "u2":
-            index = "u" + str(len(qc[i][1]) - 1)
-        elif qc[i][0].name == "u3":
+        if qc[i][0].name == "u2" or qc[i][0].name == "u3":
             index = "u" + str(len(qc[i][1]) - 1)
         elif qc[i][0].name == "cx" or qc[i][0].name == "ccx" or qc[i][0].name.startswith("mcx"):
             index = "x" + str(len(qc[i][1]) - 1)
