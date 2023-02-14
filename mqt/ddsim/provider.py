@@ -44,4 +44,4 @@ class DDSIMProvider(ProviderV1):
         return filter_backends(backends, filters=filters, **kwargs)
 
     def __str__(self):
-        return "MQTProvider"
+        return "DDSIMProvider"

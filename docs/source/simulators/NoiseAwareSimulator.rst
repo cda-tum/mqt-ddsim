@@ -6,6 +6,14 @@ global decoherence and gate error noise effects. A detailed summary of the simul
 in :cite:p:`grurl2022`. Note that the simulator currently does not support simulating the integrated
 algorithms.
 
+Usage in Python
+###############
+
+TODO
+
+Usage as Standalone Executable
+##############################
+
 Building the simulator requires :code:`Threads::Threads`. It can be built by executing
 
 .. code-block:: console

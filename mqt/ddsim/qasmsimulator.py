@@ -4,7 +4,7 @@ import logging
 import time
 import uuid
 import warnings
-from typing import List, Union
+from typing import Dict, List, Union
 
 from qiskit import QiskitError, QuantumCircuit
 from qiskit.compiler import assemble
@@ -94,7 +94,7 @@ class QasmSimulatorBackend(BackendV1):
         }
         super().__init__(configuration=configuration or BackendConfiguration.from_dict(conf), provider=provider)
 
-    def run(self, quantum_circuits: Union[QuantumCircuit, List[QuantumCircuit]], **options):
+    def run(self, quantum_circuits: Union[QuantumCircuit, List[QuantumCircuit]], **options) -> DDSIMJob:
         if isinstance(quantum_circuits, (QasmQobj, PulseQobj)):
             msg = "QasmQobj and PulseQobj are not supported."
             raise QiskitError(msg)
@@ -115,7 +115,7 @@ class QasmSimulatorBackend(BackendV1):
         local_job.submit()
         return local_job
 
-    def _run_job(self, job_id, qobj_instance: Qobj, **options):
+    def _run_job(self, job_id, qobj_instance: Qobj, **options) -> Result:
         self._validate(qobj_instance)
 
         start = time.time()
@@ -135,7 +135,7 @@ class QasmSimulatorBackend(BackendV1):
         }
         return Result.from_dict(result)
 
-    def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options):
+    def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options) -> Dict:
         start_time = time.time()
         approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
         approximation_steps = options.get("approximation_steps", 1)
@@ -170,7 +170,7 @@ class QasmSimulatorBackend(BackendV1):
     def _validate(self, _quantum_circuit):
         return
 
-    def status(self):
+    def status(self) -> BackendStatus:
         """Return backend status.
         Returns:
             BackendStatus: the status of the backend.

@@ -1,4 +1,9 @@
+import pathlib
+import subprocess
+import sys
 from importlib.metadata import version
+
+sys.path.insert(0, str(pathlib.Path("../../mqt").resolve()))
 
 # -- Project information -----------------------------------------------------
 project = "DDSIM"
@@ -22,6 +27,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinxext.opengraph",
     "sphinx_rtd_dark_mode",
+    "breathe",
 ]
 
 bibtex_bibfiles = ["refs.bib"]
@@ -32,6 +38,10 @@ copybutton_prompt_is_regexp = True
 copybutton_line_continuation_character = "\\"
 
 autosummary_generate = True
+
+breathe_projects = {"mqt.ddsim": "../doxygen/xml"}
+breathe_default_project = "mqt.ddsim"
+subprocess.call("cd ..; doxygen", shell=True)
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "sphinx_rtd_theme"

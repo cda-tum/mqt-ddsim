@@ -95,7 +95,7 @@ protected:
     std::size_t             approximationRuns{0};
     long double             finalFidelity{1.0L};
 
-    std::map<std::size_t, bool> singleShot(bool ignore_nonunitaries);
+    std::map<std::size_t, bool> singleShot(bool ignoreNonUnitaries);
 };
 
 #endif //DDSIM_CIRCUITSIMULATOR_HPP

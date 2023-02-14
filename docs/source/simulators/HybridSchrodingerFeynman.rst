@@ -1,6 +1,16 @@
 Hybrid Schrödinger-Feynman Simulator
 ====================================
 
+TODO
+
+
+Usage in Python
+###############
+
+
+Usage as Standalone Executable
+##############################
+
 Please see :doc:`CircuitSimulator` on how to build the :code:`ddsim_simple` (the name stuck due to historical reasons ;) ) CMake target.
 
 Launching the standalone executable with :code:`-h` parameter shows the available options (truncated to highlight the hybrid settings):
