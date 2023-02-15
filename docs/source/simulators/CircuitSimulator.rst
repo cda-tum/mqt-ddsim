@@ -23,6 +23,18 @@ Available backends in the provider :code:`DDSIMProvider`:
 - :code:`qasm_simulator` to simulate and sample from the resulting state
 - :code:`statevector_simulator` to simulate and explicitly return the state vector (which will require an exponential amount of memory in the number of qubits)
 
+Using the Circuit Simulator without Qiskit is also possible by passing a file name like in the following example:
+
+.. code-block:: python
+
+    from mqt import ddsim
+
+    sim = ddsim.CircuitSimulator("ghz_03.qasm")
+    result = sim.simulate(1000)  # 1000 shots
+    # results will contain a dictional like {'000': 510, '111': 490}
+
+This of course assumes a file :code:`ghz_03.qasm` exists.
+
 Usage as Standalone Executable
 ##############################
 

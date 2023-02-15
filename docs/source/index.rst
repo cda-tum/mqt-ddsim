@@ -44,5 +44,5 @@ If you have any questions, feel free to contact us via quantum.cda@xcit.tum.de o
    :caption: API Reference
    :glob:
 
-   api/Cpp
    api/modules
+   api/Cpp

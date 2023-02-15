@@ -98,4 +98,5 @@ In addition to the above, CoTenGra can be configured using the options described
 Usage as Standalone Executable
 ##############################
 
-TODO
+.. warning::
+    The path framework simulator is not exposed as standalone executable.

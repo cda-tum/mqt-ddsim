@@ -9,6 +9,14 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
     def setUp(self) -> None:
         self.nonzero_states_ghz = 2
 
+    def test_truly_standalone(self):
+        sim = ddsim.CircuitSimulator("ghz_03.qasm")
+        result = sim.simulate(1000)
+        print(result)
+        assert len(result.keys()) == self.nonzero_states_ghz
+        assert "000" in result
+        assert "111" in result
+
     def test_standalone(self):
         circ = QuantumCircuit(3)
         circ.h(0)
