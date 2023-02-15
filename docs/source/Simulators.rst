@@ -16,3 +16,4 @@ basic functionality used by multiple actual simulators.
    simulators/NoiseAwareSimulator
    simulators/SimulationPathFramework
    simulators/HybridSchrodingerFeynman
+   simulators/UnitarySimulator

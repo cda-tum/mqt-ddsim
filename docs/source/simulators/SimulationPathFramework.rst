@@ -32,7 +32,6 @@ First, create the circuit to be simulated using qiskit, e.g., in this case a thr
     circ.cx(0, 1)  # corresponds to ID 2
     circ.cx(0, 2)  # corresponds to ID 3
 
-
 Then, obtain the simulation path framework qiskit backend. You can choose between the :code:`path_sim_qasm_simulator` and the :code:`path_sim_statevector_simulator`.
 The first just yields a dictionary with the counts of the measurements, while the latter also provides the complete statevector (which, depending on the amount of qubits, might not fit in the available memory).
 
