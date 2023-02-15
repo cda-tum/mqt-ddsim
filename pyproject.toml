@@ -16,12 +16,11 @@ authors = [
     { name = "Lukas Burgholzer", email = "lukas.burgholzer@jku.at"}
 ]
 keywords = ["MQT", "quantum computing", "design automation", "quantum circuit simulation", "simulation"]
-license = { file = "LICENSE.md" }
+license = { file = "LICENSE" }
 
 classifiers=[
     "Development Status :: 5 - Production/Stable",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -35,9 +34,9 @@ classifiers=[
     "Natural Language :: English",
     "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
 ]
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dependencies = [
-    "qiskit-terra>=0.19.2"
+    "qiskit-terra>=0.20.0"
 ]
 dynamic = ["version"]
 
@@ -50,7 +49,11 @@ tnflow = [
     "numpy"
 ]
 tests = [
-    "pytest"
+    "pytest>=7"
+]
+coverage = [
+    "mqt.ddsim[tests]",
+    "pytest-cov[toml]"
 ]
 docs = [
     "sphinx>=5",
@@ -58,8 +61,10 @@ docs = [
     "sphinx-rtd-dark-mode",
     "sphinxcontrib-bibtex>=2.4.2",
     "sphinx-copybutton",
-    "sphinxext-opengraph"
+    "sphinxext-opengraph",
+    "breathe"
 ]
+dev = ["mqt.ddsim[tnflow, coverage, docs]"]
 
 [project.urls]
 Homepage = "https://github.com/cda-tum/ddsim"
@@ -99,31 +104,36 @@ repair-wheel-command = "delvewheel repair -v -w {dest_dir} {wheel}"
 select = [
     "E", "F", "W", # flake8
     "A",           # flake8-builtins
-    "B",  "B904",  # flake8-bugbear
-    "I",           # isort
     "ARG",         # flake8-unused-arguments
+    "B",  "B904",  # flake8-bugbear
     "C4",          # flake8-comprehensions
     "EM",          # flake8-errmsg
     "EXE",         # flake8-executable
+    "I",           # isort
     "ICN",         # flake8-import-conventions
     "ISC",         # flake8-implicit-str-concat
+    "N",           # flake8-naming
     "PGH",         # pygrep-hooks
     "PIE",         # flake8-pie
     "PL",          # pylint
     "PT",          # flake8-pytest-style
     "PTH",         # flake8-use-pathlib
+    "PYI",         # flake8-pyi
     "Q",           # flake8-quotes
     "RET",         # flake8-return
+    "RSE",         # flake8-raise
     "RUF",         # Ruff-specific
     "SIM",         # flake8-simplify
     "TCH",         # flake8-type-checking
+    "TID",         # flake8-tidy-imports
+    "TRY",         # tryceratops
     "UP",          # pyupgrade
     "YTT",         # flake8-2020
 ]
 ignore = [
-  "PLR2004", # Magic values
-  "PLR0913", # Too many arguments
-  "E501",    # Line too long (Black is enough)
+    "E501",    # Line too long (Black is enough)
+    "PLR2004", # Magic values
+    "PLR0913", # Too many arguments
 ]
 target-version = "py38"
 

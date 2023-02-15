@@ -1,5 +1,43 @@
-CircuitSimulator
-================
+Circuit Simulator
+=================
+
+The *Circuit Simulator* is the "default" simulator in DDSIM.
+It can handle all input supplied as :code:`QuantumComputation` from the QFR. This includes, but is not limited to,
+OpenQASM and real files as well as pre-defined algorithm like QFT, Grover, and random clifford circuits.
+
+Capabilities:
+
+- Exact Simulation :cite:p:`zulehner2019advanced,DBLP:conf/iccad/ZulehnerHW19`
+- Weak Simulation :cite:p:`DBLP:conf/dac/HillmichMW20`
+- Approximate Simulation with different strategies :cite:p:`10.1145/3530776,DBLP:conf/date/HillmichKMW21`
+
+    - Fidelity-driven
+    - Memory-driven
+
+
+Usage in Python
+###############
+
+Available backends in the provider :code:`DDSIMProvider`:
+
+- :code:`qasm_simulator` to simulate and sample from the resulting state
+- :code:`statevector_simulator` to simulate and explicitly return the state vector (which will require an exponential amount of memory in the number of qubits)
+
+Using the Circuit Simulator without Qiskit is also possible by passing a file name like in the following example:
+
+.. code-block:: python
+
+    from mqt import ddsim
+
+    sim = ddsim.CircuitSimulator("ghz_03.qasm")
+    result = sim.simulate(1000)  # 1000 shots
+    # results will contain a dictional like {'000': 510, '111': 490}
+
+This of course assumes a file :code:`ghz_03.qasm` exists.
+Alternatively, Qiskit :code:`QuantumCircuit` objects can be passed directly as well.
+
+Usage as Standalone Executable
+##############################
 
 To build the simulator execute, build the :code:`ddsim_simple` (the name stuck due to historical reasons ;) ) CMake target and run the resulting executable with options according to your needs.
 
@@ -18,21 +56,13 @@ The standalone executable is launched in the following way, showing available op
     --pcomplex                            print print additional statistics on complex numbers
     --verbose                             Causes some simulators to print additional information to STDERR
     --simulate_file arg                   simulate a quantum circuit given by file (detection by the file extension)
-    --simulate_file_hybrid arg            simulate a quantum circuit given by file (detection by the file extension) using the hybrid Schrodinger-Feynman simulator
-    --hybrid_mode arg                     mode used for hybrid Schrodinger-Feynman simulation (*amplitude*, dd)
-    --nthreads arg (=2)                   #threads used for hybrid simulation
     --simulate_qft arg                    simulate Quantum Fourier Transform for given number of qubits
     --simulate_ghz arg                    simulate state preparation of GHZ state for given number of qubits
     --step_fidelity arg (=1)              target fidelity for each approximation run (>=1 = disable approximation)
     --steps arg (=1)                      number of approximation steps
-    --simulate_grover arg                 simulate Grover's search for given number of qubits with random oracle
-    --simulate_grover_emulated arg        simulate Grover's search for given number of qubits with random oracle and emulation
-    --simulate_grover_oracle_emulated arg simulate Grover's search for given number of qubits with given oracle and emulation
-    --simulate_shor arg                   simulate Shor's algorithm factoring this number
-    --simulate_shor_coprime arg (=0)      coprime number to use with Shor's algorithm (zero randomly generates a coprime)
-    --simulate_shor_no_emulation          Force Shor simulator to do modular exponentiation instead of using emulation (you'll usually want emulation)
-    --simulate_fast_shor arg              simulate Shor's algorithm factoring this number with intermediate measurements
-    --simulate_fast_shor_coprime arg (=0) coprime number to use with Shor's algorithm (zero randomly generates a coprime)
+
+.. note::
+    The parameter list is abbreviated to show only the parameters relevant for the Circuit Simulator.
 
 The output is JSON-formatted as shown below (with hopefully intuitive naming).
 
@@ -63,28 +93,5 @@ The output is JSON-formatted as shown below (with hopefully intuitive naming).
     }
 
 
-Quickstart Guide
-################
-
-Execute the following lines to get the simulator running in no time:
-
-.. code-block:: console
-
-    $ git clone --recurse-submodules https://github.com/cda-tum/ddsim/
-    [...]
-
-    $ cd ddsim
-
-    ddsim/ $ cmake -S . -B build
-    -- Build files have been written to: /.../build
-
-    ddsim/ $ cmake --build build --config Release --target ddsim_simple
-    [...]
-    [100%] Built target ddsim_simple
-
-    ddsim/ $ build/ddsim_simple --help
-    MQT DDSIM by https://www.cda.cit.tum.de/ -- Allowed options:
-      -h [ --help ]                         produce help message
-    [...]
 
 If you are using this simulator, please cite :cite:p:`zulehner2019advanced`.

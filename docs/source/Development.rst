@@ -1,5 +1,9 @@
-Installation for Developers
-===========================
+Development Guide
+=================
+
+
+Installation
+############
 
 In order to start developing, clone the DDSIM repository using
 
@@ -9,7 +13,7 @@ In order to start developing, clone the DDSIM repository using
 
 Note the :code:`--recurse-submodules` flag. It is required to also clone all the required submodules. If you happen to forget passing the flag on your initial clone, you can initialize all the submodules by executing :code:`git submodule update --init --recursive` in the main project directory.
 
-A C++ compiler supporting C++17 and a minimum CMake version of 3.14 are required to build the project.
+A C++ compiler supporting C++17 and a minimum CMake version of 3.19 are required to build the project.
 
 Working on the core C++ library
 ###############################

@@ -72,9 +72,9 @@ def graph_state(n, include_measurements: bool = True):
     c = ClassicalRegister(n, "c")
     qc = QuantumCircuit(q, c, name="graph_state")
 
-    G = nx.random_regular_graph(3, n)
-    A = nx.convert_matrix.to_numpy_array(G)
-    qc.compose(GraphState(A), inplace=True)
+    g = nx.random_regular_graph(3, n)
+    a = nx.convert_matrix.to_numpy_array(g)
+    qc.compose(GraphState(a), inplace=True)
     if include_measurements:
         measure(qc, q, c)
     return qc
@@ -103,11 +103,11 @@ def w_state(n: int, include_measurements: bool = True):
     return qc
 
 
-def shor(N: int, a: int = 2, include_measurements: bool = True):
+def shor(n: int, a: int = 2, include_measurements: bool = True):
     from qiskit.algorithms.factorizers import Shor
 
-    qc = Shor().construct_circuit(N, a, include_measurements)
-    qc.name = "shor_" + str(N) + "_" + str(a)
+    qc = Shor().construct_circuit(n, a, include_measurements)
+    qc.name = "shor_" + str(n) + "_" + str(a)
     return qc
 
 

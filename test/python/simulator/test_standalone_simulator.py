@@ -1,3 +1,4 @@
+import pathlib
 import unittest
 
 from qiskit import QuantumCircuit
@@ -8,6 +9,15 @@ from mqt import ddsim
 class MQTStandaloneSimulatorTests(unittest.TestCase):
     def setUp(self) -> None:
         self.nonzero_states_ghz = 2
+
+    def test_truly_standalone(self):
+        filename = str(pathlib.Path(__file__).with_name("ghz_03.qasm").absolute())
+        sim = ddsim.CircuitSimulator(filename)
+        result = sim.simulate(1000)
+        print(result)
+        assert len(result.keys()) == self.nonzero_states_ghz
+        assert "000" in result
+        assert "111" in result
 
     def test_standalone(self):
         circ = QuantumCircuit(3)

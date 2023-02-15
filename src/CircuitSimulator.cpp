@@ -5,87 +5,86 @@
 
 template<class Config>
 std::map<std::string, std::size_t> CircuitSimulator<Config>::Simulate(std::size_t shots) {
-    bool has_nonmeasurement_nonunitary = false;
-    bool has_measurements              = false;
-    bool measurements_last             = true;
+    bool hasNonmeasurementNonUnitary = false;
+    bool hasMeasurements             = false;
+    bool measurementsLast            = true;
 
-    std::map<std::size_t, std::size_t> measurement_map;
+    std::map<std::size_t, std::size_t> measurementMap;
 
     for (auto& op: *qc) {
         if (op->isClassicControlledOperation() || (op->isNonUnitaryOperation() && op->getType() != qc::Measure && op->getType() != qc::Barrier)) {
-            has_nonmeasurement_nonunitary = true;
+            hasNonmeasurementNonUnitary = true;
         }
         if (op->getType() == qc::Measure) {
-            auto nu_op = dynamic_cast<qc::NonUnitaryOperation*>(op.get());
-            if (nu_op == nullptr) {
+            auto nonUnitaryOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get());
+            if (nonUnitaryOp == nullptr) {
                 throw std::runtime_error("Op with type Measurement could not be casted to NonUnitaryOperation");
             }
-            has_measurements = true;
+            hasMeasurements = true;
 
-            const auto& quantum = nu_op->getTargets();
-            const auto& classic = nu_op->getClassics();
+            const auto& quantum = nonUnitaryOp->getTargets();
+            const auto& classic = nonUnitaryOp->getClassics();
 
             if (quantum.size() != classic.size()) {
                 throw std::runtime_error("Measurement: Sizes of quantum and classic register mismatch.");
             }
 
             for (unsigned int i = 0; i < quantum.size(); ++i) {
-                measurement_map[quantum.at(i)] = classic.at(i);
+                measurementMap[quantum.at(i)] = classic.at(i);
             }
         }
-        if (has_measurements && op->isUnitary()) {
-            measurements_last = false;
+        if (hasMeasurements && op->isUnitary()) {
+            measurementsLast = false;
         }
     }
 
     // easiest case: all gates are unitary --> simulate once and sample away on all qubits
-    if (!has_nonmeasurement_nonunitary && !has_measurements) {
+    if (!hasNonmeasurementNonUnitary && !hasMeasurements) {
         singleShot(false);
         return Simulator<Config>::MeasureAllNonCollapsing(shots);
     }
 
     // single shot is enough, but the sampling should only return actually measured qubits
-    if (!has_nonmeasurement_nonunitary && measurements_last) {
+    if (!hasNonmeasurementNonUnitary && measurementsLast) {
         singleShot(true);
-        std::map<std::string, std::size_t> m_counter;
-        const auto                         n_qubits = qc->getNqubits();
-        const auto                         n_cbits  = qc->getNcbits();
+        std::map<std::string, std::size_t> measurementCounter;
+        const auto                         qubits = qc->getNqubits();
+        const auto                         cbits  = qc->getNcbits();
 
         // MeasureAllNonCollapsing returns a map from measurement over all qubits to the number of occurrences
-        for (const auto& item: Simulator<Config>::MeasureAllNonCollapsing(shots)) {
+        for (const auto& [bit_string, count]: Simulator<Config>::MeasureAllNonCollapsing(shots)) {
             std::string result_string(qc->getNcbits(), '0');
 
-            for (auto const& m: measurement_map) {
-                // m.first is the qubit, m.second the classical bit
-                result_string[n_cbits - m.second - 1] = item.first[n_qubits - m.first - 1];
+            for (auto const& [qubit_index, bitIndex]: measurementMap) {
+                result_string[cbits - bitIndex - 1] = bit_string[qubits - qubit_index - 1];
             }
 
-            m_counter[result_string] += item.second;
+            measurementCounter[result_string] += count;
         }
 
-        return m_counter;
+        return measurementCounter;
     }
 
     // there are nonunitaries (or intermediate measurement_map) and we have to actually do multiple single_shots :(
-    std::map<std::string, std::size_t> m_counter;
+    std::map<std::string, std::size_t> measurementCounter;
 
     for (unsigned int i = 0; i < shots; i++) {
-        const auto result  = singleShot(false);
-        const auto n_cbits = qc->getNcbits();
+        const auto result = singleShot(false);
+        const auto cbits  = qc->getNcbits();
 
-        std::string result_string(qc->getNcbits(), '0');
+        std::string resultString(qc->getNcbits(), '0');
 
         // result is a map from the cbit index to the Boolean value
-        for (const auto& r: result) {
-            result_string[n_cbits - r.first - 1] = r.second ? '1' : '0';
+        for (const auto& [bitIndex, value]: result) {
+            resultString[cbits - bitIndex - 1] = value ? '1' : '0';
         }
-        m_counter[result_string]++;
+        measurementCounter[resultString]++;
     }
-    return m_counter;
+    return measurementCounter;
 }
 
 template<class Config>
-std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool ignore_nonunitaries) {
+std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool ignoreNonUnitaries) {
     singleShots++;
     const auto nQubits = qc->getNqubits();
 
@@ -95,11 +94,11 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
     std::size_t                 opNum = 0;
     std::map<std::size_t, bool> classicValues;
 
-    const auto approxMod = static_cast<std::size_t>(std::ceil(static_cast<double>(qc->getNops()) / (approximationInfo.stepNumber + 1)));
+    const auto approxMod = static_cast<std::size_t>(std::ceil(static_cast<double>(qc->getNops()) / (static_cast<double>(approximationInfo.stepNumber + 1))));
 
     for (auto& op: *qc) {
         if (op->isNonUnitaryOperation()) {
-            if (ignore_nonunitaries) {
+            if (ignoreNonUnitaries) {
                 continue;
             }
             if (auto* nonUnitaryOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {

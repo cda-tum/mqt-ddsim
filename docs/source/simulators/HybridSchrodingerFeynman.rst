@@ -1,6 +1,22 @@
 Hybrid Schrödinger-Feynman Simulator
 ====================================
 
+Hybrid Schrödinger-Feynman approaches strive to use all the available memory and processing units in order to efficiently simulate quantum circuits which would
+(1) run into memory bottlenecks using Schrödinger-style simulation, or
+(2) take exceedingly long using Feynman-style path summation—eventually trading-off the respective memory and runtime requirements.
+
+Usage in Python
+###############
+
+Available backends in the provider :code:`DDSIMProvider`:
+
+- :code:`hybrid_qasm_simulator` to simulate and sample from the resulting state
+- :code:`hybrid_statevector_simulator` to simulate and explicitly return the state vector (which will require an exponential amount of memory in the number of qubits)
+
+
+Usage as Standalone Executable
+##############################
+
 Please see :doc:`CircuitSimulator` on how to build the :code:`ddsim_simple` (the name stuck due to historical reasons ;) ) CMake target.
 
 Launching the standalone executable with :code:`-h` parameter shows the available options (truncated to highlight the hybrid settings):

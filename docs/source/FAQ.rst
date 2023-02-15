@@ -14,6 +14,7 @@ of the tool. They can be built and executed in the following way:
     $ ./build/test/ddsim_test
     [...]
 
+----
 
 **Why does generation step of CMake fail?**
 
@@ -25,6 +26,7 @@ If you see the following error message ::
 
 Please run :code:`git submodule update --init --recursive` and try again.
 
+----
 
 **Why do I get a linking error at the end of the build process?**
 
