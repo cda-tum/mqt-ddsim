@@ -1,5 +1,5 @@
 Noise-aware Simulator
-================================
+=====================
 
 The tool also supports noise-aware quantum circuit simulation, based on a stochastic approach. It currently supports
 global decoherence and gate error noise effects. A detailed summary of the simulator is presented
@@ -10,7 +10,7 @@ Usage in Python
 ###############
 
 .. warning::
-    Current the noise-aware simulator is not exposed via the python bindings.
+    Currently the noise-aware simulator is not exposed via the python bindings.
 
 Usage as Standalone Executable
 ##############################
@@ -95,7 +95,7 @@ The deterministic simulator is run when "stochastic_runs" is set to 0. The same 
 
 .. code-block:: console
 
-    ./build/apps/ddsim_noise_aware --noise_effects APD --noise_prob 0.001 --stoch_runs 0 --simulate_file adder_n4.qasm  --pm --ps
+    $ ./build/apps/ddsim_noise_aware --noise_effects APD --noise_prob 0.001 --stoch_runs 0 --simulate_file adder_n4.qasm  --pm --ps
     {
       "measurement_results": {
         "0000": 0.013477634679595526,
