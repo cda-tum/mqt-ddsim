@@ -37,6 +37,11 @@ public:
 
     virtual ~Simulator() = default;
 
+    /**
+     * Run the simulation in the (derived) class.
+     * @param shots number of shots to take from the final quantum state
+     * @return a map from the strings representing basis states to the number of times they have been measured
+     */
     virtual std::map<std::string, std::size_t> Simulate(std::size_t shots) = 0;
 
     virtual std::map<std::string, std::string> AdditionalStatistics() { return {}; };
