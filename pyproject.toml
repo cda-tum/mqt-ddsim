@@ -64,7 +64,7 @@ docs = [
     "sphinxext-opengraph",
     "breathe"
 ]
-dev = ["mqt.ddsim[tnflow, tests, coverage, docs]"]
+dev = ["mqt.ddsim[tnflow, coverage, docs]"]
 
 [project.urls]
 Homepage = "https://github.com/cda-tum/ddsim"
