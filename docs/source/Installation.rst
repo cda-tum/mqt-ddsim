@@ -34,7 +34,7 @@ In most practical cases (under 64-bit Linux, MacOS, and Windows), this requires 
         (venv) $ pip install --upgrade pip setuptools wheel
 
 .. warning::
-    Support for Python 3.7 wille be officially dropped in the near future.
+    Python 3.7 will reach end-of-life in June 2023 and MQT phases out support starting now.
     We strongly recommend that users upgrade to a more recent version of Python to ensure compatibility and continue receiving updates and support.
     Thank you for your understanding.
 
