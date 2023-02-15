@@ -8,7 +8,7 @@ from qiskit import QuantumCircuit, transpile
 
 from mqt import ddsim
 from mqt.bench import get_benchmark
-from mqt.ddsim.pathqasmsimulator import PathQasmSimulator, get_simulation_path
+from mqt.ddsim.pathqasmsimulator import PathQasmSimulatorBackend, get_simulation_path
 
 
 def execute_circuit(
@@ -193,7 +193,7 @@ if __name__ == "__main__":
         )
 
     # settings to create to versions of the same quantum circuit
-    backend = PathQasmSimulator()
+    backend = PathQasmSimulatorBackend()
     configuration_dict = backend.configuration().to_dict()
     basis_gates_transpile = configuration_dict["basis_gates"]
     basis_gates_optimize = ["id", "rz", "sx", "x", "cx", "reset"]
