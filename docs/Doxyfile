@@ -17,15 +17,6 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 
-# This tag specifies the encoding used for all characters in the configuration
-# file that follow. The default is UTF-8 which is also the encoding used for all
-# text before the first occurrence of this tag. Doxygen uses libiconv (or the
-# iconv built into libc) for the transcoding. See
-# https://www.gnu.org/software/libiconv/ for the list of possible encodings.
-# The default value is: UTF-8.
-
-DOXYFILE_ENCODING      = UTF-8
-
 # The PROJECT_NAME tag is a single word (or a sequence of words surrounded by
 # double-quotes, unless you are using Doxywizard) that should identify the
 # project for which the documentation is generated. This name is used in the
@@ -34,24 +25,11 @@ DOXYFILE_ENCODING      = UTF-8
 
 PROJECT_NAME           = "MQT DDSIM"
 
-# The PROJECT_NUMBER tag can be used to enter a project or revision number. This
-# could be handy for archiving the generated documentation or if some version
-# control system is used.
-
-PROJECT_NUMBER         =
-
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
 PROJECT_BRIEF          = A quantum circuit simulator based on decision diagrams written in C++
-
-# With the PROJECT_LOGO tag one can specify a logo or an icon that is included
-# in the documentation. The maximum height of the logo should not exceed 55
-# pixels and the maximum width should not exceed 200 pixels. Doxygen will copy
-# the logo to the output directory.
-
-PROJECT_LOGO           =
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
@@ -71,15 +49,6 @@ OUTPUT_DIRECTORY       = doxygen
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = ../include ../src ../mqt/ddsim
-
-# This tag can be used to specify the character encoding of the source files
-# that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
-# libiconv (or the iconv built into libc) for the transcoding. See the libiconv
-# documentation (see:
-# https://www.gnu.org/software/libiconv/) for the list of possible encodings.
-# The default value is: UTF-8.
-
-INPUT_ENCODING         = UTF-8
 
 # If the value of the INPUT tag contains directories, you can use the
 # FILE_PATTERNS tag to specify one or more wildcard patterns (like *.cpp and
@@ -141,19 +110,3 @@ GENERATE_XML           = YES
 # This tag requires that the tag GENERATE_XML is set to YES.
 
 XML_OUTPUT             = xml
-
-# If the XML_PROGRAMLISTING tag is set to YES, doxygen will dump the program
-# listings (including syntax highlighting and cross-referencing information) to
-# the XML output. Note that enabling this will significantly increase the size
-# of the XML output.
-# The default value is: YES.
-# This tag requires that the tag GENERATE_XML is set to YES.
-
-XML_PROGRAMLISTING     = YES
-
-# If the XML_NS_MEMB_FILE_SCOPE tag is set to YES, doxygen will include
-# namespace members in file scope as well, matching the HTML output.
-# The default value is: NO.
-# This tag requires that the tag GENERATE_XML is set to YES.
-
-XML_NS_MEMB_FILE_SCOPE = NO

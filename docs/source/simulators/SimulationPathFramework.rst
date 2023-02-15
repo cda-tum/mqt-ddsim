@@ -1,7 +1,7 @@
 Simulation Path Framework
 =========================
 
-The tool also provides a framework for exploiting arbitrary simulation paths (using the `taskflow <https://github.com/taskflow/taskflow>`_ library) based on the methods proposed in :cite:p:`DBLP:conf/qce/BurgholzerBW21`.
+The tool also provides a framework for exploiting arbitrary simulation paths (using the `taskflow <https://github.com/taskflow/taskflow>`_ library) based on the methods proposed in :cite:p:`burgholzer2022simulation`.
 A *simulation path* describes the order in which the individual MxV or MxM multiplications are conducted during the simulation of a quantum circuit.
 It can be described as a list of tuples that identify the individual states/operations to be multiplied.
 The initial state is always assigned :code:`ID 0`, while the i-th operation is assigned :code:`ID i`.

@@ -34,6 +34,7 @@ Using the Circuit Simulator without Qiskit is also possible by passing a file na
     # results will contain a dictional like {'000': 510, '111': 490}
 
 This of course assumes a file :code:`ghz_03.qasm` exists.
+Alternatively, Qiskit :code:`QuantumCircuit` objects can be passed directly as well.
 
 Usage as Standalone Executable
 ##############################

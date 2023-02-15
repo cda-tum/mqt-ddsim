@@ -9,11 +9,11 @@ Usage in Python
 
 Available backend in the provider :code:`DDSIMProvider`:
 
-- :code:`unitary_simulator` to simulate and sample from the resulting state
+- :code:`unitary_simulator` to combine the gates/operations in the circuit into one unitary.
 
 
 Usage as Standalone Executable
 ##############################
 
 .. warning::
-    The path framework simulator is not exposed as standalone executable.
+    The unitary simulator is not exposed as standalone executable.
