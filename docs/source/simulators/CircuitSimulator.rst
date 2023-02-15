@@ -7,11 +7,12 @@ OpenQASM and real files as well as pre-defined algorithm like QFT, Grover, and r
 
 Capabilities:
 
-- Exact Simulation
-- Weak Simulation
-- Approximate Simulation with different strategies
-  - Fidelity-driven
-  - Memory-driven
+- Exact Simulation :cite:p:`zulehner2019advanced,DBLP:conf/iccad/ZulehnerHW19`
+- Weak Simulation :cite:p:`DBLP:conf/dac/HillmichMW20`
+- Approximate Simulation with different strategies :cite:p:`10.1145/3530776,DBLP:conf/date/HillmichKMW21`
+
+    - Fidelity-driven
+    - Memory-driven
 
 
 Usage in Python

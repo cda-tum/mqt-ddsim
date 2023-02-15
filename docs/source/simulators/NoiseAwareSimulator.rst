@@ -1,4 +1,4 @@
-Executable Noise-aware Simulator
+Noise-aware Simulator
 ================================
 
 The tool also supports noise-aware quantum circuit simulation, based on a stochastic approach. It currently supports
@@ -9,7 +9,8 @@ algorithms.
 Usage in Python
 ###############
 
-TODO
+.. warning::
+    Current the noise-aware simulator is not exposed via the python bindings.
 
 Usage as Standalone Executable
 ##############################

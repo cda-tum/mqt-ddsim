@@ -29,8 +29,8 @@ Further, the integration with IBM Qiskit allows users to switch to DDSIM with ju
 
 The important lines are :code:`provider = ddsim.DDSIMProvider()` to get an instance of the provider and
 :code:`backend = provider.get_backend("qasm_simulator")` to actually retrieve the backend that is passed to Qiskit.
-The line in between prints all the available backends which are designed for use cases that are covered in
-:ref:`Simulator Backends`.
+The line in between prints all the available backends which are designed for use cases that are covered in the *Usage in Python* sections
+of the :ref:`Simulators`.
 Running the code above gives the following output:
 
 .. code-block::

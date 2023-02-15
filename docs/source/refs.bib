@@ -27,6 +27,27 @@
     year = {2021}
 }
 
+
+@article{10.1145/3530776,
+    author = {Hillmich, Stefan and Zulehner, Alwin and Kueng, Richard and Markov, Igor L. and Wille, Robert},
+    title = {Approximating Decision Diagrams for Quantum Circuit Simulation},
+    year = {2022},
+    issue_date = {December 2022},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    volume = {3},
+    number = {4},
+    issn = {2643-6809},
+    url = {https://doi.org/10.1145/3530776},
+    doi = {10.1145/3530776},
+    abstract = {Quantum computers promise to solve important problems faster than conventional computers ever could. Underneath is a fundamentally different computational primitive that introduces new challenges for the development of software tools that aid designers of corresponding quantum algorithms. The different computational primitives render classical simulation of quantum circuits particularly challenging. While the logic simulation of conventional circuits is comparatively simple with linear complexity with respect to the number of gates, quantum circuit simulation has to deal with the exponential memory requirements to represent quantum states on non-quantum hardware with respect to the number of qubits. Decision Diagrams&nbsp;(DDs) address this challenge through exploitation of redundancies in matrices and vectors to provide significantly more compact representations in many cases. Moreover, the probabilistic nature of quantum computations enables another angle to tackle the complexity: Quantum algorithms are resistant to some degree against small inaccuracies in the quantum state as these only lead to small changes in the outcome probabilities. We propose to exploit this resistance against (small) errors to gain even more compact decision diagrams. In this work, we investigate the potential of approximation in quantum circuit simulation in detail. To this end, we first present four dedicated schemes that exploit the error resistance and efficiently approximate quantum states represented by decision diagrams. Subsequently, we propose two simulation strategies that utilize those approximations schemes in order to improve the efficiency of DD-based quantum circuit simulation, while, at the same time, allowing the user to control the resulting degradation in accuracy. We empirically show that the proposed approximation schemes reduce the size of decision diagrams substantially and also analytically prove the effect of multiple approximations on the attained accuracy. Eventually, this enables speed-ups of the resulting approximate quantum circuit simulation of up to several orders of magnitudes—again, while controlling the fidelity of the result.},
+    journal = {ACM Transactions on Quantum Computing},
+    month = {jul},
+    articleno = {22},
+    numpages = {21},
+    keywords = {decision diagrams, approximating, Quantum computing, quantum circuit simulation}
+}
+
 @inproceedings{DBLP:conf/date/HillmichKMW21,
   author    = {Stefan Hillmich and
                Richard Kueng and
@@ -87,4 +108,25 @@
 	title     = {{Noise-aware Quantum Circuit Simulation With Decision Diagrams}},
 	journal   = {Transactions on {CAD} of Integrated Circuits and Systems},
 	year      = {2022}
+}
+
+
+
+@inproceedings{DBLP:conf/iccad/ZulehnerHW19,
+  author    = {Alwin Zulehner and
+               Stefan Hillmich and
+               Robert Wille},
+  editor    = {David Z. Pan},
+  title     = {How to Efficiently Handle Complex Values? Implementing Decision Diagrams
+               for Quantum Computing},
+  booktitle = {Proceedings of the International Conference on Computer-Aided Design,
+               {ICCAD} 2019, Westminster, CO, USA, November 4-7, 2019},
+  pages     = {1--7},
+  publisher = {{ACM}},
+  year      = {2019},
+  url       = {https://doi.org/10.1109/ICCAD45719.2019.8942057},
+  doi       = {10.1109/ICCAD45719.2019.8942057},
+  timestamp = {Tue, 24 Mar 2020 16:36:51 +0100},
+  biburl    = {https://dblp.org/rec/conf/iccad/ZulehnerHW19.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
 }
