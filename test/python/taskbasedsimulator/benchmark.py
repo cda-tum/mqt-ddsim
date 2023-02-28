@@ -131,8 +131,8 @@ def generate_lookup_table(profile_path: Path) -> dict:
     # loading the Gatecost LUT
     lookup_table = {}
     with profile_path.open("r") as f:
-        for line in f.readlines():
-            line = line.split(" ")
+        for raw_line in f.readlines():
+            line = raw_line.split(" ")
             lookup_table[line[0] + line[1]] = int(line[2][:-1])
     return lookup_table
 
