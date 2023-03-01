@@ -1,0 +1,4 @@
+# Note: Header files included by non-ignored source files will still be analyzed.
+# In that case, use the HeaderFilterRegex field in .clang-tidy
+
+apps/frqi.cpp

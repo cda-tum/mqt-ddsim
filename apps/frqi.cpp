@@ -8,7 +8,7 @@
 #include <cmath>
 #include <iostream>
 #include <map>
-#include <opencv2/opencv.hpp> // NOLINT(clang-diagnostic-error)
+#include <opencv2/opencv.hpp>
 #include <string>
 
 using namespace dd::literals;

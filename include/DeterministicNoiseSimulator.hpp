@@ -49,7 +49,7 @@ public:
     [[nodiscard]] std::size_t getActiveNodeCount() const override { return Simulator<Config>::dd->dUniqueTable.getActiveNodeCount(); }
     [[nodiscard]] std::size_t getMaxNodeCount() const override { return Simulator<Config>::dd->dUniqueTable.getMaxActiveNodes(); }
 
-    [[nodiscard]] virtual std::size_t countNodesFromRoot() {
+    [[nodiscard]] std::size_t countNodesFromRoot() override {
         size_t tmp;
         if (useDensityMatrixType) {
             qc::DensityMatrixDD::alignDensityEdge(rootEdge);

@@ -55,7 +55,7 @@ public:
 
     [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return 0U; }    // Not available for stochastic simulation
     [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return 0U; } // Not available for stochastic simulation
-    [[nodiscard]] std::size_t countNodesFromRoot() const override { return 0U; }       // Not available for stochastic simulation
+    [[nodiscard]] std::size_t countNodesFromRoot() override { return 0U; }             // Not available for stochastic simulation
     [[nodiscard]] std::size_t getNumberOfQubits() const override { return qc->getNqubits(); };
     [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
     [[nodiscard]] std::string getName() const override { return "stoch_" + qc->getName(); };
