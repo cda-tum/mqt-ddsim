@@ -144,6 +144,7 @@ void HybridSchrodingerFeynmanSimulator<Config>::SimulateHybridTaskflow(const qc:
     const std::size_t maxControl          = 1ULL << ndecisions;
     const std::size_t actuallyUsedThreads = maxControl < nthreads ? maxControl : nthreads;
     const std::size_t nslicesAtOnce       = std::min<std::size_t>(16, maxControl / actuallyUsedThreads);
+    assert(nslicesAtOnce > 0);
 
     Simulator<Config>::rootEdge = qc::VectorDD::zero;
 
