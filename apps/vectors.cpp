@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 
     std::cout << "Lines: " << lines << " (Should be a power of two)\n";
     std::cout << "Fidelity: " << fidelity << "\n";
-    if (std::abs(1.0l - fidelity) < 0.001) {
+    if (std::abs(1.0l - fidelity) < 0.001L) {
         return 0;
     } else {
         return 1;

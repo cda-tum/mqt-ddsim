@@ -38,7 +38,7 @@ public:
 
     std::map<std::string, dd::fp> DeterministicSimulate();
 
-    std::map<std::string, std::size_t> sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, unsigned int shots);
+    std::map<std::string, std::size_t> sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, std::size_t shots);
 
     [[nodiscard]] std::size_t getNumberOfQubits() const override { return qc->getNqubits(); };
 
@@ -49,7 +49,7 @@ public:
     [[nodiscard]] std::size_t getActiveNodeCount() const override { return Simulator<Config>::dd->dUniqueTable.getActiveNodeCount(); }
     [[nodiscard]] std::size_t getMaxNodeCount() const override { return Simulator<Config>::dd->dUniqueTable.getMaxActiveNodes(); }
 
-    [[nodiscard]] std::size_t countNodesFromRoot() {
+    [[nodiscard]] virtual std::size_t countNodesFromRoot() {
         size_t tmp;
         if (useDensityMatrixType) {
             qc::DensityMatrixDD::alignDensityEdge(rootEdge);

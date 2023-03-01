@@ -71,7 +71,8 @@ class ShorFastSimulator: public Simulator<Config> {
 public:
     ShorFastSimulator(const std::uint32_t compositeNumber, const std::uint32_t coprimeA_, const bool verbose = false):
         Simulator<Config>(), compositeN(compositeNumber), coprimeA(coprimeA_),
-        requiredBits(static_cast<std::size_t>(std::ceil(std::log2(compositeNumber)))), nQubits(std::ceil(std::log2(compositeN)) + 1),
+        requiredBits(static_cast<std::size_t>(std::ceil(std::log2(compositeNumber)))),
+        nQubits(static_cast<std::size_t>(std::ceil(std::log2(compositeN))) + 1),
         verbose(verbose) {
         ts.resize(nQubits);
         nodesOnLevel.resize(nQubits);
@@ -79,7 +80,8 @@ public:
 
     ShorFastSimulator(const std::uint32_t compositeNumber, const std::uint32_t coprimeA_, const std::uint64_t seed, const bool verbose = false):
         Simulator<Config>(seed), compositeN(compositeNumber), coprimeA(coprimeA_),
-        requiredBits(static_cast<std::size_t>(std::ceil(std::log2(compositeNumber)))), nQubits(std::ceil(std::log2(compositeN)) + 1),
+        requiredBits(static_cast<std::size_t>(std::ceil(std::log2(compositeNumber)))),
+        nQubits(static_cast<std::size_t>(std::ceil(std::log2(compositeN))) + 1),
         verbose(verbose) {
         ts.resize(nQubits);
         nodesOnLevel.resize(nQubits);

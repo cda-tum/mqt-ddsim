@@ -48,7 +48,7 @@ std::map<std::string, double> DeterministicNoiseSimulator<Config>::Deterministic
 }
 
 template<class Config>
-std::map<std::string, std::size_t> DeterministicNoiseSimulator<Config>::sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, unsigned int shots) {
+std::map<std::string, std::size_t> DeterministicNoiseSimulator<Config>::sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, std::size_t shots) {
     // Create probability distribution from measure probabilities
     std::vector<dd::fp> weights;
     weights.reserve(resultProbabilityMap.size());

@@ -15,7 +15,7 @@ static unsigned long long gcd(unsigned long long a, unsigned long long b) {
 }
 
 static bool is_prime(unsigned int number) {
-    const unsigned int upper_limit = std::floor(std::sqrt(number));
+    const auto upper_limit = static_cast<const unsigned int>(std::floor(std::sqrt(number)));
 
     for (unsigned int a = 2; a <= upper_limit; a++) {
         if (number % a == 0) {
