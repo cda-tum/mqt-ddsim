@@ -58,7 +58,9 @@ CheckOptions:
   - key: readability-identifier-naming.ParameterCase
     value: camelBack
   - key: readability-identifier-naming.ParameterIgnoredRegexp
-    value: ".*ZX.*|.*SWAP.*|.*CEX.*|.*DD.*|.*EQ.*"
+    value: ".*ZX.*|.*SWAP.*|.*CEX.*|.*DD.*|.*EQ.*|.*_"
+  - key: readability-identifier-naming.ConstantParameterIgnoredRegexp
+    value: ".*ZX.*|.*SWAP.*|.*CEX.*|.*DD.*|.*EQ.*|.*_"
   - key: readability-identifier-naming.NamespaceCase
     value: lower_case
   - key: readability-identifier-naming.StaticConstantCase

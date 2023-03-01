@@ -8,60 +8,61 @@ template<class Config = dd::DDPackageConfig>
 class ShorSimulator: public Simulator<Config> {
     static std::uint64_t modpow(std::uint64_t base, std::uint64_t exp, std::uint64_t modulus) {
         base %= modulus;
-        std::uint64_t result = 1ull;
+        std::uint64_t result = 1ULL;
         while (exp > 0) {
-            if (exp & 1ull) result = (result * base) % modulus;
+            if ((exp & 1ULL) > 0) {
+                result = (result * base) % modulus;
+            }
             base = (base * base) % modulus;
-            exp >>= 1ull;
+            exp >>= 1ULL;
         }
         return result;
     }
 
     static std::uint64_t gcd(std::uint64_t a, std::uint64_t b) {
-        std::uint64_t c;
         while (a != 0) {
-            c = a;
-            a = b % a;
-            b = c;
+            const std::uint64_t c = a;
+            a                     = b % a;
+            b                     = c;
         }
         return b;
     }
 
-    static double QMDDcos(double fac, double div) {
+    static double cosine(double fac, double div) {
         return std::cos((dd::PI * fac) / div);
     }
 
-    static double QMDDsin(double fac, double div) {
+    static double sine(double fac, double div) {
         return std::sin((dd::PI * fac) / div);
     }
 
-    void u_a(std::uint64_t a, std::int32_t N, std::int32_t c);
+    void uA(std::uint64_t a, std::int32_t n, std::int32_t c);
 
-    void cmult_inv(std::uint64_t a, std::uint32_t N, std::int32_t c);
+    void cmultInv(std::uint64_t a, std::uint32_t n, std::int32_t c);
 
-    void cmult(std::uint64_t a, std::uint32_t N, std::int32_t c);
+    void cmult(std::uint64_t a, std::uint32_t n, std::int32_t c);
 
-    void mod_add_phi_inv(std::int32_t a, std::int32_t N, std::int32_t c1, std::int32_t c2);
+    void modAddPhiInv(std::int32_t a, std::int32_t n, std::int32_t c1, std::int32_t c2);
 
-    void mod_add_phi(std::uint64_t a, std::uint32_t N, std::int32_t c1, std::int32_t c2);
+    void modAddPhi(std::uint64_t a, std::uint32_t n, std::int32_t c1, std::int32_t c2);
 
-    void qft_inv();
+    void qftInv();
 
     void qft();
 
-    void add_phi_inv(std::uint64_t a, std::int32_t c1, std::int32_t c2);
+    void addPhiInv(std::uint64_t a, std::int32_t c1, std::int32_t c2);
 
-    void add_phi(std::uint64_t a, std::int32_t c1, std::int32_t c2);
+    void addPhi(std::uint64_t a, std::int32_t c1, std::int32_t c2);
 
-    static std::int32_t inverse_mod(std::int32_t a, std::int32_t n);
+    static std::int32_t inverseMod(std::int32_t a, std::int32_t n);
 
-    void u_a_emulate(std::uint64_t a, std::int32_t q);
+    void uAEmulate(std::uint64_t a, std::int32_t q);
 
-    void ApplyGate(dd::GateMatrix matrix, dd::Qubit target, const dd::Controls& controls);
+    void applyGate(dd::GateMatrix matrix, dd::Qubit target, const dd::Controls& controls);
 
-    void ApplyGate(dd::GateMatrix matrix, dd::Qubit target, dd::Control control);
+    void applyGate(dd::GateMatrix matrix, dd::Qubit target, dd::Control control);
 
-    void ApplyGate(dd::GateMatrix matrix, dd::Qubit target);
+    void applyGate(dd::GateMatrix matrix, dd::Qubit target);
 
     std::vector<std::uint64_t> ts;
 
@@ -71,10 +72,10 @@ class ShorSimulator: public Simulator<Config> {
 
     dd::mEdge limitTo(std::uint64_t a);
 
-    [[nodiscard]] std::pair<std::uint32_t, std::uint32_t> post_processing(const std::string& sample) const;
+    [[nodiscard]] std::pair<std::uint32_t, std::uint32_t> postProcessing(const std::string& sample) const;
 
     /// composite number to be factored
-    const std::size_t compositeN;
+    std::size_t compositeN;
     /// coprime number to `coprimeN`. Setting this to zero will randomly generate a suitable number
     std::size_t coprimeA;
     std::size_t requiredBits;
@@ -86,9 +87,9 @@ class ShorSimulator: public Simulator<Config> {
     std::string                             polrResult = "did not start";
     std::pair<std::uint32_t, std::uint32_t> polrFactors{0, 0};
 
-    const bool    emulate;
-    const bool    verbose;
-    const bool    approximate;
+    bool          emulate;
+    bool          verbose;
+    bool          approximate;
     std::uint64_t approximationRuns{0};
     long double   finalFidelity{1.0L};
     double        stepFidelity{0.9};
@@ -147,7 +148,7 @@ public:
         return {
                 {"composite_number", std::to_string(compositeN)},
                 {"coprime_a", std::to_string(coprimeA)},
-                {"emulation", std::to_string(emulate)},
+                {"emulation", (emulate ? "true" : "false")},
                 {"sim_result", simResult},
                 {"sim_factor1", std::to_string(simFactors.first)},
                 {"sim_factor2", std::to_string(simFactors.second)},

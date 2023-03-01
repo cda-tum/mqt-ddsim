@@ -16,20 +16,20 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::Simulate([[maybe_unuse
 
     if (emulate) {
         nQubits                     = static_cast<dd::QubitCount>(3 * requiredBits);
-        Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(nQubits);
+        Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::QubitCount>(nQubits));
         Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
         //Initialize qubits
         //TODO: other init method where the initial value can be chosen
-        ApplyGate(dd::Xmat, 0);
+        applyGate(dd::Xmat, 0);
 
     } else {
         nQubits                     = static_cast<dd::QubitCount>(2 * requiredBits + 3);
-        Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(nQubits);
+        Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::QubitCount>(nQubits));
         Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
         //Initialize qubits
         //TODO: other init method where the initial value can be chosen
 
-        ApplyGate(dd::Xmat, static_cast<dd::Qubit>(nQubits - 1));
+        applyGate(dd::Xmat, static_cast<dd::Qubit>(nQubits - 1));
     }
 
     if (verbose) {
@@ -52,17 +52,19 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::Simulate([[maybe_unuse
         std::clog << "Find a coprime to N=" << compositeN << ": " << coprimeA << "\n";
     }
 
-    auto* as                 = new std::uint64_t[2 * requiredBits];
+    std::vector<std::uint64_t> as;
+    as.resize(2 * requiredBits);
+    assert(as.size() == 2 * requiredBits); // it's quite easy to get the vector initialization wrong
     as[2 * requiredBits - 1] = coprimeA;
-    std::uint64_t new_a      = coprimeA;
-    for (std::int32_t i = 2 * requiredBits - 2; i >= 0; i--) {
-        new_a = new_a * new_a;
-        new_a = new_a % compositeN;
-        as[i] = new_a;
+    std::uint64_t newA       = coprimeA;
+    for (auto i = static_cast<std::int64_t>(2 * requiredBits - 2); i >= 0; i--) {
+        newA                            = newA * newA;
+        newA                            = newA % compositeN;
+        as[static_cast<std::size_t>(i)] = newA;
     }
 
     for (std::uint32_t i = 0; i < 2 * requiredBits; i++) {
-        ApplyGate(dd::Hmat, (nQubits - 1) - i);
+        applyGate(dd::Hmat, (nQubits - 1) - i);
     }
     const std::int32_t mod = std::ceil(2 * requiredBits / 6.0); // log_0.9(0.5) is about 6
     auto               t1  = std::chrono::steady_clock::now();
@@ -70,20 +72,20 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::Simulate([[maybe_unuse
     if (emulate) {
         for (std::uint32_t i = 0; i < 2 * requiredBits; i++) {
             if (verbose) {
-                std::clog << "[ " << (i + 1) << "/" << 2 * requiredBits << " ] u_a_emulate(" << as[i] << ", " << i
+                std::clog << "[ " << (i + 1) << "/" << 2 * requiredBits << " ] uAEmulate(" << as[i] << ", " << i
                           << ") " << std::chrono::duration<float>(std::chrono::steady_clock::now() - t1).count() << "\n"
                           << std::flush;
             }
-            u_a_emulate(as[i], i);
+            uAEmulate(as[i], i);
         }
     } else {
         for (std::uint32_t i = 0; i < 2 * requiredBits; i++) {
             if (verbose) {
-                std::clog << "[ " << (i + 1) << "/" << 2 * requiredBits << " ] u_a(" << as[i] << ", " << compositeN << ", " << 0
+                std::clog << "[ " << (i + 1) << "/" << 2 * requiredBits << " ] uA(" << as[i] << ", " << compositeN << ", " << 0
                           << ") " << std::chrono::duration<float>(std::chrono::steady_clock::now() - t1).count() << "\n"
                           << std::flush;
             }
-            u_a(as[i], compositeN, 0);
+            uA(as[i], compositeN, 0);
         }
     }
 
@@ -100,30 +102,28 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::Simulate([[maybe_unuse
         double q = 2;
 
         for (std::int32_t j = i - 1; j >= 0; j--) {
-            double         q_r = QMDDcos(1, -q);
-            double         q_i = QMDDsin(1, -q);
-            dd::GateMatrix Qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {q_r, q_i}};
-            ApplyGate(Qm, nQubits - 1 - i, dd::Control{static_cast<dd::Qubit>(nQubits - 1 - j)});
+            double               qR = cosine(1, -q);
+            double               qI = sine(1, -q);
+            const dd::GateMatrix qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {qR, qI}};
+            applyGate(qm, nQubits - 1 - i, dd::Control{static_cast<dd::Qubit>(nQubits - 1 - j)});
             q *= 2;
         }
 
         if (approximate && (i + 1) % mod == 0) {
-            finalFidelity *= Simulator<Config>::ApproximateByFidelity(stepFidelity, false, true);
+            finalFidelity *= static_cast<long double>(Simulator<Config>::ApproximateByFidelity(stepFidelity, false, true));
             approximationRuns++;
         }
 
-        ApplyGate(dd::Hmat, nQubits - 1 - i);
+        applyGate(dd::Hmat, nQubits - 1 - i);
     }
-
-    delete[] as;
 
     // Non-Quantum Post Processing
 
     // measure result (involves randomness)
     {
-        std::string sample_reversed = Simulator<Config>::MeasureAll(false);
-        std::string sample{sample_reversed.rbegin(), sample_reversed.rend()};
-        simFactors = post_processing(sample);
+        std::string       sampleReversed = Simulator<Config>::MeasureAll(false);
+        const std::string sample{sampleReversed.rbegin(), sampleReversed.rend()};
+        simFactors = postProcessing(sample);
         if (simFactors.first != 0 && simFactors.second != 0) {
             simResult =
                     std::string("SUCCESS(") + std::to_string(simFactors.first) + "*" +
@@ -133,13 +133,13 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::Simulate([[maybe_unuse
         }
     }
 
-    // path of least resistance result (does not involve randomness)
+    // the path of least resistance result (does not involve randomness)
     {
-        std::pair<dd::ComplexValue, std::string> polr_pair = Simulator<Config>::getPathOfLeastResistance();
+        std::pair<dd::ComplexValue, std::string> polrPair = Simulator<Config>::getPathOfLeastResistance();
         //std::clog << polr_pair.first << " " << polr_pair.second << "\n";
-        std::string polr_reversed = polr_pair.second;
-        std::string polr          = {polr_reversed.rbegin(), polr_reversed.rend()};
-        polrFactors               = post_processing(polr);
+        std::string       polrReversed = polrPair.second;
+        const std::string polr         = {polrReversed.rbegin(), polrReversed.rend()};
+        polrFactors                    = postProcessing(polr);
 
         if (polrFactors.first != 0 && polrFactors.second != 0) {
             polrResult = std::string("SUCCESS(") + std::to_string(polrFactors.first) + "*" +
@@ -159,7 +159,7 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::Simulate([[maybe_unuse
  * @return pair of integers with the factors in case of success or pair of zeros in case of errors
  */
 template<class Config>
-std::pair<std::uint32_t, std::uint32_t> ShorSimulator<Config>::post_processing(const std::string& sample) const {
+std::pair<std::uint32_t, std::uint32_t> ShorSimulator<Config>::postProcessing(const std::string& sample) const {
     std::ostream log{nullptr};
     if (verbose) {
         log.rdbuf(std::clog.rdbuf());
@@ -169,7 +169,7 @@ std::pair<std::uint32_t, std::uint32_t> ShorSimulator<Config>::post_processing(c
     log << "measurement: ";
     for (std::uint32_t i = 0; i < 2 * requiredBits; i++) {
         log << sample.at(2 * requiredBits - 1 - i);
-        res = (res << 1u) + (sample.at(requiredBits + i) == '1');
+        res = (res << 1U) + (sample.at(requiredBits + i) == '1');
     }
 
     log << " = " << res << "\n";
@@ -179,9 +179,9 @@ std::pair<std::uint32_t, std::uint32_t> ShorSimulator<Config>::post_processing(c
         return {0, 0};
     }
     std::vector<std::uint64_t> cf;
-    auto                       denom     = 1ull << (2 * requiredBits);
-    const auto                 old_denom = denom;
-    const auto                 old_res   = res;
+    auto                       denom    = 1ULL << (2 * requiredBits);
+    const auto                 oldDenom = denom;
+    const auto                 oldRes   = res;
 
     log << "Continued fraction expansion of " << res << "/" << denom << " = " << std::flush;
 
@@ -215,8 +215,8 @@ std::pair<std::uint32_t, std::uint32_t> ShorSimulator<Config>::post_processing(c
             return {0, 0};
         }
 
-        const double delta = static_cast<double>(old_res) / static_cast<double>(old_denom) - static_cast<double>(numerator) / static_cast<double>(denominator);
-        if (std::abs(delta) >= 1.0 / (2.0 * static_cast<double>(old_denom))) {
+        const double delta = static_cast<double>(oldRes) / static_cast<double>(oldDenom) - static_cast<double>(numerator) / static_cast<double>(denominator);
+        if (std::abs(delta) >= 1.0 / (2.0 * static_cast<double>(oldDenom))) {
             log << "delta is too big (" << delta << ")\n";
             continue;
         }
@@ -233,7 +233,7 @@ std::pair<std::uint32_t, std::uint32_t> ShorSimulator<Config>::post_processing(c
 
         log << "found period: " << denominator << " * " << fact << " = " << (denominator * fact) << "\n";
 
-        if ((denominator * fact) & 1u) {
+        if (((denominator * fact) & 1U) > 0) {
             log << "Factorization failed (period is odd)!\n";
             return {0, 0};
         }
@@ -244,7 +244,7 @@ std::pair<std::uint32_t, std::uint32_t> ShorSimulator<Config>::post_processing(c
         f1      = gcd(f1, compositeN);
         f2      = gcd(f2, compositeN);
 
-        if (f1 == 1ull || f2 == 1ull) {
+        if (f1 == 1ULL || f2 == 1ULL) {
             log << "Factorization failed: found trivial factors " << f1 << " and " << f2 << "\n";
             return {0, 0};
         }
@@ -266,7 +266,7 @@ dd::mEdge ShorSimulator<Config>::limitTo(std::uint64_t a) {
             dd::mEdge::zero,
             dd::mEdge::zero};
 
-    if (a & 1u) {
+    if ((a & 1U) > 0) {
         edges[0] = edges[3] = dd::mEdge::one;
     } else {
         edges[0] = dd::mEdge::one;
@@ -276,7 +276,7 @@ dd::mEdge ShorSimulator<Config>::limitTo(std::uint64_t a) {
     edges[0] = edges[1] = edges[2] = edges[3] = dd::mEdge::zero;
 
     for (std::uint32_t p = 1; p < requiredBits + 1; p++) {
-        if ((a >> p) & 1u) {
+        if (((a >> p) & 1U) > 0) {
             edges[0] = Simulator<Config>::dd->makeIdent(0, p - 1);
             edges[3] = f;
         } else {
@@ -392,7 +392,7 @@ dd::mEdge ShorSimulator<Config>::limitStateVector(dd::vEdge e) {
 }
 
 template<class Config>
-void ShorSimulator<Config>::u_a_emulate(std::uint64_t a, std::int32_t q) {
+void ShorSimulator<Config>::uAEmulate(std::uint64_t a, std::int32_t q) {
     dd::mEdge limit = Simulator<Config>::dd->makeIdent(0, requiredBits - 1);
 
     dd::mEdge                f = dd::mEdge::one;
@@ -474,7 +474,7 @@ void ShorSimulator<Config>::u_a_emulate(std::uint64_t a, std::int32_t q) {
 }
 
 template<class Config>
-std::int32_t ShorSimulator<Config>::inverse_mod(std::int32_t a, std::int32_t n) {
+std::int32_t ShorSimulator<Config>::inverseMod(std::int32_t a, std::int32_t n) {
     std::int32_t t    = 0;
     std::int32_t newt = 1;
     std::int32_t r    = n;
@@ -499,7 +499,7 @@ std::int32_t ShorSimulator<Config>::inverse_mod(std::int32_t a, std::int32_t n) 
 }
 
 template<class Config>
-void ShorSimulator<Config>::add_phi(std::uint64_t a, std::int32_t c1, std::int32_t c2) {
+void ShorSimulator<Config>::addPhi(std::uint64_t a, std::int32_t c1, std::int32_t c2) {
     for (auto i = static_cast<std::int32_t>(requiredBits); i >= 0; --i) {
         double        q   = 1;
         std::uint32_t fac = 0;
@@ -519,16 +519,16 @@ void ShorSimulator<Config>::add_phi(std::uint64_t a, std::int32_t c1, std::int32
             controls.emplace(dd::Control{static_cast<dd::Qubit>((nQubits - 1) - c2)});
         }
 
-        double         q_r = QMDDcos(fac, q);
-        double         q_i = QMDDsin(fac, q);
+        double         q_r = cosine(fac, q);
+        double         q_i = sine(fac, q);
         dd::GateMatrix Qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {q_r, q_i}};
 
-        ApplyGate(Qm, static_cast<dd::Qubit>((nQubits - 1) - (1 + 2 * requiredBits - static_cast<std::uint32_t>(i))), controls);
+        applyGate(Qm, static_cast<dd::Qubit>((nQubits - 1) - (1 + 2 * requiredBits - static_cast<std::uint32_t>(i))), controls);
     }
 }
 
 template<class Config>
-void ShorSimulator<Config>::add_phi_inv(std::uint64_t a, std::int32_t c1, std::int32_t c2) {
+void ShorSimulator<Config>::addPhiInv(std::uint64_t a, std::int32_t c1, std::int32_t c2) {
     for (auto i = static_cast<std::int32_t>(requiredBits); i >= 0; --i) {
         double        q   = 1;
         std::uint32_t fac = 0;
@@ -547,125 +547,125 @@ void ShorSimulator<Config>::add_phi_inv(std::uint64_t a, std::int32_t c1, std::i
             controls.emplace(dd::Control{static_cast<dd::Qubit>((nQubits - 1) - c2)});
         }
 
-        double         q_r = QMDDcos(fac, -q);
-        double         q_i = QMDDsin(fac, -q);
+        double         q_r = cosine(fac, -q);
+        double         q_i = sine(fac, -q);
         dd::GateMatrix Qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {q_r, q_i}};
-        ApplyGate(Qm, static_cast<dd::Qubit>((nQubits - 1) - (1 + 2 * requiredBits - i)), controls);
+        applyGate(Qm, static_cast<dd::Qubit>((nQubits - 1) - (1 + 2 * requiredBits - i)), controls);
     }
 }
 
 template<class Config>
 void ShorSimulator<Config>::qft() {
     for (std::uint32_t i = requiredBits + 1; i < 2 * requiredBits + 2; i++) {
-        ApplyGate(dd::Hmat, static_cast<dd::Qubit>((nQubits - 1) - i));
+        applyGate(dd::Hmat, static_cast<dd::Qubit>((nQubits - 1) - i));
 
         double q = 2;
         for (std::uint32_t j = i + 1; j < 2 * requiredBits + 2; j++) {
-            double         q_r = QMDDcos(1, q);
-            double         q_i = QMDDsin(1, q);
+            double         q_r = cosine(1, q);
+            double         q_i = sine(1, q);
             dd::GateMatrix Qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {q_r, q_i}};
-            ApplyGate(Qm, static_cast<dd::Qubit>((nQubits - 1) - i), dd::Control{static_cast<dd::Qubit>((nQubits - 1) - j)});
+            applyGate(Qm, static_cast<dd::Qubit>((nQubits - 1) - i), dd::Control{static_cast<dd::Qubit>((nQubits - 1) - j)});
             q *= 2;
         }
     }
 }
 
 template<class Config>
-void ShorSimulator<Config>::qft_inv() {
+void ShorSimulator<Config>::qftInv() {
     for (std::uint32_t i = 2 * requiredBits + 1; i >= requiredBits + 1; i--) {
         double q = 2;
         for (std::uint32_t j = i + 1; j < 2 * requiredBits + 2; j++) {
-            double         q_r = QMDDcos(1, -q);
-            double         q_i = QMDDsin(1, -q);
+            double         q_r = cosine(1, -q);
+            double         q_i = sine(1, -q);
             dd::GateMatrix Qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {q_r, q_i}};
-            ApplyGate(Qm, (nQubits - 1) - i, dd::Control{static_cast<dd::Qubit>((nQubits - 1) - j)});
+            applyGate(Qm, (nQubits - 1) - i, dd::Control{static_cast<dd::Qubit>((nQubits - 1) - j)});
             q *= 2;
         }
-        ApplyGate(dd::Hmat, (nQubits - 1) - i);
+        applyGate(dd::Hmat, (nQubits - 1) - i);
     }
 }
 
 template<class Config>
-void ShorSimulator<Config>::mod_add_phi(std::uint64_t a, std::uint32_t N, std::int32_t c1, std::int32_t c2) {
-    add_phi(a, c1, c2);
-    add_phi_inv(N, std::numeric_limits<std::int32_t>::min(), std::numeric_limits<std::int32_t>::min());
+void ShorSimulator<Config>::modAddPhi(std::uint64_t a, std::uint32_t n, std::int32_t c1, std::int32_t c2) {
+    addPhi(a, c1, c2);
+    addPhiInv(n, std::numeric_limits<std::int32_t>::min(), std::numeric_limits<std::int32_t>::min());
 
-    qft_inv();
+    qftInv();
 
-    ApplyGate(dd::Xmat, (nQubits - 1) - (2 * requiredBits + 2),
+    applyGate(dd::Xmat, (nQubits - 1) - (2 * requiredBits + 2),
               dd::Control{static_cast<dd::Qubit>((nQubits - 1) - (requiredBits + 1))});
 
     qft();
-    add_phi(N, 2 * requiredBits + 2, std::numeric_limits<std::int32_t>::min());
-    add_phi_inv(a, c1, c2);
-    qft_inv();
+    addPhi(n, 2 * requiredBits + 2, std::numeric_limits<std::int32_t>::min());
+    addPhiInv(a, c1, c2);
+    qftInv();
 
-    ApplyGate(dd::Xmat, (nQubits - 1) - (2 * requiredBits + 2),
+    applyGate(dd::Xmat, (nQubits - 1) - (2 * requiredBits + 2),
               dd::Control{static_cast<dd::Qubit>((nQubits - 1) - (requiredBits + 1)), dd::Control::Type::neg});
 
     qft();
-    add_phi(a, c1, c2);
+    addPhi(a, c1, c2);
 }
 
 template<class Config>
-void ShorSimulator<Config>::mod_add_phi_inv(std::int32_t a, std::int32_t N, std::int32_t c1, std::int32_t c2) {
-    add_phi_inv(a, c1, c2);
-    qft_inv();
+void ShorSimulator<Config>::modAddPhiInv(std::int32_t a, std::int32_t n, std::int32_t c1, std::int32_t c2) {
+    addPhiInv(a, c1, c2);
+    qftInv();
 
-    ApplyGate(dd::Xmat, static_cast<dd::Qubit>((nQubits - 1) - (2 * requiredBits + 2)), dd::Control{static_cast<dd::Qubit>((nQubits - 1) - (requiredBits + 1)), dd::Control::Type::neg});
-
-    qft();
-    add_phi(a, c1, c2);
-    add_phi_inv(N, 2 * requiredBits + 2, std::numeric_limits<std::int32_t>::min());
-    qft_inv();
-
-    ApplyGate(dd::Xmat, (nQubits - 1) - (2 * requiredBits + 2), dd::Control{static_cast<dd::Qubit>((nQubits - 1) - (requiredBits + 1))});
+    applyGate(dd::Xmat, static_cast<dd::Qubit>((nQubits - 1) - (2 * requiredBits + 2)), dd::Control{static_cast<dd::Qubit>((nQubits - 1) - (requiredBits + 1)), dd::Control::Type::neg});
 
     qft();
-    add_phi(N, std::numeric_limits<std::int32_t>::min(), std::numeric_limits<std::int32_t>::min());
-    add_phi_inv(a, c1, c2);
+    addPhi(a, c1, c2);
+    addPhiInv(n, 2 * requiredBits + 2, std::numeric_limits<std::int32_t>::min());
+    qftInv();
+
+    applyGate(dd::Xmat, (nQubits - 1) - (2 * requiredBits + 2), dd::Control{static_cast<dd::Qubit>((nQubits - 1) - (requiredBits + 1))});
+
+    qft();
+    addPhi(n, std::numeric_limits<std::int32_t>::min(), std::numeric_limits<std::int32_t>::min());
+    addPhiInv(a, c1, c2);
 }
 
 template<class Config>
-void ShorSimulator<Config>::cmult(std::uint64_t a, std::uint32_t N, std::int32_t c) {
+void ShorSimulator<Config>::cmult(std::uint64_t a, std::uint32_t n, std::int32_t c) {
     qft();
 
     std::uint64_t t = a;
     for (std::uint32_t i = requiredBits; i >= 1; i--) {
-        mod_add_phi(t, N, i, c);
-        t = (2 * t) % N;
+        modAddPhi(t, n, i, c);
+        t = (2 * t) % n;
     }
-    qft_inv();
+    qftInv();
 }
 
 template<class Config>
-void ShorSimulator<Config>::cmult_inv(std::uint64_t a, std::uint32_t N, std::int32_t c) {
+void ShorSimulator<Config>::cmultInv(std::uint64_t a, std::uint32_t n, std::int32_t c) {
     qft();
     std::uint64_t t = a;
     for (std::uint32_t i = requiredBits; i >= 1; i--) {
-        mod_add_phi_inv(t, N, i, c);
-        t = (2 * t) % N;
+        modAddPhiInv(t, n, i, c);
+        t = (2 * t) % n;
     }
-    qft_inv();
+    qftInv();
 }
 
 template<class Config>
-void ShorSimulator<Config>::u_a(std::uint64_t a, std::int32_t N, std::int32_t c) {
+void ShorSimulator<Config>::uA(std::uint64_t a, std::int32_t n, std::int32_t c) {
     using namespace dd::literals;
-    cmult(a, N, c);
+    cmult(a, n, c);
     for (std::uint32_t i = 0; i < requiredBits; i++) {
-        ApplyGate(dd::Xmat, static_cast<dd::Qubit>((nQubits - 1) - (i + 1)), dd::Control{static_cast<dd::Qubit>((nQubits - 1) - (requiredBits + 2 + i))});
+        applyGate(dd::Xmat, static_cast<dd::Qubit>((nQubits - 1) - (i + 1)), dd::Control{static_cast<dd::Qubit>((nQubits - 1) - (requiredBits + 2 + i))});
 
-        ApplyGate(dd::Xmat, static_cast<dd::Qubit>((nQubits - 1) - (requiredBits + 2 + i)), dd::Controls{{dd::Control{static_cast<dd::Qubit>(nQubits - 1 - (i + 1))}, dd::Control{static_cast<dd::Qubit>(nQubits - 1 - c)}}});
+        applyGate(dd::Xmat, static_cast<dd::Qubit>((nQubits - 1) - (requiredBits + 2 + i)), dd::Controls{{dd::Control{static_cast<dd::Qubit>(nQubits - 1 - (i + 1))}, dd::Control{static_cast<dd::Qubit>(nQubits - 1 - c)}}});
 
-        ApplyGate(dd::Xmat, static_cast<dd::Qubit>((nQubits - 1) - (i + 1)), dd::Control{static_cast<dd::Qubit>((nQubits - 1) - (requiredBits + 2 + i))});
+        applyGate(dd::Xmat, static_cast<dd::Qubit>((nQubits - 1) - (i + 1)), dd::Control{static_cast<dd::Qubit>((nQubits - 1) - (requiredBits + 2 + i))});
     }
 
-    cmult_inv(inverse_mod(a, N), N, c);
+    cmultInv(inverseMod(a, n), n, c);
 }
 
 template<class Config>
-void ShorSimulator<Config>::ApplyGate(dd::GateMatrix matrix, dd::Qubit target) {
+void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target) {
     dd::Edge gate = Simulator<Config>::dd->makeGateDD(matrix, nQubits, target);
     dd::Edge tmp  = Simulator<Config>::dd->multiply(gate, Simulator<Config>::rootEdge);
     Simulator<Config>::dd->incRef(tmp);
@@ -676,7 +676,7 @@ void ShorSimulator<Config>::ApplyGate(dd::GateMatrix matrix, dd::Qubit target) {
 }
 
 template<class Config>
-void ShorSimulator<Config>::ApplyGate(dd::GateMatrix matrix, dd::Qubit target, dd::Control control) {
+void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target, dd::Control control) {
     dd::Edge gate = Simulator<Config>::dd->makeGateDD(matrix, nQubits, control, target);
     dd::Edge tmp  = Simulator<Config>::dd->multiply(gate, Simulator<Config>::rootEdge);
     Simulator<Config>::dd->incRef(tmp);
@@ -687,7 +687,7 @@ void ShorSimulator<Config>::ApplyGate(dd::GateMatrix matrix, dd::Qubit target, d
 }
 
 template<class Config>
-void ShorSimulator<Config>::ApplyGate(dd::GateMatrix matrix, dd::Qubit target, const dd::Controls& controls) {
+void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target, const dd::Controls& controls) {
     dd::Edge gate = Simulator<Config>::dd->makeGateDD(matrix, nQubits, controls, target);
     dd::Edge tmp  = Simulator<Config>::dd->multiply(gate, Simulator<Config>::rootEdge);
     Simulator<Config>::dd->incRef(tmp);
