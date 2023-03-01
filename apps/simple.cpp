@@ -19,12 +19,12 @@
 
 namespace nl = nlohmann;
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     cxxopts::Options options("MQT DDSIM", "for more information see https://www.cda.cit.tum.de/");
     // clang-format off
     options.add_options()
         ("h,help", "produce help message")
-        ("seed", "seed for random number generator (default zero is possibly directly used as seed!)", cxxopts::value<unsigned long long>()->default_value("0"))
+        ("seed", "seed for random number generator (default zero is possibly directly used as seed!)", cxxopts::value<std::uint64_t>()->default_value("0"))
         ("shots", "number of measurements (if the algorithm does not contain non-unitary gates, weak simulation is used)", cxxopts::value<unsigned int>()->default_value("0"))
         ("pv", "display the state vector")
         ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
@@ -53,12 +53,12 @@ int main(int argc, char** argv) {
     // clang-format on
 
     auto vm = options.parse(argc, argv);
-    if (vm.count("help")) {
+    if (vm.count("help") > 0) {
         std::cout << options.help();
         std::exit(0);
     }
 
-    const auto seed         = vm["seed"].as<unsigned long long>();
+    const auto seed         = vm["seed"].as<std::uint64_t>();
     const auto shots        = vm["shots"].as<unsigned int>();
     const auto nthreads     = vm["nthreads"].as<unsigned int>();
     const auto approxSteps  = vm["steps"].as<unsigned int>();
@@ -70,17 +70,17 @@ int main(int argc, char** argv) {
 
     std::unique_ptr<qc::QuantumComputation>         quantumComputation;
     std::unique_ptr<Simulator<dd::DDPackageConfig>> ddsim{nullptr};
-    ApproximationInfo                               approximationInfo(stepFidelity, approxSteps, strategy);
+    const ApproximationInfo                         approximationInfo(stepFidelity, approxSteps, strategy);
     const bool                                      verbose = vm.count("verbose") > 0;
 
-    if (vm.count("simulate_file")) {
+    if (vm.count("simulate_file") > 0) {
         const std::string fname = vm["simulate_file"].as<std::string>();
         quantumComputation      = std::make_unique<qc::QuantumComputation>(fname);
         ddsim                   = std::make_unique<CircuitSimulator<dd::DDPackageConfig>>(std::move(quantumComputation), approximationInfo, seed);
-    } else if (vm.count("simulate_file_hybrid")) {
+    } else if (vm.count("simulate_file_hybrid") > 0) {
         const std::string fname = vm["simulate_file_hybrid"].as<std::string>();
         quantumComputation      = std::make_unique<qc::QuantumComputation>(fname);
-        if (vm.count("hybrid_mode")) {
+        if (vm.count("hybrid_mode") > 0) {
             const std::string mname = vm["hybrid_mode"].as<std::string>();
             if (mname == "amplitude") {
                 mode = HybridSchrodingerFeynmanSimulator<dd::DDPackageConfig>::Mode::Amplitude;
@@ -93,40 +93,40 @@ int main(int argc, char** argv) {
         } else {
             ddsim = std::make_unique<HybridSchrodingerFeynmanSimulator<dd::DDPackageConfig>>(std::move(quantumComputation), mode, nthreads);
         }
-    } else if (vm.count("simulate_qft")) {
-        const unsigned int n_qubits = vm["simulate_qft"].as<unsigned int>();
-        quantumComputation          = std::make_unique<qc::QFT>(n_qubits);
-        ddsim                       = std::make_unique<CircuitSimulator<>>(std::move(quantumComputation), approximationInfo, seed);
-    } else if (vm.count("simulate_fast_shor")) {
-        const unsigned int composite_number = vm["simulate_fast_shor"].as<unsigned int>();
-        const unsigned int coprime          = vm["simulate_fast_shor_coprime"].as<unsigned int>();
+    } else if (vm.count("simulate_qft") > 0) {
+        const unsigned int nQubits = vm["simulate_qft"].as<unsigned int>();
+        quantumComputation         = std::make_unique<qc::QFT>(nQubits);
+        ddsim                      = std::make_unique<CircuitSimulator<>>(std::move(quantumComputation), approximationInfo, seed);
+    } else if (vm.count("simulate_fast_shor") > 0) {
+        const unsigned int compositeNumber = vm["simulate_fast_shor"].as<unsigned int>();
+        const unsigned int coprime         = vm["simulate_fast_shor_coprime"].as<unsigned int>();
         if (seed == 0) {
-            ddsim = std::make_unique<ShorFastSimulator<dd::DDPackageConfig>>(composite_number, coprime, verbose);
+            ddsim = std::make_unique<ShorFastSimulator<dd::DDPackageConfig>>(compositeNumber, coprime, verbose);
         } else {
-            ddsim = std::make_unique<ShorFastSimulator<dd::DDPackageConfig>>(composite_number, coprime, seed, verbose);
+            ddsim = std::make_unique<ShorFastSimulator<dd::DDPackageConfig>>(compositeNumber, coprime, seed, verbose);
         }
-    } else if (vm.count("simulate_shor")) {
-        const unsigned int composite_number = vm["simulate_shor"].as<unsigned int>();
-        const unsigned int coprime          = vm["simulate_shor_coprime"].as<unsigned int>();
-        const bool         emulate          = vm.count("simulate_shor_no_emulation") == 0;
+    } else if (vm.count("simulate_shor") > 0) {
+        const unsigned int compositeNumber = vm["simulate_shor"].as<unsigned int>();
+        const unsigned int coprime         = vm["simulate_shor_coprime"].as<unsigned int>();
+        const bool         emulate         = vm.count("simulate_shor_no_emulation") == 0;
         if (seed == 0) {
-            ddsim = std::make_unique<ShorSimulator<dd::DDPackageConfig>>(composite_number, coprime, emulate, verbose, stepFidelity < 1);
+            ddsim = std::make_unique<ShorSimulator<dd::DDPackageConfig>>(compositeNumber, coprime, emulate, verbose, stepFidelity < 1);
         } else {
-            ddsim = std::make_unique<ShorSimulator<dd::DDPackageConfig>>(composite_number, coprime, seed, emulate, verbose,
+            ddsim = std::make_unique<ShorSimulator<dd::DDPackageConfig>>(compositeNumber, coprime, seed, emulate, verbose,
                                                                          stepFidelity < 1);
         }
-    } else if (vm.count("simulate_grover")) {
-        const unsigned int n_qubits = vm["simulate_grover"].as<unsigned int>();
-        quantumComputation          = std::make_unique<qc::Grover>(n_qubits, seed);
-        ddsim                       = std::make_unique<CircuitSimulator<>>(std::move(quantumComputation), approximationInfo, seed);
-    } else if (vm.count("simulate_grover_emulated")) {
+    } else if (vm.count("simulate_grover") > 0) {
+        const unsigned int nQubits = vm["simulate_grover"].as<unsigned int>();
+        quantumComputation         = std::make_unique<qc::Grover>(nQubits, seed);
+        ddsim                      = std::make_unique<CircuitSimulator<>>(std::move(quantumComputation), approximationInfo, seed);
+    } else if (vm.count("simulate_grover_emulated") > 0) {
         ddsim = std::make_unique<GroverSimulator<dd::DDPackageConfig>>(vm["simulate_grover_emulated"].as<unsigned int>(), seed);
-    } else if (vm.count("simulate_grover_oracle_emulated")) {
+    } else if (vm.count("simulate_grover_oracle_emulated") > 0) {
         ddsim = std::make_unique<GroverSimulator<dd::DDPackageConfig>>(vm["simulate_grover_oracle_emulated"].as<std::string>(), seed);
-    } else if (vm.count("simulate_ghz")) {
-        const unsigned int n_qubits = vm["simulate_ghz"].as<unsigned int>();
-        quantumComputation          = std::make_unique<qc::Entanglement>(n_qubits);
-        ddsim                       = std::make_unique<CircuitSimulator<>>(std::move(quantumComputation), approximationInfo, seed);
+    } else if (vm.count("simulate_ghz") > 0) {
+        const unsigned int nQubits = vm["simulate_ghz"].as<unsigned int>();
+        quantumComputation         = std::make_unique<qc::Entanglement>(nQubits);
+        ddsim                      = std::make_unique<CircuitSimulator<>>(std::move(quantumComputation), approximationInfo, seed);
     } else {
         std::cerr << "Did not find anything to simulate. See help below.\n"
                   << options.help() << "\n";
@@ -141,9 +141,9 @@ int main(int argc, char** argv) {
     auto m  = ddsim->Simulate(shots);
     auto t2 = std::chrono::high_resolution_clock::now();
 
-    std::chrono::duration<float> duration_simulation = t2 - t1;
+    const std::chrono::duration<float> durationSimulation = t2 - t1;
 
-    if (vm.count("approx_state")) {
+    if (vm.count("approx_state") > 0) {
         // TargetFidelity
         ddsim->ApproximateByFidelity(1 / 100.0, false, false, true);
         ddsim->ApproximateByFidelity(2 / 100.0, false, false, true);
@@ -206,19 +206,19 @@ int main(int argc, char** argv) {
         }
     }
 
-    nl::json output_obj;
+    nl::json outputObj;
 
-    if (vm.count("pm")) {
-        output_obj["measurement_results"] = m;
+    if (vm.count("pm") > 0) {
+        outputObj["measurement_results"] = m;
     }
 
-    if (vm.count("pv")) {
-        output_obj["state_vector"] = ddsim->getVectorPair();
+    if (vm.count("pv") > 0) {
+        outputObj["state_vector"] = ddsim->getVectorPair();
     }
 
-    if (vm.count("ps")) {
-        output_obj["statistics"] = {
-                {"simulation_time", duration_simulation.count()},
+    if (vm.count("ps") > 0) {
+        outputObj["statistics"] = {
+                {"simulation_time", durationSimulation.count()},
                 {"benchmark", ddsim->getName()},
                 {"n_qubits", +ddsim->getNumberOfQubits()},
                 {"applied_gates", ddsim->getNumberOfOps()},
@@ -229,19 +229,19 @@ int main(int argc, char** argv) {
         };
 
         for (const auto& [stat, value]: ddsim->AdditionalStatistics()) {
-            output_obj["statistics"][stat] = value;
+            outputObj["statistics"][stat] = value;
         }
     }
 
-    if (vm.count("pcomplex")) {
-        output_obj["complex_stats"] = ddsim->dd->cn.complexTable.getStatistics();
+    if (vm.count("pcomplex") > 0) {
+        outputObj["complex_stats"] = ddsim->dd->cn.complexTable.getStatistics();
     }
 
-    if (vm.count("dump_complex")) {
+    if (vm.count("dump_complex") > 0) {
         auto filename = vm["dump_complex"].as<std::string>();
         auto ostream  = std::fstream(filename, std::fstream::out);
         dd::exportEdgeWeights(ddsim->rootEdge, ostream);
     }
 
-    std::cout << std::setw(2) << output_obj << std::endl;
+    std::cout << std::setw(2) << outputObj << std::endl;
 }
