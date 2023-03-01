@@ -106,17 +106,17 @@ TEST(CircuitSimTest, DestructiveMeasurementAll) {
     CircuitSimulator ddsim(std::move(quantumComputation), 42);
     ddsim.Simulate(1);
 
-    const std::vector<dd::ComplexValue> v_before = ddsim.getVector();
-    ASSERT_EQ(v_before[0], v_before[1]);
-    ASSERT_EQ(v_before[0], v_before[2]);
-    ASSERT_EQ(v_before[0], v_before[3]);
+    const std::vector<dd::ComplexValue> vBefore = ddsim.getVector();
+    ASSERT_EQ(vBefore[0], vBefore[1]);
+    ASSERT_EQ(vBefore[0], vBefore[2]);
+    ASSERT_EQ(vBefore[0], vBefore[3]);
 
-    const std::string m       = ddsim.MeasureAll(true);
-    const auto        v_after = ddsim.getVector();
-    const int         i       = std::stoi(m, nullptr, 2);
+    const std::string m      = ddsim.MeasureAll(true);
+    const auto        vAfter = ddsim.getVector();
+    const std::size_t i      = std::stoul(m, nullptr, 2);
 
-    ASSERT_EQ(v_after[i].r, 1.0);
-    ASSERT_EQ(v_after[i].i, 0.0);
+    ASSERT_EQ(vAfter[i].r, 1.0);
+    ASSERT_EQ(vAfter[i].i, 0.0);
 }
 
 TEST(CircuitSimTest, DestructiveMeasurementOne) {
@@ -126,30 +126,30 @@ TEST(CircuitSimTest, DestructiveMeasurementOne) {
     CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
     ddsim.Simulate(1);
 
-    const char m       = ddsim.MeasureOneCollapsing(0);
-    const auto v_after = ddsim.getVector();
+    const char m      = ddsim.MeasureOneCollapsing(0);
+    const auto vAfter = ddsim.getVector();
 
     if (m == '0') {
-        ASSERT_EQ(v_after[0], dd::complex_SQRT2_2);
-        ASSERT_EQ(v_after[2], dd::complex_SQRT2_2);
-        ASSERT_EQ(v_after[1], dd::complex_zero);
-        ASSERT_EQ(v_after[3], dd::complex_zero);
+        ASSERT_EQ(vAfter[0], dd::complex_SQRT2_2);
+        ASSERT_EQ(vAfter[2], dd::complex_SQRT2_2);
+        ASSERT_EQ(vAfter[1], dd::complex_zero);
+        ASSERT_EQ(vAfter[3], dd::complex_zero);
     } else if (m == '1') {
-        ASSERT_EQ(v_after[0], dd::complex_zero);
-        ASSERT_EQ(v_after[2], dd::complex_zero);
-        ASSERT_EQ(v_after[1], dd::complex_SQRT2_2);
-        ASSERT_EQ(v_after[3], dd::complex_SQRT2_2);
+        ASSERT_EQ(vAfter[0], dd::complex_zero);
+        ASSERT_EQ(vAfter[2], dd::complex_zero);
+        ASSERT_EQ(vAfter[1], dd::complex_SQRT2_2);
+        ASSERT_EQ(vAfter[3], dd::complex_SQRT2_2);
     } else {
         FAIL() << "Measurement result not in {0,1}!";
     }
 
-    const auto v_after_pairs = ddsim.getVectorPair();
-    const auto v_after_compl = ddsim.getVectorComplex();
+    const auto vAfterPairs = ddsim.getVectorPair();
+    const auto vAfterCompl = ddsim.getVectorComplex();
 
-    ASSERT_EQ(v_after_pairs.size(), v_after_compl.size());
-    for (std::size_t i = 0; i < v_after_pairs.size(); i++) {
-        ASSERT_EQ(v_after_pairs.at(i).first, v_after_compl.at(i).real());
-        ASSERT_EQ(v_after_pairs.at(i).second, v_after_compl.at(i).imag());
+    ASSERT_EQ(vAfterPairs.size(), vAfterCompl.size());
+    for (std::size_t i = 0; i < vAfterPairs.size(); i++) {
+        ASSERT_EQ(vAfterPairs.at(i).first, vAfterCompl.at(i).real());
+        ASSERT_EQ(vAfterPairs.at(i).second, vAfterCompl.at(i).imag());
     }
 }
 
@@ -163,10 +163,10 @@ TEST(CircuitSimTest, ApproximateByFidelity) {
     ddsim.Simulate(1);
     ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
 
-    double resulting_fidelity = ddsim.ApproximateByFidelity(0.3, false, true, true);
+    double const resultingFidelity = ddsim.ApproximateByFidelity(0.3, false, true, true);
 
     ASSERT_EQ(ddsim.getActiveNodeCount(), 3);
-    ASSERT_DOUBLE_EQ(resulting_fidelity, 0.5); //equal up to 4 ULP
+    ASSERT_DOUBLE_EQ(resultingFidelity, 0.5); //equal up to 4 ULP
 }
 
 TEST(CircuitSimTest, ApproximateBySampling) {
@@ -179,10 +179,10 @@ TEST(CircuitSimTest, ApproximateBySampling) {
 
     ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
 
-    double resulting_fidelity = ddsim.ApproximateBySampling(1, 0, true, true);
+    double const resultingFidelity = ddsim.ApproximateBySampling(1, 0, true, true);
 
     ASSERT_EQ(ddsim.getActiveNodeCount(), 3);
-    ASSERT_LE(resulting_fidelity, 0.75); // the least contributing path has .25
+    ASSERT_LE(resultingFidelity, 0.75); // the least contributing path has .25
 }
 
 TEST(CircuitSimTest, ApproximationByMemoryInSimulator) {
