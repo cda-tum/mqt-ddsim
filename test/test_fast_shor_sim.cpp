@@ -8,7 +8,7 @@
  */
 
 TEST(FastShorSimTest, Factorize15BaseTest) {
-    ShorFastSimulator ddsim(15, 2, 5ull, true);
+    ShorFastSimulator ddsim(15, 2, 5ULL, true);
 
     ASSERT_EQ(ddsim.getNumberOfOps(), 0);
     ASSERT_EQ(ddsim.getName(), "fast_shor_15_2");

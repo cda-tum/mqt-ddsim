@@ -76,13 +76,13 @@ TEST(HybridSimTest, GRCSTestDD) {
     auto qc1 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
     auto qc2 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
 
-    HybridSchrodingerFeynmanSimulator ddsim_hybrid_dd(std::move(qc1), HybridSchrodingerFeynmanSimulator<>::Mode::DD);
+    HybridSchrodingerFeynmanSimulator ddsimHybridDd(std::move(qc1), HybridSchrodingerFeynmanSimulator<>::Mode::DD);
     CircuitSimulator                  ddsim(std::move(qc2));
 
-    ddsim_hybrid_dd.Simulate(1);
+    ddsimHybridDd.Simulate(1);
     ddsim.Simulate(1);
 
-    dd::serialize(ddsim_hybrid_dd.rootEdge, "result_parallel.dd", true);
+    dd::serialize(ddsimHybridDd.rootEdge, "result_parallel.dd", true);
     dd::serialize(ddsim.rootEdge, "result.dd", true);
 
     auto dd     = std::make_unique<dd::Package<>>(ddsim.getNumberOfQubits());
@@ -109,16 +109,16 @@ TEST(HybridSimTest, GRCSTestAmplitudes) {
     auto qc1 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
     auto qc2 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
 
-    HybridSchrodingerFeynmanSimulator ddsim_hybrid_amp(std::move(qc1), HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude);
+    HybridSchrodingerFeynmanSimulator ddsimHybridAmp(std::move(qc1), HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude);
     CircuitSimulator                  ddsim(std::move(qc2));
 
-    ddsim_hybrid_amp.Simulate(0);
+    ddsimHybridAmp.Simulate(0);
     ddsim.Simulate(0);
 
     // if edges are not equal -> compare amplitudes
-    auto  refAmplitudes    = ddsim.getVector();
-    auto& resultAmplitudes = ddsim_hybrid_amp.getFinalAmplitudes();
-    bool  equal            = true;
+    auto        refAmplitudes    = ddsim.getVector();
+    const auto& resultAmplitudes = ddsimHybridAmp.getFinalAmplitudes();
+    bool        equal            = true;
     for (std::size_t i = 0; i < refAmplitudes.size(); ++i) {
         if (std::abs(refAmplitudes[i].r - resultAmplitudes[i].real()) > 1e-6 || std::abs(refAmplitudes[i].i - resultAmplitudes[i].imag()) > 1e-6) {
             equal = false;
@@ -133,17 +133,17 @@ TEST(HybridSimTest, GRCSTestFixedSeed) {
     auto qc1 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
     auto qc2 = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
 
-    HybridSchrodingerFeynmanSimulator ddsim_hybrid_amp(std::move(qc1), ApproximationInfo{}, 42);
-    EXPECT_TRUE(ddsim_hybrid_amp.getMode() == HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude);
+    HybridSchrodingerFeynmanSimulator ddsimHybridAmp(std::move(qc1), ApproximationInfo{}, 42);
+    EXPECT_TRUE(ddsimHybridAmp.getMode() == HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude);
     CircuitSimulator ddsim(std::move(qc2));
 
-    ddsim_hybrid_amp.Simulate(0);
+    ddsimHybridAmp.Simulate(0);
     ddsim.Simulate(0);
 
     // if edges are not equal -> compare amplitudes
-    auto  refAmplitudes    = ddsim.getVector();
-    auto& resultAmplitudes = ddsim_hybrid_amp.getFinalAmplitudes();
-    bool  equal            = true;
+    auto        refAmplitudes    = ddsim.getVector();
+    const auto& resultAmplitudes = ddsimHybridAmp.getFinalAmplitudes();
+    bool        equal            = true;
     for (std::size_t i = 0; i < refAmplitudes.size(); ++i) {
         if (std::abs(refAmplitudes[i].r - resultAmplitudes[i].real()) > 1e-6 || std::abs(refAmplitudes[i].i - resultAmplitudes[i].imag()) > 1e-6) {
             equal = false;

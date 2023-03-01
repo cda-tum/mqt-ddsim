@@ -122,7 +122,7 @@ TEST(TaskBasedSimTest, SimpleCircuitBracket) {
 
 TEST(TaskBasedSimTest, GroverCircuitBracket) {
     std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(4, 12345);
-    auto                                    grover      = dynamic_cast<qc::Grover*>(qc.get());
+    auto*                                   grover      = dynamic_cast<qc::Grover*>(qc.get());
     auto                                    targetValue = grover->targetValue;
 
     // construct simulator and generate bracketing contraction plan
@@ -148,7 +148,7 @@ TEST(TaskBasedSimTest, GroverCircuitBracket) {
 
 TEST(TaskBasedSimTest, GroverCircuitAlternatingMiddle) {
     std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(4, 12345);
-    auto                                    grover      = dynamic_cast<qc::Grover*>(qc.get());
+    auto*                                   grover      = dynamic_cast<qc::Grover*>(qc.get());
     auto                                    targetValue = grover->targetValue;
 
     // construct simulator and generate alternating contraction plan
@@ -173,7 +173,7 @@ TEST(TaskBasedSimTest, GroverCircuitAlternatingMiddle) {
 
 TEST(TaskBasedSimTest, GroverCircuitPairwiseGrouping) {
     std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(4, 12345);
-    auto                                    grover      = dynamic_cast<qc::Grover*>(qc.get());
+    auto*                                   grover      = dynamic_cast<qc::Grover*>(qc.get());
     auto                                    targetValue = grover->targetValue;
 
     // construct simulator and generate pairwise recursive contraction plan

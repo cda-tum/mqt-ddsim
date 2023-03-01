@@ -260,12 +260,10 @@ TEST(DeterministicNoiseSimTest, sampleFromProbabilityMap1) {
     auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, std::string("APD"), 0, 0, 1, true);
     auto m     = ddsim->DeterministicSimulate();
 
-    std::vector<std::complex<dd::fp>> temp{};
-
     const std::size_t shots        = 100000;
     auto              sampledShots = ddsim->sampleFromProbabilityMap(m, shots);
 
-    double tolerance = 0.01;
+    double const tolerance = 0.01;
     for (auto& result: m) {
         EXPECT_NEAR(result.second, static_cast<dd::fp>(sampledShots.find(result.first)->second) / shots, tolerance);
     }
@@ -276,13 +274,11 @@ TEST(DeterministicNoiseSimTest, sampleFromProbabilityMap2) {
 
     auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, std::string("AP"), 0.1, 0.2, 1, true);
 
-    std::vector<std::complex<dd::fp>> temp{};
-
     const std::size_t shots        = 1000000;
     auto              sampledShots = ddsim->Simulate(shots);
     auto              m            = ddsim->DeterministicSimulate();
 
-    double tolerance = 0.01;
+    double const tolerance = 0.01;
     for (auto& result: m) {
         EXPECT_NEAR(result.second, static_cast<dd::fp>(sampledShots.find(result.first)->second) / shots, tolerance);
     }
