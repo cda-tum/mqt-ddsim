@@ -244,7 +244,7 @@ PYBIND11_MODULE(pyddsim, m) {
     // Miscellaneous functions
     m.def("get_matrix", &getNumpyMatrix<>, "sim"_a, "mat"_a);
 
-    m.def("dumpTensorNetwork", &dumpTensorNetwork, "dump a tensor network representation of the given circuit",
+    m.def("dump_tensor_network", &dumpTensorNetwork, "dump a tensor network representation of the given circuit",
           "circ"_a, "filename"_a);
 
 #define STRINGIFY(x) #x
