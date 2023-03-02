@@ -16,7 +16,7 @@ std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_
             hasNonmeasurementNonUnitary = true;
         }
         if (op->getType() == qc::Measure) {
-            auto nonUnitaryOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get());
+            auto* nonUnitaryOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get());
             if (nonUnitaryOp == nullptr) {
                 throw std::runtime_error("Op with type Measurement could not be casted to NonUnitaryOperation");
             }
@@ -53,13 +53,13 @@ std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_
 
         // MeasureAllNonCollapsing returns a map from measurement over all qubits to the number of occurrences
         for (const auto& [bit_string, count]: Simulator<Config>::measureAllNonCollapsing(shots)) {
-            std::string result_string(qc->getNcbits(), '0');
+            std::string resultString(qc->getNcbits(), '0');
 
             for (auto const& [qubit_index, bitIndex]: measurementMap) {
-                result_string[cbits - bitIndex - 1] = bit_string[qubits - qubit_index - 1];
+                resultString[cbits - bitIndex - 1] = bit_string[qubits - qubit_index - 1];
             }
 
-            measurementCounter[result_string] += count;
+            measurementCounter[resultString] += count;
         }
 
         return measurementCounter;
@@ -125,12 +125,12 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
         } else {
             if (op->isClassicControlledOperation()) {
                 if (auto* classicallyControlledOp = dynamic_cast<qc::ClassicControlledOperation*>(op.get())) {
-                    const auto   startIndex    = static_cast<unsigned short>(classicallyControlledOp->getParameter().at(0));
-                    const auto   length        = static_cast<unsigned short>(classicallyControlledOp->getParameter().at(1));
+                    const auto   startIndex    = static_cast<std::uint16_t>(classicallyControlledOp->getParameter().at(0));
+                    const auto   length        = static_cast<std::uint16_t>(classicallyControlledOp->getParameter().at(1));
                     const auto   expectedValue = classicallyControlledOp->getExpectedValue();
                     unsigned int actualValue   = 0;
                     for (std::size_t i = 0; i < length; i++) {
-                        actualValue |= (classicValues[startIndex + i] ? 1u : 0u) << i;
+                        actualValue |= (classicValues[startIndex + i] ? 1U : 0U) << i;
                     }
 
                     //std::clog << "expected " << expected_value << " and actual value was " << actual_value << "\n";
@@ -155,8 +155,8 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
             if (approximationInfo.stepNumber > 0 && approximationInfo.stepFidelity < 1.0) {
                 if (approximationInfo.strategy == ApproximationInfo::FidelityDriven && (opNum + 1) % approxMod == 0 &&
                     approximationRuns < approximationInfo.stepNumber) {
-                    [[maybe_unused]] const unsigned int size_before = Simulator<Config>::dd->size(Simulator<Config>::rootEdge);
-                    const auto                          apFid       = Simulator<Config>::approximateByFidelity(approximationInfo.stepFidelity, false, true);
+                    [[maybe_unused]] const unsigned int sizeBefore = Simulator<Config>::dd->size(Simulator<Config>::rootEdge);
+                    const auto                          apFid      = Simulator<Config>::approximateByFidelity(approximationInfo.stepFidelity, false, true);
                     approximationRuns++;
                     finalFidelity *= static_cast<long double>(apFid);
                     /*std::clog << "[INFO] Fidelity-driven ApproximationInfo run finished. "
@@ -167,7 +167,7 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
                               << "; #runs=" << approximation_runs
                               << "\n";//*/
                 } else if (approximationInfo.strategy == ApproximationInfo::MemoryDriven) {
-                    [[maybe_unused]] const unsigned int size_before = Simulator<Config>::dd->size(Simulator<Config>::rootEdge);
+                    [[maybe_unused]] const unsigned int sizeBefore = Simulator<Config>::dd->size(Simulator<Config>::rootEdge);
                     if (Simulator<Config>::dd->template getUniqueTable<dd::vNode>().possiblyNeedsCollection()) {
                         const auto apFid = Simulator<Config>::approximateByFidelity(approximationInfo.stepFidelity, false, true);
                         approximationRuns++;
