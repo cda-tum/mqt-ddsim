@@ -9,3 +9,5 @@ __pycache__/
 .pytest_cache/
 .ipynb_checkpoints/
 .ruff_cache/
+.cpp-linter_cache/
+.mypy_cache/
