@@ -94,7 +94,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     const int rows    = dest.rows;
     const int colrows = cols * rows;
 
-    const std::map<std::string, std::size_t> mCounter = ddsim.Simulate(numOfShots);
+    const std::map<std::string, std::size_t> mCounter = ddsim.simulate(numOfShots);
 
     const auto t1end = std::chrono::steady_clock::now();
 

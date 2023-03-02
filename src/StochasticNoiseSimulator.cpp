@@ -6,19 +6,19 @@
 using CN = dd::ComplexNumbers;
 
 template<class Config>
-std::map<std::string, std::size_t> StochasticNoiseSimulator<Config>::Simulate(const std::size_t shots) {
+std::map<std::string, std::size_t> StochasticNoiseSimulator<Config>::simulate(size_t shots) {
     bool hasNonunitary = std::any_of(qc->cbegin(), qc->cend(), [&](const auto& p) { return p->isNonUnitaryOperation(); });
 
     if (!hasNonunitary) {
         perfectSimulationRun();
-        return Simulator<Config>::MeasureAllNonCollapsing(shots);
+        return Simulator<Config>::measureAllNonCollapsing(shots);
     }
 
     std::map<std::string, std::size_t> mCounter;
 
     for (unsigned int i = 0; i < shots; i++) {
         perfectSimulationRun();
-        mCounter[Simulator<Config>::MeasureAll()]++;
+        mCounter[Simulator<Config>::measureAll()]++;
     }
 
     return mCounter;
@@ -42,7 +42,7 @@ void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
                     assert(quantum.size() == classic.size()); // this should not happen do to check in Simulate
 
                     for (std::size_t i = 0U; i < quantum.size(); ++i) {
-                        const auto result = Simulator<Config>::MeasureOneCollapsing(quantum.at(i));
+                        const auto result = Simulator<Config>::measureOneCollapsing(quantum.at(i));
                         assert(result == '0' || result == '1');
                         classicValues[classic.at(i)] = (result == '1');
                     }
@@ -266,7 +266,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
 
                 if (stepFidelity < 1. && (opCount + 1U) % approxMod == 0U) {
                     approxCount++;
-                    Simulator<Config>::ApproximateByFidelity(localDD, localRootEdge, stepFidelity, false, true);
+                    Simulator<Config>::approximateByFidelity(localDD, localRootEdge, stepFidelity, false, true);
                 }
             }
             localDD->garbageCollect();

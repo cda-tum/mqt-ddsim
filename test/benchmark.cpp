@@ -30,7 +30,7 @@ static void yardstiqSimX(benchmark::State& state) {
     CircuitSimulator sim(std::move(qc));
     for ([[maybe_unused]] auto _: state) {
         const auto start = std::chrono::steady_clock::now();
-        sim.Simulate(1);
+        sim.simulate(1);
         const auto end = std::chrono::steady_clock::now();
         sim.dd->reset();
         auto elapsedSeconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
@@ -49,7 +49,7 @@ static void yardstiqSimH(benchmark::State& state) {
     CircuitSimulator sim(std::move(qc));
     for ([[maybe_unused]] auto _: state) {
         const auto start = std::chrono::steady_clock::now();
-        sim.Simulate(1);
+        sim.simulate(1);
         const auto end = std::chrono::steady_clock::now();
         sim.dd->reset();
         auto elapsedSeconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
@@ -68,7 +68,7 @@ static void yardstiqSimT(benchmark::State& state) {
     CircuitSimulator sim(std::move(qc));
     for ([[maybe_unused]] auto _: state) {
         const auto start = std::chrono::steady_clock::now();
-        sim.Simulate(1);
+        sim.simulate(1);
         const auto end = std::chrono::steady_clock::now();
         sim.dd->reset();
         auto elapsedSeconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
@@ -87,7 +87,7 @@ static void yardstiqSimCnot(benchmark::State& state) {
     CircuitSimulator sim(std::move(qc));
     for ([[maybe_unused]] auto _: state) {
         const auto start = std::chrono::steady_clock::now();
-        sim.Simulate(1);
+        sim.simulate(1);
         const auto end = std::chrono::steady_clock::now();
         sim.dd->reset();
         auto elapsedSeconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
@@ -107,7 +107,7 @@ static void yardstiqSimToffoli(benchmark::State& state) {
     CircuitSimulator sim(std::move(qc));
     for ([[maybe_unused]] auto _: state) {
         const auto start = std::chrono::steady_clock::now();
-        sim.Simulate(1);
+        sim.simulate(1);
         const auto end = std::chrono::steady_clock::now();
         sim.dd->reset();
         auto elapsedSeconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
@@ -165,7 +165,7 @@ static void yardstiqSimQcbm(benchmark::State& state) {
     CircuitSimulator sim(std::move(qc));
     for ([[maybe_unused]] auto _: state) {
         const auto start = std::chrono::steady_clock::now();
-        sim.Simulate(1);
+        sim.simulate(1);
         const auto end = std::chrono::steady_clock::now();
         sim.dd->reset();
         auto elapsedSeconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
@@ -251,7 +251,7 @@ static void bmExtraInst4x4100(benchmark::State& state) {
     CircuitSimulator sim(std::move(qc));
     for ([[maybe_unused]] auto _: state) {
         const auto start = std::chrono::steady_clock::now();
-        sim.Simulate(1);
+        sim.simulate(1);
         const auto end = std::chrono::steady_clock::now();
         sim.dd->reset();
         auto elapsedSeconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);

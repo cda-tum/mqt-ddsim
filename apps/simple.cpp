@@ -138,71 +138,71 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     }
 
     auto t1 = std::chrono::high_resolution_clock::now();
-    auto m  = ddsim->Simulate(shots);
+    auto m  = ddsim->simulate(shots);
     auto t2 = std::chrono::high_resolution_clock::now();
 
     const std::chrono::duration<float> durationSimulation = t2 - t1;
 
     if (vm.count("approx_state") > 0) {
         // TargetFidelity
-        ddsim->ApproximateByFidelity(1 / 100.0, false, false, true);
-        ddsim->ApproximateByFidelity(2 / 100.0, false, false, true);
-        ddsim->ApproximateByFidelity(3 / 100.0, false, false, true);
-        ddsim->ApproximateByFidelity(4 / 100.0, false, false, true);
+        ddsim->approximateByFidelity(1 / 100.0, false, false, true);
+        ddsim->approximateByFidelity(2 / 100.0, false, false, true);
+        ddsim->approximateByFidelity(3 / 100.0, false, false, true);
+        ddsim->approximateByFidelity(4 / 100.0, false, false, true);
         for (int i = 6; i <= 95; i += 2) {
-            ddsim->ApproximateByFidelity(i / 100.0, false, false, true);
+            ddsim->approximateByFidelity(i / 100.0, false, false, true);
         }
-        ddsim->ApproximateByFidelity(96 / 100.0, false, false, true);
-        ddsim->ApproximateByFidelity(97 / 100.0, false, false, true);
-        ddsim->ApproximateByFidelity(98 / 100.0, false, false, true);
-        ddsim->ApproximateByFidelity(99 / 100.0, false, false, true);
-        ddsim->ApproximateByFidelity(100 / 100.0, false, false, true);
+        ddsim->approximateByFidelity(96 / 100.0, false, false, true);
+        ddsim->approximateByFidelity(97 / 100.0, false, false, true);
+        ddsim->approximateByFidelity(98 / 100.0, false, false, true);
+        ddsim->approximateByFidelity(99 / 100.0, false, false, true);
+        ddsim->approximateByFidelity(100 / 100.0, false, false, true);
 
         // TargetFidelityPerLevel
-        ddsim->ApproximateByFidelity(1 / 1000.0, true, false, true);
-        ddsim->ApproximateByFidelity(5 / 1000.0, true, false, true);
-        ddsim->ApproximateByFidelity(10 / 1000.0, true, false, true);
-        ddsim->ApproximateByFidelity(20 / 1000.0, true, false, true);
-        ddsim->ApproximateByFidelity(30 / 1000.0, true, false, true);
-        ddsim->ApproximateByFidelity(40 / 1000.0, true, false, true);
+        ddsim->approximateByFidelity(1 / 1000.0, true, false, true);
+        ddsim->approximateByFidelity(5 / 1000.0, true, false, true);
+        ddsim->approximateByFidelity(10 / 1000.0, true, false, true);
+        ddsim->approximateByFidelity(20 / 1000.0, true, false, true);
+        ddsim->approximateByFidelity(30 / 1000.0, true, false, true);
+        ddsim->approximateByFidelity(40 / 1000.0, true, false, true);
         for (int i = 50; i <= 950; i += 10) {
-            ddsim->ApproximateByFidelity(i / 1000.0, true, false, true);
+            ddsim->approximateByFidelity(i / 1000.0, true, false, true);
         }
-        ddsim->ApproximateByFidelity(960 / 1000.0, true, false, true);
-        ddsim->ApproximateByFidelity(970 / 1000.0, true, false, true);
-        ddsim->ApproximateByFidelity(980 / 1000.0, true, false, true);
-        ddsim->ApproximateByFidelity(985 / 1000.0, true, false, true);
-        ddsim->ApproximateByFidelity(990 / 1000.0, true, false, true);
-        ddsim->ApproximateByFidelity(995 / 1000.0, true, false, true);
-        ddsim->ApproximateByFidelity(1000 / 1000.0, true, false, true);
+        ddsim->approximateByFidelity(960 / 1000.0, true, false, true);
+        ddsim->approximateByFidelity(970 / 1000.0, true, false, true);
+        ddsim->approximateByFidelity(980 / 1000.0, true, false, true);
+        ddsim->approximateByFidelity(985 / 1000.0, true, false, true);
+        ddsim->approximateByFidelity(990 / 1000.0, true, false, true);
+        ddsim->approximateByFidelity(995 / 1000.0, true, false, true);
+        ddsim->approximateByFidelity(1000 / 1000.0, true, false, true);
 
         // Traversal
         for (std::size_t i = 1; i < 10; i += 1) {
-            ddsim->ApproximateBySampling(i, 0, false, true);
+            ddsim->approximateBySampling(i, 0, false, true);
         }
         for (std::size_t i = 10; i < 100; i += 10) {
-            ddsim->ApproximateBySampling(i, 0, false, true);
+            ddsim->approximateBySampling(i, 0, false, true);
         }
         for (std::size_t i = 100; i < 1000; i += 100) {
-            ddsim->ApproximateBySampling(i, 0, false, true);
+            ddsim->approximateBySampling(i, 0, false, true);
         }
         for (std::size_t i = 1000; i < 100000; i += 1000) {
-            ddsim->ApproximateBySampling(i, 0, false, true);
+            ddsim->approximateBySampling(i, 0, false, true);
         }
         for (std::size_t i = 100000; i <= 1000000; i += 10000) {
-            ddsim->ApproximateBySampling(i, 0, false, true);
+            ddsim->approximateBySampling(i, 0, false, true);
         }
 
         // Traversal+Threshold
         for (std::size_t i = 1; i < 10; i += 1) {
-            ddsim->ApproximateBySampling(1000000, i, false, true);
+            ddsim->approximateBySampling(1000000, i, false, true);
         }
         for (std::size_t i = 10; i < 100; i += 10) {
-            ddsim->ApproximateBySampling(1000000, i, false, true);
+            ddsim->approximateBySampling(1000000, i, false, true);
         }
 
         for (std::size_t i = 100; i <= 5000; i += 100) {
-            ddsim->ApproximateBySampling(1000000, i, false, true);
+            ddsim->approximateBySampling(1000000, i, false, true);
         }
     }
 
@@ -228,7 +228,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
                 {"seed", ddsim->getSeed()},
         };
 
-        for (const auto& [stat, value]: ddsim->AdditionalStatistics()) {
+        for (const auto& [stat, value]: ddsim->additionalStatistics()) {
             outputObj["statistics"][stat] = value;
         }
     }

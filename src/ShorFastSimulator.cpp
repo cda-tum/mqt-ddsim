@@ -8,9 +8,9 @@
 #include <random>
 
 template<class Config>
-std::map<std::string, std::size_t> ShorFastSimulator<Config>::Simulate([[maybe_unused]] std::size_t shots) {
+std::map<std::string, std::size_t> ShorFastSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
     if (verbose) {
-        std::clog << "Simulate Shor's algorithm for n=" << compositeN;
+        std::clog << "simulate Shor's algorithm for n=" << compositeN;
     }
     Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::QubitCount>(nQubits));
     Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
@@ -80,7 +80,7 @@ std::map<std::string, std::size_t> ShorFastSimulator<Config>::Simulate([[maybe_u
 
         applyGate(dd::Hmat, nQubits - 1);
 
-        measurements[i] = Simulator<Config>::MeasureOneCollapsing(nQubits - 1, false);
+        measurements[i] = Simulator<Config>::measureOneCollapsing(nQubits - 1, false);
         Simulator<Config>::dd->garbageCollect();
 
         if (measurements[i] == '1') {

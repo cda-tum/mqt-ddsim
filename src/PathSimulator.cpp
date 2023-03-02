@@ -97,7 +97,7 @@ PathSimulator<Config>::SimulationPath::SimulationPath(std::size_t nleaves_, Path
 }
 
 template<class Config>
-std::map<std::string, std::size_t> PathSimulator<Config>::Simulate(std::size_t shots) {
+std::map<std::string, std::size_t> PathSimulator<Config>::simulate(std::size_t shots) {
     // build task graph from simulation path
     constructTaskGraph();
     //std::cout<< *qc << std::endl;
@@ -109,7 +109,7 @@ std::map<std::string, std::size_t> PathSimulator<Config>::Simulate(std::size_t s
     executor.run(taskflow).wait();
 
     // measure resulting DD
-    return Simulator<Config>::MeasureAllNonCollapsing(shots);
+    return Simulator<Config>::measureAllNonCollapsing(shots);
 }
 
 template<class Config>

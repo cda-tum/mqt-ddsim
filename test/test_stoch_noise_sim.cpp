@@ -44,9 +44,9 @@ TEST(StochNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
 
     ASSERT_EQ(ddsim.getNumberOfOps(), 1);
 
-    ddsim.Simulate(1);
+    ddsim.simulate(1);
 
-    auto m = ddsim.MeasureAll(false);
+    auto m = ddsim.measureAll(false);
 
     ASSERT_EQ("01", m);
 }
@@ -61,9 +61,9 @@ TEST(StochNoiseSimTest, ClassicControlledOp) {
 
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
 
-    ddsim.Simulate(1);
+    ddsim.simulate(1);
 
-    auto m = ddsim.MeasureAll(false);
+    auto m = ddsim.measureAll(false);
 
     ASSERT_EQ("11", m);
 }
@@ -74,14 +74,14 @@ TEST(StochNoiseSimTest, DestructiveMeasurementAll) {
     quantumComputation->h(1);
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
 
-    ddsim.Simulate(1);
+    ddsim.simulate(1);
 
     const std::vector<dd::ComplexValue> vBefore = ddsim.getVector();
     ASSERT_EQ(vBefore[0], vBefore[1]);
     ASSERT_EQ(vBefore[0], vBefore[2]);
     ASSERT_EQ(vBefore[0], vBefore[3]);
 
-    const std::string                   m      = ddsim.MeasureAll(true);
+    const std::string                   m      = ddsim.measureAll(true);
     const std::vector<dd::ComplexValue> vAfter = ddsim.getVector();
     const std::size_t                   i      = std::stoul(m, nullptr, 2);
 
@@ -95,9 +95,9 @@ TEST(StochNoiseSimTest, DestructiveMeasurementOne) {
     quantumComputation->h(1);
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
 
-    ddsim.Simulate(1);
+    ddsim.simulate(1);
 
-    const char                          m      = ddsim.MeasureOneCollapsing(0);
+    const char                          m      = ddsim.measureOneCollapsing(0);
     const std::vector<dd::ComplexValue> vAfter = ddsim.getVector();
 
     if (m == '0') {
@@ -121,7 +121,7 @@ TEST(StochNoiseSimTest, DestructiveMeasurementOneArbitraryNormalization) {
     quantumComputation->h(1);
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
 
-    ddsim.Simulate(1);
+    ddsim.simulate(1);
 
     std::mt19937_64 gen{}; // NOLINT(cert-msc51-cpp)
 
@@ -156,11 +156,11 @@ TEST(StochNoiseSimTest, ApproximateByFidelity) {
     quantumComputation->x(2, {0_pc, 1_pc});
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1, 54);
 
-    ddsim.Simulate(1);
+    ddsim.simulate(1);
 
     ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
 
-    double const resultingFidelity = ddsim.ApproximateByFidelity(0.3, false, true);
+    double const resultingFidelity = ddsim.approximateByFidelity(0.3, false, true);
 
     ASSERT_EQ(ddsim.getActiveNodeCount(), 3);
     ASSERT_DOUBLE_EQ(resultingFidelity, 0.5); //equal up to 4 ULP
@@ -173,11 +173,11 @@ TEST(StochNoiseSimTest, ApproximateBySampling) {
     quantumComputation->x(2, {0_pc, 1_pc});
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
 
-    ddsim.Simulate(1);
+    ddsim.simulate(1);
 
     ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
 
-    double const resultingFidelity = ddsim.ApproximateBySampling(1, 0, true);
+    double const resultingFidelity = ddsim.approximateBySampling(1, 0, true);
 
     ASSERT_EQ(ddsim.getActiveNodeCount(), 3);
     ASSERT_LE(resultingFidelity, 0.75); // the least contributing path has .25
@@ -192,7 +192,7 @@ TEST(StochNoiseSimTest, Reordering) {
 
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
 
-    ddsim.Simulate(1);
+    ddsim.simulate(1);
 }
 
 TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
@@ -219,8 +219,8 @@ TEST(StochNoiseSimTest, SimulateAdder4WithoutNoise) {
     auto                     quantumComputation = stochGetAdder4Circuit();
     StochasticNoiseSimulator ddsim(quantumComputation, 1, 1);
 
-    ddsim.Simulate(1);
-    auto m = ddsim.MeasureAll(false);
+    ddsim.simulate(1);
+    auto m = ddsim.measureAll(false);
     ASSERT_EQ("1001", m);
 }
 
@@ -333,7 +333,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithNoiseAndApproximation) {
     EXPECT_NEAR(m.find("1110")->second, 0.023929692098939092, tolerance);
     EXPECT_NEAR(m.find("1111")->second, 0.011037316662706232, tolerance);
 
-    EXPECT_GT(std::stoi(ddsim.AdditionalStatistics().at("approximation_runs")), 0);
+    EXPECT_GT(std::stoi(ddsim.additionalStatistics().at("approximation_runs")), 0);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorUnoptimizedSim) {
@@ -363,10 +363,10 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorUnoptimizedSim)
     EXPECT_EQ(ddsim.getMaxMatrixNodeCount(), 0);
     EXPECT_EQ(ddsim.getMatrixActiveNodeCount(), 0);
     EXPECT_EQ(ddsim.countNodesFromRoot(), 0);
-    auto statistics = ddsim.AdditionalStatistics();
+    auto statistics = ddsim.additionalStatistics();
     EXPECT_NEAR(m.find("1101")->second, 0.024359601507422463, tolerance);
 
-    EXPECT_EQ(std::stoi(ddsim.AdditionalStatistics().at("approximation_runs")), 0);
+    EXPECT_EQ(std::stoi(ddsim.additionalStatistics().at("approximation_runs")), 0);
 
     EXPECT_NE(statistics.find("step_fidelity"), statistics.end());
     EXPECT_NE(statistics.find("approximation_runs"), statistics.end());

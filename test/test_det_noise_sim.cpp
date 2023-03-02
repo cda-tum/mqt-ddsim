@@ -275,7 +275,7 @@ TEST(DeterministicNoiseSimTest, sampleFromProbabilityMap2) {
     auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, std::string("AP"), 0.1, 0.2, 1, true);
 
     const std::size_t shots        = 1000000;
-    auto              sampledShots = ddsim->Simulate(shots);
+    auto              sampledShots = ddsim->simulate(shots);
     auto              m            = ddsim->deterministicSimulate();
 
     double const tolerance = 0.01;

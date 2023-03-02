@@ -45,7 +45,7 @@ public:
         qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator<Config>::qc));
     }
 
-    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
+    std::map<std::string, std::size_t> simulate(std::size_t shots) override;
 
     Mode mode = Mode::Amplitude;
 

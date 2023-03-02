@@ -18,7 +18,7 @@ TEST(HybridSimTest, TrivialParallelDD) {
 
     HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator<>::Mode::DD);
 
-    auto resultDD = ddsim.Simulate(8192);
+    auto resultDD = ddsim.simulate(8192);
     for (const auto& entry: resultDD) {
         std::cout << "resultDD[" << entry.first << "] = " << entry.second << "\n";
     }
@@ -52,7 +52,7 @@ TEST(HybridSimTest, TrivialParallelAmplitude) {
 
     HybridSchrodingerFeynmanSimulator ddsim(quantumComputation(), HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude);
 
-    auto resultAmp = ddsim.Simulate(8192);
+    auto resultAmp = ddsim.simulate(8192);
     for (const auto& entry: resultAmp) {
         std::cout << "resultAmp[" << entry.first << "] = " << entry.second << "\n";
     }
@@ -79,8 +79,8 @@ TEST(HybridSimTest, GRCSTestDD) {
     HybridSchrodingerFeynmanSimulator ddsimHybridDd(std::move(qc1), HybridSchrodingerFeynmanSimulator<>::Mode::DD);
     CircuitSimulator                  ddsim(std::move(qc2));
 
-    ddsimHybridDd.Simulate(1);
-    ddsim.Simulate(1);
+    ddsimHybridDd.simulate(1);
+    ddsim.simulate(1);
 
     dd::serialize(ddsimHybridDd.rootEdge, "result_parallel.dd", true);
     dd::serialize(ddsim.rootEdge, "result.dd", true);
@@ -112,8 +112,8 @@ TEST(HybridSimTest, GRCSTestAmplitudes) {
     HybridSchrodingerFeynmanSimulator ddsimHybridAmp(std::move(qc1), HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude);
     CircuitSimulator                  ddsim(std::move(qc2));
 
-    ddsimHybridAmp.Simulate(0);
-    ddsim.Simulate(0);
+    ddsimHybridAmp.simulate(0);
+    ddsim.simulate(0);
 
     // if edges are not equal -> compare amplitudes
     auto        refAmplitudes    = ddsim.getVector();
@@ -137,8 +137,8 @@ TEST(HybridSimTest, GRCSTestFixedSeed) {
     EXPECT_TRUE(ddsimHybridAmp.getMode() == HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude);
     CircuitSimulator ddsim(std::move(qc2));
 
-    ddsimHybridAmp.Simulate(0);
-    ddsim.Simulate(0);
+    ddsimHybridAmp.simulate(0);
+    ddsim.simulate(0);
 
     // if edges are not equal -> compare amplitudes
     auto        refAmplitudes    = ddsim.getVector();
@@ -163,5 +163,5 @@ TEST(HybridSimTest, NonStandardOperation) {
     quantumComputation->measure(0, 0);
 
     HybridSchrodingerFeynmanSimulator ddsim(std::move(quantumComputation));
-    EXPECT_THROW(ddsim.Simulate(0), std::invalid_argument);
+    EXPECT_THROW(ddsim.simulate(0), std::invalid_argument);
 }

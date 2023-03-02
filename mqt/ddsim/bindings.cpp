@@ -154,8 +154,8 @@ PYBIND11_MODULE(pyddsim, m) {
                  "seed"_a                        = -1)
             .def("get_number_of_qubits", &CircuitSimulator<>::getNumberOfQubits)
             .def("get_name", &CircuitSimulator<>::getName)
-            .def("simulate", &CircuitSimulator<>::Simulate, "shots"_a)
-            .def("statistics", &CircuitSimulator<>::AdditionalStatistics)
+            .def("simulate", &CircuitSimulator<>::simulate, "shots"_a)
+            .def("statistics", &CircuitSimulator<>::additionalStatistics)
             .def("get_vector", &CircuitSimulator<>::getVectorComplex);
 
     // Hybrid Schrödinger-Feynman Simulator
@@ -175,8 +175,8 @@ PYBIND11_MODULE(pyddsim, m) {
                  "nthreads"_a                    = 2)
             .def("get_number_of_qubits", &HybridSchrodingerFeynmanSimulator<>::getNumberOfQubits)
             .def("get_name", &HybridSchrodingerFeynmanSimulator<>::getName)
-            .def("simulate", &HybridSchrodingerFeynmanSimulator<>::Simulate, "shots"_a)
-            .def("statistics", &HybridSchrodingerFeynmanSimulator<>::AdditionalStatistics)
+            .def("simulate", &HybridSchrodingerFeynmanSimulator<>::simulate, "shots"_a)
+            .def("statistics", &HybridSchrodingerFeynmanSimulator<>::additionalStatistics)
             .def("get_vector", &HybridSchrodingerFeynmanSimulator<>::getVectorComplex)
             .def("get_mode", &HybridSchrodingerFeynmanSimulator<>::getMode)
             .def("get_final_amplitudes", &HybridSchrodingerFeynmanSimulator<>::getFinalAmplitudes);
@@ -215,8 +215,8 @@ PYBIND11_MODULE(pyddsim, m) {
             .def("set_simulation_path", py::overload_cast<const PathSimulator<>::SimulationPath::Components&, bool>(&PathSimulator<>::setSimulationPath))
             .def("get_number_of_qubits", &PathSimulator<>::getNumberOfQubits)
             .def("get_name", &PathSimulator<>::getName)
-            .def("simulate", &PathSimulator<>::Simulate, "shots"_a)
-            .def("statistics", &PathSimulator<>::AdditionalStatistics)
+            .def("simulate", &PathSimulator<>::simulate, "shots"_a)
+            .def("statistics", &PathSimulator<>::additionalStatistics)
             .def("get_vector", &PathSimulator<>::getVectorComplex);
 
     // Unitary Simulator
@@ -235,7 +235,7 @@ PYBIND11_MODULE(pyddsim, m) {
                  "mode"_a                        = UnitarySimulator<>::Mode::Recursive)
             .def("get_number_of_qubits", &UnitarySimulator<>::getNumberOfQubits)
             .def("get_name", &UnitarySimulator<>::getName)
-            .def("construct", &UnitarySimulator<>::Construct)
+            .def("construct", &UnitarySimulator<>::construct)
             .def("get_mode", &UnitarySimulator<>::getMode)
             .def("get_construction_time", &UnitarySimulator<>::getConstructionTime)
             .def("get_final_node_count", &UnitarySimulator<>::getFinalNodeCount)

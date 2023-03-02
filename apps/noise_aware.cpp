@@ -97,7 +97,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
                     {"seed", ddsim->getSeed()},
             };
 
-            for (const auto& [key, value]: ddsim->AdditionalStatistics()) {
+            for (const auto& [key, value]: ddsim->additionalStatistics()) {
                 outputObj["statistics"][key] = value;
             }
         }
@@ -138,7 +138,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
                     {"active_nodes", ddsim->getActiveNodeCount()},
             };
 
-            for (const auto& item: ddsim->AdditionalStatistics()) {
+            for (const auto& item: ddsim->additionalStatistics()) {
                 outputObj["statistics"][item.first] = item.second;
             }
         }

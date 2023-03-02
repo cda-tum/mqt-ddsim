@@ -120,17 +120,17 @@ bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(std::unique_ptr<dd:
 }
 
 template<class Config>
-std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator<Config>::Simulate(std::size_t shots) {
+std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator<Config>::simulate(std::size_t shots) {
     auto nqubits    = CircuitSimulator<Config>::getNumberOfQubits();
     auto splitQubit = static_cast<qc::Qubit>(nqubits / 2);
     if (mode == Mode::DD) {
         simulateHybridTaskflow(splitQubit);
-        return Simulator<Config>::MeasureAllNonCollapsing(shots);
+        return Simulator<Config>::measureAllNonCollapsing(shots);
     } else {
         simulateHybridAmplitudes(splitQubit);
 
         if (shots > 0) {
-            return Simulator<Config>::SampleFromAmplitudeVectorInPlace(finalAmplitudes, shots);
+            return Simulator<Config>::sampleFromAmplitudeVectorInPlace(finalAmplitudes, shots);
         } else {
             // in case no shots were requested, the final amplitudes remain untouched
             return {};

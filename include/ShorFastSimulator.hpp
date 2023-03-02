@@ -89,7 +89,7 @@ public:
         nodesOnLevel.resize(nQubits);
     };
 
-    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
+    std::map<std::string, std::size_t> simulate(std::size_t shots) override;
 
     [[nodiscard]] std::string getName() const override {
         return "fast_shor_" + std::to_string(compositeN) + "_" + std::to_string(coprimeA);
@@ -107,7 +107,7 @@ public:
         return simFactors;
     }
 
-    std::map<std::string, std::string> AdditionalStatistics() override {
+    std::map<std::string, std::string> additionalStatistics() override {
         return {
                 {"composite_number", std::to_string(compositeN)},
                 {"coprime_a", std::to_string(coprimeA)},

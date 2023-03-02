@@ -10,7 +10,7 @@
 using CN = dd::ComplexNumbers;
 
 template<class Config>
-std::map<std::string, std::size_t> Simulator<Config>::SampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, const std::size_t shots) {
+std::map<std::string, std::size_t> Simulator<Config>::sampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, size_t shots) {
     // in-place prefix-sum calculation of probabilities
     std::inclusive_scan(
             amplitudes.begin(), amplitudes.end(), amplitudes.begin(),
@@ -42,7 +42,7 @@ std::vector<dd::ComplexValue> Simulator<Config>::getVector() const {
     for (unsigned long long i = 0; i < 1ull << getNumberOfQubits(); ++i) {
         const std::string corrected_path{path.rbegin(), path.rend()};
         results[i] = dd->getValueByPath(rootEdge, corrected_path);
-        NextPath(path);
+        nextPath(path);
     }
     return results;
 }
@@ -57,7 +57,7 @@ std::vector<std::pair<dd::fp, dd::fp>> Simulator<Config>::getVectorPair() const 
         const std::string      corrected_path{path.rbegin(), path.rend()};
         const dd::ComplexValue cv = dd->getValueByPath(rootEdge, corrected_path);
         results[i]                = std::make_pair(cv.r, cv.i);
-        NextPath(path);
+        nextPath(path);
     }
     return results;
 }
@@ -72,13 +72,13 @@ std::vector<std::complex<dd::fp>> Simulator<Config>::getVectorComplex() const {
         const std::string      corrected_path{path.rbegin(), path.rend()};
         const dd::ComplexValue cv = dd->getValueByPath(rootEdge, corrected_path);
         results[i]                = std::complex<dd::fp>(cv.r, cv.i);
-        NextPath(path);
+        nextPath(path);
     }
     return results;
 }
 
 template<class Config>
-void Simulator<Config>::NextPath(std::string& s) {
+void Simulator<Config>::nextPath(std::string& s) {
     std::string::reverse_iterator iter = s.rbegin(), end = s.rend();
     int                           carry = 1;
     while (carry && iter != end) {
@@ -99,7 +99,7 @@ void Simulator<Config>::NextPath(std::string& s) {
  * @return vector of priority queues with each queue corresponding to a level of the decision diagram
  */
 template<class Config>
-std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::pair<double, dd::vNode*>>>> Simulator<Config>::GetNodeContributions(const dd::vEdge& edge) const {
+std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::pair<double, dd::vNode*>>>> Simulator<Config>::getNodeContributions(const dd::vEdge& edge) const {
     std::queue<dd::vNode*>       q;
     std::map<dd::vNode*, dd::fp> probsMone;
 
@@ -148,13 +148,13 @@ std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::
  * @param edge reference to the root node of the quantum state, will point to the new state afterwards if removeNodes is true
  * @param targetFidelity the fidelity that should be achieved
  * @param allLevels if true, apply approximation to targetFidely to each level, if false, only apply to the most suitable level
- * @param removeNodes if true, actually remove the nodes that are identified as unnecessary for the targetFidelity, if false, don't remove anything
+ * @param actuallyRemoveNodes if true, actually remove the nodes that are identified as unnecessary for the targetFidelity, if false, don't remove anything
  * @param verbose output information about the process and result
  * @return fidelity of the resulting quantum state
  */
 template<class Config>
-double Simulator<Config>::ApproximateByFidelity(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool removeNodes, bool verbose) {
-    auto                    qq = GetNodeContributions(edge);
+double Simulator<Config>::approximateByFidelity(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool actuallyRemoveNodes, bool verbose) {
+    auto                    qq = getNodeContributions(edge);
     std::vector<dd::vNode*> nodes_to_remove;
 
     std::size_t max_remove = 0;
@@ -196,7 +196,7 @@ double Simulator<Config>::ApproximateByFidelity(std::unique_ptr<dd::Package<Conf
         dag_edges[it] = dd::vEdge::zero;
     }
 
-    dd::vEdge newEdge = RemoveNodes(localDD, edge, dag_edges);
+    dd::vEdge newEdge = removeNodes(localDD, edge, dag_edges);
     assert(!std::isnan(dd::CTEntry::val(edge.w.r)));
     assert(!std::isnan(dd::CTEntry::val(edge.w.i)));
     dd::Complex c = localDD->cn.getCached(std::sqrt(CN::mag2(newEdge.w)), 0);
@@ -225,7 +225,7 @@ double Simulator<Config>::ApproximateByFidelity(std::unique_ptr<dd::Package<Conf
                 << "\n";
     }
 
-    if (removeNodes) {
+    if (actuallyRemoveNodes) {
         localDD->decRef(edge);
         localDD->incRef(newEdge);
         edge = newEdge;
@@ -234,7 +234,7 @@ double Simulator<Config>::ApproximateByFidelity(std::unique_ptr<dd::Package<Conf
 }
 
 template<class Config>
-double Simulator<Config>::ApproximateBySampling(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, std::size_t nSamples, std::size_t threshold, bool removeNodes, bool verbose) {
+double Simulator<Config>::approximateBySampling(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, std::size_t nSamples, std::size_t threshold, bool actuallyRemoveNodes, bool verbose) {
     assert(nSamples > threshold);
     std::map<dd::vNode*, unsigned int>     visited_nodes;
     std::uniform_real_distribution<dd::fp> dist(0.0, 1.0L);
@@ -287,7 +287,7 @@ double Simulator<Config>::ApproximateBySampling(std::unique_ptr<dd::Package<Conf
         dag_edges[it] = dd::vEdge::zero;
     }
 
-    dd::vEdge   newEdge = RemoveNodes(localDD, edge, dag_edges);
+    dd::vEdge   newEdge = removeNodes(localDD, edge, dag_edges);
     dd::Complex c       = localDD->cn.getCached(std::sqrt(CN::mag2(newEdge.w)), 0);
     CN::div(c, newEdge.w, c);
     newEdge.w = localDD->cn.lookup(c);
@@ -314,7 +314,7 @@ double Simulator<Config>::ApproximateBySampling(std::unique_ptr<dd::Package<Conf
                 << "\n";
     }
 
-    if (removeNodes) {
+    if (actuallyRemoveNodes) {
         localDD->decRef(edge);
         localDD->incRef(newEdge);
         edge = newEdge;
@@ -325,13 +325,13 @@ double Simulator<Config>::ApproximateBySampling(std::unique_ptr<dd::Package<Conf
 }
 
 template<class Config>
-dd::vEdge Simulator<Config>::RemoveNodes(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge e, std::map<dd::vNode*, dd::vEdge>& dag_edges) {
+dd::vEdge Simulator<Config>::removeNodes(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge e, std::map<dd::vNode*, dd::vEdge>& dagEdges) {
     if (e.isTerminal()) {
         return e;
     }
 
-    const auto it = dag_edges.find(e.p);
-    if (it != dag_edges.end()) {
+    const auto it = dagEdges.find(e.p);
+    if (it != dagEdges.end()) {
         dd::vEdge r = it->second;
         if (r.w.approximatelyZero()) {
             return dd::vEdge::zero;
@@ -343,12 +343,12 @@ dd::vEdge Simulator<Config>::RemoveNodes(std::unique_ptr<dd::Package<Config>>& l
     }
 
     std::array<dd::vEdge, dd::RADIX> edges{
-            RemoveNodes(localDD, e.p->e.at(0), dag_edges),
-            RemoveNodes(localDD, e.p->e.at(1), dag_edges)};
+            removeNodes(localDD, e.p->e.at(0), dagEdges),
+            removeNodes(localDD, e.p->e.at(1), dagEdges)};
 
-    dd::vEdge r    = localDD->makeDDNode(e.p->v, edges, false);
-    dag_edges[e.p] = r;
-    dd::Complex c  = localDD->cn.getCached();
+    dd::vEdge r   = localDD->makeDDNode(e.p->v, edges, false);
+    dagEdges[e.p] = r;
+    dd::Complex c = localDD->cn.getCached();
     CN::mul(c, e.w, r.w);
     r.w = localDD->cn.lookup(c);
     return r;

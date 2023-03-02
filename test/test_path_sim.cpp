@@ -49,7 +49,7 @@ TEST(TaskBasedSimTest, SimpleCircuit) {
     PathSimulator tbs(std::move(qc), PathSimulator<>::Configuration());
 
     // simulate circuit
-    auto counts = tbs.Simulate(1024);
+    auto counts = tbs.simulate(1024);
 
     EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
     EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
@@ -68,7 +68,7 @@ TEST(TaskBasedSimTest, SimpleCircuitArgumentConstructor) {
     PathSimulator tbs(std::move(qc), PathSimulator<>::Configuration::Mode::Sequential, 2, 0, {}, 12345U);
 
     // simulate circuit
-    auto counts = tbs.Simulate(1024);
+    auto counts = tbs.simulate(1024);
 
     EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
     EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
@@ -89,7 +89,7 @@ TEST(TaskBasedSimTest, SimpleCircuitAssumeFalseOrder) {
     path.emplace_back(3, 2);
     tbs.setSimulationPath(path, false);
     // simulate circuit
-    auto counts = tbs.Simulate(1024);
+    auto counts = tbs.simulate(1024);
 
     EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
     EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
@@ -113,7 +113,7 @@ TEST(TaskBasedSimTest, SimpleCircuitBracket) {
     PathSimulator tbs(std::move(qc), config);
 
     // simulate circuit
-    auto counts = tbs.Simulate(1024);
+    auto counts = tbs.simulate(1024);
 
     for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;
@@ -132,7 +132,7 @@ TEST(TaskBasedSimTest, GroverCircuitBracket) {
     PathSimulator tbs(std::move(qc), config);
 
     // simulate circuit
-    auto counts = tbs.Simulate(4096);
+    auto counts = tbs.simulate(4096);
 
     const auto target = targetValue.to_ullong() | (1ULL << 4);
     auto       c      = tbs.dd->getValueByPath(tbs.rootEdge, target);
@@ -157,7 +157,7 @@ TEST(TaskBasedSimTest, GroverCircuitAlternatingMiddle) {
     PathSimulator tbs(std::move(qc), config);
 
     // simulate circuit
-    auto counts = tbs.Simulate(4096);
+    auto counts = tbs.simulate(4096);
 
     const auto target = targetValue.to_ullong() | (1ULL << 4);
     auto       c      = tbs.dd->getValueByPath(tbs.rootEdge, target);
@@ -182,7 +182,7 @@ TEST(TaskBasedSimTest, GroverCircuitPairwiseGrouping) {
     PathSimulator tbs(std::move(qc), config);
 
     // simulate circuit
-    auto counts = tbs.Simulate(4096);
+    auto counts = tbs.simulate(4096);
 
     const auto target = targetValue.to_ullong() | (1ULL << 4);
     auto       c      = tbs.dd->getValueByPath(tbs.rootEdge, target);
@@ -204,7 +204,7 @@ TEST(TaskBasedSimTest, EmptyCircuit) {
 
     // simulate circuit
     const auto shots  = 1024U;
-    auto       counts = tbs.Simulate(shots);
+    auto       counts = tbs.simulate(shots);
 
     for (const auto& [state, count]: counts) {
         EXPECT_EQ(state, "00");
@@ -227,7 +227,7 @@ TEST(TaskBasedSimTest, SimpleCircuitGatecost) {
     PathSimulator tbs(std::move(qc), PathSimulator<>::Configuration::Mode::GateCost, 2, 2, {1, 1}, 12345U);
 
     // simulate circuit
-    auto counts = tbs.Simulate(1024);
+    auto counts = tbs.simulate(1024);
 
     for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;
@@ -252,7 +252,7 @@ TEST(TaskBasedSimTest, SimpleCircuitGatecostConfigurationObject) {
     PathSimulator tbs(std::move(qc), config);
 
     // simulate circuit
-    auto counts = tbs.Simulate(1024);
+    auto counts = tbs.simulate(1024);
 
     for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;

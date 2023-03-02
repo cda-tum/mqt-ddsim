@@ -36,9 +36,9 @@ public:
         }
     }
 
-    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
+    std::map<std::string, std::size_t> simulate(std::size_t shots) override;
 
-    std::map<std::string, std::string> AdditionalStatistics() override {
+    std::map<std::string, std::string> additionalStatistics() override {
         return {
                 {"oracle", std::string(oracle.rbegin(), oracle.rend())},
                 {"iterations", std::to_string(iterations)},

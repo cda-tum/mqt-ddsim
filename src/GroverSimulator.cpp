@@ -6,7 +6,7 @@
 #include <chrono>
 
 template<class Config>
-std::map<std::string, std::size_t> GroverSimulator<Config>::Simulate(std::size_t shots) {
+std::map<std::string, std::size_t> GroverSimulator<Config>::simulate(std::size_t shots) {
     // Setup X on the last, Hadamard on all qubits
     qc::QuantumComputation qc_setup(n_qubits + n_anciallae);
     qc_setup.x(n_qubits);
@@ -87,7 +87,7 @@ std::map<std::string, std::size_t> GroverSimulator<Config>::Simulate(std::size_t
         Simulator<Config>::dd->garbageCollect();
     }
 
-    return Simulator<Config>::MeasureAllNonCollapsing(shots);
+    return Simulator<Config>::measureAllNonCollapsing(shots);
 }
 
 template class GroverSimulator<dd::DDPackageConfig>;

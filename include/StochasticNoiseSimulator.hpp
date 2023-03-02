@@ -50,7 +50,7 @@ public:
     std::vector<std::map<std::string, unsigned int>>  classicalMeasurementsMaps;
     std::map<std::string, unsigned int>               finalClassicalMeasurementsMap;
 
-    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
+    std::map<std::string, std::size_t> simulate(std::size_t shots) override;
     std::map<std::string, double>      stochSimulate();
 
     [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return 0U; }    // Not available for stochastic simulation
@@ -96,7 +96,7 @@ public:
 
     void setRecordedProperties(const std::string& input);
 
-    std::map<std::string, std::string> AdditionalStatistics() override {
+    std::map<std::string, std::string> additionalStatistics() override {
         return {
                 {"step_fidelity", std::to_string(stepFidelity)},
                 {"approximation_runs", std::to_string(approximationRuns)},
