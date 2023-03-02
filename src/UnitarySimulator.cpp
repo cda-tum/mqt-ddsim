@@ -5,7 +5,7 @@
 #include <chrono>
 
 template<class Config>
-void UnitarySimulator<Config>::Construct() {
+void UnitarySimulator<Config>::construct() {
     // carry out actual computation
     auto start = std::chrono::steady_clock::now();
     if (mode == Mode::Sequential) {

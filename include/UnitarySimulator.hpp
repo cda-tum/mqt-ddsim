@@ -32,7 +32,7 @@ public:
 
     UnitarySimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
                      const ApproximationInfo&                  approximationInfo_,
-                     const unsigned long long                  seed_,
+                     const std::uint64_t                       seed_,
                      const Mode                                simMode = Mode::Recursive):
         CircuitSimulator<Config>(std::move(qc_), approximationInfo_, seed_),
         mode(simMode) {
@@ -40,7 +40,7 @@ public:
         qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator<Config>::qc));
     }
 
-    void Construct();
+    void construct();
 
     [[nodiscard]] Mode         getMode() const { return mode; }
     [[nodiscard]] qc::MatrixDD getConstructedDD() const { return e; }
