@@ -5,11 +5,10 @@
 #include <string>
 
 static std::uint64_t gcd(std::uint64_t a, std::uint64_t b) {
-    std::uint64_t c{};
     while (a != 0) {
-        c = a;
-        a = b % a;
-        b = c;
+        const std::uint64_t c = a;
+        a                     = b % a;
+        b                     = c;
     }
     return b;
 }
@@ -51,7 +50,7 @@ void outputPrimes(const std::uint64_t compositeNumber, const std::uint64_t lengt
     }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     cxxopts::Options options("MQT DDSIM", "see for more information https://www.cda.cit.tum.de/");
     // clang-format off
     options.add_options()
@@ -62,7 +61,7 @@ int main(int argc, char** argv) {
     // clang-format on
 
     auto vm = options.parse(argc, argv);
-    if (vm.count("help")) {
+    if (vm.count("help") > 0) {
         std::cout << options.help();
         std::exit(0);
     }
