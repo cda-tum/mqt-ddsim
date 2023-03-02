@@ -13,7 +13,7 @@
 
 using namespace dd::literals;
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     cxxopts::Options options("FRQI", "with MQT DDSIM by https://www.cda.cit.tum.de/ -- Allowed options");
     // clang-format off
     options.add_options()
@@ -24,22 +24,22 @@ int main(int argc, char** argv) {
             ;
     // clang-format on
     auto vm = options.parse(argc, argv);
-    if (vm.count("help")) {
+    if (vm.count("help") > 0) {
         std::cout << options.help();
         std::exit(0);
     }
 
-    unsigned int numOfShots = vm["shots"].as<unsigned int>();
-    std::string  filename   = vm["file"].as<std::string>()
+    const unsigned int numOfShots = vm["shots"].as<unsigned int>();
+    const std::string  filename   = vm["file"].as<std::string>();
 
-                                   cv::Mat image,
-                dest;
-    cv::Mat        genimg;
-    cv::Size       size(32, 32);
-    dd::QubitCount nqubits = 11;
+    cv::Mat              image;
+    cv::Mat              dest;
+    const cv::Mat        genimg;
+    const cv::Size       size(32, 32);
+    const dd::QubitCount nqubits = 11;
 
     image = imread(filename, cv::IMREAD_GRAYSCALE);
-    if (!image.data) {
+    if (image.data == nullptr) {
         std::cerr << "Could not open or find the image '" << filename << "'" << std::endl;
         return -1;
     }
@@ -53,7 +53,9 @@ int main(int argc, char** argv) {
     cv::resizeWindow("original", 128, 128);
     cv::imshow("original", dest);
 
-    cv::MatIterator_<double> it, end;
+    cv::MatIterator_<double> it;
+    cv::MatIterator_<double> end;
+
     for (it = dest.begin<double>(), end = dest.end<double>(); it != end; ++it) {
         *it = std::asin(*it);
     }
@@ -62,16 +64,16 @@ int main(int argc, char** argv) {
     /* Preparation of the quantum circuit */
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>(nqubits);
 
-    for (dd::Qubit i = 1; i < 11; i++) {
+    for (qc::Qubit i = 1; i < 11; i++) {
         qc->h(i); // add Hadamard gates
     }
 
     int cnt = 0; // start with the x/y location at 0000000000b
     for (it = dest.begin<double>(), end = dest.end<double>(); it != end; ++it) {
         if (*it != 0) {
-            dd::Controls controls;
+            qc::Controls controls;
             for (int i = 0; i < 10; i++) {
-                controls.insert({static_cast<dd::Qubit>(i + 1), (cnt & 1LL << i) ? dd::Control::Type::pos : dd::Control::Type::neg});
+                controls.insert({static_cast<qc::Qubit>(i + 1), (cnt & 1LL << i) != 0 ? qc::Control::Type::Pos : qc::Control::Type::Neg});
             }
             qc->ry(0, controls, (*it) * 2);
         }
@@ -79,7 +81,7 @@ int main(int argc, char** argv) {
     }
     const auto t0end = std::chrono::steady_clock::now();
 
-    if (vm.count("verbose")) {
+    if (vm.count("verbose") > 0) {
         qc->print(std::cout);
     }
 
@@ -88,12 +90,11 @@ int main(int argc, char** argv) {
     const auto         t1start = std::chrono::steady_clock::now();
     CircuitSimulator<> ddsim(std::move(qc));
 
-    std::vector<unsigned int> counts(1024, 0);
-    int                       cols    = dest.cols;
-    int                       rows    = dest.rows;
-    int                       colrows = cols * rows;
+    const int cols    = dest.cols;
+    const int rows    = dest.rows;
+    const int colrows = cols * rows;
 
-    std::map<std::string, std::size_t> m_counter = ddsim.Simulate(numOfShots);
+    const std::map<std::string, std::size_t> mCounter = ddsim.Simulate(numOfShots);
 
     const auto t1end = std::chrono::steady_clock::now();
 
@@ -101,21 +102,21 @@ int main(int argc, char** argv) {
     std::clog << "size of image: " << colrows << std::endl;
 
     unsigned int result = 0;
-    for (auto& elem: m_counter) {
-        result += elem.second;
+    for (const auto& [bitstring, count]: mCounter) {
+        result += count;
     }
-    std::clog << "Number of distinct measurements: " << m_counter.size() << "\n";
+    std::clog << "Number of distinct measurements: " << mCounter.size() << "\n";
     std::clog << "RESULT: " << result << std::endl;
 
     std::vector<double> prob(1024, 0);
 
-    for (auto& elem: m_counter) {
-        std::size_t fixed_index = std::stoi(elem.first.substr(0, 10), nullptr, 2);
-        double      tmp         = std::sqrt(static_cast<double>(elem.second) / numOfShots) * 32. * 255.;
-        if (vm.count("verbose")) {
-            std::clog << elem.first << " (" << fixed_index << ") : " << elem.second << " (" << tmp << ")\n";
+    for (const auto& [bitstring, count]: mCounter) {
+        const std::size_t fixedIndex = std::stoul(bitstring.substr(0, 10), nullptr, 2);
+        const double      tmp        = std::sqrt(static_cast<double>(count) / numOfShots) * 32. * 255.;
+        if (vm.count("verbose") > 0) {
+            std::clog << bitstring << " (" << fixedIndex << ") : " << count << " (" << tmp << ")\n";
         }
-        prob.at(fixed_index) = tmp;
+        prob.at(fixedIndex) = tmp;
     }
 
     cv::Mat final = cv::Mat(prob).reshape(0, 32);
