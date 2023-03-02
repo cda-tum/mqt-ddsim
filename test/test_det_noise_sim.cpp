@@ -201,7 +201,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4NoNoise1) {
     EXPECT_NEAR(m.find("1001")->second, 1, tolerance);
 }
 
-TEST(DeterministicNoiseSimTest, SimulateAdder4NoNoise_2) {
+TEST(DeterministicNoiseSimTest, SimulateAdder4NoNoise2) {
     auto quantumComputation = detGetAdder4Circuit();
     auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, std::string("APD"), 0, 0, 1);
 
