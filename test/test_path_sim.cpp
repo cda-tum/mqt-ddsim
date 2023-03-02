@@ -15,6 +15,7 @@ TEST(TaskBasedSimTest, Configuration) {
     EXPECT_EQ(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode::Alternating), "alternating");
     EXPECT_EQ(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode::Cotengra), "cotengra");
     EXPECT_EQ(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode::GateCost), "gate_cost");
+    EXPECT_THROW(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode(32)), std::invalid_argument);
 
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("sequential"), PathSimulator<>::Configuration::Mode::Sequential);
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("pairwise_recursive"), PathSimulator<>::Configuration::Mode::PairwiseRecursiveGrouping);
@@ -22,6 +23,7 @@ TEST(TaskBasedSimTest, Configuration) {
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("alternating"), PathSimulator<>::Configuration::Mode::Alternating);
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("cotengra"), PathSimulator<>::Configuration::Mode::Cotengra);
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("gate_cost"), PathSimulator<>::Configuration::Mode::GateCost);
+    EXPECT_THROW(PathSimulator<>::Configuration::modeFromString("invalid argument"), std::invalid_argument);
 
     auto config = PathSimulator<>::Configuration{};
     config.seed = 12345U;
