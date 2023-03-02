@@ -89,7 +89,7 @@ void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
 }
 
 template<class Config>
-std::map<std::string, double> StochasticNoiseSimulator<Config>::StochSimulate() {
+std::map<std::string, double> StochasticNoiseSimulator<Config>::stochSimulate() {
     // Generate a vector for each instance.
     recordedPropertiesPerInstance.resize(maxInstances, std::vector<double>(recordedProperties.size(), 0.0));
     classicalMeasurementsMaps.resize(maxInstances);
@@ -155,12 +155,12 @@ std::map<std::string, double> StochasticNoiseSimulator<Config>::StochSimulate() 
 }
 
 template<class Config>
-void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t                                stochRun,
-                                                               qc::Qubit                                  nQubits,
-                                                               std::vector<double>&                       recordedPropertiesStorage,
-                                                               std::vector<std::pair<long, std::string>>& recordedPropertiesList,
-                                                               std::map<std::string, unsigned int>&       classicalMeasurementsMap,
-                                                               unsigned long long                         localSeed) {
+void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t                                        stochRun,
+                                                               qc::Qubit                                          nQubits,
+                                                               std::vector<double>&                               recordedPropertiesStorage,
+                                                               std::vector<std::pair<std::int64_t, std::string>>& recordedPropertiesList,
+                                                               std::map<std::string, unsigned int>&               classicalMeasurementsMap,
+                                                               std::uint64_t                                      localSeed) {
     std::mt19937_64                        generator(localSeed);
     std::uniform_real_distribution<dd::fp> dist(0.0, 1.0);
 
@@ -350,7 +350,7 @@ void StochasticNoiseSimulator<Config>::setRecordedProperties(const std::string& 
 }
 
 template<class Config>
-std::string StochasticNoiseSimulator<Config>::intToString(long targetNumber) const {
+std::string StochasticNoiseSimulator<Config>::intToString(std::int64_t targetNumber) const {
     if (targetNumber < 0) {
         return "X";
     }

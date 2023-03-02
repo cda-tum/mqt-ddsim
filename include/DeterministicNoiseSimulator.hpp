@@ -15,7 +15,7 @@ public:
                                 std::optional<double>                    ampDampingProbability,
                                 double                                   multiQubitGateFactor,
                                 bool                                     unoptimizedSim = false,
-                                unsigned long long                       seed           = 0):
+                                std::uint64_t                            seed           = 0):
         Simulator<Config>(seed),
         qc(qc),
         noiseEffects(StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>::initializeNoiseEffects(noiseEffects)),
@@ -29,14 +29,14 @@ public:
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, unsigned long long seed = 0):
+    explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, std::uint64_t seed = 0):
         DeterministicNoiseSimulator(qc, std::string("APD"), 0.001, std::optional<double>{}, 2, false, seed) {}
 
     std::map<std::string, std::size_t> Simulate(const std::size_t shots) override {
-        return sampleFromProbabilityMap(DeterministicSimulate(), shots);
+        return sampleFromProbabilityMap(deterministicSimulate(), shots);
     };
 
-    std::map<std::string, dd::fp> DeterministicSimulate();
+    std::map<std::string, dd::fp> deterministicSimulate();
 
     std::map<std::string, std::size_t> sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, std::size_t shots);
 
@@ -50,30 +50,28 @@ public:
     [[nodiscard]] std::size_t getMaxNodeCount() const override { return Simulator<Config>::dd->dUniqueTable.getMaxActiveNodes(); }
 
     [[nodiscard]] std::size_t countNodesFromRoot() override {
-        size_t tmp;
         if (useDensityMatrixType) {
             qc::DensityMatrixDD::alignDensityEdge(rootEdge);
-            tmp = Simulator<Config>::dd->size(rootEdge);
+            const std::size_t tmp = Simulator<Config>::dd->size(rootEdge);
             qc::DensityMatrixDD::setDensityMatrixTrue(rootEdge);
-        } else {
-            tmp = Simulator<Config>::dd->size(rootEdge);
+            return tmp;
         }
-        return tmp;
+        return Simulator<Config>::dd->size(rootEdge);
     }
 
     qc::DensityMatrixDD rootEdge{};
 
 private:
-    const std::unique_ptr<qc::QuantumComputation>& qc;
-    const std::vector<dd::NoiseOperations>         noiseEffects;
+    const std::unique_ptr<qc::QuantumComputation>& qc; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
+    std::vector<dd::NoiseOperations>               noiseEffects;
 
-    const double noiseProbSingleQubit{};
-    const double ampDampingProbSingleQubit{};
-    const double noiseProbMultiQubit{};
-    const double ampDampingProbMultiQubit{};
+    double noiseProbSingleQubit{};
+    double ampDampingProbSingleQubit{};
+    double noiseProbMultiQubit{};
+    double ampDampingProbMultiQubit{};
 
-    const double measurementThreshold = 0.01;
+    double measurementThreshold = 0.01;
 
-    const bool sequentiallyApplyNoise{};
-    const bool useDensityMatrixType{};
+    bool sequentiallyApplyNoise{};
+    bool useDensityMatrixType{};
 };

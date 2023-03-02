@@ -44,14 +44,14 @@ public:
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int stepNumber, const double stepFidelity, std::size_t seed):
         StochasticNoiseSimulator(qc, std::string("APD"), 0.001, std::optional<double>{}, 2, 1000, std::string("0-256"), false, stepNumber, stepFidelity, seed) {}
 
-    std::vector<std::pair<long, std::string>>        recordedProperties;
-    std::vector<std::vector<double>>                 recordedPropertiesPerInstance;
-    std::vector<double>                              finalProperties;
-    std::vector<std::map<std::string, unsigned int>> classicalMeasurementsMaps;
-    std::map<std::string, unsigned int>              finalClassicalMeasurementsMap;
+    std::vector<std::pair<std::int64_t, std::string>> recordedProperties;
+    std::vector<std::vector<double>>                  recordedPropertiesPerInstance;
+    std::vector<double>                               finalProperties;
+    std::vector<std::map<std::string, unsigned int>>  classicalMeasurementsMaps;
+    std::map<std::string, unsigned int>               finalClassicalMeasurementsMap;
 
     std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
-    std::map<std::string, double>      StochSimulate();
+    std::map<std::string, double>      stochSimulate();
 
     [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return 0U; }    // Not available for stochastic simulation
     [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return 0U; } // Not available for stochastic simulation
@@ -110,18 +110,18 @@ public:
     };
 
 private:
-    std::unique_ptr<qc::QuantumComputation>& qc;
+    std::unique_ptr<qc::QuantumComputation>& qc; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
 
-    const std::size_t stepNumber{};
-    const double      stepFidelity{};
-    double            approximationRuns{0};
+    std::size_t stepNumber{};
+    double      stepFidelity{};
+    double      approximationRuns{0};
 
-    const double       noiseProbability{};
-    const double       amplitudeDampingProb{};
-    const double       multiQubitGateFactor{};
-    const bool         sequentiallyApplyNoise{};
-    const std::size_t  stochasticRuns{};
-    const unsigned int maxInstances{};
+    double       noiseProbability{};
+    double       amplitudeDampingProb{};
+    double       multiQubitGateFactor{};
+    bool         sequentiallyApplyNoise{};
+    std::size_t  stochasticRuns{};
+    unsigned int maxInstances{};
 
     std::vector<dd::NoiseOperations> noiseEffects;
 
@@ -131,12 +131,12 @@ private:
 
     void perfectSimulationRun();
 
-    void runStochSimulationForId(std::size_t                                stochRun,
-                                 qc::Qubit                                  nQubits,
-                                 std::vector<double>&                       recordedPropertiesStorage,
-                                 std::vector<std::pair<long, std::string>>& recordedPropertiesList,
-                                 std::map<std::string, unsigned int>&       classicalMeasurementsMap,
-                                 unsigned long long                         localSeed);
+    void runStochSimulationForId(std::size_t                                        stochRun,
+                                 qc::Qubit                                          nQubits,
+                                 std::vector<double>&                               recordedPropertiesStorage,
+                                 std::vector<std::pair<std::int64_t, std::string>>& recordedPropertiesList,
+                                 std::map<std::string, unsigned int>&               classicalMeasurementsMap,
+                                 std::uint64_t                                      localSeed);
 
-    [[nodiscard]] std::string intToString(long targetNumber) const;
+    [[nodiscard]] std::string intToString(std::int64_t targetNumber) const;
 };

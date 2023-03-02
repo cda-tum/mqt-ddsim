@@ -5,7 +5,7 @@
 using CN = dd::ComplexNumbers;
 
 template<class Config>
-std::map<std::string, double> DeterministicNoiseSimulator<Config>::DeterministicSimulate() {
+std::map<std::string, double> DeterministicNoiseSimulator<Config>::deterministicSimulate() {
     rootEdge = Simulator<Config>::dd->makeZeroDensityOperator(qc->getNqubits());
     Simulator<Config>::dd->incRef(rootEdge);
 

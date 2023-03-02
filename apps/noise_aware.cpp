@@ -78,7 +78,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
 
         auto t1 = std::chrono::steady_clock::now();
 
-        const std::map<std::string, double> measurementResults = ddsim->StochSimulate();
+        const std::map<std::string, double> measurementResults = ddsim->stochSimulate();
 
         auto t2 = std::chrono::steady_clock::now();
 
@@ -118,7 +118,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
 
         auto t1 = std::chrono::steady_clock::now();
 
-        const std::map<std::string, double> measurementResults = ddsim->DeterministicSimulate();
+        const std::map<std::string, double> measurementResults = ddsim->deterministicSimulate();
 
         auto t2 = std::chrono::steady_clock::now();
 
