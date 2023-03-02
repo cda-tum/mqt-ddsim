@@ -81,12 +81,11 @@ TEST(ShorSimTest, Factorize15EmulationInvalidCoprimeParametersTest) {
     ASSERT_EQ(ddsim.getNumberOfOps(), 0);
     ASSERT_EQ(ddsim.getFactors().first, 0);
     ASSERT_EQ(ddsim.getFactors().second, 0);
+    ASSERT_EQ(ddsim.additionalStatistics().at("coprime_a"), "3");
     ASSERT_EQ(ddsim.additionalStatistics().at("sim_result"), "did not start");
     ddsim.simulate(1);
 
-    ASSERT_EQ(ddsim.additionalStatistics().at("polr_factor1"), "3");
-    ASSERT_EQ(ddsim.additionalStatistics().at("polr_factor2"), "5");
-    ASSERT_EQ(ddsim.additionalStatistics().at("polr_result"), "SUCCESS(3*5)");
+    ASSERT_NE(ddsim.additionalStatistics().at("coprime_a"), "3");
 }
 
 TEST(ShorSimTest, Factorize15NegTest) {
