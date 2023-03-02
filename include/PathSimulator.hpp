@@ -74,19 +74,24 @@ public:
         static Mode modeFromString(const std::string& mode) {
             if (mode == "sequential" || mode == "0") {
                 return Mode::Sequential;
-            } else if (mode == "pairwise_recursive" || mode == "1") {
-                return Mode::PairwiseRecursiveGrouping;
-            } else if (mode == "bracket" || mode == "2") {
-                return Mode::BracketGrouping;
-            } else if (mode == "alternating" || mode == "3") {
-                return Mode::Alternating;
-            } else if (mode == "cotengra" || mode == "4") {
-                return Mode::Cotengra;
-            } else if (mode == "gate_cost" || mode == "5") {
-                return Mode::GateCost;
-            } else {
-                throw std::invalid_argument("Invalid simulation path mode: " + mode);
             }
+            if (mode == "pairwise_recursive" || mode == "1") {
+                return Mode::PairwiseRecursiveGrouping;
+            }
+            if (mode == "bracket" || mode == "2") {
+                return Mode::BracketGrouping;
+            }
+            if (mode == "alternating" || mode == "3") {
+                return Mode::Alternating;
+            }
+            if (mode == "cotengra" || mode == "4") {
+                return Mode::Cotengra;
+            }
+            if (mode == "gate_cost" || mode == "5") {
+                return Mode::GateCost;
+            }
+
+            throw std::invalid_argument("Invalid simulation path mode: " + mode);
         }
 
         static std::string modeToString(const Mode& mode) {
