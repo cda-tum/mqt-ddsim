@@ -59,6 +59,36 @@ TEST(ShorSimTest, Factorize15EmulationNoOptionalParametersTest) {
     ASSERT_EQ(ddsim.additionalStatistics().at("polr_result"), "SUCCESS(3*5)");
 }
 
+TEST(ShorSimTest, Factorize15EmulationNoCoprimeParametersTest) {
+    // add verbose = true for coverage
+    ShorSimulator ddsim(15, 0);
+
+    ASSERT_EQ(ddsim.getNumberOfOps(), 0);
+    ASSERT_EQ(ddsim.getFactors().first, 0);
+    ASSERT_EQ(ddsim.getFactors().second, 0);
+    ASSERT_EQ(ddsim.additionalStatistics().at("sim_result"), "did not start");
+    ddsim.simulate(1);
+
+    ASSERT_EQ(ddsim.additionalStatistics().at("polr_factor1"), "3");
+    ASSERT_EQ(ddsim.additionalStatistics().at("polr_factor2"), "5");
+    ASSERT_EQ(ddsim.additionalStatistics().at("polr_result"), "SUCCESS(3*5)");
+}
+
+TEST(ShorSimTest, Factorize15EmulationInvalidCoprimeParametersTest) {
+    // add verbose = true for coverage
+    ShorSimulator ddsim(15, 3);
+
+    ASSERT_EQ(ddsim.getNumberOfOps(), 0);
+    ASSERT_EQ(ddsim.getFactors().first, 0);
+    ASSERT_EQ(ddsim.getFactors().second, 0);
+    ASSERT_EQ(ddsim.additionalStatistics().at("sim_result"), "did not start");
+    ddsim.simulate(1);
+
+    ASSERT_EQ(ddsim.additionalStatistics().at("polr_factor1"), "3");
+    ASSERT_EQ(ddsim.additionalStatistics().at("polr_factor2"), "5");
+    ASSERT_EQ(ddsim.additionalStatistics().at("polr_result"), "SUCCESS(3*5)");
+}
+
 TEST(ShorSimTest, Factorize15NegTest) {
     ShorSimulator ddsim(15, 2, 1ULL);
     ddsim.simulate(1);
