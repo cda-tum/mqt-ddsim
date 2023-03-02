@@ -36,13 +36,13 @@ class ShorSimulator: public Simulator<Config> {
         return std::sin((dd::PI * fac) / div);
     }
 
-    void uA(std::uint64_t a, std::int32_t n, std::int32_t c);
+    void uA(std::uint64_t a, std::uint32_t n, std::int32_t c);
 
     void cmultInv(std::uint64_t a, std::uint32_t n, std::int32_t c);
 
     void cmult(std::uint64_t a, std::uint32_t n, std::int32_t c);
 
-    void modAddPhiInv(std::int32_t a, std::int32_t n, std::int32_t c1, std::int32_t c2);
+    void modAddPhiInv(std::uint64_t a, std::uint64_t n, std::int32_t c1, std::int32_t c2);
 
     void modAddPhi(std::uint64_t a, std::uint32_t n, std::int32_t c1, std::int32_t c2);
 
