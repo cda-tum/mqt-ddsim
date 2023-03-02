@@ -1,6 +1,6 @@
 #include "HybridSchrodingerFeynmanSimulator.hpp"
 
-#include <assert.h>
+#include <cassert>
 #include <cmath>
 #include <taskflow/taskflow.hpp>
 
@@ -212,7 +212,7 @@ template<class Config>
 void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridAmplitudes(qc::Qubit splitQubit) {
     const std::size_t ndecisions          = getNDecisions(splitQubit);
     const std::size_t maxControl          = 1ULL << ndecisions;
-    const std::size_t actuallyUsedThreads = maxControl < nthreads ? maxControl : nthreads;
+    const std::size_t actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
     const std::size_t nslicesOnOneCpu     = std::min<std::size_t>(64, maxControl / actuallyUsedThreads);
     const std::size_t nqubits             = CircuitSimulator<Config>::getNumberOfQubits();
     Simulator<Config>::rootEdge           = qc::VectorDD::zero;
