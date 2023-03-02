@@ -20,11 +20,10 @@ class ShorFastSimulator: public Simulator<Config> {
     }
 
     static std::uint64_t gcd(std::uint64_t a, std::uint64_t b) {
-        std::uint64_t c;
         while (a != 0) {
-            c = a;
-            a = b % a;
-            b = c;
+            const std::uint64_t c = a;
+            a                     = b % a;
+            b                     = c;
         }
         return b;
     }
