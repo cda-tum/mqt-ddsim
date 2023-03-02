@@ -36,7 +36,7 @@ public:
 
     HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
                                       const ApproximationInfo&                  approxInfo_,
-                                      const unsigned long long                  seed_,
+                                      const std::uint64_t                       seed_,
                                       Mode                                      mode_     = Mode::Amplitude,
                                       const std::size_t                         nthreads_ = 2):
         CircuitSimulator<Config>(std::move(qc_), approxInfo_, seed_),
@@ -60,10 +60,10 @@ private:
     std::size_t                       nthreads = 2;
     std::vector<std::complex<dd::fp>> finalAmplitudes{};
 
-    void SimulateHybridTaskflow(qc::Qubit splitQubit);
-    void SimulateHybridAmplitudes(qc::Qubit splitQubit);
+    void simulateHybridTaskflow(qc::Qubit splitQubit);
+    void simulateHybridAmplitudes(qc::Qubit splitQubit);
 
-    qc::VectorDD SimulateSlicing(std::unique_ptr<dd::Package<Config>>& sliceDD, qc::Qubit splitQubit, std::size_t controls);
+    qc::VectorDD simulateSlicing(std::unique_ptr<dd::Package<Config>>& sliceDD, qc::Qubit splitQubit, std::size_t controls);
 
     class Slice {
     protected:
@@ -76,16 +76,15 @@ private:
         }
 
     public:
-        const qc::Qubit   start;
-        const qc::Qubit   end;
-        const std::size_t controls;
-        const qc::Qubit   nqubits;
-        std::size_t       nDecisionsExecuted = 0;
-        qc::VectorDD      edge{};
+        qc::Qubit    start;
+        qc::Qubit    end;
+        std::size_t  controls;
+        qc::Qubit    nqubits;
+        std::size_t  nDecisionsExecuted = 0;
+        qc::VectorDD edge{};
 
         explicit Slice(std::unique_ptr<dd::Package<Config>>& dd, const qc::Qubit start_, const qc::Qubit end_, const std::size_t controls_):
-            start(start_), end(end_), controls(controls_), nqubits(end - start + 1) {
-            edge = dd->makeZeroState(static_cast<dd::QubitCount>(nqubits), start_);
+            start(start_), end(end_), controls(controls_), nqubits(end - start + 1), edge(dd->makeZeroState(static_cast<dd::QubitCount>(nqubits), start_)) {
             dd->incRef(edge);
         }
 

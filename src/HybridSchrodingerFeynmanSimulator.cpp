@@ -33,7 +33,7 @@ std::size_t HybridSchrodingerFeynmanSimulator<Config>::getNDecisions(qc::Qubit s
 }
 
 template<class Config>
-qc::VectorDD HybridSchrodingerFeynmanSimulator<Config>::SimulateSlicing(std::unique_ptr<dd::Package<Config>>& sliceDD, const qc::Qubit splitQubit, const std::size_t controls) {
+qc::VectorDD HybridSchrodingerFeynmanSimulator<Config>::simulateSlicing(std::unique_ptr<dd::Package<Config>>& sliceDD, unsigned int splitQubit, size_t controls) {
     Slice lower(sliceDD, 0, splitQubit - 1, controls);
     Slice upper(sliceDD, splitQubit, static_cast<qc::Qubit>(CircuitSimulator<Config>::getNumberOfQubits() - 1), controls);
 
@@ -124,10 +124,10 @@ std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator<Config>::Si
     auto nqubits    = CircuitSimulator<Config>::getNumberOfQubits();
     auto splitQubit = static_cast<qc::Qubit>(nqubits / 2);
     if (mode == Mode::DD) {
-        SimulateHybridTaskflow(splitQubit);
+        simulateHybridTaskflow(splitQubit);
         return Simulator<Config>::MeasureAllNonCollapsing(shots);
     } else {
-        SimulateHybridAmplitudes(splitQubit);
+        simulateHybridAmplitudes(splitQubit);
 
         if (shots > 0) {
             return Simulator<Config>::SampleFromAmplitudeVectorInPlace(finalAmplitudes, shots);
@@ -139,7 +139,7 @@ std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator<Config>::Si
 }
 
 template<class Config>
-void HybridSchrodingerFeynmanSimulator<Config>::SimulateHybridTaskflow(const qc::Qubit splitQubit) {
+void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned int splitQubit) {
     const std::size_t ndecisions          = getNDecisions(splitQubit);
     const std::size_t maxControl          = 1ULL << ndecisions;
     const std::size_t actuallyUsedThreads = maxControl < nthreads ? maxControl : nthreads;
@@ -158,7 +158,7 @@ void HybridSchrodingerFeynmanSimulator<Config>::SimulateHybridTaskflow(const qc:
             qc::VectorDD                         edge{};
             for (std::size_t i = 0; i < nslicesAtOnce; i++) {
                 auto sliceDD = std::make_unique<dd::Package<Config>>(CircuitSimulator<Config>::getNumberOfQubits());
-                auto result  = SimulateSlicing(sliceDD, splitQubit, current.second + i);
+                auto result  = simulateSlicing(sliceDD, splitQubit, current.second + i);
                 if (i > 0) {
                     edge = sliceDD->add(sliceDD->transfer(edge), result);
                 } else {
@@ -206,7 +206,7 @@ void HybridSchrodingerFeynmanSimulator<Config>::SimulateHybridTaskflow(const qc:
 }
 
 template<class Config>
-void HybridSchrodingerFeynmanSimulator<Config>::SimulateHybridAmplitudes(qc::Qubit splitQubit) {
+void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridAmplitudes(qc::Qubit splitQubit) {
     const std::size_t ndecisions          = getNDecisions(splitQubit);
     const std::size_t maxControl          = 1ULL << ndecisions;
     const std::size_t actuallyUsedThreads = maxControl < nthreads ? maxControl : nthreads;
@@ -225,7 +225,7 @@ void HybridSchrodingerFeynmanSimulator<Config>::SimulateHybridAmplitudes(qc::Qub
             for (std::size_t local_control = 0; local_control < nslicesOnOneCpu; local_control++) {
                 const std::size_t                    totalControl = control + local_control;
                 std::unique_ptr<dd::Package<Config>> sliceDD      = std::make_unique<dd::Package<Config>>(CircuitSimulator<Config>::getNumberOfQubits());
-                auto                                 result       = SimulateSlicing(sliceDD, splitQubit, totalControl);
+                auto                                 result       = simulateSlicing(sliceDD, splitQubit, totalControl);
                 sliceDD->addAmplitudes(result, thread_amplitudes, static_cast<dd::QubitCount>(nqubits));
             }
         });
