@@ -44,7 +44,6 @@ class ShorFastSimulator: public Simulator<Config> {
 
     void applyGate(dd::GateMatrix matrix, qc::Qubit target);
 
-    std::vector<std::uint64_t>                   ts;
     std::vector<std::map<dd::vNode*, dd::vEdge>> nodesOnLevel;
 
     dd::mEdge addConst(std::uint64_t a);
@@ -75,7 +74,6 @@ public:
         requiredBits(static_cast<std::size_t>(std::ceil(std::log2(compositeNumber)))),
         nQubits(static_cast<std::size_t>(std::ceil(std::log2(compositeN))) + 1),
         verbose(verbose) {
-        ts.resize(nQubits);
         nodesOnLevel.resize(nQubits);
     };
 
@@ -84,7 +82,6 @@ public:
         requiredBits(static_cast<std::size_t>(std::ceil(std::log2(compositeNumber)))),
         nQubits(static_cast<std::size_t>(std::ceil(std::log2(compositeN))) + 1),
         verbose(verbose) {
-        ts.resize(nQubits);
         nodesOnLevel.resize(nQubits);
     };
 

@@ -327,13 +327,14 @@ void ShorFastSimulator<Config>::applyGate(dd::GateMatrix matrix, qc::Qubit targe
  * @param a the exponent
  */
 template<class Config>
-void ShorFastSimulator<Config>::uAEmulate2(std::uint64_t a) {
+void ShorFastSimulator<Config>::uAEmulate2(const std::uint64_t a) {
     [[maybe_unused]] const std::size_t cacheCountBefore = Simulator<Config>::dd->cn.cacheCount();
     dagEdges.clear();
 
     dd::vEdge                        f = dd::vEdge::one;
-    std::array<dd::vEdge, dd::RADIX> edges{
-            dd::vEdge::zero, dd::vEdge::zero};
+    std::array<dd::vEdge, dd::RADIX> edges{dd::vEdge::zero, dd::vEdge::zero};
+    std::vector<std::uint64_t>       ts;
+    ts.resize(nQubits);
 
     std::uint64_t t = a;
     for (qc::Qubit p = 0; p < nQubits - 1; ++p) {
@@ -345,12 +346,15 @@ void ShorFastSimulator<Config>::uAEmulate2(std::uint64_t a) {
 
     Simulator<Config>::dd->incRef(f);
 
+    // clear nodesOnLevel. TODO: make it a local variable?
     for (auto& m: nodesOnLevel) {
         m = std::map<dd::vNode*, dd::vEdge>();
     }
 
+    // initialize nodesOnLevel
     uAEmulate2Rec(Simulator<Config>::rootEdge.p->e[0]);
 
+    // special treatment for the nodes on first level
     for (const auto& entry: nodesOnLevel.at(0)) {
         dd::vEdge left = f;
         if (entry.first->e[0].w == dd::Complex::zero) {
@@ -381,6 +385,7 @@ void ShorFastSimulator<Config>::uAEmulate2(std::uint64_t a) {
         nodesOnLevel[0][entry.first] = result;
     }
 
+    // treat the nodes on the remaining levels
     for (std::size_t i = 1; i < nQubits - 1; i++) {
         std::vector<dd::vEdge> saveEdges;
         for (auto it = nodesOnLevel.at(i).begin(); it != nodesOnLevel.at(i).end(); it++) {
@@ -417,6 +422,7 @@ void ShorFastSimulator<Config>::uAEmulate2(std::uint64_t a) {
         nodesOnLevel.at(i - 1).clear();
     }
 
+    // there should be only one node at the top level
     if (nodesOnLevel.at(nQubits - 2).size() != 1) {
         throw std::runtime_error("error occurred");
     }
