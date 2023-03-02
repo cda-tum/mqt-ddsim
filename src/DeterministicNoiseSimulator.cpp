@@ -6,12 +6,12 @@ using CN = dd::ComplexNumbers;
 
 template<class Config>
 std::map<std::string, double> DeterministicNoiseSimulator<Config>::deterministicSimulate() {
-    rootEdge = Simulator<Config>::dd->makeZeroDensityOperator(qc->getNqubits());
+    rootEdge = Simulator<Config>::dd->makeZeroDensityOperator(static_cast<dd::QubitCount>(qc->getNqubits()));
     Simulator<Config>::dd->incRef(rootEdge);
 
     auto deterministicNoiseFunctionality = dd::DeterministicNoiseFunctionality<Config>(
             Simulator<Config>::dd,
-            qc->getNqubits(),
+            static_cast<dd::QubitCount>(qc->getNqubits()),
             noiseProbSingleQubit,
             noiseProbMultiQubit,
             ampDampingProbSingleQubit,
@@ -29,20 +29,18 @@ std::map<std::string, double> DeterministicNoiseSimulator<Config>::deterministic
                     continue;
                 }
                 throw std::runtime_error(std::string{"Unsupported non-unitary functionality: \""} + nuOp->getName() + "\"");
-            } else {
-                throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
             }
-        } else {
-            if (op->isClassicControlledOperation()) {
-                throw std::runtime_error("Classical controlled operations are not supported.");
-            }
-            auto operation = dd::getDD(op.get(), Simulator<Config>::dd);
-
-            // Applying the operation to the density matrix
-            Simulator<Config>::dd->applyOperationToDensity(rootEdge, operation, useDensityMatrixType);
-
-            deterministicNoiseFunctionality.applyNoiseEffects(rootEdge, op);
+            throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
         }
+        if (op->isClassicControlledOperation()) {
+            throw std::runtime_error("Classical controlled operations are not supported.");
+        }
+        auto operation = dd::getDD(op.get(), Simulator<Config>::dd);
+
+        // Applying the operation to the density matrix
+        Simulator<Config>::dd->applyOperationToDensity(rootEdge, operation, useDensityMatrixType);
+
+        deterministicNoiseFunctionality.applyNoiseEffects(rootEdge, op);
     }
     return Simulator<Config>::dd->getProbVectorFromDensityMatrix(rootEdge, measurementThreshold);
 }
@@ -56,11 +54,10 @@ std::map<std::string, std::size_t> DeterministicNoiseSimulator<Config>::sampleFr
     for (const auto& [state, prob]: resultProbabilityMap) {
         weights.emplace_back(prob);
     }
-    std::discrete_distribution<> d(weights.begin(), weights.end());
+    std::discrete_distribution<std::size_t> d(weights.begin(), weights.end());
 
     //Sample n shots elements from the prob distribution
-    std::map<std::size_t, std::size_t>     results;
-    std::uniform_real_distribution<dd::fp> dist(0.0L, 1.0L);
+    std::map<std::size_t, std::size_t> results;
     for (size_t n = 0; n < shots; ++n) {
         ++results[d(Simulator<Config>::mt)];
     }
@@ -69,7 +66,7 @@ std::map<std::string, std::size_t> DeterministicNoiseSimulator<Config>::sampleFr
     std::map<std::string, std::size_t> resultShotsMap;
 
     for (const auto& [state, prob]: results) {
-        resultShotsMap.emplace(std::next(resultProbabilityMap.begin(), static_cast<long>(state))->first, prob);
+        resultShotsMap.emplace(std::next(resultProbabilityMap.begin(), static_cast<std::int64_t>(state))->first, prob);
     }
 
     return resultShotsMap;
