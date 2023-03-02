@@ -169,8 +169,8 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned 
                 oldDD = std::move(sliceDD);
             }
 
-            current.first = static_cast<std::size_t>(std::log2(nslicesAtOnce));
-            current.second /= nslicesAtOnce;
+            current.first  = static_cast<std::size_t>(std::log2(nslicesAtOnce));
+            current.second = current.second / nslicesAtOnce;
             dd::serialize(edge, "slice_" + std::to_string(current.first) + "_" + std::to_string(current.second) + ".dd", true);
         } else { // adding
             auto              sliceDD       = std::make_unique<dd::Package<Config>>(CircuitSimulator<Config>::getNumberOfQubits());
