@@ -123,7 +123,6 @@ std::map<std::string, double> StochasticNoiseSimulator<Config>::stochSimulate() 
         }
     }
 
-    //std::clog <<"Calculating amplitudes from all runs...\n";
     for (std::uint64_t j = 0U; j < recordedProperties.size(); j++) {
         for (const auto& instanceProperties: recordedPropertiesPerInstance) {
             finalProperties[j] += instanceProperties[j];

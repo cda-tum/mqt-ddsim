@@ -1,5 +1,6 @@
 #include "HybridSchrodingerFeynmanSimulator.hpp"
 
+#include <assert.h>
 #include <cmath>
 #include <taskflow/taskflow.hpp>
 
@@ -144,7 +145,7 @@ template<class Config>
 void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned int splitQubit) {
     const std::size_t ndecisions          = getNDecisions(splitQubit);
     const std::size_t maxControl          = 1ULL << ndecisions;
-    const std::size_t actuallyUsedThreads = maxControl < nthreads ? maxControl : nthreads;
+    const std::size_t actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
     const std::size_t nslicesAtOnce       = std::min<std::size_t>(16, maxControl / actuallyUsedThreads);
     assert(nslicesAtOnce > 0);
 
@@ -169,8 +170,8 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned 
                 oldDD = std::move(sliceDD);
             }
 
-            current.first  = static_cast<std::size_t>(std::log2(nslicesAtOnce));
-            current.second = current.second / nslicesAtOnce;
+            current.first = static_cast<std::size_t>(std::log2(nslicesAtOnce));
+            current.second /= nslicesAtOnce;
             dd::serialize(edge, "slice_" + std::to_string(current.first) + "_" + std::to_string(current.second) + ".dd", true);
         } else { // adding
             auto              sliceDD       = std::make_unique<dd::Package<Config>>(CircuitSimulator<Config>::getNumberOfQubits());
