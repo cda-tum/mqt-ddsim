@@ -147,7 +147,6 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned 
     const std::size_t maxControl          = 1ULL << ndecisions;
     const std::size_t actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
     const std::size_t nslicesAtOnce       = std::min<std::size_t>(16, maxControl / actuallyUsedThreads);
-    assert(nslicesAtOnce > 0);
 
     Simulator<Config>::rootEdge = qc::VectorDD::zero;
 
@@ -171,6 +170,7 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned 
             }
 
             current.first = static_cast<std::size_t>(std::log2(nslicesAtOnce));
+            assert(nslicesAtOnce > 0); // maybe helps with wrong div by zero warning
             current.second /= nslicesAtOnce;
             dd::serialize(edge, "slice_" + std::to_string(current.first) + "_" + std::to_string(current.second) + ".dd", true);
         } else { // adding
