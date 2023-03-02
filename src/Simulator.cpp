@@ -38,10 +38,10 @@ template<class Config>
 std::vector<dd::ComplexValue> Simulator<Config>::getVector() const {
     assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
     std::string                   path(getNumberOfQubits(), '0');
-    std::vector<dd::ComplexValue> results(1ull << getNumberOfQubits(), dd::complex_zero);
-    for (unsigned long long i = 0; i < 1ull << getNumberOfQubits(); ++i) {
-        const std::string corrected_path{path.rbegin(), path.rend()};
-        results[i] = dd->getValueByPath(rootEdge, corrected_path);
+    std::vector<dd::ComplexValue> results(1ULL << getNumberOfQubits(), dd::complex_zero);
+    for (std::size_t i = 0; i < 1ULL << getNumberOfQubits(); ++i) {
+        const std::string correctedPath{path.rbegin(), path.rend()};
+        results[i] = dd->getValueByPath(rootEdge, correctedPath);
         nextPath(path);
     }
     return results;
@@ -51,11 +51,11 @@ template<class Config>
 std::vector<std::pair<dd::fp, dd::fp>> Simulator<Config>::getVectorPair() const {
     assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
     std::string                            path(getNumberOfQubits(), '0');
-    std::vector<std::pair<dd::fp, dd::fp>> results{1ull << getNumberOfQubits()};
+    std::vector<std::pair<dd::fp, dd::fp>> results{1ULL << getNumberOfQubits()};
 
-    for (unsigned long long i = 0; i < 1ull << getNumberOfQubits(); ++i) {
-        const std::string      corrected_path{path.rbegin(), path.rend()};
-        const dd::ComplexValue cv = dd->getValueByPath(rootEdge, corrected_path);
+    for (std::size_t i = 0; i < 1ULL << getNumberOfQubits(); ++i) {
+        const std::string      correctedPath{path.rbegin(), path.rend()};
+        const dd::ComplexValue cv = dd->getValueByPath(rootEdge, correctedPath);
         results[i]                = std::make_pair(cv.r, cv.i);
         nextPath(path);
     }
@@ -66,11 +66,11 @@ template<class Config>
 std::vector<std::complex<dd::fp>> Simulator<Config>::getVectorComplex() const {
     assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
     std::string                       path(getNumberOfQubits(), '0');
-    std::vector<std::complex<dd::fp>> results(1ull << getNumberOfQubits());
+    std::vector<std::complex<dd::fp>> results(1ULL << getNumberOfQubits());
 
-    for (unsigned long long i = 0; i < 1ull << getNumberOfQubits(); ++i) {
-        const std::string      corrected_path{path.rbegin(), path.rend()};
-        const dd::ComplexValue cv = dd->getValueByPath(rootEdge, corrected_path);
+    for (std::size_t i = 0; i < 1ULL << getNumberOfQubits(); ++i) {
+        const std::string      correctedPath{path.rbegin(), path.rend()};
+        const dd::ComplexValue cv = dd->getValueByPath(rootEdge, correctedPath);
         results[i]                = std::complex<dd::fp>(cv.r, cv.i);
         nextPath(path);
     }
@@ -79,15 +79,18 @@ std::vector<std::complex<dd::fp>> Simulator<Config>::getVectorComplex() const {
 
 template<class Config>
 void Simulator<Config>::nextPath(std::string& s) {
-    std::string::reverse_iterator iter = s.rbegin(), end = s.rend();
-    int                           carry = 1;
-    while (carry && iter != end) {
-        int value = (*iter - '0') + carry;
-        carry     = (value / 2);
-        *iter     = static_cast<char>('0' + (value % 2));
+    std::string::reverse_iterator       iter = s.rbegin();
+    const std::string::reverse_iterator end  = s.rend();
+
+    int carry = 1;
+
+    while ((carry != 0) && iter != end) {
+        const int value = (*iter - '0') + carry;
+        carry           = (value / 2);
+        *iter           = static_cast<char>('0' + (value % 2));
         ++iter;
     }
-    if (carry) {
+    if (carry != 0) {
         s.insert(0, "1");
     }
 }
@@ -110,14 +113,14 @@ std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::
     while (!q.empty()) {
         dd::vNode* ptr = q.front();
         q.pop();
-        const dd::fp parent_prob = probsMone[ptr];
+        const dd::fp parentProb = probsMone[ptr];
 
         if (ptr->e.at(0).w != dd::Complex::zero) {
             if (probsMone.find(ptr->e.at(0).p) == probsMone.end()) {
                 q.push(ptr->e.at(0).p);
                 probsMone[ptr->e.at(0).p] = 0;
             }
-            probsMone[ptr->e.at(0).p] = probsMone.at(ptr->e.at(0).p) + parent_prob * CN::mag2(ptr->e.at(0).w);
+            probsMone[ptr->e.at(0).p] = probsMone.at(ptr->e.at(0).p) + parentProb * CN::mag2(ptr->e.at(0).w);
         }
 
         if (ptr->e.at(1).w != dd::Complex::zero) {
@@ -125,7 +128,7 @@ std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::
                 q.push(ptr->e.at(1).p);
                 probsMone[ptr->e.at(1).p] = 0;
             }
-            probsMone[ptr->e.at(1).p] = probsMone.at(ptr->e.at(1).p) + parent_prob * CN::mag2(ptr->e.at(1).w);
+            probsMone[ptr->e.at(1).p] = probsMone.at(ptr->e.at(1).p) + parentProb * CN::mag2(ptr->e.at(1).w);
         }
     }
 
@@ -155,10 +158,10 @@ std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::
 template<class Config>
 double Simulator<Config>::approximateByFidelity(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool actuallyRemoveNodes, bool verbose) {
     auto                    qq = getNodeContributions(edge);
-    std::vector<dd::vNode*> nodes_to_remove;
+    std::vector<dd::vNode*> nodesToRemove;
 
-    std::size_t max_remove = 0;
-    for (dd::QubitCount i = 0; i < getNumberOfQubits(); i++) {
+    std::size_t maxRemove = 0;
+    for (std::size_t i = 0; i < getNumberOfQubits(); i++) {
         double                  sum    = 0.0;
         std::size_t             remove = 0;
         std::vector<dd::vNode*> tmp;
@@ -170,7 +173,7 @@ double Simulator<Config>::approximateByFidelity(std::unique_ptr<dd::Package<Conf
             if (sum < 1 - targetFidelity) {
                 remove++;
                 if (allLevels) {
-                    nodes_to_remove.push_back(node);
+                    nodesToRemove.push_back(node);
                 } else {
                     tmp.push_back(node);
                 }
@@ -180,23 +183,23 @@ double Simulator<Config>::approximateByFidelity(std::unique_ptr<dd::Package<Conf
         }
         if (!allLevels) {
             if (i == 0) {
-                if (remove > max_remove) {
-                    max_remove      = remove;
-                    nodes_to_remove = tmp;
+                if (remove > maxRemove) {
+                    maxRemove     = remove;
+                    nodesToRemove = tmp;
                 }
-            } else if (remove * i > max_remove) {
-                max_remove      = remove * i;
-                nodes_to_remove = tmp;
+            } else if (remove * i > maxRemove) {
+                maxRemove     = remove * i;
+                nodesToRemove = tmp;
             }
         }
     }
 
-    std::map<dd::vNode*, dd::vEdge> dag_edges;
-    for (auto& it: nodes_to_remove) {
-        dag_edges[it] = dd::vEdge::zero;
+    std::map<dd::vNode*, dd::vEdge> dagEdges;
+    for (auto& it: nodesToRemove) {
+        dagEdges[it] = dd::vEdge::zero;
     }
 
-    dd::vEdge newEdge = removeNodes(localDD, edge, dag_edges);
+    dd::vEdge newEdge = removeNodes(localDD, edge, dagEdges);
     assert(!std::isnan(dd::CTEntry::val(edge.w.r)));
     assert(!std::isnan(dd::CTEntry::val(edge.w.i)));
     dd::Complex c = localDD->cn.getCached(std::sqrt(CN::mag2(newEdge.w)), 0);
@@ -209,18 +212,18 @@ double Simulator<Config>::approximateByFidelity(std::unique_ptr<dd::Package<Conf
     }
 
     if (verbose) {
-        const unsigned size_before = localDD->size(edge);
-        const unsigned size_after  = localDD->size(newEdge);
+        const unsigned sizeBefore = localDD->size(edge);
+        const unsigned sizeAfter  = localDD->size(newEdge);
         std::cout
                 << getName() << ","
                 << +getNumberOfQubits() << "," // unary plus for int promotion
-                << size_before << ","
+                << sizeBefore << ","
                 << "fixed_fidelity"
                 << ","
                 << allLevels << ","
                 << targetFidelity << ","
-                << size_after << ","
-                << static_cast<double>(size_after) / static_cast<double>(size_before) << ","
+                << sizeAfter << ","
+                << static_cast<double>(sizeAfter) / static_cast<double>(sizeBefore) << ","
                 << fidelity
                 << "\n";
     }
@@ -236,17 +239,17 @@ double Simulator<Config>::approximateByFidelity(std::unique_ptr<dd::Package<Conf
 template<class Config>
 double Simulator<Config>::approximateBySampling(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, std::size_t nSamples, std::size_t threshold, bool actuallyRemoveNodes, bool verbose) {
     assert(nSamples > threshold);
-    std::map<dd::vNode*, unsigned int>     visited_nodes;
+    std::map<dd::vNode*, unsigned int>     visitedNodes;
     std::uniform_real_distribution<dd::fp> dist(0.0, 1.0L);
 
     for (unsigned int j = 0; j < nSamples; j++) {
         dd::Edge cur = edge;
 
         for (dd::Qubit i = edge.p->v; i >= 0; --i) {
-            visited_nodes[cur.p]++;
+            visitedNodes[cur.p]++;
 
-            dd::fp p0 = CN::mag2(cur.p->e.at(0).w);
-            dd::fp n  = dist(mt);
+            const dd::fp p0 = CN::mag2(cur.p->e.at(0).w);
+            const dd::fp n  = dist(mt);
 
             if (n < p0) {
                 cur = cur.p->e.at(0);
@@ -256,8 +259,8 @@ double Simulator<Config>::approximateBySampling(std::unique_ptr<dd::Package<Conf
         }
     }
 
-    std::set<dd::vNode*> visited_nodes2;
-    visited_nodes2.insert(edge.p);
+    std::set<dd::vNode*> visitedNodes2;
+    visitedNodes2.insert(edge.p);
     std::queue<dd::vNode*> q;
     q.push(edge.p);
 
@@ -265,29 +268,29 @@ double Simulator<Config>::approximateBySampling(std::unique_ptr<dd::Package<Conf
         dd::vNode* ptr = q.front();
         q.pop();
 
-        if (!ptr->e.at(0).w.approximatelyZero() && visited_nodes2.find(ptr->e.at(0).p) == visited_nodes2.end()) {
-            visited_nodes2.insert(ptr->e.at(0).p);
+        if (!ptr->e.at(0).w.approximatelyZero() && visitedNodes2.find(ptr->e.at(0).p) == visitedNodes2.end()) {
+            visitedNodes2.insert(ptr->e.at(0).p);
             q.push(ptr->e.at(0).p);
         }
 
-        if (!ptr->e.at(1).w.approximatelyZero() && visited_nodes2.find(ptr->e.at(1).p) == visited_nodes2.end()) {
-            visited_nodes2.insert(ptr->e.at(1).p);
+        if (!ptr->e.at(1).w.approximatelyZero() && visitedNodes2.find(ptr->e.at(1).p) == visitedNodes2.end()) {
+            visitedNodes2.insert(ptr->e.at(1).p);
             q.push(ptr->e.at(1).p);
         }
     }
 
-    for (auto& visited_node: visited_nodes) {
-        if (visited_node.second > threshold) {
-            visited_nodes2.erase(visited_node.first);
+    for (auto& visitedNode: visitedNodes) {
+        if (visitedNode.second > threshold) {
+            visitedNodes2.erase(visitedNode.first);
         }
     }
 
-    std::map<dd::vNode*, dd::vEdge> dag_edges;
-    for (auto it: visited_nodes2) {
-        dag_edges[it] = dd::vEdge::zero;
+    std::map<dd::vNode*, dd::vEdge> dagEdges;
+    for (auto* it: visitedNodes2) {
+        dagEdges[it] = dd::vEdge::zero;
     }
 
-    dd::vEdge   newEdge = removeNodes(localDD, edge, dag_edges);
+    dd::vEdge   newEdge = removeNodes(localDD, edge, dagEdges);
     dd::Complex c       = localDD->cn.getCached(std::sqrt(CN::mag2(newEdge.w)), 0);
     CN::div(c, newEdge.w, c);
     newEdge.w = localDD->cn.lookup(c);
@@ -298,18 +301,18 @@ double Simulator<Config>::approximateBySampling(std::unique_ptr<dd::Package<Conf
     }
 
     if (verbose) {
-        const unsigned size_after  = localDD->size(newEdge);
-        const unsigned size_before = localDD->size(edge);
+        const unsigned sizeAfter  = localDD->size(newEdge);
+        const unsigned sizeBefore = localDD->size(edge);
         std::cout
                 << getName() << ","
                 << +getNumberOfQubits() << "," // unary plus for int promotion
-                << size_before << ","
+                << sizeBefore << ","
                 << "sampling"
                 << ","
                 << nSamples << ","
                 << threshold << ","
-                << size_after << ","
-                << static_cast<double>(size_after) / static_cast<double>(size_before) << ","
+                << sizeAfter << ","
+                << static_cast<double>(sizeAfter) / static_cast<double>(sizeBefore) << ","
                 << fidelity
                 << "\n";
     }
@@ -342,7 +345,7 @@ dd::vEdge Simulator<Config>::removeNodes(std::unique_ptr<dd::Package<Config>>& l
         return r;
     }
 
-    std::array<dd::vEdge, dd::RADIX> edges{
+    const std::array<dd::vEdge, dd::RADIX> edges{
             removeNodes(localDD, e.p->e.at(0), dagEdges),
             removeNodes(localDD, e.p->e.at(1), dagEdges)};
 
@@ -365,29 +368,29 @@ std::pair<dd::ComplexValue, std::string> Simulator<Config>::getPathOfLeastResist
     }
 
     std::string result(getNumberOfQubits(), '0');
-    dd::Complex path_value = dd->cn.getCached(dd::CTEntry::val(rootEdge.w.r), dd::CTEntry::val(rootEdge.w.i));
-    dd::vEdge   cur        = rootEdge;
+    dd::Complex pathValue = dd->cn.getCached(dd::CTEntry::val(rootEdge.w.r), dd::CTEntry::val(rootEdge.w.i));
+    dd::vEdge   cur       = rootEdge;
     for (dd::Qubit i = rootEdge.p->v; i >= 0; --i) {
-        dd::fp p0  = dd::ComplexNumbers::mag2(cur.p->e.at(0).w);
-        dd::fp p1  = dd::ComplexNumbers::mag2(cur.p->e.at(1).w);
-        dd::fp tmp = p0 + p1;
+        dd::fp       p0  = dd::ComplexNumbers::mag2(cur.p->e.at(0).w);
+        const dd::fp p1  = dd::ComplexNumbers::mag2(cur.p->e.at(1).w);
+        const dd::fp tmp = p0 + p1;
 
         if (std::abs(tmp - 1.0) > epsilon) {
             throw std::runtime_error("Added probabilities differ from 1 by " + std::to_string(std::abs(tmp - 1.0)));
         }
-        p0 /= tmp;
+        p0 /= tmp; // TODO: should p1 be normalized as well?
 
         if (p0 >= p1) {
-            CN::mul(path_value, path_value, cur.w);
+            CN::mul(pathValue, pathValue, cur.w);
             cur = cur.p->e.at(0);
         } else {
             result[static_cast<std::size_t>(cur.p->v)] = '1';
-            CN::mul(path_value, path_value, cur.w);
+            CN::mul(pathValue, pathValue, cur.w);
             cur = cur.p->e.at(1);
         }
     }
 
-    return {{dd::CTEntry::val(path_value.r), dd::CTEntry::val(path_value.i)},
+    return {{dd::CTEntry::val(pathValue.r), dd::CTEntry::val(pathValue.i)},
             std::string{result.rbegin(), result.rend()}};
 }
 
