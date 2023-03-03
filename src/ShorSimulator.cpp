@@ -369,30 +369,6 @@ dd::mEdge ShorSimulator<Config>::addConstMod(std::uint64_t a) {
 }
 
 template<class Config>
-dd::mEdge ShorSimulator<Config>::limitStateVector(dd::vEdge e) {
-    if (e.p == dd::vEdge::zero.p) {
-        if (e.w == dd::Complex::zero) {
-            return dd::mEdge::zero;
-        }
-        return dd::mEdge::one;
-    }
-    auto it = dagEdges.find(e.p);
-    if (it != dagEdges.end()) {
-        return it->second;
-    }
-
-    const std::array<dd::mEdge, 4> edges{
-            limitStateVector(e.p->e.at(0)),
-            dd::mEdge::zero,
-            dd::mEdge::zero,
-            limitStateVector(e.p->e.at(1))};
-
-    dd::Edge result = Simulator<Config>::dd->makeDDNode(e.p->v, edges, false);
-    dagEdges[e.p]   = result;
-    return result;
-}
-
-template<class Config>
 void ShorSimulator<Config>::uAEmulate(std::uint64_t a, std::int32_t q) {
     const dd::mEdge limit = Simulator<Config>::dd->makeIdent(0, static_cast<dd::Qubit>(requiredBits - 1));
 
@@ -668,24 +644,12 @@ void ShorSimulator<Config>::uA(std::uint64_t a, std::uint32_t n, std::int32_t c)
 
 template<class Config>
 void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target) {
-    const dd::Edge gate = Simulator<Config>::dd->makeGateDD(matrix, static_cast<dd::QubitCount>(nQubits), target);
-    const dd::Edge tmp  = Simulator<Config>::dd->multiply(gate, Simulator<Config>::rootEdge);
-    Simulator<Config>::dd->incRef(tmp);
-    Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
-    Simulator<Config>::rootEdge = tmp;
-
-    Simulator<Config>::dd->garbageCollect();
+    applyGate(matrix, target, dd::Controls{});
 }
 
 template<class Config>
 void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target, dd::Control control) {
-    const dd::Edge gate = Simulator<Config>::dd->makeGateDD(matrix, static_cast<dd::QubitCount>(nQubits), control, target);
-    const dd::Edge tmp  = Simulator<Config>::dd->multiply(gate, Simulator<Config>::rootEdge);
-    Simulator<Config>::dd->incRef(tmp);
-    Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
-    Simulator<Config>::rootEdge = tmp;
-
-    Simulator<Config>::dd->garbageCollect();
+    applyGate(matrix, target, dd::Controls{control});
 }
 
 template<class Config>
