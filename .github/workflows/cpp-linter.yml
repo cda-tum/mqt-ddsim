@@ -33,7 +33,7 @@ jobs:
           --style="file" \
           --tidy-checks="" \
           --thread-comments=true \
-          --files-changed-only=false \
+          --files-changed-only=true \
           --ignore="build" \
           --database=build
       - name: Fail if linter found errors
