@@ -47,7 +47,6 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
         ("simulate_grover_oracle_emulated", "simulate Grover's search for given number of qubits with given oracle and emulation", cxxopts::value<std::string>())
         ("simulate_shor", "simulate Shor's algorithm factoring this number", cxxopts::value<unsigned int>())
         ("simulate_shor_coprime", "coprime number to use with Shor's algorithm (zero randomly generates a coprime)", cxxopts::value<unsigned int>()->default_value("0"))
-        ("simulate_shor_no_emulation", "Force Shor simulator to do modular exponentiation instead of using emulation (you'll usually want emulation)")
         ("simulate_fast_shor", "simulate Shor's algorithm factoring this number with intermediate measurements", cxxopts::value<unsigned int>())
         ("simulate_fast_shor_coprime","coprime number to use with Shor's algorithm (zero randomly generates a coprime)", cxxopts::value<unsigned int>()->default_value("0"));
     // clang-format on
@@ -108,12 +107,10 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     } else if (vm.count("simulate_shor") > 0) {
         const unsigned int compositeNumber = vm["simulate_shor"].as<unsigned int>();
         const unsigned int coprime         = vm["simulate_shor_coprime"].as<unsigned int>();
-        const bool         emulate         = vm.count("simulate_shor_no_emulation") == 0;
         if (seed == 0) {
-            ddsim = std::make_unique<ShorSimulator<dd::DDPackageConfig>>(compositeNumber, coprime, emulate, verbose, stepFidelity < 1);
+            ddsim = std::make_unique<ShorSimulator<dd::DDPackageConfig>>(compositeNumber, coprime, verbose, stepFidelity < 1);
         } else {
-            ddsim = std::make_unique<ShorSimulator<dd::DDPackageConfig>>(compositeNumber, coprime, seed, emulate, verbose,
-                                                                         stepFidelity < 1);
+            ddsim = std::make_unique<ShorSimulator<dd::DDPackageConfig>>(compositeNumber, coprime, seed, verbose, stepFidelity < 1);
         }
     } else if (vm.count("simulate_grover") > 0) {
         const unsigned int nQubits = vm["simulate_grover"].as<unsigned int>();

@@ -9,7 +9,7 @@
 
 TEST(ShorSimTest, Factorize15EmulationTest) {
     // add verbose = true for coverage
-    ShorSimulator ddsim(15, 2, 3ULL, true, true, false);
+    ShorSimulator ddsim(15, 2, 3ULL, true, false);
 
     ASSERT_EQ(ddsim.getNumberOfOps(), 0);
     ASSERT_EQ(ddsim.getName(), "shor_15_2");
@@ -29,7 +29,7 @@ TEST(ShorSimTest, Factorize15EmulationTest) {
 
 TEST(ShorSimTest, Factorize15EmulationNoSeedTest) {
     // add verbose = true for coverage
-    ShorSimulator ddsim(15, 2, true, true, false);
+    ShorSimulator ddsim(15, 2, true, false);
 
     ASSERT_EQ(ddsim.getNumberOfOps(), 0);
     ASSERT_EQ(ddsim.getName(), "shor_15_2");
@@ -100,15 +100,6 @@ TEST(ShorSimTest, Factorize15NegTest) {
     ASSERT_EQ(ddsim.additionalStatistics().at("polr_result"), "SUCCESS(3*5)");
 }
 
-TEST(ShorSimTest, Factorize15WithoutEmulationTest) {
-    GTEST_SKIP() << "Skipping test due to https://github.com/iic-jku/ddsim/issues/26";
-    ShorSimulator ddsim(15, 2, 1ULL, false, false, false);
-    ddsim.simulate(1);
-
-    ASSERT_EQ(ddsim.getFactors().first, 3);
-    ASSERT_EQ(ddsim.getFactors().second, 5);
-}
-
 TEST(ShorSimTest, Factorize55Test) {
     ShorSimulator ddsim(55, 2, 3ULL);
     ddsim.simulate(1);
@@ -118,7 +109,7 @@ TEST(ShorSimTest, Factorize55Test) {
 }
 
 TEST(ShorSimTest, Factorize55ApproximateTest) {
-    ShorSimulator ddsim(55, 2, 3ULL, true, true, true);
+    ShorSimulator ddsim(55, 2, 3ULL, true, true);
     ddsim.simulate(1);
 
     ASSERT_EQ(ddsim.getFactors().first, 11);
