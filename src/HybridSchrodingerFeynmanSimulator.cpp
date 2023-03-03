@@ -170,7 +170,7 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned 
             }
 
             current.first = static_cast<std::size_t>(std::log2(nslicesAtOnce));
-            assert(nslicesAtOnce > 0); // maybe helps with wrong div by zero warning
+            // NOLINTNEXTLINE(clang-analyzer-core.DivideZero): clang-tidy mistakenly thinks the next line divides by zero
             current.second /= nslicesAtOnce;
             dd::serialize(edge, "slice_" + std::to_string(current.first) + "_" + std::to_string(current.second) + ".dd", true);
         } else { // adding
