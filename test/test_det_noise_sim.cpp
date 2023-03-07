@@ -166,9 +166,8 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAP) {
 }
 
 TEST(DeterministicNoiseSimTest, SimulateRunWithBadParameters) {
-    auto quantumComputation = detGetAdder4Circuit();
-    EXPECT_THROW(std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("APD"), 0.3, std::optional<double>{}, 2), std::runtime_error);
-    EXPECT_THROW(std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("APK"), 0.001, std::optional<double>{}, 2), std::runtime_error);
+    EXPECT_THROW(std::make_unique<DeterministicNoiseSimulator<>>(detGetAdder4Circuit(), std::string("APD"), 0.3, std::optional<double>{}, 2), std::runtime_error);
+    EXPECT_THROW(std::make_unique<DeterministicNoiseSimulator<>>(detGetAdder4Circuit(), std::string("APK"), 0.001, std::optional<double>{}, 2), std::runtime_error);
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDCustomProb) {

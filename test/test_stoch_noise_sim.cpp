@@ -265,9 +265,8 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorSelectedPropert
 }
 
 TEST(StochNoiseSimTest, SimulateRunWithBadParameters) {
-    auto quantumComputation = stochGetAdder4Circuit();
-    EXPECT_THROW(const StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("AP"), 0.3, std::optional<double>{}, 2, 1000, std::string("0-1000"), false, 1, 1), std::runtime_error);
-    EXPECT_THROW(const StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("APK"), 0.01, std::optional<double>{}, 2, 1000, std::string("0-1000"), false, 1, 1), std::runtime_error);
+    EXPECT_THROW(const StochasticNoiseSimulator ddsim(stochGetAdder4Circuit(), std::string("AP"), 0.3, std::optional<double>{}, 2, 1000, std::string("0-1000"), false, 1, 1), std::runtime_error);
+    EXPECT_THROW(const StochasticNoiseSimulator ddsim(stochGetAdder4Circuit(), std::string("APK"), 0.01, std::optional<double>{}, 2, 1000, std::string("0-1000"), false, 1, 1), std::runtime_error);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceError) {
