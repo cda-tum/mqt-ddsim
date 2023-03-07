@@ -29,8 +29,8 @@ public:
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, std::uint64_t seed = 0):
-        DeterministicNoiseSimulator(qc, std::string("APD"), 0.001, std::optional<double>{}, 2, false, seed) {}
+    explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, std::uint64_t seed = 0):
+        DeterministicNoiseSimulator(std::move(qc), std::string("APD"), 0.001, std::optional<double>{}, 2, false, seed) {}
 
     std::map<std::string, std::size_t> simulate(size_t shots) override {
         return sampleFromProbabilityMap(deterministicSimulate(), shots);

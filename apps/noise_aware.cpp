@@ -64,7 +64,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
 
     if (vm["stoch_runs"].as<std::size_t>() > 0) {
         // Using stochastic simulator
-        auto ddsim = std::make_unique<StochasticNoiseSimulator<>>(quantumComputation,
+        auto ddsim = std::make_unique<StochasticNoiseSimulator<>>(std::move(quantumComputation),
                                                                   vm["noise_effects"].as<std::string>(),
                                                                   vm["noise_prob"].as<double>(),
                                                                   noiseProbT1,
@@ -110,7 +110,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
 
     } else if (vm["stoch_runs"].as<std::size_t>() == 0) {
         // Using deterministic simulator
-        auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, vm["noise_effects"].as<std::string>(),
+        auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), vm["noise_effects"].as<std::string>(),
                                                                      vm["noise_prob"].as<double>(),
                                                                      noiseProbT1,
                                                                      vm["noise_prob_multi"].as<double>(),

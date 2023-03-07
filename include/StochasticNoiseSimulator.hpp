@@ -38,11 +38,11 @@ public:
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int stepNumber, const double stepFidelity):
-        StochasticNoiseSimulator(qc, std::string("APD"), 0.001, std::optional<double>{}, 2, 1000, std::string("0-256"), false, stepNumber, stepFidelity) {}
+    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, const unsigned int stepNumber, const double stepFidelity):
+        StochasticNoiseSimulator(std::move(qc), std::string("APD"), 0.001, std::optional<double>{}, 2, 1000, std::string("0-256"), false, stepNumber, stepFidelity) {}
 
-    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int stepNumber, const double stepFidelity, std::size_t seed):
-        StochasticNoiseSimulator(qc, std::string("APD"), 0.001, std::optional<double>{}, 2, 1000, std::string("0-256"), false, stepNumber, stepFidelity, seed) {}
+    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, const unsigned int stepNumber, const double stepFidelity, std::size_t seed):
+        StochasticNoiseSimulator(std::move(qc), std::string("APD"), 0.001, std::optional<double>{}, 2, 1000, std::string("0-256"), false, stepNumber, stepFidelity, seed) {}
 
     std::vector<std::pair<std::int64_t, std::string>> recordedProperties;
     std::vector<std::vector<double>>                  recordedPropertiesPerInstance;
