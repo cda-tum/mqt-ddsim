@@ -11,19 +11,19 @@
 template<class Config = StochasticNoiseSimulatorDDPackageConfig>
 class StochasticNoiseSimulator: public Simulator<Config> {
 public:
-    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc_,
-                             const std::string&                       noiseEffects_,
-                             double                                   noiseProbability_,
-                             std::optional<double>                    ampDampingProbability,
-                             double                                   multiQubitGateFactor_,
-                             std::size_t                              stochRuns,
-                             const std::string&                       recordedProperties,
-                             bool                                     unoptimizedSim,
-                             std::uint32_t                            stepNumber_,
-                             double                                   stepFidelity_,
-                             std::size_t                              seed = 0U):
+    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
+                             const std::string&                        noiseEffects_,
+                             double                                    noiseProbability_,
+                             std::optional<double>                     ampDampingProbability,
+                             double                                    multiQubitGateFactor_,
+                             std::size_t                               stochRuns,
+                             const std::string&                        recordedProperties,
+                             bool                                      unoptimizedSim,
+                             std::uint32_t                             stepNumber_,
+                             double                                    stepFidelity_,
+                             std::size_t                               seed = 0U):
         Simulator<Config>(seed),
-        qc(qc_),
+        qc(std::move(qc_)),
         stepNumber(stepNumber_),
         stepFidelity(stepFidelity_),
         noiseProbability(noiseProbability_),
@@ -110,7 +110,7 @@ public:
     };
 
 private:
-    std::unique_ptr<qc::QuantumComputation>& qc; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
+    std::unique_ptr<qc::QuantumComputation> qc;
 
     std::size_t stepNumber{};
     double      stepFidelity{};

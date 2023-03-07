@@ -9,15 +9,15 @@
 template<class Config = DensityMatrixSimulatorDDPackageConfig>
 class DeterministicNoiseSimulator: public Simulator<Config> {
 public:
-    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc,
-                                const std::string&                       noiseEffects,
-                                double                                   noiseProbability,
-                                std::optional<double>                    ampDampingProbability,
-                                double                                   multiQubitGateFactor,
-                                bool                                     unoptimizedSim = false,
-                                std::uint64_t                            seed           = 0):
+    DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
+                                const std::string&                        noiseEffects,
+                                double                                    noiseProbability,
+                                std::optional<double>                     ampDampingProbability,
+                                double                                    multiQubitGateFactor,
+                                bool                                      unoptimizedSim = false,
+                                std::uint64_t                             seed           = 0):
         Simulator<Config>(seed),
-        qc(qc),
+        qc(std::move(qc_)),
         noiseEffects(StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>::initializeNoiseEffects(noiseEffects)),
         noiseProbSingleQubit(noiseProbability),
         ampDampingProbSingleQubit(ampDampingProbability ? ampDampingProbability.value() : noiseProbability * 2),
@@ -62,8 +62,8 @@ public:
     qc::DensityMatrixDD rootEdge{};
 
 private:
-    const std::unique_ptr<qc::QuantumComputation>& qc; // NOLINT(cppcoreguidelines-avoid-const-or-ref-data-members)
-    std::vector<dd::NoiseOperations>               noiseEffects;
+    std::unique_ptr<qc::QuantumComputation> qc;
+    std::vector<dd::NoiseOperations>        noiseEffects;
 
     double noiseProbSingleQubit{};
     double ampDampingProbSingleQubit{};
