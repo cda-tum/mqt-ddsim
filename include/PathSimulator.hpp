@@ -74,19 +74,24 @@ public:
         static Mode modeFromString(const std::string& mode) {
             if (mode == "sequential" || mode == "0") {
                 return Mode::Sequential;
-            } else if (mode == "pairwise_recursive" || mode == "1") {
-                return Mode::PairwiseRecursiveGrouping;
-            } else if (mode == "bracket" || mode == "2") {
-                return Mode::BracketGrouping;
-            } else if (mode == "alternating" || mode == "3") {
-                return Mode::Alternating;
-            } else if (mode == "cotengra" || mode == "4") {
-                return Mode::Cotengra;
-            } else if (mode == "gate_cost" || mode == "5") {
-                return Mode::GateCost;
-            } else {
-                throw std::invalid_argument("Invalid simulation path mode: " + mode);
             }
+            if (mode == "pairwise_recursive" || mode == "1") {
+                return Mode::PairwiseRecursiveGrouping;
+            }
+            if (mode == "bracket" || mode == "2") {
+                return Mode::BracketGrouping;
+            }
+            if (mode == "alternating" || mode == "3") {
+                return Mode::Alternating;
+            }
+            if (mode == "cotengra" || mode == "4") {
+                return Mode::Cotengra;
+            }
+            if (mode == "gate_cost" || mode == "5") {
+                return Mode::GateCost;
+            }
+
+            throw std::invalid_argument("Invalid simulation path mode: " + mode);
         }
 
         static std::string modeToString(const Mode& mode) {
@@ -170,7 +175,7 @@ public:
     PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, typename Configuration::Mode mode_, std::size_t bracketSize_, std::size_t startingPoint_, std::list<std::size_t> gateCost_, std::size_t seed_):
         PathSimulator(std::move(qc_), Configuration{mode_, bracketSize_, startingPoint_, std::move(gateCost_), seed_}) {}
 
-    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
+    std::map<std::string, std::size_t> simulate(std::size_t shots) override;
 
     const SimulationPath& getSimulationPath() const {
         return simulationPath;

@@ -11,19 +11,19 @@
 template<class Config = StochasticNoiseSimulatorDDPackageConfig>
 class StochasticNoiseSimulator: public Simulator<Config> {
 public:
-    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc_,
-                             const std::string&                       noiseEffects_,
-                             double                                   noiseProbability_,
-                             std::optional<double>                    ampDampingProbability,
-                             double                                   multiQubitGateFactor_,
-                             std::size_t                              stochRuns,
-                             const std::string&                       recordedProperties,
-                             bool                                     unoptimizedSim,
-                             std::uint32_t                            stepNumber_,
-                             double                                   stepFidelity_,
-                             std::size_t                              seed = 0U):
+    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
+                             const std::string&                        noiseEffects_,
+                             double                                    noiseProbability_,
+                             std::optional<double>                     ampDampingProbability,
+                             double                                    multiQubitGateFactor_,
+                             std::size_t                               stochRuns,
+                             const std::string&                        recordedProperties,
+                             bool                                      unoptimizedSim,
+                             std::uint32_t                             stepNumber_,
+                             double                                    stepFidelity_,
+                             std::size_t                               seed = 0U):
         Simulator<Config>(seed),
-        qc(qc_),
+        qc(std::move(qc_)),
         stepNumber(stepNumber_),
         stepFidelity(stepFidelity_),
         noiseProbability(noiseProbability_),
@@ -38,24 +38,24 @@ public:
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int stepNumber, const double stepFidelity):
-        StochasticNoiseSimulator(qc, std::string("APD"), 0.001, std::optional<double>{}, 2, 1000, std::string("0-256"), false, stepNumber, stepFidelity) {}
+    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, const unsigned int stepNumber, const double stepFidelity):
+        StochasticNoiseSimulator(std::move(qc), std::string("APD"), 0.001, std::optional<double>{}, 2, 1000, std::string("0-256"), false, stepNumber, stepFidelity) {}
 
-    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>& qc, const unsigned int stepNumber, const double stepFidelity, std::size_t seed):
-        StochasticNoiseSimulator(qc, std::string("APD"), 0.001, std::optional<double>{}, 2, 1000, std::string("0-256"), false, stepNumber, stepFidelity, seed) {}
+    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, const unsigned int stepNumber, const double stepFidelity, std::size_t seed):
+        StochasticNoiseSimulator(std::move(qc), std::string("APD"), 0.001, std::optional<double>{}, 2, 1000, std::string("0-256"), false, stepNumber, stepFidelity, seed) {}
 
-    std::vector<std::pair<long, std::string>>        recordedProperties;
-    std::vector<std::vector<double>>                 recordedPropertiesPerInstance;
-    std::vector<double>                              finalProperties;
-    std::vector<std::map<std::string, unsigned int>> classicalMeasurementsMaps;
-    std::map<std::string, unsigned int>              finalClassicalMeasurementsMap;
+    std::vector<std::pair<std::int64_t, std::string>> recordedProperties;
+    std::vector<std::vector<double>>                  recordedPropertiesPerInstance;
+    std::vector<double>                               finalProperties;
+    std::vector<std::map<std::string, unsigned int>>  classicalMeasurementsMaps;
+    std::map<std::string, unsigned int>               finalClassicalMeasurementsMap;
 
-    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
-    std::map<std::string, double>      StochSimulate();
+    std::map<std::string, std::size_t> simulate(std::size_t shots) override;
+    std::map<std::string, double>      stochSimulate();
 
     [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return 0U; }    // Not available for stochastic simulation
     [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return 0U; } // Not available for stochastic simulation
-    [[nodiscard]] std::size_t countNodesFromRoot() const override { return 0U; }       // Not available for stochastic simulation
+    [[nodiscard]] std::size_t countNodesFromRoot() override { return 0U; }             // Not available for stochastic simulation
     [[nodiscard]] std::size_t getNumberOfQubits() const override { return qc->getNqubits(); };
     [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
     [[nodiscard]] std::string getName() const override { return "stoch_" + qc->getName(); };
@@ -96,7 +96,7 @@ public:
 
     void setRecordedProperties(const std::string& input);
 
-    std::map<std::string, std::string> AdditionalStatistics() override {
+    std::map<std::string, std::string> additionalStatistics() override {
         return {
                 {"step_fidelity", std::to_string(stepFidelity)},
                 {"approximation_runs", std::to_string(approximationRuns)},
@@ -110,18 +110,18 @@ public:
     };
 
 private:
-    std::unique_ptr<qc::QuantumComputation>& qc;
+    std::unique_ptr<qc::QuantumComputation> qc;
 
-    const std::size_t stepNumber{};
-    const double      stepFidelity{};
-    double            approximationRuns{0};
+    std::size_t stepNumber{};
+    double      stepFidelity{};
+    double      approximationRuns{0};
 
-    const double       noiseProbability{};
-    const double       amplitudeDampingProb{};
-    const double       multiQubitGateFactor{};
-    const bool         sequentiallyApplyNoise{};
-    const std::size_t  stochasticRuns{};
-    const unsigned int maxInstances{};
+    double       noiseProbability{};
+    double       amplitudeDampingProb{};
+    double       multiQubitGateFactor{};
+    bool         sequentiallyApplyNoise{};
+    std::size_t  stochasticRuns{};
+    unsigned int maxInstances{};
 
     std::vector<dd::NoiseOperations> noiseEffects;
 
@@ -131,12 +131,12 @@ private:
 
     void perfectSimulationRun();
 
-    void runStochSimulationForId(std::size_t                                stochRun,
-                                 qc::Qubit                                  nQubits,
-                                 std::vector<double>&                       recordedPropertiesStorage,
-                                 std::vector<std::pair<long, std::string>>& recordedPropertiesList,
-                                 std::map<std::string, unsigned int>&       classicalMeasurementsMap,
-                                 unsigned long long                         localSeed);
+    void runStochSimulationForId(std::size_t                                        stochRun,
+                                 qc::Qubit                                          nQubits,
+                                 std::vector<double>&                               recordedPropertiesStorage,
+                                 std::vector<std::pair<std::int64_t, std::string>>& recordedPropertiesList,
+                                 std::map<std::string, unsigned int>&               classicalMeasurementsMap,
+                                 std::uint64_t                                      localSeed);
 
-    [[nodiscard]] std::string intToString(long targetNumber) const;
+    [[nodiscard]] std::string intToString(std::int64_t targetNumber) const;
 };

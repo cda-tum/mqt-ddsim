@@ -4,7 +4,6 @@
 #include "nlohmann/json.hpp"
 
 #include <chrono>
-#include <dd/Export.hpp>
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -12,9 +11,7 @@
 
 namespace nl = nlohmann;
 
-int main(int argc, char** argv) {
-    unsigned long long seed;
-
+int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     cxxopts::Options options("MQT DDSIM", "see for more information https://www.cda.cit.tum.de/");
     // clang-format off
     options.add_options()
@@ -40,14 +37,14 @@ int main(int argc, char** argv) {
     // clang-format on
     auto vm = options.parse(argc, argv);
 
-    if (vm.count("help")) {
+    if (vm.count("help") > 0) {
         std::cout << options.help();
         std::exit(0);
     }
 
     std::unique_ptr<qc::QuantumComputation> quantumComputation;
 
-    if (vm.count("simulate_file")) {
+    if (vm.count("simulate_file") > 0) {
         const std::string fname = vm["simulate_file"].as<std::string>();
         quantumComputation      = std::make_unique<qc::QuantumComputation>(fname);
     } else {
@@ -60,17 +57,17 @@ int main(int argc, char** argv) {
         std::clog << "[WARNING] Quantum computation contains quite many qubits. You're jumping into the deep end.\n";
     }
 
-    std::optional<double> noise_prob_t1{};
-    if (vm.count("noise_prob_t1")) {
-        noise_prob_t1 = vm["noise_prob_t1"].as<std::optional<double>>();
+    std::optional<double> noiseProbT1{};
+    if (vm.count("noise_prob_t1") > 0) {
+        noiseProbT1 = vm["noise_prob_t1"].as<std::optional<double>>();
     }
 
     if (vm["stoch_runs"].as<std::size_t>() > 0) {
         // Using stochastic simulator
-        auto ddsim = std::make_unique<StochasticNoiseSimulator<>>(quantumComputation,
+        auto ddsim = std::make_unique<StochasticNoiseSimulator<>>(std::move(quantumComputation),
                                                                   vm["noise_effects"].as<std::string>(),
                                                                   vm["noise_prob"].as<double>(),
-                                                                  noise_prob_t1,
+                                                                  noiseProbT1,
                                                                   vm["noise_prob_multi"].as<double>(),
                                                                   vm["stoch_runs"].as<size_t>(),
                                                                   vm["properties"].as<std::string>(),
@@ -81,17 +78,17 @@ int main(int argc, char** argv) {
 
         auto t1 = std::chrono::steady_clock::now();
 
-        const std::map<std::string, double> measurement_results = ddsim->StochSimulate();
+        const std::map<std::string, double> measurementResults = ddsim->stochSimulate();
 
         auto t2 = std::chrono::steady_clock::now();
 
-        std::chrono::duration<float> duration_simulation = t2 - t1;
+        const std::chrono::duration<float> durationSimulation = t2 - t1;
 
-        nl::json output_obj;
+        nl::json outputObj;
 
-        if (vm.count("ps")) {
-            output_obj["statistics"] = {
-                    {"simulation_time", duration_simulation.count()},
+        if (vm.count("ps") > 0) {
+            outputObj["statistics"] = {
+                    {"simulation_time", durationSimulation.count()},
                     {"benchmark", ddsim->getName()},
                     {"n_qubits", +ddsim->getNumberOfQubits()},
                     {"applied_gates", ddsim->getNumberOfOps()},
@@ -100,38 +97,38 @@ int main(int argc, char** argv) {
                     {"seed", ddsim->getSeed()},
             };
 
-            for (const auto& item: ddsim->AdditionalStatistics()) {
-                output_obj["statistics"][item.first] = item.second;
+            for (const auto& [key, value]: ddsim->additionalStatistics()) {
+                outputObj["statistics"][key] = value;
             }
         }
 
-        if (vm.count("pm")) {
-            output_obj["measurement_results"] = measurement_results;
+        if (vm.count("pm") > 0) {
+            outputObj["measurement_results"] = measurementResults;
         }
 
-        std::cout << std::setw(2) << output_obj << std::endl;
+        std::cout << std::setw(2) << outputObj << std::endl;
 
     } else if (vm["stoch_runs"].as<std::size_t>() == 0) {
         // Using deterministic simulator
-        auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(quantumComputation, vm["noise_effects"].as<std::string>(),
+        auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), vm["noise_effects"].as<std::string>(),
                                                                      vm["noise_prob"].as<double>(),
-                                                                     noise_prob_t1,
+                                                                     noiseProbT1,
                                                                      vm["noise_prob_multi"].as<double>(),
-                                                                     vm.count("unoptimized_sim"), seed);
+                                                                     vm.count("unoptimized_sim"), vm["seed"].as<std::size_t>());
 
         auto t1 = std::chrono::steady_clock::now();
 
-        const std::map<std::string, double> measurement_results = ddsim->DeterministicSimulate();
+        const std::map<std::string, double> measurementResults = ddsim->deterministicSimulate();
 
         auto t2 = std::chrono::steady_clock::now();
 
-        std::chrono::duration<float> duration_simulation = t2 - t1;
+        const std::chrono::duration<float> durationSimulation = t2 - t1;
 
-        nl::json output_obj;
+        nl::json outputObj;
 
-        if (vm.count("ps")) {
-            output_obj["statistics"] = {
-                    {"simulation_time", duration_simulation.count()},
+        if (vm.count("ps") > 0) {
+            outputObj["statistics"] = {
+                    {"simulation_time", durationSimulation.count()},
                     {"benchmark", ddsim->getName()},
                     {"n_qubits", ddsim->getNumberOfQubits()},
                     {"applied_gates", ddsim->getNumberOfOps()},
@@ -141,14 +138,14 @@ int main(int argc, char** argv) {
                     {"active_nodes", ddsim->getActiveNodeCount()},
             };
 
-            for (const auto& item: ddsim->AdditionalStatistics()) {
-                output_obj["statistics"][item.first] = item.second;
+            for (const auto& item: ddsim->additionalStatistics()) {
+                outputObj["statistics"][item.first] = item.second;
             }
         }
 
-        if (vm.count("pm")) {
-            output_obj["measurement_results"] = measurement_results;
+        if (vm.count("pm") > 0) {
+            outputObj["measurement_results"] = measurementResults;
         }
-        std::cout << std::setw(2) << output_obj << std::endl;
+        std::cout << std::setw(2) << outputObj << std::endl;
     }
 }

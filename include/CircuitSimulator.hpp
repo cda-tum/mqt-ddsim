@@ -25,11 +25,12 @@ struct ApproximationInfo {
     static ApproximationStrategy fromString(const std::string& str) {
         if (str == "fidelity") {
             return FidelityDriven;
-        } else if (str == "memory") {
-            return MemoryDriven;
-        } else {
-            throw std::runtime_error("Unknown approximation strategy '" + str + "'.");
         }
+        if (str == "memory") {
+            return MemoryDriven;
+        }
+
+        throw std::runtime_error("Unknown approximation strategy '" + str + "'.");
     }
 
     friend std::istream& operator>>(std::istream& in, ApproximationStrategy& strategy_) {
@@ -39,9 +40,9 @@ struct ApproximationInfo {
         return in;
     }
 
-    const double                stepFidelity = 1.;
-    const std::size_t           stepNumber   = 1;
-    const ApproximationStrategy strategy     = FidelityDriven;
+    double                stepFidelity = 1.;
+    std::size_t           stepNumber   = 1;
+    ApproximationStrategy strategy     = FidelityDriven;
 };
 
 template<class Config = dd::DDPackageConfig>
@@ -52,7 +53,7 @@ public:
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const unsigned long long seed_):
+    CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const std::uint64_t seed_):
         Simulator<Config>(seed_), qc(std::move(qc_)) {
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
@@ -64,15 +65,15 @@ public:
 
     CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
                      const ApproximationInfo&                  approximationInfo_,
-                     const unsigned long long                  seed_):
+                     const std::uint64_t                       seed_):
         Simulator<Config>(seed_),
         qc(std::move(qc_)), approximationInfo(approximationInfo_) {
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    std::map<std::string, std::size_t> Simulate(std::size_t shots) override;
+    std::map<std::string, std::size_t> simulate(std::size_t shots) override;
 
-    std::map<std::string, std::string> AdditionalStatistics() override {
+    std::map<std::string, std::string> additionalStatistics() override {
         return {
                 {"step_fidelity", std::to_string(approximationInfo.stepFidelity)},
                 {"approximation_runs", std::to_string(approximationRuns)},
@@ -91,9 +92,9 @@ protected:
     std::unique_ptr<qc::QuantumComputation> qc;
     std::size_t                             singleShots{0};
 
-    const ApproximationInfo approximationInfo{};
-    std::size_t             approximationRuns{0};
-    long double             finalFidelity{1.0L};
+    ApproximationInfo approximationInfo{};
+    std::size_t       approximationRuns{0};
+    long double       finalFidelity{1.0L};
 
     std::map<std::size_t, bool> singleShot(bool ignoreNonUnitaries);
 };

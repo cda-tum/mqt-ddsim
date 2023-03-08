@@ -11,7 +11,7 @@ TEST(UnitarySimTest, ConstructSimpleCircuitSequential) {
     quantumComputation->emplace_back<qc::StandardOperation>(3, 2_pc, 1, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 2_pc, 0, qc::H);
     UnitarySimulator ddsim(std::move(quantumComputation), UnitarySimulator<>::Mode::Sequential);
-    ASSERT_NO_THROW(ddsim.Construct());
+    ASSERT_NO_THROW(ddsim.construct());
     const auto& e = ddsim.getConstructedDD();
     EXPECT_TRUE(e.p->e[0].p->isIdentity());
     EXPECT_TRUE(e.p->e[1].p->isIdentity());
@@ -28,7 +28,7 @@ TEST(UnitarySimTest, ConstructSimpleCircuitRecursive) {
     quantumComputation->emplace_back<qc::StandardOperation>(3, 2_pc, 1, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 2_pc, 0, qc::H);
     UnitarySimulator ddsim(std::move(quantumComputation), UnitarySimulator<>::Mode::Recursive);
-    ASSERT_NO_THROW(ddsim.Construct());
+    ASSERT_NO_THROW(ddsim.construct());
     const auto& e = ddsim.getConstructedDD();
     EXPECT_TRUE(e.p->e[0].p->isIdentity());
     EXPECT_TRUE(e.p->e[1].p->isIdentity());
@@ -45,7 +45,7 @@ TEST(UnitarySimTest, ConstructSimpleCircuitRecursiveWithSeed) {
     quantumComputation->emplace_back<qc::StandardOperation>(3, 2_pc, 1, qc::H);
     quantumComputation->emplace_back<qc::StandardOperation>(3, 2_pc, 0, qc::H);
     UnitarySimulator ddsim(std::move(quantumComputation), ApproximationInfo{}, 1337, UnitarySimulator<>::Mode::Recursive);
-    ASSERT_NO_THROW(ddsim.Construct());
+    ASSERT_NO_THROW(ddsim.construct());
     const auto& e = ddsim.getConstructedDD();
     EXPECT_TRUE(e.p->e[0].p->isIdentity());
     EXPECT_TRUE(e.p->e[1].p->isIdentity());
@@ -61,5 +61,5 @@ TEST(UnitarySimTest, NonStandardOperation) {
 
     UnitarySimulator ddsim(std::move(quantumComputation));
     EXPECT_TRUE(ddsim.getMode() == UnitarySimulator<>::Mode::Recursive);
-    EXPECT_THROW(ddsim.Construct(), std::invalid_argument);
+    EXPECT_THROW(ddsim.construct(), std::invalid_argument);
 }

@@ -1,6 +1,7 @@
 #include "CircuitSimulator.hpp"
 #include "QuantumComputation.hpp"
 #include "Simulator.hpp"
+#include "dd/FunctionalityConstruction.hpp"
 
 // clang format wants to put the following include to the top of the file
 // clang-format off
@@ -16,101 +17,107 @@
  * to exclude the time it takes to reset.
  */
 
-using namespace dd::literals;
+using namespace qc::literals;
 
-auto min_estimator = [](const std::vector<double>& v) -> double {
+const auto MIN_ESTIMATOR = [](const std::vector<double>& v) -> double {
     return *(std::min_element(std::begin(v), std::end(v)));
 };
 
-static void yardstiq_sim_X(benchmark::State& state) {
+static void yardstiqSimX(benchmark::State& state) {
     auto qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::X);
 
     CircuitSimulator sim(std::move(qc));
-    for (auto _: state) {
+    for ([[maybe_unused]] auto _: state) {
         const auto start = std::chrono::steady_clock::now();
-        sim.Simulate(1);
+        sim.simulate(1);
         const auto end = std::chrono::steady_clock::now();
         sim.dd->reset();
-        auto elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
-        state.SetIterationTime(elapsed_seconds.count());
+        auto elapsedSeconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+        state.SetIterationTime(elapsedSeconds.count());
     }
     state.SetLabel("X");
 }
 
-BENCHMARK(yardstiq_sim_X)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator)->UseManualTime();
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables,cppcoreguidelines-owning-memory)
+BENCHMARK(yardstiqSimX)->DenseRange(4, 25)->ComputeStatistics("min", MIN_ESTIMATOR)->UseManualTime();
 
-static void yardstiq_sim_H(benchmark::State& state) {
+static void yardstiqSimH(benchmark::State& state) {
     auto qc = std::make_unique<qc::QuantumComputation>(state.range(0));
-    qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::H);
+    qc->h(0);
 
     CircuitSimulator sim(std::move(qc));
-    for (auto _: state) {
+    for ([[maybe_unused]] auto _: state) {
         const auto start = std::chrono::steady_clock::now();
-        sim.Simulate(1);
+        sim.simulate(1);
         const auto end = std::chrono::steady_clock::now();
         sim.dd->reset();
-        auto elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
-        state.SetIterationTime(elapsed_seconds.count());
+        auto elapsedSeconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+        state.SetIterationTime(elapsedSeconds.count());
     }
     state.SetLabel("H");
 }
 
-BENCHMARK(yardstiq_sim_H)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator)->UseManualTime();
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables,cppcoreguidelines-owning-memory)
+BENCHMARK(yardstiqSimH)->DenseRange(4, 25)->ComputeStatistics("min", MIN_ESTIMATOR)->UseManualTime();
 
-static void yardstiq_sim_T(benchmark::State& state) {
+static void yardstiqSimT(benchmark::State& state) {
     auto qc = std::make_unique<qc::QuantumComputation>(state.range(0));
-    qc->emplace_back<qc::StandardOperation>(state.range(0), 0, qc::T);
+    qc->t(0);
 
     CircuitSimulator sim(std::move(qc));
-    for (auto _: state) {
+    for ([[maybe_unused]] auto _: state) {
         const auto start = std::chrono::steady_clock::now();
-        sim.Simulate(1);
+        sim.simulate(1);
         const auto end = std::chrono::steady_clock::now();
         sim.dd->reset();
-        auto elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
-        state.SetIterationTime(elapsed_seconds.count());
+        auto elapsedSeconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+        state.SetIterationTime(elapsedSeconds.count());
     }
     state.SetLabel("T");
 }
 
-BENCHMARK(yardstiq_sim_T)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator)->UseManualTime();
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables,cppcoreguidelines-owning-memory)
+BENCHMARK(yardstiqSimT)->DenseRange(4, 25)->ComputeStatistics("min", MIN_ESTIMATOR)->UseManualTime();
 
-static void yardstiq_sim_CNOT(benchmark::State& state) {
+static void yardstiqSimCnot(benchmark::State& state) {
     auto qc = std::make_unique<qc::QuantumComputation>(state.range(0));
     qc->emplace_back<qc::StandardOperation>(state.range(0), 0_pc, 1, qc::X);
 
     CircuitSimulator sim(std::move(qc));
-    for (auto _: state) {
+    for ([[maybe_unused]] auto _: state) {
         const auto start = std::chrono::steady_clock::now();
-        sim.Simulate(1);
+        sim.simulate(1);
         const auto end = std::chrono::steady_clock::now();
         sim.dd->reset();
-        auto elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
-        state.SetIterationTime(elapsed_seconds.count());
+        auto elapsedSeconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+        state.SetIterationTime(elapsedSeconds.count());
     }
     state.SetLabel("CNOT");
 }
 
-BENCHMARK(yardstiq_sim_CNOT)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator)->UseManualTime();
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables,cppcoreguidelines-owning-memory)
+BENCHMARK(yardstiqSimCnot)->DenseRange(4, 25)->ComputeStatistics("min", MIN_ESTIMATOR)->UseManualTime();
 
-static void yardstiq_sim_TOFFOLI(benchmark::State& state) {
+static void yardstiqSimToffoli(benchmark::State& state) {
     auto qc = std::make_unique<qc::QuantumComputation>(state.range(0));
-    qc->emplace_back<qc::StandardOperation>(state.range(0), dd::Controls{0_pc, 1_pc}, 2, qc::X);
+    qc->emplace_back<qc::StandardOperation>(state.range(0), qc::Controls{0_pc, 1_pc}, 2, qc::X);
+    qc->x(2, qc::Controls{0_pc, 1_pc});
 
     CircuitSimulator sim(std::move(qc));
-    for (auto _: state) {
+    for ([[maybe_unused]] auto _: state) {
         const auto start = std::chrono::steady_clock::now();
-        sim.Simulate(1);
+        sim.simulate(1);
         const auto end = std::chrono::steady_clock::now();
         sim.dd->reset();
-        auto elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
-        state.SetIterationTime(elapsed_seconds.count());
+        auto elapsedSeconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+        state.SetIterationTime(elapsedSeconds.count());
     }
     state.SetLabel("Toffoli");
 }
 
-BENCHMARK(yardstiq_sim_TOFFOLI)->DenseRange(4, 25)->ComputeStatistics("min", min_estimator)->UseManualTime();
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables,cppcoreguidelines-owning-memory)
+BENCHMARK(yardstiqSimToffoli)->DenseRange(4, 25)->ComputeStatistics("min", MIN_ESTIMATOR)->UseManualTime();
 
 /**
  * The following is translated from the other benchmarks at Roger-luo/quantum-benchmarks and does the following:
@@ -123,101 +130,104 @@ BENCHMARK(yardstiq_sim_TOFFOLI)->DenseRange(4, 25)->ComputeStatistics("min", min
  *
  * @param state contains number of qubits
  */
-static void yardstiq_sim_QCBM(benchmark::State& state) {
-    const dd::QubitCount n_qubits = state.range(0);
-    const std::size_t    depth    = 9;
-    auto                 qc       = std::make_unique<qc::QuantumComputation>(n_qubits);
+static void yardstiqSimQcbm(benchmark::State& state) {
+    const auto        nQubits = static_cast<dd::QubitCount>(state.range(0));
+    const std::size_t depth   = 9;
+    auto              qc      = std::make_unique<qc::QuantumComputation>(nQubits);
     // first rotation
-    for (dd::Qubit i = 0; i < n_qubits; i++) {
-        qc->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RX, 1.0);
-        qc->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RZ, 1.0);
+    for (qc::Qubit i = 0; i < nQubits; i++) {
+        qc->rx(i, 1.0);
+        qc->rz(i, 1.0);
     }
 
     // entangling
-    for (dd::Qubit i = 0; i < n_qubits; i++) {
-        qc->emplace_back<qc::StandardOperation>(n_qubits, dd::Control{i}, (i + 1) % n_qubits, qc::X);
+    for (qc::Qubit i = 0; i < nQubits; i++) {
+        qc->emplace_back<qc::StandardOperation>(nQubits, qc::Control{i}, (i + 1) % nQubits, qc::X);
     }
     // middle part: rotations and entanglement
     for (std::size_t d = 0; d < depth - 1; d++) {
-        // mid rotation
-        for (dd::Qubit i = 0; i < n_qubits; i++) {
-            qc->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RZ, 1.0);
-            qc->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RX, 1.0);
-            qc->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RZ, 1.0);
+        // mid-rotation
+        for (qc::Qubit i = 0; i < nQubits; i++) {
+            qc->rz(i, 1.0);
+            qc->rx(i, 1.0);
+            qc->rz(i, 1.0);
         }
         // entangling
-        for (dd::Qubit i = 0; i < n_qubits; i++) {
-            qc->emplace_back<qc::StandardOperation>(n_qubits, dd::Control{i}, (i + 1) % n_qubits, qc::X);
+        for (qc::Qubit i = 0; i < nQubits; i++) {
+            qc->x((i + 1) % nQubits, qc::Control{i});
         }
     }
     // last rotation
-    for (dd::Qubit i = 0; i < n_qubits; i++) {
-        qc->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RZ, 1.0);
-        qc->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RX, 1.0);
+    for (qc::Qubit i = 0; i < nQubits; i++) {
+        qc->rz(i, 1.0);
+        qc->rx(i, 1.0);
     }
     CircuitSimulator sim(std::move(qc));
-    for (auto _: state) {
+    for ([[maybe_unused]] auto _: state) {
         const auto start = std::chrono::steady_clock::now();
-        sim.Simulate(1);
+        sim.simulate(1);
         const auto end = std::chrono::steady_clock::now();
         sim.dd->reset();
-        auto elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
-        state.SetIterationTime(elapsed_seconds.count());
+        auto elapsedSeconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+        state.SetIterationTime(elapsedSeconds.count());
     }
     state.SetLabel("QCBM");
 }
 
 // on our compute server, the 22 qubit instance takes more than 48h
-BENCHMARK(yardstiq_sim_QCBM)->DenseRange(4, 18)->ComputeStatistics("min", min_estimator)->UseManualTime();
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables,cppcoreguidelines-owning-memory)
+BENCHMARK(yardstiqSimQcbm)->DenseRange(4, 18)->ComputeStatistics("min", MIN_ESTIMATOR)->UseManualTime();
 
-static void BM_extra_QCBM_optimized(benchmark::State& state) {
-    const unsigned int n_qubits = state.range(0);
-    const unsigned int depth    = 9;
-    auto               dd       = std::make_unique<dd::Package>();
+static void bmExtraQcbmOptimized(benchmark::State& state) {
+    const auto         nQubits = static_cast<dd::QubitCount>(state.range(0));
+    const unsigned int depth   = 9;
+    auto               dd      = std::make_unique<dd::Package<>>();
 
-    std::unique_ptr<qc::QuantumComputation> qc_pre = std::make_unique<qc::QuantumComputation>(n_qubits);
+    std::unique_ptr<qc::QuantumComputation> qcPre = std::make_unique<qc::QuantumComputation>(nQubits);
     // first rotation
-    for (unsigned int i = 0; i < n_qubits; i++) {
-        qc_pre->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RX, 1.0);
-        qc_pre->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RZ, 1.0);
+    for (unsigned int i = 0; i < nQubits; i++) {
+        qcPre->rx(i, 1.0);
+        qcPre->rz(i, 1.0);
     }
-    dd::Edge pre{qc_pre->buildFunctionality(dd)};
+
+    const dd::Edge pre{dd::buildFunctionality(qcPre.get(), dd)};
     dd->incRef(pre);
     std::cout << "pre=" << dd->size(pre) << "  ";
 
     // entangling
-    std::unique_ptr<qc::QuantumComputation> qc_entangle = std::make_unique<qc::QuantumComputation>(n_qubits);
-    for (unsigned int i = 0; i < n_qubits; i++) {
-        qc_entangle->emplace_back<qc::StandardOperation>(n_qubits, dd::Control{static_cast<dd::Qubit>(i)},
-                                                         (i + 1) % n_qubits, qc::X);
+    std::unique_ptr<qc::QuantumComputation> qcEntangle = std::make_unique<qc::QuantumComputation>(nQubits);
+    for (unsigned int i = 0; i < nQubits; i++) {
+        qcEntangle->x((i + 1) % nQubits, qc::Control{i});
     }
-    dd::Edge entangle{qc_entangle->buildFunctionality(dd)};
+
+    const dd::Edge entangle{dd::buildFunctionality(qcEntangle.get(), dd)};
     dd->incRef(entangle);
     std::cout << "entangle=" << dd->size(entangle) << "  ";
 
-    // mid rotation
-    std::unique_ptr<qc::QuantumComputation> qc_middle = std::make_unique<qc::QuantumComputation>(n_qubits);
-    for (unsigned int i = 0; i < n_qubits; i++) {
-        qc_middle->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RZ, 1.0);
-        qc_middle->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RX, 1.0);
-        qc_middle->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RZ, 1.0);
+    // mid-rotation
+    std::unique_ptr<qc::QuantumComputation> qcMiddle = std::make_unique<qc::QuantumComputation>(nQubits);
+    for (unsigned int i = 0; i < nQubits; i++) {
+        qcMiddle->rz(i, 1.0);
+        qcMiddle->rx(i, 1.0);
+        qcMiddle->rz(i, 1.0);
     }
-    dd::Edge middle{qc_middle->buildFunctionality(dd)};
+    const dd::Edge middle{dd::buildFunctionality(qcMiddle.get(), dd)};
     dd->incRef(middle);
     std::cout << "middle=" << dd->size(middle) << "  ";
 
     // last rotation
-    std::unique_ptr<qc::QuantumComputation> qc_post = std::make_unique<qc::QuantumComputation>(n_qubits);
-    for (unsigned int i = 0; i < n_qubits; i++) {
-        qc_post->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RZ, 1.0);
-        qc_post->emplace_back<qc::StandardOperation>(n_qubits, i, qc::RX, 1.0);
+    std::unique_ptr<qc::QuantumComputation> qcPost = std::make_unique<qc::QuantumComputation>(nQubits);
+    for (unsigned int i = 0; i < nQubits; i++) {
+        qcPost->rz(i, 1.0);
+        qcPost->rx(i, 1.0);
     }
-    dd::Edge post{qc_post->buildFunctionality(dd)};
+    const dd::Edge post{dd::buildFunctionality(qcPost.get(), dd)};
+
     dd->incRef(post);
     std::cout << "post=" << dd->size(post) << "\n";
 
-    for (auto _: state) {
-        dd::Edge qstate = dd->makeZeroState(n_qubits);
+    for ([[maybe_unused]] auto _: state) {
+        dd::Edge qstate = dd->makeZeroState(nQubits);
         qstate          = dd->multiply(pre, qstate);
         qstate          = dd->multiply(entangle, qstate);
 
@@ -233,20 +243,22 @@ static void BM_extra_QCBM_optimized(benchmark::State& state) {
     state.SetLabel("QCBM preprocessed");
 }
 
-BENCHMARK(BM_extra_QCBM_optimized)->DenseRange(4, 18)->ComputeStatistics("min", min_estimator);
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables,cppcoreguidelines-owning-memory)
+BENCHMARK(bmExtraQcbmOptimized)->DenseRange(4, 18)->ComputeStatistics("min", MIN_ESTIMATOR);
 
-static void BM_extra_inst4x4_10_0(benchmark::State& state) {
+static void bmExtraInst4x4100(benchmark::State& state) {
     auto             qc = std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt");
     CircuitSimulator sim(std::move(qc));
-    for (auto _: state) {
+    for ([[maybe_unused]] auto _: state) {
         const auto start = std::chrono::steady_clock::now();
-        sim.Simulate(1);
+        sim.simulate(1);
         const auto end = std::chrono::steady_clock::now();
         sim.dd->reset();
-        auto elapsed_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
-        state.SetIterationTime(elapsed_seconds.count());
+        auto elapsedSeconds = std::chrono::duration_cast<std::chrono::duration<double>>(end - start);
+        state.SetIterationTime(elapsedSeconds.count());
     }
     state.SetLabel("inst4x4-10-0");
 }
 
-BENCHMARK(BM_extra_inst4x4_10_0)->ComputeStatistics("min", min_estimator);
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables,cppcoreguidelines-owning-memory)
+BENCHMARK(bmExtraInst4x4100)->ComputeStatistics("min", MIN_ESTIMATOR);

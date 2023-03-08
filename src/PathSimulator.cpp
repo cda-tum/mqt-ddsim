@@ -13,10 +13,12 @@ PathSimulator<Config>::SimulationPath::SimulationPath(std::size_t nleaves_, Path
     }
 
     for (auto& [leftID, rightID]: components) {
-        if (leftID >= steps.size())
+        if (leftID >= steps.size()) {
             throw std::runtime_error("Left simulation path index out of range.");
-        if (rightID >= steps.size())
+        }
+        if (rightID >= steps.size()) {
             throw std::runtime_error("Right simulation path index out of range");
+        }
 
         auto& leftStep  = steps.at(leftID);
         auto& rightStep = steps.at(rightID);
@@ -61,10 +63,12 @@ PathSimulator<Config>::SimulationPath::SimulationPath(std::size_t nleaves_, Path
                     // operation on the right occurs before operation on the left in qc
                     // if they share any qubits, then right should actually be left
                     std::set<qc::Qubit> qubits{};
-                    for (const auto& target: leftOp->getTargets())
+                    for (const auto& target: leftOp->getTargets()) {
                         qubits.emplace(target);
-                    for (const auto& control: leftOp->getControls())
+                    }
+                    for (const auto& control: leftOp->getControls()) {
                         qubits.emplace(control.qubit);
+                    }
 
                     for (const auto& qubit: qubits) {
                         if (rightOp->actsOn(qubit)) {
@@ -73,12 +77,14 @@ PathSimulator<Config>::SimulationPath::SimulationPath(std::size_t nleaves_, Path
                             break;
                         }
                     }
-                    if (!leftIsActuallyLeft)
+                    if (!leftIsActuallyLeft) {
                         break;
+                    }
                     //                std::cout << "Right operation ID " << rightOpID << " does not conflict with left ID " << leftOpID << std::endl;
                 }
-                if (!leftIsActuallyLeft)
+                if (!leftIsActuallyLeft) {
                     break;
+                }
             }
 
             if (!leftIsActuallyLeft) {
@@ -97,7 +103,7 @@ PathSimulator<Config>::SimulationPath::SimulationPath(std::size_t nleaves_, Path
 }
 
 template<class Config>
-std::map<std::string, std::size_t> PathSimulator<Config>::Simulate(std::size_t shots) {
+std::map<std::string, std::size_t> PathSimulator<Config>::simulate(std::size_t shots) {
     // build task graph from simulation path
     constructTaskGraph();
     //std::cout<< *qc << std::endl;
@@ -109,7 +115,7 @@ std::map<std::string, std::size_t> PathSimulator<Config>::Simulate(std::size_t s
     executor.run(taskflow).wait();
 
     // measure resulting DD
-    return Simulator<Config>::MeasureAllNonCollapsing(shots);
+    return Simulator<Config>::measureAllNonCollapsing(shots);
 }
 
 template<class Config>
@@ -118,10 +124,11 @@ void PathSimulator<Config>::generateSequentialSimulationPath() {
     components.reserve(CircuitSimulator<Config>::qc->getNops());
 
     for (std::size_t i = 0; i < CircuitSimulator<Config>::qc->getNops(); ++i) {
-        if (i == 0)
+        if (i == 0) {
             components.emplace_back(0, 1);
-        else
+        } else {
             components.emplace_back(CircuitSimulator<Config>::qc->getNops() + i, i + 1);
+        }
     }
     setSimulationPath(components, true);
 }
@@ -131,8 +138,8 @@ void PathSimulator<Config>::generatePairwiseRecursiveGroupingSimulationPath() {
     typename SimulationPath::Components components{};
     components.reserve(CircuitSimulator<Config>::qc->getNops());
 
-    std::size_t nleaves = CircuitSimulator<Config>::qc->getNops() + 1;
-    auto        depth   = static_cast<std::size_t>(std::ceil(std::log2(nleaves)));
+    const std::size_t nleaves = CircuitSimulator<Config>::qc->getNops() + 1;
+    auto              depth   = static_cast<std::size_t>(std::ceil(std::log2(nleaves)));
 
     std::size_t id     = nleaves;
     std::size_t offset = 0;
@@ -189,9 +196,9 @@ void PathSimulator<Config>::generateBracketSimulationPath(std::size_t bracketSiz
     std::size_t opMemory         = 0;
     // Sequentially adding tasks for the first braket
     for (std::size_t i = 0; i < bracketSize; i++) {
-        if (i == 0)
+        if (i == 0) {
             components.emplace_back(0, 1);
-        else {
+        } else {
             components.emplace_back(CircuitSimulator<Config>::qc->getNops() + i, 1 + i);
         }
     }
@@ -251,13 +258,13 @@ template<class Config>
 void PathSimulator<Config>::generateAlternatingSimulationPath(std::size_t startingPoint) {
     typename SimulationPath::Components components{};
     components.reserve(CircuitSimulator<Config>::qc->getNops());
-    std::size_t startElem = startingPoint;
+    const std::size_t startElem = startingPoint;
     components.emplace_back(startElem, startElem + 1);
-    std::size_t leftID   = startElem - 1;
-    std::size_t leftEnd  = 0;
-    std::size_t rightID  = startElem + 2;
-    std::size_t rightEnd = CircuitSimulator<Config>::qc->getNops() + 1;
-    std::size_t nextID   = rightEnd;
+    std::size_t       leftID   = startElem - 1;
+    const std::size_t leftEnd  = 0;
+    std::size_t       rightID  = startElem + 2;
+    const std::size_t rightEnd = CircuitSimulator<Config>::qc->getNops() + 1;
+    std::size_t       nextID   = rightEnd;
     //Alternating between left and right-hand side
     while (leftID != leftEnd && rightID != rightEnd) {
         components.emplace_back(leftID, nextID);
@@ -381,12 +388,11 @@ void PathSimulator<Config>::constructTaskGraph() {
         if (rightID < nleaves) {
             if (rightID == 0) {
                 throw std::runtime_error("Initial state must not appear on right side of the simulation path member.");
-            } else {
-                const auto&  op   = CircuitSimulator<Config>::qc->at(rightID - 1);
-                qc::MatrixDD opDD = dd::getDD(op.get(), Simulator<Config>::dd);
-                Simulator<Config>::dd->incRef(opDD);
-                results.emplace(rightID, opDD);
             }
+            const auto&  op   = CircuitSimulator<Config>::qc->at(rightID - 1);
+            qc::MatrixDD opDD = dd::getDD(op.get(), Simulator<Config>::dd);
+            Simulator<Config>::dd->incRef(opDD);
+            results.emplace(rightID, opDD);
         }
 
         // add MxV / MxM task

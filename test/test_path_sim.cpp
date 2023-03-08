@@ -15,6 +15,7 @@ TEST(TaskBasedSimTest, Configuration) {
     EXPECT_EQ(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode::Alternating), "alternating");
     EXPECT_EQ(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode::Cotengra), "cotengra");
     EXPECT_EQ(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode::GateCost), "gate_cost");
+    EXPECT_THROW(PathSimulator<>::Configuration::modeToString(PathSimulator<>::Configuration::Mode(32)), std::invalid_argument);
 
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("sequential"), PathSimulator<>::Configuration::Mode::Sequential);
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("pairwise_recursive"), PathSimulator<>::Configuration::Mode::PairwiseRecursiveGrouping);
@@ -22,6 +23,7 @@ TEST(TaskBasedSimTest, Configuration) {
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("alternating"), PathSimulator<>::Configuration::Mode::Alternating);
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("cotengra"), PathSimulator<>::Configuration::Mode::Cotengra);
     EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("gate_cost"), PathSimulator<>::Configuration::Mode::GateCost);
+    EXPECT_THROW(PathSimulator<>::Configuration::modeFromString("invalid argument"), std::invalid_argument);
 
     auto config = PathSimulator<>::Configuration{};
     config.seed = 12345U;
@@ -49,7 +51,7 @@ TEST(TaskBasedSimTest, SimpleCircuit) {
     PathSimulator tbs(std::move(qc), PathSimulator<>::Configuration());
 
     // simulate circuit
-    auto counts = tbs.Simulate(1024);
+    auto counts = tbs.simulate(1024);
 
     EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
     EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
@@ -68,7 +70,7 @@ TEST(TaskBasedSimTest, SimpleCircuitArgumentConstructor) {
     PathSimulator tbs(std::move(qc), PathSimulator<>::Configuration::Mode::Sequential, 2, 0, {}, 12345U);
 
     // simulate circuit
-    auto counts = tbs.Simulate(1024);
+    auto counts = tbs.simulate(1024);
 
     EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
     EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
@@ -89,7 +91,7 @@ TEST(TaskBasedSimTest, SimpleCircuitAssumeFalseOrder) {
     path.emplace_back(3, 2);
     tbs.setSimulationPath(path, false);
     // simulate circuit
-    auto counts = tbs.Simulate(1024);
+    auto counts = tbs.simulate(1024);
 
     EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 0).approximatelyEquals({dd::SQRT2_2, 0}));
     EXPECT_TRUE(tbs.dd->getValueByPath(tbs.rootEdge, 3).approximatelyEquals({dd::SQRT2_2, 0}));
@@ -113,7 +115,7 @@ TEST(TaskBasedSimTest, SimpleCircuitBracket) {
     PathSimulator tbs(std::move(qc), config);
 
     // simulate circuit
-    auto counts = tbs.Simulate(1024);
+    auto counts = tbs.simulate(1024);
 
     for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;
@@ -122,7 +124,7 @@ TEST(TaskBasedSimTest, SimpleCircuitBracket) {
 
 TEST(TaskBasedSimTest, GroverCircuitBracket) {
     std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(4, 12345);
-    auto                                    grover      = dynamic_cast<qc::Grover*>(qc.get());
+    auto*                                   grover      = dynamic_cast<qc::Grover*>(qc.get());
     auto                                    targetValue = grover->targetValue;
 
     // construct simulator and generate bracketing contraction plan
@@ -132,7 +134,7 @@ TEST(TaskBasedSimTest, GroverCircuitBracket) {
     PathSimulator tbs(std::move(qc), config);
 
     // simulate circuit
-    auto counts = tbs.Simulate(4096);
+    auto counts = tbs.simulate(4096);
 
     const auto target = targetValue.to_ullong() | (1ULL << 4);
     auto       c      = tbs.dd->getValueByPath(tbs.rootEdge, target);
@@ -148,7 +150,7 @@ TEST(TaskBasedSimTest, GroverCircuitBracket) {
 
 TEST(TaskBasedSimTest, GroverCircuitAlternatingMiddle) {
     std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(4, 12345);
-    auto                                    grover      = dynamic_cast<qc::Grover*>(qc.get());
+    auto*                                   grover      = dynamic_cast<qc::Grover*>(qc.get());
     auto                                    targetValue = grover->targetValue;
 
     // construct simulator and generate alternating contraction plan
@@ -157,7 +159,7 @@ TEST(TaskBasedSimTest, GroverCircuitAlternatingMiddle) {
     PathSimulator tbs(std::move(qc), config);
 
     // simulate circuit
-    auto counts = tbs.Simulate(4096);
+    auto counts = tbs.simulate(4096);
 
     const auto target = targetValue.to_ullong() | (1ULL << 4);
     auto       c      = tbs.dd->getValueByPath(tbs.rootEdge, target);
@@ -173,7 +175,7 @@ TEST(TaskBasedSimTest, GroverCircuitAlternatingMiddle) {
 
 TEST(TaskBasedSimTest, GroverCircuitPairwiseGrouping) {
     std::unique_ptr<qc::QuantumComputation> qc          = std::make_unique<qc::Grover>(4, 12345);
-    auto                                    grover      = dynamic_cast<qc::Grover*>(qc.get());
+    auto*                                   grover      = dynamic_cast<qc::Grover*>(qc.get());
     auto                                    targetValue = grover->targetValue;
 
     // construct simulator and generate pairwise recursive contraction plan
@@ -182,7 +184,7 @@ TEST(TaskBasedSimTest, GroverCircuitPairwiseGrouping) {
     PathSimulator tbs(std::move(qc), config);
 
     // simulate circuit
-    auto counts = tbs.Simulate(4096);
+    auto counts = tbs.simulate(4096);
 
     const auto target = targetValue.to_ullong() | (1ULL << 4);
     auto       c      = tbs.dd->getValueByPath(tbs.rootEdge, target);
@@ -204,7 +206,7 @@ TEST(TaskBasedSimTest, EmptyCircuit) {
 
     // simulate circuit
     const auto shots  = 1024U;
-    auto       counts = tbs.Simulate(shots);
+    auto       counts = tbs.simulate(shots);
 
     for (const auto& [state, count]: counts) {
         EXPECT_EQ(state, "00");
@@ -227,7 +229,7 @@ TEST(TaskBasedSimTest, SimpleCircuitGatecost) {
     PathSimulator tbs(std::move(qc), PathSimulator<>::Configuration::Mode::GateCost, 2, 2, {1, 1}, 12345U);
 
     // simulate circuit
-    auto counts = tbs.Simulate(1024);
+    auto counts = tbs.simulate(1024);
 
     for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;
@@ -252,7 +254,7 @@ TEST(TaskBasedSimTest, SimpleCircuitGatecostConfigurationObject) {
     PathSimulator tbs(std::move(qc), config);
 
     // simulate circuit
-    auto counts = tbs.Simulate(1024);
+    auto counts = tbs.simulate(1024);
 
     for (const auto& [state, count]: counts) {
         std::cout << state << ": " << count << std::endl;

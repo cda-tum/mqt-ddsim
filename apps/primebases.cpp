@@ -4,20 +4,19 @@
 #include <iostream>
 #include <string>
 
-static unsigned long long gcd(unsigned long long a, unsigned long long b) {
-    unsigned long long c;
+static std::uint64_t gcd(std::uint64_t a, std::uint64_t b) {
     while (a != 0) {
-        c = a;
-        a = b % a;
-        b = c;
+        const std::uint64_t c = a;
+        a                     = b % a;
+        b                     = c;
     }
     return b;
 }
 
-static bool is_prime(unsigned int number) {
-    const unsigned int upper_limit = std::floor(std::sqrt(number));
+static bool isPrime(std::uint64_t number) {
+    const auto upperLimit = static_cast<std::uint64_t>(std::floor(std::sqrt(number)));
 
-    for (unsigned int a = 2; a <= upper_limit; a++) {
+    for (std::uint64_t a = 2; a <= upperLimit; a++) {
         if (number % a == 0) {
             return false;
         }
@@ -25,33 +24,33 @@ static bool is_prime(unsigned int number) {
     return true;
 }
 
-void output_coprimes(const unsigned int composite_number, const unsigned int length) {
-    unsigned output_length  = 0;
-    unsigned current_number = 2;
+void outputCoprimes(const std::uint64_t compositeNumber, const std::uint64_t length) {
+    std::uint64_t outputLength  = 0;
+    std::uint64_t currentNumber = 2;
 
-    while (output_length < length) {
-        if (gcd(current_number, composite_number) == 1) {
-            std::cout << current_number << "\n";
-            output_length++;
+    while (outputLength < length) {
+        if (gcd(currentNumber, compositeNumber) == 1) {
+            std::cout << currentNumber << "\n";
+            outputLength++;
         }
-        current_number++;
+        currentNumber++;
     }
 }
 
-void output_primes(const unsigned int composite_number, const unsigned int length) {
-    unsigned output_length  = 0;
-    unsigned current_number = 2;
+void outputPrimes(const std::uint64_t compositeNumber, const std::uint64_t length) {
+    std::uint64_t outputLength  = 0;
+    std::uint64_t currentNumber = 2;
 
-    while (output_length < length) {
-        if (is_prime(current_number) && gcd(current_number, composite_number) == 1) {
-            std::cout << current_number << "\n";
-            output_length++;
+    while (outputLength < length) {
+        if (isPrime(currentNumber) && gcd(currentNumber, compositeNumber) == 1) {
+            std::cout << currentNumber << "\n";
+            outputLength++;
         }
-        current_number++;
+        currentNumber++;
     }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     cxxopts::Options options("MQT DDSIM", "see for more information https://www.cda.cit.tum.de/");
     // clang-format off
     options.add_options()
@@ -62,15 +61,15 @@ int main(int argc, char** argv) {
     // clang-format on
 
     auto vm = options.parse(argc, argv);
-    if (vm.count("help")) {
+    if (vm.count("help") > 0) {
         std::cout << options.help();
         std::exit(0);
     }
 
     if (vm["strategy"].as<std::string>() == "coprimes") {
-        output_coprimes(vm["composite_number"].as<unsigned int>(), vm["length"].as<unsigned int>());
+        outputCoprimes(vm["composite_number"].as<unsigned int>(), vm["length"].as<unsigned int>());
     } else if (vm["strategy"].as<std::string>() == "primes") {
-        output_primes(vm["composite_number"].as<unsigned int>(), vm["length"].as<unsigned int>());
+        outputPrimes(vm["composite_number"].as<unsigned int>(), vm["length"].as<unsigned int>());
     } else {
         std::cerr << "Invalid strategy.\n";
     }
