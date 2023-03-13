@@ -41,6 +41,7 @@ class UnitarySimulatorBackend(BackendV1):
             "coupling_map": None,
             "description": "MQT DDSIM C++ Unitary Simulator",
             "basis_gates": [
+                "gphase",
                 "id",
                 "u0",
                 "u1",
@@ -82,6 +83,14 @@ class UnitarySimulatorBackend(BackendV1):
                 "swap",
                 "cswap",
                 "iswap",
+                "dcx",
+                "ecr",
+                "rxx",
+                "ryy",
+                "rzz",
+                "rzx",
+                "xx_minus_yy",
+                "xx_plus_yy",
             ],
             "gates": [],
         }

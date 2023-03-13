@@ -46,6 +46,7 @@ class HybridQasmSimulatorBackend(BackendV1):
             "local": True,
             "description": "MQT DDSIM Hybrid Schrodinger-Feynman C++ simulator",
             "basis_gates": [
+                "gphase",
                 "id",
                 "u0",
                 "u1",
