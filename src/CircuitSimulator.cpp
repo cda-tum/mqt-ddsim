@@ -1,7 +1,9 @@
 #include "CircuitSimulator.hpp"
 
+#include "CircuitOptimizer.hpp"
 #include "Operations.hpp"
 #include "dd/Export.hpp"
+#include "dd/FunctionalityConstruction.hpp"
 
 template<class Config>
 std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_t shots) {
@@ -81,6 +83,18 @@ std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_
         measurementCounter[resultString]++;
     }
     return measurementCounter;
+}
+
+template<class Config>
+dd::fp CircuitSimulator<Config>::expectationValue(const qc::QuantumComputation& observable) {
+    // simulate the circuit to get the state vector
+    simulate(0);
+
+    // construct the DD for the observable
+    const auto observableDD = dd::buildFunctionality(&observable, Simulator<Config>::dd);
+
+    // calculate the expectation value
+    return Simulator<Config>::dd->expectationValue(observableDD, Simulator<Config>::rootEdge);
 }
 
 template<class Config>
