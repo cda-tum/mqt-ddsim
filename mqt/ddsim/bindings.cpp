@@ -150,6 +150,7 @@ void addCommonSimulatorMethods(py::class_<Simulator>& cls) {
             .def("get_active_matrix_node_count", &Simulator::getMatrixActiveNodeCount, "Get the number of active matrix nodes, i.e., the number of matrix DD nodes in the unique table with a non-zero reference count.")
             .def("get_max_vector_node_count", &Simulator::getMaxNodeCount, "Get the maximum number of (active) vector nodes, i.e., the maximum number of vector DD nodes in the unique table at any point during the simulation.")
             .def("get_max_matrix_node_count", &Simulator::getMaxMatrixNodeCount, "Get the maximum number of (active) matrix nodes, i.e., the maximum number of matrix DD nodes in the unique table at any point during the simulation.")
+            .def("get_tolerance", &Simulator::getTolerance, "Get the tolerance for the DD package.")
             .def("set_tolerance", &Simulator::setTolerance, "tol"_a, "Set the tolerance for the DD package.");
 
     if constexpr (std::is_same_v<Simulator, UnitarySimulator<>>) {

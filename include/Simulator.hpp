@@ -105,6 +105,9 @@ public:
     void setTolerance(const dd::fp tolerance) {
         dd->cn.setTolerance(tolerance);
     }
+    [[nodiscard]] dd::fp getTolerance() const {
+        return dd->cn.complexTable.tolerance();
+    }
 
     [[nodiscard]] std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::pair<double, dd::vNode*>>>> getNodeContributions(const dd::vEdge& edge) const;
 
