@@ -141,22 +141,37 @@ void dumpTensorNetwork(const py::object& circ, const std::string& filename) {
     qc->dump(ofs, qc::Format::Tensor);
 }
 
+template<class Simulator>
+void addCommonSimulatorMethods(py::class_<Simulator>& cls) {
+    cls.def("get_number_of_qubits", &Simulator::getNumberOfQubits, "Get the number of qubits")
+            .def("get_name", &Simulator::getName, "Get the name of the simulator")
+            .def("statistics", &Simulator::additionalStatistics, "Get additional statistics provided by the simulator")
+            .def("get_active_vector_node_count", &Simulator::getActiveNodeCount, "Get the number of active vector nodes, i.e., the number of vector DD nodes in the unique table with a non-zero reference count.")
+            .def("get_active_matrix_node_count", &Simulator::getMatrixActiveNodeCount, "Get the number of active matrix nodes, i.e., the number of matrix DD nodes in the unique table with a non-zero reference count.")
+            .def("get_max_vector_node_count", &Simulator::getMaxNodeCount, "Get the maximum number of (active) vector nodes, i.e., the maximum number of vector DD nodes in the unique table at any point during the simulation.")
+            .def("get_max_matrix_node_count", &Simulator::getMaxMatrixNodeCount, "Get the maximum number of (active) matrix nodes, i.e., the maximum number of matrix DD nodes in the unique table at any point during the simulation.")
+            .def("set_tolerance", &Simulator::setTolerance, "tol"_a, "Set the tolerance for the DD package.");
+
+    if constexpr (std::is_same_v<Simulator, UnitarySimulator<>>) {
+        cls.def("construct", &Simulator::construct, "Construct the DD representing the unitary matrix of the circuit.");
+    } else {
+        cls.def("simulate", &Simulator::simulate, "shots"_a, "Simulate the circuit and return the result as a dictionary of counts.");
+        cls.def("get_vector", &Simulator::getVectorComplex, "Get the state vector resulting from the simulation.");
+    }
+}
+
 PYBIND11_MODULE(pyddsim, m) {
     m.doc() = "Python interface for the MQT DDSIM quantum circuit simulator";
 
     // Circuit Simulator
-    py::class_<CircuitSimulator<>>(m, "CircuitSimulator")
-            .def(py::init<>(&createSimulator<CircuitSimulator<>>),
-                 "circ"_a,
-                 "approximation_step_fidelity"_a = 1.,
-                 "approximation_steps"_a         = 1,
-                 "approximation_strategy"_a      = "fidelity",
-                 "seed"_a                        = -1)
-            .def("get_number_of_qubits", &CircuitSimulator<>::getNumberOfQubits)
-            .def("get_name", &CircuitSimulator<>::getName)
-            .def("simulate", &CircuitSimulator<>::simulate, "shots"_a)
-            .def("statistics", &CircuitSimulator<>::additionalStatistics)
-            .def("get_vector", &CircuitSimulator<>::getVectorComplex);
+    auto circuitSimulator = py::class_<CircuitSimulator<>>(m, "CircuitSimulator");
+    circuitSimulator.def(py::init<>(&createSimulator<CircuitSimulator<>>),
+                         "circ"_a,
+                         "approximation_step_fidelity"_a = 1.,
+                         "approximation_steps"_a         = 1,
+                         "approximation_strategy"_a      = "fidelity",
+                         "seed"_a                        = -1);
+    addCommonSimulatorMethods(circuitSimulator);
 
     // Hybrid Schrödinger-Feynman Simulator
     py::enum_<HybridSchrodingerFeynmanSimulator<>::Mode>(m, "HybridMode")
@@ -164,22 +179,18 @@ PYBIND11_MODULE(pyddsim, m) {
             .value("amplitude", HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude)
             .export_values();
 
-    py::class_<HybridSchrodingerFeynmanSimulator<>>(m, "HybridCircuitSimulator")
-            .def(py::init<>(&createSimulator<HybridSchrodingerFeynmanSimulator<>, HybridSchrodingerFeynmanSimulator<>::Mode&, const std::size_t&>),
-                 "circ"_a,
-                 "approximation_step_fidelity"_a = 1.,
-                 "approximation_steps"_a         = 1,
-                 "approximation_strategy"_a      = "fidelity",
-                 "seed"_a                        = -1,
-                 "mode"_a                        = HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude,
-                 "nthreads"_a                    = 2)
-            .def("get_number_of_qubits", &HybridSchrodingerFeynmanSimulator<>::getNumberOfQubits)
-            .def("get_name", &HybridSchrodingerFeynmanSimulator<>::getName)
-            .def("simulate", &HybridSchrodingerFeynmanSimulator<>::simulate, "shots"_a)
-            .def("statistics", &HybridSchrodingerFeynmanSimulator<>::additionalStatistics)
-            .def("get_vector", &HybridSchrodingerFeynmanSimulator<>::getVectorComplex)
+    auto hsfSimulator = py::class_<HybridSchrodingerFeynmanSimulator<>>(m, "HybridCircuitSimulator");
+    hsfSimulator.def(py::init<>(&createSimulator<HybridSchrodingerFeynmanSimulator<>, HybridSchrodingerFeynmanSimulator<>::Mode&, const std::size_t&>),
+                     "circ"_a,
+                     "approximation_step_fidelity"_a = 1.,
+                     "approximation_steps"_a         = 1,
+                     "approximation_strategy"_a      = "fidelity",
+                     "seed"_a                        = -1,
+                     "mode"_a                        = HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude,
+                     "nthreads"_a                    = 2)
             .def("get_mode", &HybridSchrodingerFeynmanSimulator<>::getMode)
             .def("get_final_amplitudes", &HybridSchrodingerFeynmanSimulator<>::getFinalAmplitudes);
+    addCommonSimulatorMethods(hsfSimulator);
 
     // Path Simulator
     py::enum_<PathSimulator<>::Configuration::Mode>(m, "PathSimulatorMode")
@@ -207,17 +218,13 @@ PYBIND11_MODULE(pyddsim, m) {
             .def("json", &PathSimulator<>::Configuration::json)
             .def("__repr__", &PathSimulator<>::Configuration::toString);
 
-    py::class_<PathSimulator<>>(m, "PathCircuitSimulator")
-            .def(py::init<>(&createSimulatorWithoutSeed<PathSimulator<>, PathSimulator<>::Configuration&>),
-                 "circ"_a, "config"_a = PathSimulator<>::Configuration())
+    auto pathSimulator = py::class_<PathSimulator<>>(m, "PathCircuitSimulator");
+    pathSimulator.def(py::init<>(&createSimulatorWithoutSeed<PathSimulator<>, PathSimulator<>::Configuration&>),
+                      "circ"_a, "config"_a = PathSimulator<>::Configuration())
             .def(py::init<>(&createSimulatorWithoutSeed<PathSimulator<>, PathSimulator<>::Configuration::Mode&, const std::size_t&, const std::size_t&, const std::list<std::size_t>&, const std::size_t&>),
                  "circ"_a, "mode"_a = PathSimulator<>::Configuration::Mode::Sequential, "bracket_size"_a = 2, "starting_point"_a = 0, "gate_cost"_a = std::list<std::size_t>{}, "seed"_a = 0)
-            .def("set_simulation_path", py::overload_cast<const PathSimulator<>::SimulationPath::Components&, bool>(&PathSimulator<>::setSimulationPath))
-            .def("get_number_of_qubits", &PathSimulator<>::getNumberOfQubits)
-            .def("get_name", &PathSimulator<>::getName)
-            .def("simulate", &PathSimulator<>::simulate, "shots"_a)
-            .def("statistics", &PathSimulator<>::additionalStatistics)
-            .def("get_vector", &PathSimulator<>::getVectorComplex);
+            .def("set_simulation_path", py::overload_cast<const PathSimulator<>::SimulationPath::Components&, bool>(&PathSimulator<>::setSimulationPath));
+    addCommonSimulatorMethods(pathSimulator);
 
     // Unitary Simulator
     py::enum_<UnitarySimulator<>::Mode>(m, "ConstructionMode")
@@ -225,21 +232,19 @@ PYBIND11_MODULE(pyddsim, m) {
             .value("sequential", UnitarySimulator<>::Mode::Sequential)
             .export_values();
 
-    py::class_<UnitarySimulator<>>(m, "UnitarySimulator")
-            .def(py::init<>(&createSimulator<UnitarySimulator<>, UnitarySimulator<>::Mode&>),
-                 "circ"_a,
-                 "approximation_step_fidelity"_a = 1.,
-                 "approximation_steps"_a         = 1,
-                 "approximation_strategy"_a      = "fidelity",
-                 "seed"_a                        = -1,
-                 "mode"_a                        = UnitarySimulator<>::Mode::Recursive)
-            .def("get_number_of_qubits", &UnitarySimulator<>::getNumberOfQubits)
-            .def("get_name", &UnitarySimulator<>::getName)
-            .def("construct", &UnitarySimulator<>::construct)
+    auto unitarySimulator = py::class_<UnitarySimulator<>>(m, "UnitarySimulator");
+    unitarySimulator.def(py::init<>(&createSimulator<UnitarySimulator<>, UnitarySimulator<>::Mode&>),
+                         "circ"_a,
+                         "approximation_step_fidelity"_a = 1.,
+                         "approximation_steps"_a         = 1,
+                         "approximation_strategy"_a      = "fidelity",
+                         "seed"_a                        = -1,
+                         "mode"_a                        = UnitarySimulator<>::Mode::Recursive)
             .def("get_mode", &UnitarySimulator<>::getMode)
             .def("get_construction_time", &UnitarySimulator<>::getConstructionTime)
             .def("get_final_node_count", &UnitarySimulator<>::getFinalNodeCount)
             .def("get_max_node_count", &UnitarySimulator<>::getMaxNodeCount);
+    addCommonSimulatorMethods(unitarySimulator);
 
     // Miscellaneous functions
     m.def("get_matrix", &getNumpyMatrix<>, "sim"_a, "mat"_a);
