@@ -88,7 +88,7 @@ std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_
 template<class Config>
 dd::fp CircuitSimulator<Config>::expectationValue(const qc::QuantumComputation& observable) {
     // simulate the circuit to get the state vector
-    simulate(0);
+    singleShot(true);
 
     // construct the DD for the observable
     const auto observableDD = dd::buildFunctionality(&observable, Simulator<Config>::dd);
