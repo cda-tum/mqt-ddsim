@@ -141,6 +141,11 @@ void dumpTensorNetwork(const py::object& circ, const std::string& filename) {
     qc->dump(ofs, qc::Format::Tensor);
 }
 
+dd::fp expectationValue(CircuitSimulator<>& sim, const py::object& observable) {
+    const auto observableCircuit = importCircuit(observable);
+    return sim.expectationValue(observableCircuit);
+}
+
 PYBIND11_MODULE(pyddsim, m) {
     m.doc() = "Python interface for the MQT DDSIM quantum circuit simulator";
 
@@ -156,7 +161,8 @@ PYBIND11_MODULE(pyddsim, m) {
             .def("get_name", &CircuitSimulator<>::getName)
             .def("simulate", &CircuitSimulator<>::simulate, "shots"_a)
             .def("statistics", &CircuitSimulator<>::additionalStatistics)
-            .def("get_vector", &CircuitSimulator<>::getVectorComplex);
+            .def("get_vector", &CircuitSimulator<>::getVectorComplex)
+            .def("expectation_value", &expectationValue, "observable"_a);
 
     // Hybrid Schrödinger-Feynman Simulator
     py::enum_<HybridSchrodingerFeynmanSimulator<>::Mode>(m, "HybridMode")
