@@ -258,3 +258,18 @@ TEST(CircuitSimTest, ApproximationTest) {
     EXPECT_EQ(abs(vec[2]), 0);
     EXPECT_EQ(abs(vec[3]), 0);
 }
+
+TEST(CircuitSimTest, ToleranceTest) {
+    // A small test to make sure that setting and getting the tolerance works
+    auto             qc = std::make_unique<qc::QuantumComputation>(2);
+    CircuitSimulator ddsim(std::move(qc));
+    const auto       tolerance = ddsim.getTolerance();
+    EXPECT_EQ(tolerance, dd::ComplexTable<>::tolerance());
+    const auto newTolerance = 0.1;
+    ddsim.setTolerance(newTolerance);
+    EXPECT_EQ(ddsim.getTolerance(), newTolerance);
+    EXPECT_EQ(dd::ComplexTable<>::tolerance(), newTolerance);
+    ddsim.setTolerance(tolerance);
+    EXPECT_EQ(ddsim.getTolerance(), tolerance);
+    EXPECT_EQ(dd::ComplexTable<>::tolerance(), tolerance);
+}
