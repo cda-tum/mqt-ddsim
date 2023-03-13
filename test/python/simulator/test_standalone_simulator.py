@@ -59,3 +59,22 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         assert len(result.keys()) == self.nonzero_states_ghz
         assert "00" in result
         assert "01" in result
+
+    @staticmethod
+    def test_native_two_qubit_gates():
+        from qiskit.circuit.library import XXMinusYYGate, XXPlusYYGate
+
+        qc = QuantumCircuit(2)
+        qc.dcx(0, 1)
+        qc.ecr(0, 1)
+        qc.rxx(0.5, 0, 1)
+        qc.rzz(0.5, 0, 1)
+        qc.ryy(0.5, 0, 1)
+        qc.rzx(0.5, 0, 1)
+        qc.append(XXMinusYYGate(0.5, 0.25), [0, 1])
+        qc.append(XXPlusYYGate(0.5, 0.25), [0, 1])
+        print(qc)
+        print(qc.global_phase)
+        sim = ddsim.CircuitSimulator(qc)
+        result = sim.simulate(1000)
+        print(result)
