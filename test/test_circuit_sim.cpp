@@ -259,6 +259,44 @@ TEST(CircuitSimTest, ApproximationTest) {
     EXPECT_EQ(abs(vec[3]), 0);
 }
 
+TEST(CircuitSimTest, expectationValueLocalOperators) {
+    const std::size_t maxQubits = 3;
+    for (std::size_t nrQubits = 1; nrQubits < maxQubits; ++nrQubits) {
+        auto             qc = std::make_unique<qc::QuantumComputation>(nrQubits);
+        CircuitSimulator ddsim(std::move(qc));
+        for (qc::Qubit site = 0; site < nrQubits; ++site) {
+            auto xObservable = qc::QuantumComputation(nrQubits);
+            xObservable.x(site);
+            EXPECT_EQ(ddsim.expectationValue(xObservable), 0);
+            auto zObservable = qc::QuantumComputation(nrQubits);
+            zObservable.z(site);
+            EXPECT_EQ(ddsim.expectationValue(zObservable), 1);
+            auto hObservable = qc::QuantumComputation(nrQubits);
+            hObservable.h(site);
+            EXPECT_EQ(ddsim.expectationValue(hObservable), dd::SQRT2_2);
+        }
+    }
+}
+
+TEST(CircuitSimTest, expectationValueGlobalOperators) {
+    const std::size_t maxQubits = 3;
+    for (std::size_t nrQubits = 1; nrQubits < maxQubits; ++nrQubits) {
+        auto             qc = std::make_unique<qc::QuantumComputation>(nrQubits);
+        CircuitSimulator ddsim(std::move(qc));
+        auto             xObservable = qc::QuantumComputation(nrQubits);
+        auto             zObservable = qc::QuantumComputation(nrQubits);
+        auto             hObservable = qc::QuantumComputation(nrQubits);
+        for (qc::Qubit site = 0; site < nrQubits; ++site) {
+            xObservable.x(site);
+            zObservable.z(site);
+            hObservable.h(site);
+        }
+        EXPECT_EQ(ddsim.expectationValue(xObservable), 0);
+        EXPECT_EQ(ddsim.expectationValue(zObservable), 1);
+        EXPECT_EQ(ddsim.expectationValue(hObservable), std::pow(dd::SQRT2_2, nrQubits));
+    }
+}
+
 TEST(CircuitSimTest, ToleranceTest) {
     // A small test to make sure that setting and getting the tolerance works
     auto             qc = std::make_unique<qc::QuantumComputation>(2);

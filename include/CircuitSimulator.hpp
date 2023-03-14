@@ -73,6 +73,8 @@ public:
 
     std::map<std::string, std::size_t> simulate(std::size_t shots) override;
 
+    virtual dd::fp expectationValue(const qc::QuantumComputation& observable);
+
     std::map<std::string, std::string> additionalStatistics() override {
         return {
                 {"step_fidelity", std::to_string(approximationInfo.stepFidelity)},
