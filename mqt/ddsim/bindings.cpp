@@ -178,8 +178,8 @@ PYBIND11_MODULE(pyddsim, m) {
                          "approximation_step_fidelity"_a = 1.,
                          "approximation_steps"_a         = 1,
                          "approximation_strategy"_a      = "fidelity",
-                         "seed"_a                        = -1);
-    .def("expectation_value", &expectationValue, "observable"_a);
+                         "seed"_a                        = -1)
+                    .def("expectation_value", &expectationValue, "observable"_a);
 
     // Hybrid Schrödinger-Feynman Simulator
     py::enum_<HybridSchrodingerFeynmanSimulator<>::Mode>(m, "HybridMode")
