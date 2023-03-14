@@ -110,7 +110,7 @@ bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(std::unique_ptr<dd:
             }
         } else if (targetInSplit) { // target slice for split or operation in split
             const auto&           param = op->getParameter();
-            qc::StandardOperation newOp(nqubits, opControls, opTargets, op->getType(), param[0], param[1], param[2], start);
+            qc::StandardOperation newOp(nqubits, opControls, opTargets, op->getType(), param, start);
             sliceDD->decRef(edge);
             edge = sliceDD->multiply(dd::getDD(&newOp, sliceDD), edge, static_cast<dd::Qubit>(start));
             sliceDD->incRef(edge);

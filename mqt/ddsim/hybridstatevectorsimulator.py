@@ -26,6 +26,7 @@ class HybridStatevectorSimulatorBackend(HybridQasmSimulatorBackend):
             "local": True,
             "description": "MQT DDSIM C++ simulator",
             "basis_gates": [
+                "gphase",
                 "id",
                 "u0",
                 "u1",
