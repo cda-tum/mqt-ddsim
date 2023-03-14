@@ -102,6 +102,13 @@ public:
         return binary;
     }
 
+    void setTolerance(const dd::fp tolerance) {
+        dd->cn.setTolerance(tolerance);
+    }
+    [[nodiscard]] dd::fp getTolerance() const {
+        return dd->cn.complexTable.tolerance();
+    }
+
     [[nodiscard]] std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::pair<double, dd::vNode*>>>> getNodeContributions(const dd::vEdge& edge) const;
 
     double approximateByFidelity(std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge, double targetFidelity, bool allLevels, bool actuallyRemoveNodes, bool verbose = false);
