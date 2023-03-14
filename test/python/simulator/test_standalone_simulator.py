@@ -78,3 +78,41 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         sim = ddsim.CircuitSimulator(qc)
         result = sim.simulate(1000)
         print(result)
+
+    @staticmethod
+    def test_expectation_value_local_operators():
+        import numpy as np
+
+        max_qubits = 3
+        for qubits in range(1, max_qubits + 1):
+            qc = QuantumCircuit(qubits)
+            sim = ddsim.CircuitSimulator(qc)
+            for i in range(qubits):
+                x_observable = QuantumCircuit(qubits)
+                x_observable.x(i)
+                assert sim.expectation_value(x_observable) == 0
+                z_observable = QuantumCircuit(qubits)
+                z_observable.z(i)
+                assert sim.expectation_value(z_observable) == 1
+                h_observable = QuantumCircuit(qubits)
+                h_observable.h(i)
+                assert np.allclose(sim.expectation_value(h_observable), 1 / np.sqrt(2))
+
+    @staticmethod
+    def test_expectation_value_global_operators():
+        import numpy as np
+
+        max_qubits = 3
+        for qubits in range(1, max_qubits + 1):
+            qc = QuantumCircuit(qubits)
+            sim = ddsim.CircuitSimulator(qc)
+            x_observable = QuantumCircuit(qubits)
+            z_observable = QuantumCircuit(qubits)
+            h_observable = QuantumCircuit(qubits)
+            for i in range(qubits):
+                x_observable.x(i)
+                z_observable.z(i)
+                h_observable.h(i)
+            assert sim.expectation_value(x_observable) == 0
+            assert sim.expectation_value(z_observable) == 1
+            assert np.allclose(sim.expectation_value(h_observable), (1 / np.sqrt(2)) ** qubits)
