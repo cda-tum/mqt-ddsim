@@ -1,5 +1,5 @@
-name-template:        "$REPOSITORY $RESOLVED_VERSION Release"
-tag-template:         "v$RESOLVED_VERSION"
+name-template: "$REPOSITORY $RESOLVED_VERSION Release"
+tag-template: "v$RESOLVED_VERSION"
 categories:
   - title: "🚀 Features and Enhancements"
     labels:
@@ -18,13 +18,13 @@ categories:
   - title: "📦 Packaging"
     labels:
       - "packaging"
-  - title:          "⬆️ Dependencies"
+  - title: "⬆️ Dependencies"
     collapse-after: 5
     labels:
       - "dependencies"
       - "submodules"
       - "github_actions"
-change-template:      "- $TITLE @$AUTHOR (#$NUMBER)"
+change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
 change-title-escapes: '\<*_&'
 version-resolver:
   major:
@@ -42,7 +42,7 @@ autolabeler:
     title:
       - "/update pre-commit hooks/i"
 
-template:             |
-                      ## What Changed 👀
-                      $CHANGES
-                      **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
+template: |
+  ## What Changed 👀
+  $CHANGES
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
