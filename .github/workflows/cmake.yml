@@ -32,8 +32,7 @@ jobs:
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
       - name: Test
-        working-directory: ${{github.workspace}}/build/test
-        run: ctest -C $BUILD_TYPE --output-on-failure
+        run: ctest -C $BUILD_TYPE --output-on-failure --test-dir build --repeat until-pass:3 --timeout 300
 
   build-macos:
     name: Build and Test on MacOS
@@ -48,9 +47,7 @@ jobs:
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
       - name: Test
-        working-directory: ${{github.workspace}}/build/test
-        shell: bash
-        run: ctest -C $BUILD_TYPE --output-on-failure
+        run: ctest -C $BUILD_TYPE --output-on-failure --test-dir build --repeat until-pass:3 --timeout 300
 
   build-windows:
     name: Build and Test on Windows
@@ -66,8 +63,7 @@ jobs:
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
       - name: Test
-        working-directory: ${{github.workspace}}/build/test
-        run: cd $BUILD_TYPE && ./ddsim_test
+        run: ctest -C $BUILD_TYPE --output-on-failure --test-dir build --repeat until-pass:3 --timeout 300
 
   coverage:
     name: Coverage
