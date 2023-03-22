@@ -45,7 +45,6 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         assert "000" in result
         assert "111" in result
 
-    @unittest.skip("Test times out")
     def test_standalone_individual_objects(self):
         circ = QuantumCircuit(3)
         circ.h(0)
