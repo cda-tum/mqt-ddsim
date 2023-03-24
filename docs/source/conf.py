@@ -37,8 +37,17 @@ extensions = [
     "sphinx_copybutton",
     "sphinxext.opengraph",
     "sphinx_rtd_dark_mode",
+    "nbsphinx",
     "breathe",
 ]
+
+nbsphinx_execute = "auto"
+
+nbsphinx_execute_arguments = [
+    "--InlineBackend.figure_formats={'svg', 'pdf'}",
+    "--InlineBackend.rc=figure.dpi=200",
+]
+nbsphinx_kernel_name = "python3"
 
 
 class CDAStyle(UnsrtStyle):

@@ -53,7 +53,7 @@ tests = [
 ]
 coverage = [
     "mqt.ddsim[tests]",
-    "pytest-cov[toml]"
+    "pytest-cov"
 ]
 docs = [
     "sphinx>=5",
@@ -62,7 +62,11 @@ docs = [
     "sphinxcontrib-bibtex>=2.4.2",
     "sphinx-copybutton",
     "sphinxext-opengraph",
-    "breathe"
+    "ipython",
+    "ipykernel",
+    "nbsphinx",
+    "breathe",
+    "qiskit-terra[visualization]",
 ]
 dev = ["mqt.ddsim[tnflow, coverage, docs]"]
 
