@@ -19,6 +19,20 @@
 
 namespace nl = nlohmann;
 
+namespace std {
+
+    template<class T>
+    void to_json(nl::json& j, const std::complex<T>& p) {
+        j = nl::json{p.real(), p.imag()};
+    }
+
+    template<class T>
+    void from_json(const nl::json& j, std::complex<T>& p) {
+        p.real(j.at(0));
+        p.imag(j.at(1));
+    }
+} // namespace std
+
 int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     cxxopts::Options options("MQT DDSIM", "for more information see https://www.cda.cit.tum.de/");
     // clang-format off
@@ -210,7 +224,15 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     }
 
     if (vm.count("pv") > 0) {
-        outputObj["state_vector"] = ddsim->getVectorPair();
+        if (vm.count("simulate_file_hybrid") > 0) {
+            auto* hsfSim = dynamic_cast<HybridSchrodingerFeynmanSimulator<dd::DDPackageConfig>*>(ddsim.get());
+            if (hsfSim == nullptr) {
+                throw std::runtime_error("'--simulate_file_hybrid' is set but not used");
+            }
+            outputObj["state_vector"] = hsfSim->getFinalAmplitudes();
+        } else {
+            outputObj["state_vector"] = ddsim->getVectorPair();
+        }
     }
 
     if (vm.count("ps") > 0) {
