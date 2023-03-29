@@ -22,12 +22,12 @@ namespace nl = nlohmann;
 namespace std {
 
     template<class T>
-    void to_json(nl::json& j, const std::complex<T>& p) {
+    void to_json(nl::json& j, const std::complex<T>& p) { // NOLINT(readability-identifier-naming): this is required by nlohmann
         j = nl::json{p.real(), p.imag()};
     }
 
     template<class T>
-    void from_json(const nl::json& j, std::complex<T>& p) {
+    void from_json(const nl::json& j, std::complex<T>& p) { // NOLINT(readability-identifier-naming): this is required by nlohmann
         p.real(j.at(0));
         p.imag(j.at(1));
     }
