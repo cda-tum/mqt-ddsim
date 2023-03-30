@@ -89,20 +89,17 @@ TEST(HybridSimTest, GRCSTestDD) {
     auto result = dd->deserialize<dd::vNode>("result_parallel.dd", true);
     auto ref    = dd->deserialize<dd::vNode>("result.dd", true);
 
-    bool equal = (result == ref);
-    if (!equal) {
+    if (result != ref) {
         // if edges are not equal -> compare amplitudes
         auto refAmplitudes    = dd->getVector(ref);
         auto resultAmplitudes = dd->getVector(result);
-        equal                 = true;
         for (std::size_t i = 0; i < refAmplitudes.size(); ++i) {
             if (std::abs(refAmplitudes[i].real() - resultAmplitudes[i].real()) > 1e-6 || std::abs(refAmplitudes[i].imag() - resultAmplitudes[i].imag()) > 1e-6) {
-                equal = false;
-                break;
+                FAIL() << "Differing values on entry " << i;
             }
         }
     }
-    EXPECT_TRUE(equal);
+    SUCCEED();
 }
 
 TEST(HybridSimTest, GRCSTestAmplitudes) {
