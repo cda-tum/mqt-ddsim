@@ -163,7 +163,7 @@ py::class_<Sim> createSimulator(py::module_ m, const std::string& name) {
         sim.def("construct", &Sim::construct, "Construct the DD representing the unitary matrix of the circuit.");
     } else {
         sim.def("simulate", &Sim::simulate, "shots"_a, "Simulate the circuit and return the result as a dictionary of counts.");
-        sim.def("get_vector", &Sim::getVectorComplex, "Get the state vector resulting from the simulation.");
+        sim.def("get_vector", &Sim::template getVector<std::complex<dd::fp>>, "Get the state vector resulting from the simulation.");
     }
     return sim;
 }
@@ -197,7 +197,7 @@ PYBIND11_MODULE(pyddsim, m) {
                      "mode"_a                        = HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude,
                      "nthreads"_a                    = 2)
             .def("get_mode", &HybridSchrodingerFeynmanSimulator<>::getMode)
-            .def("get_final_amplitudes", &HybridSchrodingerFeynmanSimulator<>::getFinalAmplitudes);
+            .def("get_final_amplitudes", &HybridSchrodingerFeynmanSimulator<>::template getVectorFromHybridSimulation<std::complex<dd::fp>>);
 
     // Path Simulator
     py::enum_<PathSimulator<>::Configuration::Mode>(m, "PathSimulatorMode")

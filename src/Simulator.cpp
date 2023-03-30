@@ -35,49 +35,6 @@ std::map<std::string, std::size_t> Simulator<Config>::sampleFromAmplitudeVectorI
 }
 
 template<class Config>
-std::vector<dd::ComplexValue> Simulator<Config>::getVector() const {
-    assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
-    std::string                   path(getNumberOfQubits(), '0');
-    std::vector<dd::ComplexValue> results(1ULL << getNumberOfQubits(), dd::complex_zero);
-    for (std::size_t i = 0; i < 1ULL << getNumberOfQubits(); ++i) {
-        const std::string correctedPath{path.rbegin(), path.rend()};
-        results[i] = dd->getValueByPath(rootEdge, correctedPath);
-        nextPath(path);
-    }
-    return results;
-}
-
-template<class Config>
-std::vector<std::pair<dd::fp, dd::fp>> Simulator<Config>::getVectorPair() const {
-    assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
-    std::string                            path(getNumberOfQubits(), '0');
-    std::vector<std::pair<dd::fp, dd::fp>> results{1ULL << getNumberOfQubits()};
-
-    for (std::size_t i = 0; i < 1ULL << getNumberOfQubits(); ++i) {
-        const std::string      correctedPath{path.rbegin(), path.rend()};
-        const dd::ComplexValue cv = dd->getValueByPath(rootEdge, correctedPath);
-        results[i]                = std::make_pair(cv.r, cv.i);
-        nextPath(path);
-    }
-    return results;
-}
-
-template<class Config>
-std::vector<std::complex<dd::fp>> Simulator<Config>::getVectorComplex() const {
-    assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
-    std::string                       path(getNumberOfQubits(), '0');
-    std::vector<std::complex<dd::fp>> results(1ULL << getNumberOfQubits());
-
-    for (std::size_t i = 0; i < 1ULL << getNumberOfQubits(); ++i) {
-        const std::string      correctedPath{path.rbegin(), path.rend()};
-        const dd::ComplexValue cv = dd->getValueByPath(rootEdge, correctedPath);
-        results[i]                = std::complex<dd::fp>(cv.r, cv.i);
-        nextPath(path);
-    }
-    return results;
-}
-
-template<class Config>
 void Simulator<Config>::nextPath(std::string& s) {
     std::string::reverse_iterator       iter = s.rbegin();
     const std::string::reverse_iterator end  = s.rend();
