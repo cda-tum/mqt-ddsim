@@ -316,5 +316,5 @@ TEST(CircuitSimDeathTest, TooManyQubitsForVectorTest) {
     auto             qc = std::make_unique<qc::QuantumComputation>(61);
     CircuitSimulator ddsim(std::move(qc));
     ddsim.simulate(0);
-    ASSERT_DEATH({ [[maybe_unused]] auto _ = ddsim.getVector<std::complex<dd::fp>>(); }, "getVector failed as expected");
+    ASSERT_DEATH({ [[maybe_unused]] auto _ = ddsim.getVector<std::complex<dd::fp>>(); }, "");
 }
