@@ -312,9 +312,9 @@ TEST(CircuitSimTest, ToleranceTest) {
     EXPECT_EQ(dd::ComplexTable<>::tolerance(), tolerance);
 }
 
-TEST(CircuitSimDeathTest, TooManyQubitsForVectorTest) {
+TEST(CircuitSimTest, TooManyQubitsForVectorTest) {
     auto             qc = std::make_unique<qc::QuantumComputation>(61);
     CircuitSimulator ddsim(std::move(qc));
     ddsim.simulate(0);
-    ASSERT_DEATH({ [[maybe_unused]] auto _ = ddsim.getVector<std::complex<dd::fp>>(); }, "");
+    EXPECT_THROW({ [[maybe_unused]] auto _ = ddsim.getVector<std::complex<dd::fp>>(); }, std::range_error);
 }

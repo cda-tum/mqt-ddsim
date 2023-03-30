@@ -68,7 +68,10 @@ public:
 
     template<class ReturnType = dd::ComplexValue>
     [[nodiscard]] std::vector<ReturnType> getVector() const {
-        assert(getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
+        if (getNumberOfQubits() >= 60) {
+            // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
+            throw std::range_error("getVector only supports less than 60 qubits.");
+        }
         std::string             path(getNumberOfQubits(), '0');
         std::vector<ReturnType> results;
         results.resize(1ULL << getNumberOfQubits());

@@ -179,3 +179,9 @@ TEST(HybridSimTest, NonStandardOperation) {
     HybridSchrodingerFeynmanSimulator ddsim(std::move(quantumComputation));
     EXPECT_THROW(ddsim.simulate(0), std::invalid_argument);
 }
+
+TEST(HybridSimTest, TooManyQubitsForVectorTest) {
+    auto                                      qc = std::make_unique<qc::QuantumComputation>(61);
+    const HybridSchrodingerFeynmanSimulator<> ddsim(std::move(qc), ApproximationInfo{}, HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude);
+    EXPECT_THROW({ [[maybe_unused]] auto _ = ddsim.getVectorFromHybridSimulation<std::complex<dd::fp>>(); }, std::range_error);
+}

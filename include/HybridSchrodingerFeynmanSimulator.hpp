@@ -51,7 +51,10 @@ public:
 
     template<class ReturnType = dd::ComplexValue>
     [[nodiscard]] std::vector<ReturnType> getVectorFromHybridSimulation() const {
-        assert(CircuitSimulator<Config>::getNumberOfQubits() < 60); // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
+        if (CircuitSimulator<Config>::getNumberOfQubits() >= 60) {
+            // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
+            throw std::range_error("getVector only supports less than 60 qubits.");
+        }
         if (getMode() == Mode::Amplitude) {
             if constexpr (std::is_same_v<ReturnType, decltype(finalAmplitudes)>) {
                 return finalAmplitudes;
