@@ -143,8 +143,8 @@ TEST(CircuitSimTest, DestructiveMeasurementOne) {
         FAIL() << "Measurement result not in {0,1}!";
     }
 
-    const auto vAfterPairs = ddsim.getVectorPair();
-    const auto vAfterCompl = ddsim.getVectorComplex();
+    const auto vAfterPairs = ddsim.getVector<std::pair<dd::fp, dd::fp>>();
+    const auto vAfterCompl = ddsim.getVector<std::complex<dd::fp>>();
 
     ASSERT_EQ(vAfterPairs.size(), vAfterCompl.size());
     for (std::size_t i = 0; i < vAfterPairs.size(); i++) {
@@ -254,7 +254,7 @@ TEST(CircuitSimTest, ApproximationTest) {
     // approximating the state with fidelity 0.98 should allow to eliminate the 1-successor of the first qubit
     CircuitSimulator ddsim(std::move(qc), ApproximationInfo(0.98, 2, ApproximationInfo::FidelityDriven));
     ddsim.simulate(4096);
-    const auto vec = ddsim.getVectorComplex();
+    const auto vec = ddsim.getVector<std::complex<dd::fp>>();
     EXPECT_EQ(abs(vec[2]), 0);
     EXPECT_EQ(abs(vec[3]), 0);
 }
@@ -310,4 +310,11 @@ TEST(CircuitSimTest, ToleranceTest) {
     ddsim.setTolerance(tolerance);
     EXPECT_EQ(ddsim.getTolerance(), tolerance);
     EXPECT_EQ(dd::ComplexTable<>::tolerance(), tolerance);
+}
+
+TEST(CircuitSimTest, TooManyQubitsForVectorTest) {
+    auto             qc = std::make_unique<qc::QuantumComputation>(61);
+    CircuitSimulator ddsim(std::move(qc));
+    ddsim.simulate(0);
+    EXPECT_THROW({ [[maybe_unused]] auto _ = ddsim.getVector<std::complex<dd::fp>>(); }, std::range_error);
 }

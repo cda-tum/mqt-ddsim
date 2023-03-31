@@ -217,7 +217,7 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridAmplitudes(qc::Qub
     const std::size_t nqubits             = CircuitSimulator<Config>::getNumberOfQubits();
     Simulator<Config>::rootEdge           = qc::VectorDD::zero;
 
-    std::vector<std::vector<std::complex<dd::fp>>> amplitudes(actuallyUsedThreads, std::vector<std::complex<dd::fp>>(1U << nqubits, {0, 0}));
+    std::vector<std::vector<std::complex<dd::fp>>> amplitudes(maxControl / nslicesOnOneCpu, std::vector<std::complex<dd::fp>>(1U << nqubits, {0, 0}));
 
     tf::Executor executor;
     for (std::size_t control = 0, i = 0; control < maxControl; control += nslicesOnOneCpu, i++) {

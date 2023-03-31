@@ -66,11 +66,23 @@ public:
 
     std::map<std::string, std::size_t> sampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, std::size_t shots);
 
-    [[nodiscard]] std::vector<dd::ComplexValue> getVector() const;
-
-    [[nodiscard]] std::vector<std::pair<dd::fp, dd::fp>> getVectorPair() const;
-
-    [[nodiscard]] std::vector<std::complex<dd::fp>> getVectorComplex() const;
+    template<class ReturnType = dd::ComplexValue>
+    [[nodiscard]] std::vector<ReturnType> getVector() const {
+        if (getNumberOfQubits() >= 60) {
+            // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
+            throw std::range_error("getVector only supports less than 60 qubits.");
+        }
+        std::string             path(getNumberOfQubits(), '0');
+        std::vector<ReturnType> results;
+        results.resize(1ULL << getNumberOfQubits());
+        for (std::size_t i = 0; i < 1ULL << getNumberOfQubits(); ++i) {
+            const std::string      correctedPath{path.rbegin(), path.rend()};
+            const dd::ComplexValue cv = dd->getValueByPath(rootEdge, correctedPath);
+            results[i]                = {cv.r, cv.i};
+            nextPath(path);
+        }
+        return results;
+    }
 
     [[nodiscard]] virtual std::size_t getActiveNodeCount() const { return dd->vUniqueTable.getActiveNodeCount(); }
 

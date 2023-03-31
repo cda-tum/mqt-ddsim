@@ -210,7 +210,11 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     }
 
     if (vm.count("pv") > 0) {
-        outputObj["state_vector"] = ddsim->getVectorPair();
+        if (auto* hsfSim = dynamic_cast<HybridSchrodingerFeynmanSimulator<>*>(ddsim.get())) {
+            outputObj["state_vector"] = hsfSim->getVectorFromHybridSimulation<std::pair<dd::fp, dd::fp>>();
+        } else {
+            outputObj["state_vector"] = ddsim->getVector<std::pair<dd::fp, dd::fp>>();
+        }
     }
 
     if (vm.count("ps") > 0) {
