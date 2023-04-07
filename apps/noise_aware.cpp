@@ -29,6 +29,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
         ("noise_prob", "Probability for applying noise.", cxxopts::value<double>()->default_value("0.001"))
         ("noise_prob_t1", "Probability for applying amplitude damping noise (default:2 x noise_prob)", cxxopts::value<std::optional<double>>())
         ("noise_prob_multi", "Noise factor for multi qubit operations", cxxopts::value<double>()->default_value("2"))
+        ("unoptimized_dm", "Do not use density matrix type")
         ("unoptimized_sim", "Use unoptimized scheme for stochastic/deterministic noise-aware simulation")
         ("stoch_runs", "Number of stochastic runs. When the value is 0, the deterministic simulator is started. ", cxxopts::value<std::size_t>()->default_value("0"))
         ("properties", R"(Comma separated list of tracked amplitudes, when conducting a stochastic simulation. The "-" operator can be used to specify a range.)", cxxopts::value<std::string>()->default_value("0-100"))
@@ -93,6 +94,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
                     {"n_qubits", +ddsim->getNumberOfQubits()},
                     {"applied_gates", ddsim->getNumberOfOps()},
                     {"max_nodes", ddsim->getMaxNodeCount()},
+                    {"active_matrix_nodes", ddsim->getMatrixActiveNodeCount()},
                     {"max_matrix_nodes", ddsim->getMaxMatrixNodeCount()},
                     {"seed", ddsim->getSeed()},
             };
@@ -114,7 +116,10 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
                                                                      vm["noise_prob"].as<double>(),
                                                                      noiseProbT1,
                                                                      vm["noise_prob_multi"].as<double>(),
-                                                                     vm.count("unoptimized_sim"), vm["seed"].as<std::size_t>());
+                                                                     vm.count("unoptimized_sim"),
+                                                                     vm.count("unoptimized_dm"),
+                                                                     vm["seed"].as<std::size_t>()
+                                                                             );
 
         auto t1 = std::chrono::steady_clock::now();
 
@@ -134,6 +139,8 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
                     {"applied_gates", ddsim->getNumberOfOps()},
                     {"max_matrix_nodes", ddsim->getMaxMatrixNodeCount()},
                     {"active_matrix_nodes", ddsim->getMatrixActiveNodeCount()},
+                    {"max_density_nodes", ddsim->getMaxDensityMatrixNodeCount()},
+                    {"active_density_nodes", ddsim->getActiveDensityMatrixNodeCount()},
                     {"seed", ddsim->getSeed()},
                     {"active_nodes", ddsim->getActiveNodeCount()},
             };

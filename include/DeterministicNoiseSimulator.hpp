@@ -15,6 +15,7 @@ public:
                                 std::optional<double>                     ampDampingProbability,
                                 double                                    multiQubitGateFactor,
                                 bool                                      unoptimizedSim = false,
+                                bool                                      unoptimizedDm = false,
                                 std::uint64_t                             seed           = 0):
         Simulator<Config>(seed),
         qc(std::move(qc_)),
@@ -24,7 +25,7 @@ public:
         noiseProbMultiQubit(noiseProbability * multiQubitGateFactor),
         ampDampingProbMultiQubit(ampDampingProbSingleQubit * multiQubitGateFactor),
         sequentiallyApplyNoise(unoptimizedSim),
-        useDensityMatrixType(!unoptimizedSim) {
+        useDensityMatrixType(!unoptimizedDm) {
         StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>::sanityCheckOfNoiseProbabilities(noiseProbability, ampDampingProbSingleQubit, multiQubitGateFactor);
         Simulator<Config>::dd->resize(qc->getNqubits());
     }

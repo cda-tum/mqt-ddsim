@@ -92,6 +92,11 @@ public:
 
     [[nodiscard]] virtual std::size_t getMatrixActiveNodeCount() const { return dd->mUniqueTable.getActiveNodeCount(); }
 
+    [[nodiscard]] virtual std::size_t getMaxDensityMatrixNodeCount() const { return dd->dUniqueTable.getMaxActiveNodes(); }
+
+    [[nodiscard]] virtual std::size_t getActiveDensityMatrixNodeCount() const { return dd->dUniqueTable.getActiveNodeCount(); }
+
+
     [[nodiscard]] virtual std::size_t countNodesFromRoot() { return dd->size(rootEdge); }
 
     [[nodiscard]] std::pair<dd::ComplexValue, std::string> getPathOfLeastResistance() const;
