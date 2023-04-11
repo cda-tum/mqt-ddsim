@@ -13,7 +13,9 @@ import pybtex.plugin
 from pybtex.style.formatting.unsrt import Style as UnsrtStyle
 from pybtex.style.template import field, href
 
-sys.path.insert(0, pathlib.Path(pathlib.Path(), "../..").resolve().as_posix())
+mqt_path = pathlib.Path(pathlib.Path(), "../..").resolve().as_posix()
+print("adding to path:", mqt_path)
+sys.path.insert(0, mqt_path)
 
 # -- Project information -----------------------------------------------------
 project = "DDSIM"
