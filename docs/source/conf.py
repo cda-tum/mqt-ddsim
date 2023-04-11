@@ -13,7 +13,7 @@ import pybtex.plugin
 from pybtex.style.formatting.unsrt import Style as UnsrtStyle
 from pybtex.style.template import field, href
 
-sys.path.insert(0, str(pathlib.Path("../..").resolve()))
+sys.path.insert(0, pathlib.Path(pathlib.Path(), "../..").resolve().as_posix())
 
 # -- Project information -----------------------------------------------------
 project = "DDSIM"

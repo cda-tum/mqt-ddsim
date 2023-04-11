@@ -11,6 +11,7 @@ def requires_submit(func):
     """
     Decorator to ensure that a submit has been performed before
     calling the method.
+
     Args:
         func (callable): test function to be decorated.
     Returns:
@@ -29,6 +30,7 @@ def requires_submit(func):
 
 class DDSIMJob(JobV1):
     """AerJob class.
+
     Attributes:
         _executor (futures.Executor): executor to handle asynchronous jobs
     """
@@ -44,6 +46,7 @@ class DDSIMJob(JobV1):
 
     def submit(self):
         """Submit the job to the backend for execution.
+
         Raises:
             QobjValidationError: if the JSON serialization of the Qobj passed
             during construction does not validate against the Qobj schema.
@@ -61,6 +64,7 @@ class DDSIMJob(JobV1):
         """Get job result. The behavior is the same as the underlying
         concurrent Future objects,
         https://docs.python.org/3/library/concurrent.futures.html#future-objects
+
         Args:
             timeout (float): number of seconds to wait for results.
         Returns:
@@ -78,6 +82,7 @@ class DDSIMJob(JobV1):
     @requires_submit
     def status(self) -> JobStatus:
         """Gets the status of the job by querying the Python's future
+
         Returns:
             JobStatus: The current JobStatus
         Raises:

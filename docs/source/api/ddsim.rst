@@ -88,7 +88,7 @@ ddsim.statevectorsimulator module
 ddsim.unitarysimulator module
 -----------------------------
 
-.. automodule:: ddsim.unitarysimulator
+.. automodule:: mqt.ddsim.unitarysimulator
    :members:
    :undoc-members:
    :show-inheritance:
@@ -96,7 +96,7 @@ ddsim.unitarysimulator module
 Module contents
 ---------------
 
-.. automodule:: ddsim
+.. automodule:: mqt.ddsim
    :members:
    :undoc-members:
    :show-inheritance:
