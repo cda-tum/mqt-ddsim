@@ -30,6 +30,9 @@ class QasmSimulatorBackend(BackendV1):
             shots=None,
             parameter_binds=None,
             simulator_seed=None,
+            approximation_step_fidelity=1.0,
+            approximation_steps=0,
+            approximation_strategy="fidelity",
         )
 
     def __init__(self, configuration=None, provider=None):
