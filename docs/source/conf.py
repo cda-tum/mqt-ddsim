@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import pathlib
 import subprocess
-import sys
 from importlib.metadata import version
 from typing import TYPE_CHECKING, Any
 
@@ -12,10 +10,6 @@ if TYPE_CHECKING:
 import pybtex.plugin
 from pybtex.style.formatting.unsrt import Style as UnsrtStyle
 from pybtex.style.template import field, href
-
-mqt_path = pathlib.Path(pathlib.Path(), "../..").resolve().as_posix()
-print("adding to path:", mqt_path)
-sys.path.insert(0, mqt_path)
 
 # -- Project information -----------------------------------------------------
 project = "DDSIM"

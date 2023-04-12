@@ -132,3 +132,12 @@ CLASS_DIAGRAMS         = NO
 # The default value is: YES.
 
 HAVE_DOT               = NO
+
+#---------------------------------------------------------------------------
+# Configuration options related to the LaTeX output
+#---------------------------------------------------------------------------
+
+# If the GENERATE_LATEX tag is set to YES, doxygen will generate LaTeX output.
+# The default value is: YES.
+
+GENERATE_LATEX         = NO
