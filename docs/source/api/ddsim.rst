@@ -7,7 +7,7 @@ Submodules
 ddsim.error module
 ------------------
 
-.. automodule:: ddsim.error
+.. automodule:: mqt.ddsim.error
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ ddsim.error module
 ddsim.hybridqasmsimulator module
 --------------------------------
 
-.. automodule:: ddsim.hybridqasmsimulator
+.. automodule:: mqt.ddsim.hybridqasmsimulator
    :members:
    :undoc-members:
    :show-inheritance:
@@ -23,7 +23,7 @@ ddsim.hybridqasmsimulator module
 ddsim.hybridstatevectorsimulator module
 ---------------------------------------
 
-.. automodule:: ddsim.hybridstatevectorsimulator
+.. automodule:: mqt.ddsim.hybridstatevectorsimulator
    :members:
    :undoc-members:
    :show-inheritance:
@@ -31,7 +31,7 @@ ddsim.hybridstatevectorsimulator module
 ddsim.job module
 ----------------
 
-.. automodule:: ddsim.job
+.. automodule:: mqt.ddsim.job
    :members:
    :undoc-members:
    :show-inheritance:
@@ -39,7 +39,7 @@ ddsim.job module
 ddsim.pathqasmsimulator module
 ------------------------------
 
-.. automodule:: ddsim.pathqasmsimulator
+.. automodule:: mqt.ddsim.pathqasmsimulator
    :members:
    :undoc-members:
    :show-inheritance:
@@ -47,7 +47,7 @@ ddsim.pathqasmsimulator module
 ddsim.pathstatevectorsimulator module
 -------------------------------------
 
-.. automodule:: ddsim.pathstatevectorsimulator
+.. automodule:: mqt.ddsim.pathstatevectorsimulator
    :members:
    :undoc-members:
    :show-inheritance:
@@ -55,7 +55,7 @@ ddsim.pathstatevectorsimulator module
 ddsim.provider module
 ---------------------
 
-.. automodule:: ddsim.provider
+.. automodule:: mqt.ddsim.provider
    :members:
    :undoc-members:
    :show-inheritance:
@@ -63,15 +63,16 @@ ddsim.provider module
 ddsim.pyddsim module
 --------------------
 
-.. automodule:: ddsim.pyddsim
+.. automodule:: mqt.ddsim.pyddsim
    :members:
    :undoc-members:
+   :special-members: __init__
    :show-inheritance:
 
 ddsim.qasmsimulator module
 --------------------------
 
-.. automodule:: ddsim.qasmsimulator
+.. automodule:: mqt.ddsim.qasmsimulator
    :members:
    :undoc-members:
    :show-inheritance:
@@ -79,7 +80,7 @@ ddsim.qasmsimulator module
 ddsim.statevectorsimulator module
 ---------------------------------
 
-.. automodule:: ddsim.statevectorsimulator
+.. automodule:: mqt.ddsim.statevectorsimulator
    :members:
    :undoc-members:
    :show-inheritance:
@@ -87,7 +88,7 @@ ddsim.statevectorsimulator module
 ddsim.unitarysimulator module
 -----------------------------
 
-.. automodule:: ddsim.unitarysimulator
+.. automodule:: mqt.ddsim.unitarysimulator
    :members:
    :undoc-members:
    :show-inheritance:
@@ -95,7 +96,7 @@ ddsim.unitarysimulator module
 Module contents
 ---------------
 
-.. automodule:: ddsim
+.. automodule:: mqt.ddsim
    :members:
    :undoc-members:
    :show-inheritance:

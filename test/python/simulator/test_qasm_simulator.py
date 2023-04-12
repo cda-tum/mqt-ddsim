@@ -86,3 +86,20 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         for key in target:
             assert key in counts
             assert abs(target[key] - counts[key]) < threshold
+
+    def test_qasm_simulator_approximation(self):
+        """Test data counts output for single circuit run against reference."""
+        shots = 1024
+        circuit = QuantumCircuit.from_qasm_str(
+            """OPENQASM 2.0;
+            include "qelib1.inc";
+            qreg q[2];
+            h q[0];
+            cx q[0], q[1];
+            """
+        )
+        result = execute(
+            circuit, self.backend, shots=shots, approximation_step_fidelity=0.4, approximation_steps=3
+        ).result()
+        counts = result.get_counts()
+        assert len(counts) == 1
