@@ -5,7 +5,7 @@
 using CN = dd::ComplexNumbers;
 
 template<class Config>
-std::map<std::string, double> DeterministicNoiseSimulator<Config>::deterministicSimulate() {
+std::map<std::string, std::size_t> DeterministicNoiseSimulator<Config>::deterministicSimulate(std::size_t shots) {
     rootEdge = Simulator<Config>::dd->makeZeroDensityOperator(static_cast<dd::QubitCount>(qc->getNqubits()));
     Simulator<Config>::dd->incRef(rootEdge);
 
@@ -42,34 +42,7 @@ std::map<std::string, double> DeterministicNoiseSimulator<Config>::deterministic
 
         deterministicNoiseFunctionality.applyNoiseEffects(rootEdge, op);
     }
-    return Simulator<Config>::dd->getProbVectorFromDensityMatrix(rootEdge, measurementThreshold);
-}
-
-template<class Config>
-std::map<std::string, std::size_t> DeterministicNoiseSimulator<Config>::sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, std::size_t shots) {
-    // Create probability distribution from measure probabilities
-    std::vector<dd::fp> weights;
-    weights.reserve(resultProbabilityMap.size());
-
-    for (const auto& [state, prob]: resultProbabilityMap) {
-        weights.emplace_back(prob);
-    }
-    std::discrete_distribution<std::size_t> d(weights.begin(), weights.end());
-
-    //Sample n shots elements from the prob distribution
-    std::map<std::size_t, std::size_t> results;
-    for (size_t n = 0; n < shots; ++n) {
-        ++results[d(Simulator<Config>::mt)];
-    }
-
-    // Create the final map containing the measurement results and the corresponding shots
-    std::map<std::string, std::size_t> resultShotsMap;
-
-    for (const auto& [state, prob]: results) {
-        resultShotsMap.emplace(std::next(resultProbabilityMap.begin(), static_cast<std::int64_t>(state))->first, prob);
-    }
-
-    return resultShotsMap;
+    return measureAllNonCollapsing2(shots);
 }
 
 template class DeterministicNoiseSimulator<DensityMatrixSimulatorDDPackageConfig>;

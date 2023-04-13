@@ -15,7 +15,7 @@ public:
                                 std::optional<double>                     ampDampingProbability,
                                 double                                    multiQubitGateFactor,
                                 bool                                      unoptimizedSim = false,
-                                bool                                      unoptimizedDm = false,
+                                bool                                      unoptimizedDm  = false,
                                 std::uint64_t                             seed           = 0):
         Simulator<Config>(seed),
         qc(std::move(qc_)),
@@ -30,16 +30,36 @@ public:
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
+    std::mt19937_64 mt;
+
+    std::uint64_t seed = 0;
+    bool          hasFixedSeed;
+    dd::fp        epsilon = 0.001;
+
+
     explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, std::uint64_t seed = 0):
         DeterministicNoiseSimulator(std::move(qc), std::string("APD"), 0.001, std::optional<double>{}, 2, false, seed) {}
 
     std::map<std::string, std::size_t> simulate(size_t shots) override {
-        return sampleFromProbabilityMap(deterministicSimulate(), shots);
+        return deterministicSimulate(shots);
     };
 
-    std::map<std::string, dd::fp> deterministicSimulate();
+    std::string measureAll2() {
+        return Simulator<Config>::dd->measureAll(rootEdge, mt, epsilon);
+    }
 
-    std::map<std::string, std::size_t> sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, std::size_t shots);
+    std::map<std::string, std::size_t> measureAllNonCollapsing2(std::size_t shots) {
+        std::map<std::string, std::size_t> results;
+        dd::dEdge::alignDensityEdge(rootEdge);
+        for (std::size_t i = 0; i < shots; i++) {
+            const auto m = measureAll2();
+            results[m]++;
+        }
+        dd::dEdge::setDensityMatrixTrue(rootEdge);
+        return results;
+    }
+
+    std::map<std::string, std::size_t> deterministicSimulate(std::size_t shots);
 
     [[nodiscard]] std::size_t getNumberOfQubits() const override { return qc->getNqubits(); };
 
