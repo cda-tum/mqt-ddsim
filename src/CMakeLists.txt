@@ -56,4 +56,4 @@ add_library(MQT::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
 find_package(Eigen3 REQUIRED)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen )
+target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)

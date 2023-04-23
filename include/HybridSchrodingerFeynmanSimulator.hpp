@@ -2,8 +2,8 @@
 #define DDSIM_HYBRIDSCHRODINGERFEYNMANSIMULATOR_HPP
 
 #include "CircuitOptimizer.hpp"
-#include "CircuitSimulator.hpp"
 #include "CircuitPartitioner.hpp"
+#include "CircuitSimulator.hpp"
 #include "Operations.hpp"
 #include "QuantumComputation.hpp"
 #include "dd/Export.hpp"
@@ -36,11 +36,10 @@ public:
         // remove final measurements
         qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator<Config>::qc));
 
-        if(mode == Mode::Amplitude && split == Split::GraphPartitioning)
-				{
-          circuitPartitioner_ = std::make_unique<qc::CircuitPartitioner>(*(CircuitSimulator<Config>::qc), balance);
-					partitionSuccess = circuitPartitioner_->graphPartitioning(*(CircuitSimulator<Config>::qc));
-				}
+        if (mode == Mode::Amplitude && split == Split::GraphPartitioning) {
+            circuitPartitioner_ = std::make_unique<qc::CircuitPartitioner>(*(CircuitSimulator<Config>::qc), balance);
+            partitionSuccess    = circuitPartitioner_->graphPartitioning(*(CircuitSimulator<Config>::qc));
+        }
     }
 
     explicit HybridSchrodingerFeynmanSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
@@ -62,16 +61,15 @@ public:
         // remove final measurements
         qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator<Config>::qc));
 
-        if(mode == Mode::Amplitude && split == Split::GraphPartitioning)
-				{
-          circuitPartitioner_ = std::make_unique<qc::CircuitPartitioner>(*(CircuitSimulator<Config>::qc), balance);
-					partitionSuccess = circuitPartitioner_->graphPartitioning(*(CircuitSimulator<Config>::qc));
-				}
+        if (mode == Mode::Amplitude && split == Split::GraphPartitioning) {
+            circuitPartitioner_ = std::make_unique<qc::CircuitPartitioner>(*(CircuitSimulator<Config>::qc), balance);
+            partitionSuccess    = circuitPartitioner_->graphPartitioning(*(CircuitSimulator<Config>::qc));
+        }
     }
 
     std::map<std::string, std::size_t> simulate(std::size_t shots) override;
 
-    Mode mode = Mode::Amplitude;
+    Mode  mode  = Mode::Amplitude;
     Split split = Split::Half;
 
     template<class ReturnType = dd::ComplexValue>
@@ -91,11 +89,10 @@ public:
         return CircuitSimulator<Config>::template getVector<ReturnType>();
     }
 
-
     //  Get # of decisions for given split_qubit, so that lower slice: q0 < i < qubit; upper slice: qubit <= i < nqubits
     std::size_t getNDecisions(qc::Qubit splitQubit);
 
-    [[nodiscard]] Mode  getMode()  const { return mode;  }
+    [[nodiscard]] Mode  getMode() const { return mode; }
     [[nodiscard]] Split getSplit() const { return split; }
 
     double getBalance() const { return balance; }
@@ -106,13 +103,13 @@ private:
 
     std::unique_ptr<qc::CircuitPartitioner> circuitPartitioner_;
 
-		// if numCut equals with half-slicing
-		// then, we don't have to do
-		// graph partitioning
-		bool   partitionSuccess;
+    // if numCut equals with half-slicing
+    // then, we don't have to do
+    // graph partitioning
+    bool   partitionSuccess;
     double balance;
-		void restoreAmplitudes();
-		void oneSwap(qc::Qubit i, qc::Qubit j);
+    void   restoreAmplitudes();
+    void   oneSwap(qc::Qubit i, qc::Qubit j);
 
     void simulateHybridTaskflow(qc::Qubit splitQubit);
     void simulateHybridAmplitudes(qc::Qubit splitQubit);
