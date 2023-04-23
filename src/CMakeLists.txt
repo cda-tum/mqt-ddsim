@@ -21,6 +21,8 @@ add_library(
   ${CMAKE_CURRENT_SOURCE_DIR}/HybridSchrodingerFeynmanSimulator.cpp
   ${PROJECT_SOURCE_DIR}/include/UnitarySimulator.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/UnitarySimulator.cpp
+  ${PROJECT_SOURCE_DIR}/include/CircuitPartitioner.hpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/CircuitPartitioner.cpp
   ${PROJECT_SOURCE_DIR}/include/PathSimulator.hpp
   ${CMAKE_CURRENT_SOURCE_DIR}/PathSimulator.cpp)
 target_include_directories(
@@ -51,3 +53,7 @@ set_target_properties(
                       $<TARGET_PROPERTY:Taskflow,INTERFACE_INCLUDE_DIRECTORIES>)
 
 add_library(MQT::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+
+find_package(Eigen3 REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen )

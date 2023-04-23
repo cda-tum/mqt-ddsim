@@ -1,8 +1,22 @@
 #include "HybridSchrodingerFeynmanSimulator.hpp"
 
+#include <string>
 #include <cassert>
 #include <cmath>
+#include <iostream>
 #include <taskflow/taskflow.hpp>
+
+static void printAmpFile(std::vector<std::complex<dd::fp>>& finalAmp, std::string filename)
+{
+    std::ofstream output(filename);
+
+    output << std::setprecision(16);
+
+    for(auto& cn : finalAmp) {
+        output << cn.real() << " " << cn.imag() << "i" << std::endl;
+    }
+    output.close();
+}
 
 template<class Config>
 std::size_t HybridSchrodingerFeynmanSimulator<Config>::getNDecisions(qc::Qubit splitQubit) {
@@ -128,16 +142,31 @@ template<class Config>
 std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator<Config>::simulate(std::size_t shots) {
     auto nqubits    = CircuitSimulator<Config>::getNumberOfQubits();
     auto splitQubit = static_cast<qc::Qubit>(nqubits / 2);
+
+    if(partitionSuccess && circuitPartitioner_ != nullptr) {
+        splitQubit = circuitPartitioner_->getSplitQubit();
+    }
+		else if(!partitionSuccess && circuitPartitioner_ != nullptr) {
+		    //std::cout << "Partition fail!" << std::endl;
+		}
+
     if (mode == Mode::DD) {
         simulateHybridTaskflow(splitQubit);
         return Simulator<Config>::measureAllNonCollapsing(shots);
     }
     simulateHybridAmplitudes(splitQubit);
+    if(partitionSuccess && circuitPartitioner_ != nullptr) {
+		    //printAmpFile(finalAmplitudes, "beforeRestore.txt");
+        restoreAmplitudes();
+        circuitPartitioner_->restoreQuantumComputation(*(CircuitSimulator<Config>::qc));
+    }
 
     if (shots > 0) {
         return Simulator<Config>::sampleFromAmplitudeVectorInPlace(finalAmplitudes, shots);
     }
     // in case no shots were requested, the final amplitudes remain untouched
+
+		//printAmpFile(finalAmplitudes, "finalAmp.txt");
     return {};
 }
 
@@ -147,6 +176,8 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned 
     const std::size_t maxControl          = 1ULL << ndecisions;
     const std::size_t actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
     const std::size_t nslicesAtOnce       = std::min<std::size_t>(16, maxControl / actuallyUsedThreads);
+
+		//std::cout << "[Partitioner] Number of branches = " << ndecisions << std::endl;
 
     Simulator<Config>::rootEdge = qc::VectorDD::zero;
 
@@ -217,6 +248,9 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridAmplitudes(qc::Qub
     const std::size_t nqubits             = CircuitSimulator<Config>::getNumberOfQubits();
     Simulator<Config>::rootEdge           = qc::VectorDD::zero;
 
+		//std::cout << "[Simulator] Number of Decisions = " << ndecisions << std::endl;
+		//std::cout << "[Simulator] Number of Branches = 2^" << ndecisions << " = " << maxControl << std::endl;
+
     std::vector<std::vector<std::complex<dd::fp>>> amplitudes(maxControl / nslicesOnOneCpu, std::vector<std::complex<dd::fp>>(1U << nqubits, {0, 0}));
 
     tf::Executor executor;
@@ -248,6 +282,63 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridAmplitudes(qc::Qub
         oldIncrement = increment;
     }
     finalAmplitudes = std::move(amplitudes[0]);
+}
+
+template<class Config>
+void HybridSchrodingerFeynmanSimulator<Config>::oneSwap(qc::Qubit i_t, qc::Qubit j_t) {
+    qc::Qubit nQubit = static_cast<qc::Qubit>(CircuitSimulator<Config>::getNumberOfQubits());
+   
+    uint32_t i = nQubit - i_t - 1;
+    uint32_t j = nQubit - j_t - 1;
+
+    i = nQubit - i - 1;
+    j = nQubit - j - 1;
+
+    uint32_t target_mask1 = 1u << i;
+    uint32_t target_mask2 = 1u << j;
+    
+    uint32_t mask = 1u;
+    for(int k = 0; k < nQubit - 1; k++) {
+        mask = mask | (mask << 1);
+    }
+
+    uint32_t mask1 = mask >> (nQubit - j);
+    mask1 = mask1 & mask;
+    
+    uint32_t mask3 = mask << (i + 1);
+    mask3 = mask3 & mask;
+    
+    uint32_t mask2 = mask ^ mask1 ^ mask3 ^ target_mask1 ^ target_mask2; 
+    mask2 = mask2 & mask;
+    
+    uint32_t idx = 0;
+    uint32_t real_idx = 0;
+    uint32_t target_idx1 = 0;
+    uint32_t target_idx2 = 0; 
+    
+    while(idx < 1u << (nQubit - 2)) {
+        real_idx = (idx & mask1) | ((idx << 1) & mask2) | ((idx << 2) & mask3); 
+    
+        target_idx1 = real_idx | target_mask1;
+        target_idx2 = real_idx | target_mask2;
+    
+        std::complex<dd::fp> temp;
+        temp = finalAmplitudes[target_idx1];
+        finalAmplitudes[target_idx1] = finalAmplitudes[target_idx2];
+        finalAmplitudes[target_idx2] = temp;
+
+        idx = idx + 1u;
+    }
+}
+
+template<class Config>
+void HybridSchrodingerFeynmanSimulator<Config>::restoreAmplitudes() {
+    for(auto& kv : circuitPartitioner_->swapList()) {
+		    if(kv.first > kv.second)
+            oneSwap(kv.first, kv.second);
+				else
+				    oneSwap(kv.second, kv.first);
+    }
 }
 
 template class HybridSchrodingerFeynmanSimulator<dd::DDPackageConfig>;
