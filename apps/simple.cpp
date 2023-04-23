@@ -35,6 +35,8 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
         ("simulate_file", "simulate a quantum circuit given by file (detection by the file extension)", cxxopts::value<std::string>())
         ("simulate_file_hybrid", "simulate a quantum circuit given by file (detection by the file extension) using the hybrid Schrodinger-Feynman simulator", cxxopts::value<std::string>())
         ("hybrid_mode", "mode used for hybrid Schrodinger-Feynman simulation (*amplitude*, dd)", cxxopts::value<std::string>())
+        ("splitting_method", "circuit splitting method for hybrid Schrodinger-Feynman simulation (*half*, graph_partitioning)", cxxopts::value<std::string>())
+        ("balance_factor", "target balance factor for circuit partitioniong ( <= 1.0 )", cxxopts::value<double>()->default_value("0.4"))
         ("nthreads", "#threads used for hybrid simulation", cxxopts::value<unsigned int>()->default_value("2"))
         ("simulate_qft", "simulate Quantum Fourier Transform for given number of qubits", cxxopts::value<unsigned int>())
         ("simulate_ghz", "simulate state preparation of GHZ state for given number of qubits", cxxopts::value<unsigned int>())
@@ -64,6 +66,8 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     const auto stepFidelity = vm["step_fidelity"].as<double>();
 
     auto mode = HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude;
+    auto sm   = HybridSchrodingerFeynmanSimulator<>::Split::Half; // sm := splitting_method
+		double bf = 0.4; // bf := balance factor
 
     const auto strategy = ApproximationInfo::fromString(vm["approx_when"].as<std::string>());
 
@@ -73,9 +77,9 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     const bool                                      verbose = vm.count("verbose") > 0;
 
     if (vm.count("simulate_file") > 0) {
-        const std::string fname = vm["simulate_file"].as<std::string>();
-        quantumComputation      = std::make_unique<qc::QuantumComputation>(fname);
-        ddsim                   = std::make_unique<CircuitSimulator<dd::DDPackageConfig>>(std::move(quantumComputation), approximationInfo, seed);
+		      const std::string fname = vm["simulate_file"].as<std::string>();
+      quantumComputation      = std::make_unique<qc::QuantumComputation>(fname);
+      ddsim                   = std::make_unique<CircuitSimulator<dd::DDPackageConfig>>(std::move(quantumComputation), approximationInfo, seed);
     } else if (vm.count("simulate_file_hybrid") > 0) {
         const std::string fname = vm["simulate_file_hybrid"].as<std::string>();
         quantumComputation      = std::make_unique<qc::QuantumComputation>(fname);
@@ -87,11 +91,30 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
                 mode = HybridSchrodingerFeynmanSimulator<dd::DDPackageConfig>::Mode::DD;
             }
         }
+
+			  if (vm.count("splitting_method") > 0) {
+          const std::string smname = vm["splitting_method"].as<std::string>();
+					if(smname == "graph_partitioning") 
+						sm  = HybridSchrodingerFeynmanSimulator<dd::DDPackageConfig>::Split::GraphPartitioning; 
+					else if(smname == "half")
+						sm  = HybridSchrodingerFeynmanSimulator<dd::DDPackageConfig>::Split::Half; 
+        } 
+
+			  if (vm.count("balance_factor") > 0) {
+					bf = vm["balance_factor"].as<double>();
+					if(bf < 0.0 || bf > 1.0)
+					{
+						std::clog << "[WARNING] Balance factor should be positive and lower than 1.0. This value will be ignored.\n";
+						bf = 0.4;
+					}
+				}
+
         if (seed != 0) {
-            ddsim = std::make_unique<HybridSchrodingerFeynmanSimulator<dd::DDPackageConfig>>(std::move(quantumComputation), approximationInfo, seed, mode, nthreads);
+            ddsim = std::make_unique<HybridSchrodingerFeynmanSimulator<dd::DDPackageConfig>>(std::move(quantumComputation), approximationInfo, seed, mode, sm, bf, nthreads);
         } else {
-            ddsim = std::make_unique<HybridSchrodingerFeynmanSimulator<dd::DDPackageConfig>>(std::move(quantumComputation), mode, nthreads);
+            ddsim = std::make_unique<HybridSchrodingerFeynmanSimulator<dd::DDPackageConfig>>(std::move(quantumComputation), mode, sm, bf, nthreads);
         }
+
     } else if (vm.count("simulate_qft") > 0) {
         const unsigned int nQubits = vm["simulate_qft"].as<unsigned int>();
         quantumComputation         = std::make_unique<qc::QFT>(nQubits);
