@@ -35,6 +35,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
         ("stoch_runs", "Number of stochastic runs. When the value is 0, the deterministic simulator is started. ", cxxopts::value<std::size_t>()->default_value("0"))
         ("properties", R"(Comma separated list of tracked amplitudes, when conducting a stochastic simulation. The "-" operator can be used to specify a range.)", cxxopts::value<std::string>()->default_value("0-100"))
         ("dm_sim", "Conduct deterministic simulation and sample from final state.")
+        ("pv", "Print probability vector. Only available for deterministic simulation.")
 
     ; // end arguments list
     // clang-format on
@@ -65,7 +66,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
         noiseProbT1 = vm["noise_prob_t1"].as<std::optional<double>>();
     }
 
-    if (vm.count("dm_sim") == 0)  {
+    if (vm.count("dm_sim") == 0) {
         // Using stochastic simulator
         auto ddsim = std::make_unique<StochasticNoiseSimulator<>>(std::move(quantumComputation),
                                                                   vm["noise_effects"].as<std::string>(),
@@ -112,7 +113,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
 
         std::cout << std::setw(2) << outputObj << std::endl;
 
-    } else if (vm.count("dm_sim") > 0)  {
+    } else if (vm.count("dm_sim") > 0) {
         // Using deterministic simulator
         auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), vm["noise_effects"].as<std::string>(),
                                                                      vm["noise_prob"].as<double>(),
@@ -154,6 +155,16 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
                 outputObj["statistics"][item.first] = item.second;
             }
         }
+
+        if (vm.count("pv") > 0) {
+            dd::dEdge::alignDensityEdge(ddsim->rootEdge);
+            auto m = ddsim->dd->getProbVectorFromDensityMatrix(ddsim->rootEdge, 0.001);
+
+            for (auto it = m.cbegin(); it != m.cend(); ++it) {
+                std::cout << "{" << (*it).first << ": " << (*it).second << "}\n";
+            }
+        }
+
 
         if (vm.count("pm") > 0) {
             outputObj["measurement_results"] = measurementResults;
