@@ -25,9 +25,10 @@ jobs:
         name: Install Python
         with:
           python-version: "3.9"
+          cache: "pip"
       - name: Install package
         run: |
-          pip install -U pip setuptools wheel
+          pip install --upgrade pip setuptools wheel
           pip install .[tests]
       - name: Test package
         run: pytest test/python
@@ -43,8 +44,9 @@ jobs:
         name: Install Python
         with:
           python-version: "3.9"
+          cache: "pip"
       - name: Install dependencies
-        run: pip install -q build
+        run: pip install --upgrade pip setuptools build
       - name: Build sdist
         run: python -m build --sdist
       - name: Install sdist

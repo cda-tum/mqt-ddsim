@@ -30,14 +30,14 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: recursive
-          fetch-depth: 0
 
       - name: Install Dependencies (python)
         if: ${{ matrix.language == 'python' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes python3-pip
-          pip3 install qiskit-terra
+        run: pip3 install qiskit-terra
+
+      - name: Set up mold as linker
+        if: ${{ matrix.language == 'cpp' }}
+        uses: rui314/setup-mold@v1
 
       - name: Configure CMake
         if: ${{ matrix.language == 'cpp' }}

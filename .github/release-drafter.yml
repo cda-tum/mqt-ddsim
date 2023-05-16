@@ -1,4 +1,4 @@
-name-template: "$REPOSITORY $RESOLVED_VERSION Release"
+name-template: "Release v$RESOLVED_VERSION: <TITLE>"
 tag-template: "v$RESOLVED_VERSION"
 categories:
   - title: "🚀 Features and Enhancements"
@@ -44,5 +44,7 @@ autolabeler:
 
 template: |
   ## What Changed 👀
+
   $CHANGES
+
   **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
