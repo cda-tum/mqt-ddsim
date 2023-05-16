@@ -73,6 +73,7 @@ jobs:
         with:
           submodules: recursive
       - uses: ilammy/msvc-dev-cmd@v1
+      - uses: rui314/setup-mold@v1
       - name: Set Architecture to arm64 if necessary
         if: ${{ matrix.config.arch == 'arm64' }}
         run: echo "CIBW_ARCHS_MACOS=arm64" >> $GITHUB_ENV
