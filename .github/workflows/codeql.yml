@@ -16,28 +16,25 @@ jobs:
     name: Analyze ${{ matrix.language }}
     runs-on: ubuntu-latest
     permissions:
-      actions: read
-      contents: read
       security-events: write
 
     strategy:
       fail-fast: false
       matrix:
-        language: [python, cpp]
+        language: ["cpp", "python"]
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
+          fetch-depth: 0
+
+      - name: Set up mold as linker
+        uses: rui314/setup-mold@v1
 
       - name: Install Dependencies (python)
         if: ${{ matrix.language == 'python' }}
         run: pip3 install qiskit-terra
-
-      - name: Set up mold as linker
-        if: ${{ matrix.language == 'cpp' }}
-        uses: rui314/setup-mold@v1
 
       - name: Configure CMake
         if: ${{ matrix.language == 'cpp' }}
@@ -50,8 +47,8 @@ jobs:
           config-file: .github/codeql-config.yml
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
         if: ${{ matrix.language == 'python' }}
+        uses: github/codeql-action/autobuild@v2
 
       - name: Build cpp
         if: ${{ matrix.language == 'cpp' }}

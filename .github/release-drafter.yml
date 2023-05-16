@@ -43,7 +43,7 @@ autolabeler:
       - "/update pre-commit hooks/i"
 
 template: |
-  ## What Changed 👀
+  ## 👀 What Changed
 
   $CHANGES
 
