@@ -32,23 +32,15 @@ jobs:
       - name: Set up mold as linker
         uses: rui314/setup-mold@v1
 
-      - name: Install Dependencies (python)
-        if: ${{ matrix.language == 'python' }}
-        run: pip3 install qiskit-terra
-
-      - name: Configure CMake
-        if: ${{ matrix.language == 'cpp' }}
-        run: cmake -S . -B build -DBUILD_DDSIM_TESTS=ON -DBUILD_QFR_TESTS=ON -DBUILD_DD_PACKAGE_TESTS=ON -DBINDINGS=ON
-
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}
           config-file: .github/codeql-config.yml
 
-      - name: Autobuild
-        if: ${{ matrix.language == 'python' }}
-        uses: github/codeql-action/autobuild@v2
+      - name: Configure CMake
+        if: ${{ matrix.language == 'cpp' }}
+        run: cmake -S . -B build -DBUILD_DDSIM_TESTS=ON -DBINDINGS=ON
 
       - name: Build cpp
         if: ${{ matrix.language == 'cpp' }}
