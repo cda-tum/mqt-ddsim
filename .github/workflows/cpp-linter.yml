@@ -21,8 +21,8 @@ jobs:
           submodules: recursive
       - name: Install OpenCV
         run: |
-          sudo apt update
-          sudo apt install libopencv-dev
+          sudo apt-get -q update
+          sudo apt-get install --no-install-recommends libopencv-dev
       - name: Generate compilation database
         run: CC=clang-14 CXX=clang++-14 cmake -S . -B build -DBINDINGS=ON -DBUILD_DDSIM_TESTS=ON
       - name: Run cpp-linter
