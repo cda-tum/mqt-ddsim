@@ -1,4 +1,4 @@
-add_subdirectory("${PROJECT_SOURCE_DIR}/extern/qfr" "extern/qfr"
+add_subdirectory("${PROJECT_SOURCE_DIR}/extern/mqt-core" "extern/mqt-core"
                  EXCLUDE_FROM_ALL)
 
 add_library(
@@ -31,7 +31,7 @@ target_include_directories(
 set(JSON_MultipleHeaders
     OFF
     CACHE INTERNAL "")
-target_link_libraries(${PROJECT_NAME} PUBLIC MQT::qfr_dd)
+target_link_libraries(${PROJECT_NAME} PUBLIC MQT::Core MQT::CoreDD)
 
 set(TF_BUILD_TESTS
     OFF

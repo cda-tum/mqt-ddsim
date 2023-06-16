@@ -8,30 +8,25 @@ global-exclude *.py[cod]
 global-exclude *.so
 
 # Include relevant files from other MQT projects
-include extern/qfr/CMakeLists.txt
-graft   extern/qfr/include
-graft   extern/qfr/src
-graft   extern/qfr/mqt/qfr
-include extern/qfr/extern/dd_package/CMakeLists.txt
-graft   extern/qfr/extern/dd_package/include
-graft   extern/qfr/extern/dd_package/cmake
-graft   extern/qfr/extern/zx
+include extern/mqt-core/CMakeLists.txt
+graft   extern/mqt-core/include
+graft   extern/mqt-core/src
 
 # Include necessary files from nlohmann and pybind11 (especially don't include the docs)
-graft   extern/qfr/extern/json
-prune   extern/qfr/extern/json/docs
-prune   extern/qfr/extern/json/tests
-prune   extern/qfr/extern/json/benchmarks
-prune   extern/qfr/extern/json/tools
-prune   extern/qfr/extern/json/third_party
-prune   extern/qfr/extern/json/include
+graft   extern/mqt-core/extern/json
+prune   extern/mqt-core/extern/json/docs
+prune   extern/mqt-core/extern/json/tests
+prune   extern/mqt-core/extern/json/benchmarks
+prune   extern/mqt-core/extern/json/tools
+prune   extern/mqt-core/extern/json/third_party
+prune   extern/mqt-core/extern/json/include
 
-graft   extern/qfr/extern/pybind11
-prune   extern/qfr/extern/pybind11/docs
-prune   extern/qfr/extern/pybind11/tests
+graft   extern/mqt-core/extern/pybind11
+prune   extern/mqt-core/extern/pybind11/docs
+prune   extern/mqt-core/extern/pybind11/tests
 
-graft   extern/qfr/extern/pybind11_json
-prune   extern/qfr/extern/pybind11_json/test
+graft   extern/mqt-core/extern/pybind11_json
+prune   extern/mqt-core/extern/pybind11_json/test
 
 graft extern/taskflow
 prune extern/taskflow/docs
