@@ -21,6 +21,12 @@ macro(CHECK_SUBMODULE_PRESENT modulename)
   endif()
 endmacro()
 
+if(NOT BUILD_DDSIM_TESTS)
+  set(BUILD_MQT_CORE_TESTS
+      OFF
+      CACHE BOOL "")
+endif()
+
 check_submodule_present(mqt-core)
 check_submodule_present(taskflow)
 
