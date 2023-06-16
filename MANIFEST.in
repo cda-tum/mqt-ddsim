@@ -26,8 +26,6 @@ graft   extern/mqt-core/extern/pybind11_json
 graft   extern/mqt-core/extern/boost/config
 graft   extern/mqt-core/extern/boost/multiprecision
 
-graft   extern/mqt-core/extern/googletest
-
 graft extern/taskflow
 prune extern/taskflow/image
 prune extern/taskflow/benchmarks
