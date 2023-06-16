@@ -31,7 +31,7 @@ target_include_directories(
 set(JSON_MultipleHeaders
     OFF
     CACHE INTERNAL "")
-target_link_libraries(${PROJECT_NAME} PUBLIC MQT::Core MQT::CoreDD)
+target_link_libraries(${PROJECT_NAME} PUBLIC MQT::CoreDD)
 
 set(TF_BUILD_TESTS
     OFF
