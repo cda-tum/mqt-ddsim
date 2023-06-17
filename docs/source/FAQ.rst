@@ -22,7 +22,7 @@ If you see the following error message ::
 
     $ cmake -S . -B <build target directory>
     CMake Error at CMakeLists.txt:27 (message):
-    qfr was not found.  Please init/update submodules (git submodule update --init --recursive) and try again.
+    mqt-core was not found.  Please init/update submodules (git submodule update --init --recursive) and try again.
 
 Please run :code:`git submodule update --init --recursive` and try again.
 

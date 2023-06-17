@@ -78,7 +78,7 @@ jobs:
       - name: Set up mold as linker
         uses: rui314/setup-mold@v1
       - name: Configure CMake
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DBUILD_DDSIM_TESTS=ON -DBINDINGS=ON
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DBUILD_DDSIM_TESTS=ON -DBINDINGS=ON
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config Debug --target ddsim_test
       - name: Test

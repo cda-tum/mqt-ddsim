@@ -1,7 +1,7 @@
 Installation
 ============
 
-MQT DDSIM is mainly developed as a C++ library that builds upon `our decision diagram (DD) package <https://github.com/cda-tum/dd_package.git>`_ as well as `our quantum functionality representation (QFR) <https://github.com/cda-tum/qfr.git>`_.
+MQT DDSIM is mainly developed as a C++ library that builds upon `MQT Core <https://github.com/cda-tum/mqt-core.git>`_.
 In order to make the tool as accessible as possible, it comes with an easy-to-use Python interface.
 
 We encourage installing DDSIM via pip (preferably in a `virtual environment <https://docs.python.org/3/library/venv.html>`_):

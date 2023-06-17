@@ -3,7 +3,7 @@
 
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
-#include "Operations.hpp"
+#include "dd/Operations.hpp"
 #include "nlohmann/json.hpp"
 
 #include <future>

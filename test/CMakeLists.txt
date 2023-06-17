@@ -4,9 +4,8 @@ if(NOT TARGET gtest OR NOT TARGET gmock)
   set(gtest_force_shared_crt
       ON
       CACHE BOOL "" FORCE)
-  add_subdirectory(
-    "${PROJECT_SOURCE_DIR}/extern/qfr/extern/dd_package/extern/googletest"
-    "extern/qfr/extern/dd_package/extern/googletest" EXCLUDE_FROM_ALL)
+  add_subdirectory("${PROJECT_SOURCE_DIR}/extern/mqt-core/extern/googletest"
+                   "extern/mqt-core/extern/googletest" EXCLUDE_FROM_ALL)
 endif()
 
 package_add_test(
@@ -37,31 +36,4 @@ add_custom_command(
     $<TARGET_FILE_DIR:${PROJECT_NAME}_test>/circuits
     ${CMAKE_BINARY_DIR}/circuits
   COMMENT "Copying circuits and creating symlinks for ${PROJECT_NAME}_test"
-  VERBATIM)
-
-if(NOT TARGET benchmark::benchmark)
-  set(THREADS_PREFER_PTHREAD_FLAG ON)
-  find_package(Threads REQUIRED)
-  set(BENCHMARK_ENABLE_TESTING
-      OFF
-      CACHE BOOL "Skip google benchmark self tests")
-  add_subdirectory(
-    "${PROJECT_SOURCE_DIR}/extern/qfr/extern/dd_package/extern/benchmark"
-    "extern/qfr/extern/dd_package/extern/benchmark" EXCLUDE_FROM_ALL)
-endif()
-
-add_executable(ddsim_benchmark EXCLUDE_FROM_ALL
-               ${CMAKE_CURRENT_SOURCE_DIR}/benchmark.cpp)
-target_link_libraries(ddsim_benchmark PRIVATE ${PROJECT_NAME}
-                                              benchmark::benchmark_main)
-set_target_properties(ddsim_benchmark PROPERTIES EXPORT_NAME ddsim_benchmark)
-
-add_custom_command(
-  TARGET ${PROJECT_NAME}_benchmark
-  POST_BUILD
-  COMMAND
-    ${CMAKE_COMMAND} -E create_symlink
-    $<TARGET_FILE_DIR:${PROJECT_NAME}_test>/${PROJECT_NAME}_benchmark
-    ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_benchmark
-  COMMENT "Creating symlinks for ${PROJECT_NAME}_benchmark"
   VERBATIM)

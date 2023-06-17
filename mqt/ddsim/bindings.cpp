@@ -7,8 +7,8 @@
 #include "HybridSchrodingerFeynmanSimulator.hpp"
 #include "PathSimulator.hpp"
 #include "UnitarySimulator.hpp"
-#include "qiskit/QasmQobjExperiment.hpp"
-#include "qiskit/QuantumCircuit.hpp"
+#include "python/qiskit/QasmQobjExperiment.hpp"
+#include "python/qiskit/QuantumCircuit.hpp"
 
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>

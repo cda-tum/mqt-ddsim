@@ -3,9 +3,9 @@
 
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
-#include "Operations.hpp"
 #include "QuantumComputation.hpp"
 #include "dd/Export.hpp"
+#include "dd/Operations.hpp"
 #include "dd/Package.hpp"
 
 #include <complex>

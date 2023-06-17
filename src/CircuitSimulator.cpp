@@ -1,9 +1,9 @@
 #include "CircuitSimulator.hpp"
 
 #include "CircuitOptimizer.hpp"
-#include "Operations.hpp"
 #include "dd/Export.hpp"
 #include "dd/FunctionalityConstruction.hpp"
+#include "dd/Operations.hpp"
 
 template<class Config>
 std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_t shots) {
