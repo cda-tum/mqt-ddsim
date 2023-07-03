@@ -65,7 +65,7 @@ repos:
         types_or: [c++, c, cuda]
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.275
+    rev: v0.0.276
     hooks:
       - id: ruff
         args: ["--fix"]
