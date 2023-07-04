@@ -27,7 +27,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
         // Parameters for noise aware simulation
         ("noise_effects", "Noise effects (A (=amplitude damping),D (=depolarization),P (=phase flip)) in the form of a character string describing the noise effects", cxxopts::value<std::string>()->default_value("APD"))
         ("noise_prob", "Probability for applying noise.", cxxopts::value<double>()->default_value("0.001"))
-        ("noise_prob_t1", "Probability for applying amplitude damping noise (default:2 x noise_prob)", cxxopts::value<std::optional<double>>())
+        ("noise_prob_t1", "Probability for applying amplitude damping noise (default:2 x noise_prob)", cxxopts::value<double>())
         ("noise_prob_multi", "Noise factor for multi qubit operations", cxxopts::value<double>()->default_value("2"))
         ("unoptimized_sim", "Use unoptimized scheme for stochastic/deterministic noise-aware simulation")
         ("stoch_runs", "Number of stochastic runs. When the value is 0, the deterministic simulator is started. ", cxxopts::value<std::size_t>()->default_value("0"))
@@ -59,7 +59,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
 
     std::optional<double> noiseProbT1{};
     if (vm.count("noise_prob_t1") > 0) {
-        noiseProbT1 = vm["noise_prob_t1"].as<std::optional<double>>();
+        noiseProbT1 = vm["noise_prob_t1"].as<double>();
     }
 
     if (vm["stoch_runs"].as<std::size_t>() > 0) {
