@@ -21,7 +21,7 @@ class HybridStatevectorSimulatorBackend(HybridQasmSimulatorBackend):
         conf = {
             "backend_name": "hybrid_statevector_simulator",
             "backend_version": __version__,
-            "url": "https://github.com/cda-tum/ddsim",
+            "url": "https://github.com/cda-tum/mqt-ddsim",
             "simulator": True,
             "local": True,
             "description": "MQT DDSIM C++ simulator",

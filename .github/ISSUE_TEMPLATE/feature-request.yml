@@ -11,7 +11,7 @@ body:
         **Thank you for wanting to suggest a feature for this project!**
 
         ⚠
-        Verify first that your idea is not [already requested on GitHub](https://github.com/cda-tum/ddsim/search?q=is%3Aissue&type=issues).
+        Verify first that your idea is not [already requested on GitHub](https://github.com/cda-tum/mqt-ddsim/search?q=is%3Aissue&type=issues).
 
   - type: textarea
     attributes:

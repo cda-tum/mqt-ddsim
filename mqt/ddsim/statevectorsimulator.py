@@ -19,7 +19,7 @@ class StatevectorSimulatorBackend(QasmSimulatorBackend):
         conf = {
             "backend_name": "statevector_simulator",
             "backend_version": __version__,
-            "url": "https://github.com/cda-tum/ddsim",
+            "url": "https://github.com/cda-tum/mqt-ddsim",
             "simulator": True,
             "local": True,
             "description": "MQT DDSIM C++ simulator",
