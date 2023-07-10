@@ -302,14 +302,14 @@ TEST(CircuitSimTest, ToleranceTest) {
     auto             qc = std::make_unique<qc::QuantumComputation>(2);
     CircuitSimulator ddsim(std::move(qc));
     const auto       tolerance = ddsim.getTolerance();
-    EXPECT_EQ(tolerance, dd::ComplexTable<>::tolerance());
+    EXPECT_EQ(tolerance, dd::ComplexTable::tolerance());
     const auto newTolerance = 0.1;
     ddsim.setTolerance(newTolerance);
     EXPECT_EQ(ddsim.getTolerance(), newTolerance);
-    EXPECT_EQ(dd::ComplexTable<>::tolerance(), newTolerance);
+    EXPECT_EQ(dd::ComplexTable::tolerance(), newTolerance);
     ddsim.setTolerance(tolerance);
     EXPECT_EQ(ddsim.getTolerance(), tolerance);
-    EXPECT_EQ(dd::ComplexTable<>::tolerance(), tolerance);
+    EXPECT_EQ(dd::ComplexTable::tolerance(), tolerance);
 }
 
 TEST(CircuitSimTest, TooManyQubitsForVectorTest) {
