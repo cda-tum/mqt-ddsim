@@ -6,7 +6,7 @@ We value contributions from people with all levels of experience.
 In particular if this is your first pull request not everything has to be perfect.
 We will guide you through the process.
 
-We use GitHub to `host code <https://github.com/cda-tum/ddsim>`_, to `track issues and feature requests <https://github.com/cda-tum/ddsim/issues>`_, as well as accept `pull requests <https://github.com/cda-tum/ddsim/pulls>`_.
+We use GitHub to `host code <https://github.com/cda-tum/mqt-ddsim>`_, to `track issues and feature requests <https://github.com/cda-tum/mqt-ddsim/issues>`_, as well as accept `pull requests <https://github.com/cda-tum/mqt-ddsim/pulls>`_.
 See https://docs.github.com/en/get-started/quickstart for a general introduction to working with GitHub and contributing to projects.
 
 Types of Contributions
@@ -15,16 +15,16 @@ Types of Contributions
 You can contribute in several ways:
 
 - 🐛 Report Bugs
-    Report bugs at https://github.com/cda-tum/ddsim/issues using the *Bug report* issue template. Please make sure to fill out all relevant information in the respective issue form.
+    Report bugs at https://github.com/cda-tum/mqt-ddsim/issues using the *Bug report* issue template. Please make sure to fill out all relevant information in the respective issue form.
 
 - 🐛 Fix Bugs
-    Look through the `GitHub Issues <https://github.com/cda-tum/ddsim/issues>`_ for bugs. Anything tagged with "bug" is open to whoever wants to try and fix it.
+    Look through the `GitHub Issues <https://github.com/cda-tum/mqt-ddsim/issues>`_ for bugs. Anything tagged with "bug" is open to whoever wants to try and fix it.
 
 - ✨ Propose New Features
-    Propose new features at https://github.com/cda-tum/ddsim/issues using the *Feature request* issue template. Please make sure to fill out all relevant information in the respective issue form.
+    Propose new features at https://github.com/cda-tum/mqt-ddsim/issues using the *Feature request* issue template. Please make sure to fill out all relevant information in the respective issue form.
 
 - ✨ Implement New Features
-    Look through the `GitHub Issues <https://github.com/cda-tum/ddsim/issues>`_ for features. Anything tagged with "feature" is open to whoever wants to implement it. We highly appreciate external contributions to the project.
+    Look through the `GitHub Issues <https://github.com/cda-tum/mqt-ddsim/issues>`_ for features. Anything tagged with "feature" is open to whoever wants to implement it. We highly appreciate external contributions to the project.
 
 - 📝 Write Documentation
     DDSIM could always use some more `documentation <https://ddsim.readthedocs.io/en/latest/>`_, and we appreciate any help with that.

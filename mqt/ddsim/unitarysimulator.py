@@ -31,7 +31,7 @@ class UnitarySimulatorBackend(BackendV1):
             "backend_name": "unitary_simulator",
             "backend_version": __version__,
             "n_qubits": min(24, int(log2(sqrt(local_hardware_info()["memory"] * (1024**3) / 16)))),
-            "url": "https://github.com/cda-tum/ddsim",
+            "url": "https://github.com/cda-tum/mqt-ddsim",
             "simulator": True,
             "local": True,
             "conditional": False,

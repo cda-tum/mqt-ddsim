@@ -95,7 +95,7 @@ In order to get the best performance out of DDSIM and enable platform-specific c
 This requires a `C++ compiler <https://en.wikipedia.org/wiki/List_of_compilers#C++_compilers>`_ supporting C++17 and a minimum `CMake <https://cmake.org/>`_ version of 3.19.
 
 The library is continuously tested under Linux, MacOS, and Windows using the `latest available system versions for GitHub Actions <https://github.com/actions/virtual-environments>`_.
-In order to access the latest build logs, visit `ddsim/actions/workflows/ci.yml <https://github.com/cda-tum/ddsim/actions/workflows/ci.yml>`_.
+In order to access the latest build logs, visit `ddsim/actions/workflows/ci.yml <https://github.com/cda-tum/mqt-ddsim/actions/workflows/ci.yml>`_.
 
 .. note::
     We noticed some issues when compiling with Microsoft's MSCV compiler toolchain.
@@ -116,7 +116,7 @@ python bindings) in *Release* mode for DDSIM.
 
 .. code-block:: console
 
-    $ git clone --recurse-submodules https://github.com/cda-tum/ddsim
+    $ git clone --recurse-submodules https://github.com/cda-tum/mqt-ddsim
     [...]
     $ cd ddsim
     $ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBINDINGS=ON -DBUILD_DDSIM_TESTS=ON

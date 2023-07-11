@@ -41,7 +41,7 @@ class HybridQasmSimulatorBackend(BackendV1):
         conf = {
             "backend_name": "hybrid_qasm_simulator",
             "backend_version": __version__,
-            "url": "https://github.com/cda-tum/ddsim",
+            "url": "https://github.com/cda-tum/mqt-ddsim",
             "simulator": True,
             "local": True,
             "description": "MQT DDSIM Hybrid Schrodinger-Feynman C++ simulator",

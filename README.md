@@ -1,27 +1,27 @@
 [![PyPI](https://img.shields.io/pypi/v/mqt.ddsim?logo=pypi&style=flat-square)](https://pypi.org/project/mqt.ddsim/)
 ![OS](https://img.shields.io/badge/os-linux%20%7C%20macos%20%7C%20windows-blue?style=flat-square)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![CI](https://img.shields.io/github/actions/workflow/status/cda-tum/ddsim/cmake.yml?branch=main&style=flat-square&logo=github&label=c%2B%2B)](https://github.com/cda-tum/ddsim/actions/workflows/cmake.yml)
-[![Bindings](https://img.shields.io/github/actions/workflow/status/cda-tum/ddsim/bindings.yml?branch=main&style=flat-square&logo=github&label=python)](https://github.com/cda-tum/ddsim/actions/workflows/bindings.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/cda-tum/mqt-ddsim/cmake.yml?branch=main&style=flat-square&logo=github&label=c%2B%2B)](https://github.com/cda-tum/mqt-ddsim/actions/workflows/cmake.yml)
+[![Bindings](https://img.shields.io/github/actions/workflow/status/mqt-cda-tum/mqt-ddsim/bindings.yml?branch=main&style=flat-square&logo=github&label=python)](https://github.com/cda-tum/mqt-ddsim/actions/workflows/bindings.yml)
 [![Documentation](https://img.shields.io/readthedocs/ddsim?logo=readthedocs&style=flat-square)](https://ddsim.readthedocs.io/en/latest/)
-[![codecov](https://img.shields.io/codecov/c/github/cda-tum/ddsim?style=flat-square&logo=codecov)](https://codecov.io/gh/cda-tum/ddsim)
+[![codecov](https://img.shields.io/codecov/c/github/cda-tum/mqt-ddsim?style=flat-square&logo=codecov)](https://codecov.io/gh/cda-tum/mqt-ddsim)
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cda-tum/qmap/main/docs/source/_static/mqt_light.png" width="60%">
-    <img src="https://raw.githubusercontent.com/cda-tum/qmap/main/docs/source/_static/mqt_dark.png" width="60%">
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/cda-tum/mqt-ddsim/main/docs/source/_static/mqt_light.png" width="60%">
+    <img src="https://raw.githubusercontent.com/cda-tum/mqt-ddsim/main/docs/source/_static/mqt_dark.png" width="60%">
   </picture>
 </p>
 
 # MQT DDSIM - A quantum circuit simulator based on decision diagrams written in C++
 
 A tool for classical quantum circuit simulation by the [Chair for Design Automation](https://www.cda.cit.tum.de/) at the [Technical University of Munich](https://www.tum.de/).
-QCEC is part of the Munich Quantum Toolkit (MQT; formerly known as JKQ and developed by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at)).
+DDSIM is part of the Munich Quantum Toolkit (MQT; formerly known as JKQ and developed by the [Institute for Integrated Circuits](https://iic.jku.at/) at the [Johannes Kepler University Linz](https://jku.at)).
 It builds upon [MQT Core](https://github.com/cda-tum/mqt-core).
 
 **Detailed documentation on all available formats, options, and algorithms is available at [ReadTheDocs](https://ddsim.readthedocs.io/en/latest/).**
 
-If you have any questions, feel free to contact us via [quantum.cda@xcit.tum.de](mailto:quantum.cda@xcit.tum.de) or by creating an [issue](https://github.com/cda-tum/ddsim/issues) on GitHub.
+If you have any questions, feel free to contact us via [quantum.cda@xcit.tum.de](mailto:quantum.cda@xcit.tum.de) or by creating an [issue](https://github.com/cda-tum/mqt-ddsim/issues) on GitHub.
 
 ## Getting Started
 
