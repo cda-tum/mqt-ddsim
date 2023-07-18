@@ -236,7 +236,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
 
     if (vm.count("pcomplex") > 0) {
         outputObj["complex_stats"]["cache_count"] = ddsim->dd->cn.cacheCount();
-        outputObj["complex_stats"]["real_count"] = ddsim->dd->cn.realCount();
+        outputObj["complex_stats"]["real_count"]  = ddsim->dd->cn.realCount();
     }
 
     if (vm.count("dump_complex") > 0) {
