@@ -240,6 +240,8 @@ TEST(CircuitSimTest, TestingProperties) {
     EXPECT_EQ(ddsim.getMaxMatrixNodeCount(), 0);
     EXPECT_EQ(ddsim.getMatrixActiveNodeCount(), 0);
     EXPECT_EQ(ddsim.countNodesFromRoot(), 7);
+    EXPECT_EQ(ddsim.getSeed(), "1");
+    EXPECT_EQ(ddsim.additionalStatistics().at("approximation_runs"), "0");
 }
 
 TEST(CircuitSimTest, ApproximationTest) {
@@ -298,12 +300,12 @@ TEST(CircuitSimTest, ToleranceTest) {
     // A small test to make sure that setting and getting the tolerance works
     auto             qc = std::make_unique<qc::QuantumComputation>(2);
     CircuitSimulator ddsim(std::move(qc));
-    const auto       tolerance    = dd::RealNumber::eps;
+    const auto       tolerance    = ddsim.getTolerance();
     const auto       newTolerance = 0.1;
     ddsim.setTolerance(newTolerance);
-    EXPECT_EQ(dd::RealNumber::eps, newTolerance);
+    EXPECT_EQ(ddsim.getTolerance(), newTolerance);
     ddsim.setTolerance(tolerance);
-    EXPECT_EQ(dd::RealNumber::eps, tolerance);
+    EXPECT_EQ(ddsim.getTolerance(), tolerance);
 }
 
 TEST(CircuitSimTest, TooManyQubitsForVectorTest) {
