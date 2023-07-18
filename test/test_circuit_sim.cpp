@@ -215,19 +215,16 @@ TEST(CircuitSimTest, GRCS4x4Test) {
         CircuitSimulator ddsim(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt"));
         auto             m = ddsim.simulate(100);
         EXPECT_GT(m.size(), 0);
-        ddsim.dd->cn.complexTable.printStatistics();
     }
     {
         CircuitSimulator ddsim(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_1.txt"));
         auto             m = ddsim.simulate(100);
         EXPECT_GT(m.size(), 0);
-        ddsim.dd->cn.complexTable.printStatistics();
     }
     {
         CircuitSimulator ddsim(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_2.txt"));
         auto             m = ddsim.simulate(100);
         EXPECT_GT(m.size(), 0);
-        ddsim.dd->cn.complexTable.printStatistics();
     }
 }
 
@@ -243,6 +240,8 @@ TEST(CircuitSimTest, TestingProperties) {
     EXPECT_EQ(ddsim.getMaxMatrixNodeCount(), 0);
     EXPECT_EQ(ddsim.getMatrixActiveNodeCount(), 0);
     EXPECT_EQ(ddsim.countNodesFromRoot(), 7);
+    EXPECT_EQ(ddsim.getSeed(), "1");
+    EXPECT_EQ(ddsim.additionalStatistics().at("approximation_runs"), "0");
 }
 
 TEST(CircuitSimTest, ApproximationTest) {
@@ -301,15 +300,12 @@ TEST(CircuitSimTest, ToleranceTest) {
     // A small test to make sure that setting and getting the tolerance works
     auto             qc = std::make_unique<qc::QuantumComputation>(2);
     CircuitSimulator ddsim(std::move(qc));
-    const auto       tolerance = ddsim.getTolerance();
-    EXPECT_EQ(tolerance, dd::ComplexTable::tolerance());
-    const auto newTolerance = 0.1;
+    const auto       tolerance    = ddsim.getTolerance();
+    const auto       newTolerance = 0.1;
     ddsim.setTolerance(newTolerance);
     EXPECT_EQ(ddsim.getTolerance(), newTolerance);
-    EXPECT_EQ(dd::ComplexTable::tolerance(), newTolerance);
     ddsim.setTolerance(tolerance);
     EXPECT_EQ(ddsim.getTolerance(), tolerance);
-    EXPECT_EQ(dd::ComplexTable::tolerance(), tolerance);
 }
 
 TEST(CircuitSimTest, TooManyQubitsForVectorTest) {

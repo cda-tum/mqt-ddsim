@@ -157,8 +157,8 @@ double Simulator<Config>::approximateByFidelity(std::unique_ptr<dd::Package<Conf
     }
 
     dd::vEdge newEdge = removeNodes(localDD, edge, dagEdges);
-    assert(!std::isnan(dd::CTEntry::val(edge.w.r)));
-    assert(!std::isnan(dd::CTEntry::val(edge.w.i)));
+    assert(!std::isnan(dd::RealNumber::val(edge.w.r)));
+    assert(!std::isnan(dd::RealNumber::val(edge.w.i)));
     dd::Complex c = localDD->cn.getCached(std::sqrt(CN::mag2(newEdge.w)), 0);
     CN::div(c, newEdge.w, c);
     newEdge.w = localDD->cn.lookup(c);
@@ -325,7 +325,7 @@ std::pair<dd::ComplexValue, std::string> Simulator<Config>::getPathOfLeastResist
     }
 
     std::string result(getNumberOfQubits(), '0');
-    dd::Complex pathValue = dd->cn.getCached(dd::CTEntry::val(rootEdge.w.r), dd::CTEntry::val(rootEdge.w.i));
+    dd::Complex pathValue = dd->cn.getCached(dd::RealNumber::val(rootEdge.w.r), dd::RealNumber::val(rootEdge.w.i));
     dd::vEdge   cur       = rootEdge;
     for (dd::Qubit i = rootEdge.p->v; i >= 0; --i) {
         dd::fp       p0  = dd::ComplexNumbers::mag2(cur.p->e.at(0).w);
@@ -347,7 +347,7 @@ std::pair<dd::ComplexValue, std::string> Simulator<Config>::getPathOfLeastResist
         }
     }
 
-    return {{dd::CTEntry::val(pathValue.r), dd::CTEntry::val(pathValue.i)},
+    return {{dd::RealNumber::val(pathValue.r), dd::RealNumber::val(pathValue.i)},
             std::string{result.rbegin(), result.rend()}};
 }
 
