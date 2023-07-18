@@ -46,8 +46,8 @@ public:
 
     [[nodiscard]] std::string getName() const override { return qc->getName(); };
 
-    [[nodiscard]] std::size_t getActiveNodeCount() const override { return Simulator<Config>::dd->dUniqueTable.getActiveNodeCount(); }
-    [[nodiscard]] std::size_t getMaxNodeCount() const override { return Simulator<Config>::dd->dUniqueTable.getMaxActiveNodes(); }
+    [[nodiscard]] std::size_t getActiveNodeCount() const override { return Simulator<Config>::dd->template getUniqueTable<dd::dNode>().getStats().activeEntryCount; }
+    [[nodiscard]] std::size_t getMaxNodeCount() const override { return Simulator<Config>::dd->template getUniqueTable<dd::dNode>().getStats().peakActiveEntryCount; }
 
     [[nodiscard]] std::size_t countNodesFromRoot() override {
         if (useDensityMatrixType) {

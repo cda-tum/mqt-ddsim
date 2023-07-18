@@ -215,19 +215,16 @@ TEST(CircuitSimTest, GRCS4x4Test) {
         CircuitSimulator ddsim(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt"));
         auto             m = ddsim.simulate(100);
         EXPECT_GT(m.size(), 0);
-        ddsim.dd->cn.complexTable.printStatistics();
     }
     {
         CircuitSimulator ddsim(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_1.txt"));
         auto             m = ddsim.simulate(100);
         EXPECT_GT(m.size(), 0);
-        ddsim.dd->cn.complexTable.printStatistics();
     }
     {
         CircuitSimulator ddsim(std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_2.txt"));
         auto             m = ddsim.simulate(100);
         EXPECT_GT(m.size(), 0);
-        ddsim.dd->cn.complexTable.printStatistics();
     }
 }
 
@@ -301,15 +298,12 @@ TEST(CircuitSimTest, ToleranceTest) {
     // A small test to make sure that setting and getting the tolerance works
     auto             qc = std::make_unique<qc::QuantumComputation>(2);
     CircuitSimulator ddsim(std::move(qc));
-    const auto       tolerance = ddsim.getTolerance();
-    EXPECT_EQ(tolerance, dd::ComplexTable::tolerance());
+    const auto       tolerance = dd::RealNumber::eps;
     const auto newTolerance = 0.1;
     ddsim.setTolerance(newTolerance);
-    EXPECT_EQ(ddsim.getTolerance(), newTolerance);
-    EXPECT_EQ(dd::ComplexTable::tolerance(), newTolerance);
+    EXPECT_EQ(dd::RealNumber::eps, newTolerance);
     ddsim.setTolerance(tolerance);
-    EXPECT_EQ(ddsim.getTolerance(), tolerance);
-    EXPECT_EQ(dd::ComplexTable::tolerance(), tolerance);
+    EXPECT_EQ(dd::RealNumber::eps, tolerance);
 }
 
 TEST(CircuitSimTest, TooManyQubitsForVectorTest) {
