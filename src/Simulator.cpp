@@ -157,8 +157,8 @@ double Simulator<Config>::approximateByFidelity(std::unique_ptr<dd::Package<Conf
     }
 
     dd::vEdge newEdge = removeNodes(localDD, edge, dagEdges);
-    assert(!std::isnan(dd::CTEntry::val(edge.w.r)));
-    assert(!std::isnan(dd::CTEntry::val(edge.w.i)));
+    assert(!std::isnan(dd::RealNumber::val(edge.w.r)));
+    assert(!std::isnan(dd::RealNumber::val(edge.w.i)));
     dd::Complex c = localDD->cn.getCached(std::sqrt(CN::mag2(newEdge.w)), 0);
     CN::div(c, newEdge.w, c);
     newEdge.w = localDD->cn.lookup(c);
