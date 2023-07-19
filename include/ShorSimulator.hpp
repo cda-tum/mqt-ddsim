@@ -38,9 +38,9 @@ class ShorSimulator: public Simulator<Config> {
 
     void uAEmulate(std::uint64_t a, std::int32_t q);
 
-    void applyGate(dd::GateMatrix matrix, dd::Qubit target, const dd::Controls& controls);
+    void applyGate(dd::GateMatrix matrix, dd::Qubit target, const qc::Controls& controls);
 
-    void applyGate(dd::GateMatrix matrix, dd::Qubit target, dd::Control control);
+    void applyGate(dd::GateMatrix matrix, dd::Qubit target, qc::Control control);
 
     void applyGate(dd::GateMatrix matrix, dd::Qubit target);
 

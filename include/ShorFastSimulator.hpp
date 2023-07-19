@@ -42,7 +42,7 @@ class ShorFastSimulator: public Simulator<Config> {
 
     [[nodiscard]] std::pair<std::uint32_t, std::uint32_t> postProcessing(const std::string& sample) const;
 
-    void applyGate(dd::GateMatrix matrix, qc::Qubit target);
+    void applyGate(dd::GateMatrix matrix, dd::Qubit target);
 
     std::vector<std::map<dd::vNode*, dd::vEdge>> nodesOnLevel;
 

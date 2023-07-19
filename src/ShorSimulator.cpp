@@ -83,7 +83,7 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::simulate([[maybe_unuse
             double               qR = cosine(1, -q);
             double               qI = sine(1, -q);
             const dd::GateMatrix qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {qR, qI}};
-            applyGate(qm, static_cast<dd::Qubit>(nQubits - 1 - static_cast<std::size_t>(i)), dd::Control{static_cast<dd::Qubit>(nQubits - 1 - static_cast<std::size_t>(j))});
+            applyGate(qm, static_cast<dd::Qubit>(nQubits - 1 - static_cast<std::size_t>(i)), qc::Control{static_cast<qc::Qubit>(nQubits - 1 - static_cast<std::size_t>(j))});
             q *= 2;
         }
 
@@ -343,7 +343,7 @@ dd::mEdge ShorSimulator<Config>::addConstMod(std::uint64_t a) {
     f4.w                 = dd::ComplexNumbers::neg(f4.w);
     const dd::Edge tmp   = Simulator<Config>::dd->add(Simulator<Config>::dd->multiply(f, f4), Simulator<Config>::dd->multiply(Simulator<Config>::dd->multiply(Simulator<Config>::dd->transpose(f2), f), diff2));
 
-    return tmp.p->e[0];
+    return tmp.p->e[0]; // NOLINT(clang-analyzer-core.CallAndMessage) Function Pointer is not null
 }
 
 template<class Config>
@@ -430,16 +430,16 @@ void ShorSimulator<Config>::uAEmulate(std::uint64_t a, std::int32_t q) {
 
 template<class Config>
 void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target) {
-    applyGate(matrix, target, dd::Controls{});
+    applyGate(matrix, target, qc::Controls{});
 }
 
 template<class Config>
-void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target, dd::Control control) {
-    applyGate(matrix, target, dd::Controls{control});
+void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target, qc::Control control) {
+    applyGate(matrix, target, qc::Controls{control});
 }
 
 template<class Config>
-void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target, const dd::Controls& controls) {
+void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target, const qc::Controls& controls) {
     const dd::Edge gate = Simulator<Config>::dd->makeGateDD(matrix, static_cast<dd::QubitCount>(nQubits), controls, target);
     const dd::Edge tmp  = Simulator<Config>::dd->multiply(gate, Simulator<Config>::rootEdge);
     Simulator<Config>::dd->incRef(tmp);

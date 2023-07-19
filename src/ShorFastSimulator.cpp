@@ -53,7 +53,7 @@ std::map<std::string, std::size_t> ShorFastSimulator<Config>::simulate([[maybe_u
     std::string measurements(2 * requiredBits, '0');
 
     for (std::size_t i = 0; i < 2 * requiredBits; i++) {
-        applyGate(dd::Hmat, static_cast<qc::Qubit>(nQubits - 1));
+        applyGate(dd::Hmat, static_cast<dd::Qubit>(nQubits - 1));
 
         if (verbose) {
             std::clog << "[ " << (i + 1) << "/" << 2 * requiredBits << " ] uAEmulate2(" << as[i] << ") "
@@ -73,18 +73,18 @@ std::map<std::string, std::size_t> ShorFastSimulator<Config>::simulate([[maybe_u
                 double               qR = cosine(1, -q);
                 double               qI = sine(1, -q);
                 const dd::GateMatrix qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {qR, qI}};
-                applyGate(qm, static_cast<qc::Qubit>(nQubits - 1));
+                applyGate(qm, static_cast<dd::Qubit>(nQubits - 1));
             }
             q *= 2;
         }
 
-        applyGate(dd::Hmat, static_cast<qc::Qubit>(nQubits - 1));
+        applyGate(dd::Hmat, static_cast<dd::Qubit>(nQubits - 1));
 
         measurements[i] = Simulator<Config>::measureOneCollapsing(static_cast<qc::Qubit>(nQubits - 1), false);
         Simulator<Config>::dd->garbageCollect();
 
         if (measurements[i] == '1') {
-            applyGate(dd::Xmat, static_cast<qc::Qubit>(nQubits - 1));
+            applyGate(dd::Xmat, static_cast<dd::Qubit>(nQubits - 1));
         }
     }
 
@@ -310,7 +310,7 @@ dd::mEdge ShorFastSimulator<Config>::addConstMod(std::uint64_t a) {
 }
 
 template<class Config>
-void ShorFastSimulator<Config>::applyGate(dd::GateMatrix matrix, qc::Qubit target) {
+void ShorFastSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target) {
     numberOfOperations++;
     const dd::Edge gate = Simulator<Config>::dd->makeGateDD(matrix, static_cast<dd::QubitCount>(nQubits), static_cast<dd::Qubit>(target));
     const dd::Edge tmp  = Simulator<Config>::dd->multiply(gate, Simulator<Config>::rootEdge);
