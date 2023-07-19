@@ -83,7 +83,7 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::simulate([[maybe_unuse
             double               qR = cosine(1, -q);
             double               qI = sine(1, -q);
             const dd::GateMatrix qm{dd::complex_one, dd::complex_zero, dd::complex_zero, {qR, qI}};
-            applyGate(qm, static_cast<dd::Qubit>(nQubits - 1 - static_cast<std::size_t>(i)), qc::Control{static_cast<dd::Qubit>(nQubits - 1 - static_cast<std::size_t>(j))});
+            applyGate(qm, static_cast<dd::Qubit>(nQubits - 1 - static_cast<std::size_t>(i)), qc::Control{static_cast<qc::Qubit>(nQubits - 1 - static_cast<std::size_t>(j))});
             q *= 2;
         }
 
