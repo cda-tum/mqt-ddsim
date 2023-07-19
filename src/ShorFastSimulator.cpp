@@ -84,7 +84,7 @@ std::map<std::string, std::size_t> ShorFastSimulator<Config>::simulate([[maybe_u
         Simulator<Config>::dd->garbageCollect();
 
         if (measurements[i] == '1') {
-            applyGate(dd::Xmat, static_cast<qc::Qubit>(nQubits - 1));
+            applyGate(dd::Xmat, static_cast<dd::Qubit>(nQubits - 1));
         }
     }
 

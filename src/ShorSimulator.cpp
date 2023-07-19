@@ -343,7 +343,7 @@ dd::mEdge ShorSimulator<Config>::addConstMod(std::uint64_t a) {
     f4.w                 = dd::ComplexNumbers::neg(f4.w);
     const dd::Edge tmp   = Simulator<Config>::dd->add(Simulator<Config>::dd->multiply(f, f4), Simulator<Config>::dd->multiply(Simulator<Config>::dd->multiply(Simulator<Config>::dd->transpose(f2), f), diff2));
 
-    return tmp.p->e[0];
+    return tmp.p->e[0]; // NOLINT(clang-analyzer-core.CallAndMessage) Function Pointer is not null
 }
 
 template<class Config>
