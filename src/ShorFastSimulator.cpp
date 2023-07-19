@@ -310,7 +310,7 @@ dd::mEdge ShorFastSimulator<Config>::addConstMod(std::uint64_t a) {
 }
 
 template<class Config>
-void ShorFastSimulator<Config>::applyGate(dd::GateMatrix matrix, qc::Qubit target) {
+void ShorFastSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target) {
     numberOfOperations++;
     const dd::Edge gate = Simulator<Config>::dd->makeGateDD(matrix, static_cast<dd::QubitCount>(nQubits), static_cast<dd::Qubit>(target));
     const dd::Edge tmp  = Simulator<Config>::dd->multiply(gate, Simulator<Config>::rootEdge);
