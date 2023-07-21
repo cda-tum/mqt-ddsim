@@ -169,8 +169,8 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
             if (approximationInfo.stepNumber > 0 && approximationInfo.stepFidelity < 1.0) {
                 if (approximationInfo.strategy == ApproximationInfo::FidelityDriven && (opNum + 1) % approxMod == 0 &&
                     approximationRuns < approximationInfo.stepNumber) {
-                    [[maybe_unused]] const unsigned int sizeBefore = Simulator<Config>::dd->size(Simulator<Config>::rootEdge);
-                    const auto                          apFid      = Simulator<Config>::approximateByFidelity(approximationInfo.stepFidelity, false, true);
+                    [[maybe_unused]] const auto sizeBefore = Simulator<Config>::dd->size(Simulator<Config>::rootEdge);
+                    const auto                  apFid      = Simulator<Config>::approximateByFidelity(approximationInfo.stepFidelity, false, true);
                     approximationRuns++;
                     finalFidelity *= static_cast<long double>(apFid);
                     /*std::clog << "[INFO] Fidelity-driven ApproximationInfo run finished. "
@@ -181,7 +181,7 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
                               << "; #runs=" << approximation_runs
                               << "\n";//*/
                 } else if (approximationInfo.strategy == ApproximationInfo::MemoryDriven) {
-                    [[maybe_unused]] const unsigned int sizeBefore = Simulator<Config>::dd->size(Simulator<Config>::rootEdge);
+                    [[maybe_unused]] const auto sizeBefore = Simulator<Config>::dd->size(Simulator<Config>::rootEdge);
                     if (Simulator<Config>::dd->template getUniqueTable<dd::vNode>().possiblyNeedsCollection()) {
                         const auto apFid = Simulator<Config>::approximateByFidelity(approximationInfo.stepFidelity, false, true);
                         approximationRuns++;

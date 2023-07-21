@@ -172,8 +172,8 @@ double Simulator<Config>::approximateByFidelity(std::unique_ptr<dd::Package<Conf
     }
 
     if (verbose) {
-        const unsigned sizeBefore = localDD->size(edge);
-        const unsigned sizeAfter  = localDD->size(newEdge);
+        const auto sizeBefore = localDD->size(edge);
+        const auto sizeAfter  = localDD->size(newEdge);
         std::cout
                 << getName() << ","
                 << +getNumberOfQubits() << "," // unary plus for int promotion
@@ -264,8 +264,8 @@ double Simulator<Config>::approximateBySampling(std::unique_ptr<dd::Package<Conf
     }
 
     if (verbose) {
-        const unsigned sizeAfter  = localDD->size(newEdge);
-        const unsigned sizeBefore = localDD->size(edge);
+        const auto sizeAfter  = localDD->size(newEdge);
+        const auto sizeBefore = localDD->size(edge);
         std::cout
                 << getName() << ","
                 << +getNumberOfQubits() << "," // unary plus for int promotion
