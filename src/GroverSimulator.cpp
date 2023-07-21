@@ -58,8 +58,8 @@ std::map<std::string, std::size_t> GroverSimulator<Config>::simulate(std::size_t
     const dd::Edge fullIteration{Simulator<Config>::dd->multiply(oracleOp, diffusionOp)};
     Simulator<Config>::dd->incRef(fullIteration);
 
-    assert(nQubits + nAnciallae <= std::numeric_limits<dd::QubitCount>::max());
-    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::QubitCount>(nQubits + nAnciallae));
+    assert(nQubits + nAnciallae <= std::numeric_limits<dd::Qubit>::max());
+    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::Qubit>(nQubits + nAnciallae));
     Simulator<Config>::rootEdge = Simulator<Config>::dd->multiply(setupOp, Simulator<Config>::rootEdge);
     Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
 

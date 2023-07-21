@@ -70,6 +70,9 @@ std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::
     while (!q.empty()) {
         dd::vNode* ptr = q.front();
         q.pop();
+        if (ptr == nullptr) {
+            continue;
+        }
         const dd::fp parentProb = probsMone[ptr];
 
         if (ptr->e.at(0).w != dd::Complex::zero) {
@@ -92,7 +95,7 @@ std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::
     std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::pair<double, dd::vNode*>>>> qq(getNumberOfQubits());
 
     for (auto& [node, probability]: probsMone) {
-        if (node->v < 0) {
+        if (dd::vNode::isTerminal(node)) {
             continue; // ignore the terminal node which has v == -1
         }
         qq.at(static_cast<std::size_t>(node->v)).emplace(1 - probability, node);
@@ -202,7 +205,7 @@ double Simulator<Config>::approximateBySampling(std::unique_ptr<dd::Package<Conf
     for (unsigned int j = 0; j < nSamples; j++) {
         dd::Edge cur = edge;
 
-        for (dd::Qubit i = edge.p->v; i >= 0; --i) {
+        for (dd::Qubit i = edge.p->v + 1; i-- > 0;) {
             visitedNodes[cur.p]++;
 
             const dd::fp p0 = CN::mag2(cur.p->e.at(0).w);
@@ -224,6 +227,9 @@ double Simulator<Config>::approximateBySampling(std::unique_ptr<dd::Package<Conf
     while (!q.empty()) {
         dd::vNode* ptr = q.front();
         q.pop();
+        if (ptr == nullptr) {
+            continue;
+        }
 
         if (!ptr->e.at(0).w.approximatelyZero() && visitedNodes2.find(ptr->e.at(0).p) == visitedNodes2.end()) {
             visitedNodes2.insert(ptr->e.at(0).p);
@@ -327,7 +333,7 @@ std::pair<dd::ComplexValue, std::string> Simulator<Config>::getPathOfLeastResist
     std::string result(getNumberOfQubits(), '0');
     dd::Complex pathValue = dd->cn.getCached(dd::RealNumber::val(rootEdge.w.r), dd::RealNumber::val(rootEdge.w.i));
     dd::vEdge   cur       = rootEdge;
-    for (dd::Qubit i = rootEdge.p->v; i >= 0; --i) {
+    for (dd::Qubit i = rootEdge.p->v + 1; i-- > 0;) {
         dd::fp       p0  = dd::ComplexNumbers::mag2(cur.p->e.at(0).w);
         const dd::fp p1  = dd::ComplexNumbers::mag2(cur.p->e.at(1).w);
         const dd::fp tmp = p0 + p1;

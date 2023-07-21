@@ -6,12 +6,12 @@ using CN = dd::ComplexNumbers;
 
 template<class Config>
 std::map<std::string, double> DeterministicNoiseSimulator<Config>::deterministicSimulate() {
-    rootEdge = Simulator<Config>::dd->makeZeroDensityOperator(static_cast<dd::QubitCount>(qc->getNqubits()));
+    rootEdge = Simulator<Config>::dd->makeZeroDensityOperator(static_cast<dd::Qubit>(qc->getNqubits()));
     Simulator<Config>::dd->incRef(rootEdge);
 
     auto deterministicNoiseFunctionality = dd::DeterministicNoiseFunctionality<Config>(
             Simulator<Config>::dd,
-            static_cast<dd::QubitCount>(qc->getNqubits()),
+            static_cast<dd::Qubit>(qc->getNqubits()),
             noiseProbSingleQubit,
             noiseProbMultiQubit,
             ampDampingProbSingleQubit,

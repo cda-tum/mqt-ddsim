@@ -102,7 +102,7 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
     singleShots++;
     const auto nQubits = qc->getNqubits();
 
-    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::QubitCount>(nQubits));
+    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::Qubit>(nQubits));
     Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
 
     std::size_t                 opNum = 0;
