@@ -13,6 +13,7 @@ Checks: |
   -cppcoreguidelines-special-member-functions,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-macro-usage,
+  -cppcoreguidelines-avoid-do-while,
   google-*,
   -google-readability-todo,
   -google-build-using-namespace,
