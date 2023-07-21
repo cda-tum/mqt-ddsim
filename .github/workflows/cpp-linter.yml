@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  clang-version: 15
+  clang-version: 16
 
 jobs:
   cpp-linter:
