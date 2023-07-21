@@ -24,7 +24,7 @@ jobs:
           sudo apt-get --quiet update
           sudo apt-get install --no-install-recommends libopencv-dev
       - name: Generate compilation database
-        run: CC=clang-14 CXX=clang++-14 cmake -S . -B build -DBUILD_TYPE=Debug -DBINDINGS=ON -DBUILD_DDSIM_TESTS=ON
+        run: CC=clang-14 CXX=clang++-14 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBINDINGS=ON -DBUILD_DDSIM_TESTS=ON
       - name: Run cpp-linter
         uses: cpp-linter/cpp-linter-action@v2
         id: linter
