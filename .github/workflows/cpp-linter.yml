@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  clang-version: 16
+  clang-version: 15
 
 jobs:
   cpp-linter:
@@ -25,14 +25,7 @@ jobs:
       - name: Install clang-${{ env.clang-version }}
         run: |
           sudo apt-get update
-          wget https://apt.llvm.org/llvm.sh -O ${{ runner.temp }}/llvm_install.sh
-          chmod +x ${{ runner.temp }}/llvm_install.sh
-          if sudo ${{ runner.temp }}/llvm_install.sh ${{ env.clang-version }}; then
-            sudo apt-get install -y clang-format-${{ env.clang-version }} clang-tidy-${{ env.clang-version }} || exit 1
-          else
-            echo "Running install script failed."
-            exit 1
-          fi
+          sudo apt-get install -y clang-format-${{ env.clang-version }} clang-tidy-${{ env.clang-version }}
           echo "CC=clang-${{ env.clang-version }}" >> $GITHUB_ENV
           echo "CXX=clang++-${{ env.clang-version }}" >> $GITHUB_ENV
       - name: Install OpenCV
