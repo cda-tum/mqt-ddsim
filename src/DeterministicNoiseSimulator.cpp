@@ -57,9 +57,9 @@ std::map<std::string, std::size_t> DeterministicNoiseSimulator<Config>::sampleFr
     std::discrete_distribution<std::size_t> d(weights.begin(), weights.end()); // NOLINT(misc-const-correctness) false-positive
 
     //Sample n shots elements from the prob distribution
-    std::map<std::size_t, std::size_t> results;
+    std::map<std::size_t, std::size_t> results; // NOLINT(misc-const-correctness) false-positive
     for (size_t n = 0; n < shots; ++n) {
-        ++results[d(Simulator<Config>::mt)]; // NOLINT(misc-const-correctness) false-positive
+        ++results[d(Simulator<Config>::mt)];
     }
 
     // Create the final map containing the measurement results and the corresponding shots
