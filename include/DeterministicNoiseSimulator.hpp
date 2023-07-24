@@ -10,15 +10,15 @@ template<class Config = DensityMatrixSimulatorDDPackageConfig>
 class DeterministicNoiseSimulator: public Simulator<Config> {
 public:
     DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
-                                const std::string&                        noiseEffects,
+                                const std::string&                        noiseEffects_,
                                 double                                    noiseProbability,
                                 std::optional<double>                     ampDampingProbability,
                                 double                                    multiQubitGateFactor,
                                 bool                                      unoptimizedSim = false,
-                                std::uint64_t                             seed           = 0):
-        Simulator<Config>(seed),
+                                std::uint64_t                             seed_          = 0):
+        Simulator<Config>(seed_),
         qc(std::move(qc_)),
-        noiseEffects(StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>::initializeNoiseEffects(noiseEffects)),
+        noiseEffects(StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>::initializeNoiseEffects(noiseEffects_)),
         noiseProbSingleQubit(noiseProbability),
         ampDampingProbSingleQubit(ampDampingProbability ? ampDampingProbability.value() : noiseProbability * 2),
         noiseProbMultiQubit(noiseProbability * multiQubitGateFactor),
@@ -29,8 +29,8 @@ public:
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, std::uint64_t seed = 0):
-        DeterministicNoiseSimulator(std::move(qc), std::string("APD"), 0.001, std::optional<double>{}, 2, false, seed) {}
+    explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, std::uint64_t seed_ = 0):
+        DeterministicNoiseSimulator(std::move(qc_), std::string("APD"), 0.001, std::optional<double>{}, 2, false, seed_) {}
 
     std::map<std::string, std::size_t> simulate(size_t shots) override {
         return sampleFromProbabilityMap(deterministicSimulate(), shots);
