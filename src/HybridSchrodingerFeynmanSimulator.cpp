@@ -229,7 +229,7 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridAmplitudes(qc::Qub
                 const std::size_t                    totalControl = control + localControl;
                 std::unique_ptr<dd::Package<Config>> sliceDD      = std::make_unique<dd::Package<Config>>(CircuitSimulator<Config>::getNumberOfQubits());
                 auto                                 result       = simulateSlicing(sliceDD, splitQubit, totalControl);
-                sliceDD->addAmplitudes(result, threadAmplitudes, static_cast<dd::QubitCount>(nqubits));
+                sliceDD->addAmplitudes(result, threadAmplitudes, static_cast<dd::Qubit>(nqubits));
             }
         });
     }

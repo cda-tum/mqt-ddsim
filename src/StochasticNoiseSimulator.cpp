@@ -28,7 +28,7 @@ template<class Config>
 void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
     const auto nQubits = qc->getNqubits();
 
-    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::QubitCount>(nQubits));
+    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::Qubit>(nQubits));
     Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
 
     std::map<std::size_t, bool> classicValues;
@@ -172,7 +172,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
         auto localDD                      = std::make_unique<dd::Package<StochasticNoiseSimulatorDDPackageConfig>>(qc->getNqubits());
         auto stochasticNoiseFunctionality = dd::StochasticNoiseFunctionality<StochasticNoiseSimulatorDDPackageConfig>(
                 localDD,
-                static_cast<dd::QubitCount>(nQubits),
+                static_cast<dd::Qubit>(nQubits),
                 noiseProbability,
                 amplitudeDampingProb,
                 multiQubitGateFactor,
@@ -183,7 +183,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
         std::size_t opCount     = 0U;
         std::size_t approxCount = 0U;
 
-        dd::vEdge localRootEdge = localDD->makeZeroState(static_cast<dd::QubitCount>(nQubits));
+        dd::vEdge localRootEdge = localDD->makeZeroState(static_cast<dd::Qubit>(nQubits));
         localDD->incRef(localRootEdge);
 
         for (auto& op: *qc) {

@@ -14,8 +14,8 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::simulate([[maybe_unuse
         std::clog << "simulate Shor's algorithm for n=" << compositeN;
     }
 
-    nQubits                     = static_cast<dd::QubitCount>(3 * requiredBits);
-    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::QubitCount>(nQubits));
+    nQubits                     = static_cast<dd::Qubit>(3 * requiredBits);
+    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::Qubit>(nQubits));
     Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
     //Initialize qubits
     //TODO: other init method where the initial value can be chosen
@@ -440,7 +440,7 @@ void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target, q
 
 template<class Config>
 void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target, const qc::Controls& controls) {
-    const dd::Edge gate = Simulator<Config>::dd->makeGateDD(matrix, static_cast<dd::QubitCount>(nQubits), controls, target);
+    const dd::Edge gate = Simulator<Config>::dd->makeGateDD(matrix, static_cast<dd::Qubit>(nQubits), controls, target);
     const dd::Edge tmp  = Simulator<Config>::dd->multiply(gate, Simulator<Config>::rootEdge);
     Simulator<Config>::dd->incRef(tmp);
     Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);

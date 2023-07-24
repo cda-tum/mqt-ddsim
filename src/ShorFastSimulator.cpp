@@ -12,7 +12,7 @@ std::map<std::string, std::size_t> ShorFastSimulator<Config>::simulate([[maybe_u
     if (verbose) {
         std::clog << "simulate Shor's algorithm for n=" << compositeN;
     }
-    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::QubitCount>(nQubits));
+    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::Qubit>(nQubits));
     Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
     //Initialize qubits
     //TODO: other init method where the initial value can be chosen
@@ -312,7 +312,7 @@ dd::mEdge ShorFastSimulator<Config>::addConstMod(std::uint64_t a) {
 template<class Config>
 void ShorFastSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target) {
     numberOfOperations++;
-    const dd::Edge gate = Simulator<Config>::dd->makeGateDD(matrix, static_cast<dd::QubitCount>(nQubits), static_cast<dd::Qubit>(target));
+    const dd::Edge gate = Simulator<Config>::dd->makeGateDD(matrix, static_cast<dd::Qubit>(nQubits), static_cast<dd::Qubit>(target));
     const dd::Edge tmp  = Simulator<Config>::dd->multiply(gate, Simulator<Config>::rootEdge);
     Simulator<Config>::dd->incRef(tmp);
     Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
