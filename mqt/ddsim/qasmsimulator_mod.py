@@ -8,7 +8,7 @@ from typing import Dict, List, Union
 
 from qiskit import QiskitError, QuantumCircuit
 from qiskit.compiler import assemble
-from qiskit.providers import BackendV1, Options
+from qiskit.providers import Options, BackendV2 
 from qiskit.providers.models import BackendConfiguration, BackendStatus
 from qiskit.qobj import PulseQobj, QasmQobj, QasmQobjExperiment, Qobj
 from qiskit.result import Result
@@ -19,7 +19,7 @@ from mqt.ddsim.job import DDSIMJob
 logger = logging.getLogger(__name__)
 
 
-class QasmSimulatorBackend(BackendV1):
+class QasmSimulatorBackend(BackendV2):
     """Python interface to MQT DDSIM"""
 
     SHOW_STATE_VECTOR = False
@@ -34,8 +34,10 @@ class QasmSimulatorBackend(BackendV1):
             approximation_steps=0,
             approximation_strategy="fidelity",
         )
+        
 
-    def __init__(self, configuration=None, provider=None):
+    def __init__(self, provider=None, name=None, description=None, online_date=None, backend_version=None):
+    
         conf = {
             "backend_name": "qasm_simulator",
             "backend_version": __version__,
@@ -104,7 +106,9 @@ class QasmSimulatorBackend(BackendV1):
             "open_pulse": False,
             "gates": [],
         }
-        super().__init__(configuration=configuration or BackendConfiguration.from_dict(conf), provider=provider)
+        
+        super().__init__(provider=provider, name=name, description=None, online_date=None, backend_version=None)
+        
 
     def run(self, quantum_circuits: Union[QuantumCircuit, List[QuantumCircuit]], **options) -> DDSIMJob:
         if isinstance(quantum_circuits, (QasmQobj, PulseQobj)):
@@ -115,39 +119,39 @@ class QasmSimulatorBackend(BackendV1):
             quantum_circuits = [quantum_circuits]
 
         out_options = {}
-        for key in options:
+        for key in options:        
             if not hasattr(self.options, key):
+          
                 warnings.warn("Option %s is not used by this backend" % key, UserWarning, stacklevel=2)
             else:
                 out_options[key] = options[key]
-        circuit_qobj = assemble(quantum_circuits, self, **out_options)
-
+        
         job_id = str(uuid.uuid4())
-        local_job = DDSIMJob(self, job_id, self._run_job, circuit_qobj, **options)
+        local_job = DDSIMJob(self, job_id, self._run_job, quantum_circuits, **options)
         local_job.submit()
         return local_job
 
-    def _run_job(self, job_id, qobj_instance: Qobj, **options) -> Result:
-        self._validate(qobj_instance)
+    def _run_job(self, job_id, quantum_circuits: list, **options) -> Result:
+        self._validate(quantum_circuits)
 
         start = time.time()
-        result_list = [self.run_experiment(qobj_exp, **options) for qobj_exp in qobj_instance.experiments]
+        result_list = [self.run_experiment(q_circ, **options) for q_circ in quantum_circuits]
         end = time.time()
 
-        result = {
-            "backend_name": self.configuration().backend_name,
-            "backend_version": self.configuration().backend_version,
-            "qobj_id": qobj_instance.qobj_id,
+        result = {              
+            "backend_name": self.name,
+            "backend_version": self.backend_version,   
+            "qobj_id": None,   # Before it was  "qobj_id": qobj_instance.qobj_id   (Label of the Qobj)
             "job_id": job_id,
             "results": result_list,
             "status": "COMPLETED",
             "success": True,
             "time_taken": (end - start),
-            "header": qobj_instance.header.to_dict(),
+            "header": None    # Before it was  "header": qobj_instance.header.to_dict()  (Info about the backend name and backend version)
         }
         return Result.from_dict(result)
 
-    def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options) -> Dict:
+    def run_experiment(self, q_circ: QuantumCircuit, **options) -> Dict:
         start_time = time.time()
         approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
         approximation_steps = options.get("approximation_steps", 1)
@@ -155,7 +159,7 @@ class QasmSimulatorBackend(BackendV1):
         seed = options.get("seed", -1)
 
         sim = CircuitSimulator(
-            qobj_experiment,
+            q_circ,
             approximation_step_fidelity=approximation_step_fidelity,
             approximation_steps=approximation_steps,
             approximation_strategy=approximation_strategy,
@@ -166,8 +170,8 @@ class QasmSimulatorBackend(BackendV1):
         counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
 
         result = {
-            "header": qobj_experiment.header.to_dict(),
-            "name": qobj_experiment.header.name,
+            "header": None,      # Before it was   "header": qobj_experiment.header.to_dict()   (Info about the gates and measurements in the circuit)
+            "name": None,        # Before it was   "name": qobj_experiment.header.name          (Circuit's name)
             "status": "DONE",
             "time_taken": end_time - start_time,
             "seed": options.get("seed", -1),
@@ -186,11 +190,12 @@ class QasmSimulatorBackend(BackendV1):
         """Return backend status.
         Returns:
             BackendStatus: the status of the backend.
-        """
+        """ 
         return BackendStatus(
-            backend_name=self.name(),
-            backend_version=self.configuration().backend_version,
+            backend_name=self.name,
+            backend_version=self.backend_version,
             operational=True,
             pending_jobs=0,
             status_msg="",
         )
+        
