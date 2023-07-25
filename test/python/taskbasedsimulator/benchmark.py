@@ -154,13 +154,13 @@ def run_benchmark(
     qc.remove_final_measurements(inplace=True)
     qc = transpile(qc, basis_gates=basis_gates_transpile, optimization_level=0)
     for i in range(qc.size()):
-        if qc[i][0].name == "u2" or qc[i][0].name == "u3":  # noqa: PLR1714
+        if qc[i][0].name in ("u2", "u3"):
             index = "u" + str(len(qc[i][1]) - 1)
-        elif qc[i][0].name == "cx" or qc[i][0].name == "ccx" or qc[i][0].name.startswith("mcx"):
+        elif qc[i][0].name in ("cx", "ccx") or qc[i][0].name.startswith("mcx"):
             index = "x" + str(len(qc[i][1]) - 1)
-        elif qc[i][0].name == "mcphase" or qc[i][0].name == "cp":  # noqa: PLR1714
+        elif qc[i][0].name in ("mcphase", "cp"):
             index = "p" + str(len(qc[i][1]) - 1)
-        elif qc[i][0].name == "cz":
+        elif qc[i][0].name in ("cz",):
             index = "z" + str(len(qc[i][1]) - 1)
         else:
             index = str(qc[i][0].name) + str(len(qc[i][1]) - 1)
