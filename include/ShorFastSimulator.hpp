@@ -69,19 +69,19 @@ class ShorFastSimulator: public Simulator<Config> {
     std::map<dd::vNode*, dd::vEdge> dagEdges;
 
 public:
-    ShorFastSimulator(const std::uint32_t compositeNumber, const std::uint32_t coprimeA_, const bool verbose = false):
+    ShorFastSimulator(const std::uint32_t compositeNumber, const std::uint32_t coprimeA_, const bool verbose_ = false):
         Simulator<Config>(), compositeN(compositeNumber), coprimeA(coprimeA_),
         requiredBits(static_cast<std::size_t>(std::ceil(std::log2(compositeNumber)))),
         nQubits(static_cast<std::size_t>(std::ceil(std::log2(compositeN))) + 1),
-        verbose(verbose) {
+        verbose(verbose_) {
         nodesOnLevel.resize(nQubits);
     };
 
-    ShorFastSimulator(const std::uint32_t compositeNumber, const std::uint32_t coprimeA_, const std::uint64_t seed, const bool verbose = false):
-        Simulator<Config>(seed), compositeN(compositeNumber), coprimeA(coprimeA_),
+    ShorFastSimulator(const std::uint32_t compositeNumber, const std::uint32_t coprimeA_, const std::uint64_t seed_, const bool verbose_ = false):
+        Simulator<Config>(seed_), compositeN(compositeNumber), coprimeA(coprimeA_),
         requiredBits(static_cast<std::size_t>(std::ceil(std::log2(compositeNumber)))),
         nQubits(static_cast<std::size_t>(std::ceil(std::log2(compositeN))) + 1),
-        verbose(verbose) {
+        verbose(verbose_) {
         nodesOnLevel.resize(nQubits);
     };
 
