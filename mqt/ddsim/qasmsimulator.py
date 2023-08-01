@@ -12,7 +12,17 @@ from qiskit.providers.models import BackendStatus, BackendConfiguration
 from qiskit.qobj import PulseQobj, QasmQobj
 from qiskit.result import Result
 from qiskit.circuit import Parameter
-from qiskit.circuit.library import GlobalPhaseGate, MCPhaseGate, MCXGrayCode, MCXRecursive, MCXVChain, MCMT, RXGate, RYGate, RZGate
+from qiskit.circuit.library import (
+    GlobalPhaseGate,
+    MCPhaseGate,
+    MCXGrayCode,
+    MCXRecursive,
+    MCXVChain,
+    MCMT,
+    RXGate,
+    RYGate,
+    RZGate,
+)
 from qiskit.transpiler import Target, InstructionProperties
 
 from mqt.ddsim import CircuitSimulator, __version__
@@ -23,19 +33,22 @@ logger = logging.getLogger(__name__)
 
 """Need to define new class for mcrx, mcry and mcrz. They cannot be found in qiskit.circuit.library"""
 
+
 class MCRXGate(MCMT):
-    def __init__(self, num_ctrl_qubits= None, theta= None):
-    	MCMT.__init__(self, gate= RXGate(theta), num_ctrl_qubits = num_ctrl_qubits, num_target_qubits=1)
-   
+    def __init__(self, num_ctrl_qubits=None, theta=None):
+        MCMT.__init__(self, gate=RXGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
+
+
 class MCRYGate(MCMT):
-    def __init__(self, num_ctrl_qubits= None, theta= None):
-    	MCMT.__init__(self, gate= RYGate(theta), num_ctrl_qubits = num_ctrl_qubits, num_target_qubits=1)
-    	
+    def __init__(self, num_ctrl_qubits=None, theta=None):
+        MCMT.__init__(self, gate=RYGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
+
+
 class MCRZGate(MCMT):
-    def __init__(self, num_ctrl_qubits= None, theta= None):
-    	MCMT.__init__(self, gate= RZGate(theta), num_ctrl_qubits = num_ctrl_qubits, num_target_qubits=1) 	
-    	
-    	
+    def __init__(self, num_ctrl_qubits=None, theta=None):
+        MCMT.__init__(self, gate=RZGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
+
+
 class QasmSimulatorBackend(BackendV2):
     """Python interface to MQT DDSIM"""
 
@@ -51,9 +64,8 @@ class QasmSimulatorBackend(BackendV2):
             approximation_steps=0,
             approximation_strategy="fidelity",
         )
-        
-    def __init__(self, provider=None, name= None , description= None , online_date=None, backend_version= None):
-    
+
+    def __init__(self, provider=None, name=None, description=None, online_date=None, backend_version=None):
         conf = {
             "url": "https://github.com/cda-tum/mqt-ddsim",
             "simulator": True,
@@ -115,20 +127,39 @@ class QasmSimulatorBackend(BackendV2):
             "open_pulse": False,
             "gates": [],
         }
-        
-        custom_name_mapping_dict = {"gphase": GlobalPhaseGate(Parameter("ϴ")), "u0": GlobalPhaseGate(Parameter("ϴ")), "mcphase": MCPhaseGate, "mcx_gray": MCXGrayCode, "mcx_recursive": MCXRecursive,
-        "mcx_vchain" : MCXVChain, "mcrx": MCRXGate , "mcry": MCRYGate , "mcrz": MCRZGate }
-        
-        super().__init__(provider=provider, name= "qasm_simulator", description= "MQT DDSIM C++ simulator", online_date=None, backend_version=__version__)        
-        self.target= Target.from_configuration(basis_gates=conf["basis_gates"], coupling_map=None, num_qubits= 64, custom_name_mapping = custom_name_mapping_dict)
 
-        
+        custom_name_mapping_dict = {
+            "gphase": GlobalPhaseGate(Parameter("ϴ")),
+            "u0": GlobalPhaseGate(Parameter("ϴ")),
+            "mcphase": MCPhaseGate,
+            "mcx_gray": MCXGrayCode,
+            "mcx_recursive": MCXRecursive,
+            "mcx_vchain": MCXVChain,
+            "mcrx": MCRXGate,
+            "mcry": MCRYGate,
+            "mcrz": MCRZGate,
+        }
+
+        super().__init__(
+            provider=provider,
+            name="qasm_simulator",
+            description="MQT DDSIM C++ simulator",
+            online_date=None,
+            backend_version=__version__,
+        )
+        self.target = Target.from_configuration(
+            basis_gates=conf["basis_gates"],
+            coupling_map=None,
+            num_qubits=64,
+            custom_name_mapping=custom_name_mapping_dict,
+        )
+
     def target(self):
-    	return self.target
-    	
+        return self.target
+
     def max_circuits(self):
-    	return 1000000000
-        
+        return 1000000000
+
     def run(self, quantum_circuits: Union[QuantumCircuit, List[QuantumCircuit]], **options) -> DDSIMJob:
         if isinstance(quantum_circuits, (QasmQobj, PulseQobj)):
             msg = "QasmQobj and PulseQobj are not supported."
@@ -159,7 +190,7 @@ class QasmSimulatorBackend(BackendV2):
         result = {
             "backend_name": self.name,
             "backend_version": self.backend_version,
-            "qobj_id": None , 
+            "qobj_id": None,
             "job_id": job_id,
             "results": result_list,
             "status": "COMPLETED",
@@ -213,5 +244,3 @@ class QasmSimulatorBackend(BackendV2):
             pending_jobs=0,
             status_msg="",
         )
-
-

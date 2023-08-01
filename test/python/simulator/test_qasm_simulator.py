@@ -26,7 +26,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         self.circuit.name = "test"
 
     def test_target(self):
-        """Test backend.target """
+        """Test backend.target"""
         return self.backend.target
 
     def test_status(self):
