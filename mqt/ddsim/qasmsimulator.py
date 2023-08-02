@@ -18,6 +18,7 @@ from qiskit.circuit.library import (
     RXGate,
     RYGate,
     RZGate,
+    Measure,
 )
 from qiskit.providers import BackendV2, Options
 from qiskit.providers.models import BackendStatus, BackendConfiguration
@@ -37,16 +38,18 @@ logger = logging.getLogger(__name__)
 class MCRXGate(MCMT):
     def __init__(self, num_ctrl_qubits=None, theta=None):
         super().__init__(gate=RXGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
+        QuantumCircuit.__init__(self)
 
 
 class MCRYGate(MCMT):
     def __init__(self, num_ctrl_qubits=None, theta=None):
         super().__init__(gate=RYGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
-
+        QuantumCircuit.__init__(self)
 
 class MCRZGate(MCMT):
     def __init__(self, num_ctrl_qubits=None, theta=None):
         super().__init__(gate=RZGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
+        QuantumCircuit.__init__(self)
 
 
 class QasmSimulatorBackend(BackendV2):
@@ -164,6 +167,7 @@ class QasmSimulatorBackend(BackendV2):
             num_qubits=64,
             custom_name_mapping=custom_name_mapping_dict,
         )
+        self.target.add_instruction(Measure())
         
         self._configuration = BackendConfiguration.from_dict(conf)
           
@@ -269,5 +273,4 @@ class QasmSimulatorBackend(BackendV2):
             status_msg="",
         )
         
-        
-      
+         
