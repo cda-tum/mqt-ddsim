@@ -166,12 +166,8 @@ class QasmSimulatorBackend(BackendV2):
             num_qubits=64,
             custom_name_mapping=custom_name_mapping_dict,
         )
-<<<<<<< HEAD
-        self.target.add_instruction(Measure())
-        
-=======
 
->>>>>>> b16a2c660a5c472ec75664194b181bf104a508d5
+        self.target.add_instruction(Measure())
         self._configuration = BackendConfiguration.from_dict(conf)
 
     def target(self):
@@ -277,7 +273,3 @@ class QasmSimulatorBackend(BackendV2):
             status_msg="",
         )
 
-        
-         
-=======
->>>>>>> b16a2c660a5c472ec75664194b181bf104a508d5
