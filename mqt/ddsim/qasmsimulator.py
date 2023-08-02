@@ -36,17 +36,17 @@ logger = logging.getLogger(__name__)
 
 class MCRXGate(MCMT):
     def __init__(self, num_ctrl_qubits=None, theta=None):
-        super().__init__(self, gate=RXGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
+        super().__init__(gate=RXGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
 
 
 class MCRYGate(MCMT):
     def __init__(self, num_ctrl_qubits=None, theta=None):
-        super().__init__(self, gate=RYGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
+        super().__init__(gate=RYGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
 
 
 class MCRZGate(MCMT):
     def __init__(self, num_ctrl_qubits=None, theta=None):
-        super().__init__(self, gate=RZGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
+        super().__init__(gate=RZGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
 
 
 class QasmSimulatorBackend(BackendV2):
