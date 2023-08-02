@@ -7,23 +7,23 @@ import warnings
 from typing import Dict, List, Union
 
 from qiskit import QiskitError, QuantumCircuit
-from qiskit.providers import BackendV2, Options
-from qiskit.providers.models import BackendStatus, BackendConfiguration
-from qiskit.qobj import PulseQobj, QasmQobj
-from qiskit.result import Result
 from qiskit.circuit import Parameter
 from qiskit.circuit.library import (
+    MCMT,
     GlobalPhaseGate,
     MCPhaseGate,
     MCXGrayCode,
     MCXRecursive,
     MCXVChain,
-    MCMT,
     RXGate,
     RYGate,
     RZGate,
 )
-from qiskit.transpiler import Target, InstructionProperties
+from qiskit.providers import BackendV2, Options
+from qiskit.providers.models import BackendStatus
+from qiskit.qobj import PulseQobj, QasmQobj
+from qiskit.result import Result
+from qiskit.transpiler import Target
 
 from mqt.ddsim import CircuitSimulator, __version__
 from mqt.ddsim.job import DDSIMJob
