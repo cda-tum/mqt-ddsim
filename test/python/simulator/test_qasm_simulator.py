@@ -29,6 +29,10 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         """Test backend.target"""
         return self.backend.target
 
+    def test_configuration(self):
+        """Test backend.configuration()."""
+        return self.backend.configuration()
+
     def test_status(self):
         """Test backend.status()."""
         return self.backend.status()

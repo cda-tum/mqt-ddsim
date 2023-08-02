@@ -14,14 +14,13 @@ class MQTStatevectorSimulatorTest(unittest.TestCase):
         self.q_circuit.h(qr[0])
         self.q_circuit.cx(qr[0], qr[1])
 
+    def test_target(self):
+        """Test backend.target"""
+        return self.backend.target
+
     def test_configuration(self):
         """Test backend.configuration()."""
         return self.backend.configuration()
-
-    def test_properties(self):
-        """Test backend.properties()."""
-        properties = self.backend.properties()
-        assert properties is None
 
     def test_status(self):
         """Test backend.status()."""
