@@ -15,10 +15,10 @@ from qiskit.circuit.library import (
     MCXGrayCode,
     MCXRecursive,
     MCXVChain,
+    Measure,
     RXGate,
     RYGate,
     RZGate,
-    Measure,
 )
 from qiskit.providers import BackendV2, Options
 from qiskit.providers.models import BackendConfiguration, BackendStatus
@@ -45,6 +45,7 @@ class MCRYGate(MCMT):
     def __init__(self, num_ctrl_qubits=None, theta=None):
         super().__init__(gate=RYGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
         QuantumCircuit.__init__(self)
+
 
 class MCRZGate(MCMT):
     def __init__(self, num_ctrl_qubits=None, theta=None):
@@ -272,4 +273,3 @@ class QasmSimulatorBackend(BackendV2):
             pending_jobs=0,
             status_msg="",
         )
-
