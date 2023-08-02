@@ -20,7 +20,7 @@ from qiskit.circuit.library import (
     RZGate,
 )
 from qiskit.providers import BackendV2, Options
-from qiskit.providers.models import BackendStatus, BackendConfiguration
+from qiskit.providers.models import BackendConfiguration, BackendStatus
 from qiskit.qobj import PulseQobj, QasmQobj
 from qiskit.result import Result
 from qiskit.transpiler import Target
@@ -64,9 +64,8 @@ class QasmSimulatorBackend(BackendV2):
             approximation_steps=0,
             approximation_strategy="fidelity",
         )
-    
+
     def __init__(self, provider=None, name=None, description=None, online_date=None, backend_version=None):
-        
         conf = {
             "backend_name": "qasm_simulator",
             "backend_version": __version__,
@@ -134,7 +133,7 @@ class QasmSimulatorBackend(BackendV2):
             "open_pulse": False,
             "gates": [],
         }
-        
+
         custom_name_mapping_dict = {
             "gphase": GlobalPhaseGate(Parameter("ϴ")),
             "u0": GlobalPhaseGate(Parameter("ϴ")),
@@ -149,36 +148,37 @@ class QasmSimulatorBackend(BackendV2):
 
         super().__init__(
             provider=provider,
-            name= name,
-            description= description,
+            name=name,
+            description=description,
             online_date=None,
-            backend_version= backend_version,
+            backend_version=backend_version,
         )
-    
-        self.name= "qasm_simulator"
-        self.description= "MQT DDSIM C++ simulator"
-        self.backend_version= __version__
+
+        self.name = "qasm_simulator"
+        self.description = "MQT DDSIM C++ simulator"
+        self.backend_version = __version__
         self.target = Target.from_configuration(
             basis_gates=conf["basis_gates"],
             coupling_map=None,
             num_qubits=64,
             custom_name_mapping=custom_name_mapping_dict,
         )
-        
+
         self._configuration = BackendConfiguration.from_dict(conf)
-          
-    
+
     def target(self):
         return self.target
-    
+
     def configuration(self):
-        warnings.warn("The configuration() method is deprecated and will be removed in a "
-                      "future release. Instead you should access these attributes directly "
-                      "off the object or via the .target attribute. You can refer to qiskit "
-                      "backend interface transition guide for the exact changes: "
-                      "https://qiskit.org/documentation/apidoc/providers.html#backendv1-backendv2",
-                      DeprecationWarning)
-                      
+        warnings.warn(
+            "The configuration() method is deprecated and will be removed in a "
+            "future release. Instead you should access these attributes directly "
+            "off the object or via the .target attribute. You can refer to qiskit "
+            "backend interface transition guide for the exact changes: "
+            "https://qiskit.org/documentation/apidoc/providers.html#backendv1-backendv2",
+            DeprecationWarning,
+        )
+
         return self._configuration
 
     def max_circuits(self):
@@ -268,6 +268,3 @@ class QasmSimulatorBackend(BackendV2):
             pending_jobs=0,
             status_msg="",
         )
-        
-        
-      
