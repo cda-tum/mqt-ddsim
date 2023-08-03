@@ -222,9 +222,9 @@ class QasmSimulatorBackend(BackendV2):
             "status": "COMPLETED",
             "success": True,
             "time_taken": (end - start),
-            "header": {'backend_name': self.name , 'backend_version': self.backend_version},
+            "header": {"backend_name": self.name, "backend_version": self.backend_version},
         }
-        
+
         return Result.from_dict(result)
 
     def run_experiment(self, q_circ: QuantumCircuit, **options) -> Dict:
@@ -245,10 +245,16 @@ class QasmSimulatorBackend(BackendV2):
         end_time = time.time()
         counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
 
-        header_dict = {"n_qubits": q_circ.num_qubits, "memory_slots": q_circ.num_clbits, "name": q_circ.name, "global_phase": q_circ.global_phase, "metadata": q_circ.metadata}
+        header_dict = {
+            "n_qubits": q_circ.num_qubits,
+            "memory_slots": q_circ.num_clbits,
+            "name": q_circ.name,
+            "global_phase": q_circ.global_phase,
+            "metadata": q_circ.metadata,
+        }
 
         result = {
-	    "header": header_dict,
+            "header": header_dict,
             "name": q_circ.name,
             "status": "DONE",
             "time_taken": end_time - start_time,
