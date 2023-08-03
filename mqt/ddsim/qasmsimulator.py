@@ -277,4 +277,3 @@ class QasmSimulatorBackend(BackendV2):
             pending_jobs=0,
             status_msg="",
         )
-        
