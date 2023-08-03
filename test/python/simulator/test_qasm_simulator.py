@@ -47,7 +47,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         shots = 1024
         result = execute(self.circuit, self.backend, shots=shots).result()
         threshold = 0.04 * shots
-        counts = result.get_counts("test")
+        counts = result.get_counts()
         target = {
             "100 100": shots / 8,
             "011 011": shots / 8,
@@ -69,7 +69,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         shots = 1024
         result = execute(self.circuit, BasicAer.get_backend("qasm_simulator"), shots=shots).result()
         threshold = 0.04 * shots
-        counts = result.get_counts("test")
+        counts = result.get_counts()
         target = {
             "100 100": shots / 8,
             "011 011": shots / 8,

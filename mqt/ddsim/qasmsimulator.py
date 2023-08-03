@@ -152,15 +152,12 @@ class QasmSimulatorBackend(BackendV2):
 
         super().__init__(
             provider=provider,
-            name=name,
-            description=description,
+            name="qasm_simulator",
+            description="MQT DDSIM C++ simulator",
             online_date=None,
-            backend_version=backend_version,
+            backend_version=__version__,
         )
 
-        self.name = "qasm_simulator"
-        self.description = "MQT DDSIM C++ simulator"
-        self.backend_version = __version__
         self.target = Target.from_configuration(
             basis_gates=conf["basis_gates"],
             coupling_map=None,
@@ -273,3 +270,4 @@ class QasmSimulatorBackend(BackendV2):
             pending_jobs=0,
             status_msg="",
         )
+        

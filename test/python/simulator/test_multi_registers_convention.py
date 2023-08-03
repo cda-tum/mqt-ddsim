@@ -31,12 +31,12 @@ class CircuitMultiRegsTest(unittest.TestCase):
         backend_sim = StatevectorSimulatorBackend()
 
         result = execute(qc, backend_sim).result()
-        counts = result.get_counts(qc)
+        counts = result.get_counts()
 
         target = {"01 10": 1024}
 
         result = execute(circ, backend_sim).result()
-        state = result.get_statevector(circ)
+        state = result.get_statevector()
 
         assert counts == target
         assert math.isclose(state_fidelity(Statevector.from_label("0110"), state), 1.0, abs_tol=0.000001)
