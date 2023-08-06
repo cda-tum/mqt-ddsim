@@ -32,7 +32,7 @@ from mqt.ddsim.job import DDSIMJob
 logger = logging.getLogger(__name__)
 
 
-"""Need to define new class for mcrx, mcry and mcrz. They cannot be found in qiskit.circuit.library"""
+# Need to define new class for mcrx, mcry and mcrz. They cannot be found in qiskit.circuit.library
 
 
 class MCRXGate(MCMT):
@@ -152,10 +152,10 @@ class QasmSimulatorBackend(BackendV2):
 
         super().__init__(
             provider=provider,
-            name="qasm_simulator",
-            description="MQT DDSIM C++ simulator",
-            online_date=None,
-            backend_version=__version__,
+            name= name or "qasm_simulator",
+            description= description or"MQT DDSIM C++ simulator",
+            online_date= online_date or None,
+            backend_version= backend_version or __version__,
         )
 
         self.target = Target.from_configuration(
@@ -178,7 +178,7 @@ class QasmSimulatorBackend(BackendV2):
             "off the object or via the .target attribute. You can refer to qiskit "
             "backend interface transition guide for the exact changes: "
             "https://qiskit.org/documentation/apidoc/providers.html#backendv1-backendv2",
-            DeprecationWarning,
+            DeprecationWarning, stacklevel=1
         )
 
         return self._configuration
