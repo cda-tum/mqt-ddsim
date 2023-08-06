@@ -244,9 +244,30 @@ class QasmSimulatorBackend(BackendV2):
         counts = sim.simulate(options.get("shots", 1024))
         end_time = time.time()
         counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
+        
+        qubit_labels = []
+        clbit_labels = []
+        qreg_sizes = []
+        creg_sizes = []
+    
+        for qreg in q_circ.qregs:
+            qreg_sizes.append([qreg.name, qreg.size])
+            for j in range(qreg.size):
+                qubit_labels.append([qreg.name, j])
+ 
+        for creg in q_circ.cregs:
+            creg_sizes.append([creg.name, creg.size])
+            for j in range(creg.size):
+                clbit_labels.append([creg.name, j])
 
-        header_dict = {"n_qubits": q_circ.num_qubits, "memory_slots": q_circ.num_clbits, "name": q_circ.name, "global_phase": q_circ.global_phase, "metadata": q_circ.metadata}
 
+        metadata = q_circ.metadata
+        if metadata is None:
+            metadata = {}
+
+
+        header_dict = {"clbit_labels" : clbit_labels , "qubit_labels": qubit_labels , "creg_sizes": creg_sizes , "qreg_sizes": qreg_sizes , "n_qubits": q_circ.num_qubits, "memory_slots": q_circ.num_clbits, "name": q_circ.name, "global_phase": q_circ.global_phase, "metadata": metadata}
+        
         result = {
 	    "header": header_dict,
             "name": q_circ.name,
