@@ -5,8 +5,6 @@ import logging
 from mqt.ddsim import __version__
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
-logger = logging.getLogger(__name__)
-
 
 class StatevectorSimulatorBackend(QasmSimulatorBackend):
     """Python interface to MQT DDSIM"""
