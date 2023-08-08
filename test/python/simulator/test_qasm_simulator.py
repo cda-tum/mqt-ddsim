@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import numpy as np
 import pytest
-from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister, execute
+from qiskit import AncillaRegister, ClassicalRegister, QuantumCircuit, QuantumRegister, execute
 
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
@@ -123,3 +124,89 @@ def test_qasm_simulator_portfolioqaoa(backend: QasmSimulatorBackend, shots: int)
 
     counts = result.get_counts()
     assert len(counts) == 8
+
+
+@pytest.mark.parametrize("num_controls", list(range(1, 8)))
+def test_qasm_simulator_mcx_no_ancilla(backend: QasmSimulatorBackend, num_controls: int, shots: int):
+    """Test MCX gate with no ancilla qubits."""
+    nqubits = num_controls + 1
+    q = QuantumRegister(nqubits)
+    c = ClassicalRegister(nqubits)
+    circuit = QuantumCircuit(q, c)
+    controls = q[1:nqubits]
+    circuit.x(controls)
+    circuit.mcx(controls, q[0], mode="noancilla")
+    circuit.measure(q, c)
+
+    print(backend.target.operation_names)
+
+    result = execute(circuit, backend, shots=shots).result()
+    assert result.success
+
+    counts = result.get_counts()
+    assert len(counts) == 1
+    assert counts["1" * nqubits] == shots
+
+
+@pytest.mark.parametrize("num_controls", list(range(1, 8)))
+def test_qasm_simulator_mcx_recursion(backend: QasmSimulatorBackend, num_controls: int, shots: int):
+    """Test MCX gate in recursion mode."""
+    nqubits = num_controls + 1
+    q = QuantumRegister(nqubits)
+    c = ClassicalRegister(nqubits)
+    anc = AncillaRegister(1)
+    circuit = QuantumCircuit(q, c, anc)
+    controls = q[1:nqubits]
+    circuit.x(controls)
+    circuit.mcx(controls, q[0], ancilla_qubits=anc, mode="recursion")
+    circuit.measure(q, c)
+
+    result = execute(circuit, backend, shots=shots).result()
+    assert result.success
+
+    counts = result.get_counts()
+    assert len(counts) == 1
+    assert counts["1" * nqubits] == shots
+
+
+@pytest.mark.parametrize("num_controls", list(range(1, 8)))
+def test_qasm_simulator_mcx_vchain(backend: QasmSimulatorBackend, num_controls: int, shots: int):
+    """Test MCX gate in v-chain mode."""
+    nqubits = num_controls + 1
+    q = QuantumRegister(nqubits)
+    c = ClassicalRegister(nqubits)
+    anc = AncillaRegister(max(0, num_controls - 2))
+    circuit = QuantumCircuit(q, c, anc)
+    controls = q[1:nqubits]
+    circuit.x(controls)
+    circuit.mcx(controls, q[0], ancilla_qubits=anc, mode="v-chain")
+    circuit.measure(q, c)
+
+    result = execute(circuit, backend, shots=shots).result()
+    assert result.success
+
+    counts = result.get_counts()
+    assert len(counts) == 1
+    assert counts["1" * nqubits] == shots
+
+
+@pytest.mark.parametrize("num_controls", list(range(1, 8)))
+def test_qasm_simulator_mcp(backend: QasmSimulatorBackend, num_controls: int, shots: int):
+    """Test MCPhase gate."""
+    nqubits = num_controls + 1
+    q = QuantumRegister(nqubits)
+    c = ClassicalRegister(nqubits)
+    circuit = QuantumCircuit(q, c)
+    controls = q[1:nqubits]
+    circuit.x(controls)
+    circuit.h(q[0])
+    circuit.mcp(np.pi, controls, q[0])
+    circuit.h(q[0])
+    circuit.measure(q, c)
+
+    result = execute(circuit, backend, shots=shots).result()
+    assert result.success
+
+    counts = result.get_counts()
+    assert len(counts) == 1
+    assert counts["1" * nqubits] == shots
