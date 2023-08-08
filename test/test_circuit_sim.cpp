@@ -317,10 +317,11 @@ TEST(CircuitSimTest, TooManyQubitsForVectorTest) {
 }
 
 TEST(CircuitSimTest, BernsteinVaziraniTest) {
-    std::size_t const n       = 3;
-    auto              qc      = std::make_unique<qc::BernsteinVazirani>(n, true);
-    auto              circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
-    const auto        result  = circSim->simulate(1024U);
+    std::size_t const n        = 3;
+    auto              qc       = std::make_unique<qc::BernsteinVazirani>(n, true);
+    const auto        expected = qc->expected; // qc will be undefined after move
+    auto              circSim  = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
+    const auto        result   = circSim->simulate(1024U);
     EXPECT_EQ(result.size(), 1);
-    EXPECT_EQ(result.at(qc->expected), 1024);
+    EXPECT_EQ(result.at(expected), 1024);
 }
