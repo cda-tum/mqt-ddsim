@@ -294,9 +294,3 @@ class QasmSimulatorBackend(BackendV2):
             pending_jobs=0,
             status_msg="",
         )
-
-
-backend = QasmSimulatorBackend()
-
-for ii in range(0, len(backend.target.instructions)):
-    print(backend.target.instructions[ii])
