@@ -21,7 +21,7 @@ from qiskit.circuit.library import (
     RZGate,
 )
 from qiskit.providers import BackendV2, Options
-from qiskit.providers.models import BackendConfiguration, BackendStatus
+from qiskit.providers.models import BackendStatus
 from qiskit.qobj import PulseQobj, QasmQobj
 from qiskit.result import Result
 from qiskit.transpiler import Target
@@ -165,23 +165,9 @@ class QasmSimulatorBackend(BackendV2):
         )
 
         self.target.add_instruction(Measure())
-        self._configuration = BackendConfiguration.from_dict(conf)
 
     def target(self):
         return self.target
-
-    def configuration(self):
-        warnings.warn(
-            "The configuration() method is deprecated and will be removed in a "
-            "future release. Instead you should access these attributes directly "
-            "off the object or via the .target attribute. You can refer to qiskit "
-            "backend interface transition guide for the exact changes: "
-            "https://qiskit.org/documentation/apidoc/providers.html#backendv1-backendv2",
-            DeprecationWarning,
-            stacklevel=1,
-        )
-
-        return self._configuration
 
     def max_circuits(self):
         return 1000000000
