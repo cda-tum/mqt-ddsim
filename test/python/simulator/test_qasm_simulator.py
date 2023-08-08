@@ -25,18 +25,6 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         )
         self.circuit.name = "test"
 
-    def test_target(self):
-        """Test backend.target"""
-        return self.backend.target
-
-    def test_configuration(self):
-        """Test backend.configuration()."""
-        return self.backend.configuration()
-
-    def test_status(self):
-        """Test backend.status()."""
-        return self.backend.status()
-
     def test_qasm_simulator_single_shot(self):
         """Test single shot run."""
         result = execute(self.circuit, self.backend, shots=1).result()

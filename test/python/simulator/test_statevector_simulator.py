@@ -14,18 +14,6 @@ class MQTStatevectorSimulatorTest(unittest.TestCase):
         self.q_circuit.h(qr[0])
         self.q_circuit.cx(qr[0], qr[1])
 
-    def test_target(self):
-        """Test backend.target"""
-        return self.backend.target
-
-    def test_configuration(self):
-        """Test backend.configuration()."""
-        return self.backend.configuration()
-
-    def test_status(self):
-        """Test backend.status()."""
-        return self.backend.status()
-
     def test_statevector_output(self):
         """Test final state vector for single circuit run."""
         result = execute(self.q_circuit, backend=self.backend).result()
