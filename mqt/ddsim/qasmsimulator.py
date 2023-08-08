@@ -69,14 +69,21 @@ class QasmSimulatorBackend(BackendV2):
     def __init__(self):
         super().__init__(name="qasm_simulator", description="MQT DDSIM QASM Simulator", backend_version=__version__)
 
-        conf = {
-            "backend_name": "qasm_simulator",
-            "backend_version": __version__,
-            "url": "https://github.com/cda-tum/mqt-ddsim",
-            "simulator": True,
-            "local": True,
-            "description": "MQT DDSIM C++ simulator",
-            "basis_gates": [
+        custom_name_mapping_dict = {
+            "gphase": GlobalPhaseGate(Parameter("ϴ")),
+            "u0": GlobalPhaseGate(Parameter("ϴ")),
+            "mcphase": MCPhaseGate,
+            "mcx_gray": MCXGrayCode,
+            "mcx_recursive": MCXRecursive,
+            "mcx_vchain": MCXVChain,
+            "mcrx": MCRXGate,
+            "mcry": MCRYGate,
+            "mcrz": MCRZGate,
+            "reset": Reset,
+        }
+
+        self._target = Target.from_configuration(
+            basis_gates=[
                 "gphase",
                 "id",
                 "u0",
@@ -129,30 +136,6 @@ class QasmSimulatorBackend(BackendV2):
                 "xx_minus_yy",
                 "xx_plus_yy",
             ],
-            "memory": False,
-            "n_qubits": 64,
-            "coupling_map": None,
-            "conditional": False,
-            "max_shots": 1000000000,
-            "open_pulse": False,
-            "gates": [],
-        }
-
-        custom_name_mapping_dict = {
-            "gphase": GlobalPhaseGate(Parameter("ϴ")),
-            "u0": GlobalPhaseGate(Parameter("ϴ")),
-            "mcphase": MCPhaseGate,
-            "mcx_gray": MCXGrayCode,
-            "mcx_recursive": MCXRecursive,
-            "mcx_vchain": MCXVChain,
-            "mcrx": MCRXGate,
-            "mcry": MCRYGate,
-            "mcrz": MCRZGate,
-            "reset": Reset,
-        }
-
-        self._target = Target.from_configuration(
-            basis_gates=conf["basis_gates"],
             coupling_map=None,
             num_qubits=64,
             custom_name_mapping=custom_name_mapping_dict,
