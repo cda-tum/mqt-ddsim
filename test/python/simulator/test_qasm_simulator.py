@@ -7,13 +7,13 @@ from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
 
 @pytest.fixture()
-def backend():
+def backend() -> QasmSimulatorBackend:
     """The backend fixture for the tests in this file."""
     return QasmSimulatorBackend()
 
 
 @pytest.fixture()
-def circuit():
+def circuit() -> QuantumCircuit:
     """The circuit fixture for the tests in this file."""
     qc = QuantumCircuit(name="test")
     q = QuantumRegister(3, "q")
@@ -32,29 +32,35 @@ def circuit():
     return qc
 
 
-def test_qasm_simulator_single_shot(circuit, backend):
+@pytest.fixture()
+def shots() -> int:
+    """Number of shots for the tests in this file."""
+    return 1024
+
+
+def test_qasm_simulator_single_shot(circuit: QuantumCircuit, backend: QasmSimulatorBackend):
     """Test single shot run."""
     result = execute(circuit, backend, shots=1).result()
     assert result.success
 
 
-def test_qasm_simulator(circuit, backend):
+def test_qasm_simulator(circuit: QuantumCircuit, backend: QasmSimulatorBackend, shots: int):
     """Test data counts output for single circuit run against reference."""
-    shots = 1024
     result = execute(circuit, backend, shots=shots).result()
     assert result.success
 
     threshold = 0.04 * shots
+    average = shots / 8
     counts = result.get_counts("test")
     target = {
-        "100 100": shots / 8,
-        "011 011": shots / 8,
-        "101 101": shots / 8,
-        "111 111": shots / 8,
-        "000 000": shots / 8,
-        "010 010": shots / 8,
-        "110 110": shots / 8,
-        "001 001": shots / 8,
+        "100 100": average,
+        "011 011": average,
+        "101 101": average,
+        "111 111": average,
+        "000 000": average,
+        "010 010": average,
+        "110 110": average,
+        "001 001": average,
     }
     assert len(target) == len(counts)
     for key in target:
@@ -62,9 +68,8 @@ def test_qasm_simulator(circuit, backend):
         assert abs(target[key] - counts[key]) < threshold
 
 
-def test_qasm_simulator_approximation(backend):
+def test_qasm_simulator_approximation(backend: QasmSimulatorBackend, shots: int):
     """Test data counts output for single circuit run against reference."""
-    shots = 1024
     circuit = QuantumCircuit(2)
     circuit.h(0)
     circuit.cx(0, 1)
@@ -74,7 +79,7 @@ def test_qasm_simulator_approximation(backend):
     assert len(counts) == 1
 
 
-def test_qasm_simulator_portfolioqaoa(backend):
+def test_qasm_simulator_portfolioqaoa(backend: QasmSimulatorBackend, shots: int):
     """Run simulator with with 2-target gates that take a parameter. Circuit taken from MQT Bench."""
     circuit = QuantumCircuit.from_qasm_str(
         """OPENQASM 2.0;
@@ -113,7 +118,7 @@ def test_qasm_simulator_portfolioqaoa(backend):
         measure q[2] -> meas0[2];
         """
     )
-    result = execute(circuit, backend).result()
+    result = execute(circuit, backend, shots=shots).result()
     assert result.success
 
     counts = result.get_counts()
