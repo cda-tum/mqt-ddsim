@@ -1,4 +1,5 @@
 #include "CircuitSimulator.hpp"
+#include "algorithms/BernsteinVazirani.hpp"
 #include "algorithms/Grover.hpp"
 
 #include <gtest/gtest.h>
@@ -313,4 +314,11 @@ TEST(CircuitSimTest, TooManyQubitsForVectorTest) {
     CircuitSimulator ddsim(std::move(qc));
     ddsim.simulate(0);
     EXPECT_THROW({ [[maybe_unused]] auto _ = ddsim.getVector<std::complex<dd::fp>>(); }, std::range_error);
+}
+
+TEST(CircuitSimTest, BernsteinVaziraniTest) {
+    std::size_t const n       = 3;
+    auto              qc      = std::make_unique<qc::BernsteinVazirani>(n, true);
+    auto              circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
+    const auto        result  = circSim->simulate(1024U);
 }
