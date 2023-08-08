@@ -105,6 +105,7 @@ class DDSIMTargetBuilder:
 
     @classmethod
     def add_multi_qubit_gates(cls, target: Target):
+        target.add_instruction(qcl.MCXGate, name="mcx")
         target.add_instruction(qcl.MCXGrayCode, name="mcx_gray")
         target.add_instruction(qcl.MCXRecursive, name="mcx_recursive")
         target.add_instruction(qcl.MCXVChain, name="mcx_vchain")
