@@ -13,6 +13,3 @@ class StatevectorSimulatorBackend(QasmSimulatorBackend):
         super().__init__()
         self.name = "statevector_simulator"
         self.description = "MQT DDSIM Statevector Simulator"
-
-    def _validate(self, _quantum_circuit):
-        return

@@ -189,8 +189,6 @@ class QasmSimulatorBackend(BackendV2):
         return local_job
 
     def _run_job(self, job_id, quantum_circuits: list, **options) -> Result:
-        self._validate(quantum_circuits)
-
         start = time.time()
         result_list = [self.run_experiment(q_circ, **options) for q_circ in quantum_circuits]
         end = time.time()
@@ -272,9 +270,6 @@ class QasmSimulatorBackend(BackendV2):
         if self.SHOW_STATE_VECTOR:
             result["data"]["statevector"] = sim.get_vector()
         return result
-
-    def _validate(self, _quantum_circuit):
-        return
 
     def status(self) -> BackendStatus:
         """Return backend status.
