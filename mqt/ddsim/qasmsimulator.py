@@ -169,8 +169,9 @@ class QasmSimulatorBackend(BackendV2):
     def target(self):
         return self.target
 
+    @property
     def max_circuits(self):
-        return 1000000000
+        return None
 
     def run(self, quantum_circuits: Union[QuantumCircuit, List[QuantumCircuit]], **options) -> DDSIMJob:
         if isinstance(quantum_circuits, (QasmQobj, PulseQobj)):
