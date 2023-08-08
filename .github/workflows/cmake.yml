@@ -27,12 +27,14 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
+      - name: Set up mold as linker
+        uses: rui314/setup-mold@v1
       - name: Configure CMake
         run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DBINDINGS=ON -DBUILD_DDSIM_TESTS=ON
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
       - name: Test
-        run: ctest -C $BUILD_TYPE --output-on-failure --test-dir build --repeat until-pass:3 --timeout 300
+        run: ctest --build-config $BUILD_TYPE --output-on-failure --test-dir build --repeat until-pass:3 --timeout 300
 
   build-macos:
     name: Build and Test on MacOS
@@ -47,7 +49,7 @@ jobs:
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
       - name: Test
-        run: ctest -C $BUILD_TYPE --output-on-failure --test-dir build --repeat until-pass:3 --timeout 300
+        run: ctest --build-config $BUILD_TYPE --output-on-failure --test-dir build --repeat until-pass:3 --timeout 300
 
   build-windows:
     name: Build and Test on Windows
@@ -63,7 +65,7 @@ jobs:
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config $BUILD_TYPE
       - name: Test
-        run: ctest -C $BUILD_TYPE --output-on-failure --test-dir build --repeat until-pass:3 --timeout 300
+        run: ctest --build-config $BUILD_TYPE --output-on-failure --test-dir build --repeat until-pass:3 --timeout 300
 
   coverage:
     name: Coverage
@@ -73,13 +75,15 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
+      - name: Set up mold as linker
+        uses: rui314/setup-mold@v1
       - name: Configure CMake
-        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DBUILD_DDSIM_TESTS=ON -DBINDINGS=ON
+        run: cmake -S "${{github.workspace}}" -B "${{github.workspace}}/build" -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=1 -DBUILD_DDSIM_TESTS=ON -DBINDINGS=ON
       - name: Build
         run: cmake --build "${{github.workspace}}/build" --config Debug --target ddsim_test
       - name: Test
         working-directory: ${{github.workspace}}/build/test
-        run: ctest -C Debug --output-on-failure
+        run: ctest --build-config Debug --output-on-failure
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:

@@ -7,8 +7,8 @@
 #include "HybridSchrodingerFeynmanSimulator.hpp"
 #include "PathSimulator.hpp"
 #include "UnitarySimulator.hpp"
-#include "qiskit/QasmQobjExperiment.hpp"
-#include "qiskit/QuantumCircuit.hpp"
+#include "python/qiskit/QasmQobjExperiment.hpp"
+#include "python/qiskit/QuantumCircuit.hpp"
 
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
@@ -75,7 +75,7 @@ std::unique_ptr<Simulator> constructSimulatorWithoutSeed(const py::object& circ,
 
 void getNumpyMatrixRec(const qc::MatrixDD& e, const std::complex<dd::fp>& amp, std::size_t i, std::size_t j, std::size_t dim, std::complex<dd::fp>* mat) {
     // calculate new accumulated amplitude
-    auto w = std::complex<dd::fp>{dd::CTEntry::val(e.w.r), dd::CTEntry::val(e.w.i)};
+    auto w = std::complex<dd::fp>{dd::RealNumber::val(e.w.r), dd::RealNumber::val(e.w.i)};
     auto c = amp * w;
 
     // base case

@@ -360,7 +360,7 @@ void PathSimulator<Config>::constructTaskGraph() {
     const auto& steps = simulationPath.steps;
 
     if (path.empty()) {
-        Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::QubitCount>(CircuitSimulator<Config>::qc->getNqubits()));
+        Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::Qubit>(CircuitSimulator<Config>::qc->getNqubits()));
         return;
     }
 
@@ -374,7 +374,7 @@ void PathSimulator<Config>::constructTaskGraph() {
         if (leftID < nleaves) {
             if (leftID == 0) {
                 // initial state
-                qc::VectorDD zeroState = Simulator<Config>::dd->makeZeroState(static_cast<dd::QubitCount>(CircuitSimulator<Config>::qc->getNqubits()));
+                qc::VectorDD zeroState = Simulator<Config>::dd->makeZeroState(static_cast<dd::Qubit>(CircuitSimulator<Config>::qc->getNqubits()));
                 Simulator<Config>::dd->incRef(zeroState);
                 results.emplace(leftID, zeroState);
             } else {

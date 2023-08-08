@@ -3,9 +3,9 @@
 
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
-#include "Operations.hpp"
 #include "QuantumComputation.hpp"
 #include "dd/Export.hpp"
+#include "dd/Operations.hpp"
 #include "dd/Package.hpp"
 
 #include <complex>
@@ -99,7 +99,7 @@ private:
         qc::VectorDD edge{};
 
         explicit Slice(std::unique_ptr<dd::Package<Config>>& dd, const qc::Qubit start_, const qc::Qubit end_, const std::size_t controls_):
-            start(start_), end(end_), controls(controls_), nqubits(end - start + 1), edge(dd->makeZeroState(static_cast<dd::QubitCount>(nqubits), start_)) {
+            start(start_), end(end_), controls(controls_), nqubits(end - start + 1), edge(dd->makeZeroState(static_cast<dd::Qubit>(nqubits), start_)) {
             dd->incRef(edge);
         }
 

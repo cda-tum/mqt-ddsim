@@ -3,8 +3,8 @@
 
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
-#include "Operations.hpp"
 #include "QuantumComputation.hpp"
+#include "dd/Operations.hpp"
 #include "dd/Package.hpp"
 
 #include <memory>
@@ -46,7 +46,7 @@ public:
     [[nodiscard]] qc::MatrixDD getConstructedDD() const { return e; }
     [[nodiscard]] double       getConstructionTime() const { return constructionTime; }
     [[nodiscard]] std::size_t  getFinalNodeCount() const { return Simulator<Config>::dd->size(e); }
-    [[nodiscard]] std::size_t  getMaxNodeCount() const override { return Simulator<Config>::dd->mUniqueTable.getPeakNodeCount(); }
+    [[nodiscard]] std::size_t  getMaxNodeCount() const override { return Simulator<Config>::dd->template getUniqueTable<dd::mNode>().getStats().peakActiveEntryCount; }
 
 private:
     qc::MatrixDD e{};

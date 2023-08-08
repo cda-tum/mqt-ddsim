@@ -6,12 +6,12 @@ using CN = dd::ComplexNumbers;
 
 template<class Config>
 std::map<std::string, double> DeterministicNoiseSimulator<Config>::deterministicSimulate() {
-    rootEdge = Simulator<Config>::dd->makeZeroDensityOperator(static_cast<dd::QubitCount>(qc->getNqubits()));
+    rootEdge = Simulator<Config>::dd->makeZeroDensityOperator(static_cast<dd::Qubit>(qc->getNqubits()));
     Simulator<Config>::dd->incRef(rootEdge);
 
     auto deterministicNoiseFunctionality = dd::DeterministicNoiseFunctionality<Config>(
             Simulator<Config>::dd,
-            static_cast<dd::QubitCount>(qc->getNqubits()),
+            static_cast<dd::Qubit>(qc->getNqubits()),
             noiseProbSingleQubit,
             noiseProbMultiQubit,
             ampDampingProbSingleQubit,
@@ -54,10 +54,10 @@ std::map<std::string, std::size_t> DeterministicNoiseSimulator<Config>::sampleFr
     for (const auto& [state, prob]: resultProbabilityMap) {
         weights.emplace_back(prob);
     }
-    std::discrete_distribution<std::size_t> d(weights.begin(), weights.end());
+    std::discrete_distribution<std::size_t> d(weights.begin(), weights.end()); // NOLINT(misc-const-correctness) false-positive
 
     //Sample n shots elements from the prob distribution
-    std::map<std::size_t, std::size_t> results;
+    std::map<std::size_t, std::size_t> results; // NOLINT(misc-const-correctness) false-positive
     for (size_t n = 0; n < shots; ++n) {
         ++results[d(Simulator<Config>::mt)];
     }
