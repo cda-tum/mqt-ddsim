@@ -17,12 +17,12 @@ public:
                              std::optional<double>                     ampDampingProbability,
                              double                                    multiQubitGateFactor_,
                              std::size_t                               stochRuns,
-                             const std::string&                        recordedProperties,
+                             const std::string&                        recordedProperties_,
                              bool                                      unoptimizedSim,
                              std::uint32_t                             stepNumber_,
                              double                                    stepFidelity_,
-                             std::size_t                               seed = 0U):
-        Simulator<Config>(seed),
+                             std::size_t                               seed_ = 0U):
+        Simulator<Config>(seed_),
         qc(std::move(qc_)),
         stepNumber(stepNumber_),
         stepFidelity(stepFidelity_),
@@ -34,15 +34,15 @@ public:
         maxInstances(std::thread::hardware_concurrency() > 4 ? std::thread::hardware_concurrency() - 4 : 1),
         noiseEffects(initializeNoiseEffects(noiseEffects_)) {
         sanityCheckOfNoiseProbabilities(noiseProbability, amplitudeDampingProb, multiQubitGateFactor);
-        setRecordedProperties(recordedProperties);
+        setRecordedProperties(recordedProperties_);
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, const unsigned int stepNumber, const double stepFidelity):
-        StochasticNoiseSimulator(std::move(qc), std::string("APD"), 0.001, std::optional<double>{}, 2, 1000, std::string("0-256"), false, stepNumber, stepFidelity) {}
+    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const unsigned int stepNumber_, const double stepFidelity_):
+        StochasticNoiseSimulator(std::move(qc_), std::string("APD"), 0.001, std::optional<double>{}, 2, 1000, std::string("0-256"), false, stepNumber_, stepFidelity_) {}
 
-    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc, const unsigned int stepNumber, const double stepFidelity, std::size_t seed):
-        StochasticNoiseSimulator(std::move(qc), std::string("APD"), 0.001, std::optional<double>{}, 2, 1000, std::string("0-256"), false, stepNumber, stepFidelity, seed) {}
+    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const unsigned int stepNumber_, const double stepFidelity_, std::size_t seed_):
+        StochasticNoiseSimulator(std::move(qc_), std::string("APD"), 0.001, std::optional<double>{}, 2, 1000, std::string("0-256"), false, stepNumber_, stepFidelity_, seed_) {}
 
     std::vector<std::pair<std::int64_t, std::string>> recordedProperties;
     std::vector<std::vector<double>>                  recordedPropertiesPerInstance;

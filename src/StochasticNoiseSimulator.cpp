@@ -217,10 +217,13 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
                 if (op->isClassicControlledOperation()) {
                     // Check if the operation is controlled by a classical register
                     auto* classicOp = dynamic_cast<qc::ClassicControlledOperation*>(op.get());
-                    bool  executeOp = true;
-                    auto  expValue  = classicOp->getExpectedValue();
+                    if (classicOp == nullptr) {
+                        throw std::runtime_error("Dynamic cast to ClassicControlledOperation* failed.");
+                    }
+                    bool executeOp = true;
+                    auto expValue  = classicOp->getExpectedValue();
 
-                    for (auto i = static_cast<std::size_t>(classicOp->getControlRegister().first); i < classicOp->getControlRegister().second; i++) {
+                    for (auto i = classicOp->getControlRegister().first; i < classicOp->getControlRegister().second; i++) {
                         if (static_cast<std::uint64_t>(classicValues[i]) != (expValue % 2U)) {
                             executeOp = false;
                             break;
