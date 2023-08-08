@@ -1,10 +1,7 @@
 import functools
-import logging
 from concurrent import futures
 
 from qiskit.providers import JobError, JobStatus, JobV1
-
-logger = logging.getLogger(__name__)
 
 
 def requires_submit(func):
