@@ -1,5 +1,8 @@
 #include "CircuitSimulator.hpp"
+#include "algorithms/BernsteinVazirani.hpp"
 #include "algorithms/Grover.hpp"
+#include "algorithms/QFT.hpp"
+#include "algorithms/QPE.hpp"
 
 #include <gtest/gtest.h>
 #include <memory>
@@ -313,4 +316,30 @@ TEST(CircuitSimTest, TooManyQubitsForVectorTest) {
     CircuitSimulator ddsim(std::move(qc));
     ddsim.simulate(0);
     EXPECT_THROW({ [[maybe_unused]] auto _ = ddsim.getVector<std::complex<dd::fp>>(); }, std::range_error);
+}
+
+TEST(CircuitSimTest, BernsteinVaziraniDynamicTest) {
+    std::size_t const n        = 3;
+    auto              qc       = std::make_unique<qc::BernsteinVazirani>(n, true);
+    const auto        expected = qc->expected; // qc will be undefined after move
+    auto              circSim  = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
+    const auto        result   = circSim->simulate(1024U);
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_EQ(result.at(expected), 1024);
+}
+
+TEST(CircuitSimTest, QPEDynamicTest) {
+    std::size_t const n       = 3;
+    auto              qc      = std::make_unique<qc::QPE>(n, true, true);
+    auto              circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
+    const auto        result  = circSim->simulate(1024U);
+    EXPECT_GE(result.size(), 1);
+}
+
+TEST(CircuitSimTest, QFTDynamicTest) {
+    std::size_t const n       = 3;
+    auto              qc      = std::make_unique<qc::QFT>(n, true, true);
+    auto              circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
+    const auto        result  = circSim->simulate(1024U);
+    EXPECT_GE(result.size(), 1);
 }

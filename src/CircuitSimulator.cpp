@@ -35,6 +35,7 @@ std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_
                 measurementMap[quantum.at(i)] = classic.at(i);
             }
         }
+
         if (hasMeasurements && op->isUnitary()) {
             measurementsLast = false;
         }
@@ -126,6 +127,21 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
                         auto result = Simulator<Config>::measureOneCollapsing(quantum.at(i));
                         assert(result == '0' || result == '1');
                         classicValues[classic.at(i)] = (result == '1');
+                    }
+
+                } else if (nonUnitaryOp->getType() == qc::Reset) {
+                    const auto& qubits = nonUnitaryOp->getTargets();
+                    for (const auto& qubit: qubits) {
+                        auto bit = Simulator<Config>::dd->measureOneCollapsing(Simulator<Config>::rootEdge, static_cast<dd::Qubit>(qubit), true, Simulator<Config>::mt);
+                        // apply an X operation whenever the measured result is one
+                        if (bit == '1') {
+                            const auto x   = qc::StandardOperation(qc->getNqubits(), qubit, qc::X);
+                            auto       tmp = Simulator<Config>::dd->multiply(dd::getDD(&x, Simulator<Config>::dd), Simulator<Config>::rootEdge);
+                            Simulator<Config>::dd->incRef(tmp);
+                            Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
+                            Simulator<Config>::rootEdge = tmp;
+                            Simulator<Config>::dd->garbageCollect();
+                        }
                     }
                 } else if (op->getType() == qc::Barrier) {
                     continue;
