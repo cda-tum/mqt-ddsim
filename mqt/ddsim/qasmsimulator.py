@@ -66,7 +66,9 @@ class QasmSimulatorBackend(BackendV2):
             approximation_strategy="fidelity",
         )
 
-    def __init__(self, provider=None, name=None, description=None, online_date=None, backend_version=None):
+    def __init__(self):
+        super().__init__(name="qasm_simulator", description="MQT DDSIM QASM Simulator", backend_version=__version__)
+
         conf = {
             "backend_name": "qasm_simulator",
             "backend_version": __version__,
@@ -148,14 +150,6 @@ class QasmSimulatorBackend(BackendV2):
             "mcrz": MCRZGate,
             "reset": Reset,
         }
-
-        super().__init__(
-            provider=provider,
-            name=name or "qasm_simulator",
-            description=description or "MQT DDSIM C++ simulator",
-            online_date=online_date or None,
-            backend_version=backend_version or __version__,
-        )
 
         self._target = Target.from_configuration(
             basis_gates=conf["basis_gates"],
