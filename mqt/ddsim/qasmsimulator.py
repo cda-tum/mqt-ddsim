@@ -1,11 +1,13 @@
-"""Backend for DDSIM."""
+"""QASM Simulator Backend for DDSIM."""
+
+from __future__ import annotations
 
 import time
 import uuid
 import warnings
-from typing import Dict, List, Union
+from typing import Any
 
-from qiskit import QiskitError, QuantumCircuit
+from qiskit import QuantumCircuit
 from qiskit.circuit import Parameter
 from qiskit.circuit.library import (
     MCMT,
@@ -21,7 +23,6 @@ from qiskit.circuit.library import (
     RZGate,
 )
 from qiskit.providers import BackendV2, Options
-from qiskit.qobj import PulseQobj, QasmQobj
 from qiskit.result import Result
 from qiskit.transpiler import Target
 
@@ -150,11 +151,7 @@ class QasmSimulatorBackend(BackendV2):
     def max_circuits(self):
         return None
 
-    def run(self, quantum_circuits: Union[QuantumCircuit, List[QuantumCircuit]], **options) -> DDSIMJob:
-        if isinstance(quantum_circuits, (QasmQobj, PulseQobj)):
-            msg = "QasmQobj and PulseQobj are not supported."
-            raise QiskitError(msg)
-
+    def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options) -> DDSIMJob:
         if not isinstance(quantum_circuits, list):
             quantum_circuits = [quantum_circuits]
 
@@ -170,7 +167,7 @@ class QasmSimulatorBackend(BackendV2):
         local_job.submit()
         return local_job
 
-    def _run_job(self, job_id, quantum_circuits: list, **options) -> Result:
+    def _run_job(self, job_id: int, quantum_circuits: list[QuantumCircuit], **options) -> Result:
         start = time.time()
         result_list = [self.run_experiment(q_circ, **options) for q_circ in quantum_circuits]
         end = time.time()
@@ -189,7 +186,7 @@ class QasmSimulatorBackend(BackendV2):
 
         return Result.from_dict(result)
 
-    def run_experiment(self, q_circ: QuantumCircuit, **options) -> Dict:
+    def run_experiment(self, q_circ: QuantumCircuit, **options) -> dict[str, Any]:
         start_time = time.time()
         approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
         approximation_steps = options.get("approximation_steps", 1)
