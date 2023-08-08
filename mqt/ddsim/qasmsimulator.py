@@ -21,7 +21,6 @@ from qiskit.circuit.library import (
     RZGate,
 )
 from qiskit.providers import BackendV2, Options
-from qiskit.providers.models import BackendStatus
 from qiskit.qobj import PulseQobj, QasmQobj
 from qiskit.result import Result
 from qiskit.transpiler import Target
@@ -253,16 +252,3 @@ class QasmSimulatorBackend(BackendV2):
         if self.SHOW_STATE_VECTOR:
             result["data"]["statevector"] = sim.get_vector()
         return result
-
-    def status(self) -> BackendStatus:
-        """Return backend status.
-        Returns:
-            BackendStatus: the status of the backend.
-        """
-        return BackendStatus(
-            backend_name=self.name,
-            backend_version=self.backend_version,
-            operational=True,
-            pending_jobs=0,
-            status_msg="",
-        )
