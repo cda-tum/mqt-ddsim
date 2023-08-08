@@ -5,55 +5,25 @@ from __future__ import annotations
 import time
 import uuid
 import warnings
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qiskit import QuantumCircuit
-from qiskit.circuit import Parameter
-from qiskit.circuit.library import (
-    MCMT,
-    GlobalPhaseGate,
-    MCPhaseGate,
-    MCXGrayCode,
-    MCXRecursive,
-    MCXVChain,
-    Measure,
-    Reset,
-    RXGate,
-    RYGate,
-    RZGate,
-)
 from qiskit.providers import BackendV2, Options
 from qiskit.result import Result
 from qiskit.transpiler import Target
 
-from mqt.ddsim import CircuitSimulator, __version__
-from mqt.ddsim.job import DDSIMJob
+from . import CircuitSimulator, __version__
+from .job import DDSIMJob
+from .target import DDSIMTargetBuilder
 
-# Need to define new class for mcrx, mcry and mcrz. They cannot be found in qiskit.circuit.library
-
-
-class MCRXGate(MCMT):
-    def __init__(self, num_ctrl_qubits=None, theta=None):
-        super().__init__(gate=RXGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
-        QuantumCircuit.__init__(self)
-
-
-class MCRYGate(MCMT):
-    def __init__(self, num_ctrl_qubits=None, theta=None):
-        super().__init__(gate=RYGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
-        QuantumCircuit.__init__(self)
-
-
-class MCRZGate(MCMT):
-    def __init__(self, num_ctrl_qubits=None, theta=None):
-        super().__init__(gate=RZGate(theta), num_ctrl_qubits=num_ctrl_qubits, num_target_qubits=1)
-        QuantumCircuit.__init__(self)
+if TYPE_CHECKING:
+    from qiskit import QuantumCircuit
 
 
 class QasmSimulatorBackend(BackendV2):
     """Python interface to MQT DDSIM"""
 
     SHOW_STATE_VECTOR = False
+    TARGET = Target(description="MQT DDSIM Simulator Target", num_qubits=128)
 
     @classmethod
     def _default_options(cls) -> Options:
@@ -66,86 +36,23 @@ class QasmSimulatorBackend(BackendV2):
             approximation_strategy="fidelity",
         )
 
+    def _initialize_target(self):
+        DDSIMTargetBuilder.add_0q_gates(self.TARGET)
+        DDSIMTargetBuilder.add_1q_gates(self.TARGET)
+        DDSIMTargetBuilder.add_2q_gates(self.TARGET)
+        DDSIMTargetBuilder.add_3q_gates(self.TARGET)
+        DDSIMTargetBuilder.add_multi_qubit_gates(self.TARGET)
+        DDSIMTargetBuilder.add_non_unitary_operations(self.TARGET)
+        DDSIMTargetBuilder.add_barrier(self.TARGET)
+
     def __init__(self):
         super().__init__(name="qasm_simulator", description="MQT DDSIM QASM Simulator", backend_version=__version__)
-
-        custom_name_mapping_dict = {
-            "gphase": GlobalPhaseGate(Parameter("ϴ")),
-            "u0": GlobalPhaseGate(Parameter("ϴ")),
-            "mcphase": MCPhaseGate,
-            "mcx_gray": MCXGrayCode,
-            "mcx_recursive": MCXRecursive,
-            "mcx_vchain": MCXVChain,
-            "mcrx": MCRXGate,
-            "mcry": MCRYGate,
-            "mcrz": MCRZGate,
-            "reset": Reset,
-        }
-
-        self._target = Target.from_configuration(
-            basis_gates=[
-                "gphase",
-                "id",
-                "u0",
-                "u1",
-                "u2",
-                "u3",
-                "cu3",
-                "x",
-                "cx",
-                "ccx",
-                "mcx_gray",
-                "mcx_recursive",
-                "mcx_vchain",
-                "y",
-                "cy",
-                "z",
-                "cz",
-                "h",
-                "ch",
-                "s",
-                "sdg",
-                "t",
-                "tdg",
-                "rx",
-                "crx",
-                "mcrx",
-                "ry",
-                "cry",
-                "mcry",
-                "rz",
-                "crz",
-                "mcrz",
-                "p",
-                "cp",
-                "cu1",
-                "mcphase",
-                "sx",
-                "csx",
-                "sxdg",
-                "swap",
-                "cswap",
-                "iswap",
-                "dcx",
-                "ecr",
-                "rxx",
-                "ryy",
-                "rzz",
-                "rzx",
-                "reset",
-                "xx_minus_yy",
-                "xx_plus_yy",
-            ],
-            coupling_map=None,
-            num_qubits=64,
-            custom_name_mapping=custom_name_mapping_dict,
-        )
-
-        self.target.add_instruction(Measure())
+        if len(self.TARGET.operations) == 0:
+            self._initialize_target()
 
     @property
     def target(self):
-        return self._target
+        return self.TARGET
 
     @property
     def max_circuits(self):
