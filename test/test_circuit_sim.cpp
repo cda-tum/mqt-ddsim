@@ -321,4 +321,6 @@ TEST(CircuitSimTest, BernsteinVaziraniTest) {
     auto              qc      = std::make_unique<qc::BernsteinVazirani>(n, true);
     auto              circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
     const auto        result  = circSim->simulate(1024U);
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_EQ(result.at(qc->expected), 1024);
 }
