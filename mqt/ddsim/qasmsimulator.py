@@ -157,7 +157,7 @@ class QasmSimulatorBackend(BackendV2):
             backend_version=backend_version or __version__,
         )
 
-        self.target = Target.from_configuration(
+        self._target = Target.from_configuration(
             basis_gates=conf["basis_gates"],
             coupling_map=None,
             num_qubits=64,
@@ -166,8 +166,9 @@ class QasmSimulatorBackend(BackendV2):
 
         self.target.add_instruction(Measure())
 
+    @property
     def target(self):
-        return self.target
+        return self._target
 
     @property
     def max_circuits(self):
