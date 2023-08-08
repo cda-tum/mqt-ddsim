@@ -1,6 +1,5 @@
 """Backend for DDSIM."""
 
-import logging
 
 from mqt.ddsim import __version__
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend

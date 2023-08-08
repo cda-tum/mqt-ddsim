@@ -1,6 +1,5 @@
 """Backend for DDSIM."""
 
-import logging
 import time
 import uuid
 import warnings
@@ -29,7 +28,6 @@ from qiskit.transpiler import Target
 
 from mqt.ddsim import CircuitSimulator, __version__
 from mqt.ddsim.job import DDSIMJob
-
 
 # Need to define new class for mcrx, mcry and mcrz. They cannot be found in qiskit.circuit.library
 
@@ -148,7 +146,7 @@ class QasmSimulatorBackend(BackendV2):
             "mcrx": MCRXGate,
             "mcry": MCRYGate,
             "mcrz": MCRZGate,
-            "reset": Reset
+            "reset": Reset,
         }
 
         super().__init__(
@@ -308,9 +306,9 @@ class QasmSimulatorBackend(BackendV2):
             pending_jobs=0,
             status_msg="",
         )
-        
-        
+
+
 backend = QasmSimulatorBackend()
 
-for ii in range (0, len(backend.target.instructions)):
-	print(backend.target.instructions[ii])
+for ii in range(0, len(backend.target.instructions)):
+    print(backend.target.instructions[ii])
