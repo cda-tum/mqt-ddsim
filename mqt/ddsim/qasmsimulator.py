@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import time
 import uuid
-import warnings
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
+from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
 from qiskit.result import Result
 from qiskit.transpiler import Target
@@ -14,9 +14,6 @@ from qiskit.transpiler import Target
 from . import CircuitSimulator, __version__
 from .job import DDSIMJob
 from .target import DDSIMTargetBuilder
-
-if TYPE_CHECKING:
-    from qiskit import QuantumCircuit
 
 
 class QasmSimulatorBackend(BackendV2):
@@ -59,15 +56,8 @@ class QasmSimulatorBackend(BackendV2):
         return None
 
     def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options) -> DDSIMJob:
-        if not isinstance(quantum_circuits, list):
+        if isinstance(quantum_circuits, QuantumCircuit):
             quantum_circuits = [quantum_circuits]
-
-        out_options = {}
-        for key in options:
-            if not hasattr(self.options, key):
-                warnings.warn("Option %s is not used by this backend" % key, UserWarning, stacklevel=2)
-            else:
-                out_options[key] = options[key]
 
         job_id = str(uuid.uuid4())
         local_job = DDSIMJob(self, job_id, self._run_job, quantum_circuits, **options)
