@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import time
 import uuid
-from typing import Any
 
 from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
 from qiskit.result import Result
+from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 
 from . import CircuitSimulator, __version__
@@ -66,83 +66,58 @@ class QasmSimulatorBackend(BackendV2):
 
     def _run_job(self, job_id: int, quantum_circuits: list[QuantumCircuit], **options) -> Result:
         start = time.time()
-        result_list = [self.run_experiment(q_circ, **options) for q_circ in quantum_circuits]
+        result_list = [self._run_experiment(q_circ, **options) for q_circ in quantum_circuits]
         end = time.time()
 
-        result = {
-            "backend_name": self.name,
-            "backend_version": self.backend_version,
-            "qobj_id": None,
-            "job_id": job_id,
-            "results": result_list,
-            "status": "COMPLETED",
-            "success": True,
-            "time_taken": (end - start),
-            "header": {"backend_name": self.name, "backend_version": self.backend_version},
-        }
+        return Result(
+            backend_name=self.name,
+            backend_version=self.backend_version,
+            qobj_id=None,
+            job_id=job_id,
+            success=all(res.success for res in result_list),
+            results=result_list,
+            status="COMPLETED",
+            time_taken=end - start,
+        )
 
-        return Result.from_dict(result)
-
-    def run_experiment(self, q_circ: QuantumCircuit, **options) -> dict[str, Any]:
+    def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
         start_time = time.time()
         approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
         approximation_steps = options.get("approximation_steps", 1)
         approximation_strategy = options.get("approximation_strategy", "fidelity")
-        seed = options.get("seed", -1)
+        seed = options.get("seed_simulator", -1)
+        shots = options.get("shots", 1024)
 
         sim = CircuitSimulator(
-            q_circ,
+            qc,
             approximation_step_fidelity=approximation_step_fidelity,
             approximation_steps=approximation_steps,
             approximation_strategy=approximation_strategy,
             seed=seed,
         )
-        counts = sim.simulate(options.get("shots", 1024))
+        counts = sim.simulate(shots=shots)
         end_time = time.time()
-        counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
 
-        qubit_labels = []
-        clbit_labels = []
-        qreg_sizes = []
-        creg_sizes = []
+        data = ExperimentResultData(
+            counts={hex(int(result, 2)): count for result, count in counts.items()},
+            statevector=None if not self.SHOW_STATE_VECTOR else sim.get_vector(),
+            time_taken=end_time - start_time,
+        )
 
-        for qreg in q_circ.qregs:
-            qreg_sizes.append([qreg.name, qreg.size])
-            for j in range(qreg.size):
-                qubit_labels.append([qreg.name, j])
-
-        for creg in q_circ.cregs:
-            creg_sizes.append([creg.name, creg.size])
-            for j in range(creg.size):
-                clbit_labels.append([creg.name, j])
-
-        metadata = q_circ.metadata
+        metadata = qc.metadata
         if metadata is None:
             metadata = {}
+        metadata["name"] = qc.name
+        metadata["n_qubits"] = qc.num_qubits
+        metadata["memory_slots"] = qc.num_clbits
+        metadata["global_phase"] = qc.global_phase
+        metadata["n_gates"] = qc.size()
 
-        header_dict = {
-            "clbit_labels": clbit_labels,
-            "qubit_labels": qubit_labels,
-            "creg_sizes": creg_sizes,
-            "qreg_sizes": qreg_sizes,
-            "n_qubits": q_circ.num_qubits,
-            "memory_slots": q_circ.num_clbits,
-            "name": q_circ.name,
-            "global_phase": q_circ.global_phase,
-            "metadata": metadata,
-        }
-
-        result = {
-            "header": header_dict,
-            "name": q_circ.name,
-            "status": "DONE",
-            "time_taken": end_time - start_time,
-            "seed": options.get("seed", -1),
-            "shots": options.get("shots", 1024),
-            "data": {"counts": counts_hex},
-            "success": True,
-        }
-
-        if self.SHOW_STATE_VECTOR:
-            result["data"]["statevector"] = sim.get_vector()
-        return result
+        return ExperimentResult(
+            shots=shots,
+            success=True,
+            status="DONE",
+            seed=seed,
+            data=data,
+            metadata=metadata,
+        )
