@@ -1,7 +1,13 @@
+from __future__ import annotations
+
 import functools
 from concurrent import futures
+from typing import TYPE_CHECKING
 
-from qiskit.providers import JobError, JobStatus, JobV1
+from qiskit.providers import Backend, JobError, JobStatus, JobV1
+
+if TYPE_CHECKING:
+    from qiskit import QuantumCircuit
 
 
 def requires_submit(func):
@@ -26,7 +32,7 @@ def requires_submit(func):
 
 
 class DDSIMJob(JobV1):
-    """AerJob class.
+    """DDSIMJob class.
 
     Attributes:
         _executor (futures.Executor): executor to handle asynchronous jobs
@@ -34,46 +40,33 @@ class DDSIMJob(JobV1):
 
     _executor = futures.ThreadPoolExecutor(max_workers=1)
 
-    def __init__(self, backend, job_id, fn, qobj_experiment, **args):
+    def __init__(self, backend: Backend, job_id: str, fn, experiments: list[QuantumCircuit], **args):
         super().__init__(backend, job_id)
         self._fn = fn
-        self.qobj_experiment = qobj_experiment
+        self._experiments = experiments
         self._args = args
-        self._future = None
+        self._future: futures.Future | None = None
 
     def submit(self):
         """Submit the job to the backend for execution.
 
         Raises:
-            QobjValidationError: if the JSON serialization of the Qobj passed
-            during construction does not validate against the Qobj schema.
             JobError: if trying to re-submit the job.
         """
         if self._future is not None:
-            msg = "We have already submitted the job!"
+            msg = "Job was already submitted!"
             raise JobError(msg)
 
-        self._future = self._executor.submit(self._fn, self._job_id, self.qobj_experiment, **self._args)
+        self._future = self._executor.submit(self._fn, self._job_id, self._experiments, **self._args)
 
     @requires_submit
-    def result(self, timeout=None):
-        # pylint: disable=arguments-differ
-        """Get job result. The behavior is the same as the underlying
-        concurrent Future objects,
-        https://docs.python.org/3/library/concurrent.futures.html#future-objects
-
-        Args:
-            timeout (float): number of seconds to wait for results.
-        Returns:
-            qiskit.Result: Result object
-        Raises:
-            concurrent.futures.TimeoutError: if timeout occurred.
-            concurrent.futures.CancelledError: if job cancelled before completed.
-        """
+    def result(self, timeout: float | None = None):
+        """Get job result."""
         return self._future.result(timeout=timeout)
 
     @requires_submit
     def cancel(self):
+        """Attempt to cancel the job."""
         return self._future.cancel()
 
     @requires_submit
