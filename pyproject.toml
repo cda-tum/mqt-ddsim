@@ -13,7 +13,7 @@ description = "A quantum simulator based on decision diagrams written in C++"
 readme = "README.md"
 authors = [
     { name = "Stefan Hillmich", email = "stefan.hillmich@jku.at"},
-    { name = "Lukas Burgholzer", email = "lukas.burgholzer@jku.at"}
+    { name = "Lukas Burgholzer", email = "lukas.burgholzer@tum.de"}
 ]
 keywords = ["MQT", "quantum computing", "design automation", "quantum circuit simulation", "simulation"]
 license = { file = "LICENSE" }
@@ -73,7 +73,7 @@ dev = ["mqt.ddsim[tnflow, coverage, docs]"]
 
 [project.urls]
 Homepage = "https://github.com/cda-tum/mqt-ddsim"
-Documentation = "https://ddsim.readthedocs.io"
+Documentation = "https://mqt.readthedocs.io/projects/ddsim"
 "Bug Tracker" = "https://github.com/cda-tum/mqt-ddsim/issues"
 Discussions = "https://github.com/cda-tum/mqt-ddsim/discussions"
 Research = "https://www.cda.cit.tum.de/research/quantum_simulation/"
