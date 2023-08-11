@@ -72,7 +72,7 @@ dev = ["mqt.ddsim[tnflow, coverage, docs]"]
 
 [project.urls]
 Homepage = "https://github.com/cda-tum/mqt-ddsim"
-Documentation = "https://ddsim.readthedocs.io"
+Documentation = "https://mqt.readthedocs.io/projects/ddsim"
 "Bug Tracker" = "https://github.com/cda-tum/mqt-ddsim/issues"
 Discussions = "https://github.com/cda-tum/mqt-ddsim/discussions"
 Research = "https://www.cda.cit.tum.de/research/quantum_simulation/"
