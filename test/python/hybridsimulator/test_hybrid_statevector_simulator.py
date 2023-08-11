@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 import unittest
 
@@ -7,7 +9,7 @@ from mqt.ddsim.hybridstatevectorsimulator import HybridStatevectorSimulatorBacke
 
 
 class MQTHybridStatevectorSimulatorTest(unittest.TestCase):
-    """Runs backend checks and some very basic functionality tests"""
+    """Runs backend checks and some very basic functionality tests."""
 
     def setUp(self):
         self.backend = HybridStatevectorSimulatorBackend()

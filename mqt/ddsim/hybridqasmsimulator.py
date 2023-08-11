@@ -1,11 +1,11 @@
 """Backend for DDSIM Hybrid Schrodinger-Feynman Simulator."""
+from __future__ import annotations
 
 import logging
 import time
 import uuid
 import warnings
 from math import log2
-from typing import List, Union
 
 from qiskit import QiskitError, QuantumCircuit
 from qiskit.compiler import assemble
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 class HybridQasmSimulatorBackend(BackendV1):
-    """Python interface to MQT DDSIM Hybrid Schrodinger-Feynman Simulator"""
+    """Python interface to MQT DDSIM Hybrid Schrodinger-Feynman Simulator."""
 
     SHOW_STATE_VECTOR = False
 
@@ -37,7 +37,7 @@ class HybridQasmSimulatorBackend(BackendV1):
             nthreads=local_hardware_info()["cpus"],
         )
 
-    def __init__(self, configuration=None, provider=None):
+    def __init__(self, configuration=None, provider=None) -> None:
         conf = {
             "backend_name": "hybrid_qasm_simulator",
             "backend_version": __version__,
@@ -90,7 +90,7 @@ class HybridQasmSimulatorBackend(BackendV1):
         }
         super().__init__(configuration=configuration or BackendConfiguration.from_dict(conf), provider=provider)
 
-    def run(self, quantum_circuits: Union[QuantumCircuit, List[QuantumCircuit]], **options):
+    def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options):
         if isinstance(quantum_circuits, (QasmQobj, PulseQobj)):
             msg = "QasmQobj and PulseQobj are not supported."
             raise QiskitError(msg)
@@ -189,6 +189,7 @@ class HybridQasmSimulatorBackend(BackendV1):
 
     def status(self):
         """Return backend status.
+
         Returns:
             BackendStatus: the status of the backend.
         """

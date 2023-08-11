@@ -1,11 +1,11 @@
 """Backend for DDSIM Unitary Simulator."""
+from __future__ import annotations
 
 import logging
 import time
 import uuid
 import warnings
 from math import log2, sqrt
-from typing import List, Union
 
 import numpy as np
 from qiskit import QiskitError, QuantumCircuit
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 class UnitarySimulatorBackend(BackendV1):
     """Decision diagram-based unitary simulator."""
 
-    def __init__(self, configuration=None, provider=None, **fields):
+    def __init__(self, configuration=None, provider=None, **fields) -> None:
         conf = {
             "backend_name": "unitary_simulator",
             "backend_version": __version__,
@@ -102,7 +102,7 @@ class UnitarySimulatorBackend(BackendV1):
     def _default_options(cls):
         return Options(shots=1, mode="recursive", parameter_binds=None)
 
-    def run(self, quantum_circuits: Union[QuantumCircuit, List[QuantumCircuit]], **options):
+    def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options):
         if isinstance(quantum_circuits, (QasmQobj, PulseQobj)):
             msg = "QasmQobj and PulseQobj are not supported."
             raise QiskitError(msg)
@@ -185,7 +185,7 @@ class UnitarySimulatorBackend(BackendV1):
         """Semantic validations of the qobj which cannot be done via schemas.
         Some of these may later move to backend schemas.
         1. No shots
-        2. No measurements in the middle
+        2. No measurements in the middle.
         """
         n_qubits = qobj.config.n_qubits
         max_qubits = self.configuration().n_qubits
