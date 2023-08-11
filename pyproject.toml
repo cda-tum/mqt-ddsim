@@ -171,3 +171,25 @@ line-length = 120
 
 [tool.black]
 line-length = 120
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = ["-ra", "--strict-markers", "--strict-config"]
+xfail_strict = true
+filterwarnings = [
+    "error",
+    'ignore:.*qiskit.__qiskit_version__.*:DeprecationWarning:qiskit:',
+]
+log_cli_level = "info"
+testpaths = ["test/python"]
+
+[tool.coverage]
+run.source = ["mqt.ddsim"]
+report.show_missing = true
+report.skip_empty = true
+report.precision = 1
+report.exclude_lines = [
+    'pragma: no cover',
+    '\.\.\.',
+    'if typing.TYPE_CHECKING:',
+]
