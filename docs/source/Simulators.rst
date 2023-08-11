@@ -4,7 +4,7 @@ Simulators
 ==========
 
 DDSIM offers different kinds of simulators to use. The following documentation gives an overview of the different simulator
-followed by brief demonstatrations of the usage in Python and as standalone executable.
+followed by brief demonstrations of the usage in Python and as standalone executable.
 
 All simulators immediately, or with steps in between, inherit from the abstract :cpp:class:`Simulator` class that provides
 basic functionality used by multiple actual simulators.
