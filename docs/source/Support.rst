@@ -5,7 +5,7 @@ If you are stuck with a problem using DDSIM or are having questions, please do g
 
 You can save time by following this procedure when reporting a problem:
 
-- Do try to solve the problem on your own first. Make sure to consult the `Documentation <https://ddsim.readthedocs.io/en/latest/>`_.
+- Do try to solve the problem on your own first. Make sure to consult the `Documentation <https://mqt.readthedocs.io/projects/ddsim>`_.
 - Search through past `Issues <https://github.com/cda-tum/mqt-ddsim/issues>`_ to see if someone else already had the same problem.
 - Before filing a bug report, try to create a minimal working example (MWE) that reproduces the problem. It's much easier to identify the cause for the problem if a handful of lines suffice to show that something isn't working.
 
