@@ -121,5 +121,3 @@ class QasmSimulatorBackend(BackendV2):
             data=data,
             metadata=metadata,
         )
-        
-
