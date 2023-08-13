@@ -17,19 +17,6 @@ class MQTUnitarySimulatorTest(unittest.TestCase):
         self.circuit.name = "test"
         self.non_zeros_in_bell_circuit = 16
 
-    def test_configuration(self):
-        """Test backend.configuration()."""
-        return self.backend.configuration()
-
-    def test_properties(self):
-        """Test backend.properties()."""
-        properties = self.backend.properties()
-        assert properties is None
-
-    def test_status(self):
-        """Test backend.status()."""
-        return self.backend.status()
-
     def test_unitary_simulator_sequential_mode(self):
         result = execute(self.circuit, self.backend, mode="sequential").result()
         assert result.success
