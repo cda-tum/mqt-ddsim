@@ -126,7 +126,7 @@ class UnitarySimulatorBackend(BackendV2):
             data=data,
             metadata=metadata,
             header=DDSIMHeaderBuilder.from_circ(qc),
-            time_taken= end - start
+            time_taken=end - start,
         )
 
     def _validate(self, quantum_circuits: list[QuantumCircuit]):
