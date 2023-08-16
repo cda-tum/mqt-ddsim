@@ -86,7 +86,7 @@ class UnitarySimulatorBackend(BackendV2):
         )
 
     def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
-        time.time()
+        start = time.time()
         seed = options.get("seed", -1)
         mode = options.get("mode", "recursive")
 
@@ -112,7 +112,7 @@ class UnitarySimulatorBackend(BackendV2):
             "max_dd_nodes": sim.get_max_node_count(),
             "dd_nodes": sim.get_final_node_count(),
         }
-        time.time()
+        end = time.time()
 
         metadata = qc.metadata
         if metadata is None:
@@ -126,6 +126,7 @@ class UnitarySimulatorBackend(BackendV2):
             data=data,
             metadata=metadata,
             header=DDSIMHeaderBuilder.from_circ(qc),
+            time_taken= end - start
         )
 
     def _validate(self, quantum_circuits: list[QuantumCircuit]):
