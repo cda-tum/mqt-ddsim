@@ -15,9 +15,9 @@ from qiskit.utils.multiprocessing import local_hardware_info
 
 from mqt.ddsim import ConstructionMode, UnitarySimulator, __version__, get_matrix
 from mqt.ddsim.error import DDSIMError
+from mqt.ddsim.header import DDSIMHeaderBuilder
 from mqt.ddsim.job import DDSIMJob
 from mqt.ddsim.target import DDSIMTargetBuilder
-from mqt.ddsim.header import DDSIMHeaderBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +86,7 @@ class UnitarySimulatorBackend(BackendV2):
         )
 
     def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
-        start = time.time()
+        time.time()
         seed = options.get("seed", -1)
         mode = options.get("mode", "recursive")
 
@@ -112,7 +112,7 @@ class UnitarySimulatorBackend(BackendV2):
             "max_dd_nodes": sim.get_max_node_count(),
             "dd_nodes": sim.get_final_node_count(),
         }
-        end = time.time()
+        time.time()
 
         metadata = qc.metadata
         if metadata is None:
@@ -125,7 +125,7 @@ class UnitarySimulatorBackend(BackendV2):
             seed=seed,
             data=data,
             metadata=metadata,
-            header= DDSIMHeaderBuilder.from_circ(qc),
+            header=DDSIMHeaderBuilder.from_circ(qc),
         )
 
     def _validate(self, quantum_circuits: list[QuantumCircuit]):
