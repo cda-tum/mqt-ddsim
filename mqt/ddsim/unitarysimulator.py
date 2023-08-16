@@ -9,7 +9,7 @@ import numpy as np
 from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
 from qiskit.result import Result
-from qiskit.result.models import ExperimentResult
+from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 from qiskit.utils.multiprocessing import local_hardware_info
 
@@ -106,12 +106,13 @@ class UnitarySimulatorBackend(BackendV2):
         # Add extract resulting matrix from final DD and write data
         unitary = np.zeros((2**qc.num_qubits, 2**qc.num_qubits), dtype=complex)
         get_matrix(sim, unitary)
-        data = {
-            "unitary": unitary,
-            "construction_time": sim.get_construction_time(),
-            "max_dd_nodes": sim.get_max_node_count(),
-            "dd_nodes": sim.get_final_node_count(),
-        }
+        data = ExperimentResultData(
+            unitary = unitary,
+            construction_time = sim.get_construction_time(),
+            max_dd_nodes = sim.get_max_node_count(),
+            dd_nodes = sim.get_final_node_count(),
+        )
+
         end = time.time()
 
         metadata = qc.metadata
