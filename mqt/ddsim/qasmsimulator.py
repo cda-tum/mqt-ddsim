@@ -14,6 +14,7 @@ from qiskit.transpiler import Target
 from . import CircuitSimulator, __version__
 from .job import DDSIMJob
 from .target import DDSIMTargetBuilder
+from .header import DDSIMHeaderBuilder
 
 
 class QasmSimulatorBackend(BackendV2):
@@ -107,12 +108,8 @@ class QasmSimulatorBackend(BackendV2):
         metadata = qc.metadata
         if metadata is None:
             metadata = {}
-        metadata["name"] = qc.name
-        metadata["n_qubits"] = qc.num_qubits
-        metadata["memory_slots"] = qc.num_clbits
-        metadata["global_phase"] = qc.global_phase
-        metadata["n_gates"] = qc.size()
-
+            
+            
         return ExperimentResult(
             shots=shots,
             success=True,
@@ -120,4 +117,5 @@ class QasmSimulatorBackend(BackendV2):
             seed=seed,
             data=data,
             metadata=metadata,
+            header= DDSIMHeaderBuilder.from_circ(qc),
         )

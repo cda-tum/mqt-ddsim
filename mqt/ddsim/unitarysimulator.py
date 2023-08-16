@@ -17,6 +17,7 @@ from mqt.ddsim import ConstructionMode, UnitarySimulator, __version__, get_matri
 from mqt.ddsim.error import DDSIMError
 from mqt.ddsim.job import DDSIMJob
 from mqt.ddsim.target import DDSIMTargetBuilder
+from mqt.ddsim.header import DDSIMHeaderBuilder
 
 logger = logging.getLogger(__name__)
 
@@ -116,11 +117,6 @@ class UnitarySimulatorBackend(BackendV2):
         metadata = qc.metadata
         if metadata is None:
             metadata = {}
-        metadata["name"] = qc.name
-        metadata["time_taken"] = end - start
-        metadata["n_qubits"] = qc.num_qubits
-        metadata["global_phase"] = qc.global_phase
-        metadata["n_gates"] = qc.size()
 
         return ExperimentResult(
             shots=1,
@@ -129,6 +125,7 @@ class UnitarySimulatorBackend(BackendV2):
             seed=seed,
             data=data,
             metadata=metadata,
+            header= DDSIMHeaderBuilder.from_circ(qc),
         )
 
     def _validate(self, quantum_circuits: list[QuantumCircuit]):
