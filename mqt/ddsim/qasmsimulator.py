@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import time
 import uuid
+from typing import Union
 
 from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
@@ -56,7 +57,7 @@ class QasmSimulatorBackend(BackendV2):
     def max_circuits(self):
         return None
 
-    def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options) -> DDSIMJob:
+    def run(self, quantum_circuits: Union[QuantumCircuit, list[QuantumCircuit]], **options) -> DDSIMJob:
         if isinstance(quantum_circuits, QuantumCircuit):
             quantum_circuits = [quantum_circuits]
 
