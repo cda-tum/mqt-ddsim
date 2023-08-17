@@ -44,9 +44,9 @@ class DDSIMHeaderBuilder:
     def from_circ(cls, qc: QuantumCircuit):
         data = cls.build_header_dict(qc)
         return cls(**data)
-        
-    def to_dict(self):   
-        header_dict = {
+
+    def to_dict(self):
+        return {
             "clbit_labels": self.clbit_labels,
             "qubit_labels": self.qubit_labels,
             "creg_sizes": self.creg_sizes,
@@ -56,4 +56,3 @@ class DDSIMHeaderBuilder:
             "name": self.name,
             "global_phase": self.global_phase,
         }
-        return header_dict  
