@@ -1,4 +1,5 @@
 """Backend for DDSIM Hybrid Schrodinger-Feynman Simulator."""
+from __future__ import annotations
 
 import logging
 from math import log2
@@ -13,11 +14,11 @@ logger = logging.getLogger(__name__)
 
 
 class HybridStatevectorSimulatorBackend(HybridQasmSimulatorBackend):
-    """Python interface to MQT DDSIM Hybrid Schrodinger-Feynman Simulator"""
+    """Python interface to MQT DDSIM Hybrid Schrodinger-Feynman Simulator."""
 
     SHOW_STATE_VECTOR = True
 
-    def __init__(self, configuration=None, provider=None):
+    def __init__(self, configuration=None, provider=None) -> None:
         conf = {
             "backend_name": "hybrid_statevector_simulator",
             "backend_version": __version__,

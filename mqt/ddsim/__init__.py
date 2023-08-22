@@ -1,4 +1,5 @@
-from mqt.ddsim.pyddsim import (  # noqa: I001
+from __future__ import annotations  # noqa: I001
+from mqt.ddsim.pyddsim import (
     CircuitSimulator,
     ConstructionMode,
     HybridCircuitSimulator,

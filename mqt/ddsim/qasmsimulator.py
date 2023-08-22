@@ -1,10 +1,10 @@
 """Backend for DDSIM."""
+from __future__ import annotations
 
 import logging
 import time
 import uuid
 import warnings
-from typing import Dict, List, Union
 
 from qiskit import QiskitError, QuantumCircuit
 from qiskit.compiler import assemble
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class QasmSimulatorBackend(BackendV1):
-    """Python interface to MQT DDSIM"""
+    """Python interface to MQT DDSIM."""
 
     SHOW_STATE_VECTOR = False
 
@@ -35,7 +35,7 @@ class QasmSimulatorBackend(BackendV1):
             approximation_strategy="fidelity",
         )
 
-    def __init__(self, configuration=None, provider=None):
+    def __init__(self, configuration=None, provider=None) -> None:
         conf = {
             "backend_name": "qasm_simulator",
             "backend_version": __version__,
@@ -106,7 +106,7 @@ class QasmSimulatorBackend(BackendV1):
         }
         super().__init__(configuration=configuration or BackendConfiguration.from_dict(conf), provider=provider)
 
-    def run(self, quantum_circuits: Union[QuantumCircuit, List[QuantumCircuit]], **options) -> DDSIMJob:
+    def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options) -> DDSIMJob:
         if isinstance(quantum_circuits, (QasmQobj, PulseQobj)):
             msg = "QasmQobj and PulseQobj are not supported."
             raise QiskitError(msg)
@@ -147,7 +147,7 @@ class QasmSimulatorBackend(BackendV1):
         }
         return Result.from_dict(result)
 
-    def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options) -> Dict:
+    def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options) -> dict:
         start_time = time.time()
         approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
         approximation_steps = options.get("approximation_steps", 1)
@@ -184,6 +184,7 @@ class QasmSimulatorBackend(BackendV1):
 
     def status(self) -> BackendStatus:
         """Return backend status.
+
         Returns:
             BackendStatus: the status of the backend.
         """

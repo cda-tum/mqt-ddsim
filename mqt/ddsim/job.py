@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import functools
 import logging
 from concurrent import futures
@@ -8,12 +10,12 @@ logger = logging.getLogger(__name__)
 
 
 def requires_submit(func):
-    """
-    Decorator to ensure that a submit has been performed before
+    """Decorator to ensure that a submit has been performed before
     calling the method.
 
     Args:
         func (callable): test function to be decorated.
+
     Returns:
         callable: the decorated function.
     """
@@ -37,7 +39,7 @@ class DDSIMJob(JobV1):
 
     _executor = futures.ThreadPoolExecutor(max_workers=1)
 
-    def __init__(self, backend, job_id, fn, qobj_experiment, **args):
+    def __init__(self, backend, job_id, fn, qobj_experiment, **args) -> None:
         super().__init__(backend, job_id)
         self._fn = fn
         self.qobj_experiment = qobj_experiment
@@ -63,10 +65,11 @@ class DDSIMJob(JobV1):
         # pylint: disable=arguments-differ
         """Get job result. The behavior is the same as the underlying
         concurrent Future objects,
-        https://docs.python.org/3/library/concurrent.futures.html#future-objects
+        https://docs.python.org/3/library/concurrent.futures.html#future-objects.
 
         Args:
             timeout (float): number of seconds to wait for results.
+
         Returns:
             qiskit.Result: Result object
         Raises:
@@ -81,7 +84,7 @@ class DDSIMJob(JobV1):
 
     @requires_submit
     def status(self) -> JobStatus:
-        """Gets the status of the job by querying the Python's future
+        """Gets the status of the job by querying the Python's future.
 
         Returns:
             JobStatus: The current JobStatus
