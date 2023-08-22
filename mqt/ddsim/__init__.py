@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from mqt.ddsim.provider import DDSIMProvider
+from __future__ import annotations  # noqa: I001
 from mqt.ddsim.pyddsim import (
     CircuitSimulator,
     ConstructionMode,
@@ -14,6 +12,7 @@ from mqt.ddsim.pyddsim import (
     dump_tensor_network,
     get_matrix,
 )
+from mqt.ddsim.provider import DDSIMProvider
 
 __all__ = [
     "DDSIMProvider",
