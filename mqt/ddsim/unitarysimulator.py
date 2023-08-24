@@ -4,7 +4,6 @@ import logging
 import time
 import uuid
 from math import log2, sqrt
-from typing import Union
 
 import numpy as np
 from qiskit import QuantumCircuit
@@ -59,7 +58,7 @@ class UnitarySimulatorBackend(BackendV2):
     def _default_options(cls):
         return Options(shots=1, mode="recursive", parameter_binds=None)
 
-    def run(self, quantum_circuits: Union[QuantumCircuit, list[QuantumCircuit]], **options) -> DDSIMJob:
+    def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options) -> DDSIMJob:
         if isinstance(quantum_circuits, QuantumCircuit):
             quantum_circuits = [quantum_circuits]
 
