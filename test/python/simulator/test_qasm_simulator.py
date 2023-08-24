@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import unittest
+
 import numpy as np
 import pytest
 from qiskit import AncillaRegister, ClassicalRegister, QuantumCircuit, QuantumRegister, execute

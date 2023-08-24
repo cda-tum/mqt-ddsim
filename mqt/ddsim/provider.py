@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from qiskit.providers import ProviderV1
 from qiskit.providers.providerutils import filter_backends
 
@@ -30,3 +32,6 @@ class DDSIMProvider(ProviderV1):
             if name is None or backend_name == name:
                 backends.append(backend_cls())
         return filter_backends(backends, filters=filters, **kwargs)
+        
+    def __str__(self) -> str:
+        return "DDSIMProvider"

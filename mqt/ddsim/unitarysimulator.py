@@ -1,4 +1,5 @@
 """Backend for DDSIM Unitary Simulator."""
+from __future__ import annotations
 
 import logging
 import time
@@ -39,7 +40,7 @@ class UnitarySimulatorBackend(BackendV2):
         DDSIMTargetBuilder.add_non_unitary_operations(self.TARGET)
         DDSIMTargetBuilder.add_barrier(self.TARGET)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(
             name="unitary_simulator", description="MQT DDSIM C++ Unitary Simulator", backend_version=__version__
         )
@@ -134,7 +135,7 @@ class UnitarySimulatorBackend(BackendV2):
         """Semantic validations of the quantum circuits which cannot be done via schemas.
         Some of these may later move to backend schemas.
         1. No shots
-        2. No measurements in the middle
+        2. No measurements in the middle.
         """
         for qc in quantum_circuits:
             name = qc.name

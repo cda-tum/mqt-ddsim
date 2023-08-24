@@ -1,4 +1,4 @@
-"""QASM Simulator Backend for DDSIM."""
+"""Backend for DDSIM."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from .target import DDSIMTargetBuilder
 
 
 class QasmSimulatorBackend(BackendV2):
-    """Python interface to MQT DDSIM"""
+    """Python interface to MQT DDSIM."""
 
     SHOW_STATE_VECTOR = False
     TARGET = Target(description="MQT DDSIM Simulator Target", num_qubits=128)
@@ -43,7 +43,7 @@ class QasmSimulatorBackend(BackendV2):
         DDSIMTargetBuilder.add_non_unitary_operations(self.TARGET)
         DDSIMTargetBuilder.add_barrier(self.TARGET)
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(name="qasm_simulator", description="MQT DDSIM QASM Simulator", backend_version=__version__)
         if len(self.TARGET.operations) == 0:
             self._initialize_target()
