@@ -1,8 +1,6 @@
 """Backend for DDSIM."""
 from __future__ import annotations
 
-from __future__ import annotations
-
 import time
 import uuid
 
@@ -71,7 +69,6 @@ class QasmSimulatorBackend(BackendV2):
         result_list = [self._run_experiment(q_circ, **options) for q_circ in quantum_circuits]
         end = time.time()
 
-
         return Result(
             backend_name=self.name,
             backend_version=self.backend_version,
@@ -84,7 +81,6 @@ class QasmSimulatorBackend(BackendV2):
         )
 
     def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
-
         start_time = time.time()
         approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
         approximation_steps = options.get("approximation_steps", 1)

@@ -23,7 +23,6 @@ class DDSIMProvider(ProviderV1):
         ("unitary_simulator", UnitarySimulatorBackend),
     )
 
-
     def get_backend(self, name=None, **kwargs):
         return super().get_backend(name=name, **kwargs)
 
