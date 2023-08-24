@@ -310,7 +310,7 @@ class PathQasmSimulatorBackend(BackendV1):
 
     def status(self):
         """Return backend status.
-        
+
         Returns:
             BackendStatus: the status of the backend.
         """
