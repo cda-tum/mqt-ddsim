@@ -16,19 +16,11 @@ class DDSIMHeaderBuilder:
 
     @classmethod
     def build_header_dict(cls, qc: QuantumCircuit):
-        qubit_labels = []
-        clbit_labels = []
-        qreg_sizes = []
-        creg_sizes = []
-        for qreg in qc.qregs:
-            qreg_sizes.append([qreg.name, qreg.size])
-            for j in range(qreg.size):
-                qubit_labels.append([qreg.name, j])
-        for creg in qc.cregs:
-            creg_sizes.append([creg.name, creg.size])
-            for j in range(creg.size):
-                clbit_labels.append([creg.name, j])
-
+        qubit_labels = [[qreg.name, j] for qreg in qc.qregs for j in range(qreg.size)]
+        clbit_labels = [[creg.name, j] for creg in qc.cregs for j in range(creg.size)]
+        qreg_sizes = [[qreg.name, qreg.size] for qreg in qc.qregs]
+        creg_sizes = [[creg.name, creg.size] for creg in qc.cregs]
+        
         return {
             "clbit_labels": clbit_labels,
             "qubit_labels": qubit_labels,
