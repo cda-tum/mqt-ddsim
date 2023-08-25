@@ -13,8 +13,8 @@ from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 
 from mqt.ddsim import PathCircuitSimulator, PathSimulatorConfiguration, PathSimulatorMode, __version__
-from mqt.ddsim.job import DDSIMJob
 from mqt.ddsim.header import DDSIMHeaderBuilder
+from mqt.ddsim.job import DDSIMJob
 from mqt.ddsim.target import DDSIMTargetBuilder
 
 
