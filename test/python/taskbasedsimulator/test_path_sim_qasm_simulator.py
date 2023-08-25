@@ -27,14 +27,6 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         )
         self.circuit.name = "test"
 
-    def test_configuration(self):
-        """Test backend.configuration()."""
-        return self.backend.configuration()
-
-    def test_properties(self):
-        """Test backend.properties()."""
-        properties = self.backend.properties()
-        assert properties is None
 
     def test_status(self):
         """Test backend.status()."""
