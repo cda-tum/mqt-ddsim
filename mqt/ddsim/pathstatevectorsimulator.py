@@ -13,6 +13,3 @@ class PathStatevectorSimulatorBackend(PathQasmSimulatorBackend):
         super().__init__()
         self.name = "path_sim_statevector_simulator"
         self.description = "MQT DDSIM C++ simulation path framework"
-        
-        
-

@@ -1,13 +1,11 @@
 """Backend for DDSIM Task-Based Simulator."""
 from __future__ import annotations
 
-import logging
 import pathlib
 import time
 import uuid
-import warnings
 
-from qiskit import QiskitError, QuantumCircuit
+from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
 from qiskit.providers.models import BackendStatus
 from qiskit.result import Result
@@ -18,6 +16,7 @@ from mqt.ddsim import PathCircuitSimulator, PathSimulatorConfiguration, PathSimu
 from mqt.ddsim.job import DDSIMJob
 from mqt.ddsim.header import DDSIMHeaderBuilder
 from mqt.ddsim.target import DDSIMTargetBuilder
+
 
 def read_tensor_network_file(filename):
     import numpy as np
@@ -141,10 +140,14 @@ class PathQasmSimulatorBackend(BackendV2):
         DDSIMTargetBuilder.add_barrier(self.TARGET)
 
     def __init__(self) -> None:
-        super().__init__(name="path_sim_qasm_simulator", description="MQT DDSIM C++ simulation path framework", backend_version=__version__)
+        super().__init__(
+            name="path_sim_qasm_simulator",
+            description="MQT DDSIM C++ simulation path framework",
+            backend_version=__version__,
+        )
         if len(self.TARGET.operations) == 0:
             self._initialize_target()
-            
+
     @property
     def target(self):
         return self.TARGET
@@ -152,7 +155,7 @@ class PathQasmSimulatorBackend(BackendV2):
     @property
     def max_circuits(self):
         return None
-        
+
     def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options) -> DDSIMJob:
         if isinstance(quantum_circuits, QuantumCircuit):
             quantum_circuits = [quantum_circuits]
@@ -161,7 +164,7 @@ class PathQasmSimulatorBackend(BackendV2):
         local_job = DDSIMJob(self, job_id, self._run_job, quantum_circuits, **options)
         local_job.submit()
         return local_job
-        
+
     def _run_job(self, job_id: int, quantum_circuits: list[QuantumCircuit], **options) -> Result:
         start = time.time()
         result_list = [self._run_experiment(q_circ, **options) for q_circ in quantum_circuits]
@@ -220,16 +223,16 @@ class PathQasmSimulatorBackend(BackendV2):
         setup_time = time.time()
         counts = sim.simulate(shots)
         end_time = time.time()
-        counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
-        
+        {hex(int(result, 2)): count for result, count in counts.items()}
+
         data = ExperimentResultData(
             counts={hex(int(result, 2)): count for result, count in counts.items()},
             statevector=None if not self.SHOW_STATE_VECTOR else sim.get_vector(),
             time_taken=end_time - start_time,
-            time_setup= setup_time- start_time,
-            time_sim= end_time- setup_time
+            time_setup=setup_time - start_time,
+            time_sim=end_time - setup_time,
         )
-        
+
         metadata = qc.metadata
         if metadata is None:
             metadata = {}
@@ -238,13 +241,12 @@ class PathQasmSimulatorBackend(BackendV2):
             shots=shots,
             success=True,
             status="DONE",
-            config= pathsim_configuration,
+            config=pathsim_configuration,
             seed=seed,
             data=data,
             metadata=metadata,
             header=DDSIMHeaderBuilder.from_circ(qc),
         )
-
 
     def status(self):
         """Return backend status.
