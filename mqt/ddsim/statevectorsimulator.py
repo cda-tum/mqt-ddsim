@@ -5,7 +5,7 @@ from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
 
 class StatevectorSimulatorBackend(QasmSimulatorBackend):
-    """Python interface to MQT DDSIM"""
+    """Python interface to MQT DDSIM."""
 
     SHOW_STATE_VECTOR = True
 

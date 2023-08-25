@@ -16,7 +16,7 @@ def requires_submit(func):
 
     Args:
         func (callable): test function to be decorated.
-        
+
     Returns:
         callable: the decorated function.
     """
@@ -84,7 +84,7 @@ class DDSIMJob(JobV1):
 
     @requires_submit
     def status(self) -> JobStatus:
-        """Gets the status of the job by querying the Python's future
+        """Gets the status of the job by querying the Python's future.
 
         Returns:
             JobStatus: The current JobStatus

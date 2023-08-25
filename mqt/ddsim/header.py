@@ -1,6 +1,10 @@
 """Utilities for constructing a DDSIM header."""
+from __future__ import annotations
 
-from qiskit import QuantumCircuit
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from qiskit import QuantumCircuit
 
 
 class DDSIMHeaderBuilder:

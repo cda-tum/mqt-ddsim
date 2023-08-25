@@ -32,6 +32,6 @@ class DDSIMProvider(ProviderV1):
             if name is None or backend_name == name:
                 backends.append(backend_cls())
         return filter_backends(backends, filters=filters, **kwargs)
-        
+
     def __str__(self) -> str:
         return "DDSIMProvider"
