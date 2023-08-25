@@ -24,7 +24,7 @@ class DDSIMHeaderBuilder:
         clbit_labels = [[creg.name, j] for creg in qc.cregs for j in range(creg.size)]
         qreg_sizes = [[qreg.name, qreg.size] for qreg in qc.qregs]
         creg_sizes = [[creg.name, creg.size] for creg in qc.cregs]
-        
+
         return {
             "clbit_labels": clbit_labels,
             "qubit_labels": qubit_labels,
