@@ -17,7 +17,7 @@ from qiskit.transpiler import Target
 from mqt.ddsim import PathCircuitSimulator, PathSimulatorConfiguration, PathSimulatorMode, __version__
 from mqt.ddsim.job import DDSIMJob
 from mqt.ddsim.header import DDSIMHeaderBuilder
-from mqt.ddism.target import DDSIMTargetBuilder
+from mqt.ddsim.target import DDSIMTargetBuilder
 
 def read_tensor_network_file(filename):
     import numpy as np
