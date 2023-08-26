@@ -155,7 +155,7 @@ class HybridQasmSimulatorBackend(BackendV2):
             BackendStatus: the status of the backend.
         """
         return BackendStatus(
-            backend_name=self.name(),
+            backend_name=self.name,
             backend_version=self.backend_version,
             operational=True,
             pending_jobs=0,
