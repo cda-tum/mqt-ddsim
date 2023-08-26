@@ -27,7 +27,7 @@ def test_transpilation_preserves_1q_0p_target_gates(target: Target, gate: str):
     """Test that transpilation does not change single-qubit gates without parameters that are already in the target."""
     qc = QuantumCircuit(1)
     getattr(qc, gate)(0)
-    qc_transpiled = transpile(qc, target=target, optimization_level=0)
+    qc_transpiled = transpile(qc, target=target)
     assert len(qc_transpiled.data) == 1
     assert qc_transpiled.data[0][0].name == gate
 
@@ -37,7 +37,7 @@ def test_transpile_preserves_1q_1p_target_gates(target: Target, gate: str):
     """Test that transpilation does not change single-qubit gates with one parameter that are already in the target."""
     qc = QuantumCircuit(1)
     getattr(qc, gate)(np.pi, 0)
-    qc_transpiled = transpile(qc, target=target, optimization_level=0)
+    qc_transpiled = transpile(qc, target=target)
     assert len(qc_transpiled.data) == 1
     assert qc_transpiled.data[0][0].name == gate
 
