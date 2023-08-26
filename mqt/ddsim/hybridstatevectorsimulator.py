@@ -19,9 +19,5 @@ class HybridStatevectorSimulatorBackend(HybridQasmSimulatorBackend):
     def __init__(self) -> None:
         super().__init__()
         self.name = "hybrid_statevector_simulator"
-        self.description = "MQT DDSIM C++ simulator",
-        self.TARGET.num_qubits= int(log2(local_hardware_info()["memory"] * (1024**3) / 16))
-        
-        
-
-
+        self.description = ("MQT DDSIM C++ simulator",)
+        self.TARGET.num_qubits = int(log2(local_hardware_info()["memory"] * (1024**3) / 16))

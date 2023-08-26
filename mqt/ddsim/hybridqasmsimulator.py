@@ -4,10 +4,9 @@ from __future__ import annotations
 import logging
 import time
 import uuid
-import warnings
 from math import log2
 
-from qiskit import QiskitError, QuantumCircuit
+from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
 from qiskit.providers.models import BackendStatus
 from qiskit.result import Result
@@ -17,8 +16,8 @@ from qiskit.utils.multiprocessing import local_hardware_info
 
 from mqt.ddsim import HybridCircuitSimulator, HybridMode, __version__
 from mqt.ddsim.error import DDSIMError
-from mqt.ddsim.job import DDSIMJob
 from mqt.ddsim.header import DDSIMHeaderBuilder
+from mqt.ddsim.job import DDSIMJob
 from mqt.ddsim.target import DDSIMTargetBuilder
 
 logger = logging.getLogger(__name__)
@@ -29,7 +28,7 @@ class HybridQasmSimulatorBackend(BackendV2):
 
     SHOW_STATE_VECTOR = False
     TARGET = Target(description="MQT DDSIM Simulator Target", num_qubits=128)
-    
+
     @classmethod
     def _default_options(cls) -> Options:
         return Options(
@@ -39,7 +38,7 @@ class HybridQasmSimulatorBackend(BackendV2):
             mode="amplitude",
             nthreads=local_hardware_info()["cpus"],
         )
-        
+
     def _initialize_target(self):
         DDSIMTargetBuilder.add_0q_gates(self.TARGET)
         DDSIMTargetBuilder.add_1q_gates(self.TARGET)
@@ -48,12 +47,16 @@ class HybridQasmSimulatorBackend(BackendV2):
         DDSIMTargetBuilder.add_multi_qubit_gates(self.TARGET)
         DDSIMTargetBuilder.add_non_unitary_operations(self.TARGET)
         DDSIMTargetBuilder.add_barrier(self.TARGET)
-        
+
     def __init__(self) -> None:
-        super().__init__(name="hybrid_qasm_simulator", description="MQT DDSIM Hybrid Schrodinger-Feynman C++ simulator", backend_version=__version__)
+        super().__init__(
+            name="hybrid_qasm_simulator",
+            description="MQT DDSIM Hybrid Schrodinger-Feynman C++ simulator",
+            backend_version=__version__,
+        )
         if len(self.TARGET.operations) == 0:
             self._initialize_target()
-            
+
     @property
     def target(self):
         return self.TARGET
@@ -61,7 +64,7 @@ class HybridQasmSimulatorBackend(BackendV2):
     @property
     def max_circuits(self):
         return None
-        
+
     def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options) -> DDSIMJob:
         if isinstance(quantum_circuits, QuantumCircuit):
             quantum_circuits = [quantum_circuits]
@@ -156,14 +159,18 @@ class HybridQasmSimulatorBackend(BackendV2):
 
         counts = sim.simulate(shots)
         end_time = time.time()
-        counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
+        {hex(int(result, 2)): count for result, count in counts.items()}
 
         data = ExperimentResultData(
             counts={hex(int(result, 2)): count for result, count in counts.items()},
-            statevector = None if not self.SHOW_STATE_VECTOR else sim.get_vector() if sim.get_mode() == HybridMode.DD else sim.get_final_amplitudes(),
+            statevector=None
+            if not self.SHOW_STATE_VECTOR
+            else sim.get_vector()
+            if sim.get_mode() == HybridMode.DD
+            else sim.get_final_amplitudes(),
             time_taken=end_time - start_time,
-            mode= mode,
-            nthreads= nthreads,
+            mode=mode,
+            nthreads=nthreads,
         )
 
         metadata = qc.metadata
