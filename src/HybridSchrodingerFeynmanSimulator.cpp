@@ -9,6 +9,9 @@ std::size_t HybridSchrodingerFeynmanSimulator<Config>::getNDecisions(qc::Qubit s
     std::size_t ndecisions = 0;
     // calculate number of decisions
     for (const auto& op: *CircuitSimulator<Config>::qc) {
+        if (op->getType() == qc::Barrier) {
+            continue;
+        }
         if (op->isStandardOperation()) {
             bool targetInLowerSlice  = false;
             bool targetInUpperSlice  = false;
@@ -26,8 +29,6 @@ std::size_t HybridSchrodingerFeynmanSimulator<Config>::getNDecisions(qc::Qubit s
                 (targetInUpperSlice && controlInLowerSlice)) {
                 ndecisions++;
             }
-        } else if (op->getType() == qc::Barrier || op->getType() == qc::Snapshot || op->getType() == qc::ShowProbabilities) {
-            continue;
         } else {
             throw std::invalid_argument("Only StandardOperations are supported for now.");
         }
