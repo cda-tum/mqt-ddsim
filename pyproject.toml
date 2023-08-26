@@ -1,11 +1,6 @@
 [build-system]
-requires = [
-    "setuptools>=61",
-    "setuptools_scm[toml]>=7",
-    "ninja>=1.10; sys_platform != 'win32'",
-    "cmake>=3.14",
-]
-build-backend = "setuptools.build_meta"
+requires = ["scikit-build-core>=0.5.0", "setuptools-scm>=7", "pybind11>=2.11"]
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "mqt.ddsim"
@@ -15,25 +10,27 @@ authors = [
     { name = "Stefan Hillmich", email = "stefan.hillmich@jku.at"},
     { name = "Lukas Burgholzer", email = "lukas.burgholzer@tum.de"}
 ]
-keywords = ["MQT", "quantum computing", "design automation", "quantum circuit simulation", "simulation"]
+keywords = ["MQT", "quantum-computing", "design-automation", "quantum-circuit-sim", "simulation"]
 license = { file = "LICENSE" }
 
-classifiers=[
-    "Development Status :: 5 - Production/Stable",
+classifiers = [
+    "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+    "Intended Audience :: Science/Research",
+    "Natural Language :: English",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: C++",
+    "Programming Language :: Python",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: C++",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: Microsoft :: Windows",
-    "Operating System :: MacOS",
-    "Operating System :: POSIX :: Linux",
-    "Intended Audience :: Science/Research",
-    "Natural Language :: English",
-    "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+    "Development Status :: 5 - Production/Stable",
 ]
 requires-python = ">=3.8"
 dependencies = [
@@ -74,45 +71,114 @@ dev = ["mqt.ddsim[tnflow, coverage, docs]"]
 [project.urls]
 Homepage = "https://github.com/cda-tum/mqt-ddsim"
 Documentation = "https://mqt.readthedocs.io/projects/ddsim"
-"Bug Tracker" = "https://github.com/cda-tum/mqt-ddsim/issues"
+Issues = "https://github.com/cda-tum/mqt-ddsim/issues"
 Discussions = "https://github.com/cda-tum/mqt-ddsim/discussions"
-Research = "https://www.cda.cit.tum.de/research/quantum_simulation/"
 
-[tool.setuptools.packages.find]
-include = ["mqt.*"]
+
+[tool.scikit-build]
+# Protect the configuration against future changes in scikit-build-core
+minimum-version = "0.5.0"
+
+# Set the target to build
+cmake.targets = ["pyddsim"]
+
+# Set required CMake and Ninja versions
+cmake.minimum-version = "3.19"
+ninja.minimum-version = "1.10"
+
+# Setuptools-style build caching in a local directory
+build-dir = "build/{wheel_tag}"
+
+# Build stable ABI wheels for CPython 3.12+
+wheel.py-api = "cp312"
+
+# Explicitly set the package directory
+wheel.packages = ["src/mqt"]
+
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+sdist.include = ["src/mqt/ddsim/_version.py"]
+sdist.exclude = [
+    "**/.github",
+    "**/doc",
+    "**/docs",
+    "**/meta",
+    "**/plots",
+    "**/test",
+    "**/tests",
+    "extern/mqt-core/extern/json/include",
+    "extern/mqt-core/extern/googletest",
+    "extern/mqt-core/extern/boost/config/checks",
+    "extern/mqt-core/extern/boost/config/tools",
+    "extern/mqt-core/extern/boost/multiprecision/config",
+    "extern/mqt-core/extern/boost/multiprecision/example",
+    "extern/mqt-core/extern/boost/multiprecision/performance",
+    "extern/mqt-core/extern/boost/multiprecision/tools"
+]
+
+[tool.scikit-build.cmake.define]
+BUILD_MQT_DDSIM_TESTS = "OFF"
+BUILD_MQT_DDSIM_BINDINGS = "ON"
+ENABLE_IPO = "ON"
+
+
+[tool.check-sdist]
+sdist-only = ["src/mqt/ddsim/_version.py"]
+git-only = [
+    "docs/*",
+    "extern/*",
+    "test/*",
+    ".idea/*",
+]
 
 
 [tool.setuptools_scm]
+write_to = "src/mqt/ddsim/_version.py"
 
 
-[tool.cibuildwheel]
-build = "cp3*"
-skip = "*-musllinux_*"
-archs = "auto64"
-test-extras = ["test"]
-test-command = "python -c \"from mqt import ddsim\""
-test-skip = "cp312-*"  # qiskit-terra does not support python 3.12 yet
-environment = { DEPLOY = "ON" }
-build-frontend = "build"
-build-verbosity = 3
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["test/python"]
+addopts = ["-ra", "--strict-markers", "--strict-config", "--showlocals"]
+log_cli_level = "INFO"
+xfail_strict = true
+filterwarnings = [
+    "error",
+    'ignore:.*qiskit.__qiskit_version__.*:DeprecationWarning:qiskit:',
+]
 
-[tool.cibuildwheel.linux]
+[tool.coverage]
+run.source = ["mqt.ddsim"]
+report.exclude_also = [
+    '\.\.\.',
+    'if TYPE_CHECKING:',
+]
 
-[tool.cibuildwheel.macos]
-environment = { MACOSX_DEPLOYMENT_TARGET = "10.15", DEPLOY = "ON" }
+[tool.black]
+line-length = 120
 
-[tool.cibuildwheel.windows]
-before-build = "pip install delvewheel"
-repair-wheel-command = "delvewheel repair -v -w {dest_dir} {wheel}"
 
+[tool.mypy]
+files = ["src/mqt", "test/python"]
+mypy_path = ["$MYPY_CONFIG_FILE_DIR/src"]
+python_version = "3.8"
+strict = true
+show_error_codes = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+warn_unreachable = true
+explicit_package_bases = true
+pretty = true
+
+[[tool.mypy.overrides]]
+module = ["qiskit.*"]
+ignore_missing_imports = true
 
 [tool.ruff]
 include = ["*.py", "*.pyi", "**/pyproject.toml", "*.ipynb"]
 select = [
     "E", "F", "W", # flake8
     "A",           # flake8-builtins
-    "ARG",         # flake8-unused-arguments
 #    "ANN",         # flake8-annotations
+    "ARG",         # flake8-unused-arguments
     "ASYNC",       # flake8-async
     "B",  "B904",  # flake8-bugbear
     "C4",          # flake8-comprehensions
@@ -120,6 +186,7 @@ select = [
     "EM",          # flake8-errmsg
     "EXE",         # flake8-executable
     "FA",          # flake8-future-annotations
+    "FLY",         # flynt
     "I",           # isort
     "ICN",         # flake8-import-conventions
     "ISC",         # flake8-implicit-str-concat
@@ -151,6 +218,7 @@ extend-ignore = [
     "E501",    # Line too long (Black is enough)
     "PLR",     # Design related pylint codes
 ]
+src = ["src"]
 flake8-unused-arguments.ignore-variadic-names = true
 isort.required-imports = ["from __future__ import annotations"]
 line-length = 120
@@ -166,27 +234,21 @@ line-length = 120
 [tool.ruff.pydocstyle]
 convention = "google"
 
-[tool.black]
-line-length = 120
 
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = ["-ra", "--strict-markers", "--strict-config"]
-xfail_strict = true
-filterwarnings = [
-    "error",
-    'ignore:.*qiskit.__qiskit_version__.*:DeprecationWarning:qiskit:',
-]
-log_cli_level = "info"
-testpaths = ["test/python"]
+[tool.cibuildwheel]
+build = "cp3*"
+skip = "*-musllinux_*"
+archs = "auto64"
+test-command = "python -c \"from mqt import ddsim\""
+test-skip = "cp312-*"  # Qiskit Terra does not support Python 3.12 yet
+build-frontend = "build"
 
-[tool.coverage]
-run.source = ["mqt.ddsim"]
-report.show_missing = true
-report.skip_empty = true
-report.precision = 1
-report.exclude_lines = [
-    'pragma: no cover',
-    '\.\.\.',
-    'if typing.TYPE_CHECKING:',
-]
+[tool.cibuildwheel.linux]
+
+[tool.cibuildwheel.macos]
+environment = { MACOSX_DEPLOYMENT_TARGET = "10.15" }
+
+[tool.cibuildwheel.windows]
+before-build = "pip install delvewheel"
+repair-wheel-command = "delvewheel repair -v -w {dest_dir} {wheel}"
+environment = { CMAKE_ARGS = "-T ClangCL" }
