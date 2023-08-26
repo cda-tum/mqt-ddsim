@@ -102,7 +102,6 @@ repos:
         additional_dependencies:
           - numpy
           - pytest
-          - types-setuptools
 
   # Check for spelling
   - repo: https://github.com/codespell-project/codespell
