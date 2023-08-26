@@ -20,7 +20,7 @@ class MQTStatevectorSimulatorTest(unittest.TestCase):
         """Test final state vector for single circuit run."""
         result = execute(self.q_circuit, backend=self.backend).result()
         assert result.success
-        actual = result.get_statevector(self.q_circuit)
+        actual = result.get_statevector()
 
         # state is 1/sqrt(2)|00> + 1/sqrt(2)|11>, up to a global phase
         assert math.isclose((abs(actual[0])) ** 2, 0.5, abs_tol=0.0001)

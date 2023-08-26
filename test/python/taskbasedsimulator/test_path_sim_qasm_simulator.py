@@ -33,15 +33,14 @@ class MQTQasmSimulatorTest(unittest.TestCase):
 
     def test_qasm_simulator_single_shot(self):
         """Test single shot run."""
-        result = execute(self.circuit, self.backend, shots=1).result()
-        assert result.success
+        assert execute(self.circuit, self.backend, shots=1).result().success
 
     def test_qasm_simulator(self):
         """Test data counts output for single circuit run against reference."""
         shots = 1024
         result = execute(self.circuit, self.backend, shots=shots).result()
         threshold = 0.04 * shots
-        counts = result.get_counts("test")
+        counts = result.get_counts()
         target = {
             "100 100": shots / 8,
             "011 011": shots / 8,
@@ -63,7 +62,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         shots = 1024
         result = execute(self.circuit, self.backend, shots=shots, mode="pairwise_recursive").result()
         threshold = 0.04 * shots
-        counts = result.get_counts("test")
+        counts = result.get_counts()
         target = {
             "100 100": shots / 8,
             "011 011": shots / 8,
@@ -87,7 +86,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
 
         print(result)
         threshold = 0.04 * shots
-        counts = result.get_counts("test")
+        counts = result.get_counts()
         target = {
             "100 100": shots / 8,
             "011 011": shots / 8,
@@ -111,7 +110,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
 
         print(result)
         threshold = 0.04 * shots
-        counts = result.get_counts("test")
+        counts = result.get_counts()
         target = {
             "100 100": shots / 8,
             "011 011": shots / 8,

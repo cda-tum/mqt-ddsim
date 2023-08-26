@@ -52,7 +52,7 @@ def test_qasm_simulator(circuit: QuantumCircuit, backend: QasmSimulatorBackend, 
 
     threshold = 0.04 * shots
     average = shots / 8
-    counts = result.get_counts("test")
+    counts = result.get_counts()
     target = {
         "100 100": average,
         "011 011": average,
