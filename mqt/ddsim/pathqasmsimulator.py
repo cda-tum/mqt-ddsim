@@ -223,7 +223,6 @@ class PathQasmSimulatorBackend(BackendV2):
         setup_time = time.time()
         counts = sim.simulate(shots)
         end_time = time.time()
-        {hex(int(result, 2)): count for result, count in counts.items()}
 
         data = ExperimentResultData(
             counts={hex(int(result, 2)): count for result, count in counts.items()},

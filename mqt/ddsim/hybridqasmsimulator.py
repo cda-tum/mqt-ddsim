@@ -92,44 +92,6 @@ class HybridQasmSimulatorBackend(BackendV2):
 
     def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
         start_time = time.time()
-        approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
-        approximation_steps = options.get("approximation_steps", 1)
-        approximation_strategy = options.get("approximation_strategy", "fidelity")
-        seed = options.get("seed_simulator", -1)
-        shots = options.get("shots", 1024)
-
-        sim = CircuitSimulator(
-            qc,
-            approximation_step_fidelity=approximation_step_fidelity,
-            approximation_steps=approximation_steps,
-            approximation_strategy=approximation_strategy,
-            seed=seed,
-        )
-        counts = sim.simulate(shots=shots)
-        end_time = time.time()
-
-        data = ExperimentResultData(
-            counts={hex(int(result, 2)): count for result, count in counts.items()},
-            statevector=None if not self.SHOW_STATE_VECTOR else sim.get_vector(),
-            time_taken=end_time - start_time,
-        )
-
-        metadata = qc.metadata
-        if metadata is None:
-            metadata = {}
-
-        return ExperimentResult(
-            shots=shots,
-            success=True,
-            status="DONE",
-            seed=seed,
-            data=data,
-            metadata=metadata,
-            header=DDSIMHeaderBuilder.from_circ(qc),
-        )
-
-    def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
-        start_time = time.time()
         seed = options.get("seed", -1)
         mode = options.get("mode", "amplitude")
         nthreads = int(options.get("nthreads", local_hardware_info()["cpus"]))
@@ -159,7 +121,6 @@ class HybridQasmSimulatorBackend(BackendV2):
 
         counts = sim.simulate(shots)
         end_time = time.time()
-        {hex(int(result, 2)): count for result, count in counts.items()}
 
         data = ExperimentResultData(
             counts={hex(int(result, 2)): count for result, count in counts.items()},
