@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import functools
 from concurrent import futures
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Callable
 
-from qiskit.providers import Backend, JobError, JobStatus, JobV1
+from qiskit.providers import JobError, JobStatus, JobV1
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
+    from qiskit.providers import BackendV2
 
 
 def requires_submit(func):
@@ -40,14 +41,16 @@ class DDSIMJob(JobV1):
 
     _executor = futures.ThreadPoolExecutor(max_workers=1)
 
-    def __init__(self, backend: Backend, job_id: str, fn, experiments: list[QuantumCircuit], **args) -> None:
+    def __init__(
+        self, backend: BackendV2, job_id: str, fn: Callable, experiments: list[QuantumCircuit], **args: dict[str, Any]
+    ) -> None:
         super().__init__(backend, job_id)
         self._fn = fn
         self._experiments = experiments
         self._args = args
         self._future: futures.Future | None = None
 
-    def submit(self):
+    def submit(self) -> None:
         """Submit the job to the backend for execution.
 
         Raises:
@@ -78,7 +81,7 @@ class DDSIMJob(JobV1):
         return self._future.result(timeout=timeout)
 
     @requires_submit
-    def cancel(self):
+    def cancel(self) -> bool:
         """Attempt to cancel the job."""
         return self._future.cancel()
 
@@ -93,6 +96,7 @@ class DDSIMJob(JobV1):
             concurrent.futures.TimeoutError: if timeout occurred.
         """
         # The order is important here
+        assert self._future is not None
         if self._future.running():
             return JobStatus.RUNNING
         if self._future.cancelled():
@@ -106,6 +110,6 @@ class DDSIMJob(JobV1):
         # in any of the previous states, is PENDING, ergo INITIALIZING for us.
         return JobStatus.INITIALIZING
 
-    def backend(self):
+    def backend(self) -> BackendV2 | None:
         """Return the instance of the backend used for this job."""
         return self._backend

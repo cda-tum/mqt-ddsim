@@ -13,11 +13,11 @@ if TYPE_CHECKING:
 
 class DDSIMTargetBuilder:
     @classmethod
-    def add_0q_gates(cls, target: Target):
+    def add_0q_gates(cls, target: Target) -> None:
         target.add_instruction(qcl.GlobalPhaseGate(Parameter("phase")))
 
     @classmethod
-    def add_1q_clifford_gates(cls, target: Target):
+    def add_1q_clifford_gates(cls, target: Target) -> None:
         target.add_instruction(qcl.IGate())
         target.add_instruction(qcl.XGate())
         target.add_instruction(qcl.YGate())
@@ -29,7 +29,7 @@ class DDSIMTargetBuilder:
         target.add_instruction(qcl.SXdgGate())
 
     @classmethod
-    def add_1q_gates(cls, target: Target):
+    def add_1q_gates(cls, target: Target) -> None:
         cls.add_1q_clifford_gates(target)
 
         theta = Parameter("theta")
@@ -47,13 +47,13 @@ class DDSIMTargetBuilder:
         target.add_instruction(qcl.U3Gate(theta, phi, lam))
 
     @classmethod
-    def add_2q_controlled_clifford_gates(cls, target: Target):
+    def add_2q_controlled_clifford_gates(cls, target: Target) -> None:
         target.add_instruction(qcl.CXGate())
         target.add_instruction(qcl.CYGate())
         target.add_instruction(qcl.CZGate())
 
     @classmethod
-    def add_2q_controlled_gates(cls, target: Target):
+    def add_2q_controlled_gates(cls, target: Target) -> None:
         cls.add_2q_controlled_clifford_gates(target)
 
         theta = Parameter("theta")
@@ -72,14 +72,14 @@ class DDSIMTargetBuilder:
         target.add_instruction(qcl.CU3Gate(theta, phi, lam))
 
     @classmethod
-    def add_2q_non_controlled_clifford_gates(cls, target: Target):
+    def add_2q_non_controlled_clifford_gates(cls, target: Target) -> None:
         target.add_instruction(qcl.SwapGate())
         target.add_instruction(qcl.iSwapGate())
         target.add_instruction(qcl.DCXGate())
         target.add_instruction(qcl.ECRGate())
 
     @classmethod
-    def add_2q_non_controlled_gates(cls, target: Target):
+    def add_2q_non_controlled_gates(cls, target: Target) -> None:
         cls.add_2q_non_controlled_clifford_gates(target)
 
         beta = Parameter("beta")
@@ -93,18 +93,18 @@ class DDSIMTargetBuilder:
         target.add_instruction(qcl.XXPlusYYGate(theta, beta))
 
     @classmethod
-    def add_2q_gates(cls, target: Target):
+    def add_2q_gates(cls, target: Target) -> None:
         cls.add_2q_controlled_gates(target)
         cls.add_2q_non_controlled_gates(target)
 
     @classmethod
-    def add_3q_gates(cls, target: Target):
+    def add_3q_gates(cls, target: Target) -> None:
         target.add_instruction(qcl.CCXGate())
         target.add_instruction(qcl.CCZGate())
         target.add_instruction(qcl.CSwapGate())
 
     @classmethod
-    def add_multi_qubit_gates(cls, target: Target):
+    def add_multi_qubit_gates(cls, target: Target) -> None:
         target.add_instruction(qcl.MCXGate, name="mcx")
         target.add_instruction(qcl.MCXGrayCode, name="mcx_gray")
         target.add_instruction(qcl.MCXRecursive, name="mcx_recursive")
@@ -113,18 +113,18 @@ class DDSIMTargetBuilder:
         target.add_instruction(qcl.MCU1Gate, name="mcu1")
 
     @classmethod
-    def add_measure(cls, target: Target):
+    def add_measure(cls, target: Target) -> None:
         target.add_instruction(qcl.Measure())
 
     @classmethod
-    def add_reset(cls, target: Target):
+    def add_reset(cls, target: Target) -> None:
         target.add_instruction(qcl.Reset())
 
     @classmethod
-    def add_non_unitary_operations(cls, target: Target):
+    def add_non_unitary_operations(cls, target: Target) -> None:
         cls.add_measure(target)
         cls.add_reset(target)
 
     @classmethod
-    def add_barrier(cls, target: Target):
+    def add_barrier(cls, target: Target) -> None:
         target.add_instruction(qcl.Barrier, name="barrier")
