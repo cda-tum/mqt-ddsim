@@ -211,14 +211,16 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned 
 
 template<class Config>
 void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridAmplitudes(qc::Qubit splitQubit) {
-    const std::size_t ndecisions          = getNDecisions(splitQubit);
-    const std::size_t maxControl          = 1ULL << ndecisions;
-    const std::size_t actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
-    const std::size_t nslicesOnOneCpu     = std::min<std::size_t>(64, maxControl / actuallyUsedThreads);
-    const std::size_t nqubits             = CircuitSimulator<Config>::getNumberOfQubits();
-    Simulator<Config>::rootEdge           = qc::VectorDD::zero;
+    const auto ndecisions          = getNDecisions(splitQubit);
+    const auto maxControl          = 1ULL << ndecisions;
+    const auto actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
+    const auto chunkSize           = static_cast<std::size_t>(std::ceil(static_cast<double>(maxControl) / static_cast<double>(actuallyUsedThreads)));
+    const auto nslicesOnOneCpu     = std::min<std::size_t>(64, chunkSize);
+    const auto nqubits             = CircuitSimulator<Config>::getNumberOfQubits();
+    const auto requiredVectors     = static_cast<std::size_t>(std::ceil(static_cast<double>(maxControl) / static_cast<double>(nslicesOnOneCpu)));
+    Simulator<Config>::rootEdge    = qc::VectorDD::zero;
 
-    std::vector<std::vector<std::complex<dd::fp>>> amplitudes(maxControl / nslicesOnOneCpu, std::vector<std::complex<dd::fp>>(1U << nqubits, {0, 0}));
+    std::vector<std::vector<std::complex<dd::fp>>> amplitudes(requiredVectors, std::vector<std::complex<dd::fp>>(1U << nqubits, {0, 0}));
 
     tf::Executor executor;
     for (std::size_t control = 0, i = 0; control < maxControl; control += nslicesOnOneCpu, i++) {
@@ -237,10 +239,10 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridAmplitudes(qc::Qub
     executor.wait_for_all();
 
     std::size_t oldIncrement    = 1;
-    const auto  nAdditionLevels = static_cast<std::uint16_t>(std::ceil(std::log2(actuallyUsedThreads)));
+    const auto  nAdditionLevels = static_cast<std::uint16_t>(std::ceil(std::log2(requiredVectors)));
     for (std::uint16_t level = 0; level < nAdditionLevels; ++level) {
         const std::size_t increment = 2ULL << level;
-        for (std::size_t idx = 0; idx < actuallyUsedThreads; idx += increment) {
+        for (std::size_t idx = 0; idx + oldIncrement < requiredVectors; idx += increment) {
             // in-place addition of amplitudes
             std::transform(amplitudes[idx].begin(), amplitudes[idx].end(),
                            amplitudes[idx + oldIncrement].begin(),
