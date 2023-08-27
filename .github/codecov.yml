@@ -1,9 +1,9 @@
 ignore:
-  - "apps/**/*"
+  - "apps/*"
   - "extern/**/*"
   - "include/python/**/*"
-  - "src/python/**/*"
-  - "test/**/*"
+  - "src/python/*.cpp"
+  - "test/*.cpp"
 
 coverage:
   range: 60..90
@@ -28,7 +28,7 @@ flag_management:
       paths:
         - "include"
         - "src"
-        - "!src/mqt/**/*"
+        - "!src/python/*.cpp"
       after_n_builds: 1
     - name: python
       paths:
