@@ -9,7 +9,7 @@ of the tool. They can be built and executed in the following way:
 
 .. code-block:: console
 
-    $ cmake -DBUILD_DDSIM_TESTS=ON -DCMAKE_BUILD_TYPE=Release -S . -B build
+    $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
     $ cmake --build build/ --config Release
     $ ./build/test/ddsim_test
     [...]
@@ -18,7 +18,9 @@ of the tool. They can be built and executed in the following way:
 
 **Why does generation step of CMake fail?**
 
-If you see the following error message ::
+If you see the following error message
+
+.. code-block:: console
 
     $ cmake -S . -B <build target directory>
     CMake Error at CMakeLists.txt:27 (message):
@@ -30,7 +32,9 @@ Please run :code:`git submodule update --init --recursive` and try again.
 
 **Why do I get a linking error at the end of the build process?**
 
-If you are using gcc for building, and you get the error message ::
+If you are using gcc for building, and you get the error message
+
+.. code-block:: console
 
     lto1: internal compiler error: Segmentation fault
     Please submit a full bug report,
