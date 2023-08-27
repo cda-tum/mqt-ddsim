@@ -46,13 +46,8 @@ tnflow = [
     "pandas",
     "numpy"
 ]
-tests = [
-    "pytest>=7"
-]
-coverage = [
-    "mqt.ddsim[tests]",
-    "pytest-cov"
-]
+test = ["pytest>=7.0"]
+coverage = ["mqt.ddsim[test]", "pytest-cov"]
 docs = [
     "sphinx>=5,<7",
     "sphinx-rtd-theme",
