@@ -59,8 +59,7 @@ qc::VectorDD HybridSchrodingerFeynmanSimulator<Config>::simulateSlicing(std::uni
 template<class Config>
 bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(std::unique_ptr<dd::Package<Config>>& sliceDD, const std::unique_ptr<qc::Operation>& op) {
     bool isSplitOp = false;
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-    if (reinterpret_cast<qc::StandardOperation*>(op.get()) != nullptr) { // TODO change control and target if wrong direction
+    if (dynamic_cast<qc::StandardOperation*>(op.get()) != nullptr) { // TODO change control and target if wrong direction
         qc::Targets  opTargets{};
         qc::Controls opControls{};
 
