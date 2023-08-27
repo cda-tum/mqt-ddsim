@@ -157,7 +157,7 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned 
 
     tf::Executor executor(actuallyUsedThreads);
 
-    std::function<void(std::pair<std::size_t, std::size_t>)> computePair = [this, &computePair, &computed, &executor, ndecisions, nslicesOnOneCpu, splitQubit, maxControl, nqubits, lastLevel](std::pair<std::size_t, std::size_t> current) {
+    std::function<void(std::pair<std::size_t, std::size_t>)> computePair = [this, &computePair, &computed, &executor, nslicesOnOneCpu, splitQubit, maxControl, nqubits, lastLevel](std::pair<std::size_t, std::size_t> current) {
         if (current.first == 0) { // slice
             std::unique_ptr<dd::Package<Config>> oldDD;
             qc::VectorDD                         edge{};
