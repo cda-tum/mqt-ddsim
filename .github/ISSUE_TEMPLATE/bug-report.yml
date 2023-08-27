@@ -1,9 +1,6 @@
-name: Bug report
+name: 🐛 Bug report
 description: Something is not working correctly.
-title: "<title>"
-labels: ["bug"]
-assignees:
-  - hillmich
+title: "🐛 <title>"
 body:
   - type: markdown
     attributes:
@@ -14,34 +11,18 @@ body:
         Verify first that your issue is not [already reported on GitHub](https://github.com/cda-tum/mqt-ddsim/search?q=is%3Aissue&type=issues).
 
         If you are having general questions, please consider [starting a discussion](https://github.com/cda-tum/mqt-ddsim/discussions).
-  - type: markdown
-    attributes:
-      value: >-
-        **Environment**
-  - type: input
-    attributes:
-      label: mqt.ddsim version
-      placeholder: For example, mqt.ddsim==1.0.0
-    validations:
-      required: true
-  - type: input
-    attributes:
-      label: OS
-      placeholder: For example, Ubuntu 22.04, macOS Big Sur, Windows etc.
-    validations:
-      required: true
-  - type: input
-    attributes:
-      label: Python version
-      placeholder: For example, Python 3.10
-  - type: input
-    attributes:
-      label: C++ compiler
-      placeholder: For example, gcc-10
   - type: textarea
     attributes:
-      label: Additional environment information
-      description: Feel free to add more information about your environment here.
+      label: Environment information
+      description: >-
+        Please provide information about your environment. For example, OS, C++ compiler, mqt.core version etc.
+      placeholder: |
+        - OS:
+        - C++ compiler:
+        - mqt.ddsim version:
+        - Additional environment information:
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Description

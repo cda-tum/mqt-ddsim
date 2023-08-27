@@ -1,9 +1,6 @@
-name: Feature request
+name: ✨ Feature request
 description: Suggest an idea
-title: "<title>"
-labels: ["enhancement"]
-assignees:
-  - hillmich
+title: "✨ <title>"
 body:
   - type: markdown
     attributes:
