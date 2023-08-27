@@ -51,7 +51,7 @@ build_and_store_wheels: &BUILD_AND_STORE_WHEELS
     path: "wheelhouse/*"
 
 linux_aarch64_wheels_task:
-  #  only_if: "$CIRRUS_RELEASE != ''"
+  only_if: "$CIRRUS_RELEASE != ''"
   name: 🐍 Packaging / 🎡 🐧 arm64
   alias: linux_aarch64_wheels
   clone_script: *clone
@@ -66,7 +66,7 @@ linux_aarch64_wheels_task:
   <<: *BUILD_AND_STORE_WHEELS
 
 macos_arm64_wheels_task:
-  #  only_if: "$CIRRUS_RELEASE != ''"
+  only_if: "$CIRRUS_RELEASE != ''"
   name: 🐍 Packaging / 🎡 🍎 arm64
   alias: macos_arm64_wheels
   clone_script: *clone
