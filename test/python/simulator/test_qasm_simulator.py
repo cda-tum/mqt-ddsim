@@ -38,7 +38,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
 
     def test_status(self):
         """Test backend.status()."""
-        return self.backend.status()
+        self.backend.status()
 
     def test_qasm_simulator_single_shot(self):
         """Test single shot run."""
