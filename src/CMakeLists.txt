@@ -44,7 +44,8 @@ set(TF_BUILD_EXAMPLES
 set(TF_BUILD_PROFILER
     OFF
     CACHE BOOL "")
-add_subdirectory("${PROJECT_SOURCE_DIR}/extern/taskflow" "extern/taskflow")
+add_subdirectory("${PROJECT_SOURCE_DIR}/extern/taskflow" "extern/taskflow"
+                 EXCLUDE_FROM_ALL)
 target_link_libraries(${PROJECT_NAME} PUBLIC Taskflow)
 # the following sets the SYSTEM flag for the include dirs of the taskflow libs
 # cmake-lint: disable=C0307
