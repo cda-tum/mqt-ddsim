@@ -143,10 +143,11 @@ std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator<Config>::si
 
 template<class Config>
 void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned int splitQubit) {
-    const std::size_t ndecisions          = getNDecisions(splitQubit);
-    const std::size_t maxControl          = 1ULL << ndecisions;
-    const std::size_t actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
-    const std::size_t nslicesAtOnce       = std::min<std::size_t>(16, maxControl / actuallyUsedThreads);
+    const auto ndecisions          = getNDecisions(splitQubit);
+    const auto maxControl          = 1ULL << ndecisions;
+    const auto actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
+    const auto chunkSize           = static_cast<std::size_t>(std::ceil(static_cast<double>(maxControl) / static_cast<double>(actuallyUsedThreads)));
+    const auto nslicesAtOnce       = std::min<std::size_t>(16, chunkSize);
 
     Simulator<Config>::rootEdge = qc::VectorDD::zero;
 
