@@ -1,0 +1,13 @@
+name: CD
+on:
+  release:
+    types: [published]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  python-packaging:
+    name: 🐍 Packaging
+    uses: cda-tum/mqt-core/.github/workflows/reusable-python-packaging.yml@make-reusable-workflows-more-generic
+    with:
+      package-name: mqt.ddsim
