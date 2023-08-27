@@ -185,3 +185,101 @@ TEST(HybridSimTest, TooManyQubitsForVectorTest) {
     const HybridSchrodingerFeynmanSimulator<> ddsim(std::move(qc), ApproximationInfo{}, HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude);
     EXPECT_THROW({ [[maybe_unused]] auto _ = ddsim.getVectorFromHybridSimulation<std::complex<dd::fp>>(); }, std::range_error);
 }
+
+TEST(HybridSimTest, RegressionTestDDModeUnevenChunks) {
+    // The circuit below has 3 two-qubit gates.
+    // Thus HSF simulation creates 8 decisions.
+    // Setting the number of threads to 3 results in the following chunks: 3|3|2
+    // The result of the simulation should be |10>.
+
+    auto qc = std::make_unique<qc::QuantumComputation>(2U);
+    qc->x(0);
+    qc->x(1, 0_pc);
+    qc->x(0, 1_pc);
+    qc->x(1, 0_pc);
+
+    const auto mode     = HybridSchrodingerFeynmanSimulator<>::Mode::DD;
+    const auto nthreads = 3U;
+
+    HybridSchrodingerFeynmanSimulator ddsim(std::move(qc), ApproximationInfo{}, mode, nthreads);
+    const auto                        result = ddsim.simulate(1024U);
+    EXPECT_EQ(result.size(), 1U);
+    EXPECT_EQ(result.begin()->first, "10");
+    EXPECT_EQ(result.begin()->second, 1024U);
+}
+
+TEST(HybridSimTest, RegressionTestAmplitudeModeUnevenChunks) {
+    // The circuit below has 3 two-qubit gates.
+    // Thus HSF simulation creates 8 decisions.
+    // Setting the number of threads to 3 results in the following chunks: 3|3|2
+    // The result of the simulation should be |10>.
+
+    auto qc = std::make_unique<qc::QuantumComputation>(2U);
+    qc->x(0);
+    qc->x(1, 0_pc);
+    qc->x(0, 1_pc);
+    qc->x(1, 0_pc);
+
+    const auto mode     = HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude;
+    const auto nthreads = 3U;
+
+    HybridSchrodingerFeynmanSimulator ddsim(std::move(qc), ApproximationInfo{}, mode, nthreads);
+    const auto                        result = ddsim.simulate(1024U);
+    EXPECT_EQ(result.size(), 1U);
+    EXPECT_EQ(result.begin()->first, "10");
+    EXPECT_EQ(result.begin()->second, 1024U);
+}
+
+TEST(HybridSimTest, RegressionTestDDModeMoreChunksAsThreads) {
+    // The circuit below has 6 two-qubit gates.
+    // Thus HSF simulation creates 64 decisions.
+    // Due to the maximum number of decisions per thread being 16 in DD mode,
+    // setting the number of threads to 2 results in the following chunks: 16|16|16|16
+    // The result of the simulation should be |01>.
+
+    auto qc = std::make_unique<qc::QuantumComputation>(2U);
+    qc->x(0);
+    qc->x(1, 0_pc);
+    qc->x(0, 1_pc);
+    qc->x(1, 0_pc);
+    qc->x(1, 0_pc);
+    qc->x(0, 1_pc);
+    qc->x(1, 0_pc);
+
+    const auto mode     = HybridSchrodingerFeynmanSimulator<>::Mode::DD;
+    const auto nthreads = 2U;
+
+    HybridSchrodingerFeynmanSimulator ddsim(std::move(qc), ApproximationInfo{}, mode, nthreads);
+    const auto                        result = ddsim.simulate(1024U);
+    EXPECT_EQ(result.size(), 1U);
+    EXPECT_EQ(result.begin()->first, "01");
+    EXPECT_EQ(result.begin()->second, 1024U);
+}
+
+TEST(HybridSimTest, RegressionTestAmplitudeModeMoreChunksAsThreads) {
+    // The circuit below has 8 two-qubit gates.
+    // Thus HSF simulation creates 256 decisions.
+    // Due to the maximum number of decisions per thread being 64 in Amplitude mode,
+    // setting the number of threads to 2 results in the following chunks: 64|64|64|64
+    // The result of the simulation should be |10>.
+
+    auto qc = std::make_unique<qc::QuantumComputation>(2U);
+    qc->x(0);
+    qc->x(1, 0_pc);
+    qc->x(0, 1_pc);
+    qc->x(1, 0_pc);
+    qc->x(1, 0_pc);
+    qc->x(0, 1_pc);
+    qc->x(1, 0_pc);
+    qc->x(1, 0_pc);
+    qc->x(0, 1_pc);
+
+    const auto mode     = HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude;
+    const auto nthreads = 2U;
+
+    HybridSchrodingerFeynmanSimulator ddsim(std::move(qc), ApproximationInfo{}, mode, nthreads);
+    const auto                        result = ddsim.simulate(1024U);
+    EXPECT_EQ(result.size(), 1U);
+    EXPECT_EQ(result.begin()->first, "10");
+    EXPECT_EQ(result.begin()->second, 1024U);
+}
