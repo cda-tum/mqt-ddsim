@@ -222,16 +222,19 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridAmplitudes(qc::Qub
 
     std::vector<std::vector<std::complex<dd::fp>>> amplitudes(requiredVectors, std::vector<std::complex<dd::fp>>(1U << nqubits, {0, 0}));
 
-    tf::Executor executor;
+    tf::Executor executor(actuallyUsedThreads);
     for (std::size_t control = 0, i = 0; control < maxControl; control += nslicesOnOneCpu, i++) {
-        executor.silent_async([this, i, &amplitudes, nslicesOnOneCpu, control, nqubits, splitQubit]() {
+        executor.silent_async([this, i, &amplitudes, nslicesOnOneCpu, control, nqubits, splitQubit, maxControl]() {
             const auto                         currentThread    = i;
             std::vector<std::complex<dd::fp>>& threadAmplitudes = amplitudes.at(currentThread);
 
             for (std::size_t localControl = 0; localControl < nslicesOnOneCpu; localControl++) {
-                const std::size_t                    totalControl = control + localControl;
-                std::unique_ptr<dd::Package<Config>> sliceDD      = std::make_unique<dd::Package<Config>>(CircuitSimulator<Config>::getNumberOfQubits());
-                auto                                 result       = simulateSlicing(sliceDD, splitQubit, totalControl);
+                const std::size_t totalControl = control + localControl;
+                if (totalControl >= maxControl) {
+                    break;
+                }
+                std::unique_ptr<dd::Package<Config>> sliceDD = std::make_unique<dd::Package<Config>>(CircuitSimulator<Config>::getNumberOfQubits());
+                auto                                 result  = simulateSlicing(sliceDD, splitQubit, totalControl);
                 sliceDD->addAmplitudes(result, threadAmplitudes, static_cast<dd::Qubit>(nqubits));
             }
         });
