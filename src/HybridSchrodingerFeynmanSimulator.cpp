@@ -236,8 +236,9 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridAmplitudes(qc::Qub
     }
     executor.wait_for_all();
 
-    std::size_t oldIncrement = 1;
-    for (std::uint16_t level = 0; level < static_cast<std::uint16_t>(std::log2(actuallyUsedThreads)); ++level) {
+    std::size_t oldIncrement    = 1;
+    const auto  nAdditionLevels = static_cast<std::uint16_t>(std::ceil(std::log2(actuallyUsedThreads)));
+    for (std::uint16_t level = 0; level < nAdditionLevels; ++level) {
         const std::size_t increment = 2ULL << level;
         for (std::size_t idx = 0; idx < actuallyUsedThreads; idx += increment) {
             // in-place addition of amplitudes
