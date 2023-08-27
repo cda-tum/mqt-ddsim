@@ -166,7 +166,7 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned 
                 } else {
                     edge = result;
                 }
-                oldDD = std::move(sliceDD);
+                oldDD = std::move(sliceDD); // this might seem unused, but it keeps the DD package alive for the serialization below
             }
 
             current.first = static_cast<std::size_t>(std::log2(nslicesAtOnce));
