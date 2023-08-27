@@ -13,8 +13,9 @@ from qiskit.providers.models import BackendConfiguration, BackendStatus
 from qiskit.qobj import PulseQobj, QasmQobj, QasmQobjExperiment, Qobj
 from qiskit.result import Result
 
-from mqt.ddsim import CircuitSimulator, __version__
-from mqt.ddsim.job import DDSIMJob
+from . import __version__
+from .job import DDSIMJob
+from .pyddsim import CircuitSimulator
 
 logger = logging.getLogger(__name__)
 

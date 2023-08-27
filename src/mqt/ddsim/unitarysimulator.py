@@ -17,9 +17,10 @@ from qiskit.qobj import PulseQobj, QasmQobj, QasmQobjExperiment, Qobj
 from qiskit.result import Result
 from qiskit.utils.multiprocessing import local_hardware_info
 
-from mqt.ddsim import ConstructionMode, UnitarySimulator, __version__, get_matrix
-from mqt.ddsim.error import DDSIMError
-from mqt.ddsim.job import DDSIMJob
+from . import __version__
+from .error import DDSIMError
+from .job import DDSIMJob
+from .pyddsim import ConstructionMode, UnitarySimulator, get_matrix
 
 logger = logging.getLogger(__name__)
 
