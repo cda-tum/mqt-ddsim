@@ -67,7 +67,7 @@ TEST(HybridSimTest, TrivialParallelAmplitude) {
     it = resultAmp.find("0100");
     ASSERT_TRUE(it != resultAmp.end());
     EXPECT_NEAR(static_cast<double>(it->second), 2048, 128);
-    it = resultAmp.find("1110");
+    it = resultAmp.find("0111");
     ASSERT_TRUE(it != resultAmp.end());
     EXPECT_NEAR(static_cast<double>(it->second), 2048, 128);
 }
