@@ -18,7 +18,7 @@ class MQTStatevectorSimulatorTest(unittest.TestCase):
 
     def test_status(self):
         """Test backend.status()."""
-        return self.backend.status()
+        self.backend.status()
 
     def test_statevector_output(self):
         """Test final state vector for single circuit run."""

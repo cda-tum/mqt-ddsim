@@ -14,9 +14,10 @@ from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 from qiskit.utils.multiprocessing import local_hardware_info
 
-from . import CircuitSimulator, __version__
+from . import __version__
 from .header import DDSIMHeader
 from .job import DDSIMJob
+from .pyddsim import CircuitSimulator
 from .target import DDSIMTargetBuilder
 
 

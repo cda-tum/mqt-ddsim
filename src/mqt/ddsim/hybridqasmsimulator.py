@@ -13,8 +13,8 @@ from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 from qiskit.utils.multiprocessing import local_hardware_info
 
-from . import HybridCircuitSimulator, HybridMode
 from .header import DDSIMHeader
+from .pyddsim import HybridCircuitSimulator, HybridMode
 from .qasmsimulator import QasmSimulatorBackend
 from .target import DDSIMTargetBuilder
 

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from qiskit.transpiler import Target
 
-from mqt.ddsim.pathqasmsimulator import PathQasmSimulatorBackend
+from .pathqasmsimulator import PathQasmSimulatorBackend
 
 
 class PathStatevectorSimulatorBackend(PathQasmSimulatorBackend):

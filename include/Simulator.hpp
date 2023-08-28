@@ -108,7 +108,7 @@ public:
         std::string binary(numberOfQubits, '0');
         for (std::size_t j = 0; j < numberOfQubits; ++j) {
             if ((value & (1U << j)) != 0U) {
-                binary[j] = '1';
+                binary[numberOfQubits - 1 - j] = '1';
             }
         }
         return binary;

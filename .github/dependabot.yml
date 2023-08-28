@@ -1,31 +1,36 @@
 version: 2
 updates:
-  # Enable version updates for git submodules
   - package-ecosystem: "gitsubmodule"
-    # Look for `.gitmodules` in the `root` directory
     directory: "/"
-    # Check the submodules for updates every week
+    groups:
+      submodules:
+        patterns:
+          - "*"
     schedule:
       interval: "monthly"
-      day: "friday"
       time: "05:00"
       timezone: "Europe/Vienna"
 
-  # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
-    # Look for `*.yml` files in the `.github/workflows` directory
     directory: "/"
-    # Check for updates to GitHub Actions every week
+    groups:
+      github-actions:
+        patterns:
+          - "*"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
       day: "friday"
       time: "05:00"
       timezone: "Europe/Vienna"
 
   - package-ecosystem: "pip"
     directory: "/"
+    groups:
+      python-dependencies:
+        patterns:
+          - "*"
     schedule:
-      interval: "monthly"
+      interval: "weekly"
       day: "friday"
       time: "05:00"
       timezone: "Europe/Vienna"

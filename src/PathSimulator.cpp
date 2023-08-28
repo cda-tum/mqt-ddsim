@@ -194,7 +194,7 @@ void PathSimulator<Config>::generateBracketSimulationPath(std::size_t bracketSiz
     std::size_t memoryLeft       = 0;
     std::size_t bracketMemory    = 0;
     std::size_t opMemory         = 0;
-    // Sequentially adding tasks for the first braket
+    // Sequentially adding tasks for the first bracket
     for (std::size_t i = 0; i < bracketSize; i++) {
         if (i == 0) {
             components.emplace_back(0, 1);

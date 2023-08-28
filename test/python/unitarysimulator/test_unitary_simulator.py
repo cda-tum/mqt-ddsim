@@ -24,10 +24,8 @@ class MQTUnitarySimulatorTest(unittest.TestCase):
         assert result.success
         print(result.get_unitary())
         assert np.count_nonzero(result.get_unitary()) == self.non_zeros_in_bell_circuit
-        return result
 
     def test_unitary_simulator_recursive_mode(self):
         result = execute(self.circuit, self.backend, mode="recursive").result()
         assert result.success
         assert np.count_nonzero(result.get_unitary()) == self.non_zeros_in_bell_circuit
-        return result

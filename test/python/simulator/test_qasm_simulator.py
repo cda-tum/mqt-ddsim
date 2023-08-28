@@ -36,7 +36,7 @@ def circuit() -> QuantumCircuit:
 @pytest.fixture()
 def shots() -> int:
     """Number of shots for the tests in this file."""
-    return 1024
+    return 8192
 
 
 def test_qasm_simulator_single_shot(circuit: QuantumCircuit, backend: QasmSimulatorBackend):
@@ -87,7 +87,6 @@ def test_qasm_simulator_portfolioqaoa(backend: QasmSimulatorBackend, shots: int)
         include "qelib1.inc";
         qreg q[3];
         creg meas[3];
-        creg meas0[3];
         u2(0.41951949,-pi) q[0];
         u2(0.41620669,-pi) q[1];
         rzz(-0.420917333908502) q[0],q[1];
@@ -113,13 +112,9 @@ def test_qasm_simulator_portfolioqaoa(backend: QasmSimulatorBackend, shots: int)
         measure q[0] -> meas[0];
         measure q[1] -> meas[1];
         measure q[2] -> meas[2];
-        barrier q[0],q[1],q[2];
-        measure q[0] -> meas0[0];
-        measure q[1] -> meas0[1];
-        measure q[2] -> meas0[2];
         """
     )
-    result = execute(circuit, backend, shots=shots).result()
+    result = execute(circuit, backend, shots=shots, seed_simulator=1337).result()
     assert result.success
 
     counts = result.get_counts()

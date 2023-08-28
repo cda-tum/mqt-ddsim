@@ -6,13 +6,13 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import numpy.typing as npt
-from qiskit import QiskitError
+from qiskit import QiskitError, QuantumCircuit
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 
-from . import ConstructionMode, UnitarySimulator, get_matrix
 from .header import DDSIMHeader
+from .pyddsim import ConstructionMode, UnitarySimulator, get_matrix
 from .qasmsimulator import QasmSimulatorBackend
 from .target import DDSIMTargetBuilder
 

@@ -1,9 +1,5 @@
 # set required cmake version
-cmake_minimum_required(VERSION 3.19)
-
-# This avoids googletest complaining that this (IPO) policy is not set
-cmake_policy(SET CMP0069 NEW)
-set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
+cmake_minimum_required(VERSION 3.19...3.27)
 
 project(
   ddsim
@@ -21,20 +17,36 @@ macro(CHECK_SUBMODULE_PRESENT modulename)
   endif()
 endmacro()
 
-if(NOT BUILD_DDSIM_TESTS)
-  set(BUILD_MQT_CORE_TESTS
-      OFF
-      CACHE BOOL "")
-endif()
-
 check_submodule_present(mqt-core)
 check_submodule_present(taskflow)
 
+option(BUILD_MQT_DDSIM_BINDINGS "Build the MQT DDSIM Python bindings" OFF)
+if(BUILD_MQT_DDSIM_BINDINGS)
+  # ensure that the BINDINGS option is set
+  set(BINDINGS
+      ON
+      CACHE BOOL "Enable settings related to Python bindings" FORCE)
+  # cmake-lint: disable=C0103
+  set(Python_FIND_VIRTUALENV
+      FIRST
+      CACHE STRING "Give precedence to virtualenvs when searching for Python")
+  # cmake-lint: disable=C0103
+  set(Python_ARTIFACTS_INTERACTIVE
+      ON
+      CACHE
+        BOOL
+        "Prevent multiple searches for Python and instead cache the results.")
+  # top-level call to find Python
+  find_package(
+    Python 3.8 REQUIRED
+    COMPONENTS Interpreter Development.Module
+    OPTIONAL_COMPONENTS Development.SABIModule)
+endif()
+
 add_subdirectory(src)
 
-option(BUILD_DDSIM_TESTS "Also build tests and benchmarks for DDSIM project"
-       OFF)
-if(BUILD_DDSIM_TESTS)
+option(BUILD_MQT_DDSIM_TESTS "Also build tests for the MQT DDSIM project" ON)
+if(BUILD_MQT_DDSIM_TESTS)
   enable_testing()
   include(GoogleTest)
   add_subdirectory(test)
@@ -43,10 +55,4 @@ endif()
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   check_submodule_present(cxxopts)
   add_subdirectory(apps)
-endif()
-
-option(BINDINGS "Configure for building Python bindings")
-if(BINDINGS)
-  # add Python binding code
-  add_subdirectory(mqt/ddsim)
 endif()
