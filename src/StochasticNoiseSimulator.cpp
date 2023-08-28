@@ -33,6 +33,10 @@ void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
 
     std::map<std::size_t, bool> classicValues;
     for (auto& op: *qc) {
+        if (op->getType() == qc::Barrier) {
+            continue;
+        }
+
         if (op->isNonUnitaryOperation()) {
             if (auto* nuOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
                 if (op->getType() == qc::Measure) {
@@ -46,8 +50,6 @@ void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
                         assert(result == '0' || result == '1');
                         classicValues[classic.at(i)] = (result == '1');
                     }
-                } else if (op->getType() == qc::Barrier) {
-                    continue;
                 } else {
                     throw std::runtime_error(std::string("Unsupported non-unitary functionality '") + op->getName() + "'.");
                 }
@@ -187,6 +189,10 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
         localDD->incRef(localRootEdge);
 
         for (auto& op: *qc) {
+            if (op->getType() == qc::Barrier) {
+                continue;
+            }
+
             if (!op->isUnitary() && !(op->isClassicControlledOperation())) {
                 if (auto* nuOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
                     if (nuOp->getType() == qc::Measure) {
@@ -201,10 +207,6 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
                             classicValues[classic.at(i)] = (result == '0');
                         }
                     } else {
-                        //Skipping barrier
-                        if (op->getType() == qc::Barrier) {
-                            continue;
-                        }
                         throw std::runtime_error("Unsupported non-unitary functionality.");
                     }
                 } else {

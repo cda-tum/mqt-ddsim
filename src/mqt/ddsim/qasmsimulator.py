@@ -1,11 +1,10 @@
-"""Backend for DDSIM Hybrid Schrodinger-Feynman Simulator."""
+"""Backend for DDSIM."""
 from __future__ import annotations
 
 import logging
 import time
 import uuid
 import warnings
-from math import log2
 
 from qiskit import QiskitError, QuantumCircuit
 from qiskit.compiler import assemble
@@ -13,17 +12,16 @@ from qiskit.providers import BackendV1, Options
 from qiskit.providers.models import BackendConfiguration, BackendStatus
 from qiskit.qobj import PulseQobj, QasmQobj, QasmQobjExperiment, Qobj
 from qiskit.result import Result
-from qiskit.utils.multiprocessing import local_hardware_info
 
-from mqt.ddsim import HybridCircuitSimulator, HybridMode, __version__
-from mqt.ddsim.error import DDSIMError
-from mqt.ddsim.job import DDSIMJob
+from . import __version__
+from .job import DDSIMJob
+from .pyddsim import CircuitSimulator
 
 logger = logging.getLogger(__name__)
 
 
-class HybridQasmSimulatorBackend(BackendV1):
-    """Python interface to MQT DDSIM Hybrid Schrodinger-Feynman Simulator."""
+class QasmSimulatorBackend(BackendV1):
+    """Python interface to MQT DDSIM."""
 
     SHOW_STATE_VECTOR = False
 
@@ -33,18 +31,19 @@ class HybridQasmSimulatorBackend(BackendV1):
             shots=None,
             parameter_binds=None,
             simulator_seed=None,
-            mode="amplitude",
-            nthreads=local_hardware_info()["cpus"],
+            approximation_step_fidelity=1.0,
+            approximation_steps=0,
+            approximation_strategy="fidelity",
         )
 
     def __init__(self, configuration=None, provider=None) -> None:
         conf = {
-            "backend_name": "hybrid_qasm_simulator",
+            "backend_name": "qasm_simulator",
             "backend_version": __version__,
             "url": "https://github.com/cda-tum/mqt-ddsim",
             "simulator": True,
             "local": True,
-            "description": "MQT DDSIM Hybrid Schrodinger-Feynman C++ simulator",
+            "description": "MQT DDSIM C++ simulator",
             "basis_gates": [
                 "gphase",
                 "id",
@@ -55,6 +54,10 @@ class HybridQasmSimulatorBackend(BackendV1):
                 "cu3",
                 "x",
                 "cx",
+                "ccx",
+                "mcx_gray",
+                "mcx_recursive",
+                "mcx_vchain",
                 "y",
                 "cy",
                 "z",
@@ -67,21 +70,35 @@ class HybridQasmSimulatorBackend(BackendV1):
                 "tdg",
                 "rx",
                 "crx",
+                "mcrx",
                 "ry",
                 "cry",
+                "mcry",
                 "rz",
                 "crz",
+                "mcrz",
                 "p",
                 "cp",
                 "cu1",
+                "mcphase",
                 "sx",
                 "csx",
                 "sxdg",
-                # 'swap', 'cswap', 'iswap',
+                "swap",
+                "cswap",
+                "iswap",
+                "dcx",
+                "ecr",
+                "rxx",
+                "ryy",
+                "rzz",
+                "rzx",
+                "xx_minus_yy",
+                "xx_plus_yy",
                 "snapshot",
             ],
             "memory": False,
-            "n_qubits": 128,
+            "n_qubits": 64,
             "coupling_map": None,
             "conditional": False,
             "max_shots": 1000000000,
@@ -90,7 +107,7 @@ class HybridQasmSimulatorBackend(BackendV1):
         }
         super().__init__(configuration=configuration or BackendConfiguration.from_dict(conf), provider=provider)
 
-    def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options):
+    def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options) -> DDSIMJob:
         if isinstance(quantum_circuits, (QasmQobj, PulseQobj)):
             msg = "QasmQobj and PulseQobj are not supported."
             raise QiskitError(msg)
@@ -111,7 +128,7 @@ class HybridQasmSimulatorBackend(BackendV1):
         local_job.submit()
         return local_job
 
-    def _run_job(self, job_id, qobj_instance: Qobj, **options):
+    def _run_job(self, job_id, qobj_instance: Qobj, **options) -> Result:
         self._validate(qobj_instance)
 
         start = time.time()
@@ -131,36 +148,21 @@ class HybridQasmSimulatorBackend(BackendV1):
         }
         return Result.from_dict(result)
 
-    def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options):
+    def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options) -> dict:
         start_time = time.time()
+        approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
+        approximation_steps = options.get("approximation_steps", 1)
+        approximation_strategy = options.get("approximation_strategy", "fidelity")
         seed = options.get("seed", -1)
-        mode = options.get("mode", "amplitude")
-        nthreads = int(options.get("nthreads", local_hardware_info()["cpus"]))
-        if mode == "amplitude":
-            hybrid_mode = HybridMode.amplitude
-            max_qubits = int(log2(local_hardware_info()["memory"] * (1024**3) / 16))
-            algorithm_qubits = qobj_experiment.header.n_qubits
-            if algorithm_qubits > max_qubits:
-                msg = "Not enough memory available to simulate the circuit even on a single thread"
-                raise DDSIMError(msg)
-            qubit_diff = max_qubits - algorithm_qubits
-            nthreads = int(min(2**qubit_diff, nthreads))
-        elif mode == "dd":
-            hybrid_mode = HybridMode.DD
-        else:
-            msg = f"Simulation mode{mode} not supported by hybrid simulator. Available modes are 'amplitude' and 'dd'."
-            raise DDSIMError(msg)
 
-        sim = HybridCircuitSimulator(qobj_experiment, seed=seed, mode=hybrid_mode, nthreads=nthreads)
-
-        shots = options.get("shots", 1024)
-        if self.SHOW_STATE_VECTOR and shots > 0:
-            logger.info(
-                "Statevector can only be shown if shots == 0 when using the amplitude hybrid simulation mode. Setting shots=0."
-            )
-            shots = 0
-
-        counts = sim.simulate(shots)
+        sim = CircuitSimulator(
+            qobj_experiment,
+            approximation_step_fidelity=approximation_step_fidelity,
+            approximation_steps=approximation_steps,
+            approximation_strategy=approximation_strategy,
+            seed=seed,
+        )
+        counts = sim.simulate(options.get("shots", 1024))
         end_time = time.time()
         counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
 
@@ -169,25 +171,19 @@ class HybridQasmSimulatorBackend(BackendV1):
             "name": qobj_experiment.header.name,
             "status": "DONE",
             "time_taken": end_time - start_time,
-            "seed": seed,
-            "mode": mode,
-            "nthreads": nthreads,
-            "shots": shots,
+            "seed": options.get("seed", -1),
+            "shots": options.get("shots", 1024),
             "data": {"counts": counts_hex},
             "success": True,
         }
         if self.SHOW_STATE_VECTOR:
-            if sim.get_mode() == HybridMode.DD:
-                result["data"]["statevector"] = sim.get_vector()
-            else:
-                result["data"]["statevector"] = sim.get_final_amplitudes()
-
+            result["data"]["statevector"] = sim.get_vector()
         return result
 
     def _validate(self, _quantum_circuit):
         return
 
-    def status(self):
+    def status(self) -> BackendStatus:
         """Return backend status.
 
         Returns:

@@ -1,22 +1,54 @@
 ignore:
-  - "extern/**/*"
   - "apps/*"
+  - "extern/**/*"
+  - "include/python/**/*"
+  - "src/python/*.cpp"
   - "test/*.cpp"
-  - "mqt/**/*"
 
 coverage:
-  range: 60..95
+  range: 60..90
   precision: 1
   status:
-    project:
-      default:
+    project: off
+    patch: off
+
+flag_management:
+  default_rules:
+    carryforward: true
+    statuses:
+      - type: project
+        target: auto
         threshold: 0.5%
-    patch:
-      default:
+        removed_code_behavior: adjust_base
+      - type: patch
+        target: 90%
         threshold: 1%
+  individual_flags:
+    - name: cpp
+      paths:
+        - "include"
+        - "src"
+        - "!src/python/*.cpp"
+      after_n_builds: 1
+    - name: python
+      paths:
+        - "src/mqt/**/*.py"
+      after_n_builds: 3
+      statuses:
+        - type: project
+          threshold: 0.5%
+          removed_code_behavior: adjust_base
+        - type: patch
+          target: 95%
+          threshold: 1%
 
 parsers:
   gcov:
     branch_detection:
       conditional: no
       loop: no
+
+comment:
+  layout: "reach, diff, flags, files"
+  require_changes: true
+  show_carryforward_flags: true

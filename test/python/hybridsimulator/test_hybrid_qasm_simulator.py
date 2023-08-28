@@ -29,7 +29,7 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
 
     def test_configuration(self):
         """Test backend.configuration()."""
-        return self.backend.configuration()
+        self.backend.configuration()
 
     def test_properties(self):
         """Test backend.properties()."""
@@ -38,7 +38,7 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
 
     def test_status(self):
         """Test backend.status()."""
-        return self.backend.status()
+        self.backend.status()
 
     def test_qasm_simulator_single_shot(self):
         """Test single shot run."""
@@ -101,7 +101,6 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
         self.circuit = circ
         result = execute(self.circuit, self.backend, mode="dd").result()
         assert result.success
-        return result
 
     def test_amplitude_mode_simulation(self):
         """Test running a single circuit."""
@@ -115,4 +114,3 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
         self.circuit = circ
         result = execute(self.circuit, self.backend, mode="amplitude").result()
         assert result.success
-        return result

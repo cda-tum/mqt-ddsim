@@ -238,7 +238,7 @@ TEST(DeterministicNoiseSimTest, TestFunctionsUnOptimized) {
     EXPECT_EQ(ddsim->getMatrixActiveNodeCount(), 0);
     EXPECT_EQ(ddsim->countNodesFromRoot(), 30);
 
-    EXPECT_TRUE(ddsim->toBinaryString(9, 6) == "100100");
+    EXPECT_TRUE(ddsim->toBinaryString(9, 6) == "001001");
 }
 
 TEST(DeterministicNoiseSimTest, TestingSimulatorFunctionality) {

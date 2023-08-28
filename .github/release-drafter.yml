@@ -9,6 +9,7 @@ categories:
   - title: "🐛 Bug Fixes"
     labels:
       - "bug"
+      - "fix"
   - title: "📄 Documentation"
     labels:
       - "documentation"
@@ -18,6 +19,9 @@ categories:
   - title: "📦 Packaging"
     labels:
       - "packaging"
+  - title: "🧹 Code Quality"
+    labels:
+      - "code quality"
   - title: "⬆️ Dependencies"
     collapse-after: 5
     labels:

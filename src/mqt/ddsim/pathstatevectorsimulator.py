@@ -5,25 +5,25 @@ import logging
 
 from qiskit.providers.models import BackendConfiguration
 
-from mqt.ddsim import __version__
-from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
+from . import __version__
+from .pathqasmsimulator import PathQasmSimulatorBackend
 
 logger = logging.getLogger(__name__)
 
 
-class StatevectorSimulatorBackend(QasmSimulatorBackend):
-    """Python interface to MQT DDSIM."""
+class PathStatevectorSimulatorBackend(PathQasmSimulatorBackend):
+    """Python interface to MQT DDSIM Simulation Path Framework."""
 
     SHOW_STATE_VECTOR = True
 
     def __init__(self, configuration=None, provider=None) -> None:
         conf = {
-            "backend_name": "statevector_simulator",
+            "backend_name": "path_sim_statevector_simulator",
             "backend_version": __version__,
             "url": "https://github.com/cda-tum/mqt-ddsim",
             "simulator": True,
             "local": True,
-            "description": "MQT DDSIM C++ simulator",
+            "description": "MQT DDSIM C++ simulation path framework",
             "basis_gates": [
                 "gphase",
                 "id",
@@ -38,6 +38,7 @@ class StatevectorSimulatorBackend(QasmSimulatorBackend):
                 "mcx_gray",
                 "mcx_recursive",
                 "mcx_vchain",
+                "mcx",
                 "y",
                 "cy",
                 "z",
@@ -78,7 +79,7 @@ class StatevectorSimulatorBackend(QasmSimulatorBackend):
                 "snapshot",
             ],
             "memory": False,
-            "n_qubits": 64,
+            "n_qubits": 128,
             "coupling_map": None,
             "conditional": False,
             "max_shots": 1000000000,

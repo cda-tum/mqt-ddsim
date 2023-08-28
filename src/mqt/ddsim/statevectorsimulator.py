@@ -1,26 +1,24 @@
-"""Backend for DDSIM Hybrid Schrodinger-Feynman Simulator."""
+"""Backend for DDSIM."""
 from __future__ import annotations
 
 import logging
-from math import log2
 
 from qiskit.providers.models import BackendConfiguration
-from qiskit.utils.multiprocessing import local_hardware_info
 
-from mqt.ddsim import __version__
-from mqt.ddsim.hybridqasmsimulator import HybridQasmSimulatorBackend
+from . import __version__
+from .qasmsimulator import QasmSimulatorBackend
 
 logger = logging.getLogger(__name__)
 
 
-class HybridStatevectorSimulatorBackend(HybridQasmSimulatorBackend):
-    """Python interface to MQT DDSIM Hybrid Schrodinger-Feynman Simulator."""
+class StatevectorSimulatorBackend(QasmSimulatorBackend):
+    """Python interface to MQT DDSIM."""
 
     SHOW_STATE_VECTOR = True
 
     def __init__(self, configuration=None, provider=None) -> None:
         conf = {
-            "backend_name": "hybrid_statevector_simulator",
+            "backend_name": "statevector_simulator",
             "backend_version": __version__,
             "url": "https://github.com/cda-tum/mqt-ddsim",
             "simulator": True,
@@ -36,6 +34,10 @@ class HybridStatevectorSimulatorBackend(HybridQasmSimulatorBackend):
                 "cu3",
                 "x",
                 "cx",
+                "ccx",
+                "mcx_gray",
+                "mcx_recursive",
+                "mcx_vchain",
                 "y",
                 "cy",
                 "z",
@@ -48,21 +50,35 @@ class HybridStatevectorSimulatorBackend(HybridQasmSimulatorBackend):
                 "tdg",
                 "rx",
                 "crx",
+                "mcrx",
                 "ry",
                 "cry",
+                "mcry",
                 "rz",
                 "crz",
+                "mcrz",
                 "p",
                 "cp",
                 "cu1",
+                "mcphase",
                 "sx",
                 "csx",
                 "sxdg",
-                # 'swap', 'cswap', 'iswap',
+                "swap",
+                "cswap",
+                "iswap",
+                "dcx",
+                "ecr",
+                "rxx",
+                "ryy",
+                "rzz",
+                "rzx",
+                "xx_minus_yy",
+                "xx_plus_yy",
                 "snapshot",
             ],
             "memory": False,
-            "n_qubits": int(log2(local_hardware_info()["memory"] * (1024**3) / 16)),
+            "n_qubits": 64,
             "coupling_map": None,
             "conditional": False,
             "max_shots": 1000000000,

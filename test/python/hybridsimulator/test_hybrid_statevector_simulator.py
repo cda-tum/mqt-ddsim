@@ -20,7 +20,7 @@ class MQTHybridStatevectorSimulatorTest(unittest.TestCase):
 
     def test_configuration(self):
         """Test backend.configuration()."""
-        return self.backend.configuration()
+        self.backend.configuration()
 
     def test_properties(self):
         """Test backend.properties()."""
@@ -29,7 +29,7 @@ class MQTHybridStatevectorSimulatorTest(unittest.TestCase):
 
     def test_status(self):
         """Test backend.status()."""
-        return self.backend.status()
+        self.backend.status()
 
     def test_statevector_output(self):
         """Test final state vector for single circuit run."""

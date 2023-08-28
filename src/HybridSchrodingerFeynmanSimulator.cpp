@@ -9,6 +9,9 @@ std::size_t HybridSchrodingerFeynmanSimulator<Config>::getNDecisions(qc::Qubit s
     std::size_t ndecisions = 0;
     // calculate number of decisions
     for (const auto& op: *CircuitSimulator<Config>::qc) {
+        if (op->getType() == qc::Barrier) {
+            continue;
+        }
         if (op->isStandardOperation()) {
             bool targetInLowerSlice  = false;
             bool targetInUpperSlice  = false;
@@ -26,8 +29,6 @@ std::size_t HybridSchrodingerFeynmanSimulator<Config>::getNDecisions(qc::Qubit s
                 (targetInUpperSlice && controlInLowerSlice)) {
                 ndecisions++;
             }
-        } else if (op->getType() == qc::Barrier || op->getType() == qc::Snapshot || op->getType() == qc::ShowProbabilities) {
-            continue;
         } else {
             throw std::invalid_argument("Only StandardOperations are supported for now.");
         }
@@ -58,8 +59,7 @@ qc::VectorDD HybridSchrodingerFeynmanSimulator<Config>::simulateSlicing(std::uni
 template<class Config>
 bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(std::unique_ptr<dd::Package<Config>>& sliceDD, const std::unique_ptr<qc::Operation>& op) {
     bool isSplitOp = false;
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-    if (reinterpret_cast<qc::StandardOperation*>(op.get()) != nullptr) { // TODO change control and target if wrong direction
+    if (dynamic_cast<qc::StandardOperation*>(op.get()) != nullptr) { // TODO change control and target if wrong direction
         qc::Targets  opTargets{};
         qc::Controls opControls{};
 
@@ -143,42 +143,50 @@ std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator<Config>::si
 
 template<class Config>
 void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned int splitQubit) {
-    const std::size_t ndecisions          = getNDecisions(splitQubit);
-    const std::size_t maxControl          = 1ULL << ndecisions;
-    const std::size_t actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
-    const std::size_t nslicesAtOnce       = std::min<std::size_t>(16, maxControl / actuallyUsedThreads);
-
-    Simulator<Config>::rootEdge = qc::VectorDD::zero;
+    const auto ndecisions          = getNDecisions(splitQubit);
+    const auto maxControl          = 1ULL << ndecisions;
+    const auto actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
+    const auto chunkSize           = static_cast<std::size_t>(std::ceil(static_cast<double>(maxControl) / static_cast<double>(actuallyUsedThreads)));
+    const auto nslicesOnOneCpu     = std::min<std::size_t>(16, chunkSize);
+    const auto nqubits             = CircuitSimulator<Config>::getNumberOfQubits();
+    const auto nresults            = static_cast<std::size_t>(std::ceil(static_cast<double>(maxControl) / static_cast<double>(nslicesOnOneCpu)));
+    const auto lastLevel           = static_cast<std::size_t>(std::ceil(std::log2(nresults)));
+    Simulator<Config>::rootEdge    = qc::VectorDD::zero;
 
     std::vector<std::vector<bool>> computed(ndecisions, std::vector<bool>(maxControl, false));
 
-    tf::Executor executor(nthreads);
+    tf::Executor executor(actuallyUsedThreads);
 
-    std::function<void(std::pair<std::size_t, std::size_t>)> computePair = [this, &computePair, &computed, &executor, ndecisions, nslicesAtOnce, splitQubit](std::pair<std::size_t, std::size_t> current) {
+    std::function<void(std::pair<std::size_t, std::size_t>)> computePair = [this, &computePair, &computed, &executor, nslicesOnOneCpu, splitQubit, maxControl, nqubits, lastLevel](std::pair<std::size_t, std::size_t> current) {
         if (current.first == 0) { // slice
             std::unique_ptr<dd::Package<Config>> oldDD;
             qc::VectorDD                         edge{};
-            for (std::size_t i = 0; i < nslicesAtOnce; i++) {
-                auto sliceDD = std::make_unique<dd::Package<Config>>(CircuitSimulator<Config>::getNumberOfQubits());
-                auto result  = simulateSlicing(sliceDD, splitQubit, current.second + i);
+            for (std::size_t i = 0; i < nslicesOnOneCpu; ++i) {
+                const auto totalControl = current.second + i;
+                if (totalControl >= maxControl) {
+                    break;
+                }
+                auto sliceDD = std::make_unique<dd::Package<Config>>(nqubits);
+                auto result  = simulateSlicing(sliceDD, splitQubit, totalControl);
                 if (i > 0) {
                     edge = sliceDD->add(sliceDD->transfer(edge), result);
                 } else {
                     edge = result;
                 }
-                oldDD = std::move(sliceDD);
+                oldDD = std::move(sliceDD); // this might seem unused, but it keeps the DD package alive for the serialization below
             }
-
-            current.first = static_cast<std::size_t>(std::log2(nslicesAtOnce));
-            // NOLINTNEXTLINE(clang-analyzer-core.DivideZero): clang-tidy mistakenly thinks the next line divides by zero
-            current.second /= nslicesAtOnce;
             dd::serialize(edge, "slice_" + std::to_string(current.first) + "_" + std::to_string(current.second) + ".dd", true);
         } else { // adding
-            auto              sliceDD       = std::make_unique<dd::Package<Config>>(CircuitSimulator<Config>::getNumberOfQubits());
-            const std::string filename      = "slice_" + std::to_string(current.first - 1) + "_";
-            const std::string filenameLeft  = filename + std::to_string(current.second * 2) + ".dd";
-            const std::string filenameRight = filename + std::to_string(current.second * 2 + 1) + ".dd";
+            const std::string filename     = "slice_" + std::to_string(current.first - 1) + "_";
+            const std::string filenameLeft = filename + std::to_string(current.second) + ".dd";
+            const auto        offset       = (1ULL << (current.first - 1)) * nslicesOnOneCpu;
+            const auto        idx          = current.second + offset;
+            if (idx >= maxControl) {
+                return;
+            }
+            const std::string filenameRight = filename + std::to_string(idx) + ".dd";
 
+            auto sliceDD = std::make_unique<dd::Package<Config>>(nqubits);
             auto result  = sliceDD->template deserialize<dd::vNode>(filenameLeft, true);
             auto result2 = sliceDD->template deserialize<dd::vNode>(filenameRight, true);
             result       = sliceDD->add(result, result2);
@@ -188,57 +196,80 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned 
             remove(filenameRight.c_str());
         }
 
-        if (current.first < ndecisions) {
+        if (current.first < lastLevel) {
             computed.at(current.first).at(current.second) = true;
 
-            const auto compSecond = (current.second % 2 != 0) ? (current.second - 1) : (current.second + 1);
-
-            if (computed.at(current.first).at(compSecond)) {
-                executor.silent_async([&computePair, current]() { computePair(std::make_pair(current.first + 1, current.second / 2)); });
+            auto offset       = (1ULL << current.first) * nslicesOnOneCpu;
+            auto chunk        = current.second / offset;
+            auto secondResult = (chunk % 2 == 0) ? (current.second + offset) : (current.second - offset);
+            if (secondResult >= maxControl) {
+                // lonely result, promote to next level
+                const auto filename    = "slice_" + std::to_string(current.first) + "_" + std::to_string(current.second) + ".dd";
+                const auto newFilename = "slice_" + std::to_string(current.first + 1) + "_" + std::to_string(current.second) + ".dd";
+                rename(filename.c_str(), newFilename.c_str());
+                current.first += 1;
+                computed.at(current.first).at(current.second) = true;
+                // compute new second result
+                offset *= 2;
+                chunk        = current.second / offset;
+                secondResult = (chunk % 2 == 0) ? (current.second + offset) : (current.second - offset);
+            }
+            if (computed.at(current.first).at(secondResult)) {
+                current.first += 1;
+                current.second = std::min(current.second, static_cast<std::size_t>(secondResult));
+                executor.silent_async([&computePair, current]() { computePair(current); });
             }
         }
     };
 
-    for (auto i = static_cast<std::int64_t>(maxControl - 1); i >= 0; i -= static_cast<std::int64_t>(nslicesAtOnce)) {
+    for (std::uint64_t i = 0U; i < maxControl; i += nslicesOnOneCpu) {
         executor.silent_async([&computePair, i]() { computePair(std::make_pair(0, i)); });
     }
     executor.wait_for_all();
 
-    Simulator<Config>::rootEdge = Simulator<Config>::dd->template deserialize<dd::vNode>("slice_" + std::to_string(ndecisions) + "_0.dd", true);
+    const auto filename         = "slice_" + std::to_string(lastLevel) + "_0.dd";
+    Simulator<Config>::rootEdge = Simulator<Config>::dd->template deserialize<dd::vNode>(filename, true);
     Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
+    remove(filename.c_str());
 }
 
 template<class Config>
 void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridAmplitudes(qc::Qubit splitQubit) {
-    const std::size_t ndecisions          = getNDecisions(splitQubit);
-    const std::size_t maxControl          = 1ULL << ndecisions;
-    const std::size_t actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
-    const std::size_t nslicesOnOneCpu     = std::min<std::size_t>(64, maxControl / actuallyUsedThreads);
-    const std::size_t nqubits             = CircuitSimulator<Config>::getNumberOfQubits();
-    Simulator<Config>::rootEdge           = qc::VectorDD::zero;
+    const auto ndecisions          = getNDecisions(splitQubit);
+    const auto maxControl          = 1ULL << ndecisions;
+    const auto actuallyUsedThreads = std::min<std::size_t>(maxControl, nthreads);
+    const auto chunkSize           = static_cast<std::size_t>(std::ceil(static_cast<double>(maxControl) / static_cast<double>(actuallyUsedThreads)));
+    const auto nslicesOnOneCpu     = std::min<std::size_t>(64, chunkSize);
+    const auto nqubits             = CircuitSimulator<Config>::getNumberOfQubits();
+    const auto requiredVectors     = static_cast<std::size_t>(std::ceil(static_cast<double>(maxControl) / static_cast<double>(nslicesOnOneCpu)));
+    Simulator<Config>::rootEdge    = qc::VectorDD::zero;
 
-    std::vector<std::vector<std::complex<dd::fp>>> amplitudes(maxControl / nslicesOnOneCpu, std::vector<std::complex<dd::fp>>(1U << nqubits, {0, 0}));
+    std::vector<std::vector<std::complex<dd::fp>>> amplitudes(requiredVectors, std::vector<std::complex<dd::fp>>(1U << nqubits, {0, 0}));
 
-    tf::Executor executor;
+    tf::Executor executor(actuallyUsedThreads);
     for (std::size_t control = 0, i = 0; control < maxControl; control += nslicesOnOneCpu, i++) {
-        executor.silent_async([this, i, &amplitudes, nslicesOnOneCpu, control, nqubits, splitQubit]() {
+        executor.silent_async([this, i, &amplitudes, nslicesOnOneCpu, control, nqubits, splitQubit, maxControl]() {
             const auto                         currentThread    = i;
             std::vector<std::complex<dd::fp>>& threadAmplitudes = amplitudes.at(currentThread);
 
             for (std::size_t localControl = 0; localControl < nslicesOnOneCpu; localControl++) {
-                const std::size_t                    totalControl = control + localControl;
-                std::unique_ptr<dd::Package<Config>> sliceDD      = std::make_unique<dd::Package<Config>>(CircuitSimulator<Config>::getNumberOfQubits());
-                auto                                 result       = simulateSlicing(sliceDD, splitQubit, totalControl);
+                const std::size_t totalControl = control + localControl;
+                if (totalControl >= maxControl) {
+                    break;
+                }
+                std::unique_ptr<dd::Package<Config>> sliceDD = std::make_unique<dd::Package<Config>>(CircuitSimulator<Config>::getNumberOfQubits());
+                auto                                 result  = simulateSlicing(sliceDD, splitQubit, totalControl);
                 sliceDD->addAmplitudes(result, threadAmplitudes, static_cast<dd::Qubit>(nqubits));
             }
         });
     }
     executor.wait_for_all();
 
-    std::size_t oldIncrement = 1;
-    for (std::uint16_t level = 0; level < static_cast<std::uint16_t>(std::log2(actuallyUsedThreads)); ++level) {
+    std::size_t oldIncrement    = 1;
+    const auto  nAdditionLevels = static_cast<std::uint16_t>(std::ceil(std::log2(requiredVectors)));
+    for (std::uint16_t level = 0; level < nAdditionLevels; ++level) {
         const std::size_t increment = 2ULL << level;
-        for (std::size_t idx = 0; idx < actuallyUsedThreads; idx += increment) {
+        for (std::size_t idx = 0; idx + oldIncrement < requiredVectors; idx += increment) {
             // in-place addition of amplitudes
             std::transform(amplitudes[idx].begin(), amplitudes[idx].end(),
                            amplitudes[idx + oldIncrement].begin(),
