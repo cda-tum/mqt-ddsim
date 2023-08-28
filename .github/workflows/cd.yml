@@ -7,6 +7,6 @@ on:
 jobs:
   python-packaging:
     name: 🐍 Packaging
-    uses: cda-tum/mqt-core/.github/workflows/reusable-python-packaging.yml@make-reusable-workflows-more-generic
+    uses: cda-tum/mqt-core/.github/workflows/reusable-python-packaging.yml@main
     with:
       package-name: mqt.ddsim
