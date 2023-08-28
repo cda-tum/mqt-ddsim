@@ -8,5 +8,20 @@ jobs:
   python-packaging:
     name: 🐍 Packaging
     uses: cda-tum/mqt-core/.github/workflows/reusable-python-packaging.yml@main
-    with:
-      package-name: mqt.ddsim
+
+  deploy:
+    if: github.event_name == 'release' && github.event.action == 'published'
+    name: 🚀 Deploy to PyPI
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/mqt.ddsim
+    permissions:
+      id-token: write
+    needs: [python-packaging]
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: artifact
+          path: dist
+      - uses: pypa/gh-action-pypi-publish@release/v1
