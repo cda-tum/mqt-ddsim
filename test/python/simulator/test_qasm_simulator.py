@@ -140,6 +140,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
             measure q[2] -> meas[2];
             """
         )
-        result = execute(circuit, self.backend, seed_simulator=1337).result()
+        result = execute(circuit, self.backend, seed_simulator=1337, shots=8192).result()
         counts = result.get_counts()
+        print(counts)
         assert len(counts) == 8
