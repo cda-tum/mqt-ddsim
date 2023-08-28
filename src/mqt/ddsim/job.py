@@ -78,11 +78,13 @@ class DDSIMJob(JobV1):
             concurrent.futures.TimeoutError: if timeout occurred.
             concurrent.futures.CancelledError: if job cancelled before completed.
         """
+        assert self._future is not None
         return self._future.result(timeout=timeout)
 
     @requires_submit
     def cancel(self) -> bool:
         """Attempt to cancel the job."""
+        assert self._future is not None
         return self._future.cancel()
 
     @requires_submit

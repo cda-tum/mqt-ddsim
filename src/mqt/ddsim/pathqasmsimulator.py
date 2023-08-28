@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pathlib
 import time
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from quimb.tensor import Tensor, TensorNetwork
@@ -149,7 +149,7 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
     def target(self):
         return self._PATH_TARGET
 
-    def _run_experiment(self, qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
+    def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
         start_time = time.time()
 
         pathsim_configuration = options.get("pathsim_configuration", PathSimulatorConfiguration())

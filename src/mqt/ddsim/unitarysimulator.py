@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 import numpy.typing as npt
-from qiskit import QiskitError, QuantumCircuit
+from qiskit import QiskitError
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target

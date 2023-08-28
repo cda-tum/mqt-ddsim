@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
@@ -51,7 +51,7 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
     def target(self):
         return self._HSF_TARGET
 
-    def _run_experiment(self, qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
+    def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
         start_time = time.time()
         seed = options.get("seed", -1)
         mode = options.get("mode", "amplitude")
