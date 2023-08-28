@@ -13,8 +13,8 @@ from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 
-from . import PathCircuitSimulator, PathSimulatorConfiguration, PathSimulatorMode
 from .header import DDSIMHeader
+from .pyddsim import PathCircuitSimulator, PathSimulatorConfiguration, PathSimulatorMode
 from .qasmsimulator import QasmSimulatorBackend
 from .target import DDSIMTargetBuilder
 
