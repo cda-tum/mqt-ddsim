@@ -44,7 +44,7 @@ class DDSIMJob(JobV1):
         self._fn = fn
         self.qobj_experiment = qobj_experiment
         self._args = args
-        self._future = None
+        self._future: futures.Future | None = None
 
     def submit(self):
         """Submit the job to the backend for execution.
@@ -93,6 +93,7 @@ class DDSIMJob(JobV1):
             concurrent.futures.TimeoutError: if timeout occurred.
         """
         # The order is important here
+        assert self._future is not None
         if self._future.running():
             return JobStatus.RUNNING
         if self._future.cancelled():

@@ -8,6 +8,7 @@ import warnings
 from math import log2, sqrt
 
 import numpy as np
+import numpy.typing as npt
 from qiskit import QiskitError, QuantumCircuit
 from qiskit.compiler import assemble
 from qiskit.providers import BackendV1, Options
@@ -16,9 +17,10 @@ from qiskit.qobj import PulseQobj, QasmQobj, QasmQobjExperiment, Qobj
 from qiskit.result import Result
 from qiskit.utils.multiprocessing import local_hardware_info
 
-from mqt.ddsim import ConstructionMode, UnitarySimulator, __version__, get_matrix
-from mqt.ddsim.error import DDSIMError
-from mqt.ddsim.job import DDSIMJob
+from . import __version__
+from .error import DDSIMError
+from .job import DDSIMJob
+from .pyddsim import ConstructionMode, UnitarySimulator, get_matrix
 
 logger = logging.getLogger(__name__)
 
@@ -162,7 +164,9 @@ class UnitarySimulatorBackend(BackendV1):
         sim = UnitarySimulator(qobj_experiment, seed=seed, mode=construction_mode)
         sim.construct()
         # Add extract resulting matrix from final DD and write data
-        unitary = np.zeros((2**qobj_experiment.header.n_qubits, 2**qobj_experiment.header.n_qubits), dtype=complex)
+        unitary: npt.NDArray[np.complex_] = np.zeros(
+            (2**qobj_experiment.header.n_qubits, 2**qobj_experiment.header.n_qubits), dtype=np.complex_
+        )
         get_matrix(sim, unitary)
         data = {
             "unitary": unitary,

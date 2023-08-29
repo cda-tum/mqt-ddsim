@@ -21,7 +21,7 @@ class MQTUnitarySimulatorTest(unittest.TestCase):
 
     def test_configuration(self):
         """Test backend.configuration()."""
-        return self.backend.configuration()
+        self.backend.configuration()
 
     def test_properties(self):
         """Test backend.properties()."""
@@ -30,18 +30,16 @@ class MQTUnitarySimulatorTest(unittest.TestCase):
 
     def test_status(self):
         """Test backend.status()."""
-        return self.backend.status()
+        self.backend.status()
 
     def test_unitary_simulator_sequential_mode(self):
         result = execute(self.circuit, self.backend, mode="sequential").result()
         assert result.success
         print(result.get_unitary("test"))
         assert np.count_nonzero(result.get_unitary("test")) == self.non_zeros_in_bell_circuit
-        return result
 
     def test_unitary_simulator_recursive_mode(self):
         result = execute(self.circuit, self.backend, mode="recursive").result()
         assert result.success
         print(result.data("test"))
         assert np.count_nonzero(result.get_unitary("test")) == self.non_zeros_in_bell_circuit
-        return result

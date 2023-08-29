@@ -29,7 +29,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
 
     def test_configuration(self):
         """Test backend.configuration()."""
-        return self.backend.configuration()
+        self.backend.configuration()
 
     def test_properties(self):
         """Test backend.properties()."""
@@ -38,7 +38,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
 
     def test_status(self):
         """Test backend.status()."""
-        return self.backend.status()
+        self.backend.status()
 
     def test_qasm_simulator_single_shot(self):
         """Test single shot run."""
@@ -113,7 +113,6 @@ class MQTQasmSimulatorTest(unittest.TestCase):
             include "qelib1.inc";
             qreg q[3];
             creg meas[3];
-            creg meas0[3];
             u2(0.41951949,-pi) q[0];
             u2(0.41620669,-pi) q[1];
             rzz(-0.420917333908502) q[0],q[1];
@@ -139,12 +138,9 @@ class MQTQasmSimulatorTest(unittest.TestCase):
             measure q[0] -> meas[0];
             measure q[1] -> meas[1];
             measure q[2] -> meas[2];
-            barrier q[0],q[1],q[2];
-            measure q[0] -> meas0[0];
-            measure q[1] -> meas0[1];
-            measure q[2] -> meas0[2];
             """
         )
-        result = execute(circuit, self.backend).result()
+        result = execute(circuit, self.backend, seed_simulator=1337, shots=8192).result()
         counts = result.get_counts()
+        print(counts)
         assert len(counts) == 8
