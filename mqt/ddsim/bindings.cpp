@@ -5,6 +5,8 @@
 // clang-format off
 #include "CircuitSimulator.hpp"
 #include "HybridSchrodingerFeynmanSimulator.hpp"
+#include "StochasticNoiseSimulator.hpp"
+#include "DeterministicNoiseSimulator.hpp"
 #include "PathSimulator.hpp"
 #include "UnitarySimulator.hpp"
 #include "python/qiskit/QasmQobjExperiment.hpp"
@@ -53,6 +55,9 @@ std::unique_ptr<Simulator> constructSimulator(const py::object&  circ,
     auto       qc     = std::make_unique<qc::QuantumComputation>(importCircuit(circ));
     const auto approx = ApproximationInfo{stepFidelity, stepNumber, ApproximationInfo::fromString(approximationStrategy)};
     if constexpr (std::is_same_v<Simulator, PathSimulator<>>) {
+        return std::make_unique<Simulator>(std::move(qc),
+                                           std::forward<Args>(args)...);
+    } else if constexpr (std::is_same_v<Simulator, StochasticNoiseSimulator<>>) {
         return std::make_unique<Simulator>(std::move(qc),
                                            std::forward<Args>(args)...);
     } else {
@@ -180,6 +185,18 @@ PYBIND11_MODULE(pyddsim, m) {
                          "approximation_strategy"_a      = "fidelity",
                          "seed"_a                        = -1)
             .def("expectation_value", &expectationValue, "observable"_a);
+
+    // Stoch simulator
+//    auto stochasticNoiseSimulator = createSimulator<StochasticNoiseSimulator<>>(m, "StochasticSimulator");
+//    stochasticNoiseSimulator.def(py::init<>(&constructSimulator<StochasticNoiseSimulator<>>),
+//                                 "circ"_a,
+//                                 "steps"_a            = 1,
+//                                 "step_fidelity"_a    = 1);
+    auto stochasticNoiseSimulator = createSimulator<StochasticNoiseSimulator<>>(m, "StochasticNoiseSimulator");
+    stochasticNoiseSimulator.def(py::init<>(&constructSimulatorWithoutSeed<StochasticNoiseSimulator<>, StochasticNoiseSimulator<>::Configuration&>),
+                      "circ"_a, "config"_a = StochasticNoiseSimulator<>::Configuration())
+            .def(py::init<>(&constructSimulatorWithoutSeed<StochasticNoiseSimulator<>, const std::size_t&, const std::size_t&>),
+                 "circ"_a, "fidelity"_a = 0, "stepsize"_a = 0);
 
     // Hybrid Schrödinger-Feynman Simulator
     py::enum_<HybridSchrodingerFeynmanSimulator<>::Mode>(m, "HybridMode")
