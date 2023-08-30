@@ -113,7 +113,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
             if "shots" in qc.metadata and qc.metadata["shots"] != 1:
                 qc.metadata["shots"] = 1
 
-            for ii in range(0, len(qc.data)):
+            for ii in range(len(qc.data)):
                 if qc.data[ii].operation.name in ["measure", "reset"]:
                     operation_name = qc.data[ii].operation.name
                     msg = f"Unsupported '{self.name}' instruction '{operation_name}' in circuit '{name}'."
