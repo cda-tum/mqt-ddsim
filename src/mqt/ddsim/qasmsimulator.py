@@ -50,8 +50,8 @@ class QasmSimulatorBackend(BackendV2):
             return
         self._add_operations_to_target(self.target)
 
-    def __init__(self) -> None:
-        super().__init__(name="qasm_simulator", description="MQT DDSIM QASM Simulator", backend_version=__version__)
+    def __init__(self, name= "qasm_simulator", description="MQT DDSIM QASM Simulator") -> None:
+        super().__init__(name= name, description= description, backend_version=__version__)
         self._initialize_target()
 
     @classmethod

@@ -38,9 +38,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
         DDSIMTargetBuilder.add_barrier(target)
 
     def __init__(self) -> None:
-        super().__init__()
-        self.name = "unitary_simulator"
-        self.description = "MQT DDSIM Unitary Simulator"
+        super().__init__(name = "unitary_simulator", description= "MQT DDSIM Unitary Simulator")
 
     @classmethod
     def _default_options(cls):

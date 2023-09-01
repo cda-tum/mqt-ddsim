@@ -32,10 +32,8 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
         DDSIMTargetBuilder.add_barrier(target)
         DDSIMTargetBuilder.add_measure(target)
 
-    def __init__(self) -> None:
-        super().__init__()
-        self.name = "hybrid_qasm_simulator"
-        self.description = ("MQT DDSIM Hybrid Schrodinger-Feynman simulator",)
+    def __init__(self, name= "hybrid_qasm_simulator", description="MQT DDSIM Hybrid Schrodinger-Feynman simulator") -> None:
+        super().__init__(name= name, description= description)
 
     @classmethod
     def _default_options(cls) -> Options:
