@@ -122,8 +122,8 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
         DDSIMTargetBuilder.add_barrier(target)
         DDSIMTargetBuilder.add_measure(target)
 
-    def __init__(self, name= "path_sim_qasm_simulator", description="MQT DDSIM Simulation Path Framework") -> None:
-        super().__init__(name= name, description= description)
+    def __init__(self, name="path_sim_qasm_simulator", description="MQT DDSIM Simulation Path Framework") -> None:
+        super().__init__(name=name, description=description)
 
     @classmethod
     def _default_options(cls) -> Options:

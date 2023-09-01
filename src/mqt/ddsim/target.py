@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 from typing import TYPE_CHECKING
 
 import qiskit.circuit.library as qcl
@@ -14,10 +15,8 @@ if TYPE_CHECKING:
 class DDSIMTargetBuilder:
     @classmethod
     def add_0q_gates(cls, target: Target) -> None:
-        try:
+        with contextlib.suppress(AttributeError):
             target.add_instruction(qcl.GlobalPhaseGate(Parameter("phase")))
-        except AttributeError:
-            pass    
 
     @classmethod
     def add_1q_clifford_gates(cls, target: Target) -> None:
