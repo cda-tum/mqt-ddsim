@@ -63,7 +63,6 @@ class DDSIMTargetBuilder:
         lam = Parameter("lam")
 
         target.add_instruction(qcl.CHGate())
-        target.add_instruction(qcl.CSGate())
         target.add_instruction(qcl.CSdgGate())
         target.add_instruction(qcl.CSXGate())
         target.add_instruction(qcl.CRXGate(theta))
@@ -72,6 +71,8 @@ class DDSIMTargetBuilder:
         target.add_instruction(qcl.CPhaseGate(theta))
         target.add_instruction(qcl.CU1Gate(theta))
         target.add_instruction(qcl.CU3Gate(theta, phi, lam))
+        with contextlib.suppress(AttributeError):
+            target.add_instruction(qcl.CSGate())
 
     @classmethod
     def add_2q_non_controlled_clifford_gates(cls, target: Target) -> None:
