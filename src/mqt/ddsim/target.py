@@ -16,7 +16,7 @@ class DDSIMTargetBuilder:
     @classmethod
     def add_0q_gates(cls, target: Target) -> None:
         with contextlib.suppress(AttributeError):
-            target.add_instruction(qcl.GlobalPhaseGate(Parameter("phase")))
+            target.add_instruction(qcl.GlobalPhaseGate(Parameter("phase")))  
 
     @classmethod
     def add_1q_clifford_gates(cls, target: Target) -> None:
@@ -63,7 +63,6 @@ class DDSIMTargetBuilder:
         lam = Parameter("lam")
 
         target.add_instruction(qcl.CHGate())
-        target.add_instruction(qcl.CSdgGate())
         target.add_instruction(qcl.CSXGate())
         target.add_instruction(qcl.CRXGate(theta))
         target.add_instruction(qcl.CRYGate(theta))
@@ -72,7 +71,8 @@ class DDSIMTargetBuilder:
         target.add_instruction(qcl.CU1Gate(theta))
         target.add_instruction(qcl.CU3Gate(theta, phi, lam))
         with contextlib.suppress(AttributeError):
-            target.add_instruction(qcl.CSGate())
+            target.add_instruction(qcl.CSGate())      
+            target.add_instruction(qcl.CSdgGate())   
 
     @classmethod
     def add_2q_non_controlled_clifford_gates(cls, target: Target) -> None:
@@ -103,8 +103,10 @@ class DDSIMTargetBuilder:
     @classmethod
     def add_3q_gates(cls, target: Target) -> None:
         target.add_instruction(qcl.CCXGate())
-        target.add_instruction(qcl.CCZGate())
         target.add_instruction(qcl.CSwapGate())
+        with contextlib.suppress(AttributeError):
+            target.add_instruction(qcl.CCZGate())
+        
 
     @classmethod
     def add_multi_qubit_gates(cls, target: Target) -> None:

@@ -11,10 +11,10 @@ from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 
-from .header import DDSIMHeader
-from .pyddsim import ConstructionMode, UnitarySimulator, get_matrix
-from .qasmsimulator import QasmSimulatorBackend
-from .target import DDSIMTargetBuilder
+from mqt.ddsim.header import DDSIMHeader
+from mqt.ddsim.pyddsim import ConstructionMode, UnitarySimulator, get_matrix
+from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
+from mqt.ddsim.target import DDSIMTargetBuilder
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
@@ -107,12 +107,16 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
             if n_qubits > max_qubits:
                 msg = f"Number of qubits {n_qubits} is greater than maximum ({max_qubits}) for '{self.name}'."
                 raise QiskitError(msg)
+            
+            if qc.metadata is not None:
+                if "shots" in qc.metadata and qc.metadata["shots"] != 1:
+                    qc.metadata["shots"] = 1
 
-            if "shots" in qc.metadata and qc.metadata["shots"] != 1:
-                qc.metadata["shots"] = 1
-
-            for ii in range(len(qc.data)):
-                if qc.data[ii].operation.name in ["measure", "reset"]:
-                    operation_name = qc.data[ii].operation.name
+            for obj in qc.data:
+                if obj[0].name in ["measure", "reset"]:
+                    operation_name = obj[0].name
                     msg = f"Unsupported '{self.name}' instruction '{operation_name}' in circuit '{name}'."
-                    raise QiskitError(msg)
+                    raise QiskitError(msg) 
+                    
+
+
