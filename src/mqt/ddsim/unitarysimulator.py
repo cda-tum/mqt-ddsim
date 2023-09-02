@@ -107,16 +107,12 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
             if n_qubits > max_qubits:
                 msg = f"Number of qubits {n_qubits} is greater than maximum ({max_qubits}) for '{self.name}'."
                 raise QiskitError(msg)
-            
-            if qc.metadata is not None:
-                if "shots" in qc.metadata and qc.metadata["shots"] != 1:
-                    qc.metadata["shots"] = 1
+
+            if qc.metadata is not None and "shots" in qc.metadata and qc.metadata["shots"] != 1:
+                qc.metadata["shots"] = 1
 
             for obj in qc.data:
                 if obj[0].name in ["measure", "reset"]:
                     operation_name = obj[0].name
                     msg = f"Unsupported '{self.name}' instruction '{operation_name}' in circuit '{name}'."
-                    raise QiskitError(msg) 
-                    
-
-
+                    raise QiskitError(msg)
