@@ -1,187 +1,144 @@
 """Backend for DDSIM."""
 from __future__ import annotations
 
-import logging
 import time
 import uuid
-import warnings
+from math import log2
+from typing import Any
 
-from qiskit import QiskitError, QuantumCircuit
-from qiskit.compiler import assemble
-from qiskit.providers import BackendV1, Options
-from qiskit.providers.models import BackendConfiguration, BackendStatus
-from qiskit.qobj import PulseQobj, QasmQobj, QasmQobjExperiment, Qobj
+from qiskit import QuantumCircuit
+from qiskit.providers import BackendV2, Options
+from qiskit.providers.models import BackendStatus
 from qiskit.result import Result
+from qiskit.result.models import ExperimentResult, ExperimentResultData
+from qiskit.transpiler import Target
+from qiskit.utils.multiprocessing import local_hardware_info
 
 from . import __version__
+from .header import DDSIMHeader
 from .job import DDSIMJob
 from .pyddsim import CircuitSimulator
+from .target import DDSIMTargetBuilder
 
-logger = logging.getLogger(__name__)
 
-
-class QasmSimulatorBackend(BackendV1):
+class QasmSimulatorBackend(BackendV2):
     """Python interface to MQT DDSIM."""
 
-    SHOW_STATE_VECTOR = False
+    _SHOW_STATE_VECTOR = False
+    _TARGET = Target(description="MQT DDSIM Simulator Target", num_qubits=128)
+
+    @staticmethod
+    def max_qubits(for_matrix: bool = False) -> int:
+        max_complex = local_hardware_info()["memory"] * (1024**3) / 16
+        max_qubits = int(log2(max_complex))
+        if for_matrix:
+            max_qubits = max_qubits // 2
+        return max_qubits
+
+    @staticmethod
+    def _add_operations_to_target(target: Target) -> None:
+        DDSIMTargetBuilder.add_0q_gates(target)
+        DDSIMTargetBuilder.add_1q_gates(target)
+        DDSIMTargetBuilder.add_2q_gates(target)
+        DDSIMTargetBuilder.add_3q_gates(target)
+        DDSIMTargetBuilder.add_multi_qubit_gates(target)
+        DDSIMTargetBuilder.add_non_unitary_operations(target)
+        DDSIMTargetBuilder.add_barrier(target)
+
+    def _initialize_target(self) -> None:
+        if len(self.target.operations) > 0:
+            return
+        self._add_operations_to_target(self.target)
+
+    def __init__(self, name="qasm_simulator", description="MQT DDSIM QASM Simulator") -> None:
+        super().__init__(name=name, description=description, backend_version=__version__)
+        self._initialize_target()
 
     @classmethod
     def _default_options(cls) -> Options:
         return Options(
             shots=None,
             parameter_binds=None,
-            simulator_seed=None,
+            seed_simulator=None,
             approximation_step_fidelity=1.0,
             approximation_steps=0,
             approximation_strategy="fidelity",
         )
 
-    def __init__(self, configuration=None, provider=None) -> None:
-        conf = {
-            "backend_name": "qasm_simulator",
-            "backend_version": __version__,
-            "url": "https://github.com/cda-tum/mqt-ddsim",
-            "simulator": True,
-            "local": True,
-            "description": "MQT DDSIM C++ simulator",
-            "basis_gates": [
-                "gphase",
-                "id",
-                "u0",
-                "u1",
-                "u2",
-                "u3",
-                "cu3",
-                "x",
-                "cx",
-                "ccx",
-                "mcx_gray",
-                "mcx_recursive",
-                "mcx_vchain",
-                "y",
-                "cy",
-                "z",
-                "cz",
-                "h",
-                "ch",
-                "s",
-                "sdg",
-                "t",
-                "tdg",
-                "rx",
-                "crx",
-                "mcrx",
-                "ry",
-                "cry",
-                "mcry",
-                "rz",
-                "crz",
-                "mcrz",
-                "p",
-                "cp",
-                "cu1",
-                "mcphase",
-                "sx",
-                "csx",
-                "sxdg",
-                "swap",
-                "cswap",
-                "iswap",
-                "dcx",
-                "ecr",
-                "rxx",
-                "ryy",
-                "rzz",
-                "rzx",
-                "xx_minus_yy",
-                "xx_plus_yy",
-                "snapshot",
-            ],
-            "memory": False,
-            "n_qubits": 64,
-            "coupling_map": None,
-            "conditional": False,
-            "max_shots": 1000000000,
-            "open_pulse": False,
-            "gates": [],
-        }
-        super().__init__(configuration=configuration or BackendConfiguration.from_dict(conf), provider=provider)
+    @property
+    def target(self):
+        return self._TARGET
 
-    def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options) -> DDSIMJob:
-        if isinstance(quantum_circuits, (QasmQobj, PulseQobj)):
-            msg = "QasmQobj and PulseQobj are not supported."
-            raise QiskitError(msg)
+    @property
+    def max_circuits(self):
+        return None
 
-        if not isinstance(quantum_circuits, list):
+    def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options: dict[str, Any]) -> DDSIMJob:
+        if isinstance(quantum_circuits, QuantumCircuit):
             quantum_circuits = [quantum_circuits]
 
-        out_options = {}
-        for key in options:
-            if not hasattr(self.options, key):
-                warnings.warn("Option %s is not used by this backend" % key, UserWarning, stacklevel=2)
-            else:
-                out_options[key] = options[key]
-        circuit_qobj = assemble(quantum_circuits, self, **out_options)
-
         job_id = str(uuid.uuid4())
-        local_job = DDSIMJob(self, job_id, self._run_job, circuit_qobj, **options)
+        local_job = DDSIMJob(self, job_id, self._run_job, quantum_circuits, **options)
         local_job.submit()
         return local_job
 
-    def _run_job(self, job_id, qobj_instance: Qobj, **options) -> Result:
-        self._validate(qobj_instance)
+    def _validate(self, quantum_circuits: list[QuantumCircuit]) -> None:
+        pass
 
+    def _run_job(self, job_id: int, quantum_circuits: list[QuantumCircuit], **options: dict[str, Any]) -> Result:
+        self._validate(quantum_circuits)
         start = time.time()
-        result_list = [self.run_experiment(qobj_exp, **options) for qobj_exp in qobj_instance.experiments]
+        result_list = [self._run_experiment(q_circ, **options) for q_circ in quantum_circuits]
         end = time.time()
 
-        result = {
-            "backend_name": self.configuration().backend_name,
-            "backend_version": self.configuration().backend_version,
-            "qobj_id": qobj_instance.qobj_id,
-            "job_id": job_id,
-            "results": result_list,
-            "status": "COMPLETED",
-            "success": True,
-            "time_taken": (end - start),
-            "header": qobj_instance.header.to_dict(),
-        }
-        return Result.from_dict(result)
+        return Result(
+            backend_name=self.name,
+            backend_version=self.backend_version,
+            qobj_id=None,
+            job_id=job_id,
+            success=all(res.success for res in result_list),
+            results=result_list,
+            status="COMPLETED",
+            time_taken=end - start,
+        )
 
-    def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options) -> dict:
+    def _run_experiment(self, qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
         start_time = time.time()
         approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
         approximation_steps = options.get("approximation_steps", 1)
         approximation_strategy = options.get("approximation_strategy", "fidelity")
-        seed = options.get("seed", -1)
+        seed = options.get("seed_simulator", -1)
+        shots = options.get("shots", 1024)
 
         sim = CircuitSimulator(
-            qobj_experiment,
+            qc,
             approximation_step_fidelity=approximation_step_fidelity,
             approximation_steps=approximation_steps,
             approximation_strategy=approximation_strategy,
             seed=seed,
         )
-        counts = sim.simulate(options.get("shots", 1024))
+        counts = sim.simulate(shots=shots)
         end_time = time.time()
-        counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
 
-        result = {
-            "header": qobj_experiment.header.to_dict(),
-            "name": qobj_experiment.header.name,
-            "status": "DONE",
-            "time_taken": end_time - start_time,
-            "seed": options.get("seed", -1),
-            "shots": options.get("shots", 1024),
-            "data": {"counts": counts_hex},
-            "success": True,
-        }
-        if self.SHOW_STATE_VECTOR:
-            result["data"]["statevector"] = sim.get_vector()
-        return result
+        data = ExperimentResultData(
+            counts={hex(int(result, 2)): count for result, count in counts.items()},
+            statevector=None if not self._SHOW_STATE_VECTOR else sim.get_vector(),
+            time_taken=end_time - start_time,
+        )
 
-    def _validate(self, _quantum_circuit):
-        return
+        metadata = qc.metadata
+        if metadata is None:
+            metadata = {}
+
+        return ExperimentResult(
+            shots=shots,
+            success=True,
+            status="DONE",
+            seed=seed,
+            data=data,
+            metadata=metadata,
+            header=DDSIMHeader(qc),
+        )
 
     def status(self) -> BackendStatus:
         """Return backend status.
@@ -190,8 +147,8 @@ class QasmSimulatorBackend(BackendV1):
             BackendStatus: the status of the backend.
         """
         return BackendStatus(
-            backend_name=self.name(),
-            backend_version=self.configuration().backend_version,
+            backend_name=self.name,
+            backend_version=self.backend_version,
             operational=True,
             pending_jobs=0,
             status_msg="",
