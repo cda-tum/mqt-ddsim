@@ -72,16 +72,16 @@ public:
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const unsigned int stepNumber_, const double stepFidelity_):
         StochasticNoiseSimulator(std::move(qc_), {}, stepNumber_, stepFidelity_) {}
 
-//    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
-//                             const std::string& noiseEffects_,
-//                             double                noiseProbability_,
-//                             std::optional<double> ampDampingProbability_,
-//                             double                multiQubitGateFactor_,
-//                             std::size_t           stochRuns_,
-//                             const std::string&    recordedProperties_,
-//                             bool                  unoptimizedSim_,
-//                             std::size_t           seed_):
-//        StochasticNoiseSimulator(std::move(qc_), {noiseEffects_, noiseProbability_, ampDampingProbability_, multiQubitGateFactor_, stochRuns_, recordedProperties_, unoptimizedSim_, seed_}) {}
+    //    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
+    //                             const std::string& noiseEffects_,
+    //                             double                noiseProbability_,
+    //                             std::optional<double> ampDampingProbability_,
+    //                             double                multiQubitGateFactor_,
+    //                             std::size_t           stochRuns_,
+    //                             const std::string&    recordedProperties_,
+    //                             bool                  unoptimizedSim_,
+    //                             std::size_t           seed_):
+    //        StochasticNoiseSimulator(std::move(qc_), {noiseEffects_, noiseProbability_, ampDampingProbability_, multiQubitGateFactor_, stochRuns_, recordedProperties_, unoptimizedSim_, seed_}) {}
 
     //    explicit StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_):
     //        StochasticNoiseSimulator(std::move(qc_), Configuration{std::string("APD"), 0.001, 0.002, 2, 1000, std::string("0-256"), false}) {}

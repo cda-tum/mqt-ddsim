@@ -51,6 +51,20 @@ TEST(StochNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
     ASSERT_EQ("01", m);
 }
 
+TEST(StochNoiseSimTest, ResetOp) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(1);
+    quantumComputation->x(0);
+    quantumComputation->reset(0);
+
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation));
+
+    ddsim.simulate(1);
+
+    auto m = ddsim.measureAll(false);
+
+    ASSERT_EQ("0", m);
+}
+
 TEST(StochNoiseSimTest, ClassicControlledOp) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->x(0);

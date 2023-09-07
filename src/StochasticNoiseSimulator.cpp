@@ -50,6 +50,20 @@ void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
                         assert(result == '0' || result == '1');
                         classicValues[classic.at(i)] = (result == '1');
                     }
+                } else if (op->getType() == qc::Reset) {
+                    // Reset qubit
+                    auto qubits = nuOp->getTargets();
+                    for (const auto& qubit: qubits) {
+                        const auto result = Simulator<Config>::dd->measureOneCollapsing(Simulator<Config>::rootEdge, static_cast<dd::Qubit>(qubits.at(qubit)), true, Simulator<Config>::mt);
+                        if (result == '1') {
+                            const auto x   = qc::StandardOperation(qc->getNqubits(), qubit, qc::X);
+                            auto       tmp = Simulator<Config>::dd->multiply(dd::getDD(&x, Simulator<Config>::dd), Simulator<Config>::rootEdge);
+                            Simulator<Config>::dd->incRef(tmp);
+                            Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
+                            Simulator<Config>::rootEdge = tmp;
+                            Simulator<Config>::dd->garbageCollect();
+                        }
+                    }
                 } else {
                     throw std::runtime_error(std::string("Unsupported non-unitary functionality '") + op->getName() + "'.");
                 }
@@ -192,7 +206,6 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
             if (op->getType() == qc::Barrier) {
                 continue;
             }
-
             if (!op->isUnitary() && !(op->isClassicControlledOperation())) {
                 if (auto* nuOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
                     if (nuOp->getType() == qc::Measure) {
@@ -205,6 +218,20 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
                             const auto result = localDD->measureOneCollapsing(localRootEdge, static_cast<dd::Qubit>(quantum.at(i)), true, generator);
                             assert(result == '0' || result == '1');
                             classicValues[classic.at(i)] = (result == '0');
+                        }
+                    } else if (op->getType() == qc::Reset) {
+                        // Reset qubit
+                        auto qubits = nuOp->getTargets();
+                        for (const auto& qubit: qubits) {
+                            const auto result = localDD->measureOneCollapsing(localRootEdge, static_cast<dd::Qubit>(qubits.at(qubit)), true, generator);
+                            if (result == '1') {
+                                const auto x   = qc::StandardOperation(qc->getNqubits(), qubit, qc::X);
+                                auto       tmp = Simulator<Config>::dd->multiply(dd::getDD(&x, Simulator<Config>::dd), Simulator<Config>::rootEdge);
+                                Simulator<Config>::dd->incRef(tmp);
+                                Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
+                                Simulator<Config>::rootEdge = tmp;
+                                Simulator<Config>::dd->garbageCollect();
+                            }
                         }
                     } else {
                         throw std::runtime_error("Unsupported non-unitary functionality.");
@@ -255,16 +282,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
 
                 const auto usedQubits = op->getUsedQubits();
 
-                if (sequentiallyApplyNoise) {
-                    stochasticNoiseFunctionality.setNoiseEffects(std::vector<dd::NoiseOperations>{dd::Identity});
-                    stochasticNoiseFunctionality.applyNoiseOperation(usedQubits, operation, localRootEdge, generator);
-                    for (auto noiseEffect: noiseEffects) {
-                        stochasticNoiseFunctionality.setNoiseEffects(std::vector<dd::NoiseOperations>{noiseEffect});
-                        stochasticNoiseFunctionality.applyNoiseOperation(usedQubits, stochasticNoiseFunctionality.getIdentityDD(), localRootEdge, generator);
-                    }
-                } else {
-                    stochasticNoiseFunctionality.applyNoiseOperation(usedQubits, operation, localRootEdge, generator);
-                }
+                stochasticNoiseFunctionality.applyNoiseOperation(usedQubits, operation, localRootEdge, generator);
 
                 if (stepFidelity < 1. && (opCount + 1U) % approxMod == 0U) {
                     approxCount++;
