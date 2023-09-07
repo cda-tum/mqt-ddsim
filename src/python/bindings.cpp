@@ -4,10 +4,10 @@
  */
 
 #include "CircuitSimulator.hpp"
-#include "HybridSchrodingerFeynmanSimulator.hpp"
-#include "StochasticNoiseSimulator.hpp"
 #include "DeterministicNoiseSimulator.hpp"
+#include "HybridSchrodingerFeynmanSimulator.hpp"
 #include "PathSimulator.hpp"
+#include "StochasticNoiseSimulator.hpp"
 #include "UnitarySimulator.hpp"
 #include "python/qiskit/QasmQobjExperiment.hpp"
 #include "python/qiskit/QuantumCircuit.hpp"
@@ -185,14 +185,20 @@ PYBIND11_MODULE(pyddsim, m) {
             .def("expectation_value", &expectationValue, "observable"_a);
 
     // Stoch simulator
-//    auto stochasticNoiseSimulator = createSimulator<StochasticNoiseSimulator<>>(m, "StochasticSimulator");
-//    stochasticNoiseSimulator.def(py::init<>(&constructSimulator<StochasticNoiseSimulator<>>),
-//                                 "circ"_a,
-//                                 "steps"_a            = 1,
-//                                 "step_fidelity"_a    = 1);
     auto stochasticNoiseSimulator = createSimulator<StochasticNoiseSimulator<>>(m, "StochasticNoiseSimulator");
     stochasticNoiseSimulator.def(py::init<>(&constructSimulatorWithoutSeed<StochasticNoiseSimulator<>, StochasticNoiseSimulator<>::Configuration&>),
-                      "circ"_a, "config"_a = StochasticNoiseSimulator<>::Configuration())
+                                 "circ"_a, "config"_a = StochasticNoiseSimulator<>::Configuration())
+            //            .def(py::init<>(&constructSimulatorWithoutSeed<StochasticNoiseSimulator<>, const std::string&, double, std::optional<double>, double, std::size_t, const std::string&, bool, std::size_t>),
+            //                 "circ"_a,
+            //                 "noiseEffects"_a = "APD",
+            //                 "noiseProbability"_a = 0.01,
+            //                 "ampDampingProbability"_a = 0.02,
+            //                 "multiQubitGateFactor"_a = 2,
+            //                 "stochRuns"_a = 1000,
+            //                 "recordedProperties"_a = "1-200",
+            //                 "unoptimizedSim"_a = false,
+            //                 "seed"_a = 1
+            //                 );
             .def(py::init<>(&constructSimulatorWithoutSeed<StochasticNoiseSimulator<>, const std::size_t&, const std::size_t&>),
                  "circ"_a, "fidelity"_a = 0, "stepsize"_a = 0);
 
