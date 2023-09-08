@@ -18,15 +18,6 @@ class MQTHybridStatevectorSimulatorTest(unittest.TestCase):
         self.q_circuit.h(qr[0])
         self.q_circuit.cx(qr[0], qr[1])
 
-    def test_configuration(self):
-        """Test backend.configuration()."""
-        self.backend.configuration()
-
-    def test_properties(self):
-        """Test backend.properties()."""
-        properties = self.backend.properties()
-        assert properties is None
-
     def test_status(self):
         """Test backend.status()."""
         self.backend.status()
@@ -35,7 +26,7 @@ class MQTHybridStatevectorSimulatorTest(unittest.TestCase):
         """Test final state vector for single circuit run."""
         result = execute(self.q_circuit, backend=self.backend, shots=0).result()
         assert result.success
-        actual = result.get_statevector(self.q_circuit)
+        actual = result.get_statevector()
 
         assert len(actual) == 2**2  # state vector has 2**(#qubits) length
 

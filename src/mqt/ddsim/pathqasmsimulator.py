@@ -1,27 +1,25 @@
 """Backend for DDSIM Task-Based Simulator."""
 from __future__ import annotations
 
-import logging
 import pathlib
 import time
-import uuid
-import warnings
+from typing import TYPE_CHECKING
 
-from qiskit import QiskitError, QuantumCircuit
-from qiskit.compiler import assemble
-from qiskit.providers import BackendV1, Options
-from qiskit.providers.models import BackendConfiguration, BackendStatus
-from qiskit.qobj import PulseQobj, QasmQobj, QasmQobjExperiment, Qobj
-from qiskit.result import Result
+if TYPE_CHECKING:
+    from quimb.tensor import Tensor, TensorNetwork
 
-from . import __version__
-from .job import DDSIMJob
+from qiskit import QuantumCircuit
+from qiskit.providers import Options
+from qiskit.result.models import ExperimentResult, ExperimentResultData
+from qiskit.transpiler import Target
+
+from .header import DDSIMHeader
 from .pyddsim import PathCircuitSimulator, PathSimulatorConfiguration, PathSimulatorMode
+from .qasmsimulator import QasmSimulatorBackend
+from .target import DDSIMTargetBuilder
 
-logger = logging.getLogger(__name__)
 
-
-def read_tensor_network_file(filename):
+def read_tensor_network_file(filename: str) -> list[Tensor]:
     import numpy as np
     import pandas as pd
     import quimb.tensor as qtn
@@ -39,7 +37,7 @@ def read_tensor_network_file(filename):
     return tensors
 
 
-def create_tensor_network(qc):
+def create_tensor_network(qc: QuantumCircuit) -> TensorNetwork:
     import quimb.tensor as qtn
     import sparse
 
@@ -79,13 +77,13 @@ def create_tensor_network(qc):
 
 
 def get_simulation_path(
-    qc,
+    qc: QuantumCircuit,
     max_time: int = 60,
     max_repeats: int = 1024,
     parallel_runs: int = 1,
     dump_path: bool = True,
     plot_ring: bool = False,
-):
+) -> list[tuple[int, int]]:
     import cotengra as ctg
     from opt_einsum.paths import linear_to_ssa
 
@@ -109,10 +107,23 @@ def get_simulation_path(
     return path
 
 
-class PathQasmSimulatorBackend(BackendV1):
+class PathQasmSimulatorBackend(QasmSimulatorBackend):
     """Python interface to MQT DDSIM Simulation Path Framework."""
 
-    SHOW_STATE_VECTOR = False
+    _PATH_TARGET = Target(description="MQT DDSIM Simulation Path Framework Target", num_qubits=128)
+
+    @staticmethod
+    def _add_operations_to_target(target: Target) -> None:
+        DDSIMTargetBuilder.add_0q_gates(target)
+        DDSIMTargetBuilder.add_1q_gates(target)
+        DDSIMTargetBuilder.add_2q_gates(target)
+        DDSIMTargetBuilder.add_3q_gates(target)
+        DDSIMTargetBuilder.add_multi_qubit_gates(target)
+        DDSIMTargetBuilder.add_barrier(target)
+        DDSIMTargetBuilder.add_measure(target)
+
+    def __init__(self, name="path_sim_qasm_simulator", description="MQT DDSIM Simulation Path Framework") -> None:
+        super().__init__(name=name, description=description)
 
     @classmethod
     def _default_options(cls) -> Options:
@@ -132,145 +143,36 @@ class PathQasmSimulatorBackend(BackendV1):
             cotengra_dump_path=True,
         )
 
-    def __init__(self, configuration=None, provider=None) -> None:
-        conf = {
-            "backend_name": "path_sim_qasm_simulator",
-            "backend_version": __version__,
-            "url": "https://github.com/cda-tum/mqt-ddsim",
-            "simulator": True,
-            "local": True,
-            "description": "MQT DDSIM C++ simulation path framework",
-            "basis_gates": [
-                "gphase",
-                "id",
-                "u0",
-                "u1",
-                "u2",
-                "u3",
-                "cu3",
-                "x",
-                "cx",
-                "ccx",
-                "mcx_gray",
-                "mcx_recursive",
-                "mcx_vchain",
-                "mcx",
-                "y",
-                "cy",
-                "z",
-                "cz",
-                "h",
-                "ch",
-                "s",
-                "sdg",
-                "t",
-                "tdg",
-                "rx",
-                "crx",
-                "mcrx",
-                "ry",
-                "cry",
-                "mcry",
-                "rz",
-                "crz",
-                "mcrz",
-                "p",
-                "cp",
-                "cu1",
-                "mcphase",
-                "sx",
-                "csx",
-                "sxdg",
-                "swap",
-                "cswap",
-                "iswap",
-                "dcx",
-                "ecr",
-                "rxx",
-                "ryy",
-                "rzz",
-                "rzx",
-                "xx_minus_yy",
-                "xx_plus_yy",
-                "snapshot",
-            ],
-            "memory": False,
-            "n_qubits": 128,
-            "coupling_map": None,
-            "conditional": False,
-            "max_shots": 1000000000,
-            "open_pulse": False,
-            "gates": [],
-        }
-        super().__init__(configuration=configuration or BackendConfiguration.from_dict(conf), provider=provider)
+    @property
+    def target(self):
+        return self._PATH_TARGET
 
-    def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options):
-        if isinstance(quantum_circuits, (QasmQobj, PulseQobj)):
-            msg = "QasmQobj and PulseQobj are not supported."
-            raise QiskitError(msg)
-
-        if not isinstance(quantum_circuits, list):
-            quantum_circuits = [quantum_circuits]
-
-        out_options = {}
-        for key in options:
-            if not hasattr(self.options, key):
-                warnings.warn("Option %s is not used by this backend" % key, UserWarning, stacklevel=2)
-            else:
-                out_options[key] = options[key]
-        circuit_qobj = assemble(quantum_circuits, self, **out_options)
-
-        job_id = str(uuid.uuid4())
-        local_job = DDSIMJob(self, job_id, self._run_job, circuit_qobj, **options)
-        local_job.submit()
-        return local_job
-
-    def _run_job(self, job_id, qobj_instance: Qobj, **options):
-        self._validate(qobj_instance)
-
-        start = time.time()
-        result_list = [self.run_experiment(qobj_exp, **options) for qobj_exp in qobj_instance.experiments]
-        end = time.time()
-
-        result = {
-            "backend_name": self.configuration().backend_name,
-            "backend_version": self.configuration().backend_version,
-            "qobj_id": qobj_instance.qobj_id,
-            "job_id": job_id,
-            "results": result_list,
-            "status": "COMPLETED",
-            "success": True,
-            "time_taken": (end - start),
-            "header": qobj_instance.header.to_dict(),
-        }
-        return Result.from_dict(result)
-
-    def run_experiment(self, qobj_experiment: QasmQobjExperiment, **options):
+    def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
         start_time = time.time()
 
         pathsim_configuration = options.get("pathsim_configuration", PathSimulatorConfiguration())
 
-        mode = options.get("mode")
+        mode = options.get("mode", None)
         if mode is not None:
             pathsim_configuration.mode = PathSimulatorMode(mode)
 
-        bracket_size = options.get("bracket_size")
+        bracket_size = options.get("bracket_size", None)
         if bracket_size is not None:
             pathsim_configuration.bracket_size = bracket_size
 
-        alternating_start = options.get("alternating_start")
+        alternating_start = options.get("alternating_start", None)
         if alternating_start is not None:
             pathsim_configuration.alternating_start = alternating_start
 
-        gate_cost = options.get("gate_cost")
+        gate_cost = options.get("gate_cost", None)
         if gate_cost is not None:
             pathsim_configuration.gate_cost = gate_cost
 
-        seed = options.get("seed")
+        seed: int | None = options.get("seed", None)
         if seed is not None:
             pathsim_configuration.seed = seed
 
-        sim = PathCircuitSimulator(qobj_experiment, config=pathsim_configuration)
+        sim = PathCircuitSimulator(qc, config=pathsim_configuration)
 
         # determine the contraction path using cotengra in case this is requested
         if pathsim_configuration.mode == PathSimulatorMode.cotengra:
@@ -279,7 +181,7 @@ class PathQasmSimulatorBackend(BackendV1):
             dump_path = options.get("cotengra_dump_path", False)
             plot_ring = options.get("cotengra_plot_ring", False)
             path = get_simulation_path(
-                qobj_experiment, max_time=max_time, max_repeats=max_repeats, dump_path=dump_path, plot_ring=plot_ring
+                qc, max_time=max_time, max_repeats=max_repeats, dump_path=dump_path, plot_ring=plot_ring
             )
             sim.set_simulation_path(path, False)
 
@@ -287,38 +189,26 @@ class PathQasmSimulatorBackend(BackendV1):
         setup_time = time.time()
         counts = sim.simulate(shots)
         end_time = time.time()
-        counts_hex = {hex(int(result, 2)): count for result, count in counts.items()}
 
-        result = {
-            "header": qobj_experiment.header.to_dict(),
-            "name": qobj_experiment.header.name,
-            "status": "DONE",
-            "time_taken": end_time - start_time,
-            "time_setup": setup_time - start_time,
-            "time_sim": end_time - setup_time,
-            "config": pathsim_configuration,
-            "shots": shots,
-            "data": {"counts": counts_hex},
-            "success": True,
-        }
-        if self.SHOW_STATE_VECTOR:
-            result["data"]["statevector"] = sim.get_vector()
+        data = ExperimentResultData(
+            counts={hex(int(result, 2)): count for result, count in counts.items()},
+            statevector=None if not self._SHOW_STATE_VECTOR else sim.get_vector(),
+            time_taken=end_time - start_time,
+            time_setup=setup_time - start_time,
+            time_sim=end_time - setup_time,
+        )
 
-        return result
+        metadata = qc.metadata
+        if metadata is None:
+            metadata = {}
 
-    def _validate(self, _quantum_circuit):
-        return
-
-    def status(self):
-        """Return backend status.
-
-        Returns:
-            BackendStatus: the status of the backend.
-        """
-        return BackendStatus(
-            backend_name=self.name(),
-            backend_version=self.configuration().backend_version,
-            operational=True,
-            pending_jobs=0,
-            status_msg="",
+        return ExperimentResult(
+            shots=shots,
+            success=True,
+            status="DONE",
+            config=pathsim_configuration,
+            seed=seed,
+            data=data,
+            metadata=metadata,
+            header=DDSIMHeader(qc),
         )
