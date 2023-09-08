@@ -66,11 +66,29 @@ TEST(DeterministicNoiseSimTest, TestingBarrierGate) {
 }
 
 TEST(DeterministicNoiseSimTest, TestingResetGate) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(1);
+    quantumComputation->x(0);
     quantumComputation->reset(0);
-    auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation));
+    auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("A"), 0, 0, 1);
+    auto m     = ddsim->deterministicSimulate();
 
-    EXPECT_THROW(ddsim->deterministicSimulate(), std::runtime_error);
+    const double tolerance = 1e-10;
+    EXPECT_NEAR(m.find("0")->second, 0, tolerance);
+}
+
+TEST(DeterministicNoiseSimTest, ClassicControlledOp) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    quantumComputation->x(0);
+    quantumComputation->measure(0, 0);
+    std::unique_ptr<qc::Operation> op(new qc::StandardOperation(2, 1, qc::X));
+    auto                           classicalRegister = std::pair<std::size_t, std::size_t>(0, 1);
+    quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classicalRegister, 1);
+
+    auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("A"), 0, 0, 1);
+    auto m     = ddsim->deterministicSimulate();
+
+    const double tolerance = 1e-10;
+    EXPECT_NEAR(m.find("11")->second, 1, tolerance);
 }
 
 TEST(DeterministicNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
