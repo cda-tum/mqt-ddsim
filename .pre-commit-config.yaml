@@ -51,14 +51,14 @@ repos:
 
   # Run ruff (subsumes pyupgrade, isort, flake8+plugins, and more)
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.287
+    rev: v0.0.288
     hooks:
       - id: ruff
         args: ["--fix", "--show-fixes"]
 
   # Run code formatting with Black
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 23.7.0 # Keep in sync with blacken-docs
+    rev: 23.9.1 # Keep in sync with blacken-docs
     hooks:
       - id: black-jupyter
 
