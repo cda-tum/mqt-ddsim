@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
@@ -51,7 +51,7 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
     def target(self):
         return self._HSF_TARGET
 
-    def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
+    def _run_experiment(self, qc: QuantumCircuit, values: Sequence[float] | None = None, **options) -> ExperimentResult:
         start_time = time.time()
         seed = options.get("seed", -1)
         mode = options.get("mode", "amplitude")
@@ -71,7 +71,16 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
             msg = f"Simulation mode{mode} not supported by hybrid simulator. Available modes are 'amplitude' and 'dd'."
             raise QiskitError(msg)
 
-        sim = HybridCircuitSimulator(qc, seed=seed, mode=hybrid_mode, nthreads=nthreads)
+        if values is None:
+            values = []
+
+        if len(qc.parameters) != len(values):
+            msg = "The number of parameters in the circuit does not match the number of parameters provided."
+            raise AssertionError(msg)
+
+        circuit_to_simulate = qc.bind_parameters(dict(zip(qc.parameters, values))) if values else qc
+
+        sim = HybridCircuitSimulator(circuit_to_simulate, seed=seed, mode=hybrid_mode, nthreads=nthreads)
 
         shots = options.get("shots", 1024)
         if self._SHOW_STATE_VECTOR and shots > 0:

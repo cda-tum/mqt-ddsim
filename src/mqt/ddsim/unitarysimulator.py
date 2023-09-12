@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Sequence
 
 import numpy as np
 import numpy.typing as npt
@@ -48,7 +48,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
     def target(self):
         return self._US_TARGET
 
-    def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
+    def _run_experiment(self, qc: QuantumCircuit, values: Sequence[float] | None = None, **options) -> ExperimentResult:
         start_time = time.time()
         seed = options.get("seed", -1)
         mode = options.get("mode", "recursive")
@@ -64,7 +64,16 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
             )
             raise QiskitError(msg)
 
-        sim = UnitarySimulator(qc, seed=seed, mode=construction_mode)
+        if values is None:
+            values = []
+
+        if len(qc.parameters) != len(values):
+            msg = "The number of parameters in the circuit does not match the number of parameters provided."
+            raise AssertionError(msg)
+
+        circuit_to_simulate = qc.bind_parameters(dict(zip(qc.parameters, values))) if values else qc
+
+        sim = UnitarySimulator(circuit_to_simulate, seed=seed, mode=construction_mode)
         sim.construct()
         # Extract resulting matrix from final DD and write data
         unitary: npt.NDArray[np.complex_] = np.zeros((2**qc.num_qubits, 2**qc.num_qubits), dtype=np.complex_)
