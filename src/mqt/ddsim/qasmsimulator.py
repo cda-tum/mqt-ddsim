@@ -4,7 +4,7 @@ from __future__ import annotations
 import time
 import uuid
 from math import log2
-from typing import Any
+from typing import Any, Sequence
 
 from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
@@ -14,11 +14,11 @@ from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 from qiskit.utils.multiprocessing import local_hardware_info
 
-from . import __version__
-from .header import DDSIMHeader
-from .job import DDSIMJob
-from .pyddsim import CircuitSimulator
-from .target import DDSIMTargetBuilder
+from mqt.ddsim import __version__
+from mqt.ddsim.header import DDSIMHeader
+from mqt.ddsim.job import DDSIMJob
+from mqt.ddsim.pyddsim import CircuitSimulator
+from mqt.ddsim.target import DDSIMTargetBuilder
 
 
 class QasmSimulatorBackend(BackendV2):
@@ -73,22 +73,45 @@ class QasmSimulatorBackend(BackendV2):
     def max_circuits(self):
         return None
 
-    def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options: dict[str, Any]) -> DDSIMJob:
+    def run(
+        self,
+        quantum_circuits: QuantumCircuit | list[QuantumCircuit],
+        parameter_values: Sequence[Sequence[float]] | None = None,
+        **options: dict[str, Any],
+    ) -> DDSIMJob:
         if isinstance(quantum_circuits, QuantumCircuit):
             quantum_circuits = [quantum_circuits]
 
         job_id = str(uuid.uuid4())
-        local_job = DDSIMJob(self, job_id, self._run_job, quantum_circuits, **options)
+        local_job = DDSIMJob(self, job_id, self._run_job, quantum_circuits, parameter_values, **options)
         local_job.submit()
         return local_job
 
     def _validate(self, quantum_circuits: list[QuantumCircuit]) -> None:
         pass
 
-    def _run_job(self, job_id: int, quantum_circuits: list[QuantumCircuit], **options: dict[str, Any]) -> Result:
+    def _run_job(
+        self,
+        job_id: int,
+        quantum_circuits: list[QuantumCircuit],
+        parameter_values: Sequence[Sequence[float]] | None,
+        **options: dict[str, Any],
+    ) -> Result:
         self._validate(quantum_circuits)
         start = time.time()
-        result_list = [self._run_experiment(q_circ, **options) for q_circ in quantum_circuits]
+
+        if not parameter_values:
+            result_list = [self._run_experiment(q_circ, values=None, **options) for q_circ in quantum_circuits]
+        else:
+            if len(quantum_circuits) != len(parameter_values):
+                msg = "The number of circuits to simulate does not match the size of the parameter list."
+                raise AssertionError(msg)
+
+            result_list = [
+                self._run_experiment(q_circ, values, **options)
+                for q_circ, values in zip(quantum_circuits, parameter_values)
+            ]
+
         end = time.time()
 
         return Result(
@@ -102,7 +125,9 @@ class QasmSimulatorBackend(BackendV2):
             time_taken=end - start,
         )
 
-    def _run_experiment(self, qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
+    def _run_experiment(
+        self, qc: QuantumCircuit, values: Sequence[float] | None = None, **options: dict[str, Any]
+    ) -> ExperimentResult:
         start_time = time.time()
         approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
         approximation_steps = options.get("approximation_steps", 1)
@@ -110,8 +135,17 @@ class QasmSimulatorBackend(BackendV2):
         seed = options.get("seed_simulator", -1)
         shots = options.get("shots", 1024)
 
+        if values is None:
+            values = []
+
+        if len(qc.parameters) != len(values):
+            msg = "The number of parameters in the circuit does not match the number of parameters provided."
+            raise AssertionError(msg)
+
+        circuit_to_simulate = qc.bind_parameters(dict(zip(qc.parameters, values))) if values else qc
+
         sim = CircuitSimulator(
-            qc,
+            circuit_to_simulate,
             approximation_step_fidelity=approximation_step_fidelity,
             approximation_steps=approximation_steps,
             approximation_strategy=approximation_strategy,
