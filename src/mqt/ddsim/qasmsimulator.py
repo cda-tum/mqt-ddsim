@@ -72,8 +72,8 @@ class QasmSimulatorBackend(BackendV2):
     @property
     def max_circuits(self):
         return None
-    
-    @staticmethod 
+
+    @staticmethod
     def _bind_parameters(qc: QuantumCircuit, values: Sequence[float] | None) -> QuantumCircuit:
         if values is None:
             values = []
@@ -82,9 +82,7 @@ class QasmSimulatorBackend(BackendV2):
             msg = "The number of parameters in the circuit does not match the number of parameters provided."
             raise AssertionError(msg)
 
-        bound_qc = qc.bind_parameters(dict(zip(qc.parameters, values))) if values else qc
-        
-        return bound_qc
+        return qc.bind_parameters(dict(zip(qc.parameters, values))) if values else qc
 
     def run(
         self,
