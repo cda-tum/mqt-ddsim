@@ -172,16 +172,8 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
         if seed is not None:
             pathsim_configuration.seed = seed
 
-        if values is None:
-            values = []
-
-        if len(qc.parameters) != len(values):
-            msg = "The number of parameters in the circuit does not match the number of parameters provided."
-            raise AssertionError(msg)
-
-        circuit_to_simulate = qc.bind_parameters(dict(zip(qc.parameters, values))) if values else qc
-
-        sim = PathCircuitSimulator(circuit_to_simulate, config=pathsim_configuration)
+        bound_qc = self._bind_parameters(qc, values)
+        sim = PathCircuitSimulator(bound_qc, config=pathsim_configuration)
 
         # determine the contraction path using cotengra in case this is requested
         if pathsim_configuration.mode == PathSimulatorMode.cotengra:

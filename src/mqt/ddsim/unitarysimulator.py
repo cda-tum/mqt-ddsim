@@ -64,16 +64,8 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
             )
             raise QiskitError(msg)
 
-        if values is None:
-            values = []
-
-        if len(qc.parameters) != len(values):
-            msg = "The number of parameters in the circuit does not match the number of parameters provided."
-            raise AssertionError(msg)
-
-        circuit_to_simulate = qc.bind_parameters(dict(zip(qc.parameters, values))) if values else qc
-
-        sim = UnitarySimulator(circuit_to_simulate, seed=seed, mode=construction_mode)
+        bound_qc = self._bind_parameters(qc, values)
+        sim = UnitarySimulator(bound_qc, seed=seed, mode=construction_mode)
         sim.construct()
         # Extract resulting matrix from final DD and write data
         unitary: npt.NDArray[np.complex_] = np.zeros((2**qc.num_qubits, 2**qc.num_qubits), dtype=np.complex_)

@@ -71,16 +71,8 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
             msg = f"Simulation mode{mode} not supported by hybrid simulator. Available modes are 'amplitude' and 'dd'."
             raise QiskitError(msg)
 
-        if values is None:
-            values = []
-
-        if len(qc.parameters) != len(values):
-            msg = "The number of parameters in the circuit does not match the number of parameters provided."
-            raise AssertionError(msg)
-
-        circuit_to_simulate = qc.bind_parameters(dict(zip(qc.parameters, values))) if values else qc
-
-        sim = HybridCircuitSimulator(circuit_to_simulate, seed=seed, mode=hybrid_mode, nthreads=nthreads)
+        bound_qc = self._bind_parameters(qc, values)
+        sim = HybridCircuitSimulator(bound_qc, seed=seed, mode=hybrid_mode, nthreads=nthreads)
 
         shots = options.get("shots", 1024)
         if self._SHOW_STATE_VECTOR and shots > 0:

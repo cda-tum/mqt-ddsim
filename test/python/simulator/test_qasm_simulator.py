@@ -67,8 +67,7 @@ def test_qasm_simulator(circuit: QuantumCircuit, backend: QasmSimulatorBackend, 
     for key in target:
         assert key in counts
         assert abs(target[key] - counts[key]) < threshold
-
-
+        
 def test_qasm_simulator_approximation(backend: QasmSimulatorBackend, shots: int):
     """Test data counts output for single circuit run against reference."""
     circuit = QuantumCircuit(2)
