@@ -3,6 +3,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 from qiskit import AncillaRegister, ClassicalRegister, QuantumCircuit, QuantumRegister, execute
+from qiskit.circuit import Parameter
 
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
@@ -68,6 +69,46 @@ def test_qasm_simulator(circuit: QuantumCircuit, backend: QasmSimulatorBackend, 
         assert key in counts
         assert abs(target[key] - counts[key]) < threshold
         
+def test_qasm_simulator_support_parametrized_gates(backend: QasmSimulatorBackend, shots: int):
+    """Test backend's adequate support of parametrized gates"""
+    
+    theta_A = Parameter("theta_A")
+    theta_B = Parameter("theta_B")
+    theta_C = Parameter("theta_C")
+    circuit_1= QuantumCircuit(2)
+    circuit_2= QuantumCircuit(2)
+    circuit_1.ry(theta_A,0)
+    circuit_1.rx(theta_B,1)
+    circuit_2.rx(theta_C,0)
+
+    result = backend.run([circuit_1, circuit_2], [[np.pi/2, np.pi/2], [np.pi/4]], shots=shots).result()
+    
+    assert result.success
+
+    threshold = 0.04 * shots
+    average = shots / 4
+    counts_1 = result.get_counts(circuit_1)
+    counts_2 = result.get_counts(circuit_2)
+    target_1 = {
+        "0": average,
+        "11": average,
+        "1": average,
+        "11": average,
+    }
+    target_2 = {
+        "0": shots*(np.cos(np.pi/8))**2,
+        "1": shots*(np.sin(np.pi/8))**2,
+    }
+    
+    for key in target_1:
+        assert key in counts_1
+        assert abs(target_1[key] - counts_1[key]) < threshold
+        
+    for key in target_2:
+        assert key in counts_2
+        assert abs(target_2[key] - counts_2[key]) < threshold
+    
+
 def test_qasm_simulator_approximation(backend: QasmSimulatorBackend, shots: int):
     """Test data counts output for single circuit run against reference."""
     circuit = QuantumCircuit(2)
