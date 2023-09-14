@@ -88,7 +88,7 @@ class QasmSimulatorBackend(BackendV2):
         self,
         quantum_circuits: QuantumCircuit | list[QuantumCircuit],
         parameter_values: Sequence[Sequence[float]] | None = None,
-        **options: dict[str, Any],
+        **options,
     ) -> DDSIMJob:
         if isinstance(quantum_circuits, QuantumCircuit):
             quantum_circuits = [quantum_circuits]
