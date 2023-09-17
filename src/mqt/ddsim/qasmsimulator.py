@@ -52,6 +52,7 @@ class QasmSimulatorBackend(BackendV2):
 
     def __init__(self, name="qasm_simulator", description="MQT DDSIM QASM Simulator") -> None:
         super().__init__(name=name, description=description, backend_version=__version__)
+        self._simulated_circuits: list[QuantumCircuit] = []
         self._initialize_target()
 
     @classmethod
@@ -147,6 +148,7 @@ class QasmSimulatorBackend(BackendV2):
         shots = options.get("shots", 1024)
 
         bound_qc = self._bind_parameters(qc, values)
+        self._simulated_circuits.append(bound_qc)
 
         sim = CircuitSimulator(
             bound_qc,

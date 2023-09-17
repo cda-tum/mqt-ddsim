@@ -72,6 +72,7 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
             raise QiskitError(msg)
 
         bound_qc = self._bind_parameters(qc, values)
+        self._simulated_circuits.append(bound_qc)
         sim = HybridCircuitSimulator(bound_qc, seed=seed, mode=hybrid_mode, nthreads=nthreads)
 
         shots = options.get("shots", 1024)

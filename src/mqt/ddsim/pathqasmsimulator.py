@@ -173,6 +173,7 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
             pathsim_configuration.seed = seed
 
         bound_qc = self._bind_parameters(qc, values)
+        self._simulated_circuits.append(bound_qc)
         sim = PathCircuitSimulator(bound_qc, config=pathsim_configuration)
 
         # determine the contraction path using cotengra in case this is requested

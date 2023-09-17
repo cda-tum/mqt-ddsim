@@ -65,6 +65,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
             raise QiskitError(msg)
 
         bound_qc = self._bind_parameters(qc, values)
+        self._simulated_circuits.append(bound_qc)
         sim = UnitarySimulator(bound_qc, seed=seed, mode=construction_mode)
         sim.construct()
         # Extract resulting matrix from final DD and write data
