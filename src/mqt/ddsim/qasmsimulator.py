@@ -14,11 +14,11 @@ from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 from qiskit.utils.multiprocessing import local_hardware_info
 
-from mqt.ddsim import __version__
-from mqt.ddsim.header import DDSIMHeader
-from mqt.ddsim.job import DDSIMJob
-from mqt.ddsim.pyddsim import CircuitSimulator
-from mqt.ddsim.target import DDSIMTargetBuilder
+from . import __version__
+from .header import DDSIMHeader
+from .job import DDSIMJob
+from .pyddsim import CircuitSimulator
+from .target import DDSIMTargetBuilder
 
 
 class QasmSimulatorBackend(BackendV2):
@@ -75,15 +75,25 @@ class QasmSimulatorBackend(BackendV2):
         return None
 
     @staticmethod
-    def _bind_parameters(qc: QuantumCircuit, values: Sequence[float] | None) -> QuantumCircuit:
-        if values is None:
-            values = []
+    def _bind_parameters(
+        quantum_circuits: list[QuantumCircuit], parameter_values: Sequence[Sequence[float]] | None = None
+    ) -> list[QuantumCircuit]:
+        if parameter_values is None:
+            parameter_values = []
 
-        if len(qc.parameters) != len(values):
-            msg = "The number of parameters in the circuit does not match the number of parameters provided."
-            raise AssertionError(msg)
+        bound_circuits = [
+            qc.bind_parameters(dict(zip(qc.parameters, values)))
+            for qc, values in zip(quantum_circuits, parameter_values)
+        ]
 
-        return qc.bind_parameters(dict(zip(qc.parameters, values))) if values else qc
+        if len(parameter_values) < len(quantum_circuits):
+            bound_circuits.extend(quantum_circuits[len(parameter_values) : len(quantum_circuits)])
+
+        # Preserves circuit's names
+        for qc_bound, qc_unbound in zip(bound_circuits, quantum_circuits):
+            qc_bound.name = qc_unbound.name
+
+        return bound_circuits
 
     def run(
         self,
@@ -112,17 +122,8 @@ class QasmSimulatorBackend(BackendV2):
         self._validate(quantum_circuits)
         start = time.time()
 
-        if not parameter_values:
-            result_list = [self._run_experiment(q_circ, values=None, **options) for q_circ in quantum_circuits]
-        else:
-            if len(quantum_circuits) != len(parameter_values):
-                msg = "The number of circuits to simulate does not match the size of the parameter list."
-                raise AssertionError(msg)
-
-            result_list = [
-                self._run_experiment(q_circ, values, **options)
-                for q_circ, values in zip(quantum_circuits, parameter_values)
-            ]
+        bound_circuits = self._bind_parameters(quantum_circuits, parameter_values)
+        result_list = [self._run_experiment(q_circ, **options) for q_circ in bound_circuits]
 
         end = time.time()
 
@@ -137,9 +138,7 @@ class QasmSimulatorBackend(BackendV2):
             time_taken=end - start,
         )
 
-    def _run_experiment(
-        self, qc: QuantumCircuit, values: Sequence[float] | None = None, **options: dict[str, Any]
-    ) -> ExperimentResult:
+    def _run_experiment(self, qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
         start_time = time.time()
         approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
         approximation_steps = options.get("approximation_steps", 1)
@@ -147,11 +146,8 @@ class QasmSimulatorBackend(BackendV2):
         seed = options.get("seed_simulator", -1)
         shots = options.get("shots", 1024)
 
-        bound_qc = self._bind_parameters(qc, values)
-        self._simulated_circuits.append(bound_qc)
-
         sim = CircuitSimulator(
-            bound_qc,
+            qc,
             approximation_step_fidelity=approximation_step_fidelity,
             approximation_steps=approximation_steps,
             approximation_strategy=approximation_strategy,

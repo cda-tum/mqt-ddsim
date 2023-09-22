@@ -82,28 +82,14 @@ def test_qasm_simulator_support_parametrized_gates(backend: QasmSimulatorBackend
     circuit_1.rx(theta_b, 1)
     circuit_2.rx(theta_c, 0)
 
-    # Test backend raises the right type of errors
-    with pytest.raises(AssertionError) as exc_info:
-        backend.run([circuit_1, circuit_2], [[np.pi / 2, np.pi / 2]], shots=shots).result()
-
-    assert str(exc_info.value) == "The number of circuits to simulate does not match the size of the parameter list."
-
-    with pytest.raises(AssertionError) as exc_info:
-        backend.run([circuit_1], [[np.pi / 2]], shots=shots).result()
-
-    assert (
-        str(exc_info.value)
-        == "The number of parameters in the circuit does not match the number of parameters provided."
-    )
-
     # Test backend's correct functionality with multiple circuit
     result = backend.run([circuit_1, circuit_2], [[np.pi / 2, np.pi / 2], [np.pi / 4]], shots=shots).result()
     assert result.success
 
     threshold = 0.04 * shots
     average = shots / 4
-    counts_1 = result.get_counts(circuit_1)
-    counts_2 = result.get_counts(circuit_2)
+    counts_1 = result.get_counts(circuit_1.name)
+    counts_2 = result.get_counts(circuit_2.name)
     target_1 = {
         "0": average,
         "11": average,

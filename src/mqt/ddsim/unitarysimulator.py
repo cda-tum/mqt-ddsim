@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING
 
 import numpy as np
 import numpy.typing as npt
@@ -11,10 +11,10 @@ from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 
-from mqt.ddsim.header import DDSIMHeader
-from mqt.ddsim.pyddsim import ConstructionMode, UnitarySimulator, get_matrix
-from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
-from mqt.ddsim.target import DDSIMTargetBuilder
+from .header import DDSIMHeader
+from .pyddsim import ConstructionMode, UnitarySimulator, get_matrix
+from .qasmsimulator import QasmSimulatorBackend
+from .target import DDSIMTargetBuilder
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
@@ -48,7 +48,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
     def target(self):
         return self._US_TARGET
 
-    def _run_experiment(self, qc: QuantumCircuit, values: Sequence[float] | None = None, **options) -> ExperimentResult:
+    def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
         start_time = time.time()
         seed = options.get("seed", -1)
         mode = options.get("mode", "recursive")
@@ -64,9 +64,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
             )
             raise QiskitError(msg)
 
-        bound_qc = self._bind_parameters(qc, values)
-        self._simulated_circuits.append(bound_qc)
-        sim = UnitarySimulator(bound_qc, seed=seed, mode=construction_mode)
+        sim = UnitarySimulator(qc, seed=seed, mode=construction_mode)
         sim.construct()
         # Extract resulting matrix from final DD and write data
         unitary: npt.NDArray[np.complex_] = np.zeros((2**qc.num_qubits, 2**qc.num_qubits), dtype=np.complex_)

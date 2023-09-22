@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
@@ -51,7 +51,7 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
     def target(self):
         return self._HSF_TARGET
 
-    def _run_experiment(self, qc: QuantumCircuit, values: Sequence[float] | None = None, **options) -> ExperimentResult:
+    def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
         start_time = time.time()
         seed = options.get("seed", -1)
         mode = options.get("mode", "amplitude")
@@ -71,9 +71,7 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
             msg = f"Simulation mode{mode} not supported by hybrid simulator. Available modes are 'amplitude' and 'dd'."
             raise QiskitError(msg)
 
-        bound_qc = self._bind_parameters(qc, values)
-        self._simulated_circuits.append(bound_qc)
-        sim = HybridCircuitSimulator(bound_qc, seed=seed, mode=hybrid_mode, nthreads=nthreads)
+        sim = HybridCircuitSimulator(qc, seed=seed, mode=hybrid_mode, nthreads=nthreads)
 
         shots = options.get("shots", 1024)
         if self._SHOW_STATE_VECTOR and shots > 0:

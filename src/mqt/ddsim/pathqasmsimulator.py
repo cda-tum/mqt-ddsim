@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pathlib
 import time
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from quimb.tensor import Tensor, TensorNetwork
@@ -147,7 +147,7 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
     def target(self):
         return self._PATH_TARGET
 
-    def _run_experiment(self, qc: QuantumCircuit, values: Sequence[float] | None = None, **options) -> ExperimentResult:
+    def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
         start_time = time.time()
 
         pathsim_configuration = options.get("pathsim_configuration", PathSimulatorConfiguration())
@@ -172,9 +172,7 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
         if seed is not None:
             pathsim_configuration.seed = seed
 
-        bound_qc = self._bind_parameters(qc, values)
-        self._simulated_circuits.append(bound_qc)
-        sim = PathCircuitSimulator(bound_qc, config=pathsim_configuration)
+        sim = PathCircuitSimulator(qc, config=pathsim_configuration)
 
         # determine the contraction path using cotengra in case this is requested
         if pathsim_configuration.mode == PathSimulatorMode.cotengra:
