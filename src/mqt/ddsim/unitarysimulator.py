@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Sequence
 
 import numpy as np
 import numpy.typing as npt
@@ -93,7 +93,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
             header=DDSIMHeader(qc),
         )
 
-    def _validate(self, quantum_circuits: list[QuantumCircuit]):
+    def _validate(self, quantum_circuits: Sequence[QuantumCircuit]):
         """Semantic validations of the quantum circuits which cannot be done via schemas.
         Some of these may later move to backend schemas.
         1. No shots

@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import functools
 from concurrent import futures
-from typing import TYPE_CHECKING, Any, Callable, Sequence
+from typing import TYPE_CHECKING, Any, Callable, Mapping, Sequence
 
 from qiskit.providers import JobError, JobStatus, JobV1
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
+    from qiskit.circuit import Parameter
     from qiskit.providers import BackendV2
 
 
@@ -46,8 +47,8 @@ class DDSIMJob(JobV1):
         backend: BackendV2,
         job_id: str,
         fn: Callable,
-        experiments: list[QuantumCircuit],
-        parameter_values: Sequence[Sequence[float]] | None,
+        experiments: Sequence[QuantumCircuit],
+        parameter_values: Sequence[Sequence[float]] | Sequence[Mapping[Parameter, float]] | None,
         **args: dict[str, Any],
     ) -> None:
         super().__init__(backend, job_id)

@@ -4,7 +4,7 @@ from __future__ import annotations
 import time
 import uuid
 from math import log2
-from typing import Any, Sequence
+from typing import TYPE_CHECKING, Any, Mapping, Sequence
 
 from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
@@ -19,6 +19,9 @@ from .header import DDSIMHeader
 from .job import DDSIMJob
 from .pyddsim import CircuitSimulator
 from .target import DDSIMTargetBuilder
+
+if TYPE_CHECKING:
+    from qiskit.circuit import Parameter
 
 
 class QasmSimulatorBackend(BackendV2):
@@ -52,7 +55,6 @@ class QasmSimulatorBackend(BackendV2):
 
     def __init__(self, name="qasm_simulator", description="MQT DDSIM QASM Simulator") -> None:
         super().__init__(name=name, description=description, backend_version=__version__)
-        self._simulated_circuits: list[QuantumCircuit] = []
         self._initialize_target()
 
     @classmethod
@@ -76,29 +78,42 @@ class QasmSimulatorBackend(BackendV2):
 
     @staticmethod
     def _bind_parameters(
-        quantum_circuits: list[QuantumCircuit], parameter_values: Sequence[Sequence[float]] | None = None
+        quantum_circuits: Sequence[QuantumCircuit],
+        parameter_values: Sequence[Sequence[float]] | Sequence[Mapping[Parameter, float]] | None,
     ) -> list[QuantumCircuit]:
         if parameter_values is None:
             parameter_values = []
 
-        bound_circuits = [
-            qc.bind_parameters(dict(zip(qc.parameters, values)))
-            for qc, values in zip(quantum_circuits, parameter_values)
-        ]
+        number_parametrized_circuits = 0  # Initialize the counter
 
-        if len(parameter_values) < len(quantum_circuits):
-            bound_circuits.extend(quantum_circuits[len(parameter_values) : len(quantum_circuits)])
+        for qc in quantum_circuits:
+            if qc.parameters:
+                number_parametrized_circuits += 1
 
-        # Preserves circuit's names
-        for qc_bound, qc_unbound in zip(bound_circuits, quantum_circuits):
-            qc_bound.name = qc_unbound.name
+        if number_parametrized_circuits != 0 or len(parameter_values) != 0:
+            if number_parametrized_circuits == 0:
+                msg = "No parametrized circuits found in the provided list. The parameter list should be of type None or an empty list."
+                raise ValueError(msg)
+            if len(parameter_values) != len(quantum_circuits):
+                msg = "The number of circuits to simulate does not match the size of the parameter list."
+                raise ValueError(msg)
+            bound_circuits = []
+            for qc, values in zip(quantum_circuits, parameter_values):
+                if len(qc.parameters) != len(values):
+                    msg = f"The number of parameters in the circuit '{qc.name}' does not match the number of parameters provided. Expected number of parameters is '{len(qc.parameters)}'."
+                    raise ValueError(msg)
+                qc_bound = qc.bind_parameters(values)
+                qc_bound.name = qc.name  # Preserves circuits' names
+                bound_circuits.append(qc_bound)
 
-        return bound_circuits
+            return bound_circuits
+
+        return list(quantum_circuits)
 
     def run(
         self,
-        quantum_circuits: QuantumCircuit | list[QuantumCircuit],
-        parameter_values: Sequence[Sequence[float]] | None = None,
+        quantum_circuits: QuantumCircuit | Sequence[QuantumCircuit],
+        parameter_values: Sequence[Sequence[float]] | Sequence[Mapping[Parameter, float]] | None = None,
         **options,
     ) -> DDSIMJob:
         if isinstance(quantum_circuits, QuantumCircuit):
@@ -109,14 +124,14 @@ class QasmSimulatorBackend(BackendV2):
         local_job.submit()
         return local_job
 
-    def _validate(self, quantum_circuits: list[QuantumCircuit]) -> None:
+    def _validate(self, quantum_circuits: Sequence[QuantumCircuit]) -> None:
         pass
 
     def _run_job(
         self,
         job_id: int,
-        quantum_circuits: list[QuantumCircuit],
-        parameter_values: Sequence[Sequence[float]] | None,
+        quantum_circuits: Sequence[QuantumCircuit],
+        parameter_values: Sequence[Sequence[float]] | Sequence[Mapping[Parameter, float]] | None,
         **options: dict[str, Any],
     ) -> Result:
         self._validate(quantum_circuits)
