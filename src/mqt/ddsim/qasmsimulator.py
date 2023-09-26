@@ -100,7 +100,7 @@ class QasmSimulatorBackend(BackendV2):
             bound_circuits = []
             for qc, values in zip(quantum_circuits, parameter_values):
                 if len(qc.parameters) != len(values):
-                    msg = f"The number of parameters in the circuit '{qc.name}' does not match the number of parameters provided. Expected number of parameters is '{len(qc.parameters)}'."
+                    msg = f"The number of parameters in the circuit '{qc.name}' does not match the number of parameters provided ({len(values)}). Expected number of parameters is '{len(qc.parameters)}'."
                     raise ValueError(msg)
                 qc_bound = qc.bind_parameters(values)
                 qc_bound.name = qc.name  # Preserves circuits' names
