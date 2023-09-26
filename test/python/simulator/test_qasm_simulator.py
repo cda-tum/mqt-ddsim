@@ -76,37 +76,41 @@ def test_qasm_simulator_support_parametrized_gates(backend: QasmSimulatorBackend
     theta_a = Parameter("theta_a")
     theta_b = Parameter("theta_b")
     theta_c = Parameter("theta_c")
-    circuit_1 = QuantumCircuit(2)
-    circuit_2 = QuantumCircuit(2)
-    circuit_1.ry(theta_a, 0)
-    circuit_1.rx(theta_b, 1)
-    circuit_2.rx(theta_c, 0)
+    circuit_1 = QuantumCircuit(1)
+    circuit_2 = QuantumCircuit(1)
+    circuit_1.rx(theta_a, 0)
+    circuit_2.rx(theta_b, 0)
+    circuit_2.rz(theta_c, 0)
+    circuit_2.rx(theta_b, 0)
+    bare_circuit = QuantumCircuit(1)
+    bare_circuit.h(0)
+
+    with pytest.raises(
+        ValueError,
+        match=r"No parametrized circuits found, but .* parameters provided. The parameter list should either be empty or None.",
+    ):
+        backend.run([bare_circuit], [[np.pi]], shots=shots).result()
+
+    with pytest.raises(
+        ValueError, match=r"The number of circuits to simulate .* does not match the size of the parameter list .*"
+    ):
+        backend.run([circuit_1, circuit_2], shots=shots).result()
+
+    with pytest.raises(
+        ValueError,
+        match=r"The number of parameters in the circuit .* does not match the number of parameters provided .* Expected number of parameters is .*",
+    ):
+        backend.run([circuit_2], [[np.pi / 2]], shots=shots).result()
 
     # Test backend's correct functionality with multiple circuit
-    result = backend.run([circuit_1, circuit_2], [[np.pi / 2, np.pi / 2], [np.pi / 4]], shots=shots).result()
+    result = backend.run([circuit_1, circuit_2], [[np.pi], [np.pi / 2, np.pi]], shots=shots).result()
     assert result.success
 
-    threshold = 0.04 * shots
-    average = shots / 4
     counts_1 = result.get_counts(circuit_1.name)
     counts_2 = result.get_counts(circuit_2.name)
-    target_1 = {
-        "0": average,
-        "11": average,
-        "1": average,
-    }
-    target_2 = {
-        "0": shots * (np.cos(np.pi / 8)) ** 2,
-        "1": shots * (np.sin(np.pi / 8)) ** 2,
-    }
 
-    for key in target_1:
-        assert key in counts_1
-        assert abs(target_1[key] - counts_1[key]) < threshold
-
-    for key in target_2:
-        assert key in counts_2
-        assert abs(target_2[key] - counts_2[key]) < threshold
+    assert counts_1 == {"1": shots}
+    assert counts_2 == {"0": shots}
 
 
 def test_qasm_simulator_approximation(backend: QasmSimulatorBackend, shots: int):
