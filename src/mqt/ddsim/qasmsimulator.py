@@ -95,7 +95,7 @@ class QasmSimulatorBackend(BackendV2):
                 msg = "No parametrized circuits found in the provided list. The parameter list should be of type None or an empty list."
                 raise ValueError(msg)
             if len(parameter_values) != len(quantum_circuits):
-                msg = "The number of circuits to simulate does not match the size of the parameter list."
+                msg = f"The number of circuits to simulate ({len(quantum_circuits)}) does not match the size of the parameter list ({len{parameter_values)})."
                 raise ValueError(msg)
             bound_circuits = []
             for qc, values in zip(quantum_circuits, parameter_values):
