@@ -92,7 +92,7 @@ class QasmSimulatorBackend(BackendV2):
 
         if number_parametrized_circuits != 0 or len(parameter_values) != 0:
             if number_parametrized_circuits == 0:
-                msg = "No parametrized circuits found in the provided list. The parameter list should be of type None or an empty list."
+                msg = f"No parametrized circuits found, but {len(parameter_values)} parameters provided. The parameter list should either be empty or None."
                 raise ValueError(msg)
             if len(parameter_values) != len(quantum_circuits):
                 msg = f"The number of circuits to simulate ({len(quantum_circuits)}) does not match the size of the parameter list ({len{parameter_values)})."
