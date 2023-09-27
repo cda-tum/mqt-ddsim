@@ -4,7 +4,7 @@ from __future__ import annotations
 import time
 import uuid
 from math import log2
-from typing import TYPE_CHECKING, Any, Mapping, Sequence
+from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union
 
 from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
@@ -22,6 +22,9 @@ from .target import DDSIMTargetBuilder
 
 if TYPE_CHECKING:
     from qiskit.circuit import Parameter
+    from qiskit.circuit.parameterexpression import ParameterValueType
+
+    Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
 
 
 class QasmSimulatorBackend(BackendV2):
@@ -92,7 +95,7 @@ class QasmSimulatorBackend(BackendV2):
     @staticmethod
     def _bind_parameters(
         quantum_circuits: Sequence[QuantumCircuit],
-        parameter_values: Sequence[Sequence[float]] | Sequence[Mapping[Parameter, float]] | None,
+        parameter_values: Sequence[Parameters] | None,
     ) -> list[QuantumCircuit]:
         if parameter_values is None:
             parameter_values = []
@@ -117,7 +120,7 @@ class QasmSimulatorBackend(BackendV2):
     def run(
         self,
         quantum_circuits: QuantumCircuit | Sequence[QuantumCircuit],
-        parameter_values: Sequence[Sequence[float]] | Sequence[Mapping[Parameter, float]] | None = None,
+        parameter_values: Sequence[Parameters] | None = None,
         **options,
     ) -> DDSIMJob:
         if isinstance(quantum_circuits, QuantumCircuit):
@@ -135,7 +138,7 @@ class QasmSimulatorBackend(BackendV2):
         self,
         job_id: int,
         quantum_circuits: Sequence[QuantumCircuit],
-        parameter_values: Sequence[Sequence[float]] | Sequence[Mapping[Parameter, float]] | None,
+        parameter_values: Sequence[Parameters] | None,
         **options: dict[str, Any],
     ) -> Result:
         self._validate(quantum_circuits)

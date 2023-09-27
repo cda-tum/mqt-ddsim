@@ -2,14 +2,17 @@ from __future__ import annotations
 
 import functools
 from concurrent import futures
-from typing import TYPE_CHECKING, Any, Callable, Mapping, Sequence
+from typing import TYPE_CHECKING, Any, Callable, Mapping, Sequence, Union
 
 from qiskit.providers import JobError, JobStatus, JobV1
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
     from qiskit.circuit import Parameter
+    from qiskit.circuit.parameterexpression import ParameterValueType
     from qiskit.providers import BackendV2
+
+    Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
 
 
 def requires_submit(func):
@@ -48,7 +51,7 @@ class DDSIMJob(JobV1):
         job_id: str,
         fn: Callable,
         experiments: Sequence[QuantumCircuit],
-        parameter_values: Sequence[Sequence[float]] | Sequence[Mapping[Parameter, float]] | None,
+        parameter_values: Sequence[Parameters] | None,
         **args: dict[str, Any],
     ) -> None:
         super().__init__(backend, job_id)
