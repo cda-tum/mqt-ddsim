@@ -87,27 +87,27 @@ def test_qasm_simulator_support_parametrized_gates(backend: QasmSimulatorBackend
 
     with pytest.raises(
         ValueError,
-        match=r"No parametrized circuits found, but .* parameters provided. The parameter list should either be empty or None.",
+        match=r"Mismatching number of values and parameters.*",
     ):
         backend.run([bare_circuit], [[np.pi]], shots=shots).result()
 
     with pytest.raises(
-        ValueError, match=r"The number of circuits to simulate .* does not match the size of the parameter list .*"
+        ValueError, match=r"No parameter values provided although at least one parameterized circuit was supplied."
     ):
         backend.run([circuit_1, circuit_2], shots=shots).result()
 
     with pytest.raises(
         ValueError,
-        match=r"The number of parameters in the circuit .* does not match the number of parameters provided .* Expected number of parameters is .*",
+        match=r"The number of circuits \(2\) does not match the number of provided parameter sets \(1\)\.",
     ):
-        backend.run([circuit_2], [[np.pi / 2]], shots=shots).result()
+        backend.run([circuit_1, circuit_2], [[np.pi / 2]], shots=shots).result()
 
     # Test backend's correct functionality with multiple circuit
     result = backend.run([circuit_1, circuit_2], [[np.pi], [np.pi / 2, np.pi]], shots=shots).result()
     assert result.success
 
-    counts_1 = result.get_counts(circuit_1.name)
-    counts_2 = result.get_counts(circuit_2.name)
+    counts_1 = result.get_counts(circuit_1)
+    counts_2 = result.get_counts(circuit_2)
 
     assert counts_1 == {"1": shots}
     assert counts_2 == {"0": shots}
