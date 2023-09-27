@@ -80,40 +80,28 @@ class QasmSimulatorBackend(BackendV2):
         return None
 
     @staticmethod
-    def _bind_circuit_parameters(
-        qc: QuantumCircuit,
-        values: Sequence[float] | Mapping[Parameter, float],
-    ) -> QuantumCircuit:
-        if len(qc.parameters) != len(values):
-            msg = f"The number of parameters in the circuit '{qc.name}' does not match the number of parameters provided ({len(values)}). Expected number of parameters is '{len(qc.parameters)}'."
-            raise ValueError(msg)
-        qc_bound = qc.bind_parameters(values)
-        qc_bound.name = qc.name  # Preserves circuits' name
-
-        return qc_bound
-
-    @staticmethod
-    def _bind_parameters(
+    def _assign_parameters(
         quantum_circuits: Sequence[QuantumCircuit],
         parameter_values: Sequence[Parameters] | None,
     ) -> list[QuantumCircuit]:
-        if parameter_values is None:
-            parameter_values = []
-
-        number_parametrized_circuits = sum(1 for qc in quantum_circuits if qc.parameters)
-
-        if number_parametrized_circuits == 0 and len(parameter_values) == 0:
+        if not any(qc.parameters for qc in quantum_circuits) and not parameter_values:
             return list(quantum_circuits)
 
-        if number_parametrized_circuits == 0:
-            msg = f"No parametrized circuits found, but {len(parameter_values)} parameters provided. The parameter list should either be empty or None."
+        if parameter_values is None:
+            msg = "No parameter values provided although at least one parameterized circuit was supplied."
             raise ValueError(msg)
-        if len(parameter_values) != len(quantum_circuits):
-            msg = f"The number of circuits to simulate ({len(quantum_circuits)}) does not match the size of the parameter list ({len(parameter_values)})."
+
+        if len(quantum_circuits) != len(parameter_values):
+            msg = f"The number of circuits ({len(quantum_circuits)}) does not match the number of provided parameter sets ({len(parameter_values)})."
             raise ValueError(msg)
-        bound_circuits = []
-        for qc, values in zip(quantum_circuits, parameter_values):
-            bound_circuits.append(QasmSimulatorBackend._bind_circuit_parameters(qc, values))
+
+        bound_circuits = [
+            qc.assign_parameters(parameters=values) for qc, values in zip(quantum_circuits, parameter_values)
+        ]
+
+        # fix the circuit names
+        for qcb, qc in zip(bound_circuits, quantum_circuits):
+            qcb.name = qc.name
 
         return bound_circuits
 
@@ -144,7 +132,7 @@ class QasmSimulatorBackend(BackendV2):
         self._validate(quantum_circuits)
         start = time.time()
 
-        bound_circuits = self._bind_parameters(quantum_circuits, parameter_values)
+        bound_circuits = self._assign_parameters(quantum_circuits, parameter_values)
         result_list = [self._run_experiment(q_circ, **options) for q_circ in bound_circuits]
 
         end = time.time()
