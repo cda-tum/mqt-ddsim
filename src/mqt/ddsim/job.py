@@ -2,13 +2,17 @@ from __future__ import annotations
 
 import functools
 from concurrent import futures
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, Mapping, Sequence, Union
 
 from qiskit.providers import JobError, JobStatus, JobV1
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
+    from qiskit.circuit import Parameter
+    from qiskit.circuit.parameterexpression import ParameterValueType
     from qiskit.providers import BackendV2
+
+    Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
 
 
 def requires_submit(func):
@@ -42,11 +46,18 @@ class DDSIMJob(JobV1):
     _executor = futures.ThreadPoolExecutor(max_workers=1)
 
     def __init__(
-        self, backend: BackendV2, job_id: str, fn: Callable, experiments: list[QuantumCircuit], **args: dict[str, Any]
+        self,
+        backend: BackendV2,
+        job_id: str,
+        fn: Callable,
+        experiments: Sequence[QuantumCircuit],
+        parameter_values: Sequence[Parameters] | None,
+        **args: dict[str, Any],
     ) -> None:
         super().__init__(backend, job_id)
         self._fn = fn
         self._experiments = experiments
+        self._parameter_values = parameter_values
         self._args = args
         self._future: futures.Future | None = None
 
@@ -60,7 +71,9 @@ class DDSIMJob(JobV1):
             msg = "Job was already submitted!"
             raise JobError(msg)
 
-        self._future = self._executor.submit(self._fn, self._job_id, self._experiments, **self._args)
+        self._future = self._executor.submit(
+            self._fn, self._job_id, self._experiments, self._parameter_values, **self._args
+        )
 
     @requires_submit
     def result(self, timeout: float | None = None):

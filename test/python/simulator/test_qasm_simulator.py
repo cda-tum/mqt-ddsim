@@ -3,6 +3,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 from qiskit import AncillaRegister, ClassicalRegister, QuantumCircuit, QuantumRegister, execute
+from qiskit.circuit import Parameter
 
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
@@ -67,6 +68,49 @@ def test_qasm_simulator(circuit: QuantumCircuit, backend: QasmSimulatorBackend, 
     for key in target:
         assert key in counts
         assert abs(target[key] - counts[key]) < threshold
+
+
+def test_qasm_simulator_support_parametrized_gates(backend: QasmSimulatorBackend, shots: int):
+    """Test backend's adequate support of parametrized gates"""
+
+    theta_a = Parameter("theta_a")
+    theta_b = Parameter("theta_b")
+    theta_c = Parameter("theta_c")
+    circuit_1 = QuantumCircuit(1)
+    circuit_2 = QuantumCircuit(1)
+    circuit_1.rx(theta_a, 0)
+    circuit_2.rx(theta_b, 0)
+    circuit_2.rz(theta_c, 0)
+    circuit_2.rx(theta_b, 0)
+    bare_circuit = QuantumCircuit(1)
+    bare_circuit.h(0)
+
+    with pytest.raises(
+        ValueError,
+        match=r"Mismatching number of values and parameters.*",
+    ):
+        backend.run([bare_circuit], [[np.pi]], shots=shots).result()
+
+    with pytest.raises(
+        ValueError, match=r"No parameter values provided although at least one parameterized circuit was supplied."
+    ):
+        backend.run([circuit_1, circuit_2], shots=shots).result()
+
+    with pytest.raises(
+        ValueError,
+        match=r"The number of circuits \(2\) does not match the number of provided parameter sets \(1\)\.",
+    ):
+        backend.run([circuit_1, circuit_2], [[np.pi / 2]], shots=shots).result()
+
+    # Test backend's correct functionality with multiple circuit
+    result = backend.run([circuit_1, circuit_2], [[np.pi], [np.pi / 2, np.pi]], shots=shots).result()
+    assert result.success
+
+    counts_1 = result.get_counts(circuit_1)
+    counts_2 = result.get_counts(circuit_2)
+
+    assert counts_1 == {"1": shots}
+    assert counts_2 == {"0": shots}
 
 
 def test_qasm_simulator_approximation(backend: QasmSimulatorBackend, shots: int):
