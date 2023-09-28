@@ -3,23 +3,23 @@
 from __future__ import annotations
 
 import math
-import uuid
-from collections.abc import Sequence
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from qiskit.circuit.quantumcircuit import QuantumCircuit
-from qiskit.providers.backend import BackendV1, BackendV2
-from qiskit.providers.options import Options
-from qiskit.result import QuasiDistribution, Result
-from qiskit.transpiler.passmanager import PassManager
-
 from qiskit.primitives.backend_estimator import _prepare_counts
 from qiskit.primitives.base import BaseSampler, SamplerResult
-from qiskit.primitives.utils import _circuit_key
 from qiskit.primitives.primitive_job import PrimitiveJob
+from qiskit.primitives.utils import _circuit_key
+from qiskit.providers.options import Options
+from qiskit.result import QuasiDistribution, Result
 
-from mqt.ddsim.job import DDSIMJob
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from qiskit.providers.backend import BackendV2
+    from qiskit.transpiler.passmanager import PassManager
 
 
 class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
@@ -69,7 +69,6 @@ class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
         self._skip_transpilation = skip_transpilation
         self._circuit_ids = {}
 
-
     @property
     def transpiled_circuits(self) -> list[QuantumCircuit]:
         if self._skip_transpilation:
@@ -86,10 +85,10 @@ class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
     @property
     def transpile_options(self) -> Options:
         return self._transpile_options
-        
+
     def set_transpile_options(self, **fields):
         self._transpile_options.update_options(**fields)
-        
+
     def _transpile(self):
         from qiskit import transpile
 
@@ -97,7 +96,7 @@ class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
         self._transpiled_circuits.extend(
             transpile(
                 self._circuits[start:],
-                target = self._backend.target,
+                target=self._backend.target,
                 **self.transpile_options.__dict__,
             ),
         )
@@ -108,7 +107,6 @@ class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
         parameter_values: Sequence[Parameters],
         **run_options,
     ) -> PrimitiveJob:
-    
         circuit_indices = []
         for circuit in circuits:
             index = self._circuit_ids.get(_circuit_key(circuit))
@@ -119,8 +117,7 @@ class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
                 self._circuit_ids[_circuit_key(circuit)] = len(self._circuits)
                 self._circuits.append(circuit)
                 self._parameters.append(circuit.parameters)
-                
-                
+
         job = PrimitiveJob(self._call, circuit_indices, parameter_values, **run_options)
         job.submit()
         return job
@@ -131,20 +128,15 @@ class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
         parameter_values: Sequence[Parameters],
         **run_options,
     ) -> SamplerResult:
-    
-    
         transpiled_circuits = self.transpiled_circuits
         bound_circuits = self.backend._assign_parameters(transpiled_circuits, parameter_values)
         bound_circuits = self._bound_pass_manager_run(bound_circuits)
-        
-        result = [self.backend.run(bound_circuits, **run_options).result()]
-           
-        return self._postprocessing(result, bound_circuits)
-    
 
-    def _postprocessing(
-        self, result: list[Result], circuits: list[QuantumCircuit]
-    ) -> SamplerResult:
+        result = [self.backend.run(bound_circuits, **run_options).result()]
+
+        return self._postprocessing(result, bound_circuits)
+
+    def _postprocessing(self, result: list[Result], circuits: list[QuantumCircuit]) -> SamplerResult:
         counts = _prepare_counts(result)
         shots = sum(counts[0].values())
 
@@ -152,14 +144,11 @@ class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
         metadata: list[dict[str, Any]] = [{} for _ in range(len(circuits))]
         for count in counts:
             prob_dist = {k: v / shots for k, v in count.items()}
-            probabilities.append(
-                QuasiDistribution(prob_dist, shots=shots, stddev_upper_bound=math.sqrt(1 / shots))
-            )
+            probabilities.append(QuasiDistribution(prob_dist, shots=shots, stddev_upper_bound=math.sqrt(1 / shots)))
             for metadatum in metadata:
                 metadatum["shots"] = shots
 
         return SamplerResult(probabilities, metadata)
-
 
     def _bound_pass_manager_run(self, circuits):
         if self._bound_pass_manager is None:
@@ -169,27 +158,18 @@ class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
             if not isinstance(output, list):
                 output = [output]
             return output
-            
-          
 
 
- 
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
-from qiskit.circuit import Parameter
-import numpy as np
+from qiskit import QuantumCircuit
 
-
-
-qc= QuantumCircuit(2)
+qc = QuantumCircuit(2)
 qc.h(0)
-qc.cx(0,1)
+qc.cx(0, 1)
 qc.measure_all()
 
 
-
-sampler= DDSIMBackendSampler(QasmSimulatorBackend())
-job =sampler.run([qc])
+sampler = DDSIMBackendSampler(QasmSimulatorBackend())
+job = sampler.run([qc])
 result = job.result()
 
 print(result.quasi_dists)
-
