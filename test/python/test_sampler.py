@@ -29,16 +29,16 @@ def circuit() -> QuantumCircuit:
     qc.rz(theta_b, 0)
     qc.rx(theta_a, 0)
     qc.barrier()
-    qc.measure(q,c)
-    
+    qc.measure(q, c)
+
     return qc
-    
-def test_DDSIM_Sampler(circuit: QuantumCircuit, sampler: DDSIMBackendSampler):
+
+
+def test_ddsim_sampler(circuit: QuantumCircuit, sampler: DDSIMBackendSampler):
     """Test DDSIM Sampler's functionality"""
 
-    job = sampler.run([circuit],[[np.pi / 2, np.pi]])
+    job = sampler.run([circuit], [[np.pi / 2, np.pi]])
     result = job.result()
     counts = result.quasi_dists[0]
 
     assert counts == {0: 1.0}
- 
