@@ -33,6 +33,7 @@ def circuit() -> QuantumCircuit:
 
     return qc
 
+
 def test_ddsim_sampler(circuit: QuantumCircuit, sampler: DDSIMBackendSampler):
     """Test DDSIM Sampler's functionality"""
 
