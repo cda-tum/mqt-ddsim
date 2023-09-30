@@ -12,44 +12,29 @@ from qiskit.primitives.utils import _circuit_key
 from qiskit.providers.options import Options
 from qiskit.result import QuasiDistribution, Result
 
+from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
+
 if TYPE_CHECKING:
     from qiskit.circuit import Parameter
     from qiskit.circuit.parameterexpression import ParameterValueType
     from qiskit.circuit.quantumcircuit import QuantumCircuit
-    from qiskit.providers.backend import BackendV2
     from qiskit.transpiler.passmanager import PassManager
 
     Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
 
 
 class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
-    """A :class:`~.BaseSampler` implementation that provides an interface for
-    leveraging the sampler interface from any backend.
-
-    This class provides a sampler interface from any backend and doesn't do
-    any measurement mitigation, it just computes the probability distribution
-    from the counts. It facilitates using backends that do not provide a
-    native :class:`~.BaseSampler` implementation in places that work with
-    :class:`~.BaseSampler`, such as algorithms in :mod:`qiskit.algorithms`
-    including :class:`~.qiskit.algorithms.minimum_eigensolvers.SamplingVQE`.
-    However, if you're using a provider that has a native implementation of
-    :class:`~.BaseSampler`, it is a better choice to leverage that native
-    implementation as it will likely include additional optimizations and be
-    a more efficient implementation. The generic nature of this class
-    precludes doing any provider- or backend-specific optimizations.
-    """
+    _BACKEND = QasmSimulatorBackend()
 
     def __init__(
         self,
-        backend: BackendV2,
         options: dict | None = None,
         bound_pass_manager: PassManager | None = None,
         skip_transpilation: bool = False,
     ):
-        """Initialize a new BackendSampler
+        """Initialize a new DDSIM Sampler
 
         Args:
-            backend: Required: the backend to run the sampler primitive on
             options: Default options.
             bound_pass_manager: An optional pass manager to run after
                 parameter binding.
@@ -61,7 +46,6 @@ class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
         """
 
         super().__init__(options=options)
-        self._backend = backend
         self._transpile_options = Options()
         self._bound_pass_manager = bound_pass_manager
         self._preprocessed_circuits: list[QuantumCircuit] | None = None
@@ -79,8 +63,8 @@ class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
         return self._transpiled_circuits
 
     @property
-    def backend(self) -> BackendV2:
-        return self._backend
+    def backend(self):
+        return self._BACKEND
 
     @property
     def transpile_options(self) -> Options:
@@ -96,7 +80,7 @@ class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
         self._transpiled_circuits.extend(
             transpile(
                 self._circuits[start:],
-                target=self._backend.target,
+                target=self.backend.target,
                 **self.transpile_options.__dict__,
             ),
         )
