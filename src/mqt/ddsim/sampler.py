@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union
 
-from qiskit.primitives.backend_estimator import _prepare_counts
+# from qiskit.primitives.backend_estimator import _prepare_counts
 from qiskit.primitives.base import BaseSampler, SamplerResult
 from qiskit.primitives.primitive_job import PrimitiveJob
 from qiskit.primitives.utils import _circuit_key
@@ -21,6 +21,16 @@ if TYPE_CHECKING:
     from qiskit.transpiler.passmanager import PassManager
 
     Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
+
+
+def prepare_counts(results: list[Result]):
+    counts = []
+    for res in results:
+        count = res.get_counts()
+        if not isinstance(count, list):
+            count = [count]
+        counts.extend(count)
+    return counts
 
 
 class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
@@ -120,7 +130,7 @@ class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
         return self._postprocessing(result, bound_circuits)
 
     def _postprocessing(self, result: list[Result], circuits: list[QuantumCircuit]) -> SamplerResult:
-        counts = _prepare_counts(result)
+        counts = prepare_counts(result)
         shots = sum(counts[0].values())
 
         probabilities = []
