@@ -19,6 +19,18 @@
 
 namespace nl = nlohmann;
 
+namespace std {
+    template<class T>
+    void to_json(nl::json& j, const std::complex<T>& p) { // NOLINT(readability-identifier-naming)
+        j = nl::json{p.real(), p.imag()};
+    }
+    template<class T>
+    void from_json(const nl::json& j, std::complex<T>& p) { // NOLINT(readability-identifier-naming)
+        p.real(j.at(0));
+        p.imag(j.at(1));
+    }
+} /* namespace std */
+
 int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     cxxopts::Options options("MQT DDSIM", "for more information see https://www.cda.cit.tum.de/");
     // clang-format off
@@ -211,9 +223,9 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
 
     if (vm.count("pv") > 0) {
         if (auto* hsfSim = dynamic_cast<HybridSchrodingerFeynmanSimulator<>*>(ddsim.get())) {
-            outputObj["state_vector"] = hsfSim->getVectorFromHybridSimulation<std::pair<dd::fp, dd::fp>>();
+            outputObj["state_vector"] = hsfSim->getVectorFromHybridSimulation();
         } else {
-            outputObj["state_vector"] = ddsim->getVector<std::pair<dd::fp, dd::fp>>();
+            outputObj["state_vector"] = ddsim->getVector();
         }
     }
 
@@ -245,5 +257,5 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
         dd::exportEdgeWeights(ddsim->rootEdge, ostream);
     }
 
-    std::cout << std::setw(2) << outputObj << std::endl;
+    std::cout << std::setw(2) << outputObj << "\n";
 }

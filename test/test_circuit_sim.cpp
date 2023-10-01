@@ -109,7 +109,7 @@ TEST(CircuitSimTest, DestructiveMeasurementAll) {
     CircuitSimulator ddsim(std::move(quantumComputation), 42);
     ddsim.simulate(1);
 
-    const std::vector<dd::ComplexValue> vBefore = ddsim.getVector();
+    const auto vBefore = ddsim.getVector();
     ASSERT_EQ(vBefore[0], vBefore[1]);
     ASSERT_EQ(vBefore[0], vBefore[2]);
     ASSERT_EQ(vBefore[0], vBefore[3]);
@@ -118,8 +118,8 @@ TEST(CircuitSimTest, DestructiveMeasurementAll) {
     const auto        vAfter = ddsim.getVector();
     const std::size_t i      = std::stoul(m, nullptr, 2);
 
-    ASSERT_EQ(vAfter[i].r, 1.0);
-    ASSERT_EQ(vAfter[i].i, 0.0);
+    ASSERT_EQ(vAfter[i].real(), 1.0);
+    ASSERT_EQ(vAfter[i].imag(), 0.0);
 }
 
 TEST(CircuitSimTest, DestructiveMeasurementOne) {
@@ -133,26 +133,17 @@ TEST(CircuitSimTest, DestructiveMeasurementOne) {
     const auto vAfter = ddsim.getVector();
 
     if (m == '0') {
-        ASSERT_EQ(vAfter[0], dd::complex_SQRT2_2);
-        ASSERT_EQ(vAfter[2], dd::complex_SQRT2_2);
-        ASSERT_EQ(vAfter[1], dd::complex_zero);
-        ASSERT_EQ(vAfter[3], dd::complex_zero);
+        ASSERT_EQ(vAfter[0], dd::SQRT2_2);
+        ASSERT_EQ(vAfter[2], dd::SQRT2_2);
+        ASSERT_EQ(vAfter[1], 0.);
+        ASSERT_EQ(vAfter[3], 0.);
     } else if (m == '1') {
-        ASSERT_EQ(vAfter[0], dd::complex_zero);
-        ASSERT_EQ(vAfter[2], dd::complex_zero);
-        ASSERT_EQ(vAfter[1], dd::complex_SQRT2_2);
-        ASSERT_EQ(vAfter[3], dd::complex_SQRT2_2);
+        ASSERT_EQ(vAfter[0], 0.);
+        ASSERT_EQ(vAfter[2], 0.);
+        ASSERT_EQ(vAfter[1], dd::SQRT2_2);
+        ASSERT_EQ(vAfter[3], dd::SQRT2_2);
     } else {
         FAIL() << "Measurement result not in {0,1}!";
-    }
-
-    const auto vAfterPairs = ddsim.getVector<std::pair<dd::fp, dd::fp>>();
-    const auto vAfterCompl = ddsim.getVector<std::complex<dd::fp>>();
-
-    ASSERT_EQ(vAfterPairs.size(), vAfterCompl.size());
-    for (std::size_t i = 0; i < vAfterPairs.size(); i++) {
-        ASSERT_EQ(vAfterPairs.at(i).first, vAfterCompl.at(i).real());
-        ASSERT_EQ(vAfterPairs.at(i).second, vAfterCompl.at(i).imag());
     }
 }
 
@@ -256,7 +247,7 @@ TEST(CircuitSimTest, ApproximationTest) {
     // approximating the state with fidelity 0.98 should allow to eliminate the 1-successor of the first qubit
     CircuitSimulator ddsim(std::move(qc), ApproximationInfo(0.98, 2, ApproximationInfo::FidelityDriven));
     ddsim.simulate(4096);
-    const auto vec = ddsim.getVector<std::complex<dd::fp>>();
+    const auto vec = ddsim.getVector();
     EXPECT_EQ(abs(vec[2]), 0);
     EXPECT_EQ(abs(vec[3]), 0);
 }
@@ -315,7 +306,7 @@ TEST(CircuitSimTest, TooManyQubitsForVectorTest) {
     auto             qc = std::make_unique<qc::QuantumComputation>(61);
     CircuitSimulator ddsim(std::move(qc));
     ddsim.simulate(0);
-    EXPECT_THROW({ [[maybe_unused]] auto _ = ddsim.getVector<std::complex<dd::fp>>(); }, std::range_error);
+    EXPECT_THROW({ [[maybe_unused]] auto _ = ddsim.getVector(); }, std::range_error);
 }
 
 TEST(CircuitSimTest, BernsteinVaziraniDynamicTest) {

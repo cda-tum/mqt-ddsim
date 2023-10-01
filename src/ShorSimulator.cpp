@@ -68,13 +68,13 @@ std::map<std::string, std::size_t> ShorSimulator<Config>::simulate([[maybe_unuse
     }
 
     if (verbose) {
-        std::clog << "Nodes before QFT: " << Simulator<Config>::dd->size(Simulator<Config>::rootEdge) << "\n";
+        std::clog << "Nodes before QFT: " << Simulator<Config>::rootEdge.size() << "\n";
     }
 
     //EXACT QFT
     for (std::int32_t i = 0; i < static_cast<std::int32_t>(2 * requiredBits); i++) {
         if (verbose) {
-            std::clog << "[ " << i + 1 << "/" << 2 * requiredBits << " ] QFT Pass. dd size=" << Simulator<Config>::dd->size(Simulator<Config>::rootEdge)
+            std::clog << "[ " << i + 1 << "/" << 2 * requiredBits << " ] QFT Pass. dd size=" << Simulator<Config>::rootEdge.size()
                       << "\n";
         }
         double q = 2;
