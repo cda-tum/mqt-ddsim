@@ -50,7 +50,7 @@ test = ["pytest>=7.0"]
 coverage = ["mqt.ddsim[test]", "pytest-cov"]
 docs = [
     "furo>=2023.08.17",
-    "sphinx~=7.0",
+    "sphinx",
     "setuptools-scm>=7",
     "sphinxcontrib-bibtex>=2.4.2",
     "sphinx-copybutton",
