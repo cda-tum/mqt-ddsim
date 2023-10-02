@@ -243,10 +243,12 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
                     controls = op->getControls();
 
                     if (targets.size() == 1 && controls.empty()) {
-                        operation = localDD->stochasticNoiseOperationCache.lookup(op->getType(), static_cast<dd::Qubit>(targets.front()));
-                        if (operation.p == nullptr) {
+                        auto* oper = localDD->stochasticNoiseOperationCache.lookup(op->getType(), static_cast<dd::Qubit>(targets.front()));
+                        if (oper == nullptr) {
                             operation = dd::getDD(op.get(), localDD);
                             localDD->stochasticNoiseOperationCache.insert(op->getType(), static_cast<dd::Qubit>(targets.front()), operation);
+                        } else {
+                            operation = *oper;
                         }
                     } else {
                         operation = dd::getDD(op.get(), localDD);
@@ -293,9 +295,8 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
             } else {
                 // extract amplitude for state
                 const auto basisVector = recordedPropertiesList[i].second;
-                const auto amplitude   = localDD->getValueByPath(localRootEdge, basisVector);
-                const auto prob        = amplitude.r * amplitude.r + amplitude.i * amplitude.i;
-                recordedPropertiesStorage[i] += prob;
+                const auto amplitude   = localRootEdge.getValueByPath(basisVector);
+                recordedPropertiesStorage[i] += std::norm(amplitude);
             }
         }
     }

@@ -66,33 +66,23 @@ public:
 
     std::map<std::string, std::size_t> sampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, std::size_t shots);
 
-    template<class ReturnType = dd::ComplexValue>
-    [[nodiscard]] std::vector<ReturnType> getVector() const {
+    [[nodiscard]] dd::CVec getVector() const {
         if (getNumberOfQubits() >= 60) {
             // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
             throw std::range_error("getVector only supports less than 60 qubits.");
         }
-        std::string             path(getNumberOfQubits(), '0');
-        std::vector<ReturnType> results;
-        results.resize(1ULL << getNumberOfQubits());
-        for (std::size_t i = 0; i < 1ULL << getNumberOfQubits(); ++i) {
-            const std::string      correctedPath{path.rbegin(), path.rend()};
-            const dd::ComplexValue cv = dd->getValueByPath(rootEdge, correctedPath);
-            results[i]                = {cv.r, cv.i};
-            nextPath(path);
-        }
-        return results;
+        return rootEdge.getVector();
     }
 
-    [[nodiscard]] virtual std::size_t getActiveNodeCount() const { return dd->template getUniqueTable<dd::vNode>().getStats().activeEntryCount; }
+    [[nodiscard]] virtual std::size_t getActiveNodeCount() const { return dd->template getUniqueTable<dd::vNode>().getNumActiveEntries(); }
 
-    [[nodiscard]] virtual std::size_t getMaxNodeCount() const { return dd->template getUniqueTable<dd::vNode>().getStats().peakActiveEntryCount; }
+    [[nodiscard]] virtual std::size_t getMaxNodeCount() const { return dd->template getUniqueTable<dd::vNode>().getPeakNumActiveEntries(); }
 
-    [[nodiscard]] virtual std::size_t getMaxMatrixNodeCount() const { return dd->template getUniqueTable<dd::mNode>().getStats().activeEntryCount; }
+    [[nodiscard]] virtual std::size_t getMaxMatrixNodeCount() const { return dd->template getUniqueTable<dd::mNode>().getPeakNumActiveEntries(); }
 
-    [[nodiscard]] virtual std::size_t getMatrixActiveNodeCount() const { return dd->template getUniqueTable<dd::mNode>().getStats().activeEntryCount; }
+    [[nodiscard]] virtual std::size_t getMatrixActiveNodeCount() const { return dd->template getUniqueTable<dd::mNode>().getNumActiveEntries(); }
 
-    [[nodiscard]] virtual std::size_t countNodesFromRoot() { return dd->size(rootEdge); }
+    [[nodiscard]] virtual std::size_t countNodesFromRoot() { return rootEdge.size(); }
 
     [[nodiscard]] std::pair<dd::ComplexValue, std::string> getPathOfLeastResistance() const;
 
@@ -103,16 +93,6 @@ public:
     [[nodiscard]] virtual std::size_t getNumberOfOps() const = 0;
 
     [[nodiscard]] virtual std::string getName() const = 0;
-
-    [[nodiscard]] static inline std::string toBinaryString(const std::size_t value, const std::size_t numberOfQubits) {
-        std::string binary(numberOfQubits, '0');
-        for (std::size_t j = 0; j < numberOfQubits; ++j) {
-            if ((value & (1U << j)) != 0U) {
-                binary[numberOfQubits - 1 - j] = '1';
-            }
-        }
-        return binary;
-    }
 
     void setTolerance(const dd::fp tolerance) {
         dd->cn.setTolerance(tolerance);
@@ -144,8 +124,6 @@ protected:
     std::uint64_t seed = 0;
     bool          hasFixedSeed;
     dd::fp        epsilon = 0.001;
-
-    static void nextPath(std::string& s);
 };
 
 struct StochasticNoiseSimulatorDDPackageConfig: public dd::DDPackageConfig {

@@ -36,9 +36,9 @@ public:
         return sampleFromProbabilityMap(deterministicSimulate(), shots);
     };
 
-    std::map<std::string, dd::fp> deterministicSimulate();
+    dd::SparsePVecStrKeys deterministicSimulate();
 
-    std::map<std::string, std::size_t> sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, std::size_t shots);
+    std::map<std::string, std::size_t> sampleFromProbabilityMap(const dd::SparsePVecStrKeys& resultProbabilityMap, std::size_t shots);
 
     [[nodiscard]] std::size_t getNumberOfQubits() const override { return qc->getNqubits(); };
 
@@ -46,17 +46,17 @@ public:
 
     [[nodiscard]] std::string getName() const override { return qc->getName(); };
 
-    [[nodiscard]] std::size_t getActiveNodeCount() const override { return Simulator<Config>::dd->template getUniqueTable<dd::dNode>().getStats().activeEntryCount; }
-    [[nodiscard]] std::size_t getMaxNodeCount() const override { return Simulator<Config>::dd->template getUniqueTable<dd::dNode>().getStats().peakActiveEntryCount; }
+    [[nodiscard]] std::size_t getActiveNodeCount() const override { return Simulator<Config>::dd->template getUniqueTable<dd::dNode>().getNumActiveEntries(); }
+    [[nodiscard]] std::size_t getMaxNodeCount() const override { return Simulator<Config>::dd->template getUniqueTable<dd::dNode>().getPeakNumActiveEntries(); }
 
     [[nodiscard]] std::size_t countNodesFromRoot() override {
         if (useDensityMatrixType) {
             qc::DensityMatrixDD::alignDensityEdge(rootEdge);
-            const std::size_t tmp = Simulator<Config>::dd->size(rootEdge);
+            const std::size_t tmp = rootEdge.size();
             qc::DensityMatrixDD::setDensityMatrixTrue(rootEdge);
             return tmp;
         }
-        return Simulator<Config>::dd->size(rootEdge);
+        return rootEdge.size();
     }
 
     qc::DensityMatrixDD rootEdge{};

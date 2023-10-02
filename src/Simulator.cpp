@@ -28,28 +28,10 @@ std::map<std::string, std::size_t> Simulator<Config>::sampleFromAmplitudeVectorI
         auto m   = std::distance(amplitudes.begin(), mit);
 
         // construct basis state string
-        auto basisState = toBinaryString(static_cast<std::size_t>(m), getNumberOfQubits());
+        auto basisState = dd::intToBinaryString(static_cast<std::size_t>(m), getNumberOfQubits());
         results[basisState]++;
     }
     return results;
-}
-
-template<class Config>
-void Simulator<Config>::nextPath(std::string& s) {
-    std::string::reverse_iterator       iter = s.rbegin();
-    const std::string::reverse_iterator end  = s.rend();
-
-    int carry = 1;
-
-    while ((carry != 0) && iter != end) {
-        const int value = (*iter - '0') + carry;
-        carry           = (value / 2);
-        *iter           = static_cast<char>('0' + (value % 2));
-        ++iter;
-    }
-    if (carry != 0) {
-        s.insert(0, "1");
-    }
 }
 
 /**
@@ -169,8 +151,8 @@ double Simulator<Config>::approximateByFidelity(std::unique_ptr<dd::Package<Conf
     }
 
     if (verbose) {
-        const auto sizeBefore = localDD->size(edge);
-        const auto sizeAfter  = localDD->size(newEdge);
+        const auto sizeBefore = edge.size();
+        const auto sizeAfter  = newEdge.size();
         std::cout
                 << getName() << ","
                 << +getNumberOfQubits() << "," // unary plus for int promotion
@@ -258,8 +240,8 @@ double Simulator<Config>::approximateBySampling(std::unique_ptr<dd::Package<Conf
     }
 
     if (verbose) {
-        const auto sizeAfter  = localDD->size(newEdge);
-        const auto sizeBefore = localDD->size(edge);
+        const auto sizeAfter  = newEdge.size();
+        const auto sizeBefore = edge.size();
         std::cout
                 << getName() << ","
                 << +getNumberOfQubits() << "," // unary plus for int promotion
