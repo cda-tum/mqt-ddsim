@@ -33,7 +33,7 @@ def prepare_counts(results: list[Result]):
     return counts
 
 
-class DDSIMBackendSampler(BaseSampler[PrimitiveJob[SamplerResult]]):
+class DDSIMBackendSampler(BaseSampler):
     _BACKEND = QasmSimulatorBackend()
 
     def __init__(
