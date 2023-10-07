@@ -4,6 +4,8 @@ import numpy as np
 import pytest
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 from qiskit.circuit import Parameter
+from qiskit.transpiler.passes import Unroller
+from qiskit.transpiler.passmanager import PassManager
 
 from mqt.ddsim.sampler import DDSIMBackendSampler
 
@@ -38,6 +40,17 @@ def test_ddsim_sampler(circuit: QuantumCircuit, sampler: DDSIMBackendSampler):
     """Test DDSIM Sampler's functionality"""
 
     job = sampler.run([circuit], [[np.pi / 2, np.pi]])
+    result = job.result()
+    counts = result.quasi_dists[0]
+
+    assert counts == {0: 1.0}
+
+
+def test_ddsim_sampler_with_pass_manager(circuit: QuantumCircuit, sampler: DDSIMBackendSampler):
+    """Test DDSIM Sampler's functionality with pass manager"""
+    pass_ = Unroller(["u1", "u2", "u3", "cx"])
+    pm = PassManager(pass_)
+    job = sampler.run([circuit], [[np.pi / 2, np.pi]], bound_pass_manager=pm)
     result = job.result()
     counts = result.quasi_dists[0]
 

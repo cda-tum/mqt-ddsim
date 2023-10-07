@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union
 # from qiskit.primitives.backend_estimator import _prepare_counts
 from qiskit.primitives.base import BaseSampler, SamplerResult
 from qiskit.primitives.primitive_job import PrimitiveJob
-from qiskit.primitives.utils import _circuit_key
 from qiskit.providers.options import Options
 from qiskit.result import QuasiDistribution, Result
 
@@ -61,7 +60,6 @@ class DDSIMBackendSampler(BaseSampler):
         self._preprocessed_circuits: list[QuantumCircuit] | None = None
         self._transpiled_circuits: list[QuantumCircuit] = []
         self._skip_transpilation = skip_transpilation
-        self._circuit_ids: dict = {}
 
     @property
     def transpiled_circuits(self) -> list[QuantumCircuit]:
@@ -101,16 +99,9 @@ class DDSIMBackendSampler(BaseSampler):
         parameter_values: Sequence[Parameters],
         **run_options,
     ) -> PrimitiveJob:
-        circuit_indices = []
         for circuit in circuits:
-            index = self._circuit_ids.get(_circuit_key(circuit))
-            if index is not None:
-                circuit_indices.append(index)
-            else:
-                circuit_indices.append(len(self._circuits))
-                self._circuit_ids[_circuit_key(circuit)] = len(self._circuits)
-                self._circuits.append(circuit)
-                self._parameters.append(circuit.parameters)
+            self._circuits.append(circuit)
+            self._parameters.append(circuit.parameters)
 
         job = PrimitiveJob(self._call, parameter_values, **run_options)
         job.submit()
@@ -143,7 +134,7 @@ class DDSIMBackendSampler(BaseSampler):
 
         return SamplerResult(probabilities, metadata)
 
-    def _bound_pass_manager_run(self, circuits):
+    def _bound_pass_manager_run(self, circuits: Sequence[QuantumCircuit]):
         if self._bound_pass_manager is None:
             return circuits
 
