@@ -155,7 +155,9 @@ py::class_<Sim> createSimulator(py::module_ m, const std::string& name) {
             .def("get_max_vector_node_count", &Sim::getMaxNodeCount, "Get the maximum number of (active) vector nodes, i.e., the maximum number of vector DD nodes in the unique table at any point during the simulation.")
             .def("get_max_matrix_node_count", &Sim::getMaxMatrixNodeCount, "Get the maximum number of (active) matrix nodes, i.e., the maximum number of matrix DD nodes in the unique table at any point during the simulation.")
             .def("get_tolerance", &Sim::getTolerance, "Get the tolerance for the DD package.")
-            .def("set_tolerance", &Sim::setTolerance, "tol"_a, "Set the tolerance for the DD package.");
+            .def("set_tolerance", &Sim::setTolerance, "tol"_a, "Set the tolerance for the DD package.")
+            .def("export_dd_to_graphviz_str", &Sim::exportDDtoGraphvizString, "colored"_a = true, "edge_labels"_a = false, "classic"_a = false, "memory"_a = false, "format_as_polar"_a = true, "Get a Graphviz representation of the currently stored DD.")
+            .def("export_dd_to_graphviz_file", &Sim::exportDDtoGraphvizFile, "filename"_a, "colored"_a = true, "edge_labels"_a = false, "classic"_a = false, "memory"_a = false, "format_as_polar"_a = true, "Write a Graphviz representation of the currently stored DD to a file.");
 
     if constexpr (std::is_same_v<Sim, UnitarySimulator<>>) {
         sim.def("construct", &Sim::construct, "Construct the DD representing the unitary matrix of the circuit.");
