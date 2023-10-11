@@ -57,7 +57,7 @@ std::unique_ptr<Simulator> constructSimulator(const py::object&  circ,
                                            std::forward<Args>(args)...);
     } else if constexpr (std::is_same_v<Simulator, StochasticNoiseSimulator<>>) {
         return std::make_unique<Simulator>(std::move(qc),
-                                           std::forward<Args>(args)...);
+                                           StochasticNoiseSimulator<>::Configuration(std::forward<Args>(args)...));
     } else {
         if (seed < 0) {
             return std::make_unique<Simulator>(std::move(qc),
@@ -188,19 +188,19 @@ PYBIND11_MODULE(pyddsim, m) {
     auto stochasticNoiseSimulator = createSimulator<StochasticNoiseSimulator<>>(m, "StochasticNoiseSimulator");
     stochasticNoiseSimulator.def(py::init<>(&constructSimulatorWithoutSeed<StochasticNoiseSimulator<>, StochasticNoiseSimulator<>::Configuration&>),
                                  "circ"_a, "config"_a = StochasticNoiseSimulator<>::Configuration())
-            //            .def(py::init<>(&constructSimulatorWithoutSeed<StochasticNoiseSimulator<>, const std::string&, double, std::optional<double>, double, std::size_t, const std::string&, bool, std::size_t>),
-            //                 "circ"_a,
-            //                 "noiseEffects"_a = "APD",
-            //                 "noiseProbability"_a = 0.01,
-            //                 "ampDampingProbability"_a = 0.02,
-            //                 "multiQubitGateFactor"_a = 2,
-            //                 "stochRuns"_a = 1000,
-            //                 "recordedProperties"_a = "1-200",
-            //                 "unoptimizedSim"_a = false,
-            //                 "seed"_a = 1
-            //                 );
-            .def(py::init<>(&constructSimulatorWithoutSeed<StochasticNoiseSimulator<>, const std::size_t&, const std::size_t&>),
-                 "circ"_a, "fidelity"_a = 0, "stepsize"_a = 0);
+                        .def(py::init<>(&constructSimulatorWithoutSeed<StochasticNoiseSimulator<>, const std::string&, double, std::optional<double>, double, std::size_t, const std::string&, bool, std::size_t>),
+                             "circ"_a,
+                             "noiseEffects"_a = "APD",
+                             "noiseProbability"_a = 0.01,
+                             "ampDampingProbability"_a = 0.02,
+                             "multiQubitGateFactor"_a = 2,
+                             "stochRuns"_a = 1000,
+                             "recordedProperties"_a = "1-200",
+                             "unoptimizedSim"_a = false,
+                             "seed"_a = 1
+                             );
+//            .def(py::init<>(&constructSimulatorWithoutSeed<StochasticNoiseSimulator<>, const std::size_t&, const std::size_t&>),
+//                 "circ"_a, "fidelity"_a = 0, "stepsize"_a = 0);
 
     // Hybrid Schrödinger-Feynman Simulator
     py::enum_<HybridSchrodingerFeynmanSimulator<>::Mode>(m, "HybridMode")
