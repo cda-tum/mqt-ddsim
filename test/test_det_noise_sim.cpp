@@ -61,7 +61,7 @@ TEST(DeterministicNoiseSimTest, TestingBarrierGate) {
     auto m     = ddsim->deterministicSimulate();
 
     ASSERT_EQ(ddsim->getNumberOfOps(), 2);
-    ASSERT_EQ(m.find("10")->second, 1);
+    ASSERT_EQ(m.find("01")->second, 1);
     std::cout << ddsim->getName() << "\n";
 }
 
@@ -98,7 +98,7 @@ TEST(DeterministicNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
     auto m     = ddsim->deterministicSimulate();
 
     ASSERT_EQ(ddsim->getNumberOfOps(), 1);
-    ASSERT_EQ(m.find("10")->second, 1);
+    ASSERT_EQ(m.find("01")->second, 1);
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDApplySequential) {
@@ -110,19 +110,19 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDApplySequential) {
 
     const double tolerance = 1e-10;
     EXPECT_NEAR(m.find("0000")->second, 0.0969332192741, tolerance);
-    EXPECT_NEAR(m.find("0001")->second, 0.0907888041538, tolerance);
-    EXPECT_NEAR(m.find("0010")->second, 0.0141409660985, tolerance);
-    EXPECT_NEAR(m.find("0100")->second, 0.0238203475524, tolerance);
-    EXPECT_NEAR(m.find("0101")->second, 0.0235097990017, tolerance);
+    EXPECT_NEAR(m.find("0001")->second, 0.1731941264570, tolerance);
+    EXPECT_NEAR(m.find("0010")->second, 0.0238203475524, tolerance);
+    EXPECT_NEAR(m.find("0011")->second, 0.0242454336917, tolerance);
+    EXPECT_NEAR(m.find("0100")->second, 0.0141409660985, tolerance);
+    EXPECT_NEAR(m.find("0101")->second, 0.0138062113213, tolerance);
     EXPECT_NEAR(m.find("0110")->second, 0.0244576087400, tolerance);
-    EXPECT_NEAR(m.find("0111")->second, 0.0116282811276, tolerance);
-    EXPECT_NEAR(m.find("1000")->second, 0.1731941264570, tolerance);
+    EXPECT_NEAR(m.find("0111")->second, 0.0239296920989, tolerance);
+    EXPECT_NEAR(m.find("1000")->second, 0.0907888041538, tolerance);
     EXPECT_NEAR(m.find("1001")->second, 0.4145855071998, tolerance);
-    EXPECT_NEAR(m.find("1010")->second, 0.0138062113213, tolerance);
-    EXPECT_NEAR(m.find("1011")->second, 0.0184033482066, tolerance);
-    EXPECT_NEAR(m.find("1100")->second, 0.0242454336917, tolerance);
-    EXPECT_NEAR(m.find("1101")->second, 0.0262779844799, tolerance);
-    EXPECT_NEAR(m.find("1110")->second, 0.0239296920989, tolerance);
+    EXPECT_NEAR(m.find("1010")->second, 0.0235097990017, tolerance);
+    EXPECT_NEAR(m.find("1011")->second, 0.0262779844799, tolerance);
+    EXPECT_NEAR(m.find("1101")->second, 0.0184033482066, tolerance);
+    EXPECT_NEAR(m.find("1110")->second, 0.0116282811276, tolerance);
     EXPECT_NEAR(m.find("1111")->second, 0.0110373166627, tolerance);
 }
 
@@ -135,15 +135,15 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackD) {
 
     const double tolerance = 1e-10;
     EXPECT_NEAR(m.find("0000")->second, 0.0332328704931, tolerance);
-    EXPECT_NEAR(m.find("0001")->second, 0.0328434857577, tolerance);
-    EXPECT_NEAR(m.find("0010")->second, 0.0129643065735, tolerance);
-    EXPECT_NEAR(m.find("1000")->second, 0.0683938280189, tolerance);
+    EXPECT_NEAR(m.find("0001")->second, 0.0683938280189, tolerance);
+    EXPECT_NEAR(m.find("0011")->second, 0.0117061689898, tolerance);
+    EXPECT_NEAR(m.find("0100")->second, 0.0129643065735, tolerance);
+    EXPECT_NEAR(m.find("0101")->second, 0.0107812802908, tolerance);
+    EXPECT_NEAR(m.find("0111")->second, 0.0160082331009, tolerance);
+    EXPECT_NEAR(m.find("1000")->second, 0.0328434857577, tolerance);
     EXPECT_NEAR(m.find("1001")->second, 0.7370101351171, tolerance);
-    EXPECT_NEAR(m.find("1010")->second, 0.0107812802908, tolerance);
-    EXPECT_NEAR(m.find("1011")->second, 0.0275086747656, tolerance);
-    EXPECT_NEAR(m.find("1100")->second, 0.0117061689898, tolerance);
-    EXPECT_NEAR(m.find("1101")->second, 0.0186346925411, tolerance);
-    EXPECT_NEAR(m.find("1110")->second, 0.0160082331009, tolerance);
+    EXPECT_NEAR(m.find("1011")->second, 0.0186346925411, tolerance);
+    EXPECT_NEAR(m.find("1101")->second, 0.0275086747656, tolerance);
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPD) {
@@ -155,19 +155,19 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPD) {
 
     const double tolerance = 1e-10;
     EXPECT_NEAR(m.find("0000")->second, 0.0969332192741, tolerance);
-    EXPECT_NEAR(m.find("0001")->second, 0.0907888041538, tolerance);
-    EXPECT_NEAR(m.find("0010")->second, 0.0141409660985, tolerance);
-    EXPECT_NEAR(m.find("0100")->second, 0.0238203475524, tolerance);
-    EXPECT_NEAR(m.find("0101")->second, 0.0235097990017, tolerance);
+    EXPECT_NEAR(m.find("0001")->second, 0.1731941264570, tolerance);
+    EXPECT_NEAR(m.find("0010")->second, 0.0238203475524, tolerance);
+    EXPECT_NEAR(m.find("0011")->second, 0.0242454336917, tolerance);
+    EXPECT_NEAR(m.find("0100")->second, 0.0141409660985, tolerance);
+    EXPECT_NEAR(m.find("0101")->second, 0.0138062113213, tolerance);
     EXPECT_NEAR(m.find("0110")->second, 0.0244576087400, tolerance);
-    EXPECT_NEAR(m.find("0111")->second, 0.0116282811276, tolerance);
-    EXPECT_NEAR(m.find("1000")->second, 0.1731941264570, tolerance);
+    EXPECT_NEAR(m.find("0111")->second, 0.0239296920989, tolerance);
+    EXPECT_NEAR(m.find("1000")->second, 0.0907888041538, tolerance);
     EXPECT_NEAR(m.find("1001")->second, 0.4145855071998, tolerance);
-    EXPECT_NEAR(m.find("1010")->second, 0.0138062113213, tolerance);
-    EXPECT_NEAR(m.find("1011")->second, 0.0184033482066, tolerance);
-    EXPECT_NEAR(m.find("1100")->second, 0.0242454336917, tolerance);
-    EXPECT_NEAR(m.find("1101")->second, 0.0262779844799, tolerance);
-    EXPECT_NEAR(m.find("1110")->second, 0.0239296920989, tolerance);
+    EXPECT_NEAR(m.find("1010")->second, 0.0235097990017, tolerance);
+    EXPECT_NEAR(m.find("1011")->second, 0.0262779844799, tolerance);
+    EXPECT_NEAR(m.find("1101")->second, 0.0184033482066, tolerance);
+    EXPECT_NEAR(m.find("1110")->second, 0.0116282811276, tolerance);
     EXPECT_NEAR(m.find("1111")->second, 0.0110373166627, tolerance);
 }
 
@@ -179,7 +179,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAP) {
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
     const double tolerance = 1e-10;
-    EXPECT_NEAR(m.find("1000")->second, 0.03008702498522842, tolerance);
+    EXPECT_NEAR(m.find("0001")->second, 0.03008702498522842, tolerance);
     EXPECT_NEAR(m.find("1001")->second, 0.9364832248561167, tolerance);
 }
 
@@ -197,16 +197,16 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDCustomProb) {
 
     const double tolerance = 1e-10;
     EXPECT_NEAR(m.find("0000")->second, 0.0616548044047, tolerance);
-    EXPECT_NEAR(m.find("0001")->second, 0.0570878674208, tolerance);
-    EXPECT_NEAR(m.find("0100")->second, 0.0155601736851, tolerance);
-    EXPECT_NEAR(m.find("0101")->second, 0.0157508473593, tolerance);
+    EXPECT_NEAR(m.find("0001")->second, 0.1487734834937, tolerance);
+    EXPECT_NEAR(m.find("0010")->second, 0.0155601736851, tolerance);
+    EXPECT_NEAR(m.find("0011")->second, 0.0166178042857, tolerance);
     EXPECT_NEAR(m.find("0110")->second, 0.0301651684817, tolerance);
-    EXPECT_NEAR(m.find("1000")->second, 0.1487734834937, tolerance);
+    EXPECT_NEAR(m.find("0111")->second, 0.0301853251959, tolerance);
+    EXPECT_NEAR(m.find("1000")->second, 0.0570878674208, tolerance);
     EXPECT_NEAR(m.find("1001")->second, 0.5519250213313, tolerance);
-    EXPECT_NEAR(m.find("1011")->second, 0.0132640682125, tolerance);
-    EXPECT_NEAR(m.find("1100")->second, 0.0166178042857, tolerance);
-    EXPECT_NEAR(m.find("1101")->second, 0.0187340765889, tolerance);
-    EXPECT_NEAR(m.find("1110")->second, 0.0301853251959, tolerance);
+    EXPECT_NEAR(m.find("1010")->second, 0.0157508473593, tolerance);
+    EXPECT_NEAR(m.find("1011")->second, 0.0187340765889, tolerance);
+    EXPECT_NEAR(m.find("1101")->second, 0.0132640682125, tolerance);
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4NoNoise1) {
@@ -255,8 +255,6 @@ TEST(DeterministicNoiseSimTest, TestFunctionsUnOptimized) {
     EXPECT_EQ(ddsim->getMaxMatrixNodeCount(), 0);
     EXPECT_EQ(ddsim->getMatrixActiveNodeCount(), 0);
     EXPECT_EQ(ddsim->countNodesFromRoot(), 30);
-
-    EXPECT_TRUE(ddsim->toBinaryString(9, 6) == "001001");
 }
 
 TEST(DeterministicNoiseSimTest, TestingSimulatorFunctionality) {
@@ -283,8 +281,9 @@ TEST(DeterministicNoiseSimTest, sampleFromProbabilityMap1) {
     auto              sampledShots = ddsim->sampleFromProbabilityMap(m, shots);
 
     double const tolerance = 0.01;
-    for (auto& result: m) {
-        EXPECT_NEAR(result.second, static_cast<dd::fp>(sampledShots.find(result.first)->second) / shots, tolerance);
+    for (const auto& [state, prob]: m) {
+        const auto relFreq = static_cast<dd::fp>(sampledShots.find(state)->second) / shots;
+        EXPECT_NEAR(prob, relFreq, tolerance);
     }
 }
 
@@ -298,7 +297,8 @@ TEST(DeterministicNoiseSimTest, sampleFromProbabilityMap2) {
     auto              m            = ddsim->deterministicSimulate();
 
     double const tolerance = 0.01;
-    for (auto& result: m) {
-        EXPECT_NEAR(result.second, static_cast<dd::fp>(sampledShots.find(result.first)->second) / shots, tolerance);
+    for (const auto& [state, prob]: m) {
+        const auto relFreq = static_cast<dd::fp>(sampledShots.find(state)->second) / shots;
+        EXPECT_NEAR(prob, relFreq, tolerance);
     }
 }

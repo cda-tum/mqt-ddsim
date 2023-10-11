@@ -63,7 +63,7 @@ std::map<std::string, std::size_t> ShorFastSimulator<Config>::simulate([[maybe_u
         uAEmulate2(as[i]);
 
         if (verbose) {
-            std::clog << "[ " << i + 1 << "/" << 2 * requiredBits << " ] QFT Pass. dd size=" << Simulator<Config>::dd->size(Simulator<Config>::rootEdge)
+            std::clog << "[ " << i + 1 << "/" << 2 * requiredBits << " ] QFT Pass. dd size=" << Simulator<Config>::rootEdge.size()
                       << "\n";
         }
 

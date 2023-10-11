@@ -90,17 +90,17 @@ TEST(StochNoiseSimTest, DestructiveMeasurementAll) {
 
     ddsim.simulate(1);
 
-    const std::vector<dd::ComplexValue> vBefore = ddsim.getVector();
+    const auto vBefore = ddsim.getVector();
     ASSERT_EQ(vBefore[0], vBefore[1]);
     ASSERT_EQ(vBefore[0], vBefore[2]);
     ASSERT_EQ(vBefore[0], vBefore[3]);
 
-    const std::string                   m      = ddsim.measureAll(true);
-    const std::vector<dd::ComplexValue> vAfter = ddsim.getVector();
-    const std::size_t                   i      = std::stoul(m, nullptr, 2);
+    const std::string m      = ddsim.measureAll(true);
+    const auto        vAfter = ddsim.getVector();
+    const std::size_t i      = std::stoul(m, nullptr, 2);
 
-    ASSERT_EQ(vAfter[i].r, 1.0);
-    ASSERT_EQ(vAfter[i].i, 0.0);
+    ASSERT_EQ(vAfter[i].real(), 1.0);
+    ASSERT_EQ(vAfter[i].imag(), 0.0);
 }
 
 TEST(StochNoiseSimTest, DestructiveMeasurementOne) {
@@ -111,19 +111,19 @@ TEST(StochNoiseSimTest, DestructiveMeasurementOne) {
 
     ddsim.simulate(1);
 
-    const char                          m      = ddsim.measureOneCollapsing(0);
-    const std::vector<dd::ComplexValue> vAfter = ddsim.getVector();
+    const char m      = ddsim.measureOneCollapsing(0);
+    const auto vAfter = ddsim.getVector();
 
     if (m == '0') {
-        ASSERT_EQ(vAfter[0], dd::complex_SQRT2_2);
-        ASSERT_EQ(vAfter[2], dd::complex_SQRT2_2);
-        ASSERT_EQ(vAfter[1], (dd::ComplexValue{0, 0}));
-        ASSERT_EQ(vAfter[3], (dd::ComplexValue{0, 0}));
+        ASSERT_EQ(vAfter[0], dd::SQRT2_2);
+        ASSERT_EQ(vAfter[2], dd::SQRT2_2);
+        ASSERT_EQ(vAfter[1], 0.);
+        ASSERT_EQ(vAfter[3], 0.);
     } else if (m == '1') {
-        ASSERT_EQ(vAfter[0], (dd::ComplexValue{0, 0}));
-        ASSERT_EQ(vAfter[2], (dd::ComplexValue{0, 0}));
-        ASSERT_EQ(vAfter[1], dd::complex_SQRT2_2);
-        ASSERT_EQ(vAfter[3], dd::complex_SQRT2_2);
+        ASSERT_EQ(vAfter[0], 0.);
+        ASSERT_EQ(vAfter[2], 0.);
+        ASSERT_EQ(vAfter[1], dd::SQRT2_2);
+        ASSERT_EQ(vAfter[3], dd::SQRT2_2);
     } else {
         FAIL() << "Measurement result not in {0,1}!";
     }
@@ -141,7 +141,7 @@ TEST(StochNoiseSimTest, DestructiveMeasurementOneArbitraryNormalization) {
 
     char const m = ddsim.dd->measureOneCollapsing(ddsim.rootEdge, 0, false, gen);
 
-    const std::vector<dd::ComplexValue> vAfter = ddsim.getVector();
+    const auto vAfter = ddsim.getVector();
 
     for (auto const& e: vAfter) {
         std::cout << e << " ";
@@ -149,15 +149,15 @@ TEST(StochNoiseSimTest, DestructiveMeasurementOneArbitraryNormalization) {
     std::cout << "\n";
 
     if (m == '0') {
-        ASSERT_EQ(vAfter[0], dd::complex_SQRT2_2);
-        ASSERT_EQ(vAfter[2], dd::complex_SQRT2_2);
-        ASSERT_EQ(vAfter[1], (dd::ComplexValue{0, 0}));
-        ASSERT_EQ(vAfter[3], (dd::ComplexValue{0, 0}));
+        ASSERT_EQ(vAfter[0], dd::SQRT2_2);
+        ASSERT_EQ(vAfter[2], dd::SQRT2_2);
+        ASSERT_EQ(vAfter[1], 0.);
+        ASSERT_EQ(vAfter[3], 0.);
     } else if (m == '1') {
-        ASSERT_EQ(vAfter[0], (dd::ComplexValue{0, 0}));
-        ASSERT_EQ(vAfter[2], (dd::ComplexValue{0, 0}));
-        ASSERT_EQ(vAfter[1], dd::complex_SQRT2_2);
-        ASSERT_EQ(vAfter[3], dd::complex_SQRT2_2);
+        ASSERT_EQ(vAfter[0], 0.);
+        ASSERT_EQ(vAfter[2], 0.);
+        ASSERT_EQ(vAfter[1], dd::SQRT2_2);
+        ASSERT_EQ(vAfter[3], dd::SQRT2_2);
     } else {
         FAIL() << "Measurement result not in {0,1}!";
     }

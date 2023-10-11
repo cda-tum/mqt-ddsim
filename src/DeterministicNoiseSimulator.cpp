@@ -5,7 +5,7 @@
 using CN = dd::ComplexNumbers;
 
 template<class Config>
-std::map<std::string, double> DeterministicNoiseSimulator<Config>::deterministicSimulate() {
+dd::SparsePVecStrKeys DeterministicNoiseSimulator<Config>::deterministicSimulate() {
     rootEdge = Simulator<Config>::dd->makeZeroDensityOperator(static_cast<dd::Qubit>(qc->getNqubits()));
     Simulator<Config>::dd->incRef(rootEdge);
     std::map<std::size_t, bool> classicValues;
@@ -88,12 +88,11 @@ std::map<std::string, double> DeterministicNoiseSimulator<Config>::deterministic
             deterministicNoiseFunctionality.applyNoiseEffects(rootEdge, op);
         }
     }
-    return Simulator<Config>::dd->getProbVectorFromDensityMatrix(rootEdge, measurementThreshold);
+    return rootEdge.getSparseProbabilityVectorStrKeys(measurementThreshold);
 }
 
 template<class Config>
-std::map<std::string, std::size_t> DeterministicNoiseSimulator<Config>::sampleFromProbabilityMap(const std::map<std::string, dd::fp>& resultProbabilityMap, std::size_t shots) {
-    // Create probability distribution from measure probabilities
+std::map<std::string, std::size_t> DeterministicNoiseSimulator<Config>::sampleFromProbabilityMap(const dd::SparsePVecStrKeys& resultProbabilityMap, std::size_t shots) {
     std::vector<dd::fp> weights;
     weights.reserve(resultProbabilityMap.size());
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 import time
 import uuid
 from math import log2
-from typing import Any
+from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union
 
 from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
@@ -19,6 +19,12 @@ from .header import DDSIMHeader
 from .job import DDSIMJob
 from .pyddsim import CircuitSimulator
 from .target import DDSIMTargetBuilder
+
+if TYPE_CHECKING:
+    from qiskit.circuit import Parameter
+    from qiskit.circuit.parameterexpression import ParameterValueType
+
+    Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
 
 
 class QasmSimulatorBackend(BackendV2):
@@ -73,22 +79,62 @@ class QasmSimulatorBackend(BackendV2):
     def max_circuits(self):
         return None
 
-    def run(self, quantum_circuits: QuantumCircuit | list[QuantumCircuit], **options: dict[str, Any]) -> DDSIMJob:
+    @staticmethod
+    def _assign_parameters(
+        quantum_circuits: Sequence[QuantumCircuit],
+        parameter_values: Sequence[Parameters] | None,
+    ) -> list[QuantumCircuit]:
+        if not any(qc.parameters for qc in quantum_circuits) and not parameter_values:
+            return list(quantum_circuits)
+
+        if parameter_values is None:
+            msg = "No parameter values provided although at least one parameterized circuit was supplied."
+            raise ValueError(msg)
+
+        if len(quantum_circuits) != len(parameter_values):
+            msg = f"The number of circuits ({len(quantum_circuits)}) does not match the number of provided parameter sets ({len(parameter_values)})."
+            raise ValueError(msg)
+
+        bound_circuits = [
+            qc.assign_parameters(parameters=values) for qc, values in zip(quantum_circuits, parameter_values)
+        ]
+
+        # fix the circuit names
+        for qcb, qc in zip(bound_circuits, quantum_circuits):
+            qcb.name = qc.name
+
+        return bound_circuits
+
+    def run(
+        self,
+        quantum_circuits: QuantumCircuit | Sequence[QuantumCircuit],
+        parameter_values: Sequence[Parameters] | None = None,
+        **options,
+    ) -> DDSIMJob:
         if isinstance(quantum_circuits, QuantumCircuit):
             quantum_circuits = [quantum_circuits]
 
         job_id = str(uuid.uuid4())
-        local_job = DDSIMJob(self, job_id, self._run_job, quantum_circuits, **options)
+        local_job = DDSIMJob(self, job_id, self._run_job, quantum_circuits, parameter_values, **options)
         local_job.submit()
         return local_job
 
-    def _validate(self, quantum_circuits: list[QuantumCircuit]) -> None:
+    def _validate(self, quantum_circuits: Sequence[QuantumCircuit]) -> None:
         pass
 
-    def _run_job(self, job_id: int, quantum_circuits: list[QuantumCircuit], **options: dict[str, Any]) -> Result:
+    def _run_job(
+        self,
+        job_id: int,
+        quantum_circuits: Sequence[QuantumCircuit],
+        parameter_values: Sequence[Parameters] | None,
+        **options: dict[str, Any],
+    ) -> Result:
         self._validate(quantum_circuits)
         start = time.time()
-        result_list = [self._run_experiment(q_circ, **options) for q_circ in quantum_circuits]
+
+        bound_circuits = self._assign_parameters(quantum_circuits, parameter_values)
+        result_list = [self._run_experiment(q_circ, **options) for q_circ in bound_circuits]
+
         end = time.time()
 
         return Result(

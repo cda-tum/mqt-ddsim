@@ -138,7 +138,6 @@ subprocess.call("cd ..; doxygen", shell=True)
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "furo"
-html_baseurl = "https://mqt.readthedocs.io/project/ddsim/en/latest/"
 html_static_path = ["_static"]
 html_theme_options = {
     "light_logo": "mqt_dark.png",
