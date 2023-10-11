@@ -124,8 +124,8 @@ public:
      * @param formatAsPolar Whether to format the complex numbers as polar or cartesian coordinates.
      * @returns A Graphviz program representing the current DD
      */
-    virtual std::string exportDDtoGraphvizString(bool colored    = true,
-                                                 bool edgeLabels = false, bool classic = false, bool memory = false, bool formatAsPolar = true);
+    std::string exportDDtoGraphvizString(bool colored    = true,
+                                         bool edgeLabels = false, bool classic = false, bool memory = false, bool formatAsPolar = true);
 
     /**
      * @brief Write a GraphViz representation of the currently stored DD to a file.
@@ -136,8 +136,8 @@ public:
      * @param memory An alternative representation for nodes that includes detailed memory information.
      * @param formatAsPolar Whether to format the complex numbers as polar or cartesian coordinates.
      */
-    virtual void exportDDtoGraphvizFile(const std::string& filename, bool colored = true,
-                                        bool edgeLabels = false, bool classic = false, bool memory = false, bool formatAsPolar = true);
+    void exportDDtoGraphvizFile(const std::string& filename, bool colored = true,
+                                bool edgeLabels = false, bool classic = false, bool memory = false, bool formatAsPolar = true);
 
     std::unique_ptr<dd::Package<Config>> dd = std::make_unique<dd::Package<Config>>();
     dd::vEdge                            rootEdge{};
