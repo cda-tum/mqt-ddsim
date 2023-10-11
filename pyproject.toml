@@ -49,6 +49,7 @@ tnflow = [
 test = ["pytest>=7.0"]
 coverage = ["mqt.ddsim[test]", "pytest-cov"]
 docs = [
+    "mqt.ddsim[tnflow]",
     "furo>=2023.08.17",
     "sphinx",
     "setuptools-scm>=7",
@@ -63,6 +64,7 @@ docs = [
     "sphinxext-opengraph",
     "sphinx-autodoc-typehints",
     "qiskit-terra[visualization]",
+    "graphviz",
 ]
 dev = ["mqt.ddsim[tnflow, coverage, docs]"]
 
