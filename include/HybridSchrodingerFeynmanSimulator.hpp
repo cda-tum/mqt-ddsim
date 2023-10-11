@@ -65,6 +65,10 @@ public:
 
     [[nodiscard]] Mode getMode() const { return mode; }
 
+protected:
+    /// See Simulator<Config>::exportDDtoGraphviz
+    void exportDDtoGraphviz(std::ostream& os, bool colored, bool edgeLabels, bool classic, bool memory, bool formatAsPolar) override;
+
 private:
     std::size_t nthreads = 2;
     dd::CVec    finalAmplitudes{};

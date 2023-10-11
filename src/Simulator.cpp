@@ -1,5 +1,7 @@
 #include "Simulator.hpp"
 
+#include "dd/Export.hpp"
+
 #include <cassert>
 #include <cmath>
 #include <iostream>
@@ -333,5 +335,25 @@ std::pair<dd::ComplexValue, std::string> Simulator<Config>::getPathOfLeastResist
             std::string{result.rbegin(), result.rend()}};
 }
 
+template<class Config>
+void Simulator<Config>::exportDDtoGraphviz(std::ostream& os, const bool colored, const bool edgeLabels, const bool classic, const bool memory, const bool formatAsPolar) {
+    assert(os.good());
+    dd::toDot(rootEdge, os, colored, edgeLabels, classic, memory, formatAsPolar);
+}
+
+template<class Config>
+std::string Simulator<Config>::exportDDtoGraphvizString(const bool colored, const bool edgeLabels, const bool classic, const bool memory, const bool formatAsPolar) {
+    std::ostringstream oss{};
+    exportDDtoGraphviz(oss, colored, edgeLabels, classic, memory, formatAsPolar);
+    return oss.str();
+}
+
+template<class Config>
+void Simulator<Config>::exportDDtoGraphvizFile(const std::string& filename, const bool colored, const bool edgeLabels, const bool classic, const bool memory, const bool formatAsPolar) {
+    std::ofstream ofs(filename);
+    exportDDtoGraphviz(ofs, colored, edgeLabels, classic, memory, formatAsPolar);
+}
+
 template class Simulator<dd::DDPackageConfig>;
 template class Simulator<StochasticNoiseSimulatorDDPackageConfig>;
+template class Simulator<DensityMatrixSimulatorDDPackageConfig>;

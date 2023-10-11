@@ -281,4 +281,12 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridAmplitudes(qc::Qub
     finalAmplitudes = std::move(amplitudes[0]);
 }
 
+template<class Config>
+void HybridSchrodingerFeynmanSimulator<Config>::exportDDtoGraphviz(std::ostream& os, const bool colored, const bool edgeLabels, const bool classic, const bool memory, const bool formatAsPolar) {
+    if (mode == Mode::Amplitude) {
+        Simulator<Config>::rootEdge = Simulator<Config>::dd->makeStateFromVector(finalAmplitudes);
+    }
+    return Simulator<Config>::exportDDtoGraphviz(os, colored, edgeLabels, classic, memory, formatAsPolar);
+}
+
 template class HybridSchrodingerFeynmanSimulator<dd::DDPackageConfig>;

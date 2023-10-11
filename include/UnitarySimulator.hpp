@@ -48,6 +48,11 @@ public:
     [[nodiscard]] std::size_t  getFinalNodeCount() const { return e.size(); }
     [[nodiscard]] std::size_t  getMaxNodeCount() const override { return Simulator<Config>::dd->template getUniqueTable<dd::mNode>().getPeakNumActiveEntries(); }
 
+protected:
+    /// See Simulator<Config>::exportDDtoGraphviz
+    void exportDDtoGraphviz(std::ostream& os, bool colored,
+                            bool edgeLabels, bool classic, bool memory, bool formatAsPolar) override;
+
 private:
     qc::MatrixDD e{};
 
