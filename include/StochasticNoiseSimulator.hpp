@@ -19,58 +19,66 @@
 template<class Config = StochasticNoiseSimulatorDDPackageConfig>
 class StochasticNoiseSimulator: public Simulator<Config> {
 public:
-    struct Configuration {
-        std::string           noiseEffects;
-        double                noiseProbability;
-        std::optional<double> ampDampingProbability;
-        double                multiQubitGateFactor;
-        std::size_t           stochRuns;
-        std::string           recordedProperties;
-        bool                  unoptimizedSim;
-        std::size_t           seed;
-
-        //Add new variables here
-        explicit Configuration(std::string           noiseEffects_          = "APD",
-                               double                noiseProbability_      = 0.001,
-                               std::optional<double> ampDampingProbability_ = 0.002,
-                               double                multiQubitGateFactor_  = 2,
-                               std::size_t           stochRuns_             = 1000,
-                               std::string           recordedProperties_    = "0-256",
-                               bool                  unoptimizedSim_        = false,
-                               std::size_t           seed_                  = 0U):
-            noiseEffects(noiseEffects_),
-            noiseProbability(noiseProbability_),
-            ampDampingProbability(ampDampingProbability_),
-            multiQubitGateFactor(multiQubitGateFactor_),
-            recordedProperties(recordedProperties_),
-            stochRuns(stochRuns_),
-            unoptimizedSim(unoptimizedSim_),
-            seed(seed_){};
-    };
+    //    struct Configuration {
+    //        std::string           noiseEffects;
+    //        double                noiseProbability;
+    //        std::optional<double> ampDampingProbability;
+    //        double                multiQubitGateFactor;
+    //        std::size_t           stochRuns;
+    //        std::string           recordedProperties;
+    //        bool                  unoptimizedSim;
+    //        std::size_t           seed;
+    //
+    //        //Add new variables here
+    //        explicit Configuration(std::string           noiseEffects_          = "APD",
+    //                               double                noiseProbability_      = 0.001,
+    //                               std::optional<double> ampDampingProbability_ = 0.002,
+    //                               double                multiQubitGateFactor_  = 2,
+    //                               std::size_t           stochRuns_             = 1000,
+    //                               std::string           recordedProperties_    = "0-256",
+    //                               bool                  unoptimizedSim_        = false,
+    //                               std::size_t           seed_                  = 0U):
+    //            noiseEffects(noiseEffects_),
+    //            noiseProbability(noiseProbability_),
+    //            ampDampingProbability(ampDampingProbability_),
+    //            multiQubitGateFactor(multiQubitGateFactor_),
+    //            recordedProperties(recordedProperties_),
+    //            stochRuns(stochRuns_),
+    //            unoptimizedSim(unoptimizedSim_),
+    //            seed(seed_){};
+    //    };
 
     explicit StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
-                                      Configuration                             configuration = Configuration(),
-                                      const unsigned int                        stepNumber_   = 1,
-                                      const double                              stepFidelity_ = 1.0):
+                                      std::string                               noiseEffects_          = "APD",
+                                      double                                    noiseProbability_      = 0.001,
+                                      std::optional<double>                     ampDampingProbability_ = 0.002,
+                                      double                                    multiQubitGateFactor_  = 2,
+                                      std::size_t                               stochRuns_             = 1000,
+                                      std::string                               recordedProperties_    = "0-256",
+                                      bool                                      unoptimizedSim_        = false,
+                                      std::size_t                               seed_                  = 0U,
+                                      const unsigned int                        stepNumber_            = 1,
+                                      const double                              stepFidelity_          = 1.0):
         Simulator<Config>(0),
         qc(std::move(qc_)),
         stepNumber(stepNumber_),
         stepFidelity(stepFidelity_),
+        seed(seed_),
         approximationStrategy("fidelity"),
-        noiseProbability(configuration.noiseProbability),
-        amplitudeDampingProb((configuration.ampDampingProbability) ? configuration.ampDampingProbability.value() : configuration.noiseProbability * 2),
-        multiQubitGateFactor(configuration.multiQubitGateFactor),
-        sequentiallyApplyNoise(configuration.unoptimizedSim),
-        stochasticRuns(configuration.stochRuns),
+        noiseProbability(noiseProbability_),
+        amplitudeDampingProb((ampDampingProbability_) ? ampDampingProbability_.value() : noiseProbability_ * 2),
+        multiQubitGateFactor(multiQubitGateFactor_),
+        sequentiallyApplyNoise(unoptimizedSim_),
+        stochasticRuns(stochRuns_),
         maxInstances(std::thread::hardware_concurrency() > 4 ? std::thread::hardware_concurrency() - 4 : 1),
-        noiseEffects(initializeNoiseEffects(configuration.noiseEffects)) {
-        sanityCheckOfNoiseProbabilities(noiseProbability, amplitudeDampingProb, multiQubitGateFactor);
-        setRecordedProperties(configuration.recordedProperties);
+        noiseEffects(initializeNoiseEffects(noiseEffects_)) {
+        sanityCheckOfNoiseProbabilities(noiseProbability_, amplitudeDampingProb, multiQubitGateFactor_);
+        setRecordedProperties(recordedProperties_);
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const unsigned int stepNumber_, const double stepFidelity_):
-        StochasticNoiseSimulator(std::move(qc_), {}, stepNumber_, stepFidelity_) {}
+        StochasticNoiseSimulator(std::move(qc_), std::string("APD"), 0.001, 0.002, 2, 1000, std::string("0-256"), false, stepNumber_, stepFidelity_) {}
 
     //    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
     //                             const std::string& noiseEffects_,
@@ -83,11 +91,11 @@ public:
     //                             std::size_t           seed_):
     //        StochasticNoiseSimulator(std::move(qc_), {noiseEffects_, noiseProbability_, ampDampingProbability_, multiQubitGateFactor_, stochRuns_, recordedProperties_, unoptimizedSim_, seed_}) {}
 
-    //    explicit StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_):
-    //        StochasticNoiseSimulator(std::move(qc_), Configuration{std::string("APD"), 0.001, 0.002, 2, 1000, std::string("0-256"), false}) {}
+    //    explicit StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, stepNumner_, stepFidelity_ = 0.1):
+    //        StochasticNoiseSimulator(std::move(qc_), std::string("APD"), 0.001, 0.002, 2, 1000, std::string("0-256"), false, stepNumber_, stepFidelity_) {}
 
-    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, std::size_t seed_):
-        StochasticNoiseSimulator(std::move(qc_), Configuration{std::string("APD"), 0.001, 0.002, 2, 1000, std::string("0-256"), false, seed_}) {}
+    //    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, std::size_t seed_):
+    //        StochasticNoiseSimulator(std::move(qc_), Configuration{std::string("APD"), 0.001, 0.002, 2, 1000, std::string("0-256"), false, seed_}) {}
 
     std::vector<std::pair<std::int64_t, std::string>> recordedProperties;
     std::vector<std::vector<double>>                  recordedPropertiesPerInstance;
@@ -168,6 +176,7 @@ private:
     bool         sequentiallyApplyNoise{};
     std::size_t  stochasticRuns{};
     unsigned int maxInstances{};
+    size_t       seed{};
 
     std::vector<dd::NoiseOperations> noiseEffects;
 
