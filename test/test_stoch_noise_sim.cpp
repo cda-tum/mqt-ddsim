@@ -324,7 +324,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDepolarizationError) {
 
 TEST(StochNoiseSimTest, SimulateAdder4WithNoiseAndApproximation) {
     auto                     quantumComputation = stochGetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("APD"), 0.01, std::optional<double>{}, 2, 1000, std::string("-2-1000"), 1, 0.9);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("APD"), 0.01, std::optional<double>{}, 2, 1000, std::string("-2-1000"), false, 1, 1, 0.9);
 
     auto m = ddsim.stochSimulate();
 
