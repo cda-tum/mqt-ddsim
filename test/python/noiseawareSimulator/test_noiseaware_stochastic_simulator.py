@@ -4,7 +4,7 @@ import unittest
 
 from qiskit import BasicAer, QuantumCircuit, QuantumRegister, execute
 
-from mqt.ddsim.noiseawarestochasticsimulator import StochasticNoiseSimulatorBackend
+from mqt.ddsim.StochasticNoiseSimulator import StochasticNoiseSimulatorBackend
 
 
 class MQTStochQasmSimulatorTest(unittest.TestCase):
