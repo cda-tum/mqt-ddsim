@@ -184,6 +184,26 @@ PYBIND11_MODULE(pyddsim, m) {
                          "seed"_a                        = -1)
             .def("expectation_value", &expectationValue, "observable"_a);
 
+    py::class_<StochasticNoiseSimulator<>::Configuration>(m, "StochasticNoiseSimulatorConfiguration", "Configuration options for the Stochastic Noise Simulator")
+            .def(py::init())
+            .def_readwrite("noise_effects", &StochasticNoiseSimulator<>::Configuration::noiseEffects,
+                           R"pbdoc(Setting the mode used for determining a simulation path)pbdoc")
+            .def_readwrite("bracket_size", &StochasticNoiseSimulator<>::Configuration::noiseProbability,
+                           R"pbdoc(Add description)pbdoc")
+            .def_readwrite("starting_point", &StochasticNoiseSimulator<>::Configuration::ampDampingProbability,
+                           R"pbdoc(Add description)pbdoc")
+            .def_readwrite("gate_cost", &StochasticNoiseSimulator<>::Configuration::multiQubitGateFactor,
+                           R"pbdoc(Add description)pbdoc")
+            .def_readwrite("gate_cost", &StochasticNoiseSimulator<>::Configuration::stochRuns,
+                           R"pbdoc(Add description)pbdoc")
+            .def_readwrite("gate_cost", &StochasticNoiseSimulator<>::Configuration::recordedProperties,
+                           R"pbdoc(Add description)pbdoc")
+            .def_readwrite("gate_cost", &StochasticNoiseSimulator<>::Configuration::unoptimizedSim,
+                           R"pbdoc(Add description)pbdoc")
+            .def_readwrite("seed", &StochasticNoiseSimulator<>::Configuration::seed,
+                           R"pbdoc(Seed for the simulator)pbdoc");
+
+
     // Stoch simulator
     auto stochasticNoiseSimulator = createSimulator<StochasticNoiseSimulator<>>(m, "StochasticNoiseSimulator");
     stochasticNoiseSimulator.def(py::init<>(&constructSimulatorWithoutSeed<StochasticNoiseSimulator<>, StochasticNoiseSimulator<>::Configuration&>),

@@ -20,22 +20,22 @@ template<class Config = StochasticNoiseSimulatorDDPackageConfig>
 class StochasticNoiseSimulator: public Simulator<Config> {
 public:
     struct Configuration {
-        const std::string&    noiseEffects;
+        std::string           noiseEffects;
         double                noiseProbability;
         std::optional<double> ampDampingProbability;
         double                multiQubitGateFactor;
         std::size_t           stochRuns;
-        const std::string&    recordedProperties;
+        std::string           recordedProperties;
         bool                  unoptimizedSim;
         std::size_t           seed;
 
         //Add new variables here
-        explicit Configuration(const std::string&    noiseEffects_          = "APD",
+        explicit Configuration(std::string           noiseEffects_          = "APD",
                                double                noiseProbability_      = 0.001,
                                std::optional<double> ampDampingProbability_ = 0.002,
                                double                multiQubitGateFactor_  = 2,
                                std::size_t           stochRuns_             = 1000,
-                               const std::string&    recordedProperties_    = "0-256",
+                               std::string           recordedProperties_    = "0-256",
                                bool                  unoptimizedSim_        = false,
                                std::size_t           seed_                  = 0U):
             noiseEffects(noiseEffects_),
