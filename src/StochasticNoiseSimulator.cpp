@@ -33,6 +33,10 @@ void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
 
     std::map<std::size_t, bool> classicValues;
     for (auto& op: *qc) {
+        if (op->getType() == qc::Barrier) {
+            continue;
+        }
+
         if (op->isNonUnitaryOperation()) {
             if (auto* nuOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
                 if (op->getType() == qc::Measure) {
@@ -46,8 +50,6 @@ void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
                         assert(result == '0' || result == '1');
                         classicValues[classic.at(i)] = (result == '1');
                     }
-                } else if (op->getType() == qc::Barrier) {
-                    continue;
                 } else {
                     throw std::runtime_error(std::string("Unsupported non-unitary functionality '") + op->getName() + "'.");
                 }
@@ -187,6 +189,10 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
         localDD->incRef(localRootEdge);
 
         for (auto& op: *qc) {
+            if (op->getType() == qc::Barrier) {
+                continue;
+            }
+
             if (!op->isUnitary() && !(op->isClassicControlledOperation())) {
                 if (auto* nuOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
                     if (nuOp->getType() == qc::Measure) {
@@ -201,10 +207,6 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
                             classicValues[classic.at(i)] = (result == '0');
                         }
                     } else {
-                        //Skipping barrier
-                        if (op->getType() == qc::Barrier) {
-                            continue;
-                        }
                         throw std::runtime_error("Unsupported non-unitary functionality.");
                     }
                 } else {
@@ -241,10 +243,12 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
                     controls = op->getControls();
 
                     if (targets.size() == 1 && controls.empty()) {
-                        operation = localDD->stochasticNoiseOperationCache.lookup(op->getType(), static_cast<dd::Qubit>(targets.front()));
-                        if (operation.p == nullptr) {
+                        auto* oper = localDD->stochasticNoiseOperationCache.lookup(op->getType(), static_cast<dd::Qubit>(targets.front()));
+                        if (oper == nullptr) {
                             operation = dd::getDD(op.get(), localDD);
                             localDD->stochasticNoiseOperationCache.insert(op->getType(), static_cast<dd::Qubit>(targets.front()), operation);
+                        } else {
+                            operation = *oper;
                         }
                     } else {
                         operation = dd::getDD(op.get(), localDD);
@@ -291,9 +295,8 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
             } else {
                 // extract amplitude for state
                 const auto basisVector = recordedPropertiesList[i].second;
-                const auto amplitude   = localDD->getValueByPath(localRootEdge, basisVector);
-                const auto prob        = amplitude.r * amplitude.r + amplitude.i * amplitude.i;
-                recordedPropertiesStorage[i] += prob;
+                const auto amplitude   = localRootEdge.getValueByPath(basisVector);
+                recordedPropertiesStorage[i] += std::norm(amplitude);
             }
         }
     }

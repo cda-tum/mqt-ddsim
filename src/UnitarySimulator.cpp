@@ -1,5 +1,6 @@
 #include "UnitarySimulator.hpp"
 
+#include "dd/Export.hpp"
 #include "dd/FunctionalityConstruction.hpp"
 
 #include <chrono>
@@ -15,6 +16,11 @@ void UnitarySimulator<Config>::construct() {
     }
     auto end         = std::chrono::steady_clock::now();
     constructionTime = std::chrono::duration<double>(end - start).count();
+}
+
+template<class Config>
+void UnitarySimulator<Config>::exportDDtoGraphviz(std::ostream& os, const bool colored, const bool edgeLabels, const bool classic, const bool memory, const bool formatAsPolar) {
+    dd::toDot(e, os, colored, edgeLabels, classic, memory, formatAsPolar);
 }
 
 template class UnitarySimulator<dd::DDPackageConfig>;

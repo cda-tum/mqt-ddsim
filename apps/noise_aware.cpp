@@ -118,7 +118,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
 
         auto t1 = std::chrono::steady_clock::now();
 
-        const std::map<std::string, double> measurementResults = ddsim->deterministicSimulate();
+        const auto measurementResults = ddsim->deterministicSimulate();
 
         auto t2 = std::chrono::steady_clock::now();
 
@@ -146,6 +146,6 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
         if (vm.count("pm") > 0) {
             outputObj["measurement_results"] = measurementResults;
         }
-        std::cout << std::setw(2) << outputObj << std::endl;
+        std::cout << std::setw(2) << outputObj << "\n";
     }
 }

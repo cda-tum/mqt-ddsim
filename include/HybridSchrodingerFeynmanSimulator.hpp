@@ -49,21 +49,15 @@ public:
 
     Mode mode = Mode::Amplitude;
 
-    template<class ReturnType = dd::ComplexValue>
-    [[nodiscard]] std::vector<ReturnType> getVectorFromHybridSimulation() const {
+    [[nodiscard]] dd::CVec getVectorFromHybridSimulation() const {
         if (CircuitSimulator<Config>::getNumberOfQubits() >= 60) {
             // On 64bit system the vector can hold up to (2^60)-1 elements, if memory permits
             throw std::range_error("getVector only supports less than 60 qubits.");
         }
         if (getMode() == Mode::Amplitude) {
-            if constexpr (std::is_same_v<ReturnType, decltype(finalAmplitudes)>) {
-                return finalAmplitudes;
-            }
-            std::vector<ReturnType> amplitudes;
-            std::transform(finalAmplitudes.begin(), finalAmplitudes.end(), std::back_inserter(amplitudes), [](std::complex<dd::fp> x) -> ReturnType { return {x.real(), x.imag()}; });
-            return amplitudes;
+            return finalAmplitudes;
         }
-        return CircuitSimulator<Config>::template getVector<ReturnType>();
+        return CircuitSimulator<Config>::getVector();
     }
 
     //  Get # of decisions for given split_qubit, so that lower slice: q0 < i < qubit; upper slice: qubit <= i < nqubits
@@ -71,9 +65,13 @@ public:
 
     [[nodiscard]] Mode getMode() const { return mode; }
 
+protected:
+    /// See Simulator<Config>::exportDDtoGraphviz
+    void exportDDtoGraphviz(std::ostream& os, bool colored, bool edgeLabels, bool classic, bool memory, bool formatAsPolar) override;
+
 private:
-    std::size_t                       nthreads = 2;
-    std::vector<std::complex<dd::fp>> finalAmplitudes{};
+    std::size_t nthreads = 2;
+    dd::CVec    finalAmplitudes{};
 
     void simulateHybridTaskflow(qc::Qubit splitQubit);
     void simulateHybridAmplitudes(qc::Qubit splitQubit);

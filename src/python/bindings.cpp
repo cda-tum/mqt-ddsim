@@ -2,7 +2,7 @@
  * This file is part of MQT DDSIM library which is released under the MIT license.
  * See file README.md or go to https://iic.jku.at/eda/research/quantum/ for more information.
  */
-// clang-format off
+
 #include "CircuitSimulator.hpp"
 #include "HybridSchrodingerFeynmanSimulator.hpp"
 #include "PathSimulator.hpp"
@@ -10,12 +10,10 @@
 #include "python/qiskit/QasmQobjExperiment.hpp"
 #include "python/qiskit/QuantumCircuit.hpp"
 
+#include <memory>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-
-#include <memory>
-// clang-format on
 
 namespace py = pybind11;
 using namespace pybind11::literals;
@@ -73,7 +71,7 @@ std::unique_ptr<Simulator> constructSimulatorWithoutSeed(const py::object& circ,
     return constructSimulator<Simulator>(circ, 1., 1, "fidelity", -1, std::forward<Args>(args)...);
 }
 
-void getNumpyMatrixRec(const qc::MatrixDD& e, const std::complex<dd::fp>& amp, std::size_t i, std::size_t j, std::size_t dim, std::complex<dd::fp>* mat) {
+void getNumPyMatrixRec(const qc::MatrixDD& e, const std::complex<dd::fp>& amp, std::size_t i, std::size_t j, std::size_t dim, std::complex<dd::fp>* mat) {
     // calculate new accumulated amplitude
     auto w = std::complex<dd::fp>{dd::RealNumber::val(e.w.r), dd::RealNumber::val(e.w.i)};
     auto c = amp * w;
@@ -89,21 +87,21 @@ void getNumpyMatrixRec(const qc::MatrixDD& e, const std::complex<dd::fp>& amp, s
 
     // recursive case
     if (!e.p->e[0].w.approximatelyZero()) {
-        getNumpyMatrixRec(e.p->e[0], c, i, j, dim, mat);
+        getNumPyMatrixRec(e.p->e[0], c, i, j, dim, mat);
     }
     if (!e.p->e[1].w.approximatelyZero()) {
-        getNumpyMatrixRec(e.p->e[1], c, i, y, dim, mat);
+        getNumPyMatrixRec(e.p->e[1], c, i, y, dim, mat);
     }
     if (!e.p->e[2].w.approximatelyZero()) {
-        getNumpyMatrixRec(e.p->e[2], c, x, j, dim, mat);
+        getNumPyMatrixRec(e.p->e[2], c, x, j, dim, mat);
     }
     if (!e.p->e[3].w.approximatelyZero()) {
-        getNumpyMatrixRec(e.p->e[3], c, x, y, dim, mat);
+        getNumPyMatrixRec(e.p->e[3], c, x, y, dim, mat);
     }
 }
 
 template<class Config = dd::DDPackageConfig>
-void getNumpyMatrix(UnitarySimulator<Config>& sim, py::array_t<std::complex<dd::fp>>& matrix) {
+void getNumPyMatrix(UnitarySimulator<Config>& sim, py::array_t<std::complex<dd::fp>>& matrix) {
     const auto&     e            = sim.getConstructedDD();
     py::buffer_info matrixBuffer = matrix.request();
     auto*           dataPtr      = static_cast<std::complex<dd::fp>*>(matrixBuffer.ptr);
@@ -118,7 +116,7 @@ void getNumpyMatrix(UnitarySimulator<Config>& sim, py::array_t<std::complex<dd::
         throw std::runtime_error("Provided matrix does not have the right size.");
     }
 
-    getNumpyMatrixRec(e, std::complex<dd::fp>{1.0, 0.0}, 0, 0, dim, dataPtr);
+    getNumPyMatrixRec(e, std::complex<dd::fp>{1.0, 0.0}, 0, 0, dim, dataPtr);
 }
 
 void dumpTensorNetwork(const py::object& circ, const std::string& filename) {
@@ -157,13 +155,15 @@ py::class_<Sim> createSimulator(py::module_ m, const std::string& name) {
             .def("get_max_vector_node_count", &Sim::getMaxNodeCount, "Get the maximum number of (active) vector nodes, i.e., the maximum number of vector DD nodes in the unique table at any point during the simulation.")
             .def("get_max_matrix_node_count", &Sim::getMaxMatrixNodeCount, "Get the maximum number of (active) matrix nodes, i.e., the maximum number of matrix DD nodes in the unique table at any point during the simulation.")
             .def("get_tolerance", &Sim::getTolerance, "Get the tolerance for the DD package.")
-            .def("set_tolerance", &Sim::setTolerance, "tol"_a, "Set the tolerance for the DD package.");
+            .def("set_tolerance", &Sim::setTolerance, "tol"_a, "Set the tolerance for the DD package.")
+            .def("export_dd_to_graphviz_str", &Sim::exportDDtoGraphvizString, "colored"_a = true, "edge_labels"_a = false, "classic"_a = false, "memory"_a = false, "format_as_polar"_a = true, "Get a Graphviz representation of the currently stored DD.")
+            .def("export_dd_to_graphviz_file", &Sim::exportDDtoGraphvizFile, "filename"_a, "colored"_a = true, "edge_labels"_a = false, "classic"_a = false, "memory"_a = false, "format_as_polar"_a = true, "Write a Graphviz representation of the currently stored DD to a file.");
 
     if constexpr (std::is_same_v<Sim, UnitarySimulator<>>) {
         sim.def("construct", &Sim::construct, "Construct the DD representing the unitary matrix of the circuit.");
     } else {
         sim.def("simulate", &Sim::simulate, "shots"_a, "Simulate the circuit and return the result as a dictionary of counts.");
-        sim.def("get_vector", &Sim::template getVector<std::complex<dd::fp>>, "Get the state vector resulting from the simulation.");
+        sim.def("get_vector", &Sim::getVector, "Get the state vector resulting from the simulation.");
     }
     return sim;
 }
@@ -197,7 +197,7 @@ PYBIND11_MODULE(pyddsim, m) {
                      "mode"_a                        = HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude,
                      "nthreads"_a                    = 2)
             .def("get_mode", &HybridSchrodingerFeynmanSimulator<>::getMode)
-            .def("get_final_amplitudes", &HybridSchrodingerFeynmanSimulator<>::template getVectorFromHybridSimulation<std::complex<dd::fp>>);
+            .def("get_final_amplitudes", &HybridSchrodingerFeynmanSimulator<>::getVectorFromHybridSimulation);
 
     // Path Simulator
     py::enum_<PathSimulator<>::Configuration::Mode>(m, "PathSimulatorMode")
@@ -252,16 +252,8 @@ PYBIND11_MODULE(pyddsim, m) {
             .def("get_max_node_count", &UnitarySimulator<>::getMaxNodeCount);
 
     // Miscellaneous functions
-    m.def("get_matrix", &getNumpyMatrix<>, "sim"_a, "mat"_a);
+    m.def("get_matrix", &getNumPyMatrix<>, "sim"_a, "mat"_a);
 
     m.def("dump_tensor_network", &dumpTensorNetwork, "dump a tensor network representation of the given circuit",
           "circ"_a, "filename"_a);
-
-#define STRINGIFY(x) #x
-#define MACRO_STRINGIFY(x) STRINGIFY(x)
-#ifdef VERSION_INFO
-    m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
-#else
-    m.attr("__version__") = "dev";
-#endif
 }

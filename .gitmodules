@@ -1,8 +1,12 @@
 [submodule "extern/mqt-core"]
 	path = extern/mqt-core
 	url = https://github.com/cda-tum/mqt-core.git
+<<<<<<< HEAD
     branch = mem-opt-qfr-tw
     shallow = true
+=======
+    branch = main
+>>>>>>> main
 [submodule "extern/taskflow"]
 	path = extern/taskflow
 	url = https://github.com/taskflow/taskflow.git
