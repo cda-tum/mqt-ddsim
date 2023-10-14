@@ -91,8 +91,8 @@ TEST(HybridSimTest, GRCSTestDD) {
 
     if (result != ref) {
         // if edges are not equal -> compare amplitudes
-        auto refAmplitudes    = dd->getVector(ref);
-        auto resultAmplitudes = dd->getVector(result);
+        auto refAmplitudes    = ref.getVector();
+        auto resultAmplitudes = result.getVector();
         for (std::size_t i = 0; i < refAmplitudes.size(); ++i) {
             if (std::abs(refAmplitudes[i].real() - resultAmplitudes[i].real()) > 1e-6 || std::abs(refAmplitudes[i].imag() - resultAmplitudes[i].imag()) > 1e-6) {
                 FAIL() << "Differing values on entry " << i;
@@ -114,9 +114,9 @@ TEST(HybridSimTest, GRCSTestAmplitudes) {
 
     // if edges are not equal -> compare amplitudes
     const auto refAmplitudes    = ddsim.getVector();
-    const auto resultAmplitudes = ddsimHybridAmp.getVectorFromHybridSimulation<std::complex<dd::fp>>();
+    const auto resultAmplitudes = ddsimHybridAmp.getVectorFromHybridSimulation();
     for (std::size_t i = 0; i < refAmplitudes.size(); ++i) {
-        if (std::abs(refAmplitudes[i].r - resultAmplitudes[i].real()) > 1e-6 || std::abs(refAmplitudes[i].i - resultAmplitudes[i].imag()) > 1e-6) {
+        if (std::abs(refAmplitudes[i].real() - resultAmplitudes[i].real()) > 1e-6 || std::abs(refAmplitudes[i].imag() - resultAmplitudes[i].imag()) > 1e-6) {
             FAIL() << "Differing values on entry " << i;
         }
     }
@@ -136,9 +136,9 @@ TEST(HybridSimTest, GRCSTestFixedSeed) {
 
     // if edges are not equal -> compare amplitudes
     const auto refAmplitudes    = ddsim.getVector();
-    const auto resultAmplitudes = ddsimHybridAmp.getVectorFromHybridSimulation<std::complex<dd::fp>>();
+    const auto resultAmplitudes = ddsimHybridAmp.getVectorFromHybridSimulation();
     for (std::size_t i = 0; i < refAmplitudes.size(); ++i) {
-        if (std::abs(refAmplitudes[i].r - resultAmplitudes[i].real()) > 1e-6 || std::abs(refAmplitudes[i].i - resultAmplitudes[i].imag()) > 1e-6) {
+        if (std::abs(refAmplitudes[i].real() - resultAmplitudes[i].real()) > 1e-6 || std::abs(refAmplitudes[i].imag() - resultAmplitudes[i].imag()) > 1e-6) {
             FAIL() << "Differing values on entry " << i;
         }
     }
@@ -158,10 +158,10 @@ TEST(HybridSimTest, GRCSTestFixedSeedDifferentVectorType) {
     ddsimHybridDD.simulate(0);
 
     // if edges are not equal -> compare amplitudes
-    const auto refAmplitudes    = ddsimHybridDD.getVectorFromHybridSimulation<dd::ComplexValue>();
-    const auto resultAmplitudes = ddsimHybridAmp.getVectorFromHybridSimulation<std::pair<dd::fp, dd::fp>>();
+    const auto refAmplitudes    = ddsimHybridDD.getVectorFromHybridSimulation();
+    const auto resultAmplitudes = ddsimHybridAmp.getVectorFromHybridSimulation();
     for (std::size_t i = 0; i < refAmplitudes.size(); ++i) {
-        if (std::abs(refAmplitudes[i].r - resultAmplitudes[i].first) > 1e-6 || std::abs(refAmplitudes[i].i - resultAmplitudes[i].second) > 1e-6) {
+        if (std::abs(refAmplitudes[i].real() - resultAmplitudes[i].real()) > 1e-6 || std::abs(refAmplitudes[i].imag() - resultAmplitudes[i].imag()) > 1e-6) {
             FAIL() << "Differing values on entry " << i;
         }
     }
@@ -183,7 +183,7 @@ TEST(HybridSimTest, NonStandardOperation) {
 TEST(HybridSimTest, TooManyQubitsForVectorTest) {
     auto                                      qc = std::make_unique<qc::QuantumComputation>(61);
     const HybridSchrodingerFeynmanSimulator<> ddsim(std::move(qc), ApproximationInfo{}, HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude);
-    EXPECT_THROW({ [[maybe_unused]] auto _ = ddsim.getVectorFromHybridSimulation<std::complex<dd::fp>>(); }, std::range_error);
+    EXPECT_THROW({ [[maybe_unused]] auto _ = ddsim.getVectorFromHybridSimulation(); }, std::range_error);
 }
 
 TEST(HybridSimTest, RegressionTestDDModeUnevenChunks) {
