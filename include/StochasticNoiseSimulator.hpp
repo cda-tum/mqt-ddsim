@@ -59,11 +59,10 @@ public:
                                       std::size_t                               seed_                  = 0U,
                                       const unsigned int                        stepNumber_            = 1,
                                       const double                              stepFidelity_          = 1.0):
-        Simulator<Config>(0),
+        Simulator<Config>(seed_),
         qc(std::move(qc_)),
         stepNumber(stepNumber_),
         stepFidelity(stepFidelity_),
-        seed(seed_),
         approximationStrategy("fidelity"),
         noiseProbability(noiseProbability_),
         amplitudeDampingProb((ampDampingProbability_) ? ampDampingProbability_.value() : noiseProbability_ * 2),
@@ -78,7 +77,7 @@ public:
     }
 
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const unsigned int stepNumber_, const double stepFidelity_):
-        StochasticNoiseSimulator(std::move(qc_), std::string("APD"), 0.001, 0.002, 2, 1000, std::string("0-256"), false, stepNumber_, stepFidelity_) {}
+        StochasticNoiseSimulator(std::move(qc_), std::string("APD"), 0.001, 0.002, 2, 1000, std::string("0-256"), false, 0, stepNumber_, stepFidelity_) {}
 
     //    StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
     //                             const std::string& noiseEffects_,
@@ -176,7 +175,6 @@ private:
     bool         sequentiallyApplyNoise{};
     std::size_t  stochasticRuns{};
     unsigned int maxInstances{};
-    size_t       seed{};
 
     std::vector<dd::NoiseOperations> noiseEffects;
 
