@@ -69,7 +69,8 @@ public:
         multiQubitGateFactor(multiQubitGateFactor_),
         sequentiallyApplyNoise(unoptimizedSim_),
         stochasticRuns(stochRuns_),
-        maxInstances(std::thread::hardware_concurrency() > 4 ? std::thread::hardware_concurrency() - 4 : 1),
+        maxInstances(1),
+        //        maxInstances(std::thread::hardware_concurrency() > 4 ? std::thread::hardware_concurrency() - 4 : 1),
         noiseEffects(initializeNoiseEffects(noiseEffects_)) {
         sanityCheckOfNoiseProbabilities(noiseProbability_, amplitudeDampingProb, multiQubitGateFactor_);
         setRecordedProperties(recordedProperties_);
@@ -100,10 +101,18 @@ public:
     std::vector<std::vector<double>>                  recordedPropertiesPerInstance;
     std::vector<double>                               finalProperties;
     std::vector<std::map<std::string, unsigned int>>  classicalMeasurementsMaps;
-    std::map<std::string, unsigned int>               finalClassicalMeasurementsMap;
+    std::map<std::string, size_t>                     finalClassicalMeasurementsMap;
 
     std::map<std::string, std::size_t> simulate(std::size_t shots) override;
-    std::map<std::string, double>      stochSimulate();
+    std::string                        measureAll(bool collapse = false) {
+        throw std::runtime_error("Not supported for stochastic simulation!\n");
+    }
+
+    char measureOneCollapsing(const qc::Qubit index, const bool assumeProbabilityNormalization = true) {
+        throw std::runtime_error("Not supported for stochastic simulation!\n");
+    }
+
+    std::map<std::string, std::size_t> stochSimulate();
 
     [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return 0U; }    // Not available for stochastic simulation
     [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return 0U; } // Not available for stochastic simulation
@@ -184,12 +193,7 @@ private:
 
     void perfectSimulationRun();
 
-    void runStochSimulationForId(std::size_t                                        stochRun,
-                                 qc::Qubit                                          nQubits,
-                                 std::vector<double>&                               recordedPropertiesStorage,
-                                 std::vector<std::pair<std::int64_t, std::string>>& recordedPropertiesList,
-                                 std::map<std::string, unsigned int>&               classicalMeasurementsMap,
-                                 std::uint64_t                                      localSeed);
+    void runStochSimulationForId(std::size_t stochRun, qc::Qubit nQubits, std::map<std::string, unsigned int>& classicalMeasurementsMap, std::uint64_t localSeed);
 
     [[nodiscard]] std::string intToString(std::int64_t targetNumber) const;
 };

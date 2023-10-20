@@ -6,15 +6,20 @@ from typing import TYPE_CHECKING, Sequence
 
 import numpy as np
 import numpy.typing as npt
-from qiskit import QiskitError
+from qiskit import QiskitError, AncillaRegister, ClassicalRegister, QuantumCircuit, QuantumRegister, execute
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 
-from .header import DDSIMHeader
-from .pyddsim import ConstructionMode, UnitarySimulator, get_matrix
-from .qasmsimulator import QasmSimulatorBackend
-from .target import DDSIMTargetBuilder
+
+from mqt.ddsim.pyddsim import StochasticNoiseSimulator
+
+from mqt.ddsim.target import DDSIMTargetBuilder
+
+from mqt.ddsim.header import DDSIMHeader
+from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
+from mqt.ddsim.pathqasmsimulator import PathQasmSimulatorBackend
+from qiskit_aer import AerSimulator
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
@@ -23,10 +28,7 @@ if TYPE_CHECKING:
 class StochasticNoiseSimulatorBackend(QasmSimulatorBackend):
     """Decision diagram-based unitary simulator."""
 
-    _US_TARGET = Target(
-        description="MQT DDSIM Unitary Simulator Target",
-        num_qubits=QasmSimulatorBackend.max_qubits(for_matrix=True),
-    )
+    _PATH_TARGET = Target(description="MQT DDSIM Simulation Path Framework Target", num_qubits=128)
 
     @staticmethod
     def _add_operations_to_target(target: Target) -> None:
@@ -36,47 +38,31 @@ class StochasticNoiseSimulatorBackend(QasmSimulatorBackend):
         DDSIMTargetBuilder.add_3q_gates(target)
         DDSIMTargetBuilder.add_multi_qubit_gates(target)
         DDSIMTargetBuilder.add_barrier(target)
+        DDSIMTargetBuilder.add_measure(target)
 
-    def __init__(self) -> None:
-        super().__init__(name="unitary_simulator", description="MQT DDSIM Unitary Simulator")
-
-    @classmethod
-    def _default_options(cls):
-        return Options(shots=1, mode="recursive", parameter_binds=None)
+    def __init__(self, name="path_sim_qasm_simulator", description="MQT DDSIM Simulation Path Framework") -> None:
+        super().__init__(name=name, description=description)
 
     @property
     def target(self):
-        return self._US_TARGET
+        return self._PATH_TARGET
 
     def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
         start_time = time.time()
-        seed = options.get("seed", -1)
-        mode = options.get("mode", "recursive")
 
-        if mode == "sequential":
-            construction_mode = ConstructionMode.sequential
-        elif mode == "recursive":
-            construction_mode = ConstructionMode.recursive
-        else:
-            msg = (
-                f"Construction mode {mode} not supported by DDSIM unitary simulator. Available modes are "
-                "'recursive' and 'sequential'"
-            )
-            raise QiskitError(msg)
+        sim = StochasticNoiseSimulator(qc, noiseEffects="APD", noiseProbability=0.5)
 
-        sim = UnitarySimulator(qc, seed=seed, mode=construction_mode)
-        sim.construct()
-        # Extract resulting matrix from final DD and write data
-        unitary: npt.NDArray[np.complex_] = np.zeros((2**qc.num_qubits, 2**qc.num_qubits), dtype=np.complex_)
-        get_matrix(sim, unitary)
+        shots = options.get("shots", 1024)
+        setup_time = time.time()
+        counts = sim.simulate(shots)
         end_time = time.time()
 
         data = ExperimentResultData(
-            unitary=unitary,
-            construction_time=sim.get_construction_time(),
-            max_dd_nodes=sim.get_max_node_count(),
-            dd_nodes=sim.get_final_node_count(),
+            counts={hex(int(result, 2)): count for result, count in counts.items()},
+            statevector=None if not self._SHOW_STATE_VECTOR else sim.get_vector(),
             time_taken=end_time - start_time,
+            time_setup=setup_time - start_time,
+            time_sim=end_time - setup_time,
         )
 
         metadata = qc.metadata
@@ -84,35 +70,40 @@ class StochasticNoiseSimulatorBackend(QasmSimulatorBackend):
             metadata = {}
 
         return ExperimentResult(
-            shots=1,
+            shots=shots,
             success=True,
             status="DONE",
-            seed=seed,
             data=data,
             metadata=metadata,
             header=DDSIMHeader(qc),
         )
 
-    def _validate(self, quantum_circuits: Sequence[QuantumCircuit]):
-        """Semantic validations of the quantum circuits which cannot be done via schemas.
-        Some of these may later move to backend schemas.
-        1. No shots
-        2. No measurements in the middle.
-        """
-        for qc in quantum_circuits:
-            name = qc.name
-            n_qubits = qc.num_qubits
-            max_qubits = self.target.num_qubits
 
-            if n_qubits > max_qubits:
-                msg = f"Number of qubits {n_qubits} is greater than maximum ({max_qubits}) for '{self.name}'."
-                raise QiskitError(msg)
 
-            if qc.metadata is not None and "shots" in qc.metadata and qc.metadata["shots"] != 1:
-                qc.metadata["shots"] = 1
+if __name__ == '__main__':
+    shots = 100
+    backend = StochasticNoiseSimulatorBackend()
+    # backend = QasmSimulatorBackend()
+    # backend = PathQasmSimulatorBackend()
+    # backend = AerSimulator()
 
-            for obj in qc.data:
-                if obj[0].name in ["measure", "reset"]:
-                    operation_name = obj[0].name
-                    msg = f"Unsupported '{self.name}' instruction '{operation_name}' in circuit '{name}'."
-                    raise QiskitError(msg)
+
+    c2 = ClassicalRegister(2, name="c2")
+    q2 = QuantumRegister(2, name="q2")
+
+    circuit_2 = QuantumCircuit(q2, c2, name="q2")
+
+    circuit_2.x(q2[0])
+    circuit_2.x(q2[1])
+    circuit_2.measure(q2[0], c2[0])
+    circuit_2.measure(q2[1], c2[1])
+
+    result = execute(circuit_2, backend, shots=shots).result()
+
+
+
+    # assert result.success
+    #
+    counts_2 = result.get_counts(circuit_2.name)
+    print(counts_2)
+    # assert counts_2 == {"11": shots}

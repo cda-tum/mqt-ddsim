@@ -5,107 +5,113 @@
 
 using CN = dd::ComplexNumbers;
 
+//template<class Config>
+//std::map<std::string, std::size_t> StochasticNoiseSimulator<Config>::simulate(size_t shots) {
+//    //    const bool hasNonunitary = std::any_of(qc->cbegin(), qc->cend(), [&](const auto& p) { return p->isNonUnitaryOperation(); });
+//    //
+//    //    if (!hasNonunitary) {
+//    //        perfectSimulationRun();
+//    //        return Simulator<Config>::measureAllNonCollapsing(shots);
+//    //    }
+//    //
+//    //    std::map<std::string, std::size_t> mCounter;
+//    //
+//    //    for (unsigned int i = 0; i < shots; i++) {
+//    //        perfectSimulationRun();
+//    //        mCounter[Simulator<Config>::measureAll()]++;
+//    //    }
+//
+//    //    return mCounter;
+//
+//    stochSimulate();
+//
+//    return std::map<std::string, std::size_t>{};
+//}
+//
+//template<class Config>
+//void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
+//    const auto nQubits = qc->getNqubits();
+//
+//    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::Qubit>(nQubits));
+//    Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
+//
+//    std::map<std::size_t, bool> classicValues;
+//    for (auto& op: *qc) {
+//        if (op->getType() == qc::Barrier) {
+//            continue;
+//        }
+//
+//        if (op->isNonUnitaryOperation()) {
+//            if (auto* nuOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
+//                if (op->getType() == qc::Measure) {
+//                    const auto& quantum = nuOp->getTargets();
+//                    const auto& classic = nuOp->getClassics();
+//
+//                    assert(quantum.size() == classic.size()); // this should not happen do to check in Simulate
+//
+//                    for (std::size_t i = 0U; i < quantum.size(); ++i) {
+//                        const auto result = Simulator<Config>::measureOneCollapsing(quantum.at(i));
+//                        assert(result == '0' || result == '1');
+//                        classicValues[classic.at(i)] = (result == '1');
+//                    }
+//                } else if (op->getType() == qc::Reset) {
+//                    // Reset qubit
+//                    auto qubits = nuOp->getTargets();
+//                    for (const auto& qubit: qubits) {
+//                        const auto result = Simulator<Config>::dd->measureOneCollapsing(Simulator<Config>::rootEdge, static_cast<dd::Qubit>(qubits.at(qubit)), true, Simulator<Config>::mt);
+//                        if (result == '1') {
+//                            const auto x   = qc::StandardOperation(qc->getNqubits(), qubit, qc::X);
+//                            auto       tmp = Simulator<Config>::dd->multiply(dd::getDD(&x, Simulator<Config>::dd), Simulator<Config>::rootEdge);
+//                            Simulator<Config>::dd->incRef(tmp);
+//                            Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
+//                            Simulator<Config>::rootEdge = tmp;
+//                            Simulator<Config>::dd->garbageCollect();
+//                        }
+//                    }
+//                } else {
+//                    throw std::runtime_error(std::string("Unsupported non-unitary functionality '") + op->getName() + "'.");
+//                }
+//            } else {
+//                throw std::runtime_error(std::string("Dynamic cast to NonUnitaryOperation failed for '") + op->getName() + "'.");
+//            }
+//            Simulator<Config>::dd->garbageCollect();
+//        } else {
+//            if (op->isClassicControlledOperation()) {
+//                if (auto* ccOp = dynamic_cast<qc::ClassicControlledOperation*>(op.get())) {
+//                    const auto startIndex    = static_cast<std::uint16_t>(ccOp->getParameter().at(0U));
+//                    const auto length        = static_cast<std::uint16_t>(ccOp->getParameter().at(1U));
+//                    const auto expectedValue = ccOp->getExpectedValue();
+//
+//                    std::size_t actualValue = 0U;
+//                    for (std::size_t i = 0U; i < length; i++) {
+//                        actualValue |= (classicValues[startIndex + i] ? 1U : 0U) << i;
+//                    }
+//
+//                    //std::clog << "expected " << expected_value << " and actual value was " << actual_value << "\n";
+//
+//                    if (actualValue != expectedValue) {
+//                        continue;
+//                    }
+//                } else {
+//                    throw std::runtime_error("Dynamic cast to ClassicControlledOperation failed.");
+//                }
+//            }
+//
+//            auto operation = dd::getDD(op.get(), Simulator<Config>::dd);
+//            auto tmp       = Simulator<Config>::dd->multiply(operation, Simulator<Config>::rootEdge);
+//            Simulator<Config>::dd->incRef(tmp);
+//            Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
+//            Simulator<Config>::rootEdge = tmp;
+//
+//            Simulator<Config>::dd->garbageCollect();
+//        }
+//    }
+//}
+
 template<class Config>
-std::map<std::string, std::size_t> StochasticNoiseSimulator<Config>::simulate(size_t shots) {
-    const bool hasNonunitary = std::any_of(qc->cbegin(), qc->cend(), [&](const auto& p) { return p->isNonUnitaryOperation(); });
+std::map<std::string, std::size_t> StochasticNoiseSimulator<Config>::simulate(size_t nshots) {
+    stochasticRuns = nshots;
 
-    if (!hasNonunitary) {
-        perfectSimulationRun();
-        return Simulator<Config>::measureAllNonCollapsing(shots);
-    }
-
-    std::map<std::string, std::size_t> mCounter;
-
-    for (unsigned int i = 0; i < shots; i++) {
-        perfectSimulationRun();
-        mCounter[Simulator<Config>::measureAll()]++;
-    }
-
-    return mCounter;
-}
-
-template<class Config>
-void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
-    const auto nQubits = qc->getNqubits();
-
-    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::Qubit>(nQubits));
-    Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
-
-    std::map<std::size_t, bool> classicValues;
-    for (auto& op: *qc) {
-        if (op->getType() == qc::Barrier) {
-            continue;
-        }
-
-        if (op->isNonUnitaryOperation()) {
-            if (auto* nuOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
-                if (op->getType() == qc::Measure) {
-                    const auto& quantum = nuOp->getTargets();
-                    const auto& classic = nuOp->getClassics();
-
-                    assert(quantum.size() == classic.size()); // this should not happen do to check in Simulate
-
-                    for (std::size_t i = 0U; i < quantum.size(); ++i) {
-                        const auto result = Simulator<Config>::measureOneCollapsing(quantum.at(i));
-                        assert(result == '0' || result == '1');
-                        classicValues[classic.at(i)] = (result == '1');
-                    }
-                } else if (op->getType() == qc::Reset) {
-                    // Reset qubit
-                    auto qubits = nuOp->getTargets();
-                    for (const auto& qubit: qubits) {
-                        const auto result = Simulator<Config>::dd->measureOneCollapsing(Simulator<Config>::rootEdge, static_cast<dd::Qubit>(qubits.at(qubit)), true, Simulator<Config>::mt);
-                        if (result == '1') {
-                            const auto x   = qc::StandardOperation(qc->getNqubits(), qubit, qc::X);
-                            auto       tmp = Simulator<Config>::dd->multiply(dd::getDD(&x, Simulator<Config>::dd), Simulator<Config>::rootEdge);
-                            Simulator<Config>::dd->incRef(tmp);
-                            Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
-                            Simulator<Config>::rootEdge = tmp;
-                            Simulator<Config>::dd->garbageCollect();
-                        }
-                    }
-                } else {
-                    throw std::runtime_error(std::string("Unsupported non-unitary functionality '") + op->getName() + "'.");
-                }
-            } else {
-                throw std::runtime_error(std::string("Dynamic cast to NonUnitaryOperation failed for '") + op->getName() + "'.");
-            }
-            Simulator<Config>::dd->garbageCollect();
-        } else {
-            if (op->isClassicControlledOperation()) {
-                if (auto* ccOp = dynamic_cast<qc::ClassicControlledOperation*>(op.get())) {
-                    const auto startIndex    = static_cast<std::uint16_t>(ccOp->getParameter().at(0U));
-                    const auto length        = static_cast<std::uint16_t>(ccOp->getParameter().at(1U));
-                    const auto expectedValue = ccOp->getExpectedValue();
-
-                    std::size_t actualValue = 0U;
-                    for (std::size_t i = 0U; i < length; i++) {
-                        actualValue |= (classicValues[startIndex + i] ? 1U : 0U) << i;
-                    }
-
-                    //std::clog << "expected " << expected_value << " and actual value was " << actual_value << "\n";
-
-                    if (actualValue != expectedValue) {
-                        continue;
-                    }
-                } else {
-                    throw std::runtime_error("Dynamic cast to ClassicControlledOperation failed.");
-                }
-            }
-
-            auto operation = dd::getDD(op.get(), Simulator<Config>::dd);
-            auto tmp       = Simulator<Config>::dd->multiply(operation, Simulator<Config>::rootEdge);
-            Simulator<Config>::dd->incRef(tmp);
-            Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
-            Simulator<Config>::rootEdge = tmp;
-
-            Simulator<Config>::dd->garbageCollect();
-        }
-    }
-}
-
-template<class Config>
-std::map<std::string, double> StochasticNoiseSimulator<Config>::stochSimulate() {
     // Generate a vector for each instance.
     recordedPropertiesPerInstance.resize(maxInstances, std::vector<double>(recordedProperties.size(), 0.0));
     classicalMeasurementsMaps.resize(maxInstances);
@@ -121,8 +127,6 @@ std::map<std::string, double> StochasticNoiseSimulator<Config>::stochSimulate() 
                                  this,
                                  runID,
                                  qc->getNqubits(),
-                                 std::ref(recordedPropertiesPerInstance[runID]),
-                                 std::ref(recordedProperties),
                                  std::ref(classicalMeasurementsMaps[runID]),
                                  static_cast<std::uint64_t>(Simulator<Config>::mt()));
     }
@@ -139,43 +143,18 @@ std::map<std::string, double> StochasticNoiseSimulator<Config>::stochSimulate() 
         }
     }
 
-    for (std::uint64_t j = 0U; j < recordedProperties.size(); j++) {
-        for (const auto& instanceProperties: recordedPropertiesPerInstance) {
-            finalProperties[j] += instanceProperties[j];
-        }
-        finalProperties[j] /= static_cast<double>(stochasticRuns);
-    }
-
     // Adding the result of classical registers to the measureResult map
     std::map<std::string, double> measureResult;
     for (const auto& [state, count]: finalClassicalMeasurementsMap) {
-        const auto probability = count / static_cast<double>(stochasticRuns);
+        const auto probability = count;
         measureResult.emplace(state, probability); //todo maybe print both classical and quantum register ? classical register:"
     }
 
-    //std::clog << "Probabilities are ... (probabilities < 0.001 are omitted)\n";
-    for (std::size_t m = 0U; m < recordedProperties.size(); m++) {
-        if (recordedProperties[m].first == -2) {
-            meanStochTime = finalProperties[m];
-        } else if (recordedProperties[m].first == -1) {
-            approximationRuns = finalProperties[m];
-        } else if (finalProperties[m] > 0 || m < 2U) {
-            // Print all probabilities that are larger than 0, and always print the probabilities for state 0 and 1
-            std::string amplitude = recordedProperties[m].second;
-            std::replace(amplitude.begin(), amplitude.end(), '2', '1');
-            measureResult.emplace(amplitude, finalProperties[m]);
-        }
-    }
-    return measureResult;
+    return finalClassicalMeasurementsMap;
 }
 
 template<class Config>
-void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t                                        stochRun,
-                                                               qc::Qubit                                          nQubits,
-                                                               std::vector<double>&                               recordedPropertiesStorage,
-                                                               std::vector<std::pair<std::int64_t, std::string>>& recordedPropertiesList,
-                                                               std::map<std::string, unsigned int>&               classicalMeasurementsMap,
-                                                               std::uint64_t                                      localSeed) {
+void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stochRun, qc::Qubit nQubits, std::map<std::string, unsigned int>& classicalMeasurementsMap, std::uint64_t localSeed) {
     std::mt19937_64 generator(localSeed);
 
     const std::uint64_t numberOfRuns = stochasticRuns / maxInstances + (stochRun < stochasticRuns % maxInstances ? 1U : 0U);
@@ -217,7 +196,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
                         for (std::size_t i = 0U; i < quantum.size(); ++i) {
                             const auto result = localDD->measureOneCollapsing(localRootEdge, static_cast<dd::Qubit>(quantum.at(i)), true, generator);
                             assert(result == '0' || result == '1');
-                            classicValues[classic.at(i)] = (result == '0');
+                            classicValues[classic.at(i)] = (result == '1');
                         }
                     } else if (op->getType() == qc::Reset) {
                         // Reset qubit
@@ -226,11 +205,11 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
                             const auto result = localDD->measureOneCollapsing(localRootEdge, static_cast<dd::Qubit>(qubits.at(qubit)), true, generator);
                             if (result == '1') {
                                 const auto x   = qc::StandardOperation(qc->getNqubits(), qubit, qc::X);
-                                auto       tmp = Simulator<Config>::dd->multiply(dd::getDD(&x, Simulator<Config>::dd), Simulator<Config>::rootEdge);
-                                Simulator<Config>::dd->incRef(tmp);
-                                Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
-                                Simulator<Config>::rootEdge = tmp;
-                                Simulator<Config>::dd->garbageCollect();
+                                auto       tmp = localDD->multiply(dd::getDD(&x, localDD), localRootEdge);
+                                localDD->incRef(tmp);
+                                localDD->decRef(localRootEdge);
+                                localRootEdge = tmp;
+                                localDD->garbageCollect();
                             }
                         }
                     } else {
@@ -298,24 +277,18 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
         const auto t2 = std::chrono::steady_clock::now();
 
         if (!classicValues.empty()) {
-            std::string classicRegisterString;
-            for (const auto& [val, isSet]: classicValues) {
-                classicRegisterString.push_back(isSet ? '0' : '1');
-            }
-            classicalMeasurementsMap[classicRegisterString] += 1U;
-        }
+            const auto  cbits = qc->getNcbits();
+//            std::string classicRegisterString;
+            std::string classicRegisterString(qc->getNcbits(), '0');
 
-        for (std::size_t i = 0U; i < recordedPropertiesStorage.size(); i++) {
-            if (recordedPropertiesList[i].first == -2) {
-                recordedPropertiesStorage[i] += std::chrono::duration<double>(t2 - t1).count();
-            } else if (recordedPropertiesList[i].first == -1) {
-                recordedPropertiesStorage[i] += static_cast<double>(approxCount);
-            } else {
-                // extract amplitude for state
-                const auto basisVector = recordedPropertiesList[i].second;
-                const auto amplitude   = localRootEdge.getValueByPath(basisVector);
-                recordedPropertiesStorage[i] += std::norm(amplitude);
+            for (const auto& [bitIndex, value]: classicValues) {
+                classicRegisterString[cbits - bitIndex - 1] = value ? '1' : '0';
             }
+
+            //            for (const auto& [val, isSet]: classicValues) {
+            //                classicRegisterString.push_back(isSet ? '1' : '0');
+            //            }
+            classicalMeasurementsMap[classicRegisterString] += 1U;
         }
     }
 }

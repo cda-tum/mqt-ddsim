@@ -65,16 +65,16 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     if (vm["stoch_runs"].as<std::size_t>() > 0) {
         // Using stochastic simulator
         auto ddsim = std::make_unique<StochasticNoiseSimulator<>>(std::move(quantumComputation),
-                                                                  StochasticNoiseSimulator<>::Configuration(vm["noise_effects"].as<std::string>(),
+                                                                  vm["noise_effects"].as<std::string>(),
                                                                   vm["noise_prob"].as<double>(),
                                                                   noiseProbT1,
                                                                   vm["noise_prob_multi"].as<double>(),
                                                                   vm["stoch_runs"].as<size_t>(),
                                                                   vm["properties"].as<std::string>(),
                                                                   vm.count("unoptimized_sim"),
-                                                                  vm["seed"].as<std::size_t>()),
-                                                                  vm["steps"].as<unsigned int>(),
-                                                                  vm["step_fidelity"].as<double>());
+                                                                  vm["seed"].as<std::size_t>());
+//                                                                  vm["steps"].as<unsigned int>(),
+//                                                                  vm["step_fidelity"].as<double>();
 
         auto t1 = std::chrono::steady_clock::now();
 
