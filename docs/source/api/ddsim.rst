@@ -86,7 +86,7 @@ ddsim.unitarysimulator module
    :show-inheritance:
 
 ddsim.sampler module
--------------------------------------
+--------------------
 
 .. automodule:: mqt.ddsim.sampler
    :members:
