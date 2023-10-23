@@ -213,14 +213,13 @@ PYBIND11_MODULE(pyddsim, m) {
 
     // Stoch simulator
     auto stochasticNoiseSimulator = createSimulator<StochasticNoiseSimulator<>>(m, "StochasticNoiseSimulator");
-    stochasticNoiseSimulator.def(py::init<>(&constructSimulatorWithoutSeed<StochasticNoiseSimulator<>, std::string, double, std::optional<double>, double, std::size_t, std::string, bool, std::size_t>),
+    stochasticNoiseSimulator.def(py::init<>(&constructSimulatorWithoutSeed<StochasticNoiseSimulator<>, std::string, double, std::optional<double>, double, std::size_t, bool, std::size_t>),
                                  "circ"_a,
                                  "noiseEffects"_a          = "APD",
                                  "noiseProbability"_a      = 0.01,
                                  "ampDampingProbability"_a = 0.02,
                                  "multiQubitGateFactor"_a  = 2,
                                  "stochRuns"_a             = 1000,
-                                 "recordedProperties"_a    = "1-200",
                                  "unoptimizedSim"_a        = false,
                                  "seed"_a                  = 1);
 
