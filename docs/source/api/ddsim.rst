@@ -4,14 +4,6 @@ ddsim package
 Submodules
 ----------
 
-ddsim.error module
-------------------
-
-.. automodule:: mqt.ddsim.error
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 ddsim.hybridqasmsimulator module
 --------------------------------
 
