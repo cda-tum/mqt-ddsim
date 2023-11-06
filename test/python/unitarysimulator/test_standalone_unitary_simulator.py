@@ -16,7 +16,9 @@ class MQTStandaloneUnitarySimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
         self.circuit = circ
-        self.unitary: npt.NDArray[np.complex_] = np.zeros((2**circ.num_qubits, 2**circ.num_qubits), dtype=np.complex_)
+        self.unitary: npt.NDArray[np.complex128] = np.zeros(
+            (2**circ.num_qubits, 2**circ.num_qubits), dtype=np.complex128
+        )
         self.non_zeros_in_bell_circuit = 16
 
     def test_standalone_sequential_mode(self):

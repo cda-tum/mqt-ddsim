@@ -1,4 +1,5 @@
 """Backend for DDSIM Task-Based Simulator."""
+
 from __future__ import annotations
 
 import pathlib

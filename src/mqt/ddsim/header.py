@@ -1,4 +1,5 @@
 """Utilities for constructing a Qiskit experiment header for DDSIM backends."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

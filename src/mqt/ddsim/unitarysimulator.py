@@ -1,4 +1,5 @@
 """Backend for DDSIM Unitary Simulator."""
+
 from __future__ import annotations
 
 import time
@@ -67,7 +68,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
         sim = UnitarySimulator(qc, seed=seed, mode=construction_mode)
         sim.construct()
         # Extract resulting matrix from final DD and write data
-        unitary: npt.NDArray[np.complex_] = np.zeros((2**qc.num_qubits, 2**qc.num_qubits), dtype=np.complex_)
+        unitary: npt.NDArray[np.complex128] = np.zeros((2**qc.num_qubits, 2**qc.num_qubits), dtype=np.complex128)
         get_matrix(sim, unitary)
         end_time = time.time()
 

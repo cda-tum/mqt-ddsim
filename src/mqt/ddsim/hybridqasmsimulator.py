@@ -1,4 +1,5 @@
 """Backend for DDSIM Hybrid Schrodinger-Feynman Simulator."""
+
 from __future__ import annotations
 
 import time

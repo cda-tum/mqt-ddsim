@@ -1,4 +1,5 @@
 """Backend for DDSIM."""
+
 from __future__ import annotations
 
 from qiskit.transpiler import Target
