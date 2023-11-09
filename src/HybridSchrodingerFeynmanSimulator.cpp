@@ -82,7 +82,7 @@ bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(std::unique_ptr<dd:
         // check controls
         for (const auto& control: op->getControls()) {
             if (start <= control.qubit && control.qubit <= end) {
-                opControls.emplace(qc::Control{control.qubit, control.type});
+                opControls.emplace(control.qubit, control.type);
             } else { // other controls are set to the corresponding value
                 if (targetInSplit) {
                     isSplitOp              = true;
