@@ -13,7 +13,7 @@ protected:
     void SetUp() override {
         qc = std::make_unique<qc::QuantumComputation>(2U);
         qc->h(0U);
-        qc->x(1U, 0_pc);
+        qc->cx(0U, 1U);
     }
 
     std::unique_ptr<qc::QuantumComputation> qc;

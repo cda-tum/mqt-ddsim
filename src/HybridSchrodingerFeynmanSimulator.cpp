@@ -82,7 +82,7 @@ bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(std::unique_ptr<dd:
         // check controls
         for (const auto& control: op->getControls()) {
             if (start <= control.qubit && control.qubit <= end) {
-                opControls.emplace(qc::Control{control.qubit, control.type});
+                opControls.emplace(control.qubit, control.type);
             } else { // other controls are set to the corresponding value
                 if (targetInSplit) {
                     isSplitOp              = true;
@@ -151,7 +151,7 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned 
     const auto nqubits             = CircuitSimulator<Config>::getNumberOfQubits();
     const auto nresults            = static_cast<std::size_t>(std::ceil(static_cast<double>(maxControl) / static_cast<double>(nslicesOnOneCpu)));
     const auto lastLevel           = static_cast<std::size_t>(std::ceil(std::log2(nresults)));
-    Simulator<Config>::rootEdge    = qc::VectorDD::zero;
+    Simulator<Config>::rootEdge    = qc::VectorDD::zero();
 
     std::vector<std::vector<bool>> computed(ndecisions, std::vector<bool>(maxControl, false));
 
@@ -242,7 +242,7 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridAmplitudes(qc::Qub
     const auto nslicesOnOneCpu     = std::min<std::size_t>(64, chunkSize);
     const auto nqubits             = CircuitSimulator<Config>::getNumberOfQubits();
     const auto requiredVectors     = static_cast<std::size_t>(std::ceil(static_cast<double>(maxControl) / static_cast<double>(nslicesOnOneCpu)));
-    Simulator<Config>::rootEdge    = qc::VectorDD::zero;
+    Simulator<Config>::rootEdge    = qc::VectorDD::zero();
 
     std::vector<dd::CVec> amplitudes(requiredVectors, dd::CVec(1ULL << nqubits, 0));
 

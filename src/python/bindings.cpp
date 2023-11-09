@@ -7,7 +7,6 @@
 #include "HybridSchrodingerFeynmanSimulator.hpp"
 #include "PathSimulator.hpp"
 #include "UnitarySimulator.hpp"
-#include "python/qiskit/QasmQobjExperiment.hpp"
 #include "python/qiskit/QuantumCircuit.hpp"
 
 #include <memory>
@@ -21,8 +20,6 @@ using namespace pybind11::literals;
 static qc::QuantumComputation importCircuit(const py::object& circ) {
     const py::object quantumCircuit =
             py::module::import("qiskit").attr("QuantumCircuit");
-    const py::object pyQasmQobjExperiment =
-            py::module::import("qiskit.qobj").attr("QasmQobjExperiment");
 
     auto qc = qc::QuantumComputation();
 
@@ -31,11 +28,9 @@ static qc::QuantumComputation importCircuit(const py::object& circ) {
         qc.import(file);
     } else if (py::isinstance(circ, quantumCircuit)) {
         qc::qiskit::QuantumCircuit::import(qc, circ);
-    } else if (py::isinstance(circ, pyQasmQobjExperiment)) {
-        qc::qiskit::QasmQobjExperiment::import(qc, circ);
     } else {
         throw std::runtime_error(
-                "PyObject is neither py::str, QuantumCircuit, nor QasmQobjExperiment");
+                "PyObject is neither py::str nor QuantumCircuit");
     }
 
     return qc;
@@ -120,8 +115,7 @@ void getNumPyMatrix(UnitarySimulator<Config>& sim, py::array_t<std::complex<dd::
 }
 
 void dumpTensorNetwork(const py::object& circ, const std::string& filename) {
-    const py::object quantumCircuit       = py::module::import("qiskit").attr("QuantumCircuit");
-    const py::object pyQasmQobjExperiment = py::module::import("qiskit.qobj").attr("QasmQobjExperiment");
+    const py::object quantumCircuit = py::module::import("qiskit").attr("QuantumCircuit");
 
     std::unique_ptr<qc::QuantumComputation> qc = std::make_unique<qc::QuantumComputation>();
 
@@ -130,10 +124,8 @@ void dumpTensorNetwork(const py::object& circ, const std::string& filename) {
         qc->import(file1);
     } else if (py::isinstance(circ, quantumCircuit)) {
         qc::qiskit::QuantumCircuit::import(*qc, circ);
-    } else if (py::isinstance(circ, pyQasmQobjExperiment)) {
-        qc::qiskit::QasmQobjExperiment::import(*qc, circ);
     } else {
-        throw std::runtime_error("PyObject is neither py::str, QuantumCircuit, nor QasmQobjExperiment");
+        throw std::runtime_error("PyObject is neither py::str nor QuantumCircuit");
     }
     std::ofstream ofs(filename);
     qc->dump(ofs, qc::Format::Tensor);

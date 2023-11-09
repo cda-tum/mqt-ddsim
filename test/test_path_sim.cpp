@@ -45,7 +45,7 @@ TEST(TaskBasedSimTest, Configuration) {
 TEST(TaskBasedSimTest, SimpleCircuit) {
     auto qc = std::make_unique<qc::QuantumComputation>(2);
     qc->h(1U);
-    qc->x(0U, 1_pc);
+    qc->cx(1, 0);
 
     // construct simulator and generate sequential contraction plan
     PathSimulator tbs(std::move(qc), PathSimulator<>::Configuration());
@@ -64,7 +64,7 @@ TEST(TaskBasedSimTest, SimpleCircuit) {
 TEST(TaskBasedSimTest, SimpleCircuitArgumentConstructor) {
     auto qc = std::make_unique<qc::QuantumComputation>(2);
     qc->h(1U);
-    qc->x(0U, 1_pc);
+    qc->cx(1, 0);
 
     // construct simulator and generate sequential contraction plan
     PathSimulator tbs(std::move(qc), PathSimulator<>::Configuration::Mode::Sequential, 2, 0, {}, 12345U);
@@ -83,7 +83,7 @@ TEST(TaskBasedSimTest, SimpleCircuitArgumentConstructor) {
 TEST(TaskBasedSimTest, SimpleCircuitAssumeFalseOrder) {
     auto qc = std::make_unique<qc::QuantumComputation>(2);
     qc->h(1U);
-    qc->x(0U, 1_pc);
+    qc->cx(1, 0);
     PathSimulator tbs(std::move(qc), PathSimulator<>::Configuration());
     // construct simulator and generate sequential contraction plan
     PathSimulator<>::SimulationPath::Components path{};
@@ -104,9 +104,9 @@ TEST(TaskBasedSimTest, SimpleCircuitAssumeFalseOrder) {
 TEST(TaskBasedSimTest, SimpleCircuitBracket) {
     auto qc = std::make_unique<qc::QuantumComputation>(2);
     qc->h(1U);
-    qc->x(0U, 1_pc);
-    qc->x(0U, 1_pc);
-    qc->x(0U, 1_pc);
+    qc->cx(1, 0);
+    qc->cx(1, 0);
+    qc->cx(1, 0);
 
     // construct simulator and generate bracketing contraction plan
     auto config        = PathSimulator<>::Configuration{};
@@ -215,12 +215,12 @@ TEST(TaskBasedSimTest, EmptyCircuit) {
 TEST(TaskBasedSimTest, SimpleCircuitGatecost) {
     auto qc = std::make_unique<qc::QuantumComputation>(2);
     qc->h(1U);
-    qc->x(0U, 1_pc);
-    qc->x(0U, 1_pc);
-    qc->x(0U, 1_pc);
-    qc->x(0U, 1_pc);
-    qc->x(0U, 1_pc);
-    qc->x(0U, 1_pc);
+    qc->cx(1, 0);
+    qc->cx(1, 0);
+    qc->cx(1, 0);
+    qc->cx(1, 0);
+    qc->cx(1, 0);
+    qc->cx(1, 0);
 
     // construct simulator and generate gatecost contraction plan
     PathSimulator tbs(std::move(qc), PathSimulator<>::Configuration::Mode::GateCost, 2, 2, {1, 1}, 12345U);
@@ -236,12 +236,12 @@ TEST(TaskBasedSimTest, SimpleCircuitGatecost) {
 TEST(TaskBasedSimTest, SimpleCircuitGatecostConfigurationObject) {
     auto qc = std::make_unique<qc::QuantumComputation>(2);
     qc->h(1U);
-    qc->x(0U, 1_pc);
-    qc->x(0U, 1_pc);
-    qc->x(0U, 1_pc);
-    qc->x(0U, 1_pc);
-    qc->x(0U, 1_pc);
-    qc->x(0U, 1_pc);
+    qc->cx(1, 0);
+    qc->cx(1, 0);
+    qc->cx(1, 0);
+    qc->cx(1, 0);
+    qc->cx(1, 0);
+    qc->cx(1, 0);
 
     // construct simulator and generate gatecost contraction plan
     auto config          = PathSimulator<>::Configuration{};
