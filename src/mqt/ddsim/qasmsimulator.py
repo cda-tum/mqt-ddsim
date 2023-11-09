@@ -57,7 +57,11 @@ class QasmSimulatorBackend(BackendV2):
             return
         self._add_operations_to_target(self.target)
 
-    def __init__(self, name="qasm_simulator", description="MQT DDSIM QASM Simulator") -> None:
+    def __init__(
+        self,
+        name: str = "qasm_simulator",
+        description: str = "MQT DDSIM QASM Simulator",
+    ) -> None:
         super().__init__(name=name, description=description, backend_version=__version__)
         self._initialize_target()
 
@@ -73,11 +77,11 @@ class QasmSimulatorBackend(BackendV2):
         )
 
     @property
-    def target(self):
+    def target(self) -> Target:
         return self._TARGET
 
     @property
-    def max_circuits(self):
+    def max_circuits(self) -> int | None:
         return None
 
     @staticmethod
@@ -110,7 +114,7 @@ class QasmSimulatorBackend(BackendV2):
         self,
         quantum_circuits: QuantumCircuit | Sequence[QuantumCircuit],
         parameter_values: Sequence[Parameters] | None = None,
-        **options,
+        **options: Any,
     ) -> DDSIMJob:
         if isinstance(quantum_circuits, QuantumCircuit):
             quantum_circuits = [quantum_circuits]
@@ -128,7 +132,7 @@ class QasmSimulatorBackend(BackendV2):
         job_id: int,
         quantum_circuits: Sequence[QuantumCircuit],
         parameter_values: Sequence[Parameters] | None,
-        **options: dict[str, Any],
+        **options: Any,
     ) -> Result:
         self._validate(quantum_circuits)
         start = time.time()

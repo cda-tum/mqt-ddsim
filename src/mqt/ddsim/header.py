@@ -22,7 +22,7 @@ class DDSIMHeader(QobjExperimentHeader):
     qreg_sizes: list[tuple[str, int]]
     qubit_labels: list[tuple[str, int]]
 
-    def __init__(self, qc: QuantumCircuit):
+    def __init__(self, qc: QuantumCircuit) -> None:
         super().__init__()
         self.name = qc.name
         self.n_qubits = qc.num_qubits

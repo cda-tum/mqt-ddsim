@@ -71,8 +71,7 @@ def test_qasm_simulator(circuit: QuantumCircuit, backend: QasmSimulatorBackend, 
 
 
 def test_qasm_simulator_support_parametrized_gates(backend: QasmSimulatorBackend, shots: int):
-    """Test backend's adequate support of parametrized gates"""
-
+    """Test backend's adequate support of parametrized gates."""
     theta_a = Parameter("theta_a")
     theta_b = Parameter("theta_b")
     theta_c = Parameter("theta_c")
@@ -125,7 +124,7 @@ def test_qasm_simulator_approximation(backend: QasmSimulatorBackend, shots: int)
 
 
 def test_qasm_simulator_access(backend: QasmSimulatorBackend, shots: int):
-    """Test data counts output for multiple quantum circuits in a single job"""
+    """Test data counts output for multiple quantum circuits in a single job."""
     circuit_1 = QuantumCircuit(2, name="c1")
     circuit_2 = QuantumCircuit(2, name="c2")
     circuit_2.x(0)

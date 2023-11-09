@@ -11,11 +11,12 @@ if TYPE_CHECKING:
     from qiskit.circuit import Parameter
     from qiskit.circuit.parameterexpression import ParameterValueType
     from qiskit.providers import BackendV2
+    from qiskit.result import Result
 
     Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
 
 
-def requires_submit(func):
+def requires_submit(func: Callable[..., Any]) -> Callable[..., Any]:
     """Decorator to ensure that a submit has been performed before
     calling the method.
 
@@ -27,7 +28,7 @@ def requires_submit(func):
     """
 
     @functools.wraps(func)
-    def _wrapper(self, *args, **kwargs):
+    def _wrapper(self: DDSIMJob, *args: Any, **kwargs: Any) -> Any:  # noqa: ANN401
         if self._future is None:
             msg = "Job not submitted yet!. You have to .submit() first!"
             raise JobError(msg)
@@ -72,11 +73,15 @@ class DDSIMJob(JobV1):
             raise JobError(msg)
 
         self._future = self._executor.submit(
-            self._fn, self._job_id, self._experiments, self._parameter_values, **self._args
+            self._fn,
+            self._job_id,
+            self._experiments,
+            self._parameter_values,
+            **self._args,
         )
 
     @requires_submit
-    def result(self, timeout: float | None = None):
+    def result(self, timeout: float | None = None) -> Result:
         # pylint: disable=arguments-differ
         """Get job result. The behavior is the same as the underlying
         concurrent Future objects,

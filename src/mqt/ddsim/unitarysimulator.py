@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING, Sequence
+from typing import TYPE_CHECKING, Any, Sequence
 
 import numpy as np
 import numpy.typing as npt
@@ -42,14 +42,15 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
         super().__init__(name="unitary_simulator", description="MQT DDSIM Unitary Simulator")
 
     @classmethod
-    def _default_options(cls):
+    def _default_options(cls) -> Options:
         return Options(shots=1, mode="recursive", parameter_binds=None)
 
     @property
-    def target(self):
+    def target(self) -> Target:
         return self._US_TARGET
 
-    def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
+    @classmethod
+    def _run_experiment(cls, qc: QuantumCircuit, **options: Any) -> ExperimentResult:
         start_time = time.time()
         seed = options.get("seed", -1)
         mode = options.get("mode", "recursive")
@@ -94,9 +95,9 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
             header=DDSIMHeader(qc),
         )
 
-    def _validate(self, quantum_circuits: Sequence[QuantumCircuit]):
+    def _validate(self, quantum_circuits: Sequence[QuantumCircuit]) -> None:
         """Semantic validations of the quantum circuits which cannot be done via schemas.
-        Some of these may later move to backend schemas.
+
         1. No shots
         2. No measurements in the middle.
         """
@@ -113,7 +114,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
                 qc.metadata["shots"] = 1
 
             for obj in qc.data:
-                if obj[0].name in ["measure", "reset"]:
+                if obj[0].name in {"measure", "reset"}:
                     operation_name = obj[0].name
                     msg = f"Unsupported '{self.name}' instruction '{operation_name}' in circuit '{name}'."
                     raise QiskitError(msg)
