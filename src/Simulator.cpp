@@ -56,7 +56,7 @@ std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::
         q.pop();
         const dd::fp parentProb = probsMone[ptr];
 
-        if (ptr->e.at(0).p != nullptr && ptr->e.at(0).w != dd::Complex::zero) {
+        if (ptr->e.at(0).p != nullptr && !ptr->e.at(0).w.exactlyZero()) {
             if (probsMone.find(ptr->e.at(0).p) == probsMone.end()) {
                 q.push(ptr->e.at(0).p);
                 probsMone[ptr->e.at(0).p] = 0;
@@ -64,7 +64,7 @@ std::vector<std::priority_queue<std::pair<double, dd::vNode*>, std::vector<std::
             probsMone[ptr->e.at(0).p] = probsMone.at(ptr->e.at(0).p) + parentProb * CN::mag2(ptr->e.at(0).w);
         }
 
-        if (ptr->e.at(1).p != nullptr && ptr->e.at(1).w != dd::Complex::zero) {
+        if (ptr->e.at(1).p != nullptr && !ptr->e.at(1).w.exactlyZero()) {
             if (probsMone.find(ptr->e.at(1).p) == probsMone.end()) {
                 q.push(ptr->e.at(1).p);
                 probsMone[ptr->e.at(1).p] = 0;
@@ -137,7 +137,7 @@ double Simulator<Config>::approximateByFidelity(std::unique_ptr<dd::Package<Conf
 
     std::map<dd::vNode*, dd::vEdge> dagEdges;
     for (auto& it: nodesToRemove) {
-        dagEdges[it] = dd::vEdge::zero;
+        dagEdges[it] = dd::vEdge::zero();
     }
 
     dd::vEdge newEdge = removeNodes(localDD, edge, dagEdges);
@@ -228,7 +228,7 @@ double Simulator<Config>::approximateBySampling(std::unique_ptr<dd::Package<Conf
 
     std::map<dd::vNode*, dd::vEdge> dagEdges;
     for (auto* it: visitedNodes2) {
-        dagEdges[it] = dd::vEdge::zero;
+        dagEdges[it] = dd::vEdge::zero();
     }
 
     dd::vEdge   newEdge = removeNodes(localDD, edge, dagEdges);
@@ -278,11 +278,9 @@ dd::vEdge Simulator<Config>::removeNodes(std::unique_ptr<dd::Package<Config>>& l
     if (it != dagEdges.end()) {
         dd::vEdge r = it->second;
         if (r.w.approximatelyZero()) {
-            return dd::vEdge::zero;
+            return dd::vEdge::zero();
         }
-        dd::Complex c = localDD->cn.getTemporary();
-        dd::ComplexNumbers::mul(c, e.w, r.w);
-        r.w = localDD->cn.lookup(c);
+        r.w = localDD->cn.lookup(r.w * e.w);
         return r;
     }
 

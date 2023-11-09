@@ -151,7 +151,7 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(unsigned 
     const auto nqubits             = CircuitSimulator<Config>::getNumberOfQubits();
     const auto nresults            = static_cast<std::size_t>(std::ceil(static_cast<double>(maxControl) / static_cast<double>(nslicesOnOneCpu)));
     const auto lastLevel           = static_cast<std::size_t>(std::ceil(std::log2(nresults)));
-    Simulator<Config>::rootEdge    = qc::VectorDD::zero;
+    Simulator<Config>::rootEdge    = qc::VectorDD::zero();
 
     std::vector<std::vector<bool>> computed(ndecisions, std::vector<bool>(maxControl, false));
 
@@ -242,7 +242,7 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridAmplitudes(qc::Qub
     const auto nslicesOnOneCpu     = std::min<std::size_t>(64, chunkSize);
     const auto nqubits             = CircuitSimulator<Config>::getNumberOfQubits();
     const auto requiredVectors     = static_cast<std::size_t>(std::ceil(static_cast<double>(maxControl) / static_cast<double>(nslicesOnOneCpu)));
-    Simulator<Config>::rootEdge    = qc::VectorDD::zero;
+    Simulator<Config>::rootEdge    = qc::VectorDD::zero();
 
     std::vector<dd::CVec> amplitudes(requiredVectors, dd::CVec(1ULL << nqubits, 0));
 
