@@ -1,4 +1,5 @@
 """Sphinx configuration file."""
+
 from __future__ import annotations
 
 import subprocess
@@ -104,13 +105,20 @@ hoverxref_role_types = {
     "attr": "tooltip",
     "property": "tooltip",
 }
-exclude_patterns = ["_build", "build", "**.ipynb_checkpoints", "Thumbs.db", ".DS_Store", ".env"]
+exclude_patterns = [
+    "_build",
+    "build",
+    "**.ipynb_checkpoints",
+    "Thumbs.db",
+    ".DS_Store",
+    ".env",
+]
 
 
 class CDAStyle(UnsrtStyle):
     """Custom style for including PDF links."""
 
-    def format_url(self, _e: Entry) -> HRef:
+    def format_url(self, _e: Entry) -> HRef:  # noqa: PLR6301
         """Format URL field as a link to the PDF."""
         url = field("url", raw=True)
         return href()[url, "[PDF]"]
@@ -134,7 +142,7 @@ napoleon_numpy_docstring = False
 
 breathe_projects = {"mqt.ddsim": "../doxygen/xml"}
 breathe_default_project = "mqt.ddsim"
-subprocess.call("cd ..; doxygen", shell=True)
+subprocess.call("cd ..; doxygen", shell=True)  # noqa: S602, S607
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "furo"

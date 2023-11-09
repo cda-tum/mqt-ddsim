@@ -99,7 +99,7 @@ def test_transpilation_preserves_mcx_target_gates(target: Target, num_controls: 
     qc_transpiled = transpile(qc, target=target)
     assert len(qc_transpiled.data) == 1
     if mode == "noancilla":
-        assert qc_transpiled.data[0][0].name in ("mcx_gray", "mcx")
+        assert qc_transpiled.data[0][0].name in {"mcx_gray", "mcx"}
     elif mode == "recursion":
         assert qc_transpiled.data[0][0].name == "mcx_recursive"
     elif mode == "v-chain":
