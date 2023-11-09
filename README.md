@@ -15,7 +15,7 @@
 
 # MQT DDSIM - A quantum circuit simulator based on decision diagrams written in C++
 
-A tool for classical quantum circuit simulation developed as part of the [_Munich Quantum Toolkit_](https://mqt.readthedocs.io) (_MQT_)[^1] by the [Chair for Design Automation](https://www.cda.cit.tum.de/) at the [Technical University of Munich](https://www.tum.de/).
+A tool for classical quantum circuit simulation developed as part of the [_Munich Quantum Toolkit_](https://mqt.readthedocs.io) (_MQT_) by the [Chair for Design Automation](https://www.cda.cit.tum.de/) at the [Technical University of Munich](https://www.tum.de/).
 It builds upon [MQT Core](https://github.com/cda-tum/mqt-core), which forms the backbone of the MQT.
 
 <p align="center">
@@ -73,8 +73,6 @@ DDSIM has been developed based on methods proposed in the following papers:
 - L. Burgholzer, H. Bauer, and R. Wille, "[Hybrid Schrödinger-Feynman Simulation of Quantum Circuits With Decision Diagrams](https://www.cda.cit.tum.de/files/eda/2021_qce_hybrid_schrodinger_feynman_simulation_with_decision_diagrams.pdf)," Conference on Quantum Computing and Engineering (QCE), 2021
 - L. Burgholzer, A.Ploier, and R. Wille, "[Exploiting Arbitrary Paths for the Simulation of Quantum Circuits with Decision Diagrams](https://www.cda.cit.tum.de/files/eda/2022_date_exploiting_arbitrary_paths_simulation_quantum_circuits_decision_diagrams.pdf)," in Design, Automation and Test in Europe (DATE), 2022
 - T. Grurl, J. Fuß, and R. Wille, "[Noise-aware Quantum Circuit Simulation With Decision Diagrams](https://www.cda.cit.tum.de/files/eda/2022_tcad_noise-aware_quantum_circuit_simulation_with_decision_diagrams.pdf)," Transactions on CAD of Integrated Circuits and Systems (TCAD), 2022.
-
-[^1]: The Munich Quantum Toolkit was formerly known under the acronym _JKQ_ and developed by the [Institute for Integrated Circuits](https://iic.jku.at/eda/) at the [Johannes Kepler University Linz](https://jku.at)).
 
 ---
 
