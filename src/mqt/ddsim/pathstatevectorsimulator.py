@@ -1,4 +1,5 @@
 """Backend for DDSIM."""
+
 from __future__ import annotations
 
 from qiskit.transpiler import Target
@@ -22,5 +23,5 @@ class PathStatevectorSimulatorBackend(PathQasmSimulatorBackend):
         )
 
     @property
-    def target(self):
+    def target(self) -> Target:
         return self._Path_SV_TARGET

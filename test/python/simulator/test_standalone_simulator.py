@@ -52,8 +52,8 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         circ = QuantumCircuit(2)
         circ.h(0)
         circ.cry(np.pi / 8, 0, 1)
-        circ.i(0)
-        circ.i(0)
+        circ.id(0)
+        circ.id(0)
 
         # create a simulator that approximates once and by at most 2%
         sim = ddsim.CircuitSimulator(circ, approximation_step_fidelity=0.98, approximation_steps=1)
