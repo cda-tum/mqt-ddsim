@@ -35,9 +35,10 @@ TEST(CircuitSimTest, SingleOneQubitSingleShot) {
 }
 
 TEST(CircuitSimTest, SingleOneQubitSingleShot2) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, 0, 0);
+    std::cout << *quantumComputation << "\n";
     CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo(), 1337);
 
     ASSERT_EQ(ddsim.getNumberOfOps(), 2);
@@ -47,7 +48,7 @@ TEST(CircuitSimTest, SingleOneQubitSingleShot2) {
 }
 
 TEST(CircuitSimTest, SingleOneQubitMultiShots) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, 0, 0);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::H);
@@ -73,7 +74,7 @@ TEST(CircuitSimTest, BarrierStatement) {
 }
 
 TEST(CircuitSimTest, ClassicControlledOp) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, 0, 0);
     std::unique_ptr<qc::Operation> op(new qc::StandardOperation(2, 1, qc::X));
@@ -88,7 +89,7 @@ TEST(CircuitSimTest, ClassicControlledOp) {
 }
 
 TEST(CircuitSimTest, ClassicControlledOpAsNop) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
     quantumComputation->emplace_back<qc::NonUnitaryOperation>(2, 0, 0);
     std::unique_ptr<qc::Operation> op(new qc::StandardOperation(2, 1, qc::X));
@@ -242,7 +243,7 @@ TEST(CircuitSimTest, ApproximationTest) {
     // the following creates a state where the first qubit has a <2% probability of being 1
     auto qc = std::make_unique<qc::QuantumComputation>(2);
     qc->h(0);
-    qc->ry(1, qc::Control{0}, qc::PI / 8);
+    qc->cry(qc::PI / 8, 0, 1);
 
     // approximating the state with fidelity 0.98 should allow to eliminate the 1-successor of the first qubit
     CircuitSimulator ddsim(std::move(qc), ApproximationInfo(0.98, 2, ApproximationInfo::FidelityDriven));

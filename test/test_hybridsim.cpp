@@ -10,7 +10,7 @@ TEST(HybridSimTest, TrivialParallelDD) {
         auto qc = std::make_unique<qc::QuantumComputation>(4);
         qc->h(2);
         qc->h(1);
-        qc->x(0, {2_pc, 1_pc});
+        qc->mcx({2, 1}, 0);
         qc->i(1); // some dummy operations
         qc->i(1);
         return qc;
@@ -44,7 +44,7 @@ TEST(HybridSimTest, TrivialParallelAmplitude) {
         auto qc = std::make_unique<qc::QuantumComputation>(4);
         qc->h(2);
         qc->h(1);
-        qc->x(0, {2_pc, 1_pc});
+        qc->mcx({2, 1}, 0);
         qc->i(1); // some dummy operations
         qc->i(1);
         return qc;
@@ -169,7 +169,7 @@ TEST(HybridSimTest, GRCSTestFixedSeedDifferentVectorType) {
 }
 
 TEST(HybridSimTest, NonStandardOperation) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(1);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(1, 1);
     quantumComputation->h(0);
     quantumComputation->measure(0, 0);
     quantumComputation->barrier(0);
@@ -194,9 +194,9 @@ TEST(HybridSimTest, RegressionTestDDModeUnevenChunks) {
 
     auto qc = std::make_unique<qc::QuantumComputation>(2U);
     qc->x(0);
-    qc->x(1, 0_pc);
-    qc->x(0, 1_pc);
-    qc->x(1, 0_pc);
+    qc->cx(0, 1);
+    qc->cx(1, 0);
+    qc->cx(0, 1);
 
     const auto mode     = HybridSchrodingerFeynmanSimulator<>::Mode::DD;
     const auto nthreads = 3U;
@@ -216,9 +216,9 @@ TEST(HybridSimTest, RegressionTestAmplitudeModeUnevenChunks) {
 
     auto qc = std::make_unique<qc::QuantumComputation>(2U);
     qc->x(0);
-    qc->x(1, 0_pc);
-    qc->x(0, 1_pc);
-    qc->x(1, 0_pc);
+    qc->cx(0, 1);
+    qc->cx(1, 0);
+    qc->cx(0, 1);
 
     const auto mode     = HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude;
     const auto nthreads = 3U;
@@ -239,12 +239,12 @@ TEST(HybridSimTest, RegressionTestDDModeMoreChunksAsThreads) {
 
     auto qc = std::make_unique<qc::QuantumComputation>(2U);
     qc->x(0);
-    qc->x(1, 0_pc);
-    qc->x(0, 1_pc);
-    qc->x(1, 0_pc);
-    qc->x(1, 0_pc);
-    qc->x(0, 1_pc);
-    qc->x(1, 0_pc);
+    qc->cx(0, 1);
+    qc->cx(1, 0);
+    qc->cx(0, 1);
+    qc->cx(0, 1);
+    qc->cx(1, 0);
+    qc->cx(0, 1);
 
     const auto mode     = HybridSchrodingerFeynmanSimulator<>::Mode::DD;
     const auto nthreads = 2U;
@@ -265,14 +265,14 @@ TEST(HybridSimTest, RegressionTestAmplitudeModeMoreChunksAsThreads) {
 
     auto qc = std::make_unique<qc::QuantumComputation>(2U);
     qc->x(0);
-    qc->x(1, 0_pc);
-    qc->x(0, 1_pc);
-    qc->x(1, 0_pc);
-    qc->x(1, 0_pc);
-    qc->x(0, 1_pc);
-    qc->x(1, 0_pc);
-    qc->x(1, 0_pc);
-    qc->x(0, 1_pc);
+    qc->cx(0, 1);
+    qc->cx(1, 0);
+    qc->cx(0, 1);
+    qc->cx(0, 1);
+    qc->cx(1, 0);
+    qc->cx(0, 1);
+    qc->cx(0, 1);
+    qc->cx(1, 0);
 
     const auto mode     = HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude;
     const auto nthreads = 2U;

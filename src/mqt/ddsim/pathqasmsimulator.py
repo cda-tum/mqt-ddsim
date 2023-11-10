@@ -1,9 +1,10 @@
 """Backend for DDSIM Task-Based Simulator."""
+
 from __future__ import annotations
 
 import pathlib
 import time
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from quimb.tensor import Tensor, TensorNetwork
@@ -90,7 +91,11 @@ def get_simulation_path(
     tn = create_tensor_network(qc)
 
     opt = ctg.HyperOptimizer(
-        max_time=max_time, max_repeats=max_repeats, progbar=True, parallel=parallel_runs, minimize="flops"
+        max_time=max_time,
+        max_repeats=max_repeats,
+        progbar=True,
+        parallel=parallel_runs,
+        minimize="flops",
     )
     info = tn.contract(all, get="path-info", optimize=opt)
     path = linear_to_ssa(info.path)
@@ -122,7 +127,11 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
         DDSIMTargetBuilder.add_barrier(target)
         DDSIMTargetBuilder.add_measure(target)
 
-    def __init__(self, name="path_sim_qasm_simulator", description="MQT DDSIM Simulation Path Framework") -> None:
+    def __init__(
+        self,
+        name: str = "path_sim_qasm_simulator",
+        description: str = "MQT DDSIM Simulation Path Framework",
+    ) -> None:
         super().__init__(name=name, description=description)
 
     @classmethod
@@ -144,10 +153,10 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
         )
 
     @property
-    def target(self):
+    def target(self) -> Target:
         return self._PATH_TARGET
 
-    def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
+    def _run_experiment(self, qc: QuantumCircuit, **options: Any) -> ExperimentResult:
         start_time = time.time()
 
         pathsim_configuration = options.get("pathsim_configuration", PathSimulatorConfiguration())

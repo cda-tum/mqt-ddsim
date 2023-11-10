@@ -58,7 +58,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
             assert abs(target[key] - counts[key]) < threshold
 
     def test_qasm_simulator_access(self):
-        """Test data counts output for multiple quantum circuits in a single job"""
+        """Test data counts output for multiple quantum circuits in a single job."""
         shots = 1024
         circuit_1 = QuantumCircuit(2, name="c1")
         circuit_2 = QuantumCircuit(2, name="c2")

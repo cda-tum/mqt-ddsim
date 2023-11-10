@@ -1,8 +1,9 @@
 """Backend for DDSIM Hybrid Schrodinger-Feynman Simulator."""
+
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
@@ -33,7 +34,9 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
         DDSIMTargetBuilder.add_measure(target)
 
     def __init__(
-        self, name="hybrid_qasm_simulator", description="MQT DDSIM Hybrid Schrodinger-Feynman simulator"
+        self,
+        name: str = "hybrid_qasm_simulator",
+        description: str = "MQT DDSIM Hybrid Schrodinger-Feynman simulator",
     ) -> None:
         super().__init__(name=name, description=description)
 
@@ -48,10 +51,10 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
         )
 
     @property
-    def target(self):
+    def target(self) -> Target:
         return self._HSF_TARGET
 
-    def _run_experiment(self, qc: QuantumCircuit, **options) -> ExperimentResult:
+    def _run_experiment(self, qc: QuantumCircuit, **options: Any) -> ExperimentResult:
         start_time = time.time()
         seed = options.get("seed", -1)
         mode = options.get("mode", "amplitude")
@@ -75,7 +78,6 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
 
         shots = options.get("shots", 1024)
         if self._SHOW_STATE_VECTOR and shots > 0:
-            print("Statevector can only be shown if shots == 0 when using the amplitude hybrid simulation mode.")
             shots = 0
 
         counts = sim.simulate(shots)
