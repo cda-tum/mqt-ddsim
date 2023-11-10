@@ -26,7 +26,7 @@ class Sampler(BaseSampler):
     def __init__(
         self,
         options: dict | None = None,
-    ):
+    ) -> None:
         """Initialize a new DDSIM Sampler
 
         Args:
