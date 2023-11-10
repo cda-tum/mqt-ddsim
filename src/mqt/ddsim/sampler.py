@@ -44,10 +44,10 @@ class Sampler(BaseSampler):
         return self._transpiled_circuits
 
     @property
-    def backend(self):
+    def backend(self) -> QasmSimulatorBackend:
         return self._BACKEND
 
-    def _transpile(self):
+    def _transpile(self) -> None:
         """Transpiles circuits stored in the instance.
         Circuits are only transpiled once. If no new circuits are provided, compilation is skipped on further calls to the method
         """
@@ -66,7 +66,7 @@ class Sampler(BaseSampler):
         self,
         circuits: Sequence[QuantumCircuit],
         parameter_values: Sequence[Parameters],
-        **run_options,
+        **run_options: dict[str, Any],
     ) -> PrimitiveJob:
         """Stores circuits and parameters within the instance.
         Executes _call function.
@@ -97,7 +97,7 @@ class Sampler(BaseSampler):
         self,
         circuits: Sequence[int],
         parameter_values: Sequence[Parameters],
-        **run_options,
+        **run_options: dict[str, Any],
     ) -> SamplerResult:
         """Executes transpilation and runs DDSIM backend
 
@@ -109,7 +109,8 @@ class Sampler(BaseSampler):
 
         return self._postprocessing(result, circuits)
 
-    def _postprocessing(self, result: Result, circuits: Sequence[int]) -> SamplerResult:
+    @staticmethod
+    def _postprocessing(result: Result, circuits: Sequence[int]) -> SamplerResult:
         """Converts counts into quasi-probability distributions
 
         Returns:
