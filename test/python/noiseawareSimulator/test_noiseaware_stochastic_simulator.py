@@ -2,117 +2,62 @@ from __future__ import annotations
 
 import unittest
 
-from qiskit import BasicAer, QuantumCircuit, QuantumRegister, execute
+from qiskit import QuantumCircuit, QuantumRegister
 
-from mqt.ddsim.stochasticnoisesimulator import StochasticNoiseSimulatorBackend
+from mqt import ddsim
 
 
 class MQTStochQasmSimulatorTest(unittest.TestCase):
     """Runs backend checks, the Basic qasm_simulator tests from Qiskit Terra, and some additional tests for the Hybrid DDSIM QasmSimulator."""
 
-    def setUp(self):
-        self.backend = StochasticNoiseSimulatorBackend()
-        self.circuit = QuantumCircuit.from_qasm_str(
-            """OPENQASM 2.0;
-            include "qelib1.inc";
-            qreg q[3];
-            qreg r[3];
-            h q;
-            cx q, r;
-            creg c[3];
-            creg d[3];
-            barrier q;
-            measure q->c;
-            measure r->d;"""
-        )
-        self.circuit.name = "test"
-    #
-    # def test_configuration(self):
-    #     """Test backend.configuration()."""
-    #     return self.backend.configuration()
-    #
-    # def test_properties(self):
-    #     """Test backend.properties()."""
-    #     properties = self.backend.properties()
-    #     assert properties is None
-    #
-    # def test_status(self):
-    #     """Test backend.status()."""
-    #     return self.backend.status()
-    #
-    # def test_qasm_simulator_single_shot(self):
-    #     """Test single shot run."""
-    #     result = execute(self.circuit, self.backend, shots=1).result()
-    #     assert result.success
-    #
-    # def test_qasm_simulator(self):
-    #     """Test data counts output for single circuit run against reference."""
-    #     shots = 1024
-    #     result = execute(self.circuit, self.backend, shots=shots).result()
-    #     threshold = 0.04 * shots
-    #     counts = result.get_counts("test")
-    #     target = {
-    #         "100 100": shots / 8,
-    #         "011 011": shots / 8,
-    #         "101 101": shots / 8,
-    #         "111 111": shots / 8,
-    #         "000 000": shots / 8,
-    #         "010 010": shots / 8,
-    #         "110 110": shots / 8,
-    #         "001 001": shots / 8,
-    #     }
-    #
-    #     assert len(target) == len(counts)
-    #     for key in target:
-    #         assert key in counts
-    #         assert abs(target[key] - counts[key]) < threshold
-    #
-    # def test_basicaer_simulator(self):
-    #     """Test data counts output for single circuit run against reference."""
-    #     shots = 1024
-    #     result = execute(self.circuit, BasicAer.get_backend("qasm_simulator"), shots=shots).result()
-    #     threshold = 0.04 * shots
-    #     counts = result.get_counts("test")
-    #     target = {
-    #         "100 100": shots / 8,
-    #         "011 011": shots / 8,
-    #         "101 101": shots / 8,
-    #         "111 111": shots / 8,
-    #         "000 000": shots / 8,
-    #         "010 010": shots / 8,
-    #         "110 110": shots / 8,
-    #         "001 001": shots / 8,
-    #     }
-    #
-    #     assert len(target) == len(counts)
-    #     for key in target:
-    #         assert key in counts
-    #         assert abs(target[key] - counts[key]) < threshold
-    #
-    # def test_dd_mode_simulation(self):
-    #     """Test running a single circuit."""
-    #     q = QuantumRegister(4)
-    #     circ = QuantumCircuit(q)
-    #     circ.h(q)
-    #     circ.cz(3, 1)
-    #     circ.cz(2, 0)
-    #     circ.measure_all(inplace=True)
-    #     print(circ.draw(fold=-1))
-    #     self.circuit = circ
-    #     result = execute(self.circuit, self.backend, mode="dd").result()
-    #     assert result.success
-    #     return result
-    #
-    # def test_amplitude_mode_simulation(self):
-    #     """Test running a single circuit."""
-    #     q = QuantumRegister(4)
-    #     circ = QuantumCircuit(q)
-    #     circ.h(q)
-    #     circ.cz(3, 1)
-    #     circ.cz(2, 0)
-    #     circ.measure_all(inplace=True)
-    #     print(circ.draw(fold=-1))
-    #     self.circuit = circ
-    #     result = execute(self.circuit, self.backend, mode="amplitude").result()
-    #     assert result.success
-    #     return result
+    def setUp(self) -> None:
+        q = QuantumRegister(4)
+        circ = QuantumCircuit(q)
+        circ.x(0)
+        circ.x(1)
+        circ.h(3)
+        circ.cx(2, 3)
+        circ.t(0)
+        circ.t(1)
+        circ.t(2)
+        circ.tdg(3)
+        circ.cx(0, 1)
+        circ.cx(2, 3)
+        circ.cx(3, 0)
+        circ.cx(1, 2)
+        circ.cx(0, 1)
+        circ.cx(2, 3)
+        circ.tdg(0)
+        circ.tdg(1)
+        circ.tdg(2)
+        circ.t(3)
+        circ.cx(0, 1)
+        circ.cx(2, 3)
+        circ.s(3)
+        circ.cx(3, 0)
+        circ.h(3)
+
+        circ.measure_all(inplace=True)
+        self.circuit = circ
+        self.non_zeros_in_matrix = 16
+
+    def test_no_noise(self):
+        tolerance = 0
+        sim = ddsim.StochasticNoiseSimulator(self.circuit, noiseEffects="APD",
+                                             noiseProbability=0,
+                                             ampDampingProbability=0,
+                                             multiQubitGateFactor=2,
+                                             seed=1)
+        result = sim.simulate(1000)
+        assert abs(result['1001'] - 1000) < tolerance
+
+    def test_def_config(self):
+        tolerance = 50
+        sim = ddsim.StochasticNoiseSimulator(self.circuit, noiseEffects="APD",
+                                             noiseProbability=0.1,
+                                             ampDampingProbability=0.1,
+                                             multiQubitGateFactor=2,
+                                             seed=1)
+        result = sim.simulate(1000)
+        assert abs(result['0000'] - 211) < tolerance
+        assert abs(result['1000'] - 146) < tolerance
