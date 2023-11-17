@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import RealAmplitudes
@@ -38,7 +40,11 @@ def circuits() -> list[QuantumCircuit]:
     return [bell_1, bell_2, param_qc_1, param_qc_2]
 
 
-def compare_probs(prob: list[dict] | dict, target: list[dict] | dict):
+def compare_probs(
+    prob: list[dict[Any, float]] | dict[Any, float],
+    target: list[dict[Any, float]] | dict[Any, float],
+    tolerance: float = 0.035,
+):
     if not isinstance(prob, list):
         prob = [prob]
     if not isinstance(target, list):
@@ -49,15 +55,15 @@ def compare_probs(prob: list[dict] | dict, target: list[dict] | dict):
     for p, targ in zip(prob, target):
         for key, t_val in targ.items():
             if key in p:
-                assert abs(p[key] - t_val) < 0.1
+                assert abs(p[key] - t_val) < tolerance
             else:
-                assert abs(t_val) < 0.1
+                assert abs(t_val) < tolerance
 
 
 def test_sampler_run_single_circuit(circuits: list[QuantumCircuit], sampler: Sampler):
     """Test Sampler.run() with single circuits"""
     bell = circuits[0]
-    target = {0: 0.5, 3: 0.5, 1: 0, 2: 0}
+    target = {0: 0.5, 1: 0, 2: 0, 3: 0.5}
     target_binary = {"00": 0.5, "11": 0.5, "01": 0, "10": 0}
     result = sampler.run([bell]).result()
 
@@ -72,7 +78,7 @@ def test_sample_run_multiple_circuits(circuits: list[QuantumCircuit], sampler: S
     """Test Sampler.run() with multiple circuits."""
     bell_1 = circuits[0]
     bell_2 = circuits[1]
-    target = [{0: 0.5, 3: 0.5, 1: 0, 2: 0}, {1: 0.5, 2: 0.5, 3: 0, 0: 0}, {0: 0.5, 3: 0.5, 1: 0, 2: 0}]
+    target = [{0: 0.5, 1: 0, 2: 0, 3: 0.5}, {0: 0, 1: 0.5, 2: 0.5, 3: 0}, {0: 0.5, 1: 0, 2: 0, 3: 0.5}]
     result = sampler.run([bell_1, bell_2, bell_1]).result()
     compare_probs(result.quasi_dists, target)
 
@@ -85,7 +91,7 @@ def test_sampler_run_with_parameterized_circuits(circuits: list[QuantumCircuit],
         {"00": 0.1309248462975777, "01": 0.3608720796028448, "10": 0.09324865232050054, "11": 0.41495442177907715},
         {"00": 0.06282290651933871, "01": 0.02877144385576705, "10": 0.606654494132085, "11": 0.3017511554928094},
     ]
-    result = sampler.run([param_qc, param_qc], parameter_values).result()
+    result = sampler.run([param_qc, param_qc], parameter_values, shots=5000000).result()
     compare_probs(result.quasi_dists[0].binary_probabilities(), target[0])
     compare_probs(result.quasi_dists[1].binary_probabilities(), target[1])
 
@@ -105,12 +111,12 @@ def test_sequential_run(circuits: list[QuantumCircuit], sampler: Sampler):
     ]
 
     # First run
-    result = sampler.run(qc_1, parameter_values[0]).result()
+    result = sampler.run(qc_1, parameter_values[0], shots=5000000).result()
     compare_probs(result.quasi_dists[0].binary_probabilities(), target[0])
     number_stored_circuits_first_run = len(sampler.circuits)
 
     # Second run
-    result = sampler.run([qc_2, qc_1], [parameter_values[2], parameter_values[1]]).result()
+    result = sampler.run([qc_2, qc_1], [parameter_values[2], parameter_values[1]], shots=5000000).result()
     compare_probs(result.quasi_dists[0].binary_probabilities(), target[2])
     compare_probs(result.quasi_dists[1].binary_probabilities(), target[1])
     number_stored_circuits_second_run = len(sampler.circuits)
