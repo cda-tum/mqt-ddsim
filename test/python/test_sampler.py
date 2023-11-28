@@ -40,7 +40,7 @@ def circuits() -> list[QuantumCircuit]:
 
 def compare_probs(
     prob: list[dict[int | str, float]] | dict[int | str, float],
-    target: list[dict[int, float]] | dict[int | str, float],
+    target: list[dict[int | str, float]] | dict[int | str, float],
     tolerance: float = 0.045,
 ):
     if not isinstance(prob, list):
