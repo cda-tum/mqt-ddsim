@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Any
-
 import pytest
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import RealAmplitudes
@@ -41,8 +39,8 @@ def circuits() -> list[QuantumCircuit]:
 
 
 def compare_probs(
-    prob: list[dict[Any, float]] | dict[Any, float],
-    target: list[dict[Any, float]] | dict[Any, float],
+    prob: list[dict[int | str, float]] | dict[int | str, float],
+    target: list[dict[int, float]] | dict[int | str, float],
     tolerance: float = 0.045,
 ):
     if not isinstance(prob, list):

@@ -25,7 +25,7 @@ class Sampler(BaseSampler):
 
     def __init__(
         self,
-        options: dict | None = None,
+        options: dict[str, Any] | None = None,
     ) -> None:
         """Initialize a new DDSIM Sampler
 
@@ -34,7 +34,7 @@ class Sampler(BaseSampler):
         """
 
         super().__init__(options=options)
-        self._circuit_ids: dict[Sequence[Any], int] = {}
+        self._circuit_ids: dict[Sequence[int | tuple], int] = {}
 
     @property
     def backend(self) -> QasmSimulatorBackend:
@@ -44,7 +44,7 @@ class Sampler(BaseSampler):
         self,
         circuits: Sequence[QuantumCircuit],
         parameter_values: Sequence[Parameters],
-        **run_options: dict[str, Any],
+        **run_options: Any,
     ) -> PrimitiveJob:
         """Stores circuits and parameters within the instance.
         Executes _call function.
@@ -58,12 +58,13 @@ class Sampler(BaseSampler):
         """
         circuit_indices = []
         for circuit in circuits:
-            index = self._circuit_ids.get(_circuit_key(circuit))
+            key = _circuit_key(circuit)
+            index = self._circuit_ids.get(key)
             if index is not None:
                 circuit_indices.append(index)
             else:
                 circuit_indices.append(len(self._circuits))
-                self._circuit_ids[_circuit_key(circuit)] = len(self._circuits)
+                self._circuit_ids[key] = len(self._circuits)
                 self._circuits.append(circuit)
                 self._parameters.append(circuit.parameters)
 
@@ -75,7 +76,7 @@ class Sampler(BaseSampler):
         self,
         circuits: Sequence[int],
         parameter_values: Sequence[Parameters],
-        **run_options: dict[str, Any],
+        **run_options: Any,
     ) -> SamplerResult:
         """Runs DDSIM backend
 
