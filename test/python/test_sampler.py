@@ -45,23 +45,15 @@ def circuits() -> list[QuantumCircuit]:
 
 
 def compare_probs(
-    prob: list[dict[int | str, float]] | dict[int | str, float],
-    target: list[dict[int, float]] | dict[int, float] | dict[str, float],
+    prob: dict[int | str, float],
+    target: dict[int, float] | dict[str, float],
     tolerance: float = 0.01,
 ):
-    if not isinstance(prob, list):
-        prob = [prob]
-    if not isinstance(target, list):
-        target = [target]
-
-    assert len(prob) == len(target)
-
-    for p, targ in zip(prob, target):
-        for key, t_val in targ.items():
-            if key in p:
-                assert abs(p[key] - t_val) < tolerance
-            else:
-                assert abs(t_val) < tolerance
+    for key, t_val in target.items():
+        if key in prob:
+            assert abs(prob[key] - t_val) < tolerance
+        else:
+            assert abs(t_val) < tolerance
 
 
 def test_sampler_run_single_circuit(circuits: list[QuantumCircuit], sampler: Sampler, shots: int):
@@ -84,7 +76,9 @@ def test_sample_run_multiple_circuits(circuits: list[QuantumCircuit], sampler: S
     bell_2 = circuits[1]
     target = [{0: 0.5, 1: 0, 2: 0, 3: 0.5}, {0: 0, 1: 0.5, 2: 0.5, 3: 0}, {0: 0.5, 1: 0, 2: 0, 3: 0.5}]
     result = sampler.run([bell_1, bell_2, bell_1], shots=shots).result()
-    compare_probs(result.quasi_dists, target)
+    compare_probs(result.quasi_dists[0], target[0])
+    compare_probs(result.quasi_dists[1], target[1])
+    compare_probs(result.quasi_dists[2], target[2])
 
 
 def test_sampler_run_with_parameterized_circuits(circuits: list[QuantumCircuit], sampler: Sampler, shots: int):
