@@ -98,6 +98,8 @@ protected:
     std::size_t       approximationRuns{0};
     long double       finalFidelity{1.0L};
 
+    std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>> analyseCircuit();
+
     std::map<std::size_t, bool> singleShot(bool ignoreNonUnitaries);
 };
 

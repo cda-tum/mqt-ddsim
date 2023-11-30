@@ -58,7 +58,9 @@ std::unique_ptr<Simulator> constructSimulator(const py::object&  circ,
     } else if constexpr (std::is_same_v<Simulator, StochasticNoiseSimulator<>>) {
         return std::make_unique<Simulator>(std::move(qc),
                                            std::forward<Args>(args)..., stepFidelity, stepNumber);
-        //                                           StochasticNoiseSimulator<>::Configuration(std::forward<Args>(args)...));
+    } else if constexpr (std::is_same_v<Simulator, DeterministicNoiseSimulator<>>) {
+        return std::make_unique<Simulator>(std::move(qc),
+                                           std::forward<Args>(args)...);
     } else {
         if (seed < 0) {
             return std::make_unique<Simulator>(std::move(qc),
@@ -187,35 +189,19 @@ PYBIND11_MODULE(pyddsim, m) {
                          "seed"_a                        = -1)
             .def("expectation_value", &expectationValue, "observable"_a);
 
-    //    py::class_<StochasticNoiseSimulator<>::Configuration>(m, "StochasticNoiseSimulatorConfiguration", "Configuration options for the Stochastic Noise Simulator")
-    //            .def(py::init())
-    //            .def_readwrite("noise_effects", &StochasticNoiseSimulator<>::Configuration::noiseEffects,
-    //                           R"pbdoc(Setting the mode used for determining a simulation path)pbdoc")
-    //            .def_readwrite("bracket_size", &StochasticNoiseSimulator<>::Configuration::noiseProbability,
-    //                           R"pbdoc(Add description)pbdoc")
-    //            .def_readwrite("starting_point", &StochasticNoiseSimulator<>::Configuration::ampDampingProbability,
-    //                           R"pbdoc(Add description)pbdoc")
-    //            .def_readwrite("gate_cost", &StochasticNoiseSimulator<>::Configuration::multiQubitGateFactor,
-    //                           R"pbdoc(Add description)pbdoc")
-    //            .def_readwrite("gate_cost", &StochasticNoiseSimulator<>::Configuration::stochRuns,
-    //                           R"pbdoc(Add description)pbdoc")
-    //            .def_readwrite("gate_cost", &StochasticNoiseSimulator<>::Configuration::recordedProperties,
-    //                           R"pbdoc(Add description)pbdoc")
-    //            .def_readwrite("gate_cost", &StochasticNoiseSimulator<>::Configuration::unoptimizedSim,
-    //                           R"pbdoc(Add description)pbdoc")
-    //            .def_readwrite("seed", &StochasticNoiseSimulator<>::Configuration::seed,
-    //                           R"pbdoc(Seed for the simulator)pbdoc");
-
-    //    auto pathSimulator = createSimulator<PathSimulator<>>(m, "PathCircuitSimulator");
-    //    pathSimulator.def(py::init<>(&constructSimulatorWithoutSeed<PathSimulator<>, PathSimulator<>::Configuration&>),
-    //                      "circ"_a, "config"_a = PathSimulator<>::Configuration())
-    //            .def(py::init<>(&constructSimulatorWithoutSeed<PathSimulator<>, PathSimulator<>::Configuration::Mode&, const std::size_t&, const std::size_t&, const std::list<std::size_t>&, const std::size_t&>),
-    //                 "circ"_a, "mode"_a = PathSimulator<>::Configuration::Mode::Sequential, "bracket_size"_a = 2, "starting_point"_a = 0, "gate_cost"_a = std::list<std::size_t>{}, "seed"_a = 0)
-    //            .def("set_simulation_path", py::overload_cast<const PathSimulator<>::SimulationPath::Components&, bool>(&PathSimulator<>::setSimulationPath));
-
     // Stoch simulator
     auto stochasticNoiseSimulator = createSimulator<StochasticNoiseSimulator<>>(m, "StochasticNoiseSimulator");
     stochasticNoiseSimulator.def(py::init<>(&constructSimulatorWithoutSeed<StochasticNoiseSimulator<>, std::string, double, std::optional<double>, double, std::size_t>),
+                                 "circ"_a,
+                                 "noiseEffects"_a          = "APD",
+                                 "noiseProbability"_a      = 0.01,
+                                 "ampDampingProbability"_a = 0.02,
+                                 "multiQubitGateFactor"_a  = 2,
+                                 "seed"_a                  = 1);
+
+    // Deterministic simulator
+    auto deterministicNoiseSimulator = createSimulator<DeterministicNoiseSimulator<>>(m, "DeterministicNoiseSimulator");
+    deterministicNoiseSimulator.def(py::init<>(&constructSimulatorWithoutSeed<DeterministicNoiseSimulator<>, std::string, double, std::optional<double>, double, std::size_t>),
                                  "circ"_a,
                                  "noiseEffects"_a          = "APD",
                                  "noiseProbability"_a      = 0.01,

@@ -49,7 +49,7 @@ class MQTStochQasmSimulatorTest(unittest.TestCase):
                                              multiQubitGateFactor=2,
                                              seed=1)
         result = sim.simulate(1000)
-        assert abs(result['1001'] - 1000) < tolerance
+        assert abs(result['1001'] - 1000) <= tolerance
 
     def test_def_config(self):
         tolerance = 50

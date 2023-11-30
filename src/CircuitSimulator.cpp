@@ -10,36 +10,9 @@ std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_
     bool hasNonmeasurementNonUnitary = false;
     bool hasMeasurements             = false;
     bool measurementsLast            = true;
-
     std::map<std::size_t, std::size_t> measurementMap;
 
-    for (auto& op: *qc) {
-        if (op->isClassicControlledOperation() || (op->isNonUnitaryOperation() && op->getType() != qc::Measure && op->getType() != qc::Barrier)) {
-            hasNonmeasurementNonUnitary = true;
-        }
-        if (op->getType() == qc::Measure) {
-            auto* nonUnitaryOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get());
-            if (nonUnitaryOp == nullptr) {
-                throw std::runtime_error("Op with type Measurement could not be casted to NonUnitaryOperation");
-            }
-            hasMeasurements = true;
-
-            const auto& quantum = nonUnitaryOp->getTargets();
-            const auto& classic = nonUnitaryOp->getClassics();
-
-            if (quantum.size() != classic.size()) {
-                throw std::runtime_error("Measurement: Sizes of quantum and classic register mismatch.");
-            }
-
-            for (unsigned int i = 0; i < quantum.size(); ++i) {
-                measurementMap[quantum.at(i)] = classic.at(i);
-            }
-        }
-
-        if (hasMeasurements && op->isUnitary()) {
-            measurementsLast = false;
-        }
-    }
+    std::tie(hasNonmeasurementNonUnitary, hasMeasurements, measurementsLast, measurementMap) = CircuitSimulator<Config>::analyseCircuit();
 
     // easiest case: all gates are unitary --> simulate once and sample away on all qubits
     if (!hasNonmeasurementNonUnitary && !hasMeasurements) {
@@ -84,6 +57,43 @@ std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_
         measurementCounter[resultString]++;
     }
     return measurementCounter;
+}
+
+template<class Config>
+std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>> CircuitSimulator<Config>::analyseCircuit(){
+    bool hasNonmeasurementNonUnitary = false;
+    bool hasMeasurements             = false;
+    bool measurementsLast            = true;
+    std::map<std::size_t, std::size_t> measurementMap;
+
+    for (auto& op: *qc) {
+        if (op->isClassicControlledOperation() || (op->isNonUnitaryOperation() && op->getType() != qc::Measure && op->getType() != qc::Barrier)) {
+            hasNonmeasurementNonUnitary = true;
+        }
+        if (op->getType() == qc::Measure) {
+            auto* nonUnitaryOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get());
+            if (nonUnitaryOp == nullptr) {
+                throw std::runtime_error("Op with type Measurement could not be casted to NonUnitaryOperation");
+            }
+            hasMeasurements = true;
+
+            const auto& quantum = nonUnitaryOp->getTargets();
+            const auto& classic = nonUnitaryOp->getClassics();
+
+            if (quantum.size() != classic.size()) {
+                throw std::runtime_error("Measurement: Sizes of quantum and classic register mismatch.");
+            }
+
+            for (unsigned int i = 0; i < quantum.size(); ++i) {
+                measurementMap[quantum.at(i)] = classic.at(i);
+            }
+        }
+
+        if (hasMeasurements && op->isUnitary()) {
+            measurementsLast = false;
+        }
+    }
+    return std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>>{hasNonmeasurementNonUnitary, hasMeasurements,measurementsLast,measurementMap};
 }
 
 template<class Config>
