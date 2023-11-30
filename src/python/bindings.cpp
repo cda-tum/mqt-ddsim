@@ -194,12 +194,12 @@ PYBIND11_MODULE(pyddsim, m) {
     // Deterministic simulator
     auto deterministicNoiseSimulator = createSimulator<DeterministicNoiseSimulator<>>(m, "DeterministicNoiseSimulator");
     deterministicNoiseSimulator.def(py::init<>(&constructSimulatorWithoutSeed<DeterministicNoiseSimulator<>, std::string, double, std::optional<double>, double, std::size_t>),
-                                 "circ"_a,
-                                 "noiseEffects"_a          = "APD",
-                                 "noiseProbability"_a      = 0.01,
-                                 "ampDampingProbability"_a = 0.02,
-                                 "multiQubitGateFactor"_a  = 2,
-                                 "seed"_a                  = 1);
+                                    "circ"_a,
+                                    "noiseEffects"_a          = "APD",
+                                    "noiseProbability"_a      = 0.01,
+                                    "ampDampingProbability"_a = 0.02,
+                                    "multiQubitGateFactor"_a  = 2,
+                                    "seed"_a                  = 1);
 
     // Hybrid Schrödinger-Feynman Simulator
     py::enum_<HybridSchrodingerFeynmanSimulator<>::Mode>(m, "HybridMode")

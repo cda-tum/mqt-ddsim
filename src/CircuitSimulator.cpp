@@ -7,9 +7,9 @@
 
 template<class Config>
 std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_t shots) {
-    bool hasNonmeasurementNonUnitary = false;
-    bool hasMeasurements             = false;
-    bool measurementsLast            = true;
+    bool                               hasNonmeasurementNonUnitary = false;
+    bool                               hasMeasurements             = false;
+    bool                               measurementsLast            = true;
     std::map<std::size_t, std::size_t> measurementMap;
 
     std::tie(hasNonmeasurementNonUnitary, hasMeasurements, measurementsLast, measurementMap) = CircuitSimulator<Config>::analyseCircuit();
@@ -60,10 +60,10 @@ std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_
 }
 
 template<class Config>
-std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>> CircuitSimulator<Config>::analyseCircuit(){
-    bool hasNonmeasurementNonUnitary = false;
-    bool hasMeasurements             = false;
-    bool measurementsLast            = true;
+std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>> CircuitSimulator<Config>::analyseCircuit() {
+    bool                               hasNonmeasurementNonUnitary = false;
+    bool                               hasMeasurements             = false;
+    bool                               measurementsLast            = true;
     std::map<std::size_t, std::size_t> measurementMap;
 
     for (auto& op: *qc) {
@@ -93,7 +93,7 @@ std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>> CircuitSimulato
             measurementsLast = false;
         }
     }
-    return std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>>{hasNonmeasurementNonUnitary, hasMeasurements,measurementsLast,measurementMap};
+    return std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>>{hasNonmeasurementNonUnitary, hasMeasurements, measurementsLast, measurementMap};
 }
 
 template<class Config>

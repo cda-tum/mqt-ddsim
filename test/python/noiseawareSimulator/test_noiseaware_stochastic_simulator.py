@@ -43,21 +43,27 @@ class MQTStochQasmSimulatorTest(unittest.TestCase):
 
     def test_no_noise(self):
         tolerance = 0
-        sim = ddsim.StochasticNoiseSimulator(self.circuit, noiseEffects="APD",
-                                             noiseProbability=0,
-                                             ampDampingProbability=0,
-                                             multiQubitGateFactor=2,
-                                             seed=1)
+        sim = ddsim.StochasticNoiseSimulator(
+            self.circuit,
+            noiseEffects="APD",
+            noiseProbability=0,
+            ampDampingProbability=0,
+            multiQubitGateFactor=2,
+            seed=1,
+        )
         result = sim.simulate(1000)
-        assert abs(result['1001'] - 1000) <= tolerance
+        assert abs(result["1001"] - 1000) <= tolerance
 
     def test_def_config(self):
         tolerance = 50
-        sim = ddsim.StochasticNoiseSimulator(self.circuit, noiseEffects="APD",
-                                             noiseProbability=0.1,
-                                             ampDampingProbability=0.1,
-                                             multiQubitGateFactor=2,
-                                             seed=1)
+        sim = ddsim.StochasticNoiseSimulator(
+            self.circuit,
+            noiseEffects="APD",
+            noiseProbability=0.1,
+            ampDampingProbability=0.1,
+            multiQubitGateFactor=2,
+            seed=1,
+        )
         result = sim.simulate(1000)
-        assert abs(result['0000'] - 211) < tolerance
-        assert abs(result['1000'] - 146) < tolerance
+        assert abs(result["0000"] - 211) < tolerance
+        assert abs(result["1000"] - 146) < tolerance

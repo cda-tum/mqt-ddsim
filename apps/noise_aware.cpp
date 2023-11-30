@@ -73,8 +73,8 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
                                                                   vm["properties"].as<std::string>(),
                                                                   vm.count("unoptimized_sim"),
                                                                   vm["seed"].as<std::size_t>());
-//                                                                  vm["steps"].as<unsigned int>(),
-//                                                                  vm["step_fidelity"].as<double>();
+        //                                                                  vm["steps"].as<unsigned int>(),
+        //                                                                  vm["step_fidelity"].as<double>();
 
         auto t1 = std::chrono::steady_clock::now();
 

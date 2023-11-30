@@ -231,7 +231,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDCustomProb) {
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDWithShots) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2,2);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
     quantumComputation->emplace_back<qc::StandardOperation>(2, 1, qc::X);
     quantumComputation->measure(0, 0);
