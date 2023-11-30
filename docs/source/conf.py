@@ -1,4 +1,5 @@
 """Sphinx configuration file."""
+
 from __future__ import annotations
 
 import subprocess
@@ -10,6 +11,10 @@ from typing import TYPE_CHECKING
 import pybtex.plugin
 from pybtex.style.formatting.unsrt import Style as UnsrtStyle
 from pybtex.style.template import field, href
+
+if TYPE_CHECKING:
+    from pybtex.database import Entry
+    from pybtex.richtext import HRef
 
 ROOT = Path(__file__).parent.parent.resolve()
 
@@ -33,17 +38,16 @@ except ModuleNotFoundError:
 # Filter git details from version
 release = version.split("+")[0]
 
-if TYPE_CHECKING:
-    from pybtex.database import Entry
-    from pybtex.richtext import HRef
-
-# -- Project information -----------------------------------------------------
 project = "DDSIM"
 author = "Stefan Hillmich"
 language = "en"
 project_copyright = "Chair for Design Automation, Technical University of Munich"
 
-# -- General configuration ---------------------------------------------------
+master_doc = "index"
+
+templates_path = ["_templates"]
+html_css_files = ["custom.css"]
+
 extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
@@ -104,13 +108,20 @@ hoverxref_role_types = {
     "attr": "tooltip",
     "property": "tooltip",
 }
-exclude_patterns = ["_build", "build", "**.ipynb_checkpoints", "Thumbs.db", ".DS_Store", ".env"]
+exclude_patterns = [
+    "_build",
+    "build",
+    "**.ipynb_checkpoints",
+    "Thumbs.db",
+    ".DS_Store",
+    ".env",
+]
 
 
 class CDAStyle(UnsrtStyle):
     """Custom style for including PDF links."""
 
-    def format_url(self, _e: Entry) -> HRef:
+    def format_url(self, _e: Entry) -> HRef:  # noqa: PLR6301
         """Format URL field as a link to the PDF."""
         url = field("url", raw=True)
         return href()[url, "[PDF]"]
@@ -134,7 +145,7 @@ napoleon_numpy_docstring = False
 
 breathe_projects = {"mqt.ddsim": "../doxygen/xml"}
 breathe_default_project = "mqt.ddsim"
-subprocess.call("cd ..; doxygen", shell=True)
+subprocess.call("cd ..; doxygen", shell=True)  # noqa: S602, S607
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "furo"

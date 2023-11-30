@@ -1,4 +1,5 @@
 """Backend for DDSIM."""
+
 from __future__ import annotations
 
 from qiskit.transpiler import Target
@@ -19,5 +20,5 @@ class StatevectorSimulatorBackend(QasmSimulatorBackend):
         super().__init__(name="statevector_simulator", description="MQT DDSIM Statevector Simulator")
 
     @property
-    def target(self):
+    def target(self) -> Target:
         return self._SV_TARGET
