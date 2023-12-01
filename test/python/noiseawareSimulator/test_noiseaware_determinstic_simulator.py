@@ -46,52 +46,57 @@ class MQTDeterministicQasmSimulatorTest(unittest.TestCase):
         self.non_zeros_in_matrix = 16
 
     def test_no_noise(self):
-
-        for i in range(0, 20):
+        for i in range(20):
             tolerance = 0
             # sim = ddsim.DeterministicNoiseSimulator(self.circuit)
 
-            sim = ddsim.DeterministicNoiseSimulator(self.circuit,
-                                                 noiseEffects="",
-                                                 noiseProbability=0,
-                                                 ampDampingProbability=0,
-                                                 multiQubitGateFactor=2,
-                                                 seed=i)
+            sim = ddsim.DeterministicNoiseSimulator(
+                self.circuit,
+                noiseEffects="",
+                noiseProbability=0,
+                ampDampingProbability=0,
+                multiQubitGateFactor=2,
+                seed=i,
+            )
             result = sim.simulate(1000)
-            assert abs(result['1001'] - 1000) <= tolerance
+            assert abs(result["1001"] - 1000) <= tolerance
 
     def test_default_config(self):
         tolerance = 1000
         sim = ddsim.DeterministicNoiseSimulator(self.circuit)
 
         result = sim.simulate(1000)
-        assert abs(result['0000'] - 211) < tolerance
-        assert abs(result['1000'] - 146) < tolerance
+        assert abs(result["0000"] - 211) < tolerance
+        assert abs(result["1000"] - 146) < tolerance
 
     def test_custom_config(self):
         tolerance = 100000
-        for i in range(0, 20):
-            sim = ddsim.DeterministicNoiseSimulator(self.circuit,
-                                                    noiseEffects="APD",
-                                                    noiseProbability=0.01,
-                                                    ampDampingProbability=0.02,
-                                                    multiQubitGateFactor=1,
-                                                    seed=i)
+        for i in range(20):
+            sim = ddsim.DeterministicNoiseSimulator(
+                self.circuit,
+                noiseEffects="APD",
+                noiseProbability=0.01,
+                ampDampingProbability=0.02,
+                multiQubitGateFactor=1,
+                seed=i,
+            )
 
             result = sim.simulate(tolerance)
-            assert abs(result['0001'] - 148) < tolerance
-            assert abs(result['1001'] - 551) < tolerance
+            assert abs(result["0001"] - 148) < tolerance
+            assert abs(result["1001"] - 551) < tolerance
 
     def test_custom_config2(self):
         tolerance = 10000
-        for i in range(0, 20):
-            sim = ddsim.DeterministicNoiseSimulator(self.circuit,
-                                                    noiseEffects="APD",
-                                                    noiseProbability=0.01,
-                                                    ampDampingProbability=0.02,
-                                                    multiQubitGateFactor=1,
-                                                    seed=i)
+        for i in range(20):
+            sim = ddsim.DeterministicNoiseSimulator(
+                self.circuit,
+                noiseEffects="APD",
+                noiseProbability=0.01,
+                ampDampingProbability=0.02,
+                multiQubitGateFactor=1,
+                seed=i,
+            )
 
             result = sim.simulate(tolerance)
-            assert abs(result['0001'] - 148) < tolerance
-            assert abs(result['1001'] - 551) < tolerance
+            assert abs(result["0001"] - 148) < tolerance
+            assert abs(result["1001"] - 551) < tolerance

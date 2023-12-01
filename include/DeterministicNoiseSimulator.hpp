@@ -14,7 +14,7 @@ public:
                                 double                                    noiseProbability,
                                 std::optional<double>                     ampDampingProbability,
                                 double                                    multiQubitGateFactor,
-                                std::uint64_t seed_ = 0):
+                                std::uint64_t                             seed_ = 0):
         Simulator<Config>(seed_),
         qc(std::move(qc_)),
         noiseEffects(StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>::initializeNoiseEffects(noiseEffects_)),
@@ -30,7 +30,7 @@ public:
     explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, std::uint64_t seed_ = 0):
         DeterministicNoiseSimulator(std::move(qc_), std::string("APD"), 0.001, std::optional<double>{}, 2, seed_) {}
 
-    std::map<std::string, std::size_t> measureAllNonCollapsing2(std::size_t shots){
+    std::map<std::string, std::size_t> measureAllNonCollapsing2(std::size_t shots) {
         return sampleFromProbabilityMap(rootEdge.getSparseProbabilityVectorStrKeys(measurementThreshold), shots);
     }
 

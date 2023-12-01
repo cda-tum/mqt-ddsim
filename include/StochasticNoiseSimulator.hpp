@@ -20,13 +20,13 @@ template<class Config = StochasticNoiseSimulatorDDPackageConfig>
 class StochasticNoiseSimulator: public Simulator<Config> {
 public:
     explicit StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
-                                      std::string noiseEffects_ = "APD",
-                                      double noiseProbability_ = 0.001,
-                                      std::optional<double> ampDampingProbability_ = 0.002,
-                                      double multiQubitGateFactor_ = 2,
-                                      std::size_t seed_ = 0U,
-                                      const unsigned int stepNumber_ = 1,
-                                      const double stepFidelity_ = 1.0):
+                                      std::string                               noiseEffects_          = "APD",
+                                      double                                    noiseProbability_      = 0.001,
+                                      std::optional<double>                     ampDampingProbability_ = 0.002,
+                                      double                                    multiQubitGateFactor_  = 2,
+                                      std::size_t                               seed_                  = 0U,
+                                      const unsigned int                        stepNumber_            = 1,
+                                      const double                              stepFidelity_          = 1.0):
         Simulator<Config>(seed_),
         qc(std::move(qc_)),
         stepNumber(stepNumber_),

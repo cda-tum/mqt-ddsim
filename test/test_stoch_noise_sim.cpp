@@ -10,7 +10,7 @@ using namespace qc::literals;
 
 std::unique_ptr<qc::QuantumComputation> stochGetAdder4Circuit() {
     // circuit taken from https://github.com/pnnl/qasmbench
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4,4);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4, 4);
     quantumComputation->x(0);
     quantumComputation->x(1);
     quantumComputation->h(3);
@@ -43,7 +43,7 @@ std::unique_ptr<qc::QuantumComputation> stochGetAdder4Circuit() {
 }
 
 TEST(StochNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2,2);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
     quantumComputation->x(0);
     quantumComputation->measure(0, 0);
     quantumComputation->measure(1, 1);
@@ -57,7 +57,7 @@ TEST(StochNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
 }
 
 TEST(StochNoiseSimTest, ResetOp) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(1,1);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(1, 1);
     quantumComputation->x(0);
     quantumComputation->reset(0);
     quantumComputation->measure(0, 0);
@@ -202,7 +202,7 @@ TEST(StochNoiseSimTest, ResetOp) {
 //}
 
 TEST(StochNoiseSimTest, Reordering) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(3,3);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(3, 3);
     quantumComputation->h(0);
     quantumComputation->h(1);
     quantumComputation->barrier({0, 1, 2});
@@ -238,7 +238,7 @@ TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
 }
 
 TEST(StochNoiseSimTest, CheckQubitOrder) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4,4);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4, 4);
     quantumComputation->x(0);
 
     for (qc::Qubit i = 0; i < 4; i++) {
@@ -409,7 +409,7 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorUnoptimizedSim)
 }
 
 TEST(StochNoiseSimTest, TestingBarrierGate) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2,2);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
     quantumComputation->x(0);
     quantumComputation->h(1);
     quantumComputation->t(1);
