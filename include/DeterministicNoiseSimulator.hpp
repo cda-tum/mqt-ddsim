@@ -21,8 +21,7 @@ public:
         noiseProbSingleQubit(noiseProbability),
         ampDampingProbSingleQubit(ampDampingProbability ? ampDampingProbability.value() : noiseProbability * 2),
         noiseProbMultiQubit(noiseProbability * multiQubitGateFactor),
-        ampDampingProbMultiQubit(ampDampingProbSingleQubit * multiQubitGateFactor),
-        sequentiallyApplyNoise(false) {
+        ampDampingProbMultiQubit(ampDampingProbSingleQubit * multiQubitGateFactor){
         StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>::sanityCheckOfNoiseProbabilities(noiseProbability, ampDampingProbSingleQubit, multiQubitGateFactor);
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
@@ -69,8 +68,5 @@ private:
     double noiseProbMultiQubit{};
     double ampDampingProbMultiQubit{};
 
-    double measurementThreshold = 0.01;
-
-    bool sequentiallyApplyNoise{};
-    bool useDensityMatrixType{};
+    double measurementThreshold = 0.001;
 };
