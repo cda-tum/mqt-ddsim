@@ -20,7 +20,7 @@ template<class Config = StochasticNoiseSimulatorDDPackageConfig>
 class StochasticNoiseSimulator: public Simulator<Config> {
 public:
     explicit StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
-                                      std::string                               noiseEffects_          = "APD",
+                                      const std::string&                        noiseEffects_          = "APD",
                                       double                                    noiseProbability_      = 0.001,
                                       std::optional<double>                     ampDampingProbability_ = 0.002,
                                       double                                    multiQubitGateFactor_  = 2,
@@ -48,11 +48,11 @@ public:
     std::map<std::string, size_t>                    finalClassicalMeasurementsMap;
 
     std::map<std::string, std::size_t> simulate(std::size_t shots) override;
-    std::string                        measureAll(bool collapse = false) {
+    [[maybe_unused]] std::string       measureAll([[maybe_unused]] bool collapse = false) {
         throw std::runtime_error("Not supported for stochastic simulation!\n");
     }
 
-    char measureOneCollapsing(const qc::Qubit index, const bool assumeProbabilityNormalization = true) {
+    char measureOneCollapsing([[maybe_unused]] const qc::Qubit index, [[maybe_unused]] const bool assumeProbabilityNormalization = true) {
         throw std::runtime_error("Not supported for stochastic simulation!\n");
     }
 

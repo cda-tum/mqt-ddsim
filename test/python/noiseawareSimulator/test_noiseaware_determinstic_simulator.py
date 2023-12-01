@@ -48,8 +48,6 @@ class MQTDeterministicQasmSimulatorTest(unittest.TestCase):
     def test_no_noise(self):
         for i in range(20):
             tolerance = 0
-            # sim = ddsim.DeterministicNoiseSimulator(self.circuit)
-
             sim = ddsim.DeterministicNoiseSimulator(
                 self.circuit,
                 noiseEffects="",
@@ -62,41 +60,24 @@ class MQTDeterministicQasmSimulatorTest(unittest.TestCase):
             assert abs(result["1001"] - 1000) <= tolerance
 
     def test_default_config(self):
-        tolerance = 1000
+        tolerance = 50
         sim = ddsim.DeterministicNoiseSimulator(self.circuit)
 
         result = sim.simulate(1000)
-        assert abs(result["0000"] - 211) < tolerance
-        assert abs(result["1000"] - 146) < tolerance
+        assert abs(result["0001"] - 173) < tolerance
+        assert abs(result["1001"] - 414) < tolerance
 
     def test_custom_config(self):
-        tolerance = 100000
+        tolerance = 50
         for i in range(20):
             sim = ddsim.DeterministicNoiseSimulator(
                 self.circuit,
-                noiseEffects="APD",
-                noiseProbability=0.01,
-                ampDampingProbability=0.02,
-                multiQubitGateFactor=1,
+                noiseEffects="AP",
+                noiseProbability=0.001,
+                ampDampingProbability=0.002,
+                multiQubitGateFactor=2,
                 seed=i,
             )
 
-            result = sim.simulate(tolerance)
-            assert abs(result["0001"] - 148) < tolerance
-            assert abs(result["1001"] - 551) < tolerance
-
-    def test_custom_config2(self):
-        tolerance = 10000
-        for i in range(20):
-            sim = ddsim.DeterministicNoiseSimulator(
-                self.circuit,
-                noiseEffects="APD",
-                noiseProbability=0.01,
-                ampDampingProbability=0.02,
-                multiQubitGateFactor=1,
-                seed=i,
-            )
-
-            result = sim.simulate(tolerance)
-            assert abs(result["0001"] - 148) < tolerance
-            assert abs(result["1001"] - 551) < tolerance
+            result = sim.simulate(1000)
+            assert abs(result["1001"] - 936) < tolerance

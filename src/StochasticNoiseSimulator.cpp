@@ -55,7 +55,6 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
 
     //printf("Running %d times and using the dd at %p, using the cn object at %p\n", numberOfRuns, (void *) &package, (void *) &package->cn);
     for (std::size_t currentRun = 0U; currentRun < numberOfRuns; currentRun++) {
-        const auto t1 = std::chrono::steady_clock::now();
 
         auto localDD                      = std::make_unique<dd::Package<StochasticNoiseSimulatorDDPackageConfig>>(qc->getNqubits());
         auto stochasticNoiseFunctionality = dd::StochasticNoiseFunctionality<StochasticNoiseSimulatorDDPackageConfig>(
@@ -69,7 +68,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
         std::map<std::size_t, bool> classicValues;
 
         std::size_t opCount     = 0U;
-        std::size_t approxCount = 0U;
+        [[maybe_unused]] std::size_t approxCount = 0U;
 
         dd::vEdge localRootEdge = localDD->makeZeroState(static_cast<dd::Qubit>(nQubits));
         localDD->incRef(localRootEdge);
@@ -112,9 +111,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
                     throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
                 }
             } else {
-                dd::mEdge    operation{};
-                qc::Targets  targets;
-                qc::Controls controls;
+                dd::mEdge    operation;
                 if (op->isClassicControlledOperation()) {
                     // Check if the operation is controlled by a classical register
                     auto* classicOp = dynamic_cast<qc::ClassicControlledOperation*>(op.get());
@@ -132,14 +129,12 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
                         expValue = expValue >> 1U;
                     }
                     operation = dd::getDD(classicOp->getOperation(), localDD);
-                    targets   = classicOp->getOperation()->getTargets();
-                    controls  = classicOp->getOperation()->getControls();
                     if (!executeOp) {
                         continue;
                     }
                 } else {
-                    targets  = op->getTargets();
-                    controls = op->getControls();
+                    const auto targets  = op->getTargets();
+                    const auto controls = op->getControls();
 
                     if (targets.size() == 1 && controls.empty()) {
                         auto* oper = localDD->stochasticNoiseOperationCache.lookup(op->getType(), static_cast<dd::Qubit>(targets.front()));
@@ -167,7 +162,6 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
             opCount++;
         }
         localDD->decRef(localRootEdge);
-        const auto t2 = std::chrono::steady_clock::now();
 
         if (!classicValues.empty()) {
             const auto  cbits = qc->getNcbits();

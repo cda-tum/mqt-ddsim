@@ -10,7 +10,7 @@ template<class Config = DensityMatrixSimulatorDDPackageConfig>
 class DeterministicNoiseSimulator: public Simulator<Config> {
 public:
     DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
-                                const std::string                         noiseEffects_,
+                                const std::string&                        noiseEffects_,
                                 double                                    noiseProbability,
                                 std::optional<double>                     ampDampingProbability,
                                 double                                    multiQubitGateFactor,

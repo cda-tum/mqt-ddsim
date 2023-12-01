@@ -124,7 +124,7 @@ std::map<std::size_t, bool> DeterministicNoiseSimulator<Config>::deterministicSi
                     assert(quantum.size() == classic.size()); // this should not happen do to check in Simulate
 
                     for (std::size_t i = 0U; i < quantum.size(); ++i) {
-                        char result;
+                        char result = '2';
                         std::tie(rootEdge, result) = Simulator<Config>::dd->measureOneCollapsing(rootEdge, static_cast<dd::Qubit>(quantum.at(i)), Simulator<Config>::mt);
                         assert(result == '0' || result == '1');
                         classicValues[classic.at(i)] = (result == '1');
@@ -135,7 +135,7 @@ std::map<std::size_t, bool> DeterministicNoiseSimulator<Config>::deterministicSi
                     // Reset qubit
                     auto qubits = nuOp->getTargets();
                     for (const auto& qubit: qubits) {
-                        char result;
+                        char result = '2';
                         std::tie(rootEdge, result) = Simulator<Config>::dd->measureOneCollapsing(rootEdge, static_cast<dd::Qubit>(qubits.at(qubit)), Simulator<Config>::mt);
                         if (result == '1') {
                             const auto x         = qc::StandardOperation(qc->getNqubits(), qubit, qc::X);
