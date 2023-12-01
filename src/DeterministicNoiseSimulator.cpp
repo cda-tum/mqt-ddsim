@@ -108,8 +108,7 @@ std::map<std::size_t, bool> DeterministicNoiseSimulator<Config>::deterministicSi
             noiseProbMultiQubit,
             ampDampingProbSingleQubit,
             ampDampingProbMultiQubit,
-            noiseEffects,
-            sequentiallyApplyNoise);
+            noiseEffects);
 
     for (auto const& op: *qc) {
         Simulator<Config>::dd->garbageCollect();
