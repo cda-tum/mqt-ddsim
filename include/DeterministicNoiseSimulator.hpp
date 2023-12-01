@@ -21,7 +21,7 @@ public:
         noiseProbSingleQubit(noiseProbability),
         ampDampingProbSingleQubit(ampDampingProbability ? ampDampingProbability.value() : noiseProbability * 2),
         noiseProbMultiQubit(noiseProbability * multiQubitGateFactor),
-        ampDampingProbMultiQubit(ampDampingProbSingleQubit * multiQubitGateFactor){
+        ampDampingProbMultiQubit(ampDampingProbSingleQubit * multiQubitGateFactor) {
         StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>::sanityCheckOfNoiseProbabilities(noiseProbability, ampDampingProbSingleQubit, multiQubitGateFactor);
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
