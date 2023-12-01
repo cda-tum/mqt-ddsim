@@ -36,17 +36,6 @@ def lint(session: nox.Session) -> None:
     session.run("pre-commit", "run", "--all-files", *session.posargs)
 
 
-@nox.session(reuse_venv=True)
-def pylint(session: nox.Session) -> None:
-    """Run PyLint.
-
-    Simply execute `nox -rs pylint` to run PyLint.
-    """
-    session.install(*BUILD_REQUIREMENTS)
-    session.install("--no-build-isolation", "-ve.", "pylint")
-    session.run("pylint", "mqt.ddsim", *session.posargs)
-
-
 def _run_tests(
     session: nox.Session,
     *,
