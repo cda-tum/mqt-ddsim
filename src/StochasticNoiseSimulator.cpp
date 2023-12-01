@@ -55,7 +55,6 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
 
     //printf("Running %d times and using the dd at %p, using the cn object at %p\n", numberOfRuns, (void *) &package, (void *) &package->cn);
     for (std::size_t currentRun = 0U; currentRun < numberOfRuns; currentRun++) {
-
         auto localDD                      = std::make_unique<dd::Package<StochasticNoiseSimulatorDDPackageConfig>>(qc->getNqubits());
         auto stochasticNoiseFunctionality = dd::StochasticNoiseFunctionality<StochasticNoiseSimulatorDDPackageConfig>(
                 localDD,
@@ -67,7 +66,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
 
         std::map<std::size_t, bool> classicValues;
 
-        std::size_t opCount     = 0U;
+        std::size_t                  opCount     = 0U;
         [[maybe_unused]] std::size_t approxCount = 0U;
 
         dd::vEdge localRootEdge = localDD->makeZeroState(static_cast<dd::Qubit>(nQubits));
@@ -111,7 +110,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
                     throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
                 }
             } else {
-                dd::mEdge    operation;
+                dd::mEdge operation;
                 if (op->isClassicControlledOperation()) {
                     // Check if the operation is controlled by a classical register
                     auto* classicOp = dynamic_cast<qc::ClassicControlledOperation*>(op.get());

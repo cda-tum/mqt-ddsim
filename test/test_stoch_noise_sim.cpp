@@ -69,10 +69,9 @@ TEST(StochNoiseSimTest, ResetOp) {
     ASSERT_EQ(static_cast<double>(m.find("0")->second), 1);
 }
 
-
 TEST(StochNoiseSimTest, ApproximateByFidelity) {
     auto                     quantumComputation = stochGetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("APD"), 0.1, std::optional<double>{}, 2, 1,1, 0.8);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("APD"), 0.1, std::optional<double>{}, 2, 1, 1, 0.8);
 
     auto m = ddsim.simulate(1000);
 
@@ -336,7 +335,7 @@ TEST(StochNoiseSimTest, TestingWithEmpthyNoiseTypes) {
     auto                     quantumComputation = stochGetAdder4Circuit();
     StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string(""), 0.1, std::optional<double>{}, 2);
 
-    auto         m         = ddsim.simulate(1000);
+    auto m = ddsim.simulate(1000);
     EXPECT_EQ(static_cast<double>(m.find("1001")->second), 1000);
 }
 
