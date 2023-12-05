@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+from typing import TypeVar
+
 import pytest
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import RealAmplitudes
 from qiskit.primitives import SamplerResult
 
 from mqt.ddsim.primitives import Sampler
+
+T = TypeVar("T", str, int)
 
 
 @pytest.fixture()
@@ -45,10 +49,10 @@ def circuits() -> list[QuantumCircuit]:
 
 
 def compare_probs(
-    prob: list[dict[Any, float]] | dict[Any, float],
-    target: list[dict[Any, float]] | dict[Any, float],
+    prob: list[dict[T, float]] | dict[T, float],
+    target: list[dict[T, float]] | dict[T, float],
     tolerance: float = 0.01,
-):
+) -> None:
     if not isinstance(prob, list):
         prob = [prob]
     if not isinstance(target, list):
@@ -64,7 +68,7 @@ def compare_probs(
                 assert abs(t_val) < tolerance
 
 
-def test_sampler_run_single_circuit(circuits: list[QuantumCircuit], sampler: Sampler, shots: int):
+def test_sampler_run_single_circuit(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
     """Test Sampler.run() with single circuits"""
     bell = circuits[0]
     target = {0: 0.5, 1: 0, 2: 0, 3: 0.5}
@@ -78,7 +82,7 @@ def test_sampler_run_single_circuit(circuits: list[QuantumCircuit], sampler: Sam
     compare_probs(result.quasi_dists[0].binary_probabilities(), target_binary)
 
 
-def test_sample_run_multiple_circuits(circuits: list[QuantumCircuit], sampler: Sampler, shots: int):
+def test_sample_run_multiple_circuits(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
     """Test Sampler.run() with multiple circuits."""
     bell_1 = circuits[0]
     bell_2 = circuits[1]
@@ -87,7 +91,7 @@ def test_sample_run_multiple_circuits(circuits: list[QuantumCircuit], sampler: S
     compare_probs(result.quasi_dists, target)
 
 
-def test_sampler_run_with_parameterized_circuits(circuits: list[QuantumCircuit], sampler: Sampler, shots: int):
+def test_sampler_run_with_parameterized_circuits(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
     """Test Sampler.run() with parameterized circuits."""
     param_qc = circuits[2]
     parameter_values = [[0, 1, 1, 2, 3, 5], [1, 2, 3, 4, 5, 6]]
@@ -110,7 +114,7 @@ def test_sampler_run_with_parameterized_circuits(circuits: list[QuantumCircuit],
     compare_probs(result.quasi_dists[1].binary_probabilities(), target[1])
 
 
-def test_sequential_run(circuits: list[QuantumCircuit], sampler: Sampler, shots: int):
+def test_sequential_run(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
     """Sampler stores the information about the circuits in an instance attribute.
     If the same instance is used multiple times, the attribute still keeps the information about the circuits involved in previous runs.
     This test ensures that if a circuit is analyzed in different runs, the information about this circuit is not saved twice.
