@@ -53,6 +53,7 @@ class Sampler(BaseSampler):
         Args:
             circuits: List of quantum circuits to simulate
             parameter_values: List of parameters associated with those circuits
+            run_options: Additional run options.
 
         Returns:
             PrimitiveJob.
@@ -81,8 +82,13 @@ class Sampler(BaseSampler):
     ) -> SamplerResult:
         """Runs DDSIM backend
 
+        Args:
+            circuits: List of circuit indices to simulate
+            parameter_values: List of parameters associated with those circuits
+            run_options: Additional run options.
+
         Returns:
-            SamplerResult.
+            The result of the sampling process.
         """
 
         result = self.backend.run([self._circuits[i] for i in circuits], parameter_values, **run_options).result()
@@ -93,8 +99,12 @@ class Sampler(BaseSampler):
     def _postprocessing(result: Result, circuits: Sequence[int]) -> SamplerResult:
         """Converts counts into quasi-probability distributions
 
+        Args:
+            result: Result from DDSIM backend
+            circuits: List of circuit indices
+
         Returns:
-            SamplerResult.
+            The result of the sampling process.
         """
 
         counts = result.get_counts()
