@@ -17,9 +17,7 @@ if TYPE_CHECKING:
     from qiskit.circuit.parameterexpression import ParameterValueType
     from qiskit.circuit.quantumcircuit import QuantumCircuit
 
-    Parameters = Union[
-        Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]
-    ]
+    Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
 
 
 class Sampler(BaseSampler):
@@ -94,9 +92,7 @@ class Sampler(BaseSampler):
             The result of the sampling process.
         """
 
-        result = self.backend.run(
-            [self._circuits[i] for i in circuits], parameter_values, **run_options
-        ).result()
+        result = self.backend.run([self._circuits[i] for i in circuits], parameter_values, **run_options).result()
 
         return self._postprocessing(result, circuits)
 
@@ -117,9 +113,7 @@ class Sampler(BaseSampler):
             counts = [counts]
 
         shots = sum(counts[0].values())
-        metadata: list[dict[str, Any]] = [
-            {"shots": shots} for _ in range(len(circuits))
-        ]
+        metadata: list[dict[str, Any]] = [{"shots": shots} for _ in range(len(circuits))]
         probabilities = [
             QuasiDistribution(
                 {k: v / shots for k, v in count.items()},
