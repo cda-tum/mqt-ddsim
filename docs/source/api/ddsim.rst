@@ -85,6 +85,14 @@ ddsim.unitarysimulator module
    :undoc-members:
    :show-inheritance:
 
+ddsim.primitives module
+-----------------------
+
+.. automodule:: mqt.ddsim.primitives
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

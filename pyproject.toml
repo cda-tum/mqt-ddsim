@@ -34,7 +34,7 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-    "qiskit-terra>=0.20.0"
+    "qiskit-terra>=0.22.1"
 ]
 dynamic = ["version"]
 
