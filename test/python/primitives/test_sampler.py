@@ -5,7 +5,7 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import RealAmplitudes
 from qiskit.primitives import SamplerResult
 
-from mqt.ddsim.sampler import Sampler
+from mqt.ddsim.primitives import Sampler
 
 
 @pytest.fixture()
@@ -45,15 +45,23 @@ def circuits() -> list[QuantumCircuit]:
 
 
 def compare_probs(
-    prob: dict[int | str, float],
-    target: dict[int, float] | dict[str, float],
+    prob: list[dict[Any, float]] | dict[Any, float],
+    target: list[dict[Any, float]] | dict[Any, float],
     tolerance: float = 0.01,
 ):
-    for key, t_val in target.items():
-        if key in prob:
-            assert abs(prob[key] - t_val) < tolerance
-        else:
-            assert abs(t_val) < tolerance
+    if not isinstance(prob, list):
+        prob = [prob]
+    if not isinstance(target, list):
+        target = [target]
+
+    assert len(prob) == len(target)
+
+    for p, targ in zip(prob, target):
+        for key, t_val in targ.items():
+            if key in p:
+                assert abs(p[key] - t_val) < tolerance
+            else:
+                assert abs(t_val) < tolerance
 
 
 def test_sampler_run_single_circuit(circuits: list[QuantumCircuit], sampler: Sampler, shots: int):
@@ -64,7 +72,7 @@ def test_sampler_run_single_circuit(circuits: list[QuantumCircuit], sampler: Sam
     result = sampler.run([bell], shots=shots).result()
 
     assert isinstance(result, SamplerResult)
-    assert result.quasi_dists[0].shots == 32768
+    assert result.quasi_dists[0].shots == shots
 
     compare_probs(result.quasi_dists[0], target)
     compare_probs(result.quasi_dists[0].binary_probabilities(), target_binary)
@@ -76,9 +84,7 @@ def test_sample_run_multiple_circuits(circuits: list[QuantumCircuit], sampler: S
     bell_2 = circuits[1]
     target = [{0: 0.5, 1: 0, 2: 0, 3: 0.5}, {0: 0, 1: 0.5, 2: 0.5, 3: 0}, {0: 0.5, 1: 0, 2: 0, 3: 0.5}]
     result = sampler.run([bell_1, bell_2, bell_1], shots=shots).result()
-    compare_probs(result.quasi_dists[0], target[0])
-    compare_probs(result.quasi_dists[1], target[1])
-    compare_probs(result.quasi_dists[2], target[2])
+    compare_probs(result.quasi_dists, target)
 
 
 def test_sampler_run_with_parameterized_circuits(circuits: list[QuantumCircuit], sampler: Sampler, shots: int):
@@ -86,8 +92,18 @@ def test_sampler_run_with_parameterized_circuits(circuits: list[QuantumCircuit],
     param_qc = circuits[2]
     parameter_values = [[0, 1, 1, 2, 3, 5], [1, 2, 3, 4, 5, 6]]
     target = [
-        {"00": 0.1309248462975777, "01": 0.3608720796028448, "10": 0.09324865232050054, "11": 0.41495442177907715},
-        {"00": 0.06282290651933871, "01": 0.02877144385576705, "10": 0.606654494132085, "11": 0.3017511554928094},
+        {
+            "00": 0.1309248462975777,
+            "01": 0.3608720796028448,
+            "10": 0.09324865232050054,
+            "11": 0.41495442177907715,
+        },
+        {
+            "00": 0.06282290651933871,
+            "01": 0.02877144385576705,
+            "10": 0.606654494132085,
+            "11": 0.3017511554928094,
+        },
     ]
     result = sampler.run([param_qc, param_qc], parameter_values, shots=shots).result()
     compare_probs(result.quasi_dists[0].binary_probabilities(), target[0])
@@ -101,11 +117,30 @@ def test_sequential_run(circuits: list[QuantumCircuit], sampler: Sampler, shots:
     """
     qc_1 = circuits[2]
     qc_2 = circuits[3]
-    parameter_values = [[0, 1, 1, 2, 3, 5], [1, 2, 3, 4, 5, 6], [0, 1, 2, 3, 4, 5, 6, 7]]
+    parameter_values = [
+        [0, 1, 1, 2, 3, 5],
+        [1, 2, 3, 4, 5, 6],
+        [0, 1, 2, 3, 4, 5, 6, 7],
+    ]
     target = [
-        {"00": 0.1309248462975777, "01": 0.3608720796028448, "10": 0.09324865232050054, "11": 0.41495442177907715},
-        {"00": 0.06282290651933871, "01": 0.02877144385576705, "10": 0.606654494132085, "11": 0.3017511554928094},
-        {"00": 0.1880263994380416, "01": 0.6881971261189544, "10": 0.09326232720582443, "11": 0.030514147237179892},
+        {
+            "00": 0.1309248462975777,
+            "01": 0.3608720796028448,
+            "10": 0.09324865232050054,
+            "11": 0.41495442177907715,
+        },
+        {
+            "00": 0.06282290651933871,
+            "01": 0.02877144385576705,
+            "10": 0.606654494132085,
+            "11": 0.3017511554928094,
+        },
+        {
+            "00": 0.1880263994380416,
+            "01": 0.6881971261189544,
+            "10": 0.09326232720582443,
+            "11": 0.030514147237179892,
+        },
     ]
 
     # First run
