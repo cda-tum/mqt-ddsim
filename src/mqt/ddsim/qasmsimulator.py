@@ -85,7 +85,7 @@ class QasmSimulatorBackend(BackendV2):
         return None
 
     @staticmethod
-    def assign_parameters_from_backend(
+    def _assign_parameters(
         quantum_circuits: Sequence[QuantumCircuit],
         parameter_values: Sequence[Parameters] | None,
     ) -> list[QuantumCircuit]:
@@ -137,7 +137,7 @@ class QasmSimulatorBackend(BackendV2):
         self._validate(quantum_circuits)
         start = time.time()
 
-        bound_circuits = self.assign_parameters_from_backend(quantum_circuits, parameter_values)
+        bound_circuits = self._assign_parameters(quantum_circuits, parameter_values)
         result_list = [self._run_experiment(q_circ, **options) for q_circ in bound_circuits]
 
         end = time.time()
