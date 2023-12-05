@@ -25,6 +25,7 @@ class Sampler(BaseSampler):
 
     def __init__(
         self,
+        *,
         options: dict[str, Any] | None = None,
     ) -> None:
         """Initialize a new DDSIM Sampler
@@ -34,7 +35,7 @@ class Sampler(BaseSampler):
         """
 
         super().__init__(options=options)
-        self._circuit_ids: dict[Sequence[int | tuple], int] = {}
+        self._circuit_ids: dict[tuple, int] = {}
 
     @property
     def backend(self) -> QasmSimulatorBackend:
