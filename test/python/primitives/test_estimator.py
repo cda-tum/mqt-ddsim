@@ -7,7 +7,7 @@ from qiskit.circuit.library import RealAmplitudes
 from qiskit.primitives import EstimatorResult
 from qiskit.quantum_info import Operator, Pauli, SparsePauliOp
 
-from mqt.ddsim.estimator import Estimator
+from mqt.ddsim.primitives.estimator import Estimator
 
 
 @pytest.fixture()

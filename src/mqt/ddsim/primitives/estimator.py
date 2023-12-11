@@ -13,7 +13,7 @@ from qiskit.primitives.utils import _circuit_key, _observable_key, init_observab
 from qiskit.quantum_info import Pauli, PauliList, SparsePauliOp
 
 from mqt.ddsim.pyddsim import CircuitSimulator
-from mqt.ddsim.qasmsimulator import assign_parameters_from_backend
+from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
 if TYPE_CHECKING:
     from qiskit.circuit import Parameter
@@ -196,7 +196,7 @@ class Estimator(BaseEstimator):
                 circ.metadata = {}
 
         # Bind parameters
-        bound_circuits = assign_parameters_from_backend(state_circuits, parameter_values)
+        bound_circuits = QasmSimulatorBackend._assign_parameters(state_circuits, parameter_values)
 
         # Run and bind parameters
         result_list = [
