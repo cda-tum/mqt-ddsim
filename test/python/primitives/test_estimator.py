@@ -40,15 +40,13 @@ def circuits() -> list[QuantumCircuit]:
 @pytest.fixture()
 def observables() -> list[SparsePauliOp]:
     """The observable fixture for the tests in this file."""
-    observable = SparsePauliOp.from_list(
-        [
-            ("II", -1.052373245772859),
-            ("IZ", 0.39793742484318045),
-            ("ZI", -0.39793742484318045),
-            ("ZZ", -0.01128010425623538),
-            ("XX", 0.18093119978423156),
-        ]
-    )
+    observable = SparsePauliOp.from_list([
+        ("II", -1.052373245772859),
+        ("IZ", 0.39793742484318045),
+        ("ZI", -0.39793742484318045),
+        ("ZZ", -0.01128010425623538),
+        ("XX", 0.18093119978423156),
+    ])
 
     pauli_x = Pauli("X")
     pauli_y = Pauli("Y")
@@ -84,14 +82,12 @@ def test_estimator_run_single_circuit__observable_no_params(
 def test_run_with_operator(circuits: list[QuantumCircuit], estimator: Estimator) -> None:
     """test for run with Operator as an observable"""
     circuit = circuits[0].assign_parameters([0, 1, 1, 2, 3, 5])
-    matrix = Operator(
-        [
-            [-1.06365335, 0.0, 0.0, 0.1809312],
-            [0.0, -1.83696799, 0.1809312, 0.0],
-            [0.0, 0.1809312, -0.24521829, 0.0],
-            [0.1809312, 0.0, 0.0, -1.06365335],
-        ]
-    )
+    matrix = Operator([
+        [-1.06365335, 0.0, 0.0, 0.1809312],
+        [0.0, -1.83696799, 0.1809312, 0.0],
+        [0.0, 0.1809312, -0.24521829, 0.0],
+        [0.1809312, 0.0, 0.0, -1.06365335],
+    ])
     result = estimator.run([circuit], [matrix]).result()
 
     assert isinstance(result, EstimatorResult)
