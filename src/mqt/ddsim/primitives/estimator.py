@@ -48,8 +48,8 @@ class Estimator(BaseEstimator):
 
         self._grouping = list(zip(range(len(self._circuits)), range(len(self._observables))))
 
-        self._circuit_ids: dict[Sequence[Any], int] = {}
-        self._observable_ids: dict[Sequence[Any], int] = {}
+        self._circuit_ids: dict[tuple, int] = {}
+        self._observable_ids: dict[tuple, int] = {}
 
     @property
     def preprocessed_circuits(
@@ -154,23 +154,27 @@ class Estimator(BaseEstimator):
     ) -> PrimitiveJob:
         circuit_indices = []
         for circuit in circuits:
-            index = self._circuit_ids.get(_circuit_key(circuit))
+            key_circ = _circuit_key(circuit)
+            index = self._circuit_ids.get(key_circ)
             if index is not None:
                 circuit_indices.append(index)
             else:
-                circuit_indices.append(len(self._circuits))
-                self._circuit_ids[_circuit_key(circuit)] = len(self._circuits)
+                num_circuits = len(self._circuits)
+                circuit_indices.append(num_circuits)
+                self._circuit_ids[key_circ] = num_circuits
                 self._circuits.append(circuit)
                 self._parameters.append(circuit.parameters)
         observable_indices = []
         for observable in observables:
             observable_copy = init_observable(observable)
-            index = self._observable_ids.get(_observable_key(observable_copy))
+            key_obs = _observable_key(observable_copy)
+            index = self._observable_ids.get(key_obs)
             if index is not None:
                 observable_indices.append(index)
             else:
-                observable_indices.append(len(self._observables))
-                self._observable_ids[_observable_key(observable_copy)] = len(self._observables)
+                num_observables = len(self._observables)
+                observable_indices.append(num_observables)
+                self._observable_ids[key_obs] = num_observables
                 self._observables.append(observable_copy)
         job = PrimitiveJob(self._call, circuit_indices, observable_indices, parameter_values, **run_options)
         job.submit()

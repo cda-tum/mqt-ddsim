@@ -40,13 +40,15 @@ def circuits() -> list[QuantumCircuit]:
 @pytest.fixture()
 def observables() -> list[SparsePauliOp]:
     """The observable fixture for the tests in this file."""
-    observable = SparsePauliOp.from_list([
-        ("II", -1.052373245772859),
-        ("IZ", 0.39793742484318045),
-        ("ZI", -0.39793742484318045),
-        ("ZZ", -0.01128010425623538),
-        ("XX", 0.18093119978423156),
-    ])
+    observable = SparsePauliOp.from_list(
+        [
+            ("II", -1.052373245772859),
+            ("IZ", 0.39793742484318045),
+            ("ZI", -0.39793742484318045),
+            ("ZZ", -0.01128010425623538),
+            ("XX", 0.18093119978423156),
+        ]
+    )
 
     pauli_x = Pauli("X")
     pauli_y = Pauli("Y")
@@ -61,7 +63,7 @@ def observables() -> list[SparsePauliOp]:
 
 def test_estimator_run_single_circuit__observable_no_params(
     circuits: list[QuantumCircuit], observables: list[SparsePauliOp], estimator: Estimator
-):
+) -> None:
     """test for estimator with a single circuit/observable and no parameters"""
     circuit = circuits[0].assign_parameters([0, 1, 1, 2, 3, 5])
     observable = observables[0]
@@ -79,15 +81,17 @@ def test_estimator_run_single_circuit__observable_no_params(
     np.testing.assert_allclose(result.values, [-1.284366511861733], rtol=1e-7, atol=1e-7)
 
 
-def test_run_with_operator(circuits: list[QuantumCircuit], estimator: Estimator):
+def test_run_with_operator(circuits: list[QuantumCircuit], estimator: Estimator) -> None:
     """test for run with Operator as an observable"""
     circuit = circuits[0].assign_parameters([0, 1, 1, 2, 3, 5])
-    matrix = Operator([
-        [-1.06365335, 0.0, 0.0, 0.1809312],
-        [0.0, -1.83696799, 0.1809312, 0.0],
-        [0.0, 0.1809312, -0.24521829, 0.0],
-        [0.1809312, 0.0, 0.0, -1.06365335],
-    ])
+    matrix = Operator(
+        [
+            [-1.06365335, 0.0, 0.0, 0.1809312],
+            [0.0, -1.83696799, 0.1809312, 0.0],
+            [0.0, 0.1809312, -0.24521829, 0.0],
+            [0.1809312, 0.0, 0.0, -1.06365335],
+        ]
+    )
     result = estimator.run([circuit], [matrix]).result()
 
     assert isinstance(result, EstimatorResult)
@@ -96,7 +100,7 @@ def test_run_with_operator(circuits: list[QuantumCircuit], estimator: Estimator)
 
 def test_estimator_run_single_circuit__observable_with_params(
     circuits: list[QuantumCircuit], observables: list[SparsePauliOp], estimator: Estimator
-):
+) -> None:
     """test for estimator with a single circuit/observable and parameters"""
     circuit = circuits[0]
     observable = observables[0]
@@ -116,7 +120,7 @@ def test_estimator_run_single_circuit__observable_with_params(
 
 def test_estimator_run_multiple_circuits_observables_no_params(
     circuits: list[QuantumCircuit], observables: list[SparsePauliOp], estimator: Estimator
-):
+) -> None:
     """test for estimator with multiple circuits/observables and no parameters"""
     qc_x, qc_y, qc_z = circuits[2]
     pauli_x, pauli_y, pauli_z = observables[2]
@@ -129,7 +133,7 @@ def test_estimator_run_multiple_circuits_observables_no_params(
 
 def test_estimator_run_multiple_circuits_observables_with_params(
     circuits: list[QuantumCircuit], observables: list[SparsePauliOp], estimator: Estimator
-):
+) -> None:
     """test for estimator with multiple circuits/observables with parameters"""
     psi1, psi2 = circuits[1]
     hamiltonian_1, hamiltonian_2, hamiltonian_3 = observables[1]
@@ -145,7 +149,7 @@ def test_estimator_run_multiple_circuits_observables_with_params(
 
 def test_estimator_sequenctial_run(
     circuits: list[QuantumCircuit], observables: list[SparsePauliOp], estimator: Estimator
-):
+) -> None:
     """test for estimator's sequenctial run"""
     psi1, psi2 = circuits[1]
     hamiltonian_1, hamiltonian_2, hamiltonian_3 = observables[1]
