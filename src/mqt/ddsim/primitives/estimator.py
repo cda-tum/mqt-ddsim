@@ -200,7 +200,7 @@ class Estimator(BaseEstimator):
                 circ.metadata = {}
 
         # Bind parameters
-        bound_circuits = QasmSimulatorBackend._assign_parameters(state_circuits, parameter_values)
+        bound_circuits = QasmSimulatorBackend.assign_parameters(state_circuits, parameter_values)
 
         # Run and bind parameters
         result_list = [
