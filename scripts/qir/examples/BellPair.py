@@ -2,6 +2,9 @@
 
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
+from __future__ import annotations
+
+import locale
 
 from pyqir import BasicQisBuilder, SimpleModule
 
@@ -16,5 +19,5 @@ qis.mz(bell.qubits[0], bell.results[0])
 qis.mz(bell.qubits[1], bell.results[1])
 
 if __name__ == "__main__":
-    with open('BellPair.ll', 'w') as f:
+    with open("BellPair.ll", "w", encoding=locale.getpreferredencoding(False)) as f:
         f.write(bell.ir())

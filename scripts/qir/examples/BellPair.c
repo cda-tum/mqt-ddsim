@@ -1,5 +1,6 @@
-#include <stdlib.h>
 #include "DDsimQir.h"
+
+#include <stdlib.h>
 
 // run `clang -S -emit-llvm BellPair.c -I ../../../include/qir` to produce the .ll file.
 
