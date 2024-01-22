@@ -12,8 +12,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
 
     def setUp(self):
         self.backend = PathQasmSimulatorBackend()
-        self.circuit = QuantumCircuit.from_qasm_str(
-            """OPENQASM 2.0;
+        self.circuit = QuantumCircuit.from_qasm_str("""OPENQASM 2.0;
             include "qelib1.inc";
             qreg q[3];
             qreg r[3];
@@ -23,8 +22,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
             creg d[3];
             barrier q;
             measure q->c;
-            measure r->d;"""
-        )
+            measure r->d;""")
         self.circuit.name = "test"
 
     def test_status(self):
