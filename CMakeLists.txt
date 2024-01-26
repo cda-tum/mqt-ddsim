@@ -43,6 +43,8 @@ if(BUILD_MQT_DDSIM_BINDINGS)
     OPTIONAL_COMPONENTS Development.SABIModule)
 endif()
 
+include(cmake/ExternalDependencies.cmake)
+
 add_subdirectory(src)
 
 option(BUILD_MQT_DDSIM_TESTS "Also build tests for the MQT DDSIM project" ON)
