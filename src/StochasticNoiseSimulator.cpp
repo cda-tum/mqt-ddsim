@@ -1,5 +1,7 @@
 #include "StochasticNoiseSimulator.hpp"
 
+#include "dd/Operations.hpp"
+
 #include <queue>
 #include <stdexcept>
 
@@ -79,7 +81,7 @@ void StochasticNoiseSimulator<Config>::perfectSimulationRun() {
                 }
             }
 
-            auto operation = dd::getDD(op.get(), Simulator<Config>::dd);
+            auto operation = dd::getDD(op.get(), *Simulator<Config>::dd);
             auto tmp       = Simulator<Config>::dd->multiply(operation, Simulator<Config>::rootEdge);
             Simulator<Config>::dd->incRef(tmp);
             Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
@@ -232,7 +234,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
                         }
                         expValue = expValue >> 1U;
                     }
-                    operation = dd::getDD(classicOp->getOperation(), localDD);
+                    operation = dd::getDD(classicOp->getOperation(), *localDD);
                     targets   = classicOp->getOperation()->getTargets();
                     controls  = classicOp->getOperation()->getControls();
                     if (!executeOp) {
@@ -245,13 +247,13 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t      
                     if (targets.size() == 1 && controls.empty()) {
                         auto* oper = localDD->stochasticNoiseOperationCache.lookup(op->getType(), static_cast<dd::Qubit>(targets.front()));
                         if (oper == nullptr) {
-                            operation = dd::getDD(op.get(), localDD);
+                            operation = dd::getDD(op.get(), *localDD);
                             localDD->stochasticNoiseOperationCache.insert(op->getType(), static_cast<dd::Qubit>(targets.front()), operation);
                         } else {
                             operation = *oper;
                         }
                     } else {
-                        operation = dd::getDD(op.get(), localDD);
+                        operation = dd::getDD(op.get(), *localDD);
                     }
                 }
 

@@ -14,7 +14,7 @@ std::map<std::string, std::size_t> GroverSimulator<Config>::simulate(std::size_t
         qcSetup.h(i);
     }
 
-    const dd::Edge setupOp{dd::buildFunctionality(&qcSetup, Simulator<Config>::dd)};
+    const dd::Edge setupOp{dd::buildFunctionality(&qcSetup, *Simulator<Config>::dd)};
 
     // Build the oracle
     qc::QuantumComputation qcOracle(nQubits + nAnciallae);
@@ -24,7 +24,7 @@ std::map<std::string, std::size_t> GroverSimulator<Config>::simulate(std::size_t
     }
     qcOracle.mcz(controls, nQubits);
 
-    const dd::Edge oracleOp{dd::buildFunctionality(&qcOracle, Simulator<Config>::dd)};
+    const dd::Edge oracleOp{dd::buildFunctionality(&qcOracle, *Simulator<Config>::dd)};
 
     // Build the diffusion stage.
     qc::QuantumComputation qcDiffusion(nQubits + nAnciallae);
@@ -53,7 +53,7 @@ std::map<std::string, std::size_t> GroverSimulator<Config>::simulate(std::size_t
         qcDiffusion.h(i);
     }
 
-    const dd::Edge diffusionOp{dd::buildFunctionality(&qcDiffusion, Simulator<Config>::dd)};
+    const dd::Edge diffusionOp{dd::buildFunctionality(&qcDiffusion, *Simulator<Config>::dd)};
 
     const dd::Edge fullIteration{Simulator<Config>::dd->multiply(oracleOp, diffusionOp)};
     Simulator<Config>::dd->incRef(fullIteration);

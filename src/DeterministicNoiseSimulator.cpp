@@ -1,6 +1,7 @@
 #include "DeterministicNoiseSimulator.hpp"
 
 #include "dd/Export.hpp"
+#include "dd/Operations.hpp"
 
 using CN = dd::ComplexNumbers;
 
@@ -35,7 +36,7 @@ dd::SparsePVecStrKeys DeterministicNoiseSimulator<Config>::deterministicSimulate
         if (op->isClassicControlledOperation()) {
             throw std::runtime_error("Classical controlled operations are not supported.");
         }
-        auto operation = dd::getDD(op.get(), Simulator<Config>::dd);
+        auto operation = dd::getDD(op.get(), *Simulator<Config>::dd);
 
         // Applying the operation to the density matrix
         Simulator<Config>::dd->applyOperationToDensity(rootEdge, operation, useDensityMatrixType);
