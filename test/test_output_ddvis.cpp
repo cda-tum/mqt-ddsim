@@ -2,8 +2,8 @@
 #include "HybridSchrodingerFeynmanSimulator.hpp"
 #include "UnitarySimulator.hpp"
 
+#include "gtest/gtest.h"
 #include <fstream>
-#include <gtest/gtest.h>
 #include <memory>
 
 using namespace qc::literals;
