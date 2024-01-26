@@ -56,11 +56,17 @@ def observables() -> list[SparsePauliOp]:
     hamiltonian_2 = SparsePauliOp.from_list([("IZ", 1)])
     hamiltonian_3 = SparsePauliOp.from_list([("ZI", 1), ("ZZ", 1)])
 
-    return [observable, [hamiltonian_1, hamiltonian_2, hamiltonian_3], [pauli_x, pauli_y, pauli_z]]
+    return [
+        observable,
+        [hamiltonian_1, hamiltonian_2, hamiltonian_3],
+        [pauli_x, pauli_y, pauli_z],
+    ]
 
 
 def test_estimator_run_single_circuit__observable_no_params(
-    circuits: list[QuantumCircuit], observables: list[SparsePauliOp], estimator: Estimator
+    circuits: list[QuantumCircuit],
+    observables: list[SparsePauliOp],
+    estimator: Estimator,
 ) -> None:
     """test for estimator with a single circuit/observable and no parameters"""
     circuit = circuits[0].assign_parameters([0, 1, 1, 2, 3, 5])
@@ -95,7 +101,9 @@ def test_run_with_operator(circuits: list[QuantumCircuit], estimator: Estimator)
 
 
 def test_estimator_run_single_circuit__observable_with_params(
-    circuits: list[QuantumCircuit], observables: list[SparsePauliOp], estimator: Estimator
+    circuits: list[QuantumCircuit],
+    observables: list[SparsePauliOp],
+    estimator: Estimator,
 ) -> None:
     """test for estimator with a single circuit/observable and parameters"""
     circuit = circuits[0]
@@ -115,7 +123,9 @@ def test_estimator_run_single_circuit__observable_with_params(
 
 
 def test_estimator_run_multiple_circuits_observables_no_params(
-    circuits: list[QuantumCircuit], observables: list[SparsePauliOp], estimator: Estimator
+    circuits: list[QuantumCircuit],
+    observables: list[SparsePauliOp],
+    estimator: Estimator,
 ) -> None:
     """test for estimator with multiple circuits/observables and no parameters"""
     qc_x, qc_y, qc_z = circuits[2]
@@ -128,15 +138,23 @@ def test_estimator_run_multiple_circuits_observables_no_params(
 
 
 def test_estimator_run_multiple_circuits_observables_with_params(
-    circuits: list[QuantumCircuit], observables: list[SparsePauliOp], estimator: Estimator
+    circuits: list[QuantumCircuit],
+    observables: list[SparsePauliOp],
+    estimator: Estimator,
 ) -> None:
     """test for estimator with multiple circuits/observables with parameters"""
     psi1, psi2 = circuits[1]
     hamiltonian_1, hamiltonian_2, hamiltonian_3 = observables[1]
-    theta_1, theta_2, theta_3 = ([0, 1, 1, 2, 3, 5], [0, 1, 1, 2, 3, 5, 8, 13], [1, 2, 3, 4, 5, 6])
+    theta_1, theta_2, theta_3 = (
+        [0, 1, 1, 2, 3, 5],
+        [0, 1, 1, 2, 3, 5, 8, 13],
+        [1, 2, 3, 4, 5, 6],
+    )
 
     result = estimator.run(
-        [psi1, psi2, psi1], [hamiltonian_1, hamiltonian_2, hamiltonian_3], [theta_1, theta_2, theta_3]
+        [psi1, psi2, psi1],
+        [hamiltonian_1, hamiltonian_2, hamiltonian_3],
+        [theta_1, theta_2, theta_3],
     ).result()
 
     assert isinstance(result, EstimatorResult)
@@ -144,12 +162,18 @@ def test_estimator_run_multiple_circuits_observables_with_params(
 
 
 def test_estimator_sequenctial_run(
-    circuits: list[QuantumCircuit], observables: list[SparsePauliOp], estimator: Estimator
+    circuits: list[QuantumCircuit],
+    observables: list[SparsePauliOp],
+    estimator: Estimator,
 ) -> None:
     """test for estimator's sequenctial run"""
     psi1, psi2 = circuits[1]
     hamiltonian_1, hamiltonian_2, hamiltonian_3 = observables[1]
-    theta_1, theta_2, theta_3 = ([0, 1, 1, 2, 3, 5], [0, 1, 1, 2, 3, 5, 8, 13], [1, 2, 3, 4, 5, 6])
+    theta_1, theta_2, theta_3 = (
+        [0, 1, 1, 2, 3, 5],
+        [0, 1, 1, 2, 3, 5, 8, 13],
+        [1, 2, 3, 4, 5, 6],
+    )
 
     # First run
     result = estimator.run([psi1], [hamiltonian_1], [theta_1]).result()
@@ -171,7 +195,9 @@ def test_estimator_sequenctial_run(
 
     # Last run
     result4 = estimator.run(
-        [psi1, psi2, psi1], [hamiltonian_1, hamiltonian_2, hamiltonian_3], [theta_1, theta_2, theta_3]
+        [psi1, psi2, psi1],
+        [hamiltonian_1, hamiltonian_2, hamiltonian_3],
+        [theta_1, theta_2, theta_3],
     ).result()
 
     assert isinstance(result4, EstimatorResult)
