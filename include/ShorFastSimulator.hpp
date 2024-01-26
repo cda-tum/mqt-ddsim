@@ -44,7 +44,7 @@ class ShorFastSimulator: public Simulator<Config> {
 
     void applyGate(dd::GateMatrix matrix, dd::Qubit target);
 
-    std::vector<std::map<dd::vNode*, dd::vEdge>> nodesOnLevel;
+    std::vector<std::map<dd::vNode*, dd::vCachedEdge>> nodesOnLevel;
 
     dd::mEdge addConst(std::uint64_t a);
 

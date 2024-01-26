@@ -92,7 +92,7 @@ dd::fp CircuitSimulator<Config>::expectationValue(const qc::QuantumComputation& 
     singleShot(true);
 
     // construct the DD for the observable
-    const auto observableDD = dd::buildFunctionality(&observable, Simulator<Config>::dd);
+    const auto observableDD = dd::buildFunctionality(&observable, *Simulator<Config>::dd);
 
     // calculate the expectation value
     return Simulator<Config>::dd->expectationValue(observableDD, Simulator<Config>::rootEdge);
@@ -136,7 +136,7 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
                         // apply an X operation whenever the measured result is one
                         if (bit == '1') {
                             const auto x   = qc::StandardOperation(qc->getNqubits(), qubit, qc::X);
-                            auto       tmp = Simulator<Config>::dd->multiply(dd::getDD(&x, Simulator<Config>::dd), Simulator<Config>::rootEdge);
+                            auto       tmp = Simulator<Config>::dd->multiply(dd::getDD(&x, *Simulator<Config>::dd), Simulator<Config>::rootEdge);
                             Simulator<Config>::dd->incRef(tmp);
                             Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
                             Simulator<Config>::rootEdge = tmp;
@@ -176,7 +176,7 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
                       << " #controls=" << op->getControls().size()
                       << " statesize=" << dd->size(rootEdge) << "\n";//*/
 
-            auto ddOp = dd::getDD(op.get(), Simulator<Config>::dd);
+            auto ddOp = dd::getDD(op.get(), *Simulator<Config>::dd);
             auto tmp  = Simulator<Config>::dd->multiply(ddOp, Simulator<Config>::rootEdge);
             Simulator<Config>::dd->incRef(tmp);
             Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);

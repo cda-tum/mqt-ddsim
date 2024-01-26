@@ -143,9 +143,7 @@ double Simulator<Config>::approximateByFidelity(std::unique_ptr<dd::Package<Conf
     dd::vEdge newEdge = removeNodes(localDD, edge, dagEdges);
     assert(!std::isnan(dd::RealNumber::val(edge.w.r)));
     assert(!std::isnan(dd::RealNumber::val(edge.w.i)));
-    dd::Complex c = localDD->cn.getCached(std::sqrt(CN::mag2(newEdge.w)), 0);
-    CN::div(c, newEdge.w, c);
-    newEdge.w = localDD->cn.lookup(c);
+    newEdge.w = localDD->cn.lookup(newEdge.w / std::sqrt(CN::mag2(newEdge.w)));
 
     dd::fp fidelity = 0;
     if (edge.p->v == newEdge.p->v) {
@@ -231,10 +229,8 @@ double Simulator<Config>::approximateBySampling(std::unique_ptr<dd::Package<Conf
         dagEdges[it] = dd::vEdge::zero();
     }
 
-    dd::vEdge   newEdge = removeNodes(localDD, edge, dagEdges);
-    dd::Complex c       = localDD->cn.getCached(std::sqrt(CN::mag2(newEdge.w)), 0);
-    CN::div(c, newEdge.w, c);
-    newEdge.w = localDD->cn.lookup(c);
+    dd::vEdge newEdge = removeNodes(localDD, edge, dagEdges);
+    newEdge.w         = localDD->cn.lookup(newEdge.w / std::sqrt(CN::mag2(newEdge.w)));
 
     dd::fp fidelity = 0;
     if (edge.p->v == newEdge.p->v) {
@@ -290,9 +286,7 @@ dd::vEdge Simulator<Config>::removeNodes(std::unique_ptr<dd::Package<Config>>& l
 
     dd::vEdge r   = localDD->makeDDNode(e.p->v, edges, false);
     dagEdges[e.p] = r;
-    dd::Complex c = localDD->cn.getCached();
-    CN::mul(c, e.w, r.w);
-    r.w = localDD->cn.lookup(c);
+    r.w           = localDD->cn.lookup(r.w * e.w);
     return r;
 }
 
@@ -307,9 +301,10 @@ std::pair<dd::ComplexValue, std::string> Simulator<Config>::getPathOfLeastResist
     }
 
     std::string result(getNumberOfQubits(), '0');
-    dd::Complex pathValue = dd->cn.getCached(dd::RealNumber::val(rootEdge.w.r), dd::RealNumber::val(rootEdge.w.i));
+    auto        pathValue = static_cast<dd::ComplexValue>(rootEdge.w);
     dd::vEdge   cur       = rootEdge;
     for (dd::Qubit i = rootEdge.p->v + 1; i-- > 0;) {
+        pathValue        = pathValue * cur.w;
         dd::fp       p0  = dd::ComplexNumbers::mag2(cur.p->e.at(0).w);
         const dd::fp p1  = dd::ComplexNumbers::mag2(cur.p->e.at(1).w);
         const dd::fp tmp = p0 + p1;
@@ -320,17 +315,14 @@ std::pair<dd::ComplexValue, std::string> Simulator<Config>::getPathOfLeastResist
         p0 /= tmp; // TODO: should p1 be normalized as well?
 
         if (p0 >= p1) {
-            CN::mul(pathValue, pathValue, cur.w);
             cur = cur.p->e.at(0);
         } else {
             result[static_cast<std::size_t>(cur.p->v)] = '1';
-            CN::mul(pathValue, pathValue, cur.w);
-            cur = cur.p->e.at(1);
+            cur                                        = cur.p->e.at(1);
         }
     }
 
-    return {{dd::RealNumber::val(pathValue.r), dd::RealNumber::val(pathValue.i)},
-            std::string{result.rbegin(), result.rend()}};
+    return {pathValue, std::string{result.rbegin(), result.rend()}};
 }
 
 template<class Config>

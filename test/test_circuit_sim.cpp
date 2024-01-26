@@ -4,7 +4,7 @@
 #include "algorithms/QFT.hpp"
 #include "algorithms/QPE.hpp"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include <memory>
 
 TEST(CircuitSimTest, SingleOneQubitGateOnTwoQubitCircuit) {

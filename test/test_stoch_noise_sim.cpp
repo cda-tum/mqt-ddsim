@@ -1,6 +1,6 @@
 #include "StochasticNoiseSimulator.hpp"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include <memory>
 
 /**

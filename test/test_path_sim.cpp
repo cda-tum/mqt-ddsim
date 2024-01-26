@@ -3,7 +3,7 @@
 #include "algorithms/Grover.hpp"
 #include "dd/Export.hpp"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include <memory>
 
 using namespace qc::literals;

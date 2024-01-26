@@ -1,6 +1,6 @@
 #include "HybridSchrodingerFeynmanSimulator.hpp"
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include <memory>
 
 using namespace qc::literals;

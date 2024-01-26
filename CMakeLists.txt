@@ -20,6 +20,7 @@ endmacro()
 check_submodule_present(mqt-core)
 check_submodule_present(taskflow)
 
+option(BUILD_MQT_DDSIM_TESTS "Also build tests for the MQT DDSIM project" ON)
 option(BUILD_MQT_DDSIM_BINDINGS "Build the MQT DDSIM Python bindings" OFF)
 if(BUILD_MQT_DDSIM_BINDINGS)
   # ensure that the BINDINGS option is set
@@ -43,9 +44,10 @@ if(BUILD_MQT_DDSIM_BINDINGS)
     OPTIONAL_COMPONENTS Development.SABIModule)
 endif()
 
+include(cmake/ExternalDependencies.cmake)
+
 add_subdirectory(src)
 
-option(BUILD_MQT_DDSIM_TESTS "Also build tests for the MQT DDSIM project" ON)
 if(BUILD_MQT_DDSIM_TESTS)
   enable_testing()
   include(GoogleTest)

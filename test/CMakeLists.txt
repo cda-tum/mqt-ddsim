@@ -1,13 +1,3 @@
-if(NOT TARGET gtest OR NOT TARGET gmock)
-  # Prevent overriding the parent project's compiler/linker settings on Windows
-  # cmake-lint: disable=C0103
-  set(gtest_force_shared_crt
-      ON
-      CACHE BOOL "" FORCE)
-  add_subdirectory("${PROJECT_SOURCE_DIR}/extern/mqt-core/extern/googletest"
-                   "extern/mqt-core/extern/googletest" EXCLUDE_FROM_ALL)
-endif()
-
 package_add_test(
   ${PROJECT_NAME}_test
   ${PROJECT_NAME}
