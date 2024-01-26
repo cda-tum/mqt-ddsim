@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union
 
 from qiskit.primitives.base import BaseSampler, SamplerResult
 from qiskit.primitives.primitive_job import PrimitiveJob
-from qiskit.primitives.utils import _circuit_key
+from qiskit.primitives.utils import _circuit_key  # noqa: PLC2701
 from qiskit.result import QuasiDistribution, Result
 
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend

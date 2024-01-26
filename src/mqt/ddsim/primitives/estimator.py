@@ -9,7 +9,11 @@ import numpy as np
 from qiskit.circuit import QuantumCircuit
 from qiskit.primitives.base import BaseEstimator, EstimatorResult
 from qiskit.primitives.primitive_job import PrimitiveJob
-from qiskit.primitives.utils import _circuit_key, _observable_key, init_observable
+from qiskit.primitives.utils import (
+    _circuit_key,  # noqa: PLC2701
+    _observable_key,  # noqa: PLC2701
+    init_observable,
+)
 from qiskit.quantum_info import Pauli, PauliList, SparsePauliOp
 
 from mqt.ddsim.pyddsim import CircuitSimulator
@@ -86,7 +90,10 @@ class Estimator(BaseEstimator):
             diff_circuits: list[QuantumCircuit] = []
             if self._abelian_grouping:
                 for obs in observable.group_commuting(qubit_wise=True):
-                    basis = Pauli((np.logical_or.reduce(obs.paulis.z), np.logical_or.reduce(obs.paulis.x)))
+                    basis = Pauli((
+                        np.logical_or.reduce(obs.paulis.z),
+                        np.logical_or.reduce(obs.paulis.x),
+                    ))
                     obs_circuit, indices = self._observable_circuit(circuit.num_qubits, basis)
                     paulis = PauliList.from_symplectic(
                         obs.paulis.z[:, indices],
@@ -176,7 +183,13 @@ class Estimator(BaseEstimator):
                 observable_indices.append(num_observables)
                 self._observable_ids[key_obs] = num_observables
                 self._observables.append(observable_copy)
-        job = PrimitiveJob(self._call, circuit_indices, observable_indices, parameter_values, **run_options)
+        job = PrimitiveJob(
+            self._call,
+            circuit_indices,
+            observable_indices,
+            parameter_values,
+            **run_options,
+        )
         job.submit()
         return job
 
@@ -213,7 +226,9 @@ class Estimator(BaseEstimator):
 
     @staticmethod
     def _run_experiment(
-        circ: QuantumCircuit, obs_circ_list: list[QuantumCircuit], **options: dict[str, Any]
+        circ: QuantumCircuit,
+        obs_circ_list: list[QuantumCircuit],
+        **options: dict[str, Any],
     ) -> list[float]:
         approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
         approximation_steps = options.get("approximation_steps", 1)
