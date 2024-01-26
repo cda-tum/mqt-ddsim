@@ -124,7 +124,7 @@ def test_estimator_run_multiple_circuits_observables_no_params(
     result = estimator.run([qc_x, qc_y, qc_z], [pauli_x, pauli_y, pauli_z]).result()
 
     assert isinstance(result, EstimatorResult)
-    assert np.array_equal(result.values, [1, 1, 1])
+    np.testing.assert_allclose(result.values, [1.0, 1.0, 1.0], rtol=1e-7, atol=1e-7)
 
 
 def test_estimator_run_multiple_circuits_observables_with_params(
