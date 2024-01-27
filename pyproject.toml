@@ -89,9 +89,6 @@ ninja.minimum-version = "1.10"
 # Setuptools-style build caching in a local directory
 build-dir = "build/{wheel_tag}"
 
-# Build stable ABI wheels for CPython 3.12+
-wheel.py-api = "cp312"
-
 # Explicitly set the package directory
 wheel.packages = ["src/mqt"]
 
