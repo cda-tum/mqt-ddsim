@@ -2,19 +2,18 @@ from __future__ import annotations
 
 import unittest
 
-from qiskit import QuantumCircuit, QuantumRegister
-
 from mqt import ddsim
+from mqt.core import QuantumComputation
 
 
 class MQTStandaloneHybridSimulatorTest(unittest.TestCase):
     def setUp(self) -> None:
-        q = QuantumRegister(4)
-        circ = QuantumCircuit(q)
-        circ.h(q)
+        circ = QuantumComputation(4)
+        for i in range(4):
+            circ.h(i)
         circ.cz(3, 1)
         circ.cz(2, 0)
-        circ.measure_all(inplace=True)
+        circ.measure_all()
         self.circuit = circ
         self.non_zeros_in_matrix = 16
 

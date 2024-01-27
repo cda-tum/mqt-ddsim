@@ -2,4 +2,5 @@ scikit-build-core==0.6.1
 setuptools-scm==7.0.0
 pybind11==2.11.0
 pytest==7.0.0
+mqt.core==2.2.2
 qiskit==0.45.0

@@ -16,6 +16,7 @@ from qiskit.primitives.utils import (
 )
 from qiskit.quantum_info import Pauli, PauliList, SparsePauliOp
 
+from mqt.core.io import load
 from mqt.ddsim.pyddsim import CircuitSimulator
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
@@ -235,15 +236,16 @@ class Estimator(BaseEstimator):
         approximation_strategy = options.get("approximation_strategy", "fidelity")
         seed = options.get("seed_simulator", -1)
 
+        qc = load(circ)
         sim = CircuitSimulator(
-            circ,
+            qc,
             approximation_step_fidelity=approximation_step_fidelity,
             approximation_steps=approximation_steps,
             approximation_strategy=approximation_strategy,
             seed=seed,
         )
 
-        return [sim.expectation_value(observable=obs) for obs in obs_circ_list]
+        return [sim.expectation_value(observable=load(obs)) for obs in obs_circ_list]
 
     @staticmethod
     def _postprocessing(result_list: list[float], accum: list[int], metadata: list[dict]) -> EstimatorResult:

@@ -103,6 +103,7 @@ repos:
         additional_dependencies:
           - numpy
           - pytest
+          - mqt.core~=2.2.2
 
   # Check for spelling
   - repo: https://github.com/codespell-project/codespell

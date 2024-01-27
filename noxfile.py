@@ -17,6 +17,7 @@ nox.options.sessions = ["lint", "tests"]
 PYTHON_ALL_VERSIONS = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
 BUILD_REQUIREMENTS = [
+    "mqt.core~=2.2.2",
     "scikit-build-core[pyproject]>=0.6.1",
     "setuptools_scm>=7",
     "pybind11>=2.11",
@@ -54,7 +55,12 @@ def _run_tests(
         _extras.append("coverage")
         posargs.append("--cov-config=pyproject.toml")
 
-    session.install(*BUILD_REQUIREMENTS, *install_args, env=env)
+    # On Linux, `mqt-core` needs to be installed with `--no-binary` to avoid ABI
+    # incompatibility issues caused by compiling with different GCC versions.
+    if sys.platform == "linux":
+        install_args = ["--no-binary", "mqt.core", *install_args]
+
+    session.install("-v", *BUILD_REQUIREMENTS, *install_args, env=env)
     install_arg = f"-ve.[{','.join(_extras)}]"
     session.install("--no-build-isolation", install_arg, *install_args, env=env)
     session.run("pytest", *run_args, *posargs, env=env)
@@ -89,8 +95,11 @@ def docs(session: nox.Session) -> None:
         session.error("Must not specify non-HTML builder with --serve")
 
     extra_installs = ["sphinx-autobuild"] if args.serve else []
-    session.install(*BUILD_REQUIREMENTS, *extra_installs)
-    session.install("--no-build-isolation", "-ve.[docs]")
+    # On Linux, `mqt-core` needs to be installed with `--no-binary` to avoid ABI
+    # incompatibility issues caused by compiling with different GCC versions.
+    install_args = ["--no-binary", "mqt.core"] if sys.platform == "linux" else []
+    session.install(*BUILD_REQUIREMENTS, *extra_installs, *install_args)
+    session.install("--no-build-isolation", "-ve.[docs]", *install_args)
     session.chdir("docs")
 
     if args.builder == "linkcheck":

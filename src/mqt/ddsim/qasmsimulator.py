@@ -15,6 +15,8 @@ from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 from qiskit.utils.multiprocessing import local_hardware_info
 
+from mqt.core.io import load
+
 from . import __version__
 from .header import DDSIMHeader
 from .job import DDSIMJob
@@ -161,8 +163,9 @@ class QasmSimulatorBackend(BackendV2):
         seed = options.get("seed_simulator", -1)
         shots = options.get("shots", 1024)
 
+        circuit = load(qc)
         sim = CircuitSimulator(
-            qc,
+            circuit,
             approximation_step_fidelity=approximation_step_fidelity,
             approximation_steps=approximation_steps,
             approximation_strategy=approximation_strategy,
