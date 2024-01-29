@@ -1,42 +1,34 @@
 # set required cmake version
-cmake_minimum_required(VERSION 3.19...3.27)
+cmake_minimum_required(VERSION 3.19...3.28)
 
 project(
-  ddsim
+  mqt-ddsim
   LANGUAGES CXX
-  DESCRIPTION "MQT DDSIM - A quantum simulator based on decision diagrams")
-
-# check whether `modulename` is correctly cloned in the `extern` directory.
-macro(CHECK_SUBMODULE_PRESENT modulename)
-  if(NOT EXISTS "${PROJECT_SOURCE_DIR}/extern/${modulename}/CMakeLists.txt")
-    message(
-      FATAL_ERROR
-        "${modulename} submodule not cloned properly. \
-        Please run `git submodule update --init --recursive` \
-        from the main project directory")
-  endif()
-endmacro()
-
-check_submodule_present(mqt-core)
-check_submodule_present(taskflow)
+  DESCRIPTION
+    "MQT DDSIM - A quantum circuit simulator based on decision diagrams")
 
 option(BUILD_MQT_DDSIM_TESTS "Also build tests for the MQT DDSIM project" ON)
 option(BUILD_MQT_DDSIM_BINDINGS "Build the MQT DDSIM Python bindings" OFF)
+option(BUILD_MQT_DDSIM_CLI "Build the MQT DDSIM command line interface" ON)
+
 if(BUILD_MQT_DDSIM_BINDINGS)
   # ensure that the BINDINGS option is set
   set(BINDINGS
       ON
-      CACHE BOOL "Enable settings related to Python bindings" FORCE)
-  # cmake-lint: disable=C0103
+      CACHE INTERNAL "Enable settings related to Python bindings")
+  # Some common settings for finding Python
   set(Python_FIND_VIRTUALENV
       FIRST
       CACHE STRING "Give precedence to virtualenvs when searching for Python")
-  # cmake-lint: disable=C0103
+  set(Python_FIND_FRAMEWORK
+      LAST
+      CACHE STRING "Prefer Brew/Conda to Apple framework Python")
   set(Python_ARTIFACTS_INTERACTIVE
       ON
       CACHE
         BOOL
         "Prevent multiple searches for Python and instead cache the results.")
+
   # top-level call to find Python
   find_package(
     Python 3.8 REQUIRED
@@ -46,6 +38,9 @@ endif()
 
 include(cmake/ExternalDependencies.cmake)
 
+# set the include directory for the build tree
+set(MQT_DDSIM_INCLUDE_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
+
 add_subdirectory(src)
 
 if(BUILD_MQT_DDSIM_TESTS)
@@ -54,7 +49,6 @@ if(BUILD_MQT_DDSIM_TESTS)
   add_subdirectory(test)
 endif()
 
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-  check_submodule_present(cxxopts)
+if(BUILD_MQT_DDSIM_CLI)
   add_subdirectory(apps)
 endif()
