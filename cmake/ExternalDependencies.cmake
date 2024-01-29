@@ -3,6 +3,49 @@
 include(FetchContent)
 set(FETCH_PACKAGES "")
 
+if(BUILD_MQT_DDSIM_BINDINGS)
+  if(NOT SKBUILD)
+    # Manually detect the installed pybind11 package.
+    execute_process(
+      COMMAND "${Python_EXECUTABLE}" -m pybind11 --cmakedir
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      OUTPUT_VARIABLE pybind11_DIR)
+
+    # Add the detected directory to the CMake prefix path.
+    list(APPEND CMAKE_PREFIX_PATH "${pybind11_DIR}")
+  endif()
+
+  # add pybind11 library
+  find_package(pybind11 CONFIG REQUIRED)
+endif()
+
+set(FETCHCONTENT_SOURCE_DIR_MQT-CORE
+    ${PROJECT_SOURCE_DIR}/extern/mqt-core
+    CACHE
+      PATH
+      "Path to the source directory of the mqt-core library. This variable is used by FetchContent to download the library if it is not already available."
+)
+set(MQT_CORE_VERSION
+    2.2.2
+    CACHE STRING "MQT Core version")
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
+  FetchContent_Declare(
+    mqt-core
+    GIT_REPOSITORY https://github.com/cda-tum/mqt-core.git
+    GIT_TAG v${MQT_CORE_VERSION}
+    FIND_PACKAGE_ARGS ${MQT_CORE_VERSION})
+  list(APPEND FETCH_PACKAGES mqt-core)
+else()
+  find_package(mqt-core ${MQT_CORE_VERSION} QUIET)
+  if(NOT mqt-core_FOUND)
+    FetchContent_Declare(
+      mqt-core
+      GIT_REPOSITORY https://github.com/cda-tum/mqt-core.git
+      GIT_TAG v${MQT_CORE_VERSION})
+    list(APPEND FETCH_PACKAGES mqt-core)
+  endif()
+endif()
+
 if(BUILD_MQT_DDSIM_TESTS)
   set(gtest_force_shared_crt
       ON
@@ -22,6 +65,76 @@ if(BUILD_MQT_DDSIM_TESTS)
     if(NOT googletest_FOUND)
       FetchContent_Declare(googletest URL ${GTEST_URL})
       list(APPEND FETCH_PACKAGES googletest)
+    endif()
+  endif()
+endif()
+
+set(TF_BUILD_TESTS
+    OFF
+    CACHE INTERNAL "")
+set(TF_BUILD_EXAMPLES
+    OFF
+    CACHE INTERNAL "")
+set(TF_BUILD_PROFILER
+    OFF
+    CACHE INTERNAL "")
+set(TF_VERSION
+    3.6.0
+    CACHE STRING "Taskflow version")
+set(TF_URL
+    https://github.com/taskflow/taskflow/archive/refs/tags/v${TF_VERSION}.tar.gz
+)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
+  FetchContent_Declare(taskflow URL ${TF_URL} FIND_PACKAGE_ARGS)
+  list(APPEND FETCH_PACKAGES taskflow)
+else()
+  find_package(taskflow ${TF_VERSION} QUIET)
+  if(NOT taskflow_FOUND)
+    FetchContent_Declare(taskflow URL ${TF_URL})
+    list(APPEND FETCH_PACKAGES taskflow)
+  endif()
+endif()
+
+if(BUILD_MQT_DDSIM_CLI)
+  set(THREADS_PREFER_PTHREAD_FLAG ON)
+  find_package(Threads)
+  link_libraries(Threads::Threads)
+
+  find_package(OpenCV QUIET)
+
+  set(CXXOPTS_VERSION
+      3.1.1
+      CACHE STRING "cxxopts version")
+  set(CXXOPTS_URL
+      https://github.com/jarro2783/cxxopts/archive/refs/tags/v${CXXOPTS_VERSION}.tar.gz
+  )
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
+    FetchContent_Declare(cxxopts URL ${CXXOPTS_URL} FIND_PACKAGE_ARGS
+                                     ${CXXOPTS_VERSION})
+    list(APPEND FETCH_PACKAGES cxxopts)
+  else()
+    find_package(cxxopts ${CXXOPTS_VERSION} QUIET)
+    if(NOT cxxopts_FOUND)
+      FetchContent_Declare(cxxopts URL ${CXXOPTS_URL})
+      list(APPEND FETCH_PACKAGES cxxopts)
+    endif()
+  endif()
+endif()
+
+if(BUILD_MQT_DDSIM_BINDINGS)
+  # add pybind11_json library
+  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
+    FetchContent_Declare(
+      pybind11_json
+      GIT_REPOSITORY https://github.com/pybind/pybind11_json
+      FIND_PACKAGE_ARGS)
+    list(APPEND FETCH_PACKAGES pybind11_json)
+  else()
+    find_package(pybind11_json QUIET)
+    if(NOT pybind11_json_FOUND)
+      FetchContent_Declare(
+        pybind11_json GIT_REPOSITORY https://github.com/pybind/pybind11_json)
+      list(APPEND FETCH_PACKAGES pybind11_json)
     endif()
   endif()
 endif()
