@@ -36,7 +36,7 @@ repos:
 
   # Handling unwanted unicode characters
   - repo: https://github.com/sirosen/texthooks
-    rev: 0.6.3
+    rev: 0.6.4
     hooks:
       - id: fix-ligatures
       - id: fix-smartquotes
