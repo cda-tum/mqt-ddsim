@@ -34,7 +34,7 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-    "qiskit-terra>=0.22.1"
+    "qiskit[qasm3-import]>=0.45.0"
 ]
 dynamic = ["version"]
 
@@ -64,7 +64,7 @@ docs = [
     "breathe",
     "sphinxext-opengraph",
     "sphinx-autodoc-typehints",
-    "qiskit-terra[visualization]",
+    "qiskit[visualization]",
     "graphviz",
 ]
 dev = ["mqt.ddsim[tnflow, coverage, docs]"]
