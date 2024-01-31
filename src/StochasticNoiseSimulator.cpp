@@ -1,4 +1,5 @@
 #include "StochasticNoiseSimulator.hpp"
+
 #include "dd/Operations.hpp"
 
 #include <queue>
@@ -111,7 +112,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
                     throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
                 }
             } else {
-                dd::mEdge    operation;
+                dd::mEdge operation;
                 if (op->isClassicControlledOperation()) {
                     // Check if the operation is controlled by a classical register
                     auto* classicOp = dynamic_cast<qc::ClassicControlledOperation*>(op.get());
