@@ -34,12 +34,13 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-    "qiskit-terra>=0.22.1"
+    "qiskit[qasm3-import]>=0.45.0"
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
 tnflow = [
+    "cotengra",
     "sparse",
     "opt-einsum",
     "quimb",
@@ -63,7 +64,7 @@ docs = [
     "breathe",
     "sphinxext-opengraph",
     "sphinx-autodoc-typehints",
-    "qiskit-terra[visualization]",
+    "qiskit[visualization]",
     "graphviz",
 ]
 dev = ["mqt.ddsim[tnflow, coverage, docs]"]
@@ -79,8 +80,8 @@ Discussions = "https://github.com/cda-tum/mqt-ddsim/discussions"
 # Protect the configuration against future changes in scikit-build-core
 minimum-version = "0.6.1"
 
-# Set the target to build
-cmake.targets = ["pyddsim"]
+# Set the wheel install directory
+wheel.install-dir = "mqt/ddsim"
 
 # Set required CMake and Ninja versions
 cmake.minimum-version = "3.19"
@@ -88,9 +89,6 @@ ninja.minimum-version = "1.10"
 
 # Setuptools-style build caching in a local directory
 build-dir = "build/{wheel_tag}"
-
-# Build stable ABI wheels for CPython 3.12+
-wheel.py-api = "cp312"
 
 # Explicitly set the package directory
 wheel.packages = ["src/mqt"]
@@ -118,7 +116,7 @@ sdist.exclude = [
 [tool.scikit-build.cmake.define]
 BUILD_MQT_DDSIM_TESTS = "OFF"
 BUILD_MQT_DDSIM_BINDINGS = "ON"
-ENABLE_IPO = "ON"
+BUILD_MQT_DDSIM_CLI = "OFF"
 
 
 [tool.check-sdist]
@@ -147,6 +145,7 @@ filterwarnings = [
     "ignore:.*qiskit.utils.algorithm_globals.QiskitAlgorithmGlobals*:DeprecationWarning:qiskit",
     "ignore:.*Building a flow controller with keyword arguments is going to be deprecated*:PendingDeprecationWarning:qiskit",
     "ignore:.*qiskit.extensions module is pending deprecation*:PendingDeprecationWarning:qiskit",
+    'ignore:.*datetime\.datetime\.utcfromtimestamp.*:DeprecationWarning:',
 ]
 
 [tool.coverage]
@@ -230,6 +229,7 @@ extend-ignore = [
     "PLC0415", # Import should be at top of file
     "PT004",   # Incorrect, just usefixtures instead.
     "S101",    # Use of assert detected
+    "S404",    # `subprocess` module is possibly insecure
 ]
 isort.required-imports = ["from __future__ import annotations"]
 
@@ -256,7 +256,6 @@ build = "cp3*"
 skip = "*-musllinux_*"
 archs = "auto64"
 test-command = "python -c \"from mqt import ddsim\""
-test-skip = "cp312-*"  # Qiskit Terra does not support Python 3.12 yet
 build-frontend = "build"
 
 [tool.cibuildwheel.linux]

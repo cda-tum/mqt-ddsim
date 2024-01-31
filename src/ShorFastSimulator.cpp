@@ -329,7 +329,6 @@ void ShorFastSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit targe
  */
 template<class Config>
 void ShorFastSimulator<Config>::uAEmulate2(const std::uint64_t a) {
-    [[maybe_unused]] const std::size_t cacheCountBefore = Simulator<Config>::dd->cn.cacheCount();
     dagEdges.clear();
 
     dd::vEdge                        f = dd::vEdge::one();
@@ -349,7 +348,7 @@ void ShorFastSimulator<Config>::uAEmulate2(const std::uint64_t a) {
 
     // clear nodesOnLevel. TODO: make it a local variable?
     for (auto& m: nodesOnLevel) {
-        m = std::map<dd::vNode*, dd::vEdge>();
+        m = {};
     }
 
     // initialize nodesOnLevel
@@ -357,69 +356,48 @@ void ShorFastSimulator<Config>::uAEmulate2(const std::uint64_t a) {
 
     // special treatment for the nodes on first level
     for (const auto& entry: nodesOnLevel.at(0)) {
-        dd::vEdge left = f;
-        if (entry.first->e[0].w.exactlyZero()) {
-            left = dd::vEdge::zero();
-        } else {
-            left.w = Simulator<Config>::dd->cn.mulCached(left.w, entry.first->e[0].w);
+        auto left = dd::vCachedEdge::zero();
+        if (!entry.first->e[0].w.exactlyZero()) {
+            left = {f.p, f.w * entry.first->e[0].w};
         }
 
-        dd::vEdge right = Simulator<Config>::dd->multiply(addConstMod(ts[static_cast<std::size_t>(entry.first->v)]), f);
-
-        if (entry.first->e[1].w.exactlyZero()) {
-            right = dd::vEdge::zero();
-        } else {
-            right.w = Simulator<Config>::dd->cn.mulCached(right.w, entry.first->e[1].w);
+        auto right = dd::vCachedEdge::zero();
+        if (!entry.first->e[1].w.exactlyZero()) {
+            auto tmp = Simulator<Config>::dd->multiply(addConstMod(ts[static_cast<std::size_t>(entry.first->v)]), f);
+            right    = {tmp.p, tmp.w * entry.first->e[1].w};
         }
 
-        const dd::vEdge result = Simulator<Config>::dd->add(left, right);
-
-        if (!left.w.exactlyZero()) {
-            Simulator<Config>::dd->cn.returnToCache(left.w);
-        }
-        if (!right.w.exactlyZero()) {
-            Simulator<Config>::dd->cn.returnToCache(right.w);
-        }
-
-        Simulator<Config>::dd->incRef(result);
-
-        nodesOnLevel[0][entry.first] = result;
+        nodesOnLevel[0][entry.first] = Simulator<Config>::dd->add2(left, right, 0);
     }
 
     // treat the nodes on the remaining levels
     for (std::size_t i = 1; i < nQubits - 1; i++) {
-        std::vector<dd::vEdge> saveEdges;
         for (auto it = nodesOnLevel.at(i).begin(); it != nodesOnLevel.at(i).end(); it++) {
-            dd::vEdge left = dd::vEdge::zero();
+            auto left = dd::vCachedEdge::zero();
             if (!it->first->e.at(0).w.exactlyZero()) {
                 left   = nodesOnLevel.at(i - 1)[it->first->e.at(0).p];
-                left.w = Simulator<Config>::dd->cn.mulCached(left.w, it->first->e.at(0).w);
+                left.w = left.w * it->first->e.at(0).w;
             }
 
-            dd::vEdge right = dd::vEdge::zero();
+            auto right = dd::vCachedEdge::zero();
             if (!it->first->e.at(1).w.exactlyZero()) {
-                right   = Simulator<Config>::dd->multiply(addConstMod(ts.at(static_cast<std::size_t>(it->first->v))), nodesOnLevel.at(i - 1)[it->first->e.at(1).p]);
-                right.w = Simulator<Config>::dd->cn.mulCached(right.w, it->first->e.at(1).w);
+                auto  node0 = addConstMod(ts.at(static_cast<std::size_t>(it->first->v)));
+                auto& node1 = nodesOnLevel.at(i - 1)[it->first->e.at(1).p];
+                auto  node2 = dd::vEdge{node1.p, Simulator<Config>::dd->cn.lookup(node1.w)};
+                auto  res   = Simulator<Config>::dd->multiply(node0, node2);
+                right       = {res.p, res.w * it->first->e.at(1).w};
             }
 
-            const dd::vEdge result = Simulator<Config>::dd->add(left, right);
-
-            if (!left.w.exactlyZero()) {
-                Simulator<Config>::dd->cn.returnToCache(left.w);
+            dd::Qubit level = 0;
+            if (left.p != nullptr) {
+                level = left.p->v;
             }
-            if (!right.w.exactlyZero()) {
-                Simulator<Config>::dd->cn.returnToCache(right.w);
+            if (right.p != nullptr && right.p->v > level) {
+                level = right.p->v;
             }
 
-            Simulator<Config>::dd->incRef(result);
-            nodesOnLevel.at(i)[it->first] = result;
-            saveEdges.push_back(result);
+            nodesOnLevel.at(i)[it->first] = Simulator<Config>::dd->add2(left, right, level);
         }
-        for (auto& it: nodesOnLevel.at(i - 1)) {
-            Simulator<Config>::dd->decRef(it.second);
-        }
-        Simulator<Config>::dd->garbageCollect();
-        saveEdges.push_back(Simulator<Config>::rootEdge);
         nodesOnLevel.at(i - 1).clear();
     }
 
@@ -428,33 +406,29 @@ void ShorFastSimulator<Config>::uAEmulate2(const std::uint64_t a) {
         throw std::runtime_error("error occurred");
     }
 
-    dd::vEdge result = nodesOnLevel.at(nQubits - 2)[Simulator<Config>::rootEdge.p->e[0].p];
+    auto result = nodesOnLevel.at(nQubits - 2)[Simulator<Config>::rootEdge.p->e[0].p];
+    result.w    = result.w * Simulator<Config>::rootEdge.p->e[0].w;
+    auto tmp    = dd::vCachedEdge{Simulator<Config>::rootEdge.p->e[0].p, Simulator<Config>::rootEdge.p->e[0].w};
+    result      = Simulator<Config>::dd->makeDDNode(Simulator<Config>::rootEdge.p->v, std::array{tmp, result});
 
-    Simulator<Config>::dd->decRef(result);
-
-    result.w = Simulator<Config>::dd->cn.mulCached(result.w, Simulator<Config>::rootEdge.p->e[0].w);
-    auto tmp = result.w;
-
-    result = Simulator<Config>::dd->makeDDNode(Simulator<Config>::rootEdge.p->v, std::array<dd::vEdge, dd::RADIX>{Simulator<Config>::rootEdge.p->e[0], result});
-    Simulator<Config>::dd->cn.returnToCache(tmp);
-
-    result.w = Simulator<Config>::dd->cn.mulCached(result.w, Simulator<Config>::rootEdge.w);
-    tmp      = result.w;
-    result.w = Simulator<Config>::dd->cn.lookup(result.w);
-    Simulator<Config>::dd->cn.returnToCache(tmp);
+    result.w = result.w * Simulator<Config>::rootEdge.w;
+    auto res = dd::vEdge{result.p, Simulator<Config>::dd->cn.lookup(result.w)};
+    Simulator<Config>::dd->incRef(res);
     Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
-    Simulator<Config>::dd->incRef(result);
-    Simulator<Config>::rootEdge = result;
+    Simulator<Config>::rootEdge = res;
     Simulator<Config>::dd->garbageCollect();
-    assert(Simulator<Config>::dd->cn.cacheCount() == cacheCountBefore);
 }
 
 template<class Config>
 void ShorFastSimulator<Config>::uAEmulate2Rec(dd::vEdge e) {
-    if (e.isTerminal() || nodesOnLevel.at(static_cast<std::size_t>(e.p->v)).find(e.p) != nodesOnLevel.at(static_cast<std::size_t>(e.p->v)).end()) {
+    if (e.isTerminal()) {
         return;
     }
-    nodesOnLevel.at(static_cast<std::size_t>(e.p->v))[e.p] = dd::vEdge::zero();
+    auto& nodes = nodesOnLevel.at(static_cast<std::size_t>(e.p->v));
+    if (nodes.find(e.p) != nodes.end()) {
+        return;
+    }
+    nodes[e.p] = dd::vCachedEdge::zero();
     uAEmulate2Rec(e.p->e[0]);
     uAEmulate2Rec(e.p->e[1]);
 }

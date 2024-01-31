@@ -18,18 +18,18 @@ from .pyddsim import (
 )
 
 __all__ = [
-    "DDSIMProvider",
     "CircuitSimulator",
+    "ConstructionMode",
+    "DDSIMProvider",
     "HybridCircuitSimulator",
+    "HybridMode",
     "StochasticNoiseSimulator",
     "DeterministicNoiseSimulator",
     "PathCircuitSimulator",
-    "UnitarySimulator",
-    "HybridMode",
-    "PathSimulatorMode",
     "PathSimulatorConfiguration",
-    "ConstructionMode",
-    "get_matrix",
-    "dump_tensor_network",
+    "PathSimulatorMode",
+    "UnitarySimulator",
     "__version__",
+    "dump_tensor_network",
+    "get_matrix",
 ]

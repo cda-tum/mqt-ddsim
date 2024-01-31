@@ -142,8 +142,7 @@ def test_qasm_simulator_access(backend: QasmSimulatorBackend, shots: int):
 
 def test_qasm_simulator_portfolioqaoa(backend: QasmSimulatorBackend, shots: int):
     """Run simulator with with 2-target gates that take a parameter. Circuit taken from MQT Bench."""
-    circuit = QuantumCircuit.from_qasm_str(
-        """OPENQASM 2.0;
+    circuit = QuantumCircuit.from_qasm_str("""OPENQASM 2.0;
         include "qelib1.inc";
         qreg q[3];
         creg meas[3];
@@ -172,8 +171,7 @@ def test_qasm_simulator_portfolioqaoa(backend: QasmSimulatorBackend, shots: int)
         measure q[0] -> meas[0];
         measure q[1] -> meas[1];
         measure q[2] -> meas[2];
-        """
-    )
+        """)
     result = execute(circuit, backend, shots=shots, seed_simulator=1337).result()
     assert result.success
 

@@ -95,16 +95,12 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
             nthreads=nthreads,
         )
 
-        metadata = qc.metadata
-        if metadata is None:
-            metadata = {}
-
         return ExperimentResult(
             shots=shots,
             success=True,
             status="DONE",
             seed=seed,
             data=data,
-            metadata=metadata,
+            metadata=qc.metadata,
             header=DDSIMHeader(qc),
         )

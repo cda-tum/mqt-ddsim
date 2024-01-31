@@ -36,7 +36,7 @@ repos:
 
   # Handling unwanted unicode characters
   - repo: https://github.com/sirosen/texthooks
-    rev: 0.6.3
+    rev: 0.6.4
     hooks:
       - id: fix-ligatures
       - id: fix-smartquotes
@@ -51,7 +51,7 @@ repos:
 
   # Python linting using ruff
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.11
+    rev: v0.1.14
     hooks:
       - id: ruff
         args: ["--fix", "--show-fixes"]
@@ -72,8 +72,8 @@ repos:
     hooks:
       - id: cmake-format
         additional_dependencies: [pyyaml]
-      - id: cmake-lint
-        additional_dependencies: [pyyaml]
+        types: [file]
+        files: (\.cmake|CMakeLists.txt)(.in)?$
 
   # Clang-format the C++ part of the code base automatically
   - repo: https://github.com/pre-commit/mirrors-clang-format

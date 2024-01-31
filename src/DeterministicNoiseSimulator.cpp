@@ -1,6 +1,7 @@
 #include "DeterministicNoiseSimulator.hpp"
 
 #include "dd/Export.hpp"
+#include "dd/Operations.hpp"
 
 using CN = dd::ComplexNumbers;
 
@@ -97,9 +98,9 @@ std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>> DeterministicNo
 
 template<class Config>
 std::map<std::size_t, bool> DeterministicNoiseSimulator<Config>::deterministicSimulate(bool ignoreNonUnitaries) {
+    std::map<std::size_t, bool> classicValues;
     rootEdge = Simulator<Config>::dd->makeZeroDensityOperator(static_cast<dd::Qubit>(qc->getNqubits()));
     Simulator<Config>::dd->incRef(rootEdge);
-    std::map<std::size_t, bool> classicValues;
 
     auto deterministicNoiseFunctionality = dd::DeterministicNoiseFunctionality<Config>(
             Simulator<Config>::dd,
@@ -139,7 +140,7 @@ std::map<std::size_t, bool> DeterministicNoiseSimulator<Config>::deterministicSi
                         std::tie(rootEdge, result) = Simulator<Config>::dd->measureOneCollapsing(rootEdge, static_cast<dd::Qubit>(qubits.at(qubit)), Simulator<Config>::mt);
                         if (result == '1') {
                             const auto x         = qc::StandardOperation(qc->getNqubits(), qubit, qc::X);
-                            const auto operation = dd::getDD(&x, Simulator<Config>::dd);
+                            const auto operation = dd::getDD(&x, *Simulator<Config>::dd);
                             rootEdge             = Simulator<Config>::dd->applyOperationToDensity(rootEdge, operation);
                         }
                     }
@@ -166,7 +167,7 @@ std::map<std::size_t, bool> DeterministicNoiseSimulator<Config>::deterministicSi
                 }
             }
 
-            auto operation = dd::getDD(op.get(), Simulator<Config>::dd);
+            auto operation = dd::getDD(op.get(), *Simulator<Config>::dd);
 
             // Applying the operation to the density matrix
             Simulator<Config>::dd->applyOperationToDensity(rootEdge, operation);

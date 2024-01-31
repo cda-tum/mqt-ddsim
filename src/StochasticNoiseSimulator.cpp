@@ -1,4 +1,5 @@
 #include "StochasticNoiseSimulator.hpp"
+#include "dd/Operations.hpp"
 
 #include <queue>
 #include <stdexcept>
@@ -7,8 +8,65 @@ using CN = dd::ComplexNumbers;
 
 template<class Config>
 std::map<std::string, std::size_t> StochasticNoiseSimulator<Config>::simulate(size_t nshots) {
+    std::map<std::size_t, bool> classicValues;
     stochasticRuns = nshots;
+        if (op->isNonUnitaryOperation()) {
+            if (auto* nuOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
+                if (op->getType() == qc::Measure) {
+                    const auto& quantum = nuOp->getTargets();
+                    const auto& classic = nuOp->getClassics();
 
+                    assert(quantum.size() == classic.size()); // this should not happen do to check in Simulate
+
+                    for (std::size_t i = 0U; i < quantum.size(); ++i) {
+                        const auto result = Simulator<Config>::measureOneCollapsing(quantum.at(i));
+                        assert(result == '0' || result == '1');
+                        classicValues[classic.at(i)] = (result == '1');
+                    }
+                } else {
+                    throw std::runtime_error(std::string("Unsupported non-unitary functionality '") + op->getName() + "'.");
+                }
+            } else {
+                throw std::runtime_error(std::string("Dynamic cast to NonUnitaryOperation failed for '") + op->getName() + "'.");
+            }
+            Simulator<Config>::dd->garbageCollect();
+        } else {
+            if (op->isClassicControlledOperation()) {
+                if (auto* ccOp = dynamic_cast<qc::ClassicControlledOperation*>(op.get())) {
+                    const auto startIndex    = static_cast<std::uint16_t>(ccOp->getParameter().at(0U));
+                    const auto length        = static_cast<std::uint16_t>(ccOp->getParameter().at(1U));
+                    const auto expectedValue = ccOp->getExpectedValue();
+
+                    std::size_t actualValue = 0U;
+                    for (std::size_t i = 0U; i < length; i++) {
+                        actualValue |= (classicValues[startIndex + i] ? 1U : 0U) << i;
+                    }
+
+                    //std::clog << "expected " << expected_value << " and actual value was " << actual_value << "\n";
+
+                    if (actualValue != expectedValue) {
+                        continue;
+                    }
+                } else {
+                    throw std::runtime_error("Dynamic cast to ClassicControlledOperation failed.");
+                }
+            }
+
+            auto operation = dd::getDD(op.get(), Simulator<Config>::dd);
+            auto tmp       = Simulator<Config>::dd->multiply(operation, Simulator<Config>::rootEdge);
+            Simulator<Config>::dd->incRef(tmp);
+            Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
+            Simulator<Config>::rootEdge = tmp;
+
+            Simulator<Config>::dd->garbageCollect();
+        }
+    }
+}
+
+template<class Config>
+std::map<std::string, double> StochasticNoiseSimulator<Config>::stochSimulate() {
+    // Generate a vector for each instance.
+    recordedPropertiesPerInstance.resize(maxInstances, std::vector<double>(recordedProperties.size(), 0.0));
     classicalMeasurementsMaps.resize(maxInstances);
     //std::clog << "Conducting " << stochasticRuns << " runs using " << maxInstances << " cores...\n";
     std::vector<std::thread> threadArray;
@@ -127,7 +185,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
                         }
                         expValue = expValue >> 1U;
                     }
-                    operation = dd::getDD(classicOp->getOperation(), localDD);
+                    operation = dd::getDD(classicOp->getOperation(), *localDD);
                     if (!executeOp) {
                         continue;
                     }
@@ -138,13 +196,13 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
                     if (targets.size() == 1 && controls.empty()) {
                         auto* oper = localDD->stochasticNoiseOperationCache.lookup(op->getType(), static_cast<dd::Qubit>(targets.front()));
                         if (oper == nullptr) {
-                            operation = dd::getDD(op.get(), localDD);
+                            operation = dd::getDD(op.get(), *localDD);
                             localDD->stochasticNoiseOperationCache.insert(op->getType(), static_cast<dd::Qubit>(targets.front()), operation);
                         } else {
                             operation = *oper;
                         }
                     } else {
-                        operation = dd::getDD(op.get(), localDD);
+                        operation = dd::getDD(op.get(), *localDD);
                     }
                 }
 

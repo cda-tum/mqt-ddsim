@@ -207,10 +207,6 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
             time_sim=end_time - setup_time,
         )
 
-        metadata = qc.metadata
-        if metadata is None:
-            metadata = {}
-
         return ExperimentResult(
             shots=shots,
             success=True,
@@ -218,6 +214,6 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
             config=pathsim_configuration,
             seed=seed,
             data=data,
-            metadata=metadata,
+            metadata=qc.metadata,
             header=DDSIMHeader(qc),
         )

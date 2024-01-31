@@ -81,17 +81,13 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
             time_taken=end_time - start_time,
         )
 
-        metadata = qc.metadata
-        if metadata is None:
-            metadata = {}
-
         return ExperimentResult(
             shots=1,
             success=True,
             status="DONE",
             seed=seed,
             data=data,
-            metadata=metadata,
+            metadata=qc.metadata,
             header=DDSIMHeader(qc),
         )
 
