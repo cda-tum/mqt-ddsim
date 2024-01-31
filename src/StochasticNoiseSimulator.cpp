@@ -8,65 +8,8 @@ using CN = dd::ComplexNumbers;
 
 template<class Config>
 std::map<std::string, std::size_t> StochasticNoiseSimulator<Config>::simulate(size_t nshots) {
-    std::map<std::size_t, bool> classicValues;
     stochasticRuns = nshots;
-        if (op->isNonUnitaryOperation()) {
-            if (auto* nuOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
-                if (op->getType() == qc::Measure) {
-                    const auto& quantum = nuOp->getTargets();
-                    const auto& classic = nuOp->getClassics();
 
-                    assert(quantum.size() == classic.size()); // this should not happen do to check in Simulate
-
-                    for (std::size_t i = 0U; i < quantum.size(); ++i) {
-                        const auto result = Simulator<Config>::measureOneCollapsing(quantum.at(i));
-                        assert(result == '0' || result == '1');
-                        classicValues[classic.at(i)] = (result == '1');
-                    }
-                } else {
-                    throw std::runtime_error(std::string("Unsupported non-unitary functionality '") + op->getName() + "'.");
-                }
-            } else {
-                throw std::runtime_error(std::string("Dynamic cast to NonUnitaryOperation failed for '") + op->getName() + "'.");
-            }
-            Simulator<Config>::dd->garbageCollect();
-        } else {
-            if (op->isClassicControlledOperation()) {
-                if (auto* ccOp = dynamic_cast<qc::ClassicControlledOperation*>(op.get())) {
-                    const auto startIndex    = static_cast<std::uint16_t>(ccOp->getParameter().at(0U));
-                    const auto length        = static_cast<std::uint16_t>(ccOp->getParameter().at(1U));
-                    const auto expectedValue = ccOp->getExpectedValue();
-
-                    std::size_t actualValue = 0U;
-                    for (std::size_t i = 0U; i < length; i++) {
-                        actualValue |= (classicValues[startIndex + i] ? 1U : 0U) << i;
-                    }
-
-                    //std::clog << "expected " << expected_value << " and actual value was " << actual_value << "\n";
-
-                    if (actualValue != expectedValue) {
-                        continue;
-                    }
-                } else {
-                    throw std::runtime_error("Dynamic cast to ClassicControlledOperation failed.");
-                }
-            }
-
-            auto operation = dd::getDD(op.get(), Simulator<Config>::dd);
-            auto tmp       = Simulator<Config>::dd->multiply(operation, Simulator<Config>::rootEdge);
-            Simulator<Config>::dd->incRef(tmp);
-            Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
-            Simulator<Config>::rootEdge = tmp;
-
-            Simulator<Config>::dd->garbageCollect();
-        }
-    }
-}
-
-template<class Config>
-std::map<std::string, double> StochasticNoiseSimulator<Config>::stochSimulate() {
-    // Generate a vector for each instance.
-    recordedPropertiesPerInstance.resize(maxInstances, std::vector<double>(recordedProperties.size(), 0.0));
     classicalMeasurementsMaps.resize(maxInstances);
     //std::clog << "Conducting " << stochasticRuns << " runs using " << maxInstances << " cores...\n";
     std::vector<std::thread> threadArray;
@@ -154,7 +97,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
                             const auto result = localDD->measureOneCollapsing(localRootEdge, static_cast<dd::Qubit>(qubits.at(qubit)), true, generator);
                             if (result == '1') {
                                 const auto x   = qc::StandardOperation(qc->getNqubits(), qubit, qc::X);
-                                auto       tmp = localDD->multiply(dd::getDD(&x, localDD), localRootEdge);
+                                auto       tmp = localDD->multiply(dd::getDD(&x, *localDD), localRootEdge);
                                 localDD->incRef(tmp);
                                 localDD->decRef(localRootEdge);
                                 localRootEdge = tmp;
@@ -168,7 +111,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
                     throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
                 }
             } else {
-                dd::mEdge operation;
+                dd::mEdge    operation;
                 if (op->isClassicControlledOperation()) {
                     // Check if the operation is controlled by a classical register
                     auto* classicOp = dynamic_cast<qc::ClassicControlledOperation*>(op.get());
