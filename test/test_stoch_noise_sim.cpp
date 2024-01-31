@@ -256,8 +256,6 @@ TEST(StochNoiseSimTest, SimulateAdder4WithNoiseAndApproximation) {
     EXPECT_NEAR(static_cast<double>(m.find("1011")->second), 26, tolerance);
     EXPECT_NEAR(static_cast<double>(m.find("0111")->second), 23, tolerance);
     EXPECT_NEAR(static_cast<double>(m.find("1111")->second), 11, tolerance);
-
-    //    EXPECT_GT(std::stoi(ddsim.additionalStatistics().at("approximation_runs")), 0);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorUnoptimizedSim) {

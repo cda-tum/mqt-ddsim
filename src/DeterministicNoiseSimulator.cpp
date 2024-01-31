@@ -158,9 +158,6 @@ std::map<std::size_t, bool> DeterministicNoiseSimulator<Config>::deterministicSi
                     for (std::size_t i = 0; i < length; i++) {
                         actualValue |= (classicValues[startIndex + i] ? 1U : 0U) << i;
                     }
-
-                    //std::clog << "expected " << expected_value << " and actual value was " << actual_value << "\n";
-
                     if (actualValue != expectedValue) {
                         continue;
                     }
