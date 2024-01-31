@@ -23,5 +23,5 @@ class StochasticNoiseSimulatorBackend(QasmSimulatorBackend):
         )
 
     @property
-    def target(self):
+    def target(self) -> Target:
         return self._HSF_SV_TARGET
