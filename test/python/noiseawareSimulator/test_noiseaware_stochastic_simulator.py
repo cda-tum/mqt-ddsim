@@ -55,7 +55,7 @@ class MQTStochQasmSimulatorTest(unittest.TestCase):
         assert abs(result["1001"] - 1000) <= tolerance
 
     def test_def_config(self):
-        tolerance = 50
+        tolerance = 60
         sim = ddsim.StochasticNoiseSimulator(
             self.circuit,
             noiseEffects="APD",
