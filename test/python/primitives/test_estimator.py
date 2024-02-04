@@ -88,12 +88,14 @@ def test_estimator_run_single_circuit__observable_no_params(
 def test_run_with_operator(circuits: list[QuantumCircuit], estimator: Estimator) -> None:
     """test for run with Operator as an observable"""
     circuit = circuits[0].assign_parameters([0, 1, 1, 2, 3, 5])
-    matrix = Operator([
-        [-1.06365335, 0.0, 0.0, 0.1809312],
-        [0.0, -1.83696799, 0.1809312, 0.0],
-        [0.0, 0.1809312, -0.24521829, 0.0],
-        [0.1809312, 0.0, 0.0, -1.06365335],
-    ])
+    matrix = SparsePauliOp.from_operator(
+        Operator([
+            [-1.06365335, 0.0, 0.0, 0.1809312],
+            [0.0, -1.83696799, 0.1809312, 0.0],
+            [0.0, 0.1809312, -0.24521829, 0.0],
+            [0.1809312, 0.0, 0.0, -1.06365335],
+        ])
+    )
     result = estimator.run([circuit], [matrix]).result()
 
     assert isinstance(result, EstimatorResult)

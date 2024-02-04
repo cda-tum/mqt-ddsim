@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 
-from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister, execute
+from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 from qiskit.quantum_info import Statevector, state_fidelity
 
 from mqt.ddsim.statevectorsimulator import StatevectorSimulatorBackend
@@ -28,12 +28,12 @@ def test_circuit_multi() -> None:
 
     backend_sim = StatevectorSimulatorBackend()
 
-    result = execute(qc, backend_sim).result()
+    result = backend_sim.run(qc).result()
     counts = result.get_counts(qc)
 
     target = {"01 10": 1024}
 
-    result = execute(circ, backend_sim).result()
+    result = backend_sim.run(circ).result()
     state = result.get_statevector()
 
     assert counts == target
