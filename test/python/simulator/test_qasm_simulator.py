@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-from qiskit import AncillaRegister, ClassicalRegister, QuantumCircuit, QuantumRegister, execute
+from qiskit import (
+    AncillaRegister,
+    ClassicalRegister,
+    QuantumCircuit,
+    QuantumRegister,
+)
 from qiskit.circuit import Parameter
 
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
@@ -42,13 +47,13 @@ def shots() -> int:
 
 def test_qasm_simulator_single_shot(circuit: QuantumCircuit, backend: QasmSimulatorBackend):
     """Test single shot run."""
-    result = execute(circuit, backend, shots=1).result()
+    result = backend.run(circuit, shots=1).result()
     assert result.success
 
 
 def test_qasm_simulator(circuit: QuantumCircuit, backend: QasmSimulatorBackend, shots: int):
     """Test data counts output for single circuit run against reference."""
-    result = execute(circuit, backend, shots=shots).result()
+    result = backend.run(circuit, shots=shots).result()
     assert result.success
 
     threshold = 0.04 * shots
@@ -91,7 +96,8 @@ def test_qasm_simulator_support_parametrized_gates(backend: QasmSimulatorBackend
         backend.run([bare_circuit], [[np.pi]], shots=shots).result()
 
     with pytest.raises(
-        ValueError, match=r"No parameter values provided although at least one parameterized circuit was supplied."
+        ValueError,
+        match=r"No parameter values provided although at least one parameterized circuit was supplied.",
     ):
         backend.run([circuit_1, circuit_2], shots=shots).result()
 
@@ -117,7 +123,7 @@ def test_qasm_simulator_approximation(backend: QasmSimulatorBackend, shots: int)
     circuit = QuantumCircuit(2)
     circuit.h(0)
     circuit.cx(0, 1)
-    result = execute(circuit, backend, shots=shots, approximation_step_fidelity=0.4, approximation_steps=3).result()
+    result = backend.run(circuit, shots=shots, approximation_step_fidelity=0.4, approximation_steps=3).result()
     assert result.success
     counts = result.get_counts()
     assert len(counts) == 1
@@ -130,7 +136,7 @@ def test_qasm_simulator_access(backend: QasmSimulatorBackend, shots: int):
     circuit_2.x(0)
     circuit_2.x(1)
 
-    result = execute([circuit_1, circuit_2], backend, shots=shots).result()
+    result = backend.run([circuit_1, circuit_2], shots=shots).result()
     assert result.success
 
     counts_1 = result.get_counts(circuit_1.name)
@@ -172,7 +178,7 @@ def test_qasm_simulator_portfolioqaoa(backend: QasmSimulatorBackend, shots: int)
         measure q[1] -> meas[1];
         measure q[2] -> meas[2];
         """)
-    result = execute(circuit, backend, shots=shots, seed_simulator=1337).result()
+    result = backend.run(circuit, shots=shots, seed_simulator=1337).result()
     assert result.success
 
     counts = result.get_counts()
@@ -193,7 +199,7 @@ def test_qasm_simulator_mcx_no_ancilla(backend: QasmSimulatorBackend, num_contro
 
     print(backend.target.operation_names)
 
-    result = execute(circuit, backend, shots=shots).result()
+    result = backend.run(circuit, shots=shots).result()
     assert result.success
 
     counts = result.get_counts()
@@ -214,7 +220,7 @@ def test_qasm_simulator_mcx_recursion(backend: QasmSimulatorBackend, num_control
     circuit.mcx(controls, q[0], ancilla_qubits=anc, mode="recursion")
     circuit.measure(q, c)
 
-    result = execute(circuit, backend, shots=shots).result()
+    result = backend.run(circuit, shots=shots).result()
     assert result.success
 
     counts = result.get_counts()
@@ -235,7 +241,7 @@ def test_qasm_simulator_mcx_vchain(backend: QasmSimulatorBackend, num_controls: 
     circuit.mcx(controls, q[0], ancilla_qubits=anc, mode="v-chain")
     circuit.measure(q, c)
 
-    result = execute(circuit, backend, shots=shots).result()
+    result = backend.run(circuit, shots=shots).result()
     assert result.success
 
     counts = result.get_counts()
@@ -257,7 +263,7 @@ def test_qasm_simulator_mcp(backend: QasmSimulatorBackend, num_controls: int, sh
     circuit.h(q[0])
     circuit.measure(q, c)
 
-    result = execute(circuit, backend, shots=shots).result()
+    result = backend.run(circuit, shots=shots).result()
     assert result.success
 
     counts = result.get_counts()

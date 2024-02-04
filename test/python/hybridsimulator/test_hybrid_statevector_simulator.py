@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 import unittest
 
-from qiskit import QuantumCircuit, QuantumRegister, execute
+from qiskit import QuantumCircuit, QuantumRegister
 
 from mqt.ddsim.hybridstatevectorsimulator import HybridStatevectorSimulatorBackend
 
@@ -24,7 +24,7 @@ class MQTHybridStatevectorSimulatorTest(unittest.TestCase):
 
     def test_statevector_output(self):
         """Test final state vector for single circuit run."""
-        result = execute(self.q_circuit, backend=self.backend, shots=0).result()
+        result = self.backend.run(self.q_circuit, shots=0).result()
         assert result.success
         actual = result.get_statevector()
 

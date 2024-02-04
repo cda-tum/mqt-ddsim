@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from qiskit import QuantumCircuit, execute
+from qiskit import QuantumCircuit
 
 from mqt.ddsim.pathqasmsimulator import PathQasmSimulatorBackend
 
@@ -31,12 +31,12 @@ class MQTQasmSimulatorTest(unittest.TestCase):
 
     def test_qasm_simulator_single_shot(self):
         """Test single shot run."""
-        assert execute(self.circuit, self.backend, shots=1).result().success
+        assert self.backend.run(self.circuit, shots=1).result().success
 
     def test_qasm_simulator(self):
         """Test data counts output for single circuit run against reference."""
         shots = 1024
-        result = execute(self.circuit, self.backend, shots=shots).result()
+        result = self.backend.run(self.circuit, shots=shots).result()
         threshold = 0.04 * shots
         counts = result.get_counts()
         target = {
@@ -63,7 +63,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         circuit_2.x(0)
         circuit_2.x(1)
 
-        result = execute([circuit_1, circuit_2], self.backend, shots=shots).result()
+        result = self.backend.run([circuit_1, circuit_2], shots=shots).result()
         assert result.success
 
         counts_1 = result.get_counts(circuit_1.name)
@@ -75,7 +75,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
     def test_qasm_simulator_pairwise(self):
         """Test data counts output for single circuit run against reference."""
         shots = 1024
-        result = execute(self.circuit, self.backend, shots=shots, mode="pairwise_recursive").result()
+        result = self.backend.run(self.circuit, shots=shots, mode="pairwise_recursive").result()
         threshold = 0.04 * shots
         counts = result.get_counts()
         target = {
@@ -97,7 +97,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
     def test_qasm_simulator_bracket(self):
         """Test data counts output for single circuit run against reference."""
         shots = 1024
-        result = execute(self.circuit, self.backend, shots=shots, mode="bracket").result()
+        result = self.backend.run(self.circuit, shots=shots, mode="bracket").result()
 
         print(result)
         threshold = 0.04 * shots
@@ -121,7 +121,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
     def test_qasm_simulator_alternating(self):
         """Test data counts output for single circuit run against reference."""
         shots = 1024
-        result = execute(self.circuit, self.backend, shots=shots, mode="alternating").result()
+        result = self.backend.run(self.circuit, shots=shots, mode="alternating").result()
 
         print(result)
         threshold = 0.04 * shots

@@ -58,7 +58,7 @@ Then proceed as described in the section on your operating system.
 
         backend = ddsim.DDSIMProvider().get_backend("qasm_simulator")
 
-        job = execute(circ, backend, shots=10000)
+        job = backend.run(circ, shots=10000)
         counts = job.result().get_counts(circ)
         print(counts)
 

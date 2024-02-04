@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 
 import numpy as np
-from qiskit import QuantumCircuit, execute
+from qiskit import QuantumCircuit
 
 from mqt.ddsim.unitarysimulator import UnitarySimulatorBackend
 
@@ -20,12 +20,12 @@ class MQTUnitarySimulatorTest(unittest.TestCase):
         self.non_zeros_in_bell_circuit = 16
 
     def test_unitary_simulator_sequential_mode(self):
-        result = execute(self.circuit, self.backend, mode="sequential").result()
+        result = self.backend.run(self.circuit, mode="sequential").result()
         assert result.success
         print(result.get_unitary())
         assert np.count_nonzero(result.get_unitary()) == self.non_zeros_in_bell_circuit
 
     def test_unitary_simulator_recursive_mode(self):
-        result = execute(self.circuit, self.backend, mode="recursive").result()
+        result = self.backend.run(self.circuit, mode="recursive").result()
         assert result.success
         assert np.count_nonzero(result.get_unitary()) == self.non_zeros_in_bell_circuit

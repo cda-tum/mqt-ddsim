@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from qiskit import BasicAer, QuantumCircuit, QuantumRegister, execute
+from qiskit import QuantumCircuit, QuantumRegister
 
 from mqt.ddsim.hybridqasmsimulator import HybridQasmSimulatorBackend
 
@@ -31,12 +31,12 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
 
     def test_qasm_simulator_single_shot(self):
         """Test single shot run."""
-        assert execute(self.circuit, self.backend, shots=1).result().success
+        assert self.backend.run(self.circuit, shots=1).result().success
 
     def test_qasm_simulator(self):
         """Test data counts output for single circuit run against reference."""
         shots = 1024
-        result = execute(self.circuit, self.backend, shots=shots).result()
+        result = self.backend.run(self.circuit, shots=shots).result()
         threshold = 0.04 * shots
         counts = result.get_counts()
         target = {
@@ -63,7 +63,7 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
         circuit_2.x(0)
         circuit_2.x(1)
 
-        result = execute([circuit_1, circuit_2], self.backend, shots=shots).result()
+        result = self.backend.run([circuit_1, circuit_2], shots=shots).result()
         assert result.success
 
         counts_1 = result.get_counts(circuit_1.name)
@@ -71,28 +71,6 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
 
         assert counts_1 == {"0": shots}
         assert counts_2 == {"11": shots}
-
-    def test_basicaer_simulator(self):
-        """Test data counts output for single circuit run against reference."""
-        shots = 1024
-        result = execute(self.circuit, BasicAer.get_backend("qasm_simulator"), shots=shots).result()
-        threshold = 0.04 * shots
-        counts = result.get_counts()
-        target = {
-            "100 100": shots / 8,
-            "011 011": shots / 8,
-            "101 101": shots / 8,
-            "111 111": shots / 8,
-            "000 000": shots / 8,
-            "010 010": shots / 8,
-            "110 110": shots / 8,
-            "001 001": shots / 8,
-        }
-
-        assert len(target) == len(counts)
-        for key in target:
-            assert key in counts
-            assert abs(target[key] - counts[key]) < threshold
 
     def test_dd_mode_simulation(self):
         """Test running a single circuit."""
@@ -104,7 +82,7 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
         circ.measure_all(inplace=True)
         print(circ.draw(fold=-1))
         self.circuit = circ
-        result = execute(self.circuit, self.backend, mode="dd").result()
+        result = self.backend.run(self.circuit, mode="dd").result()
         assert result.success
 
     def test_amplitude_mode_simulation(self):
@@ -117,5 +95,5 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
         circ.measure_all(inplace=True)
         print(circ.draw(fold=-1))
         self.circuit = circ
-        result = execute(self.circuit, self.backend, mode="amplitude").result()
+        result = self.backend.run(self.circuit, mode="amplitude").result()
         assert result.success
