@@ -14,7 +14,7 @@ std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_
     std::map<std::size_t, std::size_t> measurementMap;
 
     for (auto& op: *qc) {
-        if (op->isClassicControlledOperation() || (op->isNonUnitaryOperation() && op->getType() != qc::Measure && op->getType() != qc::Barrier)) {
+        if (op->isClassicControlledOperation() || (op->isNonUnitaryOperation() && op->getType() != qc::Measure)) {
             hasNonmeasurementNonUnitary = true;
         }
         if (op->getType() == qc::Measure) {
@@ -143,8 +143,6 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
                             Simulator<Config>::dd->garbageCollect();
                         }
                     }
-                } else if (op->getType() == qc::Barrier) {
-                    continue;
                 } else {
                     throw std::runtime_error("Unsupported non-unitary functionality.");
                 }
