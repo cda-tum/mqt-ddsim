@@ -62,9 +62,9 @@ TEST(CircuitSimTest, SingleOneQubitMultiShots) {
 
 TEST(CircuitSimTest, BarrierStatement) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(1);
-    quantumComputation->emplace_back<qc::StandardOperation>(1, 0, qc::H);
-    quantumComputation->emplace_back<qc::NonUnitaryOperation>(1, std::vector<qc::Qubit>{0}, qc::Barrier);
-    quantumComputation->emplace_back<qc::StandardOperation>(1, 0, qc::H);
+    quantumComputation->h(0);
+    quantumComputation->barrier(0);
+    quantumComputation->h(0);
     CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo());
 
     ASSERT_EQ(ddsim.getNumberOfOps(), 3);
