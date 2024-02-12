@@ -236,7 +236,7 @@ extend-ignore = [
 ]
 isort.required-imports = ["from __future__ import annotations"]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "test/python/**" = ["T20", "ANN", "D"]
 "docs/**" = ["T20"]
 "noxfile.py" = ["T20", "TID251"]
