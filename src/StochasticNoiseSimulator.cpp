@@ -21,9 +21,9 @@ std::map<std::string, std::size_t> StochasticNoiseSimulator<Config>::simulate(si
         threadArray.emplace_back(&StochasticNoiseSimulator<Config>::runStochSimulationForId,
                                  this,
                                  runID,
-                                 qc->getNqubits(),
+                                 CircuitSimulator<Config>::qc->getNqubits(),
                                  std::ref(classicalMeasurementsMaps[runID]),
-                                 static_cast<std::uint64_t>(Simulator<Config>::mt()));
+                                 static_cast<std::uint64_t>(CircuitSimulator<Config>::mt()));
     }
     // wait for threads to finish
     for (auto& thread: threadArray) {
@@ -53,12 +53,12 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
     std::mt19937_64 generator(localSeed);
 
     const std::uint64_t numberOfRuns = stochasticRuns / maxInstances + (stochRun < stochasticRuns % maxInstances ? 1U : 0U);
-    const auto          approxMod    = static_cast<unsigned>(std::ceil(static_cast<double>(qc->getNops()) / (static_cast<double>(stepNumber + 1))));
+    const auto          approxMod    = static_cast<unsigned>(std::ceil(static_cast<double>(CircuitSimulator<Config>::qc->getNops()) / (static_cast<double>(stepNumber + 1))));
 
     //printf("Running %d times and using the dd at %p, using the cn object at %p\n", numberOfRuns, (void *) &package, (void *) &package->cn);
     for (std::size_t currentRun = 0U; currentRun < numberOfRuns; currentRun++) {
-        auto localDD                      = std::make_unique<dd::Package<StochasticNoiseSimulatorDDPackageConfig>>(qc->getNqubits());
-        auto stochasticNoiseFunctionality = dd::StochasticNoiseFunctionality<StochasticNoiseSimulatorDDPackageConfig>(
+        auto localDD                      = std::make_unique<dd::Package<dd::StochasticNoiseSimulatorDDPackageConfig>>(CircuitSimulator<Config>::qc->getNqubits());
+        auto stochasticNoiseFunctionality = dd::StochasticNoiseFunctionality<dd::StochasticNoiseSimulatorDDPackageConfig>(
                 localDD,
                 static_cast<dd::Qubit>(nQubits),
                 noiseProbability,
@@ -74,7 +74,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
         dd::vEdge localRootEdge = localDD->makeZeroState(static_cast<dd::Qubit>(nQubits));
         localDD->incRef(localRootEdge);
 
-        for (auto& op: *qc) {
+        for (auto& op: *CircuitSimulator<Config>::qc) {
             if (op->getType() == qc::Barrier) {
                 continue;
             }
@@ -97,7 +97,7 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
                         for (const auto& qubit: qubits) {
                             const auto result = localDD->measureOneCollapsing(localRootEdge, static_cast<dd::Qubit>(qubits.at(qubit)), true, generator);
                             if (result == '1') {
-                                const auto x   = qc::StandardOperation(qc->getNqubits(), qubit, qc::X);
+                                const auto x   = qc::StandardOperation(CircuitSimulator<Config>::qc->getNqubits(), qubit, qc::X);
                                 auto       tmp = localDD->multiply(dd::getDD(&x, *localDD), localRootEdge);
                                 localDD->incRef(tmp);
                                 localDD->decRef(localRootEdge);
@@ -165,8 +165,8 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
         localDD->decRef(localRootEdge);
 
         if (!classicValues.empty()) {
-            const auto  cbits = qc->getNcbits();
-            std::string classicRegisterString(qc->getNcbits(), '0');
+            const auto  cbits = CircuitSimulator<Config>::qc->getNcbits();
+            std::string classicRegisterString(CircuitSimulator<Config>::qc->getNcbits(), '0');
 
             for (const auto& [bitIndex, value]: classicValues) {
                 classicRegisterString[cbits - bitIndex - 1] = value ? '1' : '0';
@@ -176,4 +176,4 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
     }
 }
 
-template class StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>;
+template class StochasticNoiseSimulator<dd::StochasticNoiseSimulatorDDPackageConfig>;

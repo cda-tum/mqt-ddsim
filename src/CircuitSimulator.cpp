@@ -229,3 +229,5 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
 }
 
 template class CircuitSimulator<dd::DDPackageConfig>;
+template class CircuitSimulator<dd::DensityMatrixSimulatorDDPackageConfig>;
+template class CircuitSimulator<dd::StochasticNoiseSimulatorDDPackageConfig>;

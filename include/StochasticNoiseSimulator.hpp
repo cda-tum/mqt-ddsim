@@ -1,7 +1,7 @@
 #pragma once
 
+#include "CircuitSimulator.hpp"
 #include "QuantumComputation.hpp"
-#include "Simulator.hpp"
 #include "dd/NoiseFunctionality.hpp"
 #include "nlohmann/json.hpp"
 
@@ -16,8 +16,8 @@
 #include <variant>
 #include <vector>
 
-template<class Config = StochasticNoiseSimulatorDDPackageConfig>
-class StochasticNoiseSimulator: public Simulator<Config> {
+template<class Config = dd::StochasticNoiseSimulatorDDPackageConfig>
+class StochasticNoiseSimulator: public CircuitSimulator<Config> {
 public:
     explicit StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
                                       const std::string&                        noiseEffects_          = "APD",
@@ -27,8 +27,7 @@ public:
                                       std::size_t                               seed_                  = 0U,
                                       const unsigned int                        stepNumber_            = 1,
                                       const double                              stepFidelity_          = 1.0):
-        Simulator<Config>(seed_),
-        qc(std::move(qc_)),
+        CircuitSimulator<Config>(std::move(qc_), seed_),
         stepNumber(stepNumber_),
         stepFidelity(stepFidelity_),
         approximationStrategy("fidelity"),
@@ -38,7 +37,6 @@ public:
         maxInstances(std::thread::hardware_concurrency() > 4 ? std::thread::hardware_concurrency() - 4 : 1),
         noiseEffects(initializeNoiseEffects(noiseEffects_)) {
         sanityCheckOfNoiseProbabilities(noiseProbability_, amplitudeDampingProb, multiQubitGateFactor_);
-        Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, const unsigned int stepNumber_, const double stepFidelity_):
@@ -61,9 +59,9 @@ public:
     [[nodiscard]] std::size_t getMaxMatrixNodeCount() const override { return 0U; }    // Not available for stochastic simulation
     [[nodiscard]] std::size_t getMatrixActiveNodeCount() const override { return 0U; } // Not available for stochastic simulation
     [[nodiscard]] std::size_t countNodesFromRoot() override { return 0U; }             // Not available for stochastic simulation
-    [[nodiscard]] std::size_t getNumberOfQubits() const override { return qc->getNqubits(); };
-    [[nodiscard]] std::size_t getNumberOfOps() const override { return qc->getNops(); };
-    [[nodiscard]] std::string getName() const override { return "stoch_" + qc->getName(); };
+    [[nodiscard]] std::size_t getNumberOfQubits() const override { return CircuitSimulator<Config>::qc->getNqubits(); };
+    [[nodiscard]] std::size_t getNumberOfOps() const override { return CircuitSimulator<Config>::qc->getNops(); };
+    [[nodiscard]] std::string getName() const override { return "stoch_" + CircuitSimulator<Config>::qc->getName(); };
 
     [[maybe_unused]] static void sanityCheckOfNoiseProbabilities(double noiseProbability, double amplitudeDampingProb, double multiQubitGateFactor) {
         if (noiseProbability < 0 || amplitudeDampingProb < 0 || noiseProbability * multiQubitGateFactor > 1 || amplitudeDampingProb * multiQubitGateFactor > 1) {
@@ -113,8 +111,6 @@ public:
     };
 
 private:
-    std::unique_ptr<qc::QuantumComputation> qc;
-
     std::size_t stepNumber{};
     double      stepFidelity{};
     std::string approximationStrategy{};

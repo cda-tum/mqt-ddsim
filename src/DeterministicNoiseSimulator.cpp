@@ -24,12 +24,12 @@ std::map<std::string, std::size_t> DeterministicNoiseSimulator<Config>::simulate
     if (!hasNonmeasurementNonUnitary && measurementsLast) {
         deterministicSimulate(true);
         std::map<std::string, std::size_t> measurementCounter;
-        const auto                         qubits = qc->getNqubits();
-        const auto                         cbits  = qc->getNcbits();
+        const auto                         qubits = CircuitSimulator<Config>::qc->getNqubits();
+        const auto                         cbits  = CircuitSimulator<Config>::qc->getNcbits();
 
         // MeasureAllNonCollapsing returns a map from measurement over all qubits to the number of occurrences
         for (const auto& [bit_string, count]: DeterministicNoiseSimulator<Config>::measureAllNonCollapsing2(shots)) {
-            std::string resultString(qc->getNcbits(), '0');
+            std::string resultString(CircuitSimulator<Config>::qc->getNcbits(), '0');
 
             for (auto const& [qubit_index, bitIndex]: measurementMap) {
                 resultString[cbits - bitIndex - 1] = bit_string[qubits - qubit_index - 1];
@@ -46,9 +46,9 @@ std::map<std::string, std::size_t> DeterministicNoiseSimulator<Config>::simulate
 
     for (unsigned int i = 0; i < shots; i++) {
         const auto result = deterministicSimulate(false);
-        const auto cbits  = qc->getNcbits();
+        const auto cbits  = CircuitSimulator<Config>::qc->getNcbits();
 
-        std::string resultString(qc->getNcbits(), '0');
+        std::string resultString(CircuitSimulator<Config>::qc->getNcbits(), '0');
 
         // result is a map from the cbit index to the Boolean value
         for (const auto& [bitIndex, value]: result) {
@@ -66,7 +66,7 @@ std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>> DeterministicNo
     bool                               measurementsLast            = true;
     std::map<std::size_t, std::size_t> measurementMap;
 
-    for (auto& op: *qc) {
+    for (auto& op: *CircuitSimulator<Config>::qc) {
         if (op->isClassicControlledOperation() || (op->isNonUnitaryOperation() && op->getType() != qc::Measure && op->getType() != qc::Barrier)) {
             hasNonmeasurementNonUnitary = true;
         }
@@ -99,19 +99,19 @@ std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>> DeterministicNo
 template<class Config>
 std::map<std::size_t, bool> DeterministicNoiseSimulator<Config>::deterministicSimulate(bool ignoreNonUnitaries) {
     std::map<std::size_t, bool> classicValues;
-    rootEdge = Simulator<Config>::dd->makeZeroDensityOperator(static_cast<dd::Qubit>(qc->getNqubits()));
+    rootEdge = Simulator<Config>::dd->makeZeroDensityOperator(static_cast<dd::Qubit>(CircuitSimulator<Config>::qc->getNqubits()));
     Simulator<Config>::dd->incRef(rootEdge);
 
     auto deterministicNoiseFunctionality = dd::DeterministicNoiseFunctionality<Config>(
             Simulator<Config>::dd,
-            static_cast<dd::Qubit>(qc->getNqubits()),
+            static_cast<dd::Qubit>(CircuitSimulator<Config>::qc->getNqubits()),
             noiseProbSingleQubit,
             noiseProbMultiQubit,
             ampDampingProbSingleQubit,
             ampDampingProbMultiQubit,
             noiseEffects);
 
-    for (auto const& op: *qc) {
+    for (auto const& op: *CircuitSimulator<Config>::qc) {
         Simulator<Config>::dd->garbageCollect();
         if (!op->isUnitary() && !(op->isClassicControlledOperation())) {
             if (auto* nuOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
@@ -125,7 +125,7 @@ std::map<std::size_t, bool> DeterministicNoiseSimulator<Config>::deterministicSi
                     assert(quantum.size() == classic.size()); // this should not happen do to check in Simulate
 
                     for (std::size_t i = 0U; i < quantum.size(); ++i) {
-                        auto  const result = Simulator<Config>::dd->measureOneCollapsing(rootEdge, static_cast<dd::Qubit>(quantum.at(i)), Simulator<Config>::mt);
+                        auto const result = Simulator<Config>::dd->measureOneCollapsing(rootEdge, static_cast<dd::Qubit>(quantum.at(i)), Simulator<Config>::mt);
                         assert(result == '0' || result == '1');
                         classicValues[classic.at(i)] = (result == '1');
                     }
@@ -135,9 +135,9 @@ std::map<std::size_t, bool> DeterministicNoiseSimulator<Config>::deterministicSi
                     // Reset qubit
                     auto qubits = nuOp->getTargets();
                     for (const auto& qubit: qubits) {
-                        auto  const result = Simulator<Config>::dd->measureOneCollapsing(rootEdge, static_cast<dd::Qubit>(qubits.at(qubit)), Simulator<Config>::mt);
+                        auto const result = Simulator<Config>::dd->measureOneCollapsing(rootEdge, static_cast<dd::Qubit>(qubits.at(qubit)), Simulator<Config>::mt);
                         if (result == '1') {
-                            const auto x         = qc::StandardOperation(qc->getNqubits(), qubit, qc::X);
+                            const auto x         = qc::StandardOperation(CircuitSimulator<Config>::qc->getNqubits(), qubit, qc::X);
                             const auto operation = dd::getDD(&x, *Simulator<Config>::dd);
                             rootEdge             = Simulator<Config>::dd->applyOperationToDensity(rootEdge, operation);
                         }
@@ -199,4 +199,4 @@ std::map<std::string, std::size_t> DeterministicNoiseSimulator<Config>::sampleFr
     return resultShotsMap;
 }
 
-template class DeterministicNoiseSimulator<DensityMatrixSimulatorDDPackageConfig>;
+template class DeterministicNoiseSimulator<dd::DensityMatrixSimulatorDDPackageConfig>;
