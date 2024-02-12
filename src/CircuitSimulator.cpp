@@ -153,8 +153,6 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
                             Simulator<Config>::dd->garbageCollect();
                         }
                     }
-                } else if (op->getType() == qc::Barrier) {
-                    continue;
                 } else {
                     throw std::runtime_error("Unsupported non-unitary functionality.");
                 }

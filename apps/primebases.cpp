@@ -1,54 +1,57 @@
 #include "cxxopts.hpp"
 
 #include <cmath>
+#include <cstdint>
 #include <iostream>
 #include <string>
 
-static std::uint64_t gcd(std::uint64_t a, std::uint64_t b) {
-    while (a != 0) {
-        const std::uint64_t c = a;
-        a                     = b % a;
-        b                     = c;
+namespace {
+    std::uint64_t gcd(std::uint64_t a, std::uint64_t b) {
+        while (a != 0) {
+            const std::uint64_t c = a;
+            a                     = b % a;
+            b                     = c;
+        }
+        return b;
     }
-    return b;
-}
 
-static bool isPrime(std::uint64_t number) {
-    const auto upperLimit = static_cast<std::uint64_t>(std::floor(std::sqrt(number)));
+    bool isPrime(std::uint64_t number) {
+        const auto upperLimit = static_cast<std::uint64_t>(std::floor(std::sqrt(number)));
 
-    for (std::uint64_t a = 2; a <= upperLimit; a++) {
-        if (number % a == 0) {
-            return false;
+        for (std::uint64_t a = 2; a <= upperLimit; a++) {
+            if (number % a == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void outputCoprimes(const std::uint64_t compositeNumber, const std::uint64_t length) {
+        std::uint64_t outputLength  = 0;
+        std::uint64_t currentNumber = 2;
+
+        while (outputLength < length) {
+            if (gcd(currentNumber, compositeNumber) == 1) {
+                std::cout << currentNumber << "\n";
+                outputLength++;
+            }
+            currentNumber++;
         }
     }
-    return true;
-}
 
-void outputCoprimes(const std::uint64_t compositeNumber, const std::uint64_t length) {
-    std::uint64_t outputLength  = 0;
-    std::uint64_t currentNumber = 2;
+    void outputPrimes(const std::uint64_t compositeNumber, const std::uint64_t length) {
+        std::uint64_t outputLength  = 0;
+        std::uint64_t currentNumber = 2;
 
-    while (outputLength < length) {
-        if (gcd(currentNumber, compositeNumber) == 1) {
-            std::cout << currentNumber << "\n";
-            outputLength++;
+        while (outputLength < length) {
+            if (isPrime(currentNumber) && gcd(currentNumber, compositeNumber) == 1) {
+                std::cout << currentNumber << "\n";
+                outputLength++;
+            }
+            currentNumber++;
         }
-        currentNumber++;
     }
-}
-
-void outputPrimes(const std::uint64_t compositeNumber, const std::uint64_t length) {
-    std::uint64_t outputLength  = 0;
-    std::uint64_t currentNumber = 2;
-
-    while (outputLength < length) {
-        if (isPrime(currentNumber) && gcd(currentNumber, compositeNumber) == 1) {
-            std::cout << currentNumber << "\n";
-            outputLength++;
-        }
-        currentNumber++;
-    }
-}
+} // namespace
 
 int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     cxxopts::Options options("MQT DDSIM", "see for more information https://www.cda.cit.tum.de/");
