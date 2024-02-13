@@ -106,7 +106,7 @@ def get_simulation_path(
             file.write(str(path))
 
     if plot_ring:
-        fig = opt.get_tree().plot_ring(return_fig=True)
+        fig, _ = opt.get_tree().plot_ring()
         fig.savefig("simulation_ring.svg", bbox_inches="tight")
 
     return path

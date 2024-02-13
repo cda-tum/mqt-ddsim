@@ -33,6 +33,11 @@ repos:
     rev: 3.2.0
     hooks:
       - id: nb-clean
+        args:
+          - --remove-empty-cells
+          - --preserve-cell-metadata
+          - raw_mimetype
+          - --
 
   # Handling unwanted unicode characters
   - repo: https://github.com/sirosen/texthooks
