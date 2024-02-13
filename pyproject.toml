@@ -45,7 +45,9 @@ tnflow = [
     "opt-einsum",
     "quimb",
     "pandas",
-    "numpy"
+    "numpy",
+    "kahypar",
+    "networkx",
 ]
 test = ["pytest>=7.0"]
 coverage = ["mqt.ddsim[test]", "pytest-cov"]
