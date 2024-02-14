@@ -17,7 +17,7 @@ nox.options.sessions = ["lint", "tests"]
 PYTHON_ALL_VERSIONS = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
 BUILD_REQUIREMENTS = [
-    "mqt.core~=2.2.2",
+    "mqt.core @ git+https://github.com/cda-tum/mqt-core.git@installation-improvements",
     "scikit-build-core[pyproject]>=0.6.1",
     "setuptools_scm>=7",
     "pybind11>=2.11",

@@ -39,7 +39,7 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
   FetchContent_Declare(
     mqt-core
     GIT_REPOSITORY https://github.com/cda-tum/mqt-core.git
-    GIT_TAG v${MQT_CORE_VERSION}
+    GIT_TAG installation-improvements
     FIND_PACKAGE_ARGS ${MQT_CORE_VERSION})
   list(APPEND FETCH_PACKAGES mqt-core)
 else()
@@ -48,7 +48,7 @@ else()
     FetchContent_Declare(
       mqt-core
       GIT_REPOSITORY https://github.com/cda-tum/mqt-core.git
-      GIT_TAG v${MQT_CORE_VERSION})
+      GIT_TAG installation-improvements)
     list(APPEND FETCH_PACKAGES mqt-core)
   endif()
 endif()

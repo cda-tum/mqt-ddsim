@@ -103,7 +103,7 @@ repos:
         additional_dependencies:
           - numpy
           - pytest
-          - mqt.core~=2.2.2
+          - mqt.core @ git+https://github.com/cda-tum/mqt-core.git@installation-improvements
 
   # Check for spelling
   - repo: https://github.com/codespell-project/codespell
