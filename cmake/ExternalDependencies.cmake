@@ -4,6 +4,19 @@ include(FetchContent)
 set(FETCH_PACKAGES "")
 
 if(BUILD_MQT_DDSIM_BINDINGS)
+  # Manually detect the installed mqt-core package.
+  execute_process(
+    COMMAND "${Python_EXECUTABLE}" -m mqt.core --cmake_dir
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    OUTPUT_VARIABLE mqt-core_DIR
+    ERROR_QUIET)
+
+  # Add the detected directory to the CMake prefix path.
+  if(mqt-core_DIR)
+    list(APPEND CMAKE_PREFIX_PATH "${mqt-core_DIR}")
+    message(STATUS "Found mqt-core package: ${mqt-core_DIR}")
+  endif()
+
   if(NOT SKBUILD)
     # Manually detect the installed pybind11 package.
     execute_process(
@@ -19,12 +32,6 @@ if(BUILD_MQT_DDSIM_BINDINGS)
   find_package(pybind11 CONFIG REQUIRED)
 endif()
 
-set(FETCHCONTENT_SOURCE_DIR_MQT-CORE
-    ${PROJECT_SOURCE_DIR}/extern/mqt-core
-    CACHE
-      PATH
-      "Path to the source directory of the mqt-core library. This variable is used by FetchContent to download the library if it is not already available."
-)
 set(MQT_CORE_VERSION
     2.2.2
     CACHE STRING "MQT Core version")
@@ -32,7 +39,7 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
   FetchContent_Declare(
     mqt-core
     GIT_REPOSITORY https://github.com/cda-tum/mqt-core.git
-    GIT_TAG v${MQT_CORE_VERSION}
+    GIT_TAG installation-improvements
     FIND_PACKAGE_ARGS ${MQT_CORE_VERSION})
   list(APPEND FETCH_PACKAGES mqt-core)
 else()
@@ -41,7 +48,7 @@ else()
     FetchContent_Declare(
       mqt-core
       GIT_REPOSITORY https://github.com/cda-tum/mqt-core.git
-      GIT_TAG v${MQT_CORE_VERSION})
+      GIT_TAG installation-improvements)
     list(APPEND FETCH_PACKAGES mqt-core)
   endif()
 endif()
