@@ -17,9 +17,7 @@ dd::SparsePVecStrKeys DeterministicNoiseSimulator<Config>::deterministicSimulate
             noiseProbMultiQubit,
             ampDampingProbSingleQubit,
             ampDampingProbMultiQubit,
-            noiseEffects,
-            useDensityMatrixType,
-            sequentiallyApplyNoise);
+            noiseEffects);
 
     for (auto const& op: *qc) {
         Simulator<Config>::dd->garbageCollect();
@@ -39,7 +37,7 @@ dd::SparsePVecStrKeys DeterministicNoiseSimulator<Config>::deterministicSimulate
         auto operation = dd::getDD(op.get(), *Simulator<Config>::dd);
 
         // Applying the operation to the density matrix
-        Simulator<Config>::dd->applyOperationToDensity(rootEdge, operation, useDensityMatrixType);
+        Simulator<Config>::dd->applyOperationToDensity(rootEdge, operation);
 
         deterministicNoiseFunctionality.applyNoiseEffects(rootEdge, op);
     }

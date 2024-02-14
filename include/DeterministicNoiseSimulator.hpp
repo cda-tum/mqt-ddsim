@@ -14,23 +14,20 @@ public:
                                 double                                    noiseProbability,
                                 std::optional<double>                     ampDampingProbability,
                                 double                                    multiQubitGateFactor,
-                                bool                                      unoptimizedSim = false,
-                                std::uint64_t                             seed_          = 0):
+                                std::uint64_t                             seed_ = 0):
         Simulator<Config>(seed_),
         qc(std::move(qc_)),
         noiseEffects(StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>::initializeNoiseEffects(noiseEffects_)),
         noiseProbSingleQubit(noiseProbability),
         ampDampingProbSingleQubit(ampDampingProbability ? ampDampingProbability.value() : noiseProbability * 2),
         noiseProbMultiQubit(noiseProbability * multiQubitGateFactor),
-        ampDampingProbMultiQubit(ampDampingProbSingleQubit * multiQubitGateFactor),
-        sequentiallyApplyNoise(unoptimizedSim),
-        useDensityMatrixType(!unoptimizedSim) {
+        ampDampingProbMultiQubit(ampDampingProbSingleQubit * multiQubitGateFactor) {
         StochasticNoiseSimulator<StochasticNoiseSimulatorDDPackageConfig>::sanityCheckOfNoiseProbabilities(noiseProbability, ampDampingProbSingleQubit, multiQubitGateFactor);
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
     explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, std::uint64_t seed_ = 0):
-        DeterministicNoiseSimulator(std::move(qc_), std::string("APD"), 0.001, std::optional<double>{}, 2, false, seed_) {}
+        DeterministicNoiseSimulator(std::move(qc_), std::string("APD"), 0.001, std::optional<double>{}, 2, seed_) {}
 
     std::map<std::string, std::size_t> simulate(size_t shots) override {
         return sampleFromProbabilityMap(deterministicSimulate(), shots);
@@ -50,12 +47,10 @@ public:
     [[nodiscard]] std::size_t getMaxNodeCount() const override { return Simulator<Config>::dd->template getUniqueTable<dd::dNode>().getPeakNumActiveEntries(); }
 
     [[nodiscard]] std::size_t countNodesFromRoot() override {
-        if (useDensityMatrixType) {
-            qc::DensityMatrixDD::alignDensityEdge(rootEdge);
-            const std::size_t tmp = rootEdge.size();
-            qc::DensityMatrixDD::setDensityMatrixTrue(rootEdge);
-            return tmp;
-        }
+        qc::DensityMatrixDD::alignDensityEdge(rootEdge);
+        const std::size_t tmp = rootEdge.size();
+        qc::DensityMatrixDD::setDensityMatrixTrue(rootEdge);
+        return tmp;
         return rootEdge.size();
     }
 
@@ -71,7 +66,4 @@ private:
     double ampDampingProbMultiQubit{};
 
     double measurementThreshold = 0.01;
-
-    bool sequentiallyApplyNoise{};
-    bool useDensityMatrixType{};
 };

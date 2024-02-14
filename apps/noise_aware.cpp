@@ -113,8 +113,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
         auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), vm["noise_effects"].as<std::string>(),
                                                                      vm["noise_prob"].as<double>(),
                                                                      noiseProbT1,
-                                                                     vm["noise_prob_multi"].as<double>(),
-                                                                     vm.count("unoptimized_sim"), vm["seed"].as<std::size_t>());
+                                                                     vm["noise_prob_multi"].as<double>(), vm["seed"].as<std::size_t>());
 
         auto t1 = std::chrono::steady_clock::now();
 
