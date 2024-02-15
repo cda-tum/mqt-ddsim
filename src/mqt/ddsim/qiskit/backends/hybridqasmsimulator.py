@@ -16,10 +16,10 @@ from qiskit.utils.multiprocessing import local_hardware_info
 
 from mqt.core.io import load
 
-from .header import DDSIMHeader
-from .pyddsim import HybridCircuitSimulator, HybridMode
+from ...pyddsim import HybridCircuitSimulator, HybridMode
+from ..header import DDSIMHeader
+from ..target import DDSIMTargetBuilder
 from .qasmsimulator import QasmSimulatorBackend
-from .target import DDSIMTargetBuilder
 
 
 class HybridQasmSimulatorBackend(QasmSimulatorBackend):

@@ -3,9 +3,9 @@ from __future__ import annotations
 import pathlib
 import unittest
 
-from mqt import ddsim
 from mqt.core import QuantumComputation
 from mqt.core.io import load
+from mqt.ddsim.simulators import CircuitSimulator
 
 
 class MQTStandaloneSimulatorTests(unittest.TestCase):
@@ -15,7 +15,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
     def test_truly_standalone(self):
         filename = str(pathlib.Path(__file__).with_name("ghz_03.qasm").absolute())
         circ = load(filename)
-        sim = ddsim.CircuitSimulator(circ)
+        sim = CircuitSimulator(circ)
         result = sim.simulate(1000)
         print(result)
         assert len(result.keys()) == self.nonzero_states_ghz
@@ -28,7 +28,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.CircuitSimulator(circ)
+        sim = CircuitSimulator(circ)
         result = sim.simulate(1000)
         assert len(result.keys()) == self.nonzero_states_ghz
         assert "000" in result
@@ -40,7 +40,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.CircuitSimulator(circ, seed=1337)
+        sim = CircuitSimulator(circ, seed=1337)
         result = sim.simulate(1000)
         assert len(result.keys()) == self.nonzero_states_ghz
         assert "000" in result
@@ -57,7 +57,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         circ.i(0)
 
         # create a simulator that approximates once and by at most 2%
-        sim = ddsim.CircuitSimulator(circ, approximation_step_fidelity=0.98, approximation_steps=1)
+        sim = CircuitSimulator(circ, approximation_step_fidelity=0.98, approximation_steps=1)
         result = sim.simulate(4096)
 
         # the result should always be 0
@@ -78,7 +78,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         qc.xx_plus_yy(0.5, 0.25, 0, 1)
         print(qc)
         print(qc.global_phase)
-        sim = ddsim.CircuitSimulator(qc)
+        sim = CircuitSimulator(qc)
         result = sim.simulate(1000)
         print(result)
 
@@ -89,7 +89,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         max_qubits = 3
         for qubits in range(1, max_qubits + 1):
             qc = QuantumComputation(qubits)
-            sim = ddsim.CircuitSimulator(qc)
+            sim = CircuitSimulator(qc)
             for i in range(qubits):
                 x_observable = QuantumComputation(qubits)
                 x_observable.x(i)
@@ -108,7 +108,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         max_qubits = 3
         for qubits in range(1, max_qubits + 1):
             qc = QuantumComputation(qubits)
-            sim = ddsim.CircuitSimulator(qc)
+            sim = CircuitSimulator(qc)
             x_observable = QuantumComputation(qubits)
             z_observable = QuantumComputation(qubits)
             h_observable = QuantumComputation(qubits)

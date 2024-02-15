@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pathlib
 import time
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
@@ -18,10 +18,10 @@ from qiskit.transpiler import Target
 
 from mqt.core.io import load
 
-from .header import DDSIMHeader
-from .pyddsim import PathCircuitSimulator, PathSimulatorConfiguration, PathSimulatorMode
+from ...pyddsim import PathCircuitSimulator, PathSimulatorConfiguration, PathSimulatorMode
+from ..header import DDSIMHeader
+from ..target import DDSIMTargetBuilder
 from .qasmsimulator import QasmSimulatorBackend
-from .target import DDSIMTargetBuilder
 
 
 def read_tensor_network_file(filename: str) -> list[Tensor]:
@@ -46,7 +46,7 @@ def create_tensor_network(qc: QuantumComputation) -> TensorNetwork:
     import quimb.tensor as qtn
     import sparse
 
-    from mqt.ddsim import dump_tensor_network
+    from ...pyddsim import dump_tensor_network
 
     filename = qc.name + "_" + str(qc.num_qubits) + ".tensor"
     nqubits = qc.num_qubits
@@ -98,7 +98,7 @@ def get_simulation_path(
         minimize="flops",
     )
     info = tn.contract(all, get="path-info", optimize=opt)
-    path = linear_to_ssa(info.path)
+    path = cast(list[tuple[int, int]], linear_to_ssa(info.path))
 
     if dump_path:
         filename = qc.name + "_" + str(qc.num_qubits) + ".path"

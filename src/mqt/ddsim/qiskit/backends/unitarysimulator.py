@@ -14,10 +14,10 @@ from qiskit.transpiler import Target
 
 from mqt.core.io import load
 
-from .header import DDSIMHeader
-from .pyddsim import ConstructionMode, UnitarySimulator, get_matrix
+from ...pyddsim import ConstructionMode, UnitarySimulator, get_matrix
+from ..header import DDSIMHeader
+from ..target import DDSIMTargetBuilder
 from .qasmsimulator import QasmSimulatorBackend
-from .target import DDSIMTargetBuilder
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit

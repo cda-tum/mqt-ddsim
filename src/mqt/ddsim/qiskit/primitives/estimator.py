@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from itertools import accumulate
-from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union
+from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union, cast
 
 import numpy as np
 from qiskit.circuit import QuantumCircuit
@@ -17,8 +17,9 @@ from qiskit.primitives.utils import (
 from qiskit.quantum_info import Pauli, PauliList, SparsePauliOp
 
 from mqt.core.io import load
-from mqt.ddsim.pyddsim import CircuitSimulator
-from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
+
+from ...pyddsim import CircuitSimulator
+from ..backends.qasmsimulator import QasmSimulatorBackend
 
 if TYPE_CHECKING:
     from qiskit.circuit import Parameter
@@ -35,7 +36,7 @@ class Estimator(BaseEstimator):
 
     def __init__(
         self,
-        options: dict | None = None,
+        options: dict[str, Any] | None = None,
         abelian_grouping: bool = False,
     ) -> None:
         """Initialize a new Estimator instance
@@ -231,10 +232,10 @@ class Estimator(BaseEstimator):
         obs_circ_list: list[QuantumCircuit],
         **options: dict[str, Any],
     ) -> list[float]:
-        approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
-        approximation_steps = options.get("approximation_steps", 1)
-        approximation_strategy = options.get("approximation_strategy", "fidelity")
-        seed = options.get("seed_simulator", -1)
+        approximation_step_fidelity = cast(float, options.get("approximation_step_fidelity", 1.0))
+        approximation_steps = cast(int, options.get("approximation_steps", 1))
+        approximation_strategy = str(options.get("approximation_strategy", "fidelity"))
+        seed = cast(int, options.get("seed_simulator", -1))
 
         qc = load(circ)
         sim = CircuitSimulator(
@@ -248,7 +249,7 @@ class Estimator(BaseEstimator):
         return [sim.expectation_value(observable=load(obs)) for obs in obs_circ_list]
 
     @staticmethod
-    def _postprocessing(result_list: list[float], accum: list[int], metadata: list[dict]) -> EstimatorResult:
+    def _postprocessing(result_list: list[float], accum: list[int], metadata: list[dict[str, Any]]) -> EstimatorResult:
         """
         Perform postprocessing for the evaluation of expectation values.
 

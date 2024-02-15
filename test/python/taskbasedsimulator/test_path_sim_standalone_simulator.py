@@ -2,8 +2,12 @@ from __future__ import annotations
 
 import unittest
 
-from mqt import ddsim
 from mqt.core import QuantumComputation
+from mqt.ddsim.simulators.path_circuit_simulator import (
+    PathCircuitSimulator,
+    PathSimulatorConfiguration,
+    PathSimulatorMode,
+)
 
 
 class MQTStandaloneSimulatorTests(unittest.TestCase):
@@ -16,7 +20,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.PathCircuitSimulator(circ)
+        sim = PathCircuitSimulator(circ)
         result = sim.simulate(1000)
         assert len(result.keys()) == self.nonzero_states_ghz
         assert "000" in result
@@ -28,7 +32,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.PathCircuitSimulator(circ, ddsim.PathSimulatorConfiguration())
+        sim = PathCircuitSimulator(circ, PathSimulatorConfiguration())
         result = sim.simulate(1000)
         assert len(result.keys()) == self.nonzero_states_ghz
         assert "000" in result
@@ -40,7 +44,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.PathCircuitSimulator(circ, seed=1337)
+        sim = PathCircuitSimulator(circ, seed=1337)
         result = sim.simulate(1000)
         assert len(result.keys()) == self.nonzero_states_ghz
         assert "000" in result
@@ -52,7 +56,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.PathCircuitSimulator(circ, seed=0, mode=ddsim.PathSimulatorMode.bracket, bracket_size=2)
+        sim = PathCircuitSimulator(circ, seed=0, mode=PathSimulatorMode.bracket, bracket_size=2)
         result = sim.simulate(1000)
         assert len(result.keys()) == self.nonzero_states_ghz
         assert "000" in result
@@ -64,10 +68,10 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.PathCircuitSimulator(
+        sim = PathCircuitSimulator(
             circ,
             seed=1,
-            mode=ddsim.PathSimulatorMode.pairwise_recursive,
+            mode=PathSimulatorMode.pairwise_recursive,
             bracket_size=2,
         )
         result = sim.simulate(1000)
@@ -81,9 +85,9 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.PathCircuitSimulator(
+        sim = PathCircuitSimulator(
             circ,
-            mode=ddsim.PathSimulatorMode.gate_cost,
+            mode=PathSimulatorMode.gate_cost,
             starting_point=2,
             gate_cost=[1, 1],
         )

@@ -5,7 +5,7 @@ from __future__ import annotations
 import time
 import uuid
 from math import log2
-from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union
+from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union, cast
 
 from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
@@ -17,11 +17,11 @@ from qiskit.utils.multiprocessing import local_hardware_info
 
 from mqt.core.io import load
 
-from . import __version__
-from .header import DDSIMHeader
-from .job import DDSIMJob
-from .pyddsim import CircuitSimulator
-from .target import DDSIMTargetBuilder
+from ... import __version__
+from ...pyddsim import CircuitSimulator
+from ..header import DDSIMHeader
+from ..job import DDSIMJob
+from ..target import DDSIMTargetBuilder
 
 if TYPE_CHECKING:
     from qiskit.circuit import Parameter
@@ -157,11 +157,11 @@ class QasmSimulatorBackend(BackendV2):
 
     def _run_experiment(self, qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
         start_time = time.time()
-        approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
-        approximation_steps = options.get("approximation_steps", 1)
-        approximation_strategy = options.get("approximation_strategy", "fidelity")
-        seed = options.get("seed_simulator", -1)
-        shots = options.get("shots", 1024)
+        approximation_step_fidelity = cast(float, options.get("approximation_step_fidelity", 1.0))
+        approximation_steps = cast(int, options.get("approximation_steps", 1))
+        approximation_strategy = str(options.get("approximation_strategy", "fidelity"))
+        seed = cast(int, options.get("seed_simulator", -1))
+        shots = cast(int, options.get("shots", 1024))
 
         circuit = load(qc)
         sim = CircuitSimulator(

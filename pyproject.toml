@@ -162,12 +162,12 @@ report.exclude_also = [
 files = ["src/mqt", "test/python"]
 mypy_path = ["$MYPY_CONFIG_FILE_DIR/src"]
 python_version = "3.8"
-#strict = true
-show_error_codes = true
+warn_unused_configs = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
-warn_unreachable = true
+strict = true
+disallow_untyped_defs = false
 explicit_package_bases = true
-pretty = true
+warn_unreachable = true
 
 [[tool.mypy.overrides]]
 module = ["qiskit.*"]
@@ -217,7 +217,7 @@ extend-select = [
     "SIM",         # flake8-simplify
     "T20",         # flake8-print
     "TCH",         # flake8-type-checking
-    "TID",         # flake8-tidy-imports
+    "TID251",      # flake8-tidy-imports.banned-api
     "TRY",         # tryceratops
     "UP",          # pyupgrade
     "YTT",         # flake8-2020

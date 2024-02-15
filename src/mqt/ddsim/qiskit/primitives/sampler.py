@@ -10,7 +10,7 @@ from qiskit.primitives.primitive_job import PrimitiveJob
 from qiskit.primitives.utils import _circuit_key  # noqa: PLC2701
 from qiskit.result import QuasiDistribution, Result
 
-from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
+from ..backends.qasmsimulator import QasmSimulatorBackend
 
 if TYPE_CHECKING:
     from qiskit.circuit import Parameter

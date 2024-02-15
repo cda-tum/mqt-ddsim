@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from mqt.ddsim import DDSIMProvider
+from mqt.ddsim.qiskit import DDSIMProvider
 
 
 class DDSIMProviderTestCase(unittest.TestCase):

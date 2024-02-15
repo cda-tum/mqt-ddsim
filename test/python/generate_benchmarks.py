@@ -6,12 +6,12 @@ from qiskit.circuit.library import QFT, GraphState, GroverOperator
 
 
 # measure qubits in reverse order which is better suited for DD-based simulation
-def measure(qc: QuantumCircuit, q: QuantumRegister, c: ClassicalRegister):
+def measure(qc: QuantumCircuit, q: QuantumRegister, c: ClassicalRegister) -> None:
     for i in reversed(range(q.size)):
         qc.measure(q[i], c[i])
 
 
-def ghz(n: int, include_measurements: bool = True):
+def ghz(n: int, include_measurements: bool = True) -> QuantumCircuit:
     q = QuantumRegister(n, "q")
     c = ClassicalRegister(n, "c")
     qc = QuantumCircuit(q, c, name="ghz_state")
@@ -23,7 +23,7 @@ def ghz(n: int, include_measurements: bool = True):
     return qc
 
 
-def qft(n: int, include_measurements: bool = True):
+def qft(n: int, include_measurements: bool = True) -> QuantumCircuit:
     q = QuantumRegister(n, "q")
     c = ClassicalRegister(n, "c")
     qc = QuantumCircuit(q, c, name="qft")
@@ -33,14 +33,14 @@ def qft(n: int, include_measurements: bool = True):
     return qc
 
 
-def qft_entangled(n: int, include_measurements: bool = True):
+def qft_entangled(n: int, include_measurements: bool = True) -> QuantumCircuit:
     qc = ghz(n, include_measurements=False)
     qc.compose(qft(n, include_measurements), inplace=True)
     qc.name = "qft_entangled"
     return qc
 
 
-def grover(n: int, include_measurements: bool = True):
+def grover(n: int, include_measurements: bool = True) -> QuantumCircuit:
     from qiskit.algorithms import Grover
 
     q = QuantumRegister(n, "q")
@@ -67,7 +67,7 @@ def grover(n: int, include_measurements: bool = True):
     return qc
 
 
-def graph_state(n, include_measurements: bool = True):
+def graph_state(n: int, include_measurements: bool = True) -> QuantumCircuit:
     import networkx as nx
 
     q = QuantumRegister(n, "q")
@@ -82,12 +82,12 @@ def graph_state(n, include_measurements: bool = True):
     return qc
 
 
-def w_state(n: int, include_measurements: bool = True):
+def w_state(n: int, include_measurements: bool = True) -> QuantumCircuit:
     q = QuantumRegister(n, "q")
     c = ClassicalRegister(n, "c")
     qc = QuantumCircuit(q, c, name="w_state")
 
-    def f_gate(qc: QuantumCircuit, q: QuantumRegister, i: int, j: int, n: int, k: int):
+    def f_gate(qc: QuantumCircuit, q: QuantumRegister, i: int, j: int, n: int, k: int) -> None:
         theta = np.arccos(np.sqrt(1 / (n - k + 1)))
         qc.ry(-theta, q[j])
         qc.cz(q[i], q[j])
@@ -105,15 +105,7 @@ def w_state(n: int, include_measurements: bool = True):
     return qc
 
 
-def shor(n: int, a: int = 2, include_measurements: bool = True):
-    from qiskit.algorithms.factorizers import Shor
-
-    qc = Shor().construct_circuit(n, a, include_measurements)
-    qc.name = "shor_" + str(n) + "_" + str(a)
-    return qc
-
-
-def qpe_exact(n: int, include_measurements: bool = True):
+def qpe_exact(n: int, include_measurements: bool = True) -> QuantumCircuit:
     import random
     from fractions import Fraction
 
@@ -150,7 +142,7 @@ def qpe_exact(n: int, include_measurements: bool = True):
     return qc
 
 
-def qpe_inexact(n: int, include_measurements: bool = True):
+def qpe_inexact(n: int, include_measurements: bool = True) -> QuantumCircuit:
     import random
     from fractions import Fraction
 
