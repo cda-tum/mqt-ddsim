@@ -34,7 +34,7 @@ classifiers = [
 ]
 requires-python = ">=3.8"
 dependencies = [
-    "qiskit[qasm3-import]>=0.45.0"
+    "qiskit[qasm3-import]>=1.0.0"
 ]
 dynamic = ["version"]
 
@@ -143,14 +143,7 @@ log_cli_level = "INFO"
 xfail_strict = true
 filterwarnings = [
     "error",
-    "ignore:.*qiskit.__qiskit_version__.*:DeprecationWarning:qiskit:",
-    "ignore:.*qiskit.utils.algorithm_globals.QiskitAlgorithmGlobals*:DeprecationWarning:qiskit",
-    "ignore:.*Building a flow controller with keyword arguments is going to be deprecated*:PendingDeprecationWarning:qiskit",
-    "ignore:.*qiskit.extensions module is pending deprecation*:PendingDeprecationWarning:qiskit",
     'ignore:.*datetime\.datetime\.utcfromtimestamp.*:DeprecationWarning:',
-    "ignore:.*qiskit.utils.parallel*:DeprecationWarning:qiskit",
-    "ignore:.*qiskit.tools.events*:DeprecationWarning:qiskit",
-    "ignore:.*qiskit.qasm*:DeprecationWarning:qiskit",
 ]
 
 [tool.coverage]
@@ -171,10 +164,6 @@ enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 warn_unreachable = true
 explicit_package_bases = true
 pretty = true
-
-[[tool.mypy.overrides]]
-module = ["qiskit.*"]
-ignore_missing_imports = true
 
 [tool.ruff]
 line-length = 120

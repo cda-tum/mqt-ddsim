@@ -13,7 +13,7 @@ class HybridStatevectorSimulatorBackend(HybridQasmSimulatorBackend):
     _SHOW_STATE_VECTOR = True
     _HSF_SV_TARGET = Target(
         description="MQT DDSIM HSF Statevector Simulator Target",
-        num_qubits=HybridQasmSimulatorBackend.max_qubits(),
+        num_qubits=30,  # corresponds to 16GiB memory for storing the full statevector
     )
 
     def __init__(self) -> None:

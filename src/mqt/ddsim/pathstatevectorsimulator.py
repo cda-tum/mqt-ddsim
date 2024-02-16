@@ -13,7 +13,7 @@ class PathStatevectorSimulatorBackend(PathQasmSimulatorBackend):
     _SHOW_STATE_VECTOR = True
     _Path_SV_TARGET = Target(
         description="MQT DDSIM Simulation Path Framework Statevector Target",
-        num_qubits=PathQasmSimulatorBackend.max_qubits(),
+        num_qubits=30,  # corresponds to 16GiB memory for storing the full statevector
     )
 
     def __init__(self) -> None:
