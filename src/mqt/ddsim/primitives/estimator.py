@@ -7,14 +7,9 @@ from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union
 
 import numpy as np
 from qiskit.circuit import QuantumCircuit
-from qiskit.primitives.base import BaseEstimator, EstimatorResult
-from qiskit.primitives.primitive_job import PrimitiveJob
-from qiskit.primitives.utils import (
-    _circuit_key,  # noqa: PLC2701
-    _observable_key,  # noqa: PLC2701
-    init_observable,
-)
-from qiskit.quantum_info import Pauli, PauliList, SparsePauliOp
+from qiskit.primitives import Estimator as QiskitEstimator
+from qiskit.primitives import EstimatorResult
+from qiskit.quantum_info import Pauli, PauliList
 
 from mqt.ddsim.pyddsim import CircuitSimulator
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
@@ -22,12 +17,11 @@ from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 if TYPE_CHECKING:
     from qiskit.circuit import Parameter
     from qiskit.circuit.parameterexpression import ParameterValueType
-    from qiskit.quantum_info.operators.base_operator import BaseOperator
 
     Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
 
 
-class Estimator(BaseEstimator):
+class Estimator(QiskitEstimator):
     """DDSIM implementation of qiskit's sampler.
     Code adapted from Qiskit's BackendEstimator class.
     """
@@ -151,47 +145,6 @@ class Estimator(BaseEstimator):
                 obs_circuit.z(i)
 
         return obs_circuit, qubit_indices
-
-    def _run(
-        self,
-        circuits: Sequence[QuantumCircuit],
-        observables: Sequence[BaseOperator | SparsePauliOp],
-        parameter_values: Sequence[Parameters],
-        **run_options: dict[str, Any],
-    ) -> PrimitiveJob:
-        circuit_indices = []
-        for circuit in circuits:
-            key_circ = _circuit_key(circuit)
-            index = self._circuit_ids.get(key_circ)
-            if index is not None:
-                circuit_indices.append(index)
-            else:
-                num_circuits = len(self._circuits)
-                circuit_indices.append(num_circuits)
-                self._circuit_ids[key_circ] = num_circuits
-                self._circuits.append(circuit)
-                self._parameters.append(circuit.parameters)
-        observable_indices = []
-        for observable in observables:
-            observable_copy = init_observable(observable)
-            key_obs = _observable_key(observable_copy)
-            index = self._observable_ids.get(key_obs)
-            if index is not None:
-                observable_indices.append(index)
-            else:
-                num_observables = len(self._observables)
-                observable_indices.append(num_observables)
-                self._observable_ids[key_obs] = num_observables
-                self._observables.append(observable_copy)
-        job = PrimitiveJob(
-            self._call,
-            circuit_indices,
-            observable_indices,
-            parameter_values,
-            **run_options,
-        )
-        job.submit()
-        return job
 
     def _call(
         self,

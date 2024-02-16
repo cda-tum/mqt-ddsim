@@ -86,7 +86,11 @@ def test_sample_run_multiple_circuits(circuits: list[QuantumCircuit], sampler: S
     """Test Sampler.run() with multiple circuits."""
     bell_1 = circuits[0]
     bell_2 = circuits[1]
-    target = [{0: 0.5, 1: 0, 2: 0, 3: 0.5}, {0: 0, 1: 0.5, 2: 0.5, 3: 0}, {0: 0.5, 1: 0, 2: 0, 3: 0.5}]
+    target = [
+        {0: 0.5, 1: 0, 2: 0, 3: 0.5},
+        {0: 0, 1: 0.5, 2: 0.5, 3: 0},
+        {0: 0.5, 1: 0, 2: 0, 3: 0.5},
+    ]
     result = sampler.run([bell_1, bell_2, bell_1], shots=shots).result()
     compare_probs(result.quasi_dists, target)
 
@@ -150,12 +154,12 @@ def test_sequential_run(circuits: list[QuantumCircuit], sampler: Sampler, shots:
     # First run
     result = sampler.run(qc_1, parameter_values[0], shots=shots).result()
     compare_probs(result.quasi_dists[0].binary_probabilities(), target[0])
-    number_stored_circuits_first_run = len(sampler.circuits)
+    number_stored_circuits_first_run = sampler.num_circuits
 
     # Second run
     result = sampler.run([qc_2, qc_1], [parameter_values[2], parameter_values[1]], shots=shots).result()
     compare_probs(result.quasi_dists[0].binary_probabilities(), target[2])
     compare_probs(result.quasi_dists[1].binary_probabilities(), target[1])
-    number_stored_circuits_second_run = len(sampler.circuits)
+    number_stored_circuits_second_run = sampler.num_circuits
 
     assert number_stored_circuits_second_run == number_stored_circuits_first_run + 1

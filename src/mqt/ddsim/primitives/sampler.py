@@ -5,9 +5,8 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union
 
-from qiskit.primitives.base import BaseSampler, SamplerResult
-from qiskit.primitives.primitive_job import PrimitiveJob
-from qiskit.primitives.utils import _circuit_key  # noqa: PLC2701
+from qiskit.primitives import SamplerResult
+from qiskit.primitives.sampler import Sampler as QiskitSampler
 from qiskit.result import QuasiDistribution, Result
 
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
@@ -15,12 +14,11 @@ from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 if TYPE_CHECKING:
     from qiskit.circuit import Parameter
     from qiskit.circuit.parameterexpression import ParameterValueType
-    from qiskit.circuit.quantumcircuit import QuantumCircuit
 
     Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
 
 
-class Sampler(BaseSampler):
+class Sampler(QiskitSampler):
     _BACKEND = QasmSimulatorBackend()
 
     def __init__(
@@ -41,39 +39,10 @@ class Sampler(BaseSampler):
     def backend(self) -> QasmSimulatorBackend:
         return self._BACKEND
 
-    def _run(
-        self,
-        circuits: Sequence[QuantumCircuit],
-        parameter_values: Sequence[Parameters],
-        **run_options: Any,
-    ) -> PrimitiveJob:
-        """Stores circuits and parameters within the instance.
-        Executes _call function.
-
-        Args:
-            circuits: List of quantum circuits to simulate
-            parameter_values: List of parameters associated with those circuits
-            run_options: Additional run options.
-
-        Returns:
-            PrimitiveJob.
-        """
-        circuit_indices = []
-        for circuit in circuits:
-            key = _circuit_key(circuit)
-            index = self._circuit_ids.get(key)
-            if index is not None:
-                circuit_indices.append(index)
-            else:
-                num_circuits = len(self._circuits)
-                circuit_indices.append(num_circuits)
-                self._circuit_ids[key] = num_circuits
-                self._circuits.append(circuit)
-                self._parameters.append(circuit.parameters)
-
-        job = PrimitiveJob(self._call, circuit_indices, parameter_values, **run_options)
-        job.submit()
-        return job
+    @property
+    def num_circuits(self) -> int:
+        """The number of circuits stored in the sampler."""
+        return len(self._circuits)
 
     def _call(
         self,
