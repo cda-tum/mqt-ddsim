@@ -172,10 +172,6 @@ warn_unreachable = true
 explicit_package_bases = true
 pretty = true
 
-[[tool.mypy.overrides]]
-module = ["qiskit.*"]
-ignore_missing_imports = true
-
 [tool.ruff]
 line-length = 120
 extend-include = ["*.ipynb"]
