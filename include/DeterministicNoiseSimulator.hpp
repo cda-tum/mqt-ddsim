@@ -20,18 +20,29 @@ public:
         noiseProbSingleQubit(noiseProbability),
         ampDampingProbSingleQubit(ampDampingProbability ? ampDampingProbability.value() : noiseProbability * 2),
         noiseProbMultiQubit(noiseProbability * multiQubitGateFactor),
-        ampDampingProbMultiQubit(ampDampingProbSingleQubit * multiQubitGateFactor) {
+        ampDampingProbMultiQubit(ampDampingProbSingleQubit * multiQubitGateFactor),
+        deterministicNoiseFunctionalityObject(Simulator<Config>::dd,
+                                              static_cast<dd::Qubit>(CircuitSimulator<Config>::qc->getNqubits()),
+                                              noiseProbSingleQubit,
+                                              noiseProbMultiQubit,
+                                              ampDampingProbSingleQubit,
+                                              ampDampingProbMultiQubit,
+                                              noiseEffects) {
         StochasticNoiseSimulator<dd::StochasticNoiseSimulatorDDPackageConfig>::sanityCheckOfNoiseProbabilities(noiseProbability, ampDampingProbSingleQubit, multiQubitGateFactor);
     }
 
     explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, std::uint64_t seed_ = 0):
         DeterministicNoiseSimulator(std::move(qc_), std::string("APD"), 0.001, std::optional<double>{}, 2, seed_) {}
 
-    std::map<std::string, std::size_t> measureAllNonCollapsing2(std::size_t shots) {
+    std::map<std::string, std::size_t> measureAllNonCollapsing(std::size_t shots) {
         return sampleFromProbabilityMap(rootEdge.getSparseProbabilityVectorStrKeys(measurementThreshold), shots);
     }
 
-    std::map<std::string, std::size_t> simulate(size_t shots) override;
+    //    std::map<std::size_t, bool> singleShot(bool ignoreNonUnitaries) override;
+    void initializeSimulation(std::size_t nQubits) override;
+    char measure(unsigned int i) override;
+    void reset(qc::NonUnitaryOperation* nonUnitaryOp) override;
+    void applyOperationToState(std::unique_ptr<qc::Operation>& op) override;
 
     std::map<std::size_t, bool> deterministicSimulate(bool ignoreNonUnitaries = true);
 
@@ -56,8 +67,6 @@ public:
     qc::DensityMatrixDD rootEdge{};
 
 private:
-    std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>> analyseCircuit() override;
-
     std::vector<dd::NoiseOperations> noiseEffects;
 
     double noiseProbSingleQubit{};
@@ -65,5 +74,6 @@ private:
     double noiseProbMultiQubit{};
     double ampDampingProbMultiQubit{};
 
-    double measurementThreshold = 0.001;
+    double                                      measurementThreshold = 0.001;
+    dd::DeterministicNoiseFunctionality<Config> deterministicNoiseFunctionalityObject;
 };

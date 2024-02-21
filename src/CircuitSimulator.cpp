@@ -17,7 +17,7 @@ std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_
     // easiest case: all gates are unitary --> simulate once and sample away on all qubits
     if (!hasNonmeasurementNonUnitary && !hasMeasurements) {
         singleShot(false);
-        return Simulator<Config>::measureAllNonCollapsing(shots);
+        return measureAllNonCollapsing(shots);
     }
 
     // single shot is enough, but the sampling should only return actually measured qubits
@@ -28,7 +28,7 @@ std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_
         const auto                         cbits  = qc->getNcbits();
 
         // MeasureAllNonCollapsing returns a map from measurement over all qubits to the number of occurrences
-        for (const auto& [bit_string, count]: Simulator<Config>::measureAllNonCollapsing(shots)) {
+        for (const auto& [bit_string, count]: measureAllNonCollapsing(shots)) {
             std::string resultString(qc->getNcbits(), '0');
 
             for (auto const& [qubit_index, bitIndex]: measurementMap) {
@@ -109,12 +109,48 @@ dd::fp CircuitSimulator<Config>::expectationValue(const qc::QuantumComputation& 
 }
 
 template<class Config>
+void CircuitSimulator<Config>::initializeSimulation(const std::size_t nQubits){
+    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::Qubit>(nQubits));
+    Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
+}
+
+template<class Config>
+char CircuitSimulator<Config>::measure(unsigned int i) {
+    return Simulator<Config>::measureOneCollapsing(i);
+}
+
+template<class Config>
+void CircuitSimulator<Config>::reset(qc::NonUnitaryOperation* nonUnitaryOp) {
+    const auto& qubits = nonUnitaryOp->getTargets();
+    for (const auto& qubit: qubits) {
+        auto bit = Simulator<Config>::dd->measureOneCollapsing(Simulator<Config>::rootEdge, static_cast<dd::Qubit>(qubit), true, Simulator<Config>::mt);
+        // apply an X operation whenever the measured result is one
+        if (bit == '1') {
+            const auto x   = qc::StandardOperation(qc->getNqubits(), qubit, qc::X);
+            auto       tmp = Simulator<Config>::dd->multiply(dd::getDD(&x, *Simulator<Config>::dd), Simulator<Config>::rootEdge);
+            Simulator<Config>::dd->incRef(tmp);
+            Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
+            Simulator<Config>::rootEdge = tmp;
+            Simulator<Config>::dd->garbageCollect();
+        }
+    }
+}
+
+template<class Config>
+void CircuitSimulator<Config>::applyOperationToState(std::unique_ptr<qc::Operation> &op) {
+    auto ddOp = dd::getDD(op.get(), *Simulator<Config>::dd);
+    auto tmp  = Simulator<Config>::dd->multiply(ddOp, Simulator<Config>::rootEdge);
+    Simulator<Config>::dd->incRef(tmp);
+    Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
+    Simulator<Config>::rootEdge = tmp;
+}
+
+template<class Config>
 std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool ignoreNonUnitaries) {
     singleShots++;
     const auto nQubits = qc->getNqubits();
 
-    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::Qubit>(nQubits));
-    Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
+    initializeSimulation(nQubits);
 
     std::size_t                 opNum = 0;
     std::map<std::size_t, bool> classicValues;
@@ -134,25 +170,13 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
                     assert(quantum.size() == classic.size()); // this should not happen do to check in Simulate
 
                     for (std::size_t i = 0; i < quantum.size(); ++i) {
-                        auto result = Simulator<Config>::measureOneCollapsing(quantum.at(i));
+                        auto result = measure(quantum.at(i));
                         assert(result == '0' || result == '1');
                         classicValues[classic.at(i)] = (result == '1');
                     }
 
                 } else if (nonUnitaryOp->getType() == qc::Reset) {
-                    const auto& qubits = nonUnitaryOp->getTargets();
-                    for (const auto& qubit: qubits) {
-                        auto bit = Simulator<Config>::dd->measureOneCollapsing(Simulator<Config>::rootEdge, static_cast<dd::Qubit>(qubit), true, Simulator<Config>::mt);
-                        // apply an X operation whenever the measured result is one
-                        if (bit == '1') {
-                            const auto x   = qc::StandardOperation(qc->getNqubits(), qubit, qc::X);
-                            auto       tmp = Simulator<Config>::dd->multiply(dd::getDD(&x, *Simulator<Config>::dd), Simulator<Config>::rootEdge);
-                            Simulator<Config>::dd->incRef(tmp);
-                            Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
-                            Simulator<Config>::rootEdge = tmp;
-                            Simulator<Config>::dd->garbageCollect();
-                        }
-                    }
+                    reset(nonUnitaryOp);
                 } else {
                     throw std::runtime_error("Unsupported non-unitary functionality.");
                 }
@@ -183,12 +207,7 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
             /*std::clog << "[INFO] op " << op_num << " is " << op->getName() << " on " << +op->getTargets().at(0)
                       << " #controls=" << op->getControls().size()
                       << " statesize=" << dd->size(rootEdge) << "\n";//*/
-
-            auto ddOp = dd::getDD(op.get(), *Simulator<Config>::dd);
-            auto tmp  = Simulator<Config>::dd->multiply(ddOp, Simulator<Config>::rootEdge);
-            Simulator<Config>::dd->incRef(tmp);
-            Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
-            Simulator<Config>::rootEdge = tmp;
+            applyOperationToState(op);
 
             if (approximationInfo.stepNumber > 0 && approximationInfo.stepFidelity < 1.0) {
                 if (approximationInfo.strategy == ApproximationInfo::FidelityDriven && (opNum + 1) % approxMod == 0 &&
