@@ -1,5 +1,5 @@
 [build-system]
-requires = ["scikit-build-core>=0.6.1", "setuptools-scm>=7", "pybind11>=2.11"]
+requires = ["scikit-build-core>=0.8.1", "setuptools-scm>=7", "pybind11>=2.11"]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -86,8 +86,8 @@ minimum-version = "0.6.1"
 wheel.install-dir = "mqt/ddsim"
 
 # Set required CMake and Ninja versions
-cmake.minimum-version = "3.19"
-ninja.minimum-version = "1.10"
+cmake.version = ">=3.19"
+ninja.version = ">=1.10"
 
 # Setuptools-style build caching in a local directory
 build-dir = "build/{wheel_tag}"
