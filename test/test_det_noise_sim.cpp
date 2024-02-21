@@ -92,7 +92,7 @@ TEST(DeterministicNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDWithSimulate) {
     auto quantumComputation = detGetAdder4Circuit();
     auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("APD"), 0.01, std::optional<double>{}, 2, 0);
-    auto m = ddsim->simulate(10000);
+    auto m                  = ddsim->simulate(10000);
 
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 

@@ -109,7 +109,7 @@ dd::fp CircuitSimulator<Config>::expectationValue(const qc::QuantumComputation& 
 }
 
 template<class Config>
-void CircuitSimulator<Config>::initializeSimulation(const std::size_t nQubits){
+void CircuitSimulator<Config>::initializeSimulation(const std::size_t nQubits) {
     Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(static_cast<dd::Qubit>(nQubits));
     Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
 }
@@ -137,7 +137,7 @@ void CircuitSimulator<Config>::reset(qc::NonUnitaryOperation* nonUnitaryOp) {
 }
 
 template<class Config>
-void CircuitSimulator<Config>::applyOperationToState(std::unique_ptr<qc::Operation> &op) {
+void CircuitSimulator<Config>::applyOperationToState(std::unique_ptr<qc::Operation>& op) {
     auto ddOp = dd::getDD(op.get(), *Simulator<Config>::dd);
     auto tmp  = Simulator<Config>::dd->multiply(ddOp, Simulator<Config>::rootEdge);
     Simulator<Config>::dd->incRef(tmp);

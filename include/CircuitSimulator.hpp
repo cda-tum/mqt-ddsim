@@ -71,7 +71,7 @@ public:
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
-    std::map<std::string, std::size_t> measureAllNonCollapsing(std::size_t shots) override{
+    std::map<std::string, std::size_t> measureAllNonCollapsing(std::size_t shots) override {
         return Simulator<Config>::measureAllNonCollapsing(shots);
     }
 
@@ -105,11 +105,11 @@ protected:
     virtual std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>> analyseCircuit();
 
     virtual std::map<std::size_t, bool> singleShot(bool ignoreNonUnitaries);
-    virtual void initializeSimulation(std::size_t nQubits);
-    virtual char measure(unsigned int i);
+    virtual void                        initializeSimulation(std::size_t nQubits);
+    virtual char                        measure(unsigned int i);
 
     virtual void reset(qc::NonUnitaryOperation* nonUnitaryOp);
-    virtual void applyOperationToState(std::unique_ptr<qc::Operation> &op);
+    virtual void applyOperationToState(std::unique_ptr<qc::Operation>& op);
 };
 
 #endif //DDSIM_CIRCUITSIMULATOR_HPP
