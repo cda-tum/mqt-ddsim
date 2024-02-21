@@ -1,5 +1,5 @@
-scikit-build-core==0.6.1
+scikit-build-core==0.8.1
 setuptools-scm==7.0.0
 pybind11==2.11.0
 pytest==7.0.0
-qiskit==0.45.0
+qiskit==1.0.0

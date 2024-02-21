@@ -31,10 +31,7 @@ def test_transpilation_preserves_1q_0p_target_gates(target: Target, gate: str):
     getattr(qc, gate)(0)
     qc_transpiled = transpile(qc, target=target)
     assert len(qc_transpiled.data) == 1
-    # A bug in the Qiskit compiler unrolls gates even though they are in the native gate-set.
-    # See https://github.com/Qiskit/qiskit/issues/10568
-    # As a result, the following check fails as of qiskit-terra 0.25:
-    # assert qc_transpiled.data[0][0].name == gate
+    assert qc_transpiled.data[0][0].name == gate
 
 
 @pytest.mark.parametrize("gate", ["rx", "ry", "rz", "p"])

@@ -61,7 +61,7 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
         nthreads = int(options.get("nthreads", local_hardware_info()["cpus"]))
         if mode == "amplitude":
             hybrid_mode = HybridMode.amplitude
-            max_qubits = self.max_qubits()
+            max_qubits = 30  # hard-coded 16GiB memory limit
             algorithm_qubits = qc.num_qubits
             if algorithm_qubits > max_qubits:
                 msg = "Not enough memory available to simulate the circuit even on a single thread"

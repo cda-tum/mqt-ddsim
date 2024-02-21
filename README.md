@@ -37,7 +37,7 @@ DDSIM bundled with the provider and backends for Qiskit is available via [PyPI](
 The following code gives an example on the usage:
 
 ```python3
-from qiskit import *
+from qiskit import QuantumCircuit
 from mqt import ddsim
 
 circ = QuantumCircuit(3)
@@ -49,7 +49,7 @@ print(circ.draw(fold=-1))
 
 backend = ddsim.DDSIMProvider().get_backend("qasm_simulator")
 
-job = execute(circ, backend, shots=10000)
+job = backend.run(circ, shots=10000)
 counts = job.result().get_counts(circ)
 print(counts)
 ```

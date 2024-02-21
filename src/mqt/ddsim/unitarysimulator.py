@@ -26,7 +26,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
 
     _US_TARGET = Target(
         description="MQT DDSIM Unitary Simulator Target",
-        num_qubits=QasmSimulatorBackend.max_qubits(for_matrix=True),
+        num_qubits=15,  # corresponds to 16GiB memory for storing the full matrix
     )
 
     @staticmethod

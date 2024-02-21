@@ -44,8 +44,6 @@ public:
     void reset(qc::NonUnitaryOperation* nonUnitaryOp) override;
     void applyOperationToState(std::unique_ptr<qc::Operation>& op) override;
 
-    std::map<std::size_t, bool> deterministicSimulate(bool ignoreNonUnitaries = true);
-
     std::map<std::string, std::size_t> sampleFromProbabilityMap(const dd::SparsePVecStrKeys& resultProbabilityMap, std::size_t shots);
 
     [[nodiscard]] std::size_t getNumberOfQubits() const override { return CircuitSimulator<Config>::qc->getNqubits(); };
@@ -74,6 +72,6 @@ private:
     double noiseProbMultiQubit{};
     double ampDampingProbMultiQubit{};
 
-    double                                      measurementThreshold = 0.001;
+    double                                      measurementThreshold = 0.01;
     dd::DeterministicNoiseFunctionality<Config> deterministicNoiseFunctionalityObject;
 };

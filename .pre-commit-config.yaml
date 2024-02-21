@@ -33,6 +33,11 @@ repos:
     rev: 3.2.0
     hooks:
       - id: nb-clean
+        args:
+          - --remove-empty-cells
+          - --preserve-cell-metadata
+          - raw_mimetype
+          - --
 
   # Handling unwanted unicode characters
   - repo: https://github.com/sirosen/texthooks
@@ -51,7 +56,7 @@ repos:
 
   # Python linting using ruff
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.2.0
+    rev: v0.2.2
     hooks:
       - id: ruff
         args: ["--fix", "--show-fixes"]

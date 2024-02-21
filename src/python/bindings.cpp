@@ -9,6 +9,7 @@
 #include "PathSimulator.hpp"
 #include "StochasticNoiseSimulator.hpp"
 #include "UnitarySimulator.hpp"
+#include "dd/FunctionalityConstruction.hpp"
 #include "python/qiskit/QuantumCircuit.hpp"
 
 #include <memory>
@@ -136,7 +137,7 @@ void dumpTensorNetwork(const py::object& circ, const std::string& filename) {
         throw std::runtime_error("PyObject is neither py::str nor QuantumCircuit");
     }
     std::ofstream ofs(filename);
-    qc->dump(ofs, qc::Format::Tensor);
+    dd::dumpTensorNetwork(ofs, *qc);
 }
 
 dd::fp expectationValue(CircuitSimulator<>& sim, const py::object& observable) {

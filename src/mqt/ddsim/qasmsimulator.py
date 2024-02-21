@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import time
 import uuid
-from math import log2
 from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union
 
 from qiskit import QuantumCircuit
@@ -13,7 +12,6 @@ from qiskit.providers.models import BackendStatus
 from qiskit.result import Result
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
-from qiskit.utils.multiprocessing import local_hardware_info
 
 from . import __version__
 from .header import DDSIMHeader
@@ -33,14 +31,6 @@ class QasmSimulatorBackend(BackendV2):
 
     _SHOW_STATE_VECTOR = False
     _TARGET = Target(description="MQT DDSIM Simulator Target", num_qubits=128)
-
-    @staticmethod
-    def max_qubits(for_matrix: bool = False) -> int:
-        max_complex = local_hardware_info()["memory"] * (1024**3) / 16
-        max_qubits = int(log2(max_complex))
-        if for_matrix:
-            max_qubits = max_qubits // 2
-        return max_qubits
 
     @staticmethod
     def _add_operations_to_target(target: Target) -> None:

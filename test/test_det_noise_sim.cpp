@@ -8,7 +8,7 @@ using namespace qc::literals;
 
 std::unique_ptr<qc::QuantumComputation> detGetAdder4Circuit() {
     // circuit taken from https://github.com/pnnl/qasmbench
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4, 4);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
     quantumComputation->x(0);
     quantumComputation->x(1);
     quantumComputation->h(3);
@@ -282,6 +282,7 @@ TEST(DeterministicNoiseSimTest, TestSimulateInterface) {
 
 TEST(DeterministicNoiseSimTest, TestSimulateInterfaceWithMeasurments) {
     auto quantumComputation = detGetAdder4Circuit();
+    quantumComputation->addClassicalRegister(4);
     quantumComputation->measure(0, 0);
     quantumComputation->measure(1, 1);
     quantumComputation->measure(2, 2);
