@@ -250,6 +250,7 @@ build = "cp3*"
 skip = "*-musllinux_*"
 archs = "auto64"
 test-command = "python -c \"from mqt import ddsim\""
+test-skip = "cp38-macosx_arm64"
 build-frontend = "build"
 
 [tool.cibuildwheel.linux]
