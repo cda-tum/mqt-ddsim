@@ -5,15 +5,15 @@ from typing import TYPE_CHECKING, Any, Callable
 from qiskit.providers import ProviderV1
 from qiskit.providers.providerutils import filter_backends
 
+from .deterministicnoisesimulator import DeterministicNoiseSimulatorBackend
 from .hybridqasmsimulator import HybridQasmSimulatorBackend
 from .hybridstatevectorsimulator import HybridStatevectorSimulatorBackend
 from .pathqasmsimulator import PathQasmSimulatorBackend
 from .pathstatevectorsimulator import PathStatevectorSimulatorBackend
 from .qasmsimulator import QasmSimulatorBackend
 from .statevectorsimulator import StatevectorSimulatorBackend
-from .unitarysimulator import UnitarySimulatorBackend
 from .stochasticnoisesimulator import StochasticNoiseSimulatorBackend
-from .deterministicnoisesimulator import DeterministicNoiseSimulatorBackend
+from .unitarysimulator import UnitarySimulatorBackend
 
 if TYPE_CHECKING:
     from qiskit.providers import BackendV2
