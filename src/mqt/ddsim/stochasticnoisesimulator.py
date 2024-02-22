@@ -26,17 +26,19 @@ class StochasticNoiseSimulatorBackend(QasmSimulatorBackend):
         # num_qubits=QasmSimulatorBackend.max_qubits(),
     )
 
-    def __init__(self) -> None:
-        super().__init__(
-            name="stochastic_dd_simulator",
-            description="MQT DDSIM noise-aware stochastic simulator based on decision diagrams",
-        )
+    def __init__(
+            self,
+            name: str = "stochastic_dd_simulator",
+            description: str = "MQT DDSIM noise-aware stochastic simulator based on decision diagrams",
+    ) -> None:
+        super().__init__(name=name, description=description)
 
     @property
     def target(self) -> Target:
         return self._SNS_SV_TARGET
 
-    def _run_experiment(self, qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
+    @staticmethod
+    def _run_experiment(qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
         start_time = time.time()
         noise_effect = options.get("noise_effects", "APD")
         noise_probability = options.get("noise_probability", 0.01)

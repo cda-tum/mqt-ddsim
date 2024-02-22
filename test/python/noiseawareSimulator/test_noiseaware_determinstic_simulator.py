@@ -61,7 +61,7 @@ class MQTDeterministicQasmSimulatorTest(unittest.TestCase):
 
     def test_default_config(self):
         tolerance = 100
-        sim = sim = DeterministicNoiseSimulatorBackend()
+        sim = DeterministicNoiseSimulatorBackend()
         result = sim.run(self.circuit, shots=1000).result()
         counts = result.get_counts()
         assert abs(counts["0001"] - 173) < tolerance

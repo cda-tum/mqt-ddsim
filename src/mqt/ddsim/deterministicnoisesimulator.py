@@ -27,9 +27,9 @@ class DeterministicNoiseSimulatorBackend(QasmSimulatorBackend):
     )
 
     def __init__(
-        self,
-        name="density_matrix_dd_simulator",
-        description="MQT DDSIM noise-aware density matrix simulator based on decision diagrams",
+            self,
+            name: str = "density_matrix_dd_simulator",
+            description: str = "MQT DDSIM noise-aware density matrix simulator based on decision diagrams",
     ) -> None:
         super().__init__(name=name, description=description)
 
@@ -37,7 +37,8 @@ class DeterministicNoiseSimulatorBackend(QasmSimulatorBackend):
     def target(self) -> Target:
         return self._DNS_SV_TARGET
 
-    def _run_experiment(self, qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
+    @staticmethod
+    def _run_experiment(qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
         start_time = time.time()
         noise_effect = options.get("noise_effects", "APD")
         noise_probability = options.get("noise_probability", 0.01)
