@@ -34,11 +34,10 @@ public:
     explicit DeterministicNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_, std::uint64_t seed_ = 0):
         DeterministicNoiseSimulator(std::move(qc_), std::string("APD"), 0.001, std::optional<double>{}, 2, seed_) {}
 
-    std::map<std::string, std::size_t> measureAllNonCollapsing(std::size_t shots) {
+    std::map<std::string, std::size_t> measureAllNonCollapsing(std::size_t shots) override{
         return sampleFromProbabilityMap(rootEdge.getSparseProbabilityVectorStrKeys(measurementThreshold), shots);
     }
 
-    //    std::map<std::size_t, bool> singleShot(bool ignoreNonUnitaries) override;
     void initializeSimulation(std::size_t nQubits) override;
     char measure(unsigned int i) override;
     void reset(qc::NonUnitaryOperation* nonUnitaryOp) override;

@@ -48,15 +48,12 @@ std::unique_ptr<Simulator> constructSimulator(const py::object&  circ,
                                               Args&&... args) {
     auto       qc     = std::make_unique<qc::QuantumComputation>(importCircuit(circ));
     const auto approx = ApproximationInfo{stepFidelity, stepNumber, ApproximationInfo::fromString(approximationStrategy)};
-    if constexpr (std::is_same_v<Simulator, PathSimulator<>>) {
+    if constexpr (std::is_same_v<Simulator, PathSimulator<>> || std::is_same_v<Simulator, DeterministicNoiseSimulator<>>) {
         return std::make_unique<Simulator>(std::move(qc),
                                            std::forward<Args>(args)...);
     } else if constexpr (std::is_same_v<Simulator, StochasticNoiseSimulator<>>) {
         return std::make_unique<Simulator>(std::move(qc),
                                            std::forward<Args>(args)..., stepFidelity, stepNumber);
-    } else if constexpr (std::is_same_v<Simulator, DeterministicNoiseSimulator<>>) {
-        return std::make_unique<Simulator>(std::move(qc),
-                                           std::forward<Args>(args)...);
     } else {
         if (seed < 0) {
             return std::make_unique<Simulator>(std::move(qc),

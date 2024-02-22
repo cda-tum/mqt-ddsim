@@ -11,17 +11,17 @@ class StochasticNoiseSimulatorBackend(QasmSimulatorBackend):
     """Python interface to MQT DDSIM stochastic noise-aware simulator."""
 
     _SHOW_STATE_VECTOR = True
-    _HSF_SV_TARGET = Target(
-        description="MQT DDSIM Decision Diagram-based Noise-Aware Simulator Target",
+    _SNS_SV_TARGET = Target(
+        description="MQT DDSIM decision diagram-based stochastic noise-aware simulator target",
         num_qubits=QasmSimulatorBackend.max_qubits(),
     )
 
     def __init__(self) -> None:
         super().__init__(
-            name="noise-aware_stochastic_decision-diagram_simulator",
-            description="MQT DDSIM Noise-Aware Stochastic Decision Diagram simulator",
+            name="stochastic_dd_simulator",
+            description="MQT DDSIM noise-aware stochastic simulator based on decision diagrams",
         )
 
     @property
     def target(self) -> Target:
-        return self._HSF_SV_TARGET
+        return self._SNS_SV_TARGET

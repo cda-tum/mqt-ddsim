@@ -11,10 +11,6 @@ class MQTDeterministicQasmSimulatorTest(unittest.TestCase):
     """Runs backend checks, the Basic qasm_simulator tests from Qiskit Terra, and some additional tests for the Hybrid DDSIM QasmSimulator."""
 
     def setUp(self) -> None:
-        # q = QuantumRegister(1)
-        # circ = QuantumCircuit(q)
-        # circ.x(0)
-
         q = QuantumRegister(4)
         circ = QuantumCircuit(q)
         circ.x(0)

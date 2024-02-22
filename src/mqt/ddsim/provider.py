@@ -12,6 +12,8 @@ from .pathstatevectorsimulator import PathStatevectorSimulatorBackend
 from .qasmsimulator import QasmSimulatorBackend
 from .statevectorsimulator import StatevectorSimulatorBackend
 from .unitarysimulator import UnitarySimulatorBackend
+from .stochasticnoisesimulator import StochasticNoiseSimulatorBackend
+from .deterministicnoisesimulator import DeterministicNoiseSimulatorBackend
 
 if TYPE_CHECKING:
     from qiskit.providers import BackendV2
@@ -26,6 +28,8 @@ class DDSIMProvider(ProviderV1):
         ("path_sim_qasm_simulator", PathQasmSimulatorBackend),
         ("path_sim_statevector_simulator", PathStatevectorSimulatorBackend),
         ("unitary_simulator", UnitarySimulatorBackend),
+        ("stochastic_dd_simulator", StochasticNoiseSimulatorBackend),
+        ("density_matrix_dd_simulator", DeterministicNoiseSimulatorBackend),
     )
 
     def get_backend(self, name: str | None = None, **kwargs: dict[str, Any]) -> BackendV2:

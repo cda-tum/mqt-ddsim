@@ -68,8 +68,8 @@ void StochasticNoiseSimulator<Config>::runStochSimulationForId(std::size_t stoch
 
         std::map<std::size_t, bool> classicValues;
 
-        std::size_t                  opCount     = 0U;
-        [[maybe_unused]] std::size_t approxCount = 0U;
+        std::size_t opCount     = 0U;
+        std::size_t approxCount = 0U;
 
         dd::vEdge localRootEdge = localDD->makeZeroState(static_cast<dd::Qubit>(nQubits));
         localDD->incRef(localRootEdge);

@@ -128,9 +128,5 @@ private:
     double stochRunTime{};
     double meanStochTime{};
 
-    void perfectSimulationRun();
-
     void runStochSimulationForId(std::size_t stochRun, qc::Qubit nQubits, std::map<std::string, unsigned int>& classicalMeasurementsMap, std::uint64_t localSeed);
-
-    [[nodiscard]] std::string intToString(std::int64_t targetNumber) const;
 };
