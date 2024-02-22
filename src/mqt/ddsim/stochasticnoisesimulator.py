@@ -3,18 +3,19 @@
 from __future__ import annotations
 
 import time
-from qiskit.transpiler import Target
+from typing import TYPE_CHECKING, Any
 
-from qiskit import QuantumCircuit
 from qiskit.result.models import ExperimentResult, ExperimentResultData
+from qiskit.transpiler import Target
 
 from mqt import ddsim
 
 from .header import DDSIMHeader
 from .qasmsimulator import QasmSimulatorBackend
-from .pyddsim import StochasticNoiseSimulator
 
-from typing import Any
+if TYPE_CHECKING:
+    from qiskit import QuantumCircuit
+
 
 class StochasticNoiseSimulatorBackend(QasmSimulatorBackend):
     """Python interface to MQT DDSIM stochastic noise-aware simulator."""
@@ -45,11 +46,7 @@ class StochasticNoiseSimulatorBackend(QasmSimulatorBackend):
         shots = options.get("shots", 1024)
 
         sim = ddsim.DeterministicNoiseSimulator(
-            qc,
-            noise_effect,
-            noise_probability,
-            amp_damping_probability,
-            multi_qubit_gate_factor
+            qc, noise_effect, noise_probability, amp_damping_probability, multi_qubit_gate_factor
         )
 
         counts = sim.simulate(shots=shots)
@@ -70,4 +67,3 @@ class StochasticNoiseSimulatorBackend(QasmSimulatorBackend):
             metadata=qc.metadata,
             header=DDSIMHeader(qc),
         )
-

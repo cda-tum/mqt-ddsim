@@ -3,6 +3,7 @@ from __future__ import annotations
 import unittest
 
 from qiskit import QuantumCircuit
+
 from mqt.ddsim.deterministicnoisesimulator import DeterministicNoiseSimulatorBackend
 
 
@@ -45,13 +46,16 @@ class MQTDeterministicQasmSimulatorTest(unittest.TestCase):
         # Quantum circuit is taken from https://github.com/pnnl/QASMBench
 
     def test_no_noise(self):
-        for i in range(20):
+        for _i in range(20):
             sim = DeterministicNoiseSimulatorBackend()
-            result = sim.run(self.circuit, shots=1024,
-                             noise_probability=0,
-                             noise_effects="",
-                             amp_damping_probability=0,
-                             multi_qubit_gate_factor=0).result()
+            result = sim.run(
+                self.circuit,
+                shots=1024,
+                noise_probability=0,
+                noise_effects="",
+                amp_damping_probability=0,
+                multi_qubit_gate_factor=0,
+            ).result()
             counts = result.get_counts()
             assert counts["1001"] - 1024 == 0
 
@@ -67,12 +71,14 @@ class MQTDeterministicQasmSimulatorTest(unittest.TestCase):
         tolerance = 50
         for i in range(20):
             sim = DeterministicNoiseSimulatorBackend()
-            result = sim.run(self.circuit,
-                             shots=1000,
-                             noise_effects="AP",
-                             noise_probability=0.001,
-                             amp_damping_probability=0.002,
-                             multi_qubit_gate_factor=2,
-                             seed=i).result()
+            result = sim.run(
+                self.circuit,
+                shots=1000,
+                noise_effects="AP",
+                noise_probability=0.001,
+                amp_damping_probability=0.002,
+                multi_qubit_gate_factor=2,
+                seed=i,
+            ).result()
             counts = result.get_counts()
             assert abs(counts["1001"] - 936) < tolerance

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import unittest
 
-from qiskit import QuantumCircuit, QuantumRegister
+from qiskit import QuantumCircuit
+
 from mqt.ddsim.stochasticnoisesimulator import StochasticNoiseSimulatorBackend
-from mqt import ddsim
 
 
 class MQTStochQasmSimulatorTest(unittest.TestCase):
@@ -47,23 +47,29 @@ class MQTStochQasmSimulatorTest(unittest.TestCase):
 
     def test_no_noise(self):
         sim = StochasticNoiseSimulatorBackend()
-        result = sim.run(self.circuit, shots=1024,
-                         noise_probability=0,
-                         noise_effects="",
-                         amp_damping_probability=0,
-                         multi_qubit_gate_factor=0).result()
+        result = sim.run(
+            self.circuit,
+            shots=1024,
+            noise_probability=0,
+            noise_effects="",
+            amp_damping_probability=0,
+            multi_qubit_gate_factor=0,
+        ).result()
         counts = result.get_counts()
         assert counts["1001"] - 1024 == 0
-
 
     def test_def_config(self):
         tolerance = 100
         sim = StochasticNoiseSimulatorBackend()
-        result = sim.run(self.circuit, shots=1000,
-                         noise_probability=0.1,
-                         noise_effects="APD",
-                         amp_damping_probability=0.1,
-                         multi_qubit_gate_factor=2, seed=1).result()
+        result = sim.run(
+            self.circuit,
+            shots=1000,
+            noise_probability=0.1,
+            noise_effects="APD",
+            amp_damping_probability=0.1,
+            multi_qubit_gate_factor=2,
+            seed=1,
+        ).result()
         counts = result.get_counts()
         assert abs(counts["0000"] - 211) < tolerance
         assert abs(counts["1000"] - 146) < tolerance
