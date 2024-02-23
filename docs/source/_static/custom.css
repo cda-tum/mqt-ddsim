@@ -22,9 +22,19 @@
 }
 
 /* override the default background color for literal strings */
-body:not([data-theme="light"]) .highlight .s1 {
-  background-color: #00000033;
-}
-body:not([data-theme="light"]) .highlight .s2 {
-  background-color: #00000033;
+body:not([data-theme="light"]) .highlight .sa,
+.highlight .sb,
+.highlight .sc,
+.highlight .dl,
+.highlight .sd,
+.highlight .s2,
+.highlight .se,
+.highlight .sh,
+.highlight .si,
+.highlight .sx,
+.highlight .sr,
+.highlight .s1,
+.highlight .ss,
+.highlight .s1 {
+  background-color: #00000001;
 }

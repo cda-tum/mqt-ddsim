@@ -119,3 +119,10 @@ repos:
         language: pygrep
         entry: PyBind|Numpy|Cmake|CCache|Github|PyTest|Mqt|Tum
         exclude: .pre-commit-config.yaml
+
+  # Check best practices for scientific Python code
+  - repo: https://github.com/scientific-python/cookie
+    rev: 2024.01.24
+    hooks:
+      - id: sp-repo-review
+        additional_dependencies: ["repo-review[cli]"]
