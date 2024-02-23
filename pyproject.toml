@@ -158,8 +158,7 @@ report.exclude_also = [
 files = ["src/mqt", "test/python"]
 mypy_path = ["$MYPY_CONFIG_FILE_DIR/src"]
 python_version = "3.8"
-#strict = true
-show_error_codes = true
+strict = false
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
 warn_unreachable = true
 explicit_package_bases = true
@@ -214,7 +213,7 @@ extend-select = [
     "UP",          # pyupgrade
     "YTT",         # flake8-2020
 ]
-extend-ignore = [
+ignore = [
     "ANN101",  # Missing type annotation for `self` in method
     "ANN102",  # Missing type annotation for `cls` in classmethod
     "ISC001",  # Conflicts with formatter
