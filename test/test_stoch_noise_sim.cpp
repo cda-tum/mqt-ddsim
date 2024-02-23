@@ -191,7 +191,6 @@ TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorSelectedPropert
 
 TEST(StochNoiseSimTest, SimulateRunWithBadParameters) {
     EXPECT_THROW(const StochasticNoiseSimulator ddsim(stochGetAdder4Circuit(), "AP", 0.3), std::runtime_error);
-    EXPECT_THROW(const StochasticNoiseSimulator ddsim(stochGetAdder4Circuit(), "APK"), std::runtime_error);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceError) {

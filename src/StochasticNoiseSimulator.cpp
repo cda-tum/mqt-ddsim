@@ -153,40 +153,6 @@ void StochasticNoiseSimulator::runStochSimulationForId(std::size_t stochRun, qc:
     }
 }
 
-void StochasticNoiseSimulator::sanityCheckOfNoiseProbabilities(const double noiseProbability, const double amplitudeDampingProb, const double multiQubitGateFactor) {
-    if (noiseProbability < 0 || amplitudeDampingProb < 0 || noiseProbability * multiQubitGateFactor > 1 || amplitudeDampingProb * multiQubitGateFactor > 1) {
-        throw std::runtime_error("Error probabilities are faulty!"
-                                 "\n single qubit error probability: " +
-                                 std::to_string(noiseProbability) +
-                                 " multi qubit error probability: " + std::to_string(noiseProbability * multiQubitGateFactor) +
-                                 "\n single qubit amplitude damping  probability: " + std::to_string(amplitudeDampingProb) +
-                                 " multi qubit amplitude damping  probability: " + std::to_string(amplitudeDampingProb * multiQubitGateFactor));
-    }
-}
-
-std::vector<dd::NoiseOperations> StochasticNoiseSimulator::initializeNoiseEffects(const std::string& cNoiseEffects) {
-    std::vector<dd::NoiseOperations> noiseOperationVector{};
-    for (const auto noise: cNoiseEffects) {
-        switch (noise) {
-            case 'A':
-                noiseOperationVector.push_back(dd::AmplitudeDamping);
-                break;
-            case 'P':
-                noiseOperationVector.push_back(dd::PhaseFlip);
-                break;
-            case 'D':
-                noiseOperationVector.push_back(dd::Depolarization);
-                break;
-            case 'I':
-                noiseOperationVector.push_back(dd::Identity);
-                break;
-            default:
-                throw std::runtime_error("Unknown noise operation '" + cNoiseEffects + "'\n");
-        }
-    }
-    return noiseOperationVector;
-}
-
 std::map<std::string, std::string> StochasticNoiseSimulator::additionalStatistics() {
     return {
             {"approximation_runs", std::to_string(approximationRuns)},

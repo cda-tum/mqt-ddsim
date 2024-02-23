@@ -20,7 +20,7 @@ class StochasticNoiseSimulator: public CircuitSimulator<dd::StochasticNoiseSimul
 public:
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
                              const ApproximationInfo&                  approximationInfo_,
-                             const std::string&                        noiseEffects_          = "APD",
+                             std::string                               noiseEffects_          = "APD",
                              double                                    noiseProbability_      = 0.001,
                              std::optional<double>                     ampDampingProbability_ = std::nullopt,
                              double                                    multiQubitGateFactor_  = 2):
@@ -29,21 +29,21 @@ public:
         amplitudeDampingProb((ampDampingProbability_) ? ampDampingProbability_.value() : noiseProbability_ * 2),
         multiQubitGateFactor(multiQubitGateFactor_),
         maxInstances(std::thread::hardware_concurrency() > 4 ? std::thread::hardware_concurrency() - 4 : 1),
-        noiseEffects(initializeNoiseEffects(noiseEffects_)) {
-        sanityCheckOfNoiseProbabilities(noiseProbability_, amplitudeDampingProb, multiQubitGateFactor_);
+        noiseEffects(std::move(noiseEffects_)) {
+        dd::sanityCheckOfNoiseProbabilities(noiseProbability, amplitudeDampingProb, multiQubitGateFactor);
     }
 
     explicit StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
-                                      const std::string&                        noiseEffects_          = "APD",
+                                      std::string                               noiseEffects_          = "APD",
                                       double                                    noiseProbability_      = 0.001,
                                       std::optional<double>                     ampDampingProbability_ = std::nullopt,
                                       double                                    multiQubitGateFactor_  = 2):
-        StochasticNoiseSimulator(std::move(qc_), {}, noiseEffects_, noiseProbability_, ampDampingProbability_, multiQubitGateFactor_) {}
+        StochasticNoiseSimulator(std::move(qc_), {}, std::move(noiseEffects_), noiseProbability_, ampDampingProbability_, multiQubitGateFactor_) {}
 
     StochasticNoiseSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
                              const ApproximationInfo&                  approximationInfo_,
                              const std::size_t                         seed_,
-                             const std::string&                        noiseEffects_          = "APD",
+                             std::string                               noiseEffects_          = "APD",
                              double                                    noiseProbability_      = 0.001,
                              std::optional<double>                     ampDampingProbability_ = std::nullopt,
                              double                                    multiQubitGateFactor_  = 2):
@@ -52,8 +52,8 @@ public:
         amplitudeDampingProb((ampDampingProbability_) ? ampDampingProbability_.value() : noiseProbability_ * 2),
         multiQubitGateFactor(multiQubitGateFactor_),
         maxInstances(std::thread::hardware_concurrency() > 4 ? std::thread::hardware_concurrency() - 4 : 1),
-        noiseEffects(initializeNoiseEffects(noiseEffects_)) {
-        sanityCheckOfNoiseProbabilities(noiseProbability_, amplitudeDampingProb, multiQubitGateFactor_);
+        noiseEffects(std::move(noiseEffects_)) {
+        dd::sanityCheckOfNoiseProbabilities(noiseProbability, amplitudeDampingProb, multiQubitGateFactor);
     }
 
     std::vector<std::map<std::string, size_t>> classicalMeasurementsMaps;
@@ -71,10 +71,6 @@ public:
         return 0U;
     } // Not available for stochastic simulation
 
-    static void sanityCheckOfNoiseProbabilities(double noiseProbability, double amplitudeDampingProb, double multiQubitGateFactor);
-
-    static std::vector<dd::NoiseOperations> initializeNoiseEffects(const std::string& cNoiseEffects);
-
     std::map<std::string, std::string> additionalStatistics() override;
 
 private:
@@ -84,7 +80,7 @@ private:
     std::size_t stochasticRuns{};
     std::size_t maxInstances{};
 
-    std::vector<dd::NoiseOperations> noiseEffects;
+    std::string noiseEffects;
 
     double stochRunTime{};
 
