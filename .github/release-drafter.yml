@@ -1,10 +1,10 @@
-name-template: "Release v$RESOLVED_VERSION: <TITLE>"
+name-template: "MQT DDSIM $RESOLVED_VERSION Release"
 tag-template: "v$RESOLVED_VERSION"
 categories:
   - title: "🚀 Features and Enhancements"
     labels:
-      - "enhancement"
       - "feature"
+      - "enhancement"
       - "usability"
   - title: "🐛 Bug Fixes"
     labels:
