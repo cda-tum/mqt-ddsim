@@ -137,7 +137,7 @@ TEST(StochNoiseSimTest, CheckQubitOrder) {
         quantumComputation->measure(i, i);
     }
 
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), {}, 42U, "APD", 0.02);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), {}, 41U, "APD", 0.02);
 
     const auto m = ddsim.simulate(1000);
 
