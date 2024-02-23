@@ -98,15 +98,21 @@ protected:
     std::unique_ptr<qc::QuantumComputation> qc;
     std::size_t                             singleShots{0};
 
-    ApproximationInfo approximationInfo{};
+    ApproximationInfo approximationInfo;
     std::size_t       approximationRuns{0};
     long double       finalFidelity{1.0L};
 
-    virtual std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>> analyseCircuit();
+    struct CircuitAnalysis {
+        bool                        isDynamic       = false;
+        bool                        hasMeasurements = false;
+        std::map<qc::Qubit, size_t> measurementMap;
+    };
+
+    CircuitAnalysis analyseCircuit();
 
     virtual std::map<std::size_t, bool> singleShot(bool ignoreNonUnitaries);
     virtual void                        initializeSimulation(std::size_t nQubits);
-    virtual char                        measure(unsigned int i);
+    virtual char                        measure(dd::Qubit i);
 
     virtual void reset(qc::NonUnitaryOperation* nonUnitaryOp);
     virtual void applyOperationToState(std::unique_ptr<qc::Operation>& op);

@@ -7,21 +7,16 @@
 
 template<class Config>
 std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_t shots) {
-    bool                               hasNonmeasurementNonUnitary = false;
-    bool                               hasMeasurements             = false;
-    bool                               measurementsLast            = true;
-    std::map<std::size_t, std::size_t> measurementMap;
-
-    std::tie(hasNonmeasurementNonUnitary, hasMeasurements, measurementsLast, measurementMap) = CircuitSimulator<Config>::analyseCircuit();
+    const auto analysis = CircuitSimulator<Config>::analyseCircuit();
 
     // easiest case: all gates are unitary --> simulate once and sample away on all qubits
-    if (!hasNonmeasurementNonUnitary && !hasMeasurements) {
+    if (!analysis.isDynamic && !analysis.hasMeasurements) {
         singleShot(false);
         return measureAllNonCollapsing(shots);
     }
 
     // single shot is enough, but the sampling should only return actually measured qubits
-    if (!hasNonmeasurementNonUnitary && measurementsLast) {
+    if (!analysis.isDynamic) {
         singleShot(true);
         std::map<std::string, std::size_t> measurementCounter;
         const auto                         qubits = qc->getNqubits();
@@ -31,7 +26,7 @@ std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_
         for (const auto& [bit_string, count]: measureAllNonCollapsing(shots)) {
             std::string resultString(qc->getNcbits(), '0');
 
-            for (auto const& [qubit_index, bitIndex]: measurementMap) {
+            for (auto const& [qubit_index, bitIndex]: analysis.measurementMap) {
                 resultString[cbits - bitIndex - 1] = bit_string[qubits - qubit_index - 1];
             }
 
@@ -41,7 +36,7 @@ std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_
         return measurementCounter;
     }
 
-    // there are nonunitaries (or intermediate measurement_map) and we have to actually do multiple single_shots :(
+    // the circuit is dynamic and requires single shot simulations :(
     std::map<std::string, std::size_t> measurementCounter;
 
     for (unsigned int i = 0; i < shots; i++) {
@@ -60,40 +55,34 @@ std::map<std::string, std::size_t> CircuitSimulator<Config>::simulate(std::size_
 }
 
 template<class Config>
-std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>> CircuitSimulator<Config>::analyseCircuit() {
-    bool                               hasNonmeasurementNonUnitary = false;
-    bool                               hasMeasurements             = false;
-    bool                               measurementsLast            = true;
-    std::map<std::size_t, std::size_t> measurementMap;
+auto CircuitSimulator<Config>::analyseCircuit() -> CircuitAnalysis {
+    auto analysis = CircuitAnalysis{};
 
     for (auto& op: *qc) {
-        if (op->isClassicControlledOperation() || (op->isNonUnitaryOperation() && op->getType() != qc::Measure && op->getType() != qc::Barrier)) {
-            hasNonmeasurementNonUnitary = true;
+        if (op->isClassicControlledOperation() || op->getType() == qc::Reset) {
+            analysis.isDynamic = true;
         }
-        if (op->getType() == qc::Measure) {
-            auto* nonUnitaryOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get());
-            if (nonUnitaryOp == nullptr) {
-                throw std::runtime_error("Op with type Measurement could not be casted to NonUnitaryOperation");
-            }
-            hasMeasurements = true;
+        if (const auto* measure = dynamic_cast<qc::NonUnitaryOperation*>(op.get());
+            measure != nullptr && measure->getType() == qc::Measure) {
+            analysis.hasMeasurements = true;
 
-            const auto& quantum = nonUnitaryOp->getTargets();
-            const auto& classic = nonUnitaryOp->getClassics();
+            const auto& quantum = measure->getTargets();
+            const auto& classic = measure->getClassics();
 
             if (quantum.size() != classic.size()) {
                 throw std::runtime_error("Measurement: Sizes of quantum and classic register mismatch.");
             }
 
             for (unsigned int i = 0; i < quantum.size(); ++i) {
-                measurementMap[quantum.at(i)] = classic.at(i);
+                analysis.measurementMap[quantum.at(i)] = classic.at(i);
             }
         }
 
-        if (hasMeasurements && op->isUnitary()) {
-            measurementsLast = false;
+        if (analysis.hasMeasurements && op->isUnitary()) {
+            analysis.isDynamic = true;
         }
     }
-    return std::tuple<bool, bool, bool, std::map<std::size_t, std::size_t>>{hasNonmeasurementNonUnitary, hasMeasurements, measurementsLast, measurementMap};
+    return analysis;
 }
 
 template<class Config>
@@ -115,7 +104,7 @@ void CircuitSimulator<Config>::initializeSimulation(const std::size_t nQubits) {
 }
 
 template<class Config>
-char CircuitSimulator<Config>::measure(unsigned int i) {
+char CircuitSimulator<Config>::measure(const dd::Qubit i) {
     return Simulator<Config>::measureOneCollapsing(i);
 }
 
@@ -164,13 +153,13 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
             }
             if (auto* nonUnitaryOp = dynamic_cast<qc::NonUnitaryOperation*>(op.get())) {
                 if (op->getType() == qc::Measure) {
-                    auto quantum = nonUnitaryOp->getTargets();
-                    auto classic = nonUnitaryOp->getClassics();
+                    const auto& quantum = nonUnitaryOp->getTargets();
+                    const auto& classic = nonUnitaryOp->getClassics();
 
                     assert(quantum.size() == classic.size()); // this should not happen do to check in Simulate
 
                     for (std::size_t i = 0; i < quantum.size(); ++i) {
-                        auto result = measure(quantum.at(i));
+                        auto result = measure(static_cast<dd::Qubit>(quantum.at(i)));
                         assert(result == '0' || result == '1');
                         classicValues[classic.at(i)] = (result == '1');
                     }
@@ -204,9 +193,6 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
                     throw std::runtime_error("Dynamic cast to ClassicControlledOperation failed.");
                 }
             }
-            /*std::clog << "[INFO] op " << op_num << " is " << op->getName() << " on " << +op->getTargets().at(0)
-                      << " #controls=" << op->getControls().size()
-                      << " statesize=" << dd->size(rootEdge) << "\n";//*/
             applyOperationToState(op);
 
             if (approximationInfo.stepNumber > 0 && approximationInfo.stepFidelity < 1.0) {
@@ -216,25 +202,12 @@ std::map<std::size_t, bool> CircuitSimulator<Config>::singleShot(const bool igno
                     const auto                  apFid      = Simulator<Config>::approximateByFidelity(approximationInfo.stepFidelity, false, true);
                     approximationRuns++;
                     finalFidelity *= static_cast<long double>(apFid);
-                    /*std::clog << "[INFO] Fidelity-driven ApproximationInfo run finished. "
-                              << "op_num=" << op_num
-                              << "; previous size=" << size_before
-                              << "; attained fidelity=" << ap_fid
-                              << "; global fidelity=" << final_fidelity
-                              << "; #runs=" << approximation_runs
-                              << "\n";//*/
                 } else if (approximationInfo.strategy == ApproximationInfo::MemoryDriven) {
                     [[maybe_unused]] const auto sizeBefore = Simulator<Config>::rootEdge.size();
                     if (Simulator<Config>::dd->template getUniqueTable<dd::vNode>().possiblyNeedsCollection()) {
                         const auto apFid = Simulator<Config>::approximateByFidelity(approximationInfo.stepFidelity, false, true);
                         approximationRuns++;
                         finalFidelity *= static_cast<long double>(apFid);
-                        /*std::clog << "[INFO] Memory-driven ApproximationInfo run finished. "
-                                  << "; previous size=" << size_before
-                                  << "; attained fidelity=" << ap_fid
-                                  << "; global fidelity=" << final_fidelity
-                                  << "; #runs=" << approximation_runs
-                                  << "\n";//*/
                     }
                 }
             }

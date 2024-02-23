@@ -80,7 +80,7 @@ std::map<std::string, std::size_t> ShorFastSimulator<Config>::simulate([[maybe_u
 
         applyGate(dd::H_MAT, static_cast<dd::Qubit>(nQubits - 1));
 
-        measurements[i] = Simulator<Config>::measureOneCollapsing(static_cast<qc::Qubit>(nQubits - 1), false);
+        measurements[i] = Simulator<Config>::measureOneCollapsing(static_cast<dd::Qubit>(nQubits - 1), false);
         Simulator<Config>::dd->garbageCollect();
 
         if (measurements[i] == '1') {
@@ -307,6 +307,7 @@ dd::mEdge ShorFastSimulator<Config>::addConstMod(std::uint64_t a) {
     const auto simEdgeMultiply = Simulator<Config>::dd->multiply(Simulator<Config>::dd->conjugateTranspose(f2), f);
     const auto simEdgeResult   = Simulator<Config>::dd->add(Simulator<Config>::dd->multiply(f, f4), Simulator<Config>::dd->multiply(simEdgeMultiply, diff2));
 
+    assert(simEdgeResult.p != nullptr);
     return simEdgeResult.p->e[0];
 }
 

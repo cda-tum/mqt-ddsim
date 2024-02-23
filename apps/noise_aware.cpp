@@ -62,15 +62,18 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     }
 
     if (vm.count("use_density_matrix_simulator") == 0) {
+        const auto              approxSteps  = vm["steps"].as<unsigned int>();
+        const auto              stepFidelity = vm["step_fidelity"].as<double>();
+        const ApproximationInfo approxInfo{stepFidelity, approxSteps, ApproximationInfo::FidelityDriven};
+
         // Using stochastic simulator
-        auto ddsim = std::make_unique<StochasticNoiseSimulator<>>(std::move(quantumComputation),
-                                                                  vm["noise_effects"].as<std::string>(),
-                                                                  vm["noise_prob"].as<double>(),
-                                                                  noiseProbT1,
-                                                                  vm["noise_prob_multi"].as<double>(),
-                                                                  vm["seed"].as<std::size_t>(),
-                                                                  vm["steps"].as<unsigned int>(),
-                                                                  vm["step_fidelity"].as<double>());
+        auto ddsim = std::make_unique<StochasticNoiseSimulator>(std::move(quantumComputation),
+                                                                approxInfo,
+                                                                vm["seed"].as<std::size_t>(),
+                                                                vm["noise_effects"].as<std::string>(),
+                                                                vm["noise_prob"].as<double>(),
+                                                                noiseProbT1,
+                                                                vm["noise_prob_multi"].as<double>());
 
         auto t1 = std::chrono::steady_clock::now();
 
@@ -88,8 +91,6 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
                     {"benchmark", ddsim->getName()},
                     {"n_qubits", +ddsim->getNumberOfQubits()},
                     {"applied_gates", ddsim->getNumberOfOps()},
-                    {"max_nodes", ddsim->getMaxNodeCount()},
-                    {"max_matrix_nodes", ddsim->getMaxMatrixNodeCount()},
                     {"seed", ddsim->getSeed()},
             };
 
@@ -102,16 +103,17 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
             outputObj["measurement_results"] = measurementResults;
         }
 
-        std::cout << std::setw(2) << outputObj << std::endl;
+        std::cout << std::setw(2) << outputObj << "\n";
 
     } else if (vm.count("use_density_matrix_simulator") > 0) {
         // Using deterministic simulator
-        auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation),
-                                                                     vm["noise_effects"].as<std::string>(),
-                                                                     vm["noise_prob"].as<double>(),
-                                                                     noiseProbT1,
-                                                                     vm["noise_prob_multi"].as<double>(),
-                                                                     vm["seed"].as<std::size_t>());
+        auto ddsim = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation),
+                                                                   ApproximationInfo{},
+                                                                   vm["seed"].as<std::size_t>(),
+                                                                   vm["noise_effects"].as<std::string>(),
+                                                                   vm["noise_prob"].as<double>(),
+                                                                   noiseProbT1,
+                                                                   vm["noise_prob_multi"].as<double>());
 
         auto t1 = std::chrono::steady_clock::now();
 
