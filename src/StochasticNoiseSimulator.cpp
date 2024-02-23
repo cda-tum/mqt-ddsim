@@ -43,7 +43,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(std::size_t stochRun, qc:
 
     for (std::size_t currentRun = 0U; currentRun < numberOfRuns; currentRun++) {
         auto localDD                      = std::make_unique<dd::Package<dd::StochasticNoiseSimulatorDDPackageConfig>>(getNumberOfQubits());
-        auto stochasticNoiseFunctionality = dd::StochasticNoiseFunctionality<dd::StochasticNoiseSimulatorDDPackageConfig>(
+        auto stochasticNoiseFunctionality = dd::StochasticNoiseFunctionality(
                 localDD,
                 static_cast<dd::Qubit>(nQubits),
                 noiseProbability,

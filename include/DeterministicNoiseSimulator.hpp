@@ -92,6 +92,6 @@ private:
     double noiseProbMultiQubit{};
     double ampDampingProbMultiQubit{};
 
-    double                                                                         measurementThreshold = 0.01;
-    dd::DeterministicNoiseFunctionality<dd::DensityMatrixSimulatorDDPackageConfig> deterministicNoiseFunctionality;
+    double                              measurementThreshold = 0.01;
+    dd::DeterministicNoiseFunctionality deterministicNoiseFunctionality;
 };
