@@ -345,5 +345,5 @@ void Simulator<Config>::exportDDtoGraphvizFile(const std::string& filename, cons
 }
 
 template class Simulator<dd::DDPackageConfig>;
-template class Simulator<StochasticNoiseSimulatorDDPackageConfig>;
-template class Simulator<DensityMatrixSimulatorDDPackageConfig>;
+template class Simulator<dd::StochasticNoiseSimulatorDDPackageConfig>;
+template class Simulator<dd::DensityMatrixSimulatorDDPackageConfig>;

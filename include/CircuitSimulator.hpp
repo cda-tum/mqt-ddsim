@@ -71,6 +71,10 @@ public:
         Simulator<Config>::dd->resize(qc->getNqubits());
     }
 
+    std::map<std::string, std::size_t> measureAllNonCollapsing(std::size_t shots) override {
+        return Simulator<Config>::measureAllNonCollapsing(shots);
+    }
+
     std::map<std::string, std::size_t> simulate(std::size_t shots) override;
 
     virtual dd::fp expectationValue(const qc::QuantumComputation& observable);
@@ -94,11 +98,24 @@ protected:
     std::unique_ptr<qc::QuantumComputation> qc;
     std::size_t                             singleShots{0};
 
-    ApproximationInfo approximationInfo{};
+    ApproximationInfo approximationInfo;
     std::size_t       approximationRuns{0};
     long double       finalFidelity{1.0L};
 
-    std::map<std::size_t, bool> singleShot(bool ignoreNonUnitaries);
+    struct CircuitAnalysis {
+        bool                        isDynamic       = false;
+        bool                        hasMeasurements = false;
+        std::map<qc::Qubit, size_t> measurementMap;
+    };
+
+    CircuitAnalysis analyseCircuit();
+
+    virtual std::map<std::size_t, bool> singleShot(bool ignoreNonUnitaries);
+    virtual void                        initializeSimulation(std::size_t nQubits);
+    virtual char                        measure(dd::Qubit i);
+
+    virtual void reset(qc::NonUnitaryOperation* nonUnitaryOp);
+    virtual void applyOperationToState(std::unique_ptr<qc::Operation>& op);
 };
 
 #endif //DDSIM_CIRCUITSIMULATOR_HPP

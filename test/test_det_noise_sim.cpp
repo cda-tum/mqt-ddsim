@@ -35,30 +35,14 @@ std::unique_ptr<qc::QuantumComputation> detGetAdder4Circuit() {
     return quantumComputation;
 }
 
-TEST(DeterministicNoiseSimTest, MeasurementOneSeedA) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
-    quantumComputation->h(0);
-    quantumComputation->cx(0, 1);
-    quantumComputation->measure(0, 0);
-    auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), 5);
-    EXPECT_THROW(ddsim->deterministicSimulate(), std::runtime_error);
-}
-
-TEST(DeterministicNoiseSimTest, MeasurementOneSeedB) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
-    quantumComputation->h(0);
-    quantumComputation->cx(0, 1);
-    quantumComputation->measure(0, 0);
-    auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), 1);
-    EXPECT_THROW(ddsim->deterministicSimulate(), std::runtime_error);
-}
-
 TEST(DeterministicNoiseSimTest, TestingBarrierGate) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->x(0);
     quantumComputation->barrier(0);
-    auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("A"), 0, 0, 1);
-    auto m     = ddsim->deterministicSimulate();
+    auto         ddsim                = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), std::string("A"), 0, 0, 1);
+    double const measurementThreshold = 0.01;
+    ddsim->simulate(1);
+    auto m = ddsim->rootEdge.getSparseProbabilityVectorStrKeys(measurementThreshold);
 
     ASSERT_EQ(ddsim->getNumberOfOps(), 2);
     ASSERT_EQ(m.find("01")->second, 1);
@@ -66,53 +50,78 @@ TEST(DeterministicNoiseSimTest, TestingBarrierGate) {
 }
 
 TEST(DeterministicNoiseSimTest, TestingResetGate) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
+    quantumComputation->x(0);
+    quantumComputation->x(1);
     quantumComputation->reset(0);
-    auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation));
+    quantumComputation->measure(0, 0);
+    quantumComputation->measure(1, 1);
 
-    EXPECT_THROW(ddsim->deterministicSimulate(), std::runtime_error);
+    auto ddsim = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), std::string("A"), 0, 0, 1);
+    auto m     = ddsim->simulate(1000);
+
+    ASSERT_EQ(m.find("10")->second, 1000);
+}
+
+TEST(DeterministicNoiseSimTest, ClassicControlledOp) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
+    quantumComputation->x(0);
+    quantumComputation->measure(0, 0);
+    std::unique_ptr<qc::Operation> op(new qc::StandardOperation(2, 1, qc::X));
+    auto                           classicalRegister = std::pair<std::size_t, std::size_t>(0, 1);
+    quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classicalRegister, 1);
+    quantumComputation->measure(0, 0);
+    quantumComputation->measure(1, 1);
+
+    auto ddsim = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), std::string("A"), 0, 0, 1);
+    auto m     = ddsim->simulate(1000);
+
+    ASSERT_EQ(m.find("11")->second, 1000);
 }
 
 TEST(DeterministicNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
     quantumComputation->x(0);
-    auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("A"), 0, 0, 1);
-    auto m     = ddsim->deterministicSimulate();
+    auto ddsim = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), std::string("A"), 0, 0, 1);
+    auto m     = ddsim->simulate(1000);
 
     ASSERT_EQ(ddsim->getNumberOfOps(), 1);
-    ASSERT_EQ(m.find("01")->second, 1);
+    ASSERT_EQ(m.find("01")->second, 1000);
 }
 
-TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDApplySequential) {
+TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDWithSimulate) {
     auto quantumComputation = detGetAdder4Circuit();
-    auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("APD"), 0.01, std::optional<double>{}, 2, true);
+    auto ddsim              = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), ApproximationInfo{}, 17U, std::string("APD"), 0.01, std::optional<double>{}, 2);
+    auto m                  = ddsim->simulate(10000);
 
-    auto m = ddsim->deterministicSimulate();
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    const double tolerance = 1e-10;
-    EXPECT_NEAR(m.find("0000")->second, 0.0969332192741, tolerance);
-    EXPECT_NEAR(m.find("0001")->second, 0.1731941264570, tolerance);
-    EXPECT_NEAR(m.find("0010")->second, 0.0238203475524, tolerance);
-    EXPECT_NEAR(m.find("0011")->second, 0.0242454336917, tolerance);
-    EXPECT_NEAR(m.find("0100")->second, 0.0141409660985, tolerance);
-    EXPECT_NEAR(m.find("0101")->second, 0.0138062113213, tolerance);
-    EXPECT_NEAR(m.find("0110")->second, 0.0244576087400, tolerance);
-    EXPECT_NEAR(m.find("0111")->second, 0.0239296920989, tolerance);
-    EXPECT_NEAR(m.find("1000")->second, 0.0907888041538, tolerance);
-    EXPECT_NEAR(m.find("1001")->second, 0.4145855071998, tolerance);
-    EXPECT_NEAR(m.find("1010")->second, 0.0235097990017, tolerance);
-    EXPECT_NEAR(m.find("1011")->second, 0.0262779844799, tolerance);
-    EXPECT_NEAR(m.find("1101")->second, 0.0184033482066, tolerance);
-    EXPECT_NEAR(m.find("1110")->second, 0.0116282811276, tolerance);
-    EXPECT_NEAR(m.find("1111")->second, 0.0110373166627, tolerance);
+    const auto tolerance = 100;
+    EXPECT_NEAR(static_cast<double>(m.find("0000")->second), 969, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0001")->second), 1731, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0010")->second), 238, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0011")->second), 242, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0100")->second), 141, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0101")->second), 138, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0110")->second), 244, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0111")->second), 239, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1000")->second), 907, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1001")->second), 4145, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1010")->second), 235, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1011")->second), 262, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1101")->second), 184, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1110")->second), 116, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1111")->second), 110, tolerance);
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackD) {
     auto quantumComputation = detGetAdder4Circuit();
-    auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("D"), 0.01, std::optional<double>{}, 2);
+    auto ddsim              = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), std::string("D"), 0.01, std::optional<double>{}, 2);
 
-    auto m = ddsim->deterministicSimulate();
+    double const measurementThreshold = 0.01;
+    ddsim->simulate(1);
+    auto m = ddsim->rootEdge.getSparseProbabilityVectorStrKeys(measurementThreshold);
+
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
     const double tolerance = 1e-10;
@@ -130,9 +139,12 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackD) {
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPD) {
     auto quantumComputation = detGetAdder4Circuit();
-    auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("APD"), 0.01, std::optional<double>{}, 2);
+    auto ddsim              = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), std::string("APD"), 0.01, std::optional<double>{}, 2);
 
-    auto m = ddsim->deterministicSimulate();
+    double const measurementThreshold = 0.01;
+    ddsim->simulate(1);
+    auto m = ddsim->rootEdge.getSparseProbabilityVectorStrKeys(measurementThreshold);
+
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
     const double tolerance = 1e-10;
@@ -155,9 +167,12 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPD) {
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAP) {
     auto quantumComputation = detGetAdder4Circuit();
-    auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("AP"), 0.001, std::optional<double>{}, 2);
+    auto ddsim              = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), std::string("AP"), 0.001, std::optional<double>{}, 2);
 
-    auto m = ddsim->deterministicSimulate();
+    double const measurementThreshold = 0.01;
+    ddsim->simulate(1);
+    auto m = ddsim->rootEdge.getSparseProbabilityVectorStrKeys(measurementThreshold);
+
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
     const double tolerance = 1e-10;
@@ -166,15 +181,18 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAP) {
 }
 
 TEST(DeterministicNoiseSimTest, SimulateRunWithBadParameters) {
-    EXPECT_THROW(std::make_unique<DeterministicNoiseSimulator<>>(detGetAdder4Circuit(), std::string("APD"), 0.3, std::optional<double>{}, 2), std::runtime_error);
-    EXPECT_THROW(std::make_unique<DeterministicNoiseSimulator<>>(detGetAdder4Circuit(), std::string("APK"), 0.001, std::optional<double>{}, 2), std::runtime_error);
+    EXPECT_THROW(std::make_unique<DeterministicNoiseSimulator>(detGetAdder4Circuit(), std::string("APD"), 0.3, std::optional<double>{}, 2), std::runtime_error);
+    EXPECT_THROW(std::make_unique<DeterministicNoiseSimulator>(detGetAdder4Circuit(), std::string("APK"), 0.001, std::optional<double>{}, 2), std::runtime_error);
 }
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDCustomProb) {
     auto quantumComputation = detGetAdder4Circuit();
-    auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("APD"), 0.01, 0.02, 1);
+    auto ddsim              = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), std::string("APD"), 0.01, 0.02, 1);
 
-    auto m = ddsim->deterministicSimulate();
+    double const measurementThreshold = 0.01;
+    ddsim->simulate(1);
+    auto m = ddsim->rootEdge.getSparseProbabilityVectorStrKeys(measurementThreshold);
+
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
     const double tolerance = 1e-10;
@@ -191,11 +209,30 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDCustomProb) {
     EXPECT_NEAR(m.find("1101")->second, 0.0132640682125, tolerance);
 }
 
+TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDWithShots) {
+    auto quantumComputation = detGetAdder4Circuit();
+
+    auto ddsim = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), std::string("APD"), 0.01, 0.02, 1);
+
+    auto m = ddsim->simulate(10000);
+    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+
+    const std::size_t tolerance = 500;
+
+    EXPECT_NEAR(static_cast<double>(m.find("0000")->second), 616, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0001")->second), 1487, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1000")->second), 570, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1001")->second), 5519, tolerance);
+}
+
 TEST(DeterministicNoiseSimTest, SimulateAdder4NoNoise1) {
     auto quantumComputation = detGetAdder4Circuit();
-    auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("I"), 0.01, 0.02, 1);
+    auto ddsim              = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), std::string("I"), 0.01, 0.02, 1);
 
-    auto m = ddsim->deterministicSimulate();
+    double const measurementThreshold = 0.01;
+    ddsim->simulate(1);
+    auto m = ddsim->rootEdge.getSparseProbabilityVectorStrKeys(measurementThreshold);
+
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
     const double tolerance = 1e-10;
@@ -204,19 +241,21 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4NoNoise1) {
 
 TEST(DeterministicNoiseSimTest, SimulateAdder4NoNoise2) {
     auto quantumComputation = detGetAdder4Circuit();
-    auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("APD"), 0, 0, 1);
+    auto ddsim              = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), std::string("APD"), 0, 0, 1);
 
-    auto m = ddsim->deterministicSimulate();
+    std::size_t const shots = 10000;
+
+    auto m = ddsim->simulate(shots);
     std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
     const double tolerance = 1e-10;
-    EXPECT_NEAR(m.find("1001")->second, 1, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1001")->second), static_cast<double>(shots), tolerance);
 }
 
 TEST(DeterministicNoiseSimTest, TestFunctionsOptimized) {
     auto quantumComputation = detGetAdder4Circuit();
-    auto ddsim              = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("APD"), 0.01, 0.02, 1);
-    auto m                  = ddsim->deterministicSimulate();
+    auto ddsim              = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), std::string("APD"), 0.01, 0.02, 1);
+    auto m                  = ddsim->simulate(1000);
 
     EXPECT_EQ(ddsim->getNumberOfQubits(), 4);
     EXPECT_EQ(ddsim->getActiveNodeCount(), 22);
@@ -226,35 +265,38 @@ TEST(DeterministicNoiseSimTest, TestFunctionsOptimized) {
     EXPECT_EQ(ddsim->countNodesFromRoot(), 23);
 }
 
-TEST(DeterministicNoiseSimTest, sampleFromProbabilityMap1) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-    quantumComputation->emplace_back<qc::StandardOperation>(2, 0, qc::X);
+TEST(DeterministicNoiseSimTest, TestSimulateInterface) {
+    auto quantumComputation = detGetAdder4Circuit();
+    auto ddsim              = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), std::string("APD"), 0.01, 0.02, 1);
 
-    auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("APD"), 0, 0, 1, true);
-    auto m     = ddsim->deterministicSimulate();
+    auto m = ddsim->simulate(10000);
 
-    const std::size_t shots        = 100000;
-    auto              sampledShots = ddsim->sampleFromProbabilityMap(m, shots);
+    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
 
-    double const tolerance = 0.01;
-    for (const auto& [state, prob]: m) {
-        const auto relFreq = static_cast<dd::fp>(sampledShots.find(state)->second) / shots;
-        EXPECT_NEAR(prob, relFreq, tolerance);
-    }
+    const double tolerance = 500;
+    EXPECT_NEAR(static_cast<double>(m.find("0000")->second), 616, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0001")->second), 1487, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1000")->second), 570, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1001")->second), 5519, tolerance);
 }
 
-TEST(DeterministicNoiseSimTest, sampleFromProbabilityMap2) {
+TEST(DeterministicNoiseSimTest, TestSimulateInterfaceWithMeasurments) {
     auto quantumComputation = detGetAdder4Circuit();
+    quantumComputation->addClassicalRegister(4);
+    quantumComputation->measure(0, 0);
+    quantumComputation->measure(1, 1);
+    quantumComputation->measure(2, 2);
+    quantumComputation->measure(3, 3);
 
-    auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), std::string("AP"), 0.1, 0.2, 1, true);
+    auto ddsim = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), std::string("APD"), 0.01, 0.02, 1);
 
-    const std::size_t shots        = 1000000;
-    auto              sampledShots = ddsim->simulate(shots);
-    auto              m            = ddsim->deterministicSimulate();
+    auto m = ddsim->simulate(10000);
 
-    double const tolerance = 0.01;
-    for (const auto& [state, prob]: m) {
-        const auto relFreq = static_cast<dd::fp>(sampledShots.find(state)->second) / shots;
-        EXPECT_NEAR(prob, relFreq, tolerance);
-    }
+    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+
+    const double tolerance = 500;
+    EXPECT_NEAR(static_cast<double>(m.find("0000")->second), 616, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0001")->second), 1487, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1000")->second), 570, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1001")->second), 5519, tolerance);
 }

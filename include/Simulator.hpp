@@ -50,7 +50,7 @@ public:
         return dd->measureAll(rootEdge, collapse, mt, epsilon);
     }
 
-    std::map<std::string, std::size_t> measureAllNonCollapsing(std::size_t shots) {
+    virtual std::map<std::string, std::size_t> measureAllNonCollapsing(std::size_t shots) {
         std::map<std::string, std::size_t> results;
         for (std::size_t i = 0; i < shots; i++) {
             const auto m = measureAll(false);
@@ -59,9 +59,9 @@ public:
         return results;
     }
 
-    char measureOneCollapsing(const qc::Qubit index, const bool assumeProbabilityNormalization = true) {
+    char measureOneCollapsing(const dd::Qubit index, const bool assumeProbabilityNormalization = true) {
         assert(index < getNumberOfQubits());
-        return dd->measureOneCollapsing(rootEdge, static_cast<dd::Qubit>(index), assumeProbabilityNormalization, mt, epsilon);
+        return dd->measureOneCollapsing(rootEdge, index, assumeProbabilityNormalization, mt, epsilon);
     }
 
     std::map<std::string, std::size_t> sampleFromAmplitudeVectorInPlace(std::vector<std::complex<dd::fp>>& amplitudes, std::size_t shots);
@@ -150,35 +150,6 @@ protected:
     dd::fp        epsilon = 0.001;
 
     virtual void exportDDtoGraphviz(std::ostream& os, bool colored, bool edgeLabels, bool classic, bool memory, bool formatAsPolar);
-};
-
-struct StochasticNoiseSimulatorDDPackageConfig: public dd::DDPackageConfig {
-    static constexpr std::size_t STOCHASTIC_CACHE_OPS = qc::OpType::OpCount;
-};
-
-struct DensityMatrixSimulatorDDPackageConfig: public dd::DDPackageConfig {
-    static constexpr std::size_t UT_DM_NBUCKET                 = 65536U;
-    static constexpr std::size_t UT_DM_INITIAL_ALLOCATION_SIZE = 4096U;
-
-    static constexpr std::size_t CT_DM_DM_MULT_NBUCKET = 16384U;
-    static constexpr std::size_t CT_DM_ADD_NBUCKET     = 16384U;
-    static constexpr std::size_t CT_DM_NOISE_NBUCKET   = 4096U;
-
-    static constexpr std::size_t UT_MAT_NBUCKET            = 16384U;
-    static constexpr std::size_t CT_MAT_ADD_NBUCKET        = 4096U;
-    static constexpr std::size_t CT_VEC_ADD_NBUCKET        = 4096U;
-    static constexpr std::size_t CT_MAT_TRANS_NBUCKET      = 4096U;
-    static constexpr std::size_t CT_MAT_CONJ_TRANS_NBUCKET = 4096U;
-
-    static constexpr std::size_t CT_MAT_MAT_MULT_NBUCKET        = 1U;
-    static constexpr std::size_t CT_MAT_VEC_MULT_NBUCKET        = 1U;
-    static constexpr std::size_t UT_VEC_NBUCKET                 = 1U;
-    static constexpr std::size_t UT_VEC_INITIAL_ALLOCATION_SIZE = 1U;
-    static constexpr std::size_t UT_MAT_INITIAL_ALLOCATION_SIZE = 1U;
-    static constexpr std::size_t CT_VEC_KRON_NBUCKET            = 1U;
-    static constexpr std::size_t CT_MAT_KRON_NBUCKET            = 1U;
-    static constexpr std::size_t CT_VEC_INNER_PROD_NBUCKET      = 1U;
-    static constexpr std::size_t STOCHASTIC_CACHE_OPS           = 1U;
 };
 
 #endif //DDSIMULATOR_H

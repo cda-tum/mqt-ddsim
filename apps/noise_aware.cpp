@@ -29,9 +29,8 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
         ("noise_prob", "Probability for applying noise.", cxxopts::value<double>()->default_value("0.001"))
         ("noise_prob_t1", "Probability for applying amplitude damping noise (default:2 x noise_prob)", cxxopts::value<double>())
         ("noise_prob_multi", "Noise factor for multi qubit operations", cxxopts::value<double>()->default_value("2"))
-        ("unoptimized_sim", "Use unoptimized scheme for stochastic/deterministic noise-aware simulation")
-        ("stoch_runs", "Number of stochastic runs. When the value is 0, the deterministic simulator is started. ", cxxopts::value<std::size_t>()->default_value("0"))
-        ("properties", R"(Comma separated list of tracked amplitudes, when conducting a stochastic simulation. The "-" operator can be used to specify a range.)", cxxopts::value<std::string>()->default_value("0-100"))
+        ("use_density_matrix_simulator", "Set this flag to use the density matrix simulator. Per default the stochastic simulator is used")
+        ("shots", "Specify the number of shots that shall be generated", cxxopts::value<std::size_t>()->default_value("0"))
 
     ; // end arguments list
     // clang-format on
@@ -62,23 +61,23 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
         noiseProbT1 = vm["noise_prob_t1"].as<double>();
     }
 
-    if (vm["stoch_runs"].as<std::size_t>() > 0) {
+    if (vm.count("use_density_matrix_simulator") == 0) {
+        const auto              approxSteps  = vm["steps"].as<unsigned int>();
+        const auto              stepFidelity = vm["step_fidelity"].as<double>();
+        const ApproximationInfo approxInfo{stepFidelity, approxSteps, ApproximationInfo::FidelityDriven};
+
         // Using stochastic simulator
-        auto ddsim = std::make_unique<StochasticNoiseSimulator<>>(std::move(quantumComputation),
-                                                                  vm["noise_effects"].as<std::string>(),
-                                                                  vm["noise_prob"].as<double>(),
-                                                                  noiseProbT1,
-                                                                  vm["noise_prob_multi"].as<double>(),
-                                                                  vm["stoch_runs"].as<size_t>(),
-                                                                  vm["properties"].as<std::string>(),
-                                                                  vm.count("unoptimized_sim"),
-                                                                  vm["steps"].as<unsigned int>(),
-                                                                  vm["step_fidelity"].as<double>(),
-                                                                  vm["seed"].as<std::size_t>());
+        auto ddsim = std::make_unique<StochasticNoiseSimulator>(std::move(quantumComputation),
+                                                                approxInfo,
+                                                                vm["seed"].as<std::size_t>(),
+                                                                vm["noise_effects"].as<std::string>(),
+                                                                vm["noise_prob"].as<double>(),
+                                                                noiseProbT1,
+                                                                vm["noise_prob_multi"].as<double>());
 
         auto t1 = std::chrono::steady_clock::now();
 
-        const std::map<std::string, double> measurementResults = ddsim->stochSimulate();
+        const auto measurementResults = ddsim->simulate(vm["shots"].as<size_t>());
 
         auto t2 = std::chrono::steady_clock::now();
 
@@ -92,8 +91,6 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
                     {"benchmark", ddsim->getName()},
                     {"n_qubits", +ddsim->getNumberOfQubits()},
                     {"applied_gates", ddsim->getNumberOfOps()},
-                    {"max_nodes", ddsim->getMaxNodeCount()},
-                    {"max_matrix_nodes", ddsim->getMaxMatrixNodeCount()},
                     {"seed", ddsim->getSeed()},
             };
 
@@ -106,18 +103,21 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
             outputObj["measurement_results"] = measurementResults;
         }
 
-        std::cout << std::setw(2) << outputObj << std::endl;
+        std::cout << std::setw(2) << outputObj << "\n";
 
-    } else if (vm["stoch_runs"].as<std::size_t>() == 0) {
+    } else if (vm.count("use_density_matrix_simulator") > 0) {
         // Using deterministic simulator
-        auto ddsim = std::make_unique<DeterministicNoiseSimulator<>>(std::move(quantumComputation), vm["noise_effects"].as<std::string>(),
-                                                                     vm["noise_prob"].as<double>(),
-                                                                     noiseProbT1,
-                                                                     vm["noise_prob_multi"].as<double>(), vm["seed"].as<std::size_t>());
+        auto ddsim = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation),
+                                                                   ApproximationInfo{},
+                                                                   vm["seed"].as<std::size_t>(),
+                                                                   vm["noise_effects"].as<std::string>(),
+                                                                   vm["noise_prob"].as<double>(),
+                                                                   noiseProbT1,
+                                                                   vm["noise_prob_multi"].as<double>());
 
         auto t1 = std::chrono::steady_clock::now();
 
-        const auto measurementResults = ddsim->deterministicSimulate();
+        const auto measurementResults = ddsim->simulate(vm["shots"].as<size_t>());
 
         auto t2 = std::chrono::steady_clock::now();
 

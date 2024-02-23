@@ -5,12 +5,14 @@ from typing import TYPE_CHECKING, Any, Callable
 from qiskit.providers import ProviderV1
 from qiskit.providers.providerutils import filter_backends
 
+from .deterministicnoisesimulator import DeterministicNoiseSimulatorBackend
 from .hybridqasmsimulator import HybridQasmSimulatorBackend
 from .hybridstatevectorsimulator import HybridStatevectorSimulatorBackend
 from .pathqasmsimulator import PathQasmSimulatorBackend
 from .pathstatevectorsimulator import PathStatevectorSimulatorBackend
 from .qasmsimulator import QasmSimulatorBackend
 from .statevectorsimulator import StatevectorSimulatorBackend
+from .stochasticnoisesimulator import StochasticNoiseSimulatorBackend
 from .unitarysimulator import UnitarySimulatorBackend
 
 if TYPE_CHECKING:
@@ -26,6 +28,8 @@ class DDSIMProvider(ProviderV1):
         ("path_sim_qasm_simulator", PathQasmSimulatorBackend),
         ("path_sim_statevector_simulator", PathStatevectorSimulatorBackend),
         ("unitary_simulator", UnitarySimulatorBackend),
+        ("stochastic_dd_simulator", StochasticNoiseSimulatorBackend),
+        ("density_matrix_dd_simulator", DeterministicNoiseSimulatorBackend),
     )
 
     def get_backend(self, name: str | None = None, **kwargs: dict[str, Any]) -> BackendV2:

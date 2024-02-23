@@ -10,7 +10,7 @@ using namespace qc::literals;
 
 std::unique_ptr<qc::QuantumComputation> stochGetAdder4Circuit() {
     // circuit taken from https://github.com/pnnl/qasmbench
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4, 4);
     quantumComputation->x(0);
     quantumComputation->x(1);
     quantumComputation->h(3);
@@ -34,163 +34,73 @@ std::unique_ptr<qc::QuantumComputation> stochGetAdder4Circuit() {
     quantumComputation->s(3);
     quantumComputation->cx(3, 0);
     quantumComputation->h(3);
+
+    quantumComputation->measure(0, 0);
+    quantumComputation->measure(1, 1);
+    quantumComputation->measure(2, 2);
+    quantumComputation->measure(3, 3);
     return quantumComputation;
 }
 
 TEST(StochNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-    quantumComputation->x(0);
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), 1, 1);
-
-    ASSERT_EQ(ddsim.getNumberOfOps(), 1);
-
-    ddsim.simulate(1);
-
-    auto m = ddsim.measureAll(false);
-
-    ASSERT_EQ("01", m);
-}
-
-TEST(StochNoiseSimTest, ClassicControlledOp) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
     quantumComputation->x(0);
     quantumComputation->measure(0, 0);
-    std::unique_ptr<qc::Operation> op(new qc::StandardOperation(2, 1, qc::X));
-    auto                           classicalRegister = std::pair<std::size_t, std::size_t>(0, 1);
-    quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classicalRegister, 1);
+    quantumComputation->measure(1, 1);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation));
 
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), 1, 1);
+    ASSERT_EQ(ddsim.getNumberOfOps(), 3);
 
-    ddsim.simulate(1);
+    const auto m = ddsim.simulate(1);
 
-    auto m = ddsim.measureAll(false);
-
-    ASSERT_EQ("11", m);
+    ASSERT_EQ(static_cast<double>(m.find("01")->second), 1);
 }
 
-TEST(StochNoiseSimTest, DestructiveMeasurementAll) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-    quantumComputation->h(0);
-    quantumComputation->h(1);
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), 1, 1);
+TEST(StochNoiseSimTest, ResetOp) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(1, 1);
+    quantumComputation->x(0);
+    quantumComputation->reset(0);
+    quantumComputation->measure(0, 0);
 
-    ddsim.simulate(1);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation));
 
-    const auto vBefore = ddsim.getVector();
-    ASSERT_EQ(vBefore[0], vBefore[1]);
-    ASSERT_EQ(vBefore[0], vBefore[2]);
-    ASSERT_EQ(vBefore[0], vBefore[3]);
+    const auto m = ddsim.simulate(1);
 
-    const std::string m      = ddsim.measureAll(true);
-    const auto        vAfter = ddsim.getVector();
-    const std::size_t i      = std::stoul(m, nullptr, 2);
-
-    ASSERT_EQ(vAfter[i].real(), 1.0);
-    ASSERT_EQ(vAfter[i].imag(), 0.0);
-}
-
-TEST(StochNoiseSimTest, DestructiveMeasurementOne) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-    quantumComputation->h(0);
-    quantumComputation->h(1);
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), 1, 1);
-
-    ddsim.simulate(1);
-
-    const char m      = ddsim.measureOneCollapsing(0);
-    const auto vAfter = ddsim.getVector();
-
-    if (m == '0') {
-        ASSERT_EQ(vAfter[0], dd::SQRT2_2);
-        ASSERT_EQ(vAfter[2], dd::SQRT2_2);
-        ASSERT_EQ(vAfter[1], 0.);
-        ASSERT_EQ(vAfter[3], 0.);
-    } else if (m == '1') {
-        ASSERT_EQ(vAfter[0], 0.);
-        ASSERT_EQ(vAfter[2], 0.);
-        ASSERT_EQ(vAfter[1], dd::SQRT2_2);
-        ASSERT_EQ(vAfter[3], dd::SQRT2_2);
-    } else {
-        FAIL() << "Measurement result not in {0,1}!";
-    }
-}
-
-TEST(StochNoiseSimTest, DestructiveMeasurementOneArbitraryNormalization) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-    quantumComputation->h(0);
-    quantumComputation->h(1);
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), 1, 1);
-
-    ddsim.simulate(1);
-
-    std::mt19937_64 gen{}; // NOLINT(cert-msc51-cpp)
-
-    char const m = ddsim.dd->measureOneCollapsing(ddsim.rootEdge, 0, false, gen);
-
-    const auto vAfter = ddsim.getVector();
-
-    for (auto const& e: vAfter) {
-        std::cout << e << " ";
-    }
-    std::cout << "\n";
-
-    if (m == '0') {
-        ASSERT_EQ(vAfter[0], dd::SQRT2_2);
-        ASSERT_EQ(vAfter[2], dd::SQRT2_2);
-        ASSERT_EQ(vAfter[1], 0.);
-        ASSERT_EQ(vAfter[3], 0.);
-    } else if (m == '1') {
-        ASSERT_EQ(vAfter[0], 0.);
-        ASSERT_EQ(vAfter[2], 0.);
-        ASSERT_EQ(vAfter[1], dd::SQRT2_2);
-        ASSERT_EQ(vAfter[3], dd::SQRT2_2);
-    } else {
-        FAIL() << "Measurement result not in {0,1}!";
-    }
+    ASSERT_EQ(static_cast<double>(m.find("0")->second), 1);
 }
 
 TEST(StochNoiseSimTest, ApproximateByFidelity) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
-    quantumComputation->h(0);
-    quantumComputation->h(1);
-    quantumComputation->mcx({0, 1}, 2);
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), 1, 1, 54);
+    auto                     quantumComputation = stochGetAdder4Circuit();
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), ApproximationInfo{0.8, 1, ApproximationInfo::FidelityDriven}, "APD", 0.1);
 
-    ddsim.simulate(1);
+    const auto m = ddsim.simulate(1000);
 
-    ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
+    double const tolerance = 50;
 
-    double const resultingFidelity = ddsim.approximateByFidelity(0.3, false, true);
-
-    ASSERT_EQ(ddsim.getActiveNodeCount(), 3);
-    ASSERT_DOUBLE_EQ(resultingFidelity, 0.5); //equal up to 4 ULP
-}
-
-TEST(StochNoiseSimTest, ApproximateBySampling) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
-    quantumComputation->h(0);
-    quantumComputation->h(1);
-    quantumComputation->mcx({0, 1}, 2);
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), 1, 1);
-
-    ddsim.simulate(1);
-
-    ASSERT_EQ(ddsim.getActiveNodeCount(), 6);
-
-    double const resultingFidelity = ddsim.approximateBySampling(1, 0, true);
-
-    ASSERT_EQ(ddsim.getActiveNodeCount(), 3);
-    ASSERT_LE(resultingFidelity, 0.75); // the least contributing path has .25
+    EXPECT_NEAR(static_cast<double>(m.find("0000")->second), 255, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1000")->second), 177, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0100")->second), 63, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1100")->second), 44, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0010")->second), 89, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1010")->second), 62, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0110")->second), 22, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1110")->second), 15, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0001")->second), 87, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1001")->second), 61, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0101")->second), 24, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1101")->second), 17, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0011")->second), 35, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1011")->second), 24, tolerance);
 }
 
 TEST(StochNoiseSimTest, Reordering) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(3, 3);
     quantumComputation->h(0);
     quantumComputation->h(1);
     quantumComputation->barrier({0, 1, 2});
     quantumComputation->mcx({0, 1}, 2);
 
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), 1, 1);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation));
 
     ddsim.simulate(1);
 }
@@ -204,237 +114,229 @@ TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
     auto                           classicalRegister = std::pair<std::size_t, std::size_t>(0, 1);
     quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classicalRegister, 1);
 
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("APD"), 0.02, std::optional<double>{}, 2, 1000, std::string("0-3"), false, 1, 1);
+    for (qc::Qubit i = 0; i < 2; i++) {
+        quantumComputation->measure(i, i);
+    }
 
-    auto m = ddsim.stochSimulate();
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), "APD", 0.02);
 
-    double const tolerance = 0.1;
-    EXPECT_NEAR(m.find("00")->second, 0.496431, tolerance);
-    EXPECT_NEAR(m.find("01")->second, 0.0224184, tolerance);
-    EXPECT_NEAR(m.find("10")->second, 0.460269, tolerance);
-    EXPECT_NEAR(m.find("11")->second, 0.0208816, tolerance);
+    const auto m = ddsim.simulate(1000);
+
+    double const tolerance = 50;
+    EXPECT_NEAR(static_cast<double>(m.find("00")->second), 49, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("01")->second), 45, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("10")->second), 469, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("11")->second), 435, tolerance);
+}
+
+TEST(StochNoiseSimTest, CheckQubitOrder) {
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(4, 4);
+    quantumComputation->x(0);
+
+    for (qc::Qubit i = 0; i < 4; i++) {
+        quantumComputation->measure(i, i);
+    }
+
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), {}, 41U, "APD", 0.02);
+
+    const auto m = ddsim.simulate(1000);
+
+    double const tolerance = 50;
+    EXPECT_NEAR(static_cast<double>(m.find("0001")->second), 1000, tolerance);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithoutNoise) {
     auto                     quantumComputation = stochGetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), 1, 1);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), {}, 42U, "APD", 0);
 
-    ddsim.simulate(1);
-    auto m = ddsim.measureAll(false);
-    ASSERT_EQ("1001", m);
+    const auto m = ddsim.simulate(1000);
+
+    ASSERT_EQ(static_cast<double>(m.find("1001")->second), 1000);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateError) {
     auto                     quantumComputation = stochGetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("APD"), 0.1, std::optional<double>{}, 2, 1000, std::string("0-16"), false, 1, 1);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), {}, 42U, "APD", 0.1);
 
-    auto m = ddsim.stochSimulate();
+    const auto m = ddsim.simulate(1000);
 
-    double const tolerance = 0.1;
+    double const tolerance = 50;
 
-    EXPECT_NEAR(m.find("0000")->second, 0.25574412296741467, tolerance);
-    EXPECT_NEAR(m.find("0001")->second, 0.177720207953642, tolerance);
-    EXPECT_NEAR(m.find("0010")->second, 0.06386485600556026, tolerance);
-    EXPECT_NEAR(m.find("0011")->second, 0.04438060064535747, tolerance);
-    EXPECT_NEAR(m.find("0100")->second, 0.0898482618504159, tolerance);
-    EXPECT_NEAR(m.find("0101")->second, 0.062436925904517736, tolerance);
-    EXPECT_NEAR(m.find("0110")->second, 0.022981537137908348, tolerance);
-    EXPECT_NEAR(m.find("0111")->second, 0.015970195341710985, tolerance);
-    EXPECT_NEAR(m.find("1000")->second, 0.08799481366902726, tolerance);
-    EXPECT_NEAR(m.find("1001")->second, 0.061149120043750206, tolerance);
-    EXPECT_NEAR(m.find("1010")->second, 0.02480081309590326, tolerance);
-    EXPECT_NEAR(m.find("1011")->second, 0.017234499727102268, tolerance);
-    EXPECT_NEAR(m.find("1100")->second, 0.03505400112419414, tolerance);
-    EXPECT_NEAR(m.find("1101")->second, 0.024359601507422463, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0000")->second), 255, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1000")->second), 177, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0100")->second), 63, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1100")->second), 44, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0010")->second), 89, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1010")->second), 62, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0110")->second), 22, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1110")->second), 15, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0001")->second), 87, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1001")->second), 61, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0101")->second), 24, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1101")->second), 17, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0011")->second), 35, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1011")->second), 24, tolerance);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorSelectedProperties) {
     auto                     quantumComputation = stochGetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("APD"), 0.1, std::optional<double>{}, 2, 1000, std::string("4,8-15"), false, 1, 1);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), {}, 42U, "APD", 0.1);
 
-    auto         m         = ddsim.stochSimulate();
-    double const tolerance = 0.1;
+    auto         m         = ddsim.simulate(1000);
+    double const tolerance = 50;
 
-    EXPECT_NEAR(m.find("0100")->second, 0.0898482618504159, tolerance);
-    EXPECT_NEAR(m.find("1000")->second, 0.08799481366902726, tolerance);
-    EXPECT_NEAR(m.find("1001")->second, 0.061149120043750206, tolerance);
-    EXPECT_NEAR(m.find("1010")->second, 0.02480081309590326, tolerance);
-    EXPECT_NEAR(m.find("1011")->second, 0.017234499727102268, tolerance);
-    EXPECT_NEAR(m.find("1100")->second, 0.03505400112419414, tolerance);
-    EXPECT_NEAR(m.find("1101")->second, 0.024359601507422463, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0000")->second), 211, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1000")->second), 146, tolerance);
 }
 
 TEST(StochNoiseSimTest, SimulateRunWithBadParameters) {
-    EXPECT_THROW(const StochasticNoiseSimulator ddsim(stochGetAdder4Circuit(), std::string("AP"), 0.3, std::optional<double>{}, 2, 1000, std::string("0-1000"), false, 1, 1), std::runtime_error);
-    EXPECT_THROW(const StochasticNoiseSimulator ddsim(stochGetAdder4Circuit(), std::string("APK"), 0.01, std::optional<double>{}, 2, 1000, std::string("0-1000"), false, 1, 1), std::runtime_error);
+    EXPECT_THROW(const StochasticNoiseSimulator ddsim(stochGetAdder4Circuit(), "AP", 0.3), std::runtime_error);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceError) {
     auto                     quantumComputation = stochGetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("AP"), 0.01, std::optional<double>{}, 2, 1000, std::string("0-1000"), false, 1, 1);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), {}, 42U, std::string("AP"), 0.01);
 
-    auto         m         = ddsim.stochSimulate();
-    double const tolerance = 0.1;
+    auto         m         = ddsim.simulate(1000);
+    double const tolerance = 50;
 
-    EXPECT_NEAR(m.find("0000")->second, 0.08441970960811902, tolerance);
-    EXPECT_NEAR(m.find("0001")->second, 0.0791112059351237, tolerance);
-    EXPECT_NEAR(m.find("0100")->second, 0.016558289691361448, tolerance);
-    EXPECT_NEAR(m.find("0101")->second, 0.016171421345261474, tolerance);
-    EXPECT_NEAR(m.find("0110")->second, 0.02212697987399219, tolerance);
-    EXPECT_NEAR(m.find("1000")->second, 0.17460882977464234, tolerance);
-    EXPECT_NEAR(m.find("1001")->second, 0.5375349142994105, tolerance);
-    EXPECT_NEAR(m.find("1100")->second, 0.014249759740682603, tolerance);
-    EXPECT_NEAR(m.find("1101")->second, 0.01403353315543664, tolerance);
-    EXPECT_NEAR(m.find("1110")->second, 0.01885716876841646, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0000")->second), 84, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1000")->second), 79, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0010")->second), 16, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1010")->second), 16, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0110")->second), 22, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0001")->second), 174, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1001")->second), 537, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0011")->second), 14, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1011")->second), 14, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0111")->second), 18, tolerance);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDepolarizationError) {
     auto                     quantumComputation = stochGetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("D"), 0.01, std::optional<double>{}, 2, 1000, std::string("0-1000"), false, 1, 1);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), {}, 42U, "D", 0.01);
 
-    auto m = ddsim.stochSimulate();
+    const auto m = ddsim.simulate(1000);
 
-    double const tolerance = 0.1;
+    double const tolerance = 50;
 
-    EXPECT_NEAR(m.find("0000")->second, 0.03323287049319544, tolerance);
-    EXPECT_NEAR(m.find("0001")->second, 0.03284348575778577, tolerance);
-    EXPECT_NEAR(m.find("0010")->second, 0.01296430657356062, tolerance);
-    EXPECT_NEAR(m.find("1000")->second, 0.06839382801894367, tolerance);
-    EXPECT_NEAR(m.find("1001")->second, 0.7370101351171158, tolerance);
-    EXPECT_NEAR(m.find("1010")->second, 0.010781280290814215, tolerance);
-    EXPECT_NEAR(m.find("1011")->second, 0.02750867476569656, tolerance);
-    EXPECT_NEAR(m.find("1100")->second, 0.011706168989804651, tolerance);
-    EXPECT_NEAR(m.find("1101")->second, 0.01863469254111994, tolerance);
-    EXPECT_NEAR(m.find("1110")->second, 0.016008233100915176, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0000")->second), 33, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1000")->second), 32, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0100")->second), 12, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0001")->second), 68, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1001")->second), 737, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0101")->second), 10, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1101")->second), 27, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0011")->second), 11, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1011")->second), 18, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0111")->second), 16, tolerance);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithNoiseAndApproximation) {
     auto                     quantumComputation = stochGetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("APD"), 0.01, std::optional<double>{}, 2, 1000, std::string("-2-1000"), false, 1, 0.9);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), ApproximationInfo{0.9, 1, ApproximationInfo::FidelityDriven}, 42U, "APD", 0.01);
 
-    auto m = ddsim.stochSimulate();
+    const auto m = ddsim.simulate(1000);
 
-    double const tolerance = 0.1;
+    size_t const tolerance = 50;
 
-    EXPECT_NEAR(m.find("0000")->second, 0.09693321927412533, tolerance);
-    EXPECT_NEAR(m.find("0001")->second, 0.09078880415385877, tolerance);
-    EXPECT_NEAR(m.find("0010")->second, 0.01414096609854787, tolerance);
-    EXPECT_NEAR(m.find("0100")->second, 0.02382034755245074, tolerance);
-    EXPECT_NEAR(m.find("0101")->second, 0.023509799001774703, tolerance);
-    EXPECT_NEAR(m.find("0110")->second, 0.02445760874001203, tolerance);
-    EXPECT_NEAR(m.find("0111")->second, 0.011628281127642115, tolerance);
-    EXPECT_NEAR(m.find("1000")->second, 0.1731941264570172, tolerance);
-    EXPECT_NEAR(m.find("1001")->second, 0.41458550719988047, tolerance);
-    EXPECT_NEAR(m.find("1010")->second, 0.013806211321349706, tolerance);
-    EXPECT_NEAR(m.find("1011")->second, 0.01840334820660922, tolerance);
-    EXPECT_NEAR(m.find("1100")->second, 0.024245433691737584, tolerance);
-    EXPECT_NEAR(m.find("1101")->second, 0.026277984479993615, tolerance);
-    EXPECT_NEAR(m.find("1110")->second, 0.023929692098939092, tolerance);
-    EXPECT_NEAR(m.find("1111")->second, 0.011037316662706232, tolerance);
-
-    EXPECT_GT(std::stoi(ddsim.additionalStatistics().at("approximation_runs")), 0);
+    EXPECT_NEAR(static_cast<double>(m.find("0000")->second), 96, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1000")->second), 90, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0100")->second), 14, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0010")->second), 23, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1010")->second), 23, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0110")->second), 24, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1110")->second), 11, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0001")->second), 173, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1001")->second), 414, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0101")->second), 13, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1101")->second), 18, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0011")->second), 24, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1011")->second), 26, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0111")->second), 23, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1111")->second), 11, tolerance);
 }
 
 TEST(StochNoiseSimTest, SimulateAdder4WithDecoherenceAndGateErrorUnoptimizedSim) {
     auto                     quantumComputation = stochGetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("APD"), 0.1, std::optional<double>{}, 2, 1000, std::string("0-16"), true, 1, 1);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), {}, 42U, "APD", 0.1);
 
-    auto m = ddsim.stochSimulate();
+    const auto m = ddsim.simulate(1000);
 
-    double const tolerance = 0.1;
+    const size_t tolerance = 50;
 
-    EXPECT_NEAR(m.find("0000")->second, 0.25574412296741467, tolerance);
-    EXPECT_NEAR(m.find("0001")->second, 0.177720207953642, tolerance);
-    EXPECT_NEAR(m.find("0010")->second, 0.06386485600556026, tolerance);
-    EXPECT_NEAR(m.find("0011")->second, 0.04438060064535747, tolerance);
-    EXPECT_NEAR(m.find("0100")->second, 0.0898482618504159, tolerance);
-    EXPECT_NEAR(m.find("0101")->second, 0.062436925904517736, tolerance);
-    EXPECT_NEAR(m.find("0110")->second, 0.022981537137908348, tolerance);
-    EXPECT_NEAR(m.find("0111")->second, 0.015970195341710985, tolerance);
-    EXPECT_NEAR(m.find("1000")->second, 0.08799481366902726, tolerance);
-    EXPECT_NEAR(m.find("1001")->second, 0.061149120043750206, tolerance);
-    EXPECT_NEAR(m.find("1010")->second, 0.02480081309590326, tolerance);
-    EXPECT_NEAR(m.find("1011")->second, 0.017234499727102268, tolerance);
-    EXPECT_NEAR(m.find("1100")->second, 0.03505400112419414, tolerance);
-    EXPECT_NEAR(m.find("1101")->second, 0.024359601507422463, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0000")->second), 255, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1000")->second), 177, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0100")->second), 63, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1100")->second), 44, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0010")->second), 89, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1010")->second), 62, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0110")->second), 22, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1110")->second), 15, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0001")->second), 87, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1001")->second), 61, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0101")->second), 24, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1101")->second), 17, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("0011")->second), 35, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1011")->second), 24, tolerance);
 
-    auto tmp0 = ddsim.getSeed();
     EXPECT_EQ(ddsim.getMaxMatrixNodeCount(), 0);
     EXPECT_EQ(ddsim.getMatrixActiveNodeCount(), 0);
     EXPECT_EQ(ddsim.countNodesFromRoot(), 0);
     auto statistics = ddsim.additionalStatistics();
-    EXPECT_NEAR(m.find("1101")->second, 0.024359601507422463, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("1011")->second), 24, tolerance);
 
     EXPECT_EQ(std::stoi(ddsim.additionalStatistics().at("approximation_runs")), 0);
 
-    EXPECT_NE(statistics.find("step_fidelity"), statistics.end());
     EXPECT_NE(statistics.find("approximation_runs"), statistics.end());
-    EXPECT_NE(statistics.find("perfect_run_time"), statistics.end());
-    EXPECT_NE(statistics.find("mean_stoch_run_time"), statistics.end());
     EXPECT_NE(statistics.find("stoch_wall_time"), statistics.end());
-    EXPECT_NE(statistics.find("parallel_instances"), statistics.end());
-}
-
-TEST(StochNoiseSimTest, ParseProperties) {
-    auto                     quantumComputation = stochGetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("APD"), 0.1, std::optional<double>{}, 2, 1000, std::string("0, 6, 1"), false, 1, 1);
-    auto                     m = ddsim.stochSimulate();
-
-    double const tolerance = 0.1;
-
-    EXPECT_NEAR(m.find("0000")->second, 0.25574412296741467, tolerance);
-    EXPECT_NEAR(m.find("0110")->second, 0.022981537137908348, tolerance);
-    EXPECT_NEAR(m.find("0001")->second, 0.177720207953642, tolerance);
-
-    EXPECT_EQ(m.size(), 3);
+    EXPECT_NE(statistics.find("threads"), statistics.end());
 }
 
 TEST(StochNoiseSimTest, TestingBarrierGate) {
-    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
+    auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
     quantumComputation->x(0);
     quantumComputation->h(1);
     quantumComputation->t(1);
     quantumComputation->barrier({0, 1});
     quantumComputation->h(1);
     quantumComputation->h(0);
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("APD"), 0.02, std::optional<double>{}, 2, 1000, std::string("0-3, 23, 444, 2"), false, 1, 1);
+    quantumComputation->measure(0, 0);
+    quantumComputation->measure(1, 1);
 
-    auto m = ddsim.stochSimulate();
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), {}, 42U, "APD", 0.02);
 
-    double const tolerance = 0.01;
-    EXPECT_NEAR(m.find("00")->second, 0.4168386766289282, tolerance);
-    EXPECT_NEAR(m.find("01")->second, 0.102761323371072, tolerance);
-    EXPECT_NEAR(m.find("10")->second, 0.3853912629956448, tolerance);
-    EXPECT_NEAR(m.find("11")->second, 0.09500873700435522, tolerance);
+    const auto m = ddsim.simulate(1000);
+
+    double const tolerance = 50;
+    EXPECT_NEAR(static_cast<double>(m.find("00")->second), 416, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("10")->second), 102, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("01")->second), 385, tolerance);
+    EXPECT_NEAR(static_cast<double>(m.find("11")->second), 95, tolerance);
 }
 
 TEST(StochNoiseSimTest, TestingWithErrorProbZero) {
     auto                     quantumComputation = stochGetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string("APD"), 0, std::optional<double>{}, 2, 1000, std::string("0-15"), false, 1, 1);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), "APD", 0);
 
-    auto         m         = ddsim.stochSimulate();
-    double const tolerance = 0.1;
+    const auto m = ddsim.simulate(1000);
 
-    EXPECT_NEAR(m.find("1001")->second, 1, tolerance);
-    EXPECT_EQ(m.size(), 3);
+    EXPECT_EQ(static_cast<double>(m.find("1001")->second), 1000);
 }
 
 TEST(StochNoiseSimTest, TestingWithEmpthyNoiseTypes) {
     auto                     quantumComputation = stochGetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string(""), 0.1, std::optional<double>{}, 2, 1000, std::string("0-15"), false, 1, 1);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string(""), 0.1);
 
-    auto         m         = ddsim.stochSimulate();
-    double const tolerance = 0.1;
-
-    EXPECT_NEAR(m.find("1001")->second, 1, tolerance);
-    EXPECT_EQ(m.size(), 3);
+    const auto m = ddsim.simulate(1000);
+    EXPECT_EQ(static_cast<double>(m.find("1001")->second), 1000);
 }
 
 TEST(StochNoiseSimTest, TestingSimulatorFunctionality) {
     auto                     quantumComputation = stochGetAdder4Circuit();
-    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string(""), 0.1, std::optional<double>{}, 2, 1000, std::string("0-15"), false, 1, 1);
+    StochasticNoiseSimulator ddsim(std::move(quantumComputation), std::string(""), 0.1);
 
-    auto m = ddsim.stochSimulate();
+    const auto m = ddsim.simulate(1000);
 
     EXPECT_EQ(ddsim.getNumberOfQubits(), 4);
     EXPECT_EQ(ddsim.getActiveNodeCount(), 0);

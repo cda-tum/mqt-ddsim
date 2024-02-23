@@ -4,8 +4,10 @@
  */
 
 #include "CircuitSimulator.hpp"
+#include "DeterministicNoiseSimulator.hpp"
 #include "HybridSchrodingerFeynmanSimulator.hpp"
 #include "PathSimulator.hpp"
+#include "StochasticNoiseSimulator.hpp"
 #include "UnitarySimulator.hpp"
 #include "dd/FunctionalityConstruction.hpp"
 #include "python/qiskit/QuantumCircuit.hpp"
@@ -173,6 +175,32 @@ PYBIND11_MODULE(pyddsim, m) {
                          "approximation_strategy"_a      = "fidelity",
                          "seed"_a                        = -1)
             .def("expectation_value", &expectationValue, "observable"_a);
+
+    // Stoch simulator
+    auto stochasticNoiseSimulator = createSimulator<StochasticNoiseSimulator>(m, "StochasticNoiseSimulator");
+    stochasticNoiseSimulator.def(py::init<>(&constructSimulator<StochasticNoiseSimulator, std::string, double, std::optional<double>, double>),
+                                 "circ"_a,
+                                 "approximation_step_fidelity"_a = 1.,
+                                 "approximation_steps"_a         = 1,
+                                 "approximation_strategy"_a      = "fidelity",
+                                 "seed"_a                        = -1,
+                                 "noise_effects"_a               = "APD",
+                                 "noise_probability"_a           = 0.01,
+                                 "amp_damping_probability"_a     = 0.02,
+                                 "multi_qubit_gate_factor"_a     = 2);
+
+    // Deterministic simulator
+    auto deterministicNoiseSimulator = createSimulator<DeterministicNoiseSimulator>(m, "DeterministicNoiseSimulator");
+    deterministicNoiseSimulator.def(py::init<>(&constructSimulator<DeterministicNoiseSimulator, std::string, double, std::optional<double>, double>),
+                                    "circ"_a,
+                                    "approximation_step_fidelity"_a = 1.,
+                                    "approximation_steps"_a         = 1,
+                                    "approximation_strategy"_a      = "fidelity",
+                                    "seed"_a                        = -1,
+                                    "noise_effects"_a               = "APD",
+                                    "noise_probability"_a           = 0.01,
+                                    "amp_damping_probability"_a     = 0.02,
+                                    "multi_qubit_gate_factor"_a     = 2);
 
     // Hybrid Schrödinger-Feynman Simulator
     py::enum_<HybridSchrodingerFeynmanSimulator<>::Mode>(m, "HybridMode")
