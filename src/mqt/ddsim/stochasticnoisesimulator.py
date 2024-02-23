@@ -5,8 +5,8 @@ from __future__ import annotations
 import time
 from typing import TYPE_CHECKING, Any
 
+from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
-from qiskit.transpiler import Target
 
 from mqt import ddsim
 
@@ -20,12 +20,6 @@ if TYPE_CHECKING:
 class StochasticNoiseSimulatorBackend(QasmSimulatorBackend):
     """Python interface to MQT DDSIM stochastic noise-aware simulator."""
 
-    _SHOW_STATE_VECTOR = True
-    _SNS_SV_TARGET = Target(
-        description="MQT DDSIM decision diagram-based stochastic noise-aware simulator target",
-        # num_qubits=QasmSimulatorBackend.max_qubits(),
-    )
-
     def __init__(
         self,
         name: str = "stochastic_dd_simulator",
@@ -33,22 +27,44 @@ class StochasticNoiseSimulatorBackend(QasmSimulatorBackend):
     ) -> None:
         super().__init__(name=name, description=description)
 
-    @property
-    def target(self) -> Target:
-        return self._SNS_SV_TARGET
+    @classmethod
+    def _default_options(cls) -> Options:
+        return Options(
+            shots=None,
+            parameter_binds=None,
+            simulator_seed=None,
+            approximation_step_fidelity=1.0,
+            approximation_steps=1,
+            approximation_strategy="fidelity",
+            noise_effects="APD",
+            noise_probability=0.01,
+            amp_damping_probability=0.02,
+            multi_qubit_gate_factor=2,
+        )
 
     @staticmethod
     def _run_experiment(qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
         start_time = time.time()
-        noise_effect = options.get("noise_effects", "APD")
+        approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
+        approximation_steps = options.get("approximation_steps", 1)
+        approximation_strategy = options.get("approximation_strategy", "fidelity")
+        noise_effects = options.get("noise_effects", "APD")
         noise_probability = options.get("noise_probability", 0.01)
         amp_damping_probability = options.get("amp_damping_probability", 0.02)
         multi_qubit_gate_factor = options.get("multi_qubit_gate_factor", 2)
-        seed = options.get("seed", -1)
+        seed = options.get("seed_simulator", -1)
         shots = options.get("shots", 1024)
 
-        sim = ddsim.DeterministicNoiseSimulator(
-            qc, noise_effect, noise_probability, amp_damping_probability, multi_qubit_gate_factor
+        sim = ddsim.StochasticNoiseSimulator(
+            circ=qc,
+            approximation_step_fidelity=approximation_step_fidelity,
+            approximation_steps=approximation_steps,
+            approximation_strategy=approximation_strategy,
+            seed=seed,
+            noise_effects=noise_effects,
+            noise_probability=noise_probability,
+            amp_damping_probability=amp_damping_probability,
+            multi_qubit_gate_factor=multi_qubit_gate_factor,
         )
 
         counts = sim.simulate(shots=shots)

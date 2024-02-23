@@ -62,7 +62,7 @@ class QasmSimulatorBackend(BackendV2):
             parameter_binds=None,
             seed_simulator=None,
             approximation_step_fidelity=1.0,
-            approximation_steps=0,
+            approximation_steps=1,
             approximation_strategy="fidelity",
         )
 
