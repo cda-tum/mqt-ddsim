@@ -158,11 +158,11 @@ report.exclude_also = [
 files = ["src/mqt", "test/python"]
 mypy_path = ["$MYPY_CONFIG_FILE_DIR/src"]
 python_version = "3.8"
-strict = false
+warn_unused_configs = true
 enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
-warn_unreachable = true
+strict = true
 explicit_package_bases = true
-pretty = true
+warn_unreachable = true
 
 [tool.ruff]
 line-length = 120
