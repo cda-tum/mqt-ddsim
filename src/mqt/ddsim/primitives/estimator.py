@@ -46,9 +46,6 @@ class Estimator(QiskitEstimator):  # type: ignore[misc]
 
         self._grouping = list(zip(range(len(self._circuits)), range(len(self._observables))))
 
-        self._circuit_ids: dict[tuple, int] = {}
-        self._observable_ids: dict[tuple, int] = {}
-
     @property
     def preprocessed_circuits(
         self,

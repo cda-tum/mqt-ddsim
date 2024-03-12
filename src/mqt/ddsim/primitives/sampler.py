@@ -33,7 +33,6 @@ class Sampler(QiskitSampler):  # type: ignore[misc]
         """
 
         super().__init__(options=options)
-        self._circuit_ids: dict[tuple, int] = {}
 
     @property
     def backend(self) -> QasmSimulatorBackend:
