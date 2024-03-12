@@ -37,7 +37,7 @@ def requires_submit(func: Callable[..., Any]) -> Callable[..., Any]:
     return _wrapper
 
 
-class DDSIMJob(JobV1):
+class DDSIMJob(JobV1):  # type: ignore[misc]
     """DDSIMJob class.
 
     Attributes:
@@ -50,7 +50,7 @@ class DDSIMJob(JobV1):
         self,
         backend: BackendV2,
         job_id: str,
-        fn: Callable,
+        fn: Callable[..., Result],
         experiments: Sequence[QuantumCircuit],
         parameter_values: Sequence[Parameters] | None,
         **args: dict[str, Any],
@@ -60,7 +60,7 @@ class DDSIMJob(JobV1):
         self._experiments = experiments
         self._parameter_values = parameter_values
         self._args = args
-        self._future: futures.Future | None = None
+        self._future: futures.Future[Result] | None = None
 
     def submit(self) -> None:
         """Submit the job to the backend for execution.

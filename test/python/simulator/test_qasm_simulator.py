@@ -45,13 +45,13 @@ def shots() -> int:
     return 8192
 
 
-def test_qasm_simulator_single_shot(circuit: QuantumCircuit, backend: QasmSimulatorBackend):
+def test_qasm_simulator_single_shot(circuit: QuantumCircuit, backend: QasmSimulatorBackend) -> None:
     """Test single shot run."""
     result = backend.run(circuit, shots=1).result()
     assert result.success
 
 
-def test_qasm_simulator(circuit: QuantumCircuit, backend: QasmSimulatorBackend, shots: int):
+def test_qasm_simulator(circuit: QuantumCircuit, backend: QasmSimulatorBackend, shots: int) -> None:
     """Test data counts output for single circuit run against reference."""
     result = backend.run(circuit, shots=shots).result()
     assert result.success
@@ -75,7 +75,7 @@ def test_qasm_simulator(circuit: QuantumCircuit, backend: QasmSimulatorBackend, 
         assert abs(target[key] - counts[key]) < threshold
 
 
-def test_qasm_simulator_support_parametrized_gates(backend: QasmSimulatorBackend, shots: int):
+def test_qasm_simulator_support_parametrized_gates(backend: QasmSimulatorBackend, shots: int) -> None:
     """Test backend's adequate support of parametrized gates."""
     theta_a = Parameter("theta_a")
     theta_b = Parameter("theta_b")
@@ -118,7 +118,7 @@ def test_qasm_simulator_support_parametrized_gates(backend: QasmSimulatorBackend
     assert counts_2 == {"0": shots}
 
 
-def test_qasm_simulator_approximation(backend: QasmSimulatorBackend, shots: int):
+def test_qasm_simulator_approximation(backend: QasmSimulatorBackend, shots: int) -> None:
     """Test data counts output for single circuit run against reference."""
     circuit = QuantumCircuit(2)
     circuit.h(0)
@@ -129,7 +129,7 @@ def test_qasm_simulator_approximation(backend: QasmSimulatorBackend, shots: int)
     assert len(counts) == 1
 
 
-def test_qasm_simulator_access(backend: QasmSimulatorBackend, shots: int):
+def test_qasm_simulator_access(backend: QasmSimulatorBackend, shots: int) -> None:
     """Test data counts output for multiple quantum circuits in a single job."""
     circuit_1 = QuantumCircuit(2, name="c1")
     circuit_2 = QuantumCircuit(2, name="c2")
@@ -146,7 +146,7 @@ def test_qasm_simulator_access(backend: QasmSimulatorBackend, shots: int):
     assert counts_2 == {"11": shots}
 
 
-def test_qasm_simulator_portfolioqaoa(backend: QasmSimulatorBackend, shots: int):
+def test_qasm_simulator_portfolioqaoa(backend: QasmSimulatorBackend, shots: int) -> None:
     """Run simulator with with 2-target gates that take a parameter. Circuit taken from MQT Bench."""
     circuit = QuantumCircuit.from_qasm_str("""OPENQASM 2.0;
         include "qelib1.inc";
@@ -186,7 +186,7 @@ def test_qasm_simulator_portfolioqaoa(backend: QasmSimulatorBackend, shots: int)
 
 
 @pytest.mark.parametrize("num_controls", list(range(1, 8)))
-def test_qasm_simulator_mcx_no_ancilla(backend: QasmSimulatorBackend, num_controls: int, shots: int):
+def test_qasm_simulator_mcx_no_ancilla(backend: QasmSimulatorBackend, num_controls: int, shots: int) -> None:
     """Test MCX gate with no ancilla qubits."""
     nqubits = num_controls + 1
     q = QuantumRegister(nqubits)
@@ -208,7 +208,7 @@ def test_qasm_simulator_mcx_no_ancilla(backend: QasmSimulatorBackend, num_contro
 
 
 @pytest.mark.parametrize("num_controls", list(range(1, 8)))
-def test_qasm_simulator_mcx_recursion(backend: QasmSimulatorBackend, num_controls: int, shots: int):
+def test_qasm_simulator_mcx_recursion(backend: QasmSimulatorBackend, num_controls: int, shots: int) -> None:
     """Test MCX gate in recursion mode."""
     nqubits = num_controls + 1
     q = QuantumRegister(nqubits)
@@ -229,7 +229,7 @@ def test_qasm_simulator_mcx_recursion(backend: QasmSimulatorBackend, num_control
 
 
 @pytest.mark.parametrize("num_controls", list(range(1, 8)))
-def test_qasm_simulator_mcx_vchain(backend: QasmSimulatorBackend, num_controls: int, shots: int):
+def test_qasm_simulator_mcx_vchain(backend: QasmSimulatorBackend, num_controls: int, shots: int) -> None:
     """Test MCX gate in v-chain mode."""
     nqubits = num_controls + 1
     q = QuantumRegister(nqubits)
@@ -250,7 +250,7 @@ def test_qasm_simulator_mcx_vchain(backend: QasmSimulatorBackend, num_controls: 
 
 
 @pytest.mark.parametrize("num_controls", list(range(1, 8)))
-def test_qasm_simulator_mcp(backend: QasmSimulatorBackend, num_controls: int, shots: int):
+def test_qasm_simulator_mcp(backend: QasmSimulatorBackend, num_controls: int, shots: int) -> None:
     """Test MCPhase gate."""
     nqubits = num_controls + 1
     q = QuantumRegister(nqubits)

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
@@ -42,12 +42,12 @@ class DeterministicNoiseSimulatorBackend(QasmSimulatorBackend):
     @staticmethod
     def _run_experiment(qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
         start_time = time.time()
-        noise_effects = options.get("noise_effects", "APD")
-        noise_probability = options.get("noise_probability", 0.01)
-        amp_damping_probability = options.get("amp_damping_probability", 0.02)
-        multi_qubit_gate_factor = options.get("multi_qubit_gate_factor", 2)
-        seed = options.get("simulator_seed", -1)
-        shots = options.get("shots", 1024)
+        noise_effects = cast(str, options.get("noise_effects", "APD"))
+        noise_probability = cast(float, options.get("noise_probability", 0.01))
+        amp_damping_probability = cast(float, options.get("amp_damping_probability", 0.02))
+        multi_qubit_gate_factor = cast(float, options.get("multi_qubit_gate_factor", 2))
+        seed = cast(int, options.get("simulator_seed", -1))
+        shots = cast(int, options.get("shots", 1024))
 
         sim = ddsim.DeterministicNoiseSimulator(
             circ=qc,

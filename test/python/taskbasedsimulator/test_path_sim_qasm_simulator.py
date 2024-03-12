@@ -10,7 +10,7 @@ from mqt.ddsim.pathqasmsimulator import PathQasmSimulatorBackend
 class MQTQasmSimulatorTest(unittest.TestCase):
     """Runs backend checks and the Basic qasm_simulator tests from Qiskit Terra."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.backend = PathQasmSimulatorBackend()
         self.circuit = QuantumCircuit.from_qasm_str("""OPENQASM 2.0;
             include "qelib1.inc";
@@ -25,15 +25,15 @@ class MQTQasmSimulatorTest(unittest.TestCase):
             measure r->d;""")
         self.circuit.name = "test"
 
-    def test_status(self):
+    def test_status(self) -> None:
         """Test backend.status()."""
         self.backend.status()
 
-    def test_qasm_simulator_single_shot(self):
+    def test_qasm_simulator_single_shot(self) -> None:
         """Test single shot run."""
         assert self.backend.run(self.circuit, shots=1).result().success
 
-    def test_qasm_simulator(self):
+    def test_qasm_simulator(self) -> None:
         """Test data counts output for single circuit run against reference."""
         shots = 1024
         result = self.backend.run(self.circuit, shots=shots).result()
@@ -55,7 +55,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
             assert key in counts
             assert abs(target[key] - counts[key]) < threshold
 
-    def test_qasm_simulator_access(self):
+    def test_qasm_simulator_access(self) -> None:
         """Test data counts output for multiple quantum circuits in a single job."""
         shots = 1024
         circuit_1 = QuantumCircuit(2, name="c1")
@@ -72,7 +72,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         assert counts_1 == {"0": shots}
         assert counts_2 == {"11": shots}
 
-    def test_qasm_simulator_pairwise(self):
+    def test_qasm_simulator_pairwise(self) -> None:
         """Test data counts output for single circuit run against reference."""
         shots = 1024
         result = self.backend.run(self.circuit, shots=shots, mode="pairwise_recursive").result()
@@ -94,7 +94,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
             assert key in counts
             assert abs(target[key] - counts[key]) < threshold
 
-    def test_qasm_simulator_bracket(self):
+    def test_qasm_simulator_bracket(self) -> None:
         """Test data counts output for single circuit run against reference."""
         shots = 1024
         result = self.backend.run(self.circuit, shots=shots, mode="bracket").result()
@@ -118,7 +118,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
             assert key in counts
             assert abs(target[key] - counts[key]) < threshold
 
-    def test_qasm_simulator_alternating(self):
+    def test_qasm_simulator_alternating(self) -> None:
         """Test data counts output for single circuit run against reference."""
         shots = 1024
         result = self.backend.run(self.circuit, shots=shots, mode="alternating").result()

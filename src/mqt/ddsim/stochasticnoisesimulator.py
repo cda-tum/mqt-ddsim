@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
@@ -45,15 +45,15 @@ class StochasticNoiseSimulatorBackend(QasmSimulatorBackend):
     @staticmethod
     def _run_experiment(qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
         start_time = time.time()
-        approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
-        approximation_steps = options.get("approximation_steps", 1)
-        approximation_strategy = options.get("approximation_strategy", "fidelity")
-        noise_effects = options.get("noise_effects", "APD")
-        noise_probability = options.get("noise_probability", 0.01)
-        amp_damping_probability = options.get("amp_damping_probability", 0.02)
-        multi_qubit_gate_factor = options.get("multi_qubit_gate_factor", 2)
-        seed = options.get("seed_simulator", -1)
-        shots = options.get("shots", 1024)
+        approximation_step_fidelity = cast(float, options.get("approximation_step_fidelity", 1.0))
+        approximation_steps = cast(int, options.get("approximation_steps", 1))
+        approximation_strategy = cast(str, options.get("approximation_strategy", "fidelity"))
+        noise_effects = cast(str, options.get("noise_effects", "APD"))
+        noise_probability = cast(float, options.get("noise_probability", 0.01))
+        amp_damping_probability = cast(float, options.get("amp_damping_probability", 0.02))
+        multi_qubit_gate_factor = cast(float, options.get("multi_qubit_gate_factor", 2))
+        seed = cast(int, options.get("seed_simulator", -1))
+        shots = cast(int, options.get("shots", 1024))
 
         sim = ddsim.StochasticNoiseSimulator(
             circ=qc,

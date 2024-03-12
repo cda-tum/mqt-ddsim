@@ -10,7 +10,7 @@ from mqt.ddsim.hybridqasmsimulator import HybridQasmSimulatorBackend
 class MQTHybridQasmSimulatorTest(unittest.TestCase):
     """Runs backend checks, the Basic qasm_simulator tests from Qiskit Terra, and some additional tests for the Hybrid DDSIM QasmSimulator."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.backend = HybridQasmSimulatorBackend()
         self.circuit = QuantumCircuit.from_qasm_str("""OPENQASM 2.0;
             include "qelib1.inc";
@@ -25,15 +25,15 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
             measure r->d;""")
         self.circuit.name = "test"
 
-    def test_status(self):
+    def test_status(self) -> None:
         """Test backend.status()."""
         self.backend.status()
 
-    def test_qasm_simulator_single_shot(self):
+    def test_qasm_simulator_single_shot(self) -> None:
         """Test single shot run."""
         assert self.backend.run(self.circuit, shots=1).result().success
 
-    def test_qasm_simulator(self):
+    def test_qasm_simulator(self) -> None:
         """Test data counts output for single circuit run against reference."""
         shots = 1024
         result = self.backend.run(self.circuit, shots=shots).result()
@@ -55,7 +55,7 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
             assert key in counts
             assert abs(target[key] - counts[key]) < threshold
 
-    def test_qasm_simulator_access(self):
+    def test_qasm_simulator_access(self) -> None:
         """Test data counts output for multiple quantum circuits in a single job."""
         shots = 1024
         circuit_1 = QuantumCircuit(2, name="c1")
@@ -72,7 +72,7 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
         assert counts_1 == {"0": shots}
         assert counts_2 == {"11": shots}
 
-    def test_dd_mode_simulation(self):
+    def test_dd_mode_simulation(self) -> None:
         """Test running a single circuit."""
         q = QuantumRegister(4)
         circ = QuantumCircuit(q)
@@ -85,7 +85,7 @@ class MQTHybridQasmSimulatorTest(unittest.TestCase):
         result = self.backend.run(self.circuit, mode="dd").result()
         assert result.success
 
-    def test_amplitude_mode_simulation(self):
+    def test_amplitude_mode_simulation(self) -> None:
         """Test running a single circuit."""
         q = QuantumRegister(4)
         circ = QuantumCircuit(q)

@@ -4,81 +4,93 @@ import unittest
 
 from qiskit import QuantumCircuit
 
-from mqt import ddsim
+from mqt.ddsim import (
+    PathCircuitSimulator,
+    PathSimulatorConfiguration,
+    PathSimulatorMode,
+)
 
 
 class MQTStandaloneSimulatorTests(unittest.TestCase):
     def setUp(self) -> None:
         self.nonzero_states_ghz = 2
 
-    def test_standalone(self):
+    def test_standalone(self) -> None:
         circ = QuantumCircuit(3)
         circ.h(0)
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.PathCircuitSimulator(circ)
+        sim = PathCircuitSimulator(circ)
         result = sim.simulate(1000)
         assert len(result.keys()) == self.nonzero_states_ghz
         assert "000" in result
         assert "111" in result
 
-    def test_standalone_with_config(self):
+    def test_standalone_with_config(self) -> None:
         circ = QuantumCircuit(3)
         circ.h(0)
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.PathCircuitSimulator(circ, ddsim.PathSimulatorConfiguration())
+        sim = PathCircuitSimulator(circ, PathSimulatorConfiguration())
         result = sim.simulate(1000)
         assert len(result.keys()) == self.nonzero_states_ghz
         assert "000" in result
         assert "111" in result
 
-    def test_standalone_with_seed(self):
+    def test_standalone_with_seed(self) -> None:
         circ = QuantumCircuit(3)
         circ.h(0)
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.PathCircuitSimulator(circ, seed=1337)
+        sim = PathCircuitSimulator(circ, seed=1337)
         result = sim.simulate(1000)
         assert len(result.keys()) == self.nonzero_states_ghz
         assert "000" in result
         assert "111" in result
 
-    def test_standalone_individual_objects(self):
+    def test_standalone_individual_objects(self) -> None:
         circ = QuantumCircuit(3)
         circ.h(0)
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.PathCircuitSimulator(circ, seed=0, mode=ddsim.PathSimulatorMode.bracket, bracket_size=2)
+        sim = PathCircuitSimulator(circ, seed=0, mode=PathSimulatorMode.bracket, bracket_size=2)
         result = sim.simulate(1000)
         assert len(result.keys()) == self.nonzero_states_ghz
         assert "000" in result
         assert "111" in result
 
-    def test_standalone_pairwise_only(self):
+    def test_standalone_pairwise_only(self) -> None:
         circ = QuantumCircuit(3)
         circ.h(0)
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.PathCircuitSimulator(circ, seed=1, mode=ddsim.PathSimulatorMode.pairwise_recursive, bracket_size=2)
+        sim = PathCircuitSimulator(
+            circ,
+            seed=1,
+            mode=PathSimulatorMode.pairwise_recursive,
+            bracket_size=2,
+        )
         result = sim.simulate(1000)
         assert len(result.keys()) == self.nonzero_states_ghz
         assert "000" in result
         assert "111" in result
 
-    def test_standalone_gatecost_only(self):
+    def test_standalone_gatecost_only(self) -> None:
         circ = QuantumCircuit(3)
         circ.h(0)
         circ.cx(0, 1)
         circ.cx(0, 2)
 
-        sim = ddsim.PathCircuitSimulator(
-            circ, mode=ddsim.PathSimulatorMode.gate_cost, starting_point=2, gate_cost=[1, 1]
+        sim = PathCircuitSimulator(
+            circ,
+            mode=PathSimulatorMode.gate_cost,
+            starting_point=2,
+            gate_cost=[1, 1],
         )
         result = sim.simulate(1000)
         assert len(result.keys()) == self.nonzero_states_ghz
