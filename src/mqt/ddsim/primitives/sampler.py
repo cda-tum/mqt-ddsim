@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
 
 
-class Sampler(QiskitSampler):
+class Sampler(QiskitSampler):  # type: ignore[misc]
     _BACKEND = QasmSimulatorBackend()
 
     def __init__(

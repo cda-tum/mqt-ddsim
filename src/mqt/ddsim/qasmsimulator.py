@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import time
 import uuid
-from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union
+from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union, cast
 
 from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
 
 
-class QasmSimulatorBackend(BackendV2):
+class QasmSimulatorBackend(BackendV2):  # type: ignore[misc]
     """Python interface to MQT DDSIM."""
 
     _SHOW_STATE_VECTOR = False
@@ -145,11 +145,11 @@ class QasmSimulatorBackend(BackendV2):
 
     def _run_experiment(self, qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
         start_time = time.time()
-        approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
-        approximation_steps = options.get("approximation_steps", 1)
-        approximation_strategy = options.get("approximation_strategy", "fidelity")
-        seed = options.get("seed_simulator", -1)
-        shots = options.get("shots", 1024)
+        approximation_step_fidelity = cast(float, options.get("approximation_step_fidelity", 1.0))
+        approximation_steps = cast(int, options.get("approximation_steps", 1))
+        approximation_strategy = str(options.get("approximation_strategy", "fidelity"))
+        seed = cast(int, options.get("seed_simulator", -1))
+        shots = cast(int, options.get("shots", 1024))
 
         sim = CircuitSimulator(
             qc,

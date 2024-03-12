@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable
+from typing import Any, Callable, cast
 
-from qiskit.providers import ProviderV1
+from qiskit.providers import BackendV2, ProviderV1
 from qiskit.providers.providerutils import filter_backends
 
 from .deterministicnoisesimulator import DeterministicNoiseSimulatorBackend
@@ -15,11 +15,8 @@ from .statevectorsimulator import StatevectorSimulatorBackend
 from .stochasticnoisesimulator import StochasticNoiseSimulatorBackend
 from .unitarysimulator import UnitarySimulatorBackend
 
-if TYPE_CHECKING:
-    from qiskit.providers import BackendV2
 
-
-class DDSIMProvider(ProviderV1):
+class DDSIMProvider(ProviderV1):  # type: ignore[misc]
     _BACKENDS = (
         ("qasm_simulator", QasmSimulatorBackend),
         ("statevector_simulator", StatevectorSimulatorBackend),
@@ -44,7 +41,7 @@ class DDSIMProvider(ProviderV1):
         backends = [
             backend_cls() for backend_name, backend_cls in self._BACKENDS if name is None or backend_name == name
         ]
-        return filter_backends(backends, filters=filters, **kwargs)
+        return cast(list[BackendV2], filter_backends(backends, filters=filters, **kwargs))
 
     def __str__(self) -> str:
         return "DDSIMProvider"

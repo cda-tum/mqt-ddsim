@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from itertools import accumulate
-from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union
+from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union, cast
 
 import numpy as np
 from qiskit.circuit import QuantumCircuit
@@ -21,14 +21,14 @@ if TYPE_CHECKING:
     Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
 
 
-class Estimator(QiskitEstimator):
+class Estimator(QiskitEstimator):  # type: ignore[misc]
     """DDSIM implementation of qiskit's sampler.
     Code adapted from Qiskit's BackendEstimator class.
     """
 
     def __init__(
         self,
-        options: dict | None = None,
+        options: dict[str, Any] | None = None,
         abelian_grouping: bool = False,
     ) -> None:
         """Initialize a new Estimator instance
@@ -183,10 +183,10 @@ class Estimator(QiskitEstimator):
         obs_circ_list: list[QuantumCircuit],
         **options: dict[str, Any],
     ) -> list[float]:
-        approximation_step_fidelity = options.get("approximation_step_fidelity", 1.0)
-        approximation_steps = options.get("approximation_steps", 1)
-        approximation_strategy = options.get("approximation_strategy", "fidelity")
-        seed = options.get("seed_simulator", -1)
+        approximation_step_fidelity = cast(float, options.get("approximation_step_fidelity", 1.0))
+        approximation_steps = cast(int, options.get("approximation_steps", 1))
+        approximation_strategy = str(options.get("approximation_strategy", "fidelity"))
+        seed = cast(int, options.get("seed_simulator", -1))
 
         sim = CircuitSimulator(
             circ,
@@ -199,7 +199,7 @@ class Estimator(QiskitEstimator):
         return [sim.expectation_value(observable=obs) for obs in obs_circ_list]
 
     @staticmethod
-    def _postprocessing(result_list: list[float], accum: list[int], metadata: list[dict]) -> EstimatorResult:
+    def _postprocessing(result_list: list[float], accum: list[int], metadata: list[dict[str, Any]]) -> EstimatorResult:
         """
         Perform postprocessing for the evaluation of expectation values.
 

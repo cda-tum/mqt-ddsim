@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 @dataclass
-class DDSIMHeader(QobjExperimentHeader):
+class DDSIMHeader(QobjExperimentHeader):  # type: ignore[misc]
     name: str
     n_qubits: int
     memory_slots: int

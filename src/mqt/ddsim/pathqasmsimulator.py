@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pathlib
 import time
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
     from quimb.tensor import Tensor, TensorNetwork
@@ -98,7 +98,7 @@ def get_simulation_path(
         minimize="flops",
     )
     info = tn.contract(all, get="path-info", optimize=opt)
-    path = linear_to_ssa(info.path)
+    path = cast(list[tuple[int, int]], linear_to_ssa(info.path))
 
     if dump_path:
         filename = qc.name + "_" + str(qc.num_qubits) + ".path" if isinstance(qc, QuantumCircuit) else "simulation.path"
@@ -190,7 +190,11 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
             dump_path = options.get("cotengra_dump_path", False)
             plot_ring = options.get("cotengra_plot_ring", False)
             path = get_simulation_path(
-                qc, max_time=max_time, max_repeats=max_repeats, dump_path=dump_path, plot_ring=plot_ring
+                qc,
+                max_time=max_time,
+                max_repeats=max_repeats,
+                dump_path=dump_path,
+                plot_ring=plot_ring,
             )
             sim.set_simulation_path(path, False)
 
