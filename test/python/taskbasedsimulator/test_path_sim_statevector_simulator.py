@@ -9,18 +9,18 @@ from mqt.ddsim.pathstatevectorsimulator import PathStatevectorSimulatorBackend
 
 
 class MQTStatevectorSimulatorTest(unittest.TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.backend = PathStatevectorSimulatorBackend()
         qr = QuantumRegister(2)
         self.q_circuit = QuantumCircuit(qr)
         self.q_circuit.h(qr[0])
         self.q_circuit.cx(qr[0], qr[1])
 
-    def test_status(self):
+    def test_status(self) -> None:
         """Test backend.status()."""
         self.backend.status()
 
-    def test_statevector_output(self):
+    def test_statevector_output(self) -> None:
         """Test final state vector for single circuit run."""
         result = self.backend.run(self.q_circuit).result()
         assert result.success
@@ -32,7 +32,7 @@ class MQTStatevectorSimulatorTest(unittest.TestCase):
         assert actual[2] == 0
         assert math.isclose((abs(actual[3])) ** 2, 0.5, abs_tol=0.0001)
 
-    def test_statevector_output_pairwise(self):
+    def test_statevector_output_pairwise(self) -> None:
         """Test final state vector for single circuit run."""
         mode = "pairwise_recursive"
         result = self.backend.run(self.q_circuit, mode=mode).result()

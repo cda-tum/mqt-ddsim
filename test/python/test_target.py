@@ -25,7 +25,7 @@ def target() -> Target:
 
 
 @pytest.mark.parametrize("gate", ["x", "y", "z", "h", "s", "sdg", "t", "tdg"])
-def test_transpilation_preserves_1q_0p_target_gates(target: Target, gate: str):
+def test_transpilation_preserves_1q_0p_target_gates(target: Target, gate: str) -> None:
     """Test that transpilation does not change single-qubit gates without parameters that are already in the target."""
     qc = QuantumCircuit(1)
     getattr(qc, gate)(0)
@@ -35,7 +35,7 @@ def test_transpilation_preserves_1q_0p_target_gates(target: Target, gate: str):
 
 
 @pytest.mark.parametrize("gate", ["rx", "ry", "rz", "p"])
-def test_transpile_preserves_1q_1p_target_gates(target: Target, gate: str):
+def test_transpile_preserves_1q_1p_target_gates(target: Target, gate: str) -> None:
     """Test that transpilation does not change single-qubit gates with one parameter that are already in the target."""
     qc = QuantumCircuit(1)
     getattr(qc, gate)(np.pi, 0)
@@ -48,7 +48,7 @@ def test_transpile_preserves_1q_1p_target_gates(target: Target, gate: str):
 
 
 @pytest.mark.parametrize("gate", ["cx", "cy", "cz", "ch", "cs", "csdg", "csx", "swap", "iswap", "dcx", "ecr"])
-def test_transpilation_preserves_2q_0p_target_gates(target: Target, gate: str):
+def test_transpilation_preserves_2q_0p_target_gates(target: Target, gate: str) -> None:
     """Test that transpilation does not change two-qubit gates without parameters that are already in the target."""
     qc = QuantumCircuit(2)
     with contextlib.suppress(AttributeError):
@@ -60,7 +60,7 @@ def test_transpilation_preserves_2q_0p_target_gates(target: Target, gate: str):
 
 
 @pytest.mark.parametrize("gate", ["rxx", "ryy", "rzz", "rzx", "cp", "crx", "cry", "crz"])
-def test_transpilation_preserves_2q_1p_target_gates(target: Target, gate: str):
+def test_transpilation_preserves_2q_1p_target_gates(target: Target, gate: str) -> None:
     """Test that transpilation does not change two-qubit gates with one parameter that are already in the target."""
     qc = QuantumCircuit(2)
     getattr(qc, gate)(np.pi, 0, 1)
@@ -70,7 +70,7 @@ def test_transpilation_preserves_2q_1p_target_gates(target: Target, gate: str):
 
 
 @pytest.mark.parametrize("gate", ["ccx", "ccz", "cswap"])
-def test_transpilation_preserves_3q_target_gates(target: Target, gate: str):
+def test_transpilation_preserves_3q_target_gates(target: Target, gate: str) -> None:
     """Test that transpilation does not change three-qubit gates that are already in the target."""
     qc = QuantumCircuit(3)
     with contextlib.suppress(AttributeError):
@@ -82,7 +82,7 @@ def test_transpilation_preserves_3q_target_gates(target: Target, gate: str):
 
 @pytest.mark.parametrize("num_controls", list(range(3, 6)))
 @pytest.mark.parametrize("mode", ["noancilla", "recursion", "v-chain"])
-def test_transpilation_preserves_mcx_target_gates(target: Target, num_controls: int, mode: str):
+def test_transpilation_preserves_mcx_target_gates(target: Target, num_controls: int, mode: str) -> None:
     """Test that transpilation does not change MCX gates that are already in the target."""
     nqubits = num_controls + 1
     nancillas = 0
@@ -104,7 +104,7 @@ def test_transpilation_preserves_mcx_target_gates(target: Target, num_controls: 
 
 
 @pytest.mark.parametrize("num_controls", list(range(3, 6)))
-def test_transpilation_preserves_mcp_target_gates(target: Target, num_controls: int):
+def test_transpilation_preserves_mcp_target_gates(target: Target, num_controls: int) -> None:
     """Test that transpilation does not change MCP gates that are already in the target."""
     nqubits = num_controls + 1
     qc = QuantumCircuit(nqubits)

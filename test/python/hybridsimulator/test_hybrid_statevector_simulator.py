@@ -11,18 +11,18 @@ from mqt.ddsim.hybridstatevectorsimulator import HybridStatevectorSimulatorBacke
 class MQTHybridStatevectorSimulatorTest(unittest.TestCase):
     """Runs backend checks and some very basic functionality tests."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.backend = HybridStatevectorSimulatorBackend()
         qr = QuantumRegister(2)
         self.q_circuit = QuantumCircuit(qr)
         self.q_circuit.h(qr[0])
         self.q_circuit.cx(qr[0], qr[1])
 
-    def test_status(self):
+    def test_status(self) -> None:
         """Test backend.status()."""
         self.backend.status()
 
-    def test_statevector_output(self):
+    def test_statevector_output(self) -> None:
         """Test final state vector for single circuit run."""
         result = self.backend.run(self.q_circuit, shots=0).result()
         assert result.success
