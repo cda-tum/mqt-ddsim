@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Callable, cast
+from typing import Any, Callable, List, cast
 
 from qiskit.providers import BackendV2, ProviderV1
 from qiskit.providers.providerutils import filter_backends
@@ -41,7 +41,7 @@ class DDSIMProvider(ProviderV1):  # type: ignore[misc]
         backends = [
             backend_cls() for backend_name, backend_cls in self._BACKENDS if name is None or backend_name == name
         ]
-        return cast(list[BackendV2], filter_backends(backends, filters=filters, **kwargs))
+        return cast(List[BackendV2], filter_backends(backends, filters=filters, **kwargs))
 
     def __str__(self) -> str:
         return "DDSIMProvider"
