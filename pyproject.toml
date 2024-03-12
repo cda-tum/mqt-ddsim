@@ -7,8 +7,8 @@ name = "mqt.ddsim"
 description = "A quantum simulator based on decision diagrams written in C++"
 readme = "README.md"
 authors = [
-    { name = "Stefan Hillmich", email = "stefan.hillmich@jku.at"},
-    { name = "Lukas Burgholzer", email = "lukas.burgholzer@tum.de"}
+    { name = "Lukas Burgholzer", email = "lukas.burgholzer@tum.de" },
+    { name = "Stefan Hillmich", email = "stefan.hillmich@scch.at" },
 ]
 keywords = ["MQT", "quantum-computing", "design-automation", "quantum-circuit-sim", "simulation"]
 license = { file = "LICENSE" }
