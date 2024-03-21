@@ -133,7 +133,7 @@ std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator<Config>::si
     auto splitQubit = static_cast<qc::Qubit>(nqubits / 2);
     if (mode == Mode::DD) {
         simulateHybridTaskflow(splitQubit);
-        return Simulator<Config>::measureAllNonCollapsing(shots);
+        return CircuitSimulator<Config>::measureAllNonCollapsing(shots);
     }
     simulateHybridAmplitudes(splitQubit);
 
