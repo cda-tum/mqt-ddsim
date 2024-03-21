@@ -255,7 +255,7 @@ dd::mEdge ShorSimulator<Config>::limitTo(std::uint64_t a) {
 
     for (std::uint32_t p = 1; p < requiredBits + 1; p++) {
         if (((a >> p) & 1U) > 0) {
-            edges[0] = Simulator<Config>::dd->makeIdent(0, static_cast<dd::Qubit>(p - 1));
+            edges[0] = Simulator<Config>::dd->makeIdent();
             edges[3] = f;
         } else {
             edges[0] = f;
@@ -349,7 +349,7 @@ dd::mEdge ShorSimulator<Config>::addConstMod(std::uint64_t a) {
 
 template<class Config>
 void ShorSimulator<Config>::uAEmulate(std::uint64_t a, std::int32_t q) {
-    const dd::mEdge limit = Simulator<Config>::dd->makeIdent(0, static_cast<dd::Qubit>(requiredBits - 1));
+    const dd::mEdge limit = Simulator<Config>::dd->makeIdent();
 
     dd::mEdge                f = dd::mEdge::one();
     std::array<dd::mEdge, 4> edges{
@@ -411,7 +411,7 @@ void ShorSimulator<Config>::uAEmulate(std::uint64_t a, std::int32_t q) {
     for (auto i = static_cast<std::int32_t>(2 * requiredBits - 1); i >= 0; --i) {
         if (i == q) {
             edges[1] = edges[2] = dd::mEdge::zero();
-            edges[0]            = Simulator<Config>::dd->makeIdent(0, static_cast<dd::Qubit>(nQubits - static_cast<std::size_t>(i) - 2));
+            edges[0]            = Simulator<Config>::dd->makeIdent();
             edges[3]            = e;
             e                   = Simulator<Config>::dd->makeDDNode(static_cast<dd::Qubit>(nQubits - 1 - static_cast<std::size_t>(i)), edges, false);
         } else {
