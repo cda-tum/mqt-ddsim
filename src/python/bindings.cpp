@@ -69,32 +69,31 @@ std::unique_ptr<Simulator> constructSimulatorWithoutSeed(const py::object& circ,
     return constructSimulator<Simulator>(circ, 1., 1, "fidelity", -1, std::forward<Args>(args)...);
 }
 
-void getNumPyMatrixRec(const qc::MatrixDD& e, const std::complex<dd::fp>& amp, std::size_t i, std::size_t j, std::size_t dim, std::complex<dd::fp>* mat) {
+void getNumPyMatrixRec(const qc::MatrixDD& e, const std::complex<dd::fp>& amp, std::size_t i, std::size_t j, std::size_t dim, std::complex<dd::fp>* mat, std::size_t level) {
     // calculate new accumulated amplitude
-    auto w = std::complex<dd::fp>{dd::RealNumber::val(e.w.r), dd::RealNumber::val(e.w.i)};
-    auto c = amp * w;
+    const auto c = amp * static_cast<std::complex<dd::fp>>(e.w);
 
     // base case
-    if (e.isTerminal()) {
+    if (level == 0U) {
         mat[i * dim + j] = c; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
         return;
     }
 
-    const std::size_t x = i | (1 << e.p->v);
-    const std::size_t y = j | (1 << e.p->v);
+    const auto        nextLevel = static_cast<dd::Qubit>(level - 1U);
+    const std::size_t x         = i | (1 << nextLevel);
+    const std::size_t y         = j | (1 << nextLevel);
+    if (e.isTerminal() || e.p->v < nextLevel) {
+        getNumPyMatrixRec(e, c, i, j, dim, mat, nextLevel);
+        getNumPyMatrixRec(e, c, x, y, dim, mat, nextLevel);
+        return;
+    }
 
-    // recursive case
-    if (!e.p->e[0].w.approximatelyZero()) {
-        getNumPyMatrixRec(e.p->e[0], c, i, j, dim, mat);
-    }
-    if (!e.p->e[1].w.approximatelyZero()) {
-        getNumPyMatrixRec(e.p->e[1], c, i, y, dim, mat);
-    }
-    if (!e.p->e[2].w.approximatelyZero()) {
-        getNumPyMatrixRec(e.p->e[2], c, x, j, dim, mat);
-    }
-    if (!e.p->e[3].w.approximatelyZero()) {
-        getNumPyMatrixRec(e.p->e[3], c, x, y, dim, mat);
+    const auto  coords = {std::pair{i, j}, {i, y}, {x, j}, {x, y}};
+    std::size_t k      = 0U;
+    for (const auto& [a, b]: coords) {
+        if (auto& f = e.p->e[k++]; !f.w.exactlyZero()) {
+            getNumPyMatrixRec(f, c, a, b, dim, mat, nextLevel);
+        }
     }
 }
 
@@ -109,12 +108,12 @@ void getNumPyMatrix(UnitarySimulator<Config>& sim, py::array_t<std::complex<dd::
         throw std::runtime_error("Provided matrix is not a square matrix.");
     }
 
-    const std::size_t dim = 1 << (e.p->v + 1);
+    const std::size_t dim = 1ULL << sim.getNumberOfQubits();
     if (static_cast<std::size_t>(rows) != dim) {
         throw std::runtime_error("Provided matrix does not have the right size.");
     }
 
-    getNumPyMatrixRec(e, std::complex<dd::fp>{1.0, 0.0}, 0, 0, dim, dataPtr);
+    getNumPyMatrixRec(e, std::complex<dd::fp>{1.0, 0.0}, 0, 0, dim, dataPtr, sim.getNumberOfQubits());
 }
 
 void dumpTensorNetwork(const py::object& circ, const std::string& filename) {
