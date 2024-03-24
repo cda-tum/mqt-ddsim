@@ -62,7 +62,7 @@ public:
     }
 
     std::map<std::string, std::size_t> measureAllNonCollapsing(std::size_t shots) override {
-        return sampleFromProbabilityMap(rootEdge.getSparseProbabilityVectorStrKeys(measurementThreshold), shots);
+        return sampleFromProbabilityMap(rootEdge.getSparseProbabilityVectorStrKeys(getNumberOfQubits(), measurementThreshold), shots);
     }
 
     void initializeSimulation(std::size_t nQubits) override;

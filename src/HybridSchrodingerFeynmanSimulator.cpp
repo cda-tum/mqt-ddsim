@@ -50,7 +50,7 @@ qc::VectorDD HybridSchrodingerFeynmanSimulator<Config>::simulateSlicing(std::uni
         sliceDD->garbageCollect();
     }
 
-    auto result = sliceDD->kronecker(upper.edge, lower.edge, false);
+    auto result = sliceDD->kronecker(upper.edge, lower.edge, lower.nqubits, false);
     sliceDD->incRef(result);
 
     return result;
@@ -104,16 +104,19 @@ bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(std::unique_ptr<dd:
             isSplitOp          = true;
             const bool control = getNextControl();
             for (const auto& c: opControls) {
-                sliceDD->decRef(edge); // TODO incref and decref could be integrated in delete edge
-                edge = sliceDD->deleteEdge(edge, static_cast<dd::Qubit>(c.qubit), control ? (c.type == qc::Control::Type::Pos ? 0 : 1) : (c.type == qc::Control::Type::Pos ? 1 : 0));
+                auto tmp = edge;
+                edge     = sliceDD->deleteEdge(edge, static_cast<dd::Qubit>(c.qubit), control ? (c.type == qc::Control::Type::Pos ? 0 : 1) : (c.type == qc::Control::Type::Pos ? 1 : 0));
+                // TODO incref and decref could be integrated in delete edge
                 sliceDD->incRef(edge);
+                sliceDD->decRef(tmp);
             }
         } else if (targetInSplit) { // target slice for split or operation in split
             const auto&           param = op->getParameter();
             qc::StandardOperation newOp(nqubits, opControls, opTargets, op->getType(), param, start);
-            sliceDD->decRef(edge);
-            edge = sliceDD->multiply(dd::getDD(&newOp, *sliceDD), edge, static_cast<dd::Qubit>(start));
+            auto                  tmp = edge;
+            edge                      = sliceDD->multiply(dd::getDD(&newOp, *sliceDD), edge, static_cast<dd::Qubit>(start));
             sliceDD->incRef(edge);
+            sliceDD->decRef(tmp);
         }
     } else {
         throw std::invalid_argument("Only StandardOperations are supported for now.");
@@ -130,7 +133,7 @@ std::map<std::string, std::size_t> HybridSchrodingerFeynmanSimulator<Config>::si
     auto splitQubit = static_cast<qc::Qubit>(nqubits / 2);
     if (mode == Mode::DD) {
         simulateHybridTaskflow(splitQubit);
-        return Simulator<Config>::measureAllNonCollapsing(shots);
+        return CircuitSimulator<Config>::measureAllNonCollapsing(shots);
     }
     simulateHybridAmplitudes(splitQubit);
 
