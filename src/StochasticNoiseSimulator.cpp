@@ -81,7 +81,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(std::size_t stochRun, qc:
                     for (const auto& qubit: qubits) {
                         const auto result = localDD->measureOneCollapsing(localRootEdge, static_cast<dd::Qubit>(qubits.at(qubit)), true, generator);
                         if (result == '1') {
-                            const auto x   = qc::StandardOperation(getNumberOfQubits(), qubit, qc::X);
+                            const auto x   = qc::StandardOperation(qubit, qc::X);
                             auto       tmp = localDD->multiply(dd::getDD(&x, *localDD), localRootEdge);
                             localDD->incRef(tmp);
                             localDD->decRef(localRootEdge);
