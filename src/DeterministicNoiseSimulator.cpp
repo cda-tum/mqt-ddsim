@@ -24,7 +24,7 @@ void DeterministicNoiseSimulator::reset(qc::NonUnitaryOperation* nonUnitaryOp) {
     for (const auto& qubit: nonUnitaryOp->getTargets()) {
         auto const result = dd->measureOneCollapsing(rootEdge, static_cast<dd::Qubit>(qubit), mt);
         if (result == '1') {
-            const auto x         = qc::StandardOperation(getNumberOfQubits(), qubit, qc::X);
+            const auto x         = qc::StandardOperation(qubit, qc::X);
             const auto operation = dd::getDD(&x, *dd);
             rootEdge             = dd->applyOperationToDensity(rootEdge, operation);
         }

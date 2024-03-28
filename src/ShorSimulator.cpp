@@ -441,7 +441,7 @@ void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target, q
 
 template<class Config>
 void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target, const qc::Controls& controls) {
-    const dd::Edge gate = Simulator<Config>::dd->makeGateDD(matrix, static_cast<dd::Qubit>(nQubits), controls, target);
+    const dd::Edge gate = Simulator<Config>::dd->makeGateDD(matrix, controls, target);
     const dd::Edge tmp  = Simulator<Config>::dd->multiply(gate, Simulator<Config>::rootEdge);
     Simulator<Config>::dd->incRef(tmp);
     Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
