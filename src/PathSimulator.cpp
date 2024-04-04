@@ -106,7 +106,6 @@ template<class Config>
 std::map<std::string, std::size_t> PathSimulator<Config>::simulate(std::size_t shots) {
     // build task graph from simulation path
     constructTaskGraph();
-    //std::cout<< *qc << std::endl;
     /// Enable the following statements to generate a .dot file of the resulting taskflow
     //        std::ofstream ofs("taskflow.dot");
     //        taskflow.dump(ofs);
@@ -115,7 +114,7 @@ std::map<std::string, std::size_t> PathSimulator<Config>::simulate(std::size_t s
     executor.run(taskflow).wait();
 
     // measure resulting DD
-    return Simulator<Config>::measureAllNonCollapsing(shots);
+    return CircuitSimulator<Config>::measureAllNonCollapsing(shots);
 }
 
 template<class Config>

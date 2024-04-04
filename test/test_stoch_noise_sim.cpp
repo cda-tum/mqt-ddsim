@@ -110,7 +110,7 @@ TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
     quantumComputation->x(0);
     quantumComputation->measure(0, 0);
     quantumComputation->h(0);
-    std::unique_ptr<qc::Operation> op(new qc::StandardOperation(2, 1, qc::X));
+    std::unique_ptr<qc::Operation> op(new qc::StandardOperation(1, qc::X));
     auto                           classicalRegister = std::pair<std::size_t, std::size_t>(0, 1);
     quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classicalRegister, 1);
 
