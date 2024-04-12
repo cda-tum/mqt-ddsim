@@ -50,7 +50,7 @@ tnflow = [
     "networkx",
 ]
 test = ["pytest>=7.0"]
-coverage = ["mqt.ddsim[test]", "pytest-cov"]
+coverage = ["mqt.ddsim[test]", "pytest-cov>=4"]
 docs = [
     "mqt.ddsim[tnflow]",
     "furo>=2023.08.17",
