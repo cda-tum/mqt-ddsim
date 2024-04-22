@@ -33,7 +33,7 @@ flag_management:
     - name: python
       paths:
         - "src/mqt/**/*.py"
-      after_n_builds: 12
+      after_n_builds: 10
       statuses:
         - type: project
           threshold: 0.5%
