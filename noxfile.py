@@ -75,7 +75,7 @@ def tests(session: nox.Session) -> None:
     _run_tests(session)
 
 
-@nox.session(reuse_venv=True, venv_backend="uv")
+@nox.session(reuse_venv=True, venv_backend="uv", python=PYTHON_ALL_VERSIONS)
 def minimums(session: nox.Session) -> None:
     """Test the minimum versions of dependencies."""
     _run_tests(

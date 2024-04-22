@@ -7,7 +7,7 @@ on:
 jobs:
   python-packaging:
     name: 🐍 Packaging
-    uses: cda-tum/mqt-core/.github/workflows/reusable-python-packaging.yml@main
+    uses: cda-tum/mqt-core/.github/workflows/reusable-python-packaging.yml@v2.4.1
 
   deploy:
     if: github.event_name == 'release' && github.event.action == 'published'
