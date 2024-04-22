@@ -20,10 +20,16 @@ nox.options.sessions = ["lint", "tests"]
 
 PYTHON_ALL_VERSIONS = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 
+# The following lists all the build requirements for building the package.
+# Note that this includes transitive build dependencies of package dependencies,
+# since we use `--no-build-isolation` to install the package in editable mode
+# and get better caching performance. This only concerns dependencies that are
+# not available via wheels on PyPI (i.e., only as source distributions).
 BUILD_REQUIREMENTS = [
     "scikit-build-core[pyproject]>=0.8.1",
     "setuptools_scm>=7",
     "pybind11>=2.12",
+    "wheel>=0.40",  # transitive dependency of pytest on Windows
 ]
 
 if os.environ.get("CI", None):
