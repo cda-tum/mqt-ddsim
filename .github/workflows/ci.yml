@@ -14,13 +14,13 @@ concurrency:
 jobs:
   change-detection:
     name: 🔍 Change
-    uses: cda-tum/mqt-core/.github/workflows/reusable-change-detection.yml@v2.4.1
+    uses: cda-tum/mqt-core/.github/workflows/reusable-change-detection.yml@v2.4.2
 
   cpp-tests:
     name: 🇨‌ Test
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-tests)
-    uses: cda-tum/mqt-core/.github/workflows/reusable-cpp-ci.yml@v2.4.1
+    uses: cda-tum/mqt-core/.github/workflows/reusable-cpp-ci.yml@v2.4.2
     secrets:
       token: ${{ secrets.CODECOV_TOKEN }}
     with:
@@ -33,13 +33,13 @@ jobs:
     name: 🇨‌ Lint
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-linter)
-    uses: cda-tum/mqt-core/.github/workflows/reusable-cpp-linter.yml@v2.4.1
+    uses: cda-tum/mqt-core/.github/workflows/reusable-cpp-linter.yml@v2.4.2
 
   python-tests:
     name: 🐍 Test
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-python-tests)
-    uses: cda-tum/mqt-core/.github/workflows/reusable-python-ci.yml@v2.4.1
+    uses: cda-tum/mqt-core/.github/workflows/reusable-python-ci.yml@v2.4.2
     secrets:
       token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -47,7 +47,7 @@ jobs:
     name: 📝 CodeQL
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-code-ql)
-    uses: cda-tum/mqt-core/.github/workflows/reusable-code-ql.yml@v2.4.1
+    uses: cda-tum/mqt-core/.github/workflows/reusable-code-ql.yml@v2.4.2
 
   required-checks-pass: # This job does nothing and is only used for branch protection
     name: 🚦 Check
