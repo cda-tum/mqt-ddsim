@@ -9,6 +9,8 @@ from typing import TYPE_CHECKING, Any, cast
 if TYPE_CHECKING:
     from quimb.tensor import Tensor, TensorNetwork
 
+import locale
+
 from qiskit import QuantumCircuit
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
@@ -102,7 +104,7 @@ def get_simulation_path(
 
     if dump_path:
         filename = qc.name + "_" + str(qc.num_qubits) + ".path" if isinstance(qc, QuantumCircuit) else "simulation.path"
-        with pathlib.Path(filename).open("w") as file:
+        with pathlib.Path(filename).open("w", encoding=locale.getpreferredencoding(False)) as file:
             file.write(str(path))
 
     if plot_ring:
