@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import locale
 import pathlib
 
 from qiskit import BasicAer
@@ -17,7 +18,7 @@ p cnf 3 5
 1 -2 -3 0
 -1 2 3 0
 """
-with pathlib.Path("dimacs_file.txt").open("w") as fd:
+with pathlib.Path("dimacs_file.txt").open("w", encoding=locale.getpreferredencoding(False)) as fd:
     fd.write(input_3sat_instance)
 
 print("pyddsim")
