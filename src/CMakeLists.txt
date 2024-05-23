@@ -59,3 +59,6 @@ add_library(MQT::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 if(BUILD_MQT_DDSIM_BINDINGS)
   add_subdirectory(python)
 endif()
+
+# build QIR support
+add_subdirectory(qir)
