@@ -16,12 +16,12 @@ The examples are taken from the corresponding repositories.
 
 # Instructions
 
-Build a shared library with a QIR interface:
+Build a shared library with a QIR interface (commands run from the ./build/ directory):
 
     clang \
     -c  # Only run preprocess, compile, and assemble steps \
     -o DDsimQir.o  # Write output to <file> \
-    ../src/DDsimQir.c  # input file \
+    ../src/DDsimQir.cpp  # input file \
     -I ../include  # Add directory to the end of the list of include search paths \
     -fPIC  # Enable Position Independent Code \
     -Wnp-c2x-extensions  # supress warning because of omitted parameter names
@@ -37,4 +37,4 @@ If you have written your quantum circuit in C and want to compile it to QIR (LLV
 
 To link the shared library to the QIR file and compile, use:
 
-    clang -o .build/bellPair examples/BellPair.ll .build/DDsimQir.so
+    clang -o ./build/bellPair ./scripts/qir/examples/BellPair.ll ./build/DDsimQir.so
