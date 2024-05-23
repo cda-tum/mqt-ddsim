@@ -379,7 +379,7 @@ extern "C" {
 
     Array* __quantum__rt__qubit_allocate_array(Int n) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        return malloc(sizeof(Qubit) * n);
+        return malloc(sizeof(Qubit*) * n);
     }
 
     void __quantum__rt__qubit_release(Qubit*) {
