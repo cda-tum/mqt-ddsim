@@ -3,11 +3,14 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/cd.yml
 
 jobs:
   python-packaging:
     name: 🐍 Packaging
-    uses: cda-tum/mqt-core/.github/workflows/reusable-python-packaging.yml@v2.4.2
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-packaging.yml@v1.0.0
 
   deploy:
     if: github.event_name == 'release' && github.event.action == 'published'

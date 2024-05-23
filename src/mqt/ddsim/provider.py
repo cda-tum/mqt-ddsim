@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Callable, List, cast
 
-from qiskit.providers import BackendV2, ProviderV1
+from qiskit.providers import BackendV2
+from qiskit.providers.exceptions import QiskitBackendNotFoundError
 from qiskit.providers.providerutils import filter_backends
 
 from .deterministicnoisesimulator import DeterministicNoiseSimulatorBackend
@@ -16,7 +17,7 @@ from .stochasticnoisesimulator import StochasticNoiseSimulatorBackend
 from .unitarysimulator import UnitarySimulatorBackend
 
 
-class DDSIMProvider(ProviderV1):  # type: ignore[misc]
+class DDSIMProvider:
     _BACKENDS = (
         ("qasm_simulator", QasmSimulatorBackend),
         ("statevector_simulator", StatevectorSimulatorBackend),
@@ -29,8 +30,16 @@ class DDSIMProvider(ProviderV1):  # type: ignore[misc]
         ("density_matrix_dd_simulator", DeterministicNoiseSimulatorBackend),
     )
 
-    def get_backend(self, name: str | None = None, **kwargs: dict[str, Any]) -> BackendV2:
-        return super().get_backend(name=name, **kwargs)
+    def get_backend(self, name: str | None = None, **kwargs: Any) -> BackendV2:
+        backends = self.backends(name, **kwargs)
+        if len(backends) > 1:
+            msg = "More than one backend matches the criteria"
+            raise QiskitBackendNotFoundError(msg)
+        if not backends:
+            msg = "No backend matches the criteria"
+            raise QiskitBackendNotFoundError(msg)
+
+        return backends[0]
 
     def backends(
         self,
