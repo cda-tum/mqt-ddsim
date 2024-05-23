@@ -38,3 +38,5 @@ add_custom_command(
     ${CMAKE_BINARY_DIR}/circuits
   COMMENT "Copying circuits and creating symlinks for ${PROJECT_NAME}_test"
   VERBATIM)
+
+add_subdirectory(qir)
