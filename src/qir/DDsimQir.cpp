@@ -9,29 +9,29 @@
 
 // AUXILIARY VARIABLES AND FUNCTIONS
 
-std::unique_ptr<qc::QuantumComputation> circ = nullptr;
-
-void createQuantumComputation() {
-    circ = std::make_unique<qc::QuantumComputation>();
-}
-
-void deleteQuantumComputation() {
-    circ = nullptr;
-}
-
-// Creates if necessary a new QuantumComputation object and returns a pointer to it.
-std::unique_ptr<qc::QuantumComputation>& getQuantumComputationHandle() {
-    if (circ == nullptr) {
-        createQuantumComputation();
-    }
-    return circ;
-}
-
-const char* simulate(std::unique_ptr<qc::QuantumComputation> circ) {
-    CircuitSimulator ddsim(std::move(circ), ApproximationInfo());
-    ddsim.simulate(1);
-    return ddsim.measureAll(false).c_str();
-}
+// std::unique_ptr<qc::QuantumComputation> circ = nullptr;
+//
+// void createQuantumComputation() {
+//     circ = std::make_unique<qc::QuantumComputation>();
+// }
+//
+// void deleteQuantumComputation() {
+//     circ = nullptr;
+// }
+//
+// // Creates if necessary a new QuantumComputation object and returns a pointer to it.
+// std::unique_ptr<qc::QuantumComputation>& getQuantumComputationHandle() {
+//     if (circ == nullptr) {
+//         createQuantumComputation();
+//     }
+//     return circ;
+// }
+//
+// const char* simulate(std::unique_ptr<qc::QuantumComputation> circ) {
+//     CircuitSimulator ddsim(std::move(circ), ApproximationInfo());
+//     ddsim.simulate(1);
+//     return ddsim.measureAll(false).c_str();
+// }
 
 extern "C" {
 
@@ -394,72 +394,72 @@ extern "C" {
     // QUANTUM INSTRUCTION SET
     void __quantum__qis__x__body(Qubit* q) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->x(reinterpret_cast<qc::Qubit>(q));
+        // circ->x(reinterpret_cast<qc::Qubit>(q));
     }
 
     void __quantum__qis__y__body(Qubit* q) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->y(reinterpret_cast<qc::Qubit>(q));
+        // circ->y(reinterpret_cast<qc::Qubit>(q));
     }
 
     void __quantum__qis__z__body(Qubit* q) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->z(reinterpret_cast<qc::Qubit>(q));
+        // circ->z(reinterpret_cast<qc::Qubit>(q));
     }
 
     void __quantum__qis__h__body(Qubit* q) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->h(reinterpret_cast<qc::Qubit>(q));
+        // circ->h(reinterpret_cast<qc::Qubit>(q));
     }
 
     void __quantum__qis__sqrtx__body(Qubit* q) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->sx(reinterpret_cast<qc::Qubit>(q));
+        // circ->sx(reinterpret_cast<qc::Qubit>(q));
     }
 
     void __quantum__qis__sqrtxdg__body(Qubit* q) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->sxdg(reinterpret_cast<qc::Qubit>(q));
+        // circ->sxdg(reinterpret_cast<qc::Qubit>(q));
     }
 
     void __quantum__qis__s__body(Qubit* q) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->s(reinterpret_cast<qc::Qubit>(q));
+        // circ->s(reinterpret_cast<qc::Qubit>(q));
     }
 
     void __quantum__qis__sdg__body(Qubit* q) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->sdg(reinterpret_cast<qc::Qubit>(q));
+        // circ->sdg(reinterpret_cast<qc::Qubit>(q));
     }
 
     void __quantum__qis__t__body(Qubit* q) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->t(reinterpret_cast<qc::Qubit>(q));
+        // circ->t(reinterpret_cast<qc::Qubit>(q));
     }
 
     void __quantum__qis__tdg__body(Qubit* q) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->tdg(reinterpret_cast<qc::Qubit>(q));
+        // circ->tdg(reinterpret_cast<qc::Qubit>(q));
     }
 
     void __quantum__qis__rx__body(Double phi, Qubit* q) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->rx(phi, reinterpret_cast<qc::Qubit>(q));
+        // circ->rx(phi, reinterpret_cast<qc::Qubit>(q));
     }
 
     void __quantum__qis__ry__body(Double phi, Qubit* q) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->ry(phi, reinterpret_cast<qc::Qubit>(q));
+        // circ->ry(phi, reinterpret_cast<qc::Qubit>(q));
     }
 
     void __quantum__qis__rz__body(Double phi, Qubit* q) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->rz(phi, reinterpret_cast<qc::Qubit>(q));
+        // circ->rz(phi, reinterpret_cast<qc::Qubit>(q));
     }
 
     void __quantum__qis__cnot__body(Qubit* c, Qubit* t) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->cx(reinterpret_cast<qc::Qubit>(c), reinterpret_cast<qc::Qubit>(t));
+        // circ->cx(reinterpret_cast<qc::Qubit>(c), reinterpret_cast<qc::Qubit>(t));
     }
 
     void __quantum__qis__cx__body(Qubit* c, Qubit* t) {
@@ -469,17 +469,17 @@ extern "C" {
 
     void __quantum__qis__cz__body(Qubit* c, Qubit* t) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->cz(reinterpret_cast<qc::Qubit>(c), reinterpret_cast<qc::Qubit>(t));
+        // circ->cz(reinterpret_cast<qc::Qubit>(c), reinterpret_cast<qc::Qubit>(t));
     }
 
     void __quantum__qis__ccx__body(Qubit* c1, Qubit* c2, Qubit* t) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->mcx({reinterpret_cast<qc::Qubit>(c1), reinterpret_cast<qc::Qubit>(c2)}, reinterpret_cast<qc::Qubit>(t));
+        // circ->mcx({reinterpret_cast<qc::Qubit>(c1), reinterpret_cast<qc::Qubit>(c2)}, reinterpret_cast<qc::Qubit>(t));
     }
 
     void __quantum__qis__ccz__body(Qubit* c1, Qubit* c2, Qubit* t) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->mcz({reinterpret_cast<qc::Qubit>(c1), reinterpret_cast<qc::Qubit>(c2)}, reinterpret_cast<qc::Qubit>(t));
+        // circ->mcz({reinterpret_cast<qc::Qubit>(c1), reinterpret_cast<qc::Qubit>(c2)}, reinterpret_cast<qc::Qubit>(t));
     }
 
     void __quantum__qis__mz__body(Qubit* q, Result* r) {
@@ -494,7 +494,7 @@ extern "C" {
 
     void __quantum__qis__reset__body(Qubit* q) {
         printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
-        circ->reset(reinterpret_cast<qc::Qubit>(q));
+        // circ->reset(reinterpret_cast<qc::Qubit>(q));
     }
 
 } // extern "C"
