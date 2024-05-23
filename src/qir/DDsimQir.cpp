@@ -1,7 +1,7 @@
 #include "qir/DDsimQir.h"
 
-#include "CircuitSimulator.hpp"
-#include "QuantumComputation.hpp"
+// #include "CircuitSimulator.hpp"
+// #include "QuantumComputation.hpp"
 
 #include <cstdio>
 #include <cstdlib>
