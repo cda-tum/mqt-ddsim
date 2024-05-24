@@ -14,4 +14,4 @@ target_link_libraries(
 install(
   TARGETS pyddsim
   DESTINATION .
-  COMPONENT mqt-ddsim_PythonModule)
+  COMPONENT mqt-ddsim_Python)
