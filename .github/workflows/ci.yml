@@ -14,15 +14,13 @@ concurrency:
 jobs:
   change-detection:
     name: 🔍 Change
-    uses: cda-tum/mqt-workflows/.github/workflows/reusable-change-detection.yml@v1.0.0
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-change-detection.yml@v1.0.1
 
   cpp-tests:
     name: 🇨‌ Test
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-tests)
-    uses: cda-tum/mqt-workflows/.github/workflows/reusable-cpp-ci.yml@v1.0.0
-    secrets:
-      token: ${{ secrets.CODECOV_TOKEN }}
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-cpp-ci.yml@v1.0.1
     with:
       cmake-args: ""
       cmake-args-ubuntu: -G Ninja
@@ -33,21 +31,19 @@ jobs:
     name: 🇨‌ Lint
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-linter)
-    uses: cda-tum/mqt-workflows/.github/workflows/reusable-cpp-linter.yml@v1.0.0
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-cpp-linter.yml@v1.0.1
 
   python-tests:
     name: 🐍 Test
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-python-tests)
-    uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-ci.yml@v1.0.0
-    secrets:
-      token: ${{ secrets.CODECOV_TOKEN }}
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-ci.yml@v1.0.1
 
   code-ql:
     name: 📝 CodeQL
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-code-ql)
-    uses: cda-tum/mqt-workflows/.github/workflows/reusable-code-ql.yml@v1.0.0
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-code-ql.yml@v1.0.1
 
   required-checks-pass: # This job does nothing and is only used for branch protection
     name: 🚦 Check
