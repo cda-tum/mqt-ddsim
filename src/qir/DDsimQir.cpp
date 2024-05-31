@@ -1,31 +1,33 @@
 #include "qir/DDsimQir.h"
 
 // #include "CircuitSimulator.hpp"
-// #include "QuantumComputation.hpp"
+#include "QuantumComputation.hpp"
 
 #include <cstdio>
 #include <cstdlib>
 
 // AUXILIARY VARIABLES AND FUNCTIONS
 
-// std::unique_ptr<qc::QuantumComputation> circ = nullptr;
-//
-// void createQuantumComputation() {
-//     circ = std::make_unique<qc::QuantumComputation>();
-// }
+std::unique_ptr<qc::QuantumComputation> circ = nullptr;
+
+void createQuantumComputation() {
+    // circ = std::make_unique<qc::QuantumComputation>();
+    auto test = qc::QuantumComputation(2, 2);
+    std::cout << "I have reached here." << std::endl;
+}
 //
 // void deleteQuantumComputation() {
 //     circ = nullptr;
 // }
-//
-// // Creates if necessary a new QuantumComputation object and returns a pointer to it.
+
+// Creates if necessary a new QuantumComputation object and returns a pointer to it.
 // std::unique_ptr<qc::QuantumComputation>& getQuantumComputationHandle() {
 //     if (circ == nullptr) {
 //         createQuantumComputation();
 //     }
 //     return circ;
 // }
-//
+
 // const char* simulate(std::unique_ptr<qc::QuantumComputation> circ) {
 //     CircuitSimulator ddsim(std::move(circ), ApproximationInfo());
 //     ddsim.simulate(1);
@@ -409,6 +411,7 @@ void __quantum__qis__z__body(Qubit* q) {
 void __quantum__qis__h__body(Qubit* q) {
     printf("%s:%s:%d \n", __FILE__, __FUNCTION__, __LINE__);
     // circ->h(reinterpret_cast<qc::Qubit>(q));
+    createQuantumComputation();
 }
 
 void __quantum__qis__sqrtx__body(Qubit* q) {
