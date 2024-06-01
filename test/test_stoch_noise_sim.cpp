@@ -1,7 +1,15 @@
+#include "Definitions.hpp"
+#include "QuantumComputation.hpp"
 #include "StochasticNoiseSimulator.hpp"
+#include "operations/OpType.hpp"
 
 #include "gtest/gtest.h"
+#include <cstddef>
+#include <iostream>
 #include <memory>
+#include <stdexcept>
+#include <string>
+#include <utility>
 
 /**
  * These tests may have to be adjusted if something about the random-number generation changes.
@@ -110,9 +118,7 @@ TEST(StochNoiseSimTest, SimulateClassicControlledOpWithError) {
     quantumComputation->x(0);
     quantumComputation->measure(0, 0);
     quantumComputation->h(0);
-    std::unique_ptr<qc::Operation> op(new qc::StandardOperation(1, qc::X));
-    auto                           classicalRegister = std::pair<std::size_t, std::size_t>(0, 1);
-    quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classicalRegister, 1);
+    quantumComputation->classicControlled(qc::X, 1U, {0, 1});
 
     for (qc::Qubit i = 0; i < 2; i++) {
         quantumComputation->measure(i, i);
