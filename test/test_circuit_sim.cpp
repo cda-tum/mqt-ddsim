@@ -77,8 +77,7 @@ TEST(CircuitSimTest, ClassicControlledOp) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
     quantumComputation->x(0);
     quantumComputation->measure(0, 0);
-    std::unique_ptr<qc::Operation> op(new qc::StandardOperation(1, qc::X));
-    quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, quantumComputation->getCregs().at("c"), 1);
+    quantumComputation->classicControlled(qc::X, 1U, quantumComputation->getCregs().at("c"));
 
     CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
     ddsim.simulate(1);
@@ -92,8 +91,7 @@ TEST(CircuitSimTest, ClassicControlledOpAsNop) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
     quantumComputation->x(0);
     quantumComputation->measure(0, 0);
-    std::unique_ptr<qc::Operation> op(new qc::StandardOperation(1, qc::X));
-    quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, quantumComputation->getCregs().at("c"), 0);
+    quantumComputation->classicControlled(qc::X, 1U, quantumComputation->getCregs().at("c"), 0);
 
     CircuitSimulator ddsim(std::move(quantumComputation), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
     ddsim.simulate(1);

@@ -67,9 +67,7 @@ TEST(DeterministicNoiseSimTest, ClassicControlledOp) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
     quantumComputation->x(0);
     quantumComputation->measure(0, 0);
-    std::unique_ptr<qc::Operation> op(new qc::StandardOperation(1, qc::X));
-    auto                           classicalRegister = std::pair<std::size_t, std::size_t>(0, 1);
-    quantumComputation->emplace_back<qc::ClassicControlledOperation>(op, classicalRegister, 1);
+    quantumComputation->classicControlled(qc::X, 1U, {0, 1});
     quantumComputation->measure(0, 0);
     quantumComputation->measure(1, 1);
 
