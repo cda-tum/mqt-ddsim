@@ -1,8 +1,18 @@
 #include "DeterministicNoiseSimulator.hpp"
-#include "nlohmann/json.hpp"
+#include "QuantumComputation.hpp"
+#include "operations/OpType.hpp"
 
-#include "gtest/gtest.h"
+#include <array>
+#include <cstddef>
+#include <gtest/gtest.h>
+#include <iomanip>
+#include <iostream>
 #include <memory>
+#include <nlohmann/json.hpp>
+#include <optional>
+#include <stdexcept>
+#include <string>
+#include <utility>
 
 using namespace qc::literals;
 
@@ -92,7 +102,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDWithSimulate) {
     auto ddsim              = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), ApproximationInfo{}, 17U, std::string("APD"), 0.01, std::optional<double>{}, 2);
     auto m                  = ddsim->simulate(10000);
 
-    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+    std::cout << std::setw(2) << nlohmann::basic_json(m) << "\n";
 
     const auto expectedEntries = std::array{
             "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111",
@@ -115,7 +125,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackD) {
     ddsim->simulate(1);
     auto m = ddsim->rootEdge.getSparseProbabilityVectorStrKeys(ddsim->getNumberOfQubits(), measurementThreshold);
 
-    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+    std::cout << std::setw(2) << nlohmann::basic_json(m) << "\n";
 
     const auto expectedEntries = std::array{
             "0000", "0001", "0011", "0100", "0101", "0111", "1000", "1001", "1011", "1101"};

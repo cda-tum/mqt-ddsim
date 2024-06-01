@@ -1,11 +1,22 @@
 #include "CircuitSimulator.hpp"
+#include "Definitions.hpp"
+#include "QuantumComputation.hpp"
 #include "algorithms/BernsteinVazirani.hpp"
 #include "algorithms/Grover.hpp"
 #include "algorithms/QFT.hpp"
 #include "algorithms/QPE.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "operations/OpType.hpp"
 
 #include "gtest/gtest.h"
+#include <cmath>
+#include <cstddef>
+#include <cstdlib>
+#include <iostream>
 #include <memory>
+#include <stdexcept>
+#include <string>
+#include <utility>
 
 TEST(CircuitSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
     auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);

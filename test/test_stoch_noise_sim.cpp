@@ -1,7 +1,15 @@
+#include "Definitions.hpp"
+#include "QuantumComputation.hpp"
 #include "StochasticNoiseSimulator.hpp"
+#include "operations/OpType.hpp"
 
 #include "gtest/gtest.h"
+#include <cstddef>
+#include <iostream>
 #include <memory>
+#include <stdexcept>
+#include <string>
+#include <utility>
 
 /**
  * These tests may have to be adjusted if something about the random-number generation changes.
