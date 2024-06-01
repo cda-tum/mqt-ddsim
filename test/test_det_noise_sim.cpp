@@ -149,7 +149,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPD) {
     ddsim->simulate(1);
     auto m = ddsim->rootEdge.getSparseProbabilityVectorStrKeys(ddsim->getNumberOfQubits(), measurementThreshold);
 
-    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+    std::cout << std::setw(2) << nlohmann::basic_json(m) << "\n";
 
     const auto expectedEntries = std::array{
             "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111",
@@ -176,7 +176,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAP) {
     ddsim->simulate(1);
     auto m = ddsim->rootEdge.getSparseProbabilityVectorStrKeys(ddsim->getNumberOfQubits(), measurementThreshold);
 
-    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+    std::cout << std::setw(2) << nlohmann::basic_json(m) << "\n";
 
     const auto expectedEntries = std::array{
             "0001", "1001"};
@@ -204,7 +204,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDCustomProb) {
     ddsim->simulate(1);
     auto m = ddsim->rootEdge.getSparseProbabilityVectorStrKeys(ddsim->getNumberOfQubits(), measurementThreshold);
 
-    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+    std::cout << std::setw(2) << nlohmann::basic_json(m) << "\n";
 
     const auto expectedEntries = std::array{
             "0000", "0001", "0010", "0011", "0110", "0111", "1000", "1001", "1010", "1011", "1101"};
@@ -227,7 +227,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4TrackAPDWithShots) {
     auto ddsim = std::make_unique<DeterministicNoiseSimulator>(std::move(quantumComputation), std::string("APD"), 0.01, 0.02, 1);
 
     auto m = ddsim->simulate(10000);
-    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+    std::cout << std::setw(2) << nlohmann::basic_json(m) << "\n";
 
     const auto expectedEntries = std::array{
             "0000", "0001", "1000", "1001"};
@@ -250,7 +250,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4NoNoise1) {
     ddsim->simulate(1);
     auto m = ddsim->rootEdge.getSparseProbabilityVectorStrKeys(ddsim->getNumberOfQubits(), measurementThreshold);
 
-    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+    std::cout << std::setw(2) << nlohmann::basic_json(m) << "\n";
 
     const double tolerance = 1e-10;
     if (m.count("1001") == 0) {
@@ -266,7 +266,7 @@ TEST(DeterministicNoiseSimTest, SimulateAdder4NoNoise2) {
     std::size_t const shots = 10000;
 
     auto m = ddsim->simulate(shots);
-    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+    std::cout << std::setw(2) << nlohmann::basic_json(m) << "\n";
 
     const double tolerance = 1e-10;
     if (m.count("1001") == 0) {
@@ -294,7 +294,7 @@ TEST(DeterministicNoiseSimTest, TestSimulateInterface) {
 
     auto m = ddsim->simulate(10000);
 
-    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+    std::cout << std::setw(2) << nlohmann::basic_json(m) << "\n";
 
     const auto expectedEntries = std::array{
             "0000", "0001", "1000", "1001"};
@@ -321,7 +321,7 @@ TEST(DeterministicNoiseSimTest, TestSimulateInterfaceWithMeasurments) {
 
     auto m = ddsim->simulate(10000);
 
-    std::cout << std::setw(2) << nlohmann::json(m) << "\n";
+    std::cout << std::setw(2) << nlohmann::basic_json(m) << "\n";
 
     const auto expectedEntries = std::array{
             "0000", "0001", "1000", "1001"};
