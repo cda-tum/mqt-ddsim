@@ -51,9 +51,9 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         }
 
         assert len(target) == len(counts)
-        for key in target:
+        for key, value in target.items():
             assert key in counts
-            assert abs(target[key] - counts[key]) < threshold
+            assert abs(value - counts[key]) < threshold
 
     def test_qasm_simulator_access(self) -> None:
         """Test data counts output for multiple quantum circuits in a single job."""
@@ -90,9 +90,9 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         }
 
         assert len(target) == len(counts)
-        for key in target:
+        for key, value in target.items():
             assert key in counts
-            assert abs(target[key] - counts[key]) < threshold
+            assert abs(value - counts[key]) < threshold
 
     def test_qasm_simulator_bracket(self) -> None:
         """Test data counts output for single circuit run against reference."""
@@ -114,9 +114,9 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         }
 
         assert len(target) == len(counts)
-        for key in target:
+        for key, value in target.items():
             assert key in counts
-            assert abs(target[key] - counts[key]) < threshold
+            assert abs(value - counts[key]) < threshold
 
     def test_qasm_simulator_alternating(self) -> None:
         """Test data counts output for single circuit run against reference."""
@@ -138,6 +138,6 @@ class MQTQasmSimulatorTest(unittest.TestCase):
         }
 
         assert len(target) == len(counts)
-        for key in target:
+        for key, value in target.items():
             assert key in counts
-            assert abs(target[key] - counts[key]) < threshold
+            assert abs(value - counts[key]) < threshold

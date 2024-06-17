@@ -70,9 +70,9 @@ def test_qasm_simulator(circuit: QuantumCircuit, backend: QasmSimulatorBackend, 
         "001 001": average,
     }
     assert len(target) == len(counts)
-    for key in target:
+    for key, value in target.items():
         assert key in counts
-        assert abs(target[key] - counts[key]) < threshold
+        assert abs(value - counts[key]) < threshold
 
 
 def test_qasm_simulator_support_parametrized_gates(backend: QasmSimulatorBackend, shots: int) -> None:
