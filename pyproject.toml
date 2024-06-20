@@ -11,7 +11,7 @@ authors = [
     { name = "Stefan Hillmich", email = "stefan.hillmich@scch.at" },
 ]
 keywords = ["MQT", "quantum-computing", "design-automation", "quantum-circuit-sim", "simulation"]
-license = { file = "LICENSE" }
+license = { file = "LICENSE.md" }
 
 classifiers = [
     "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
