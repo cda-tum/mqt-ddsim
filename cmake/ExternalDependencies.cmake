@@ -53,12 +53,9 @@ if(BUILD_MQT_DDSIM_TESTS)
   set(GTEST_VERSION
       1.14.0
       CACHE STRING "Google Test version")
-  set(GTEST_URL
-      https://github.com/google/googletest/archive/refs/tags/v${GTEST_VERSION}.tar.gz
-  )
+  set(GTEST_URL https://github.com/google/googletest/archive/refs/tags/v${GTEST_VERSION}.tar.gz)
   if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-    FetchContent_Declare(googletest URL ${GTEST_URL} FIND_PACKAGE_ARGS
-                                        ${GTEST_VERSION} NAMES GTest)
+    FetchContent_Declare(googletest URL ${GTEST_URL} FIND_PACKAGE_ARGS ${GTEST_VERSION} NAMES GTest)
     list(APPEND FETCH_PACKAGES googletest)
   else()
     find_package(googletest ${GTEST_VERSION} QUIET NAMES GTest)
@@ -81,9 +78,7 @@ set(TF_BUILD_PROFILER
 set(TF_VERSION
     3.6.0
     CACHE STRING "Taskflow version")
-set(TF_URL
-    https://github.com/taskflow/taskflow/archive/refs/tags/v${TF_VERSION}.tar.gz
-)
+set(TF_URL https://github.com/taskflow/taskflow/archive/refs/tags/v${TF_VERSION}.tar.gz)
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
   FetchContent_Declare(taskflow URL ${TF_URL} FIND_PACKAGE_ARGS)
   list(APPEND FETCH_PACKAGES taskflow)
@@ -105,12 +100,9 @@ if(BUILD_MQT_DDSIM_CLI)
   set(CXXOPTS_VERSION
       3.1.1
       CACHE STRING "cxxopts version")
-  set(CXXOPTS_URL
-      https://github.com/jarro2783/cxxopts/archive/refs/tags/v${CXXOPTS_VERSION}.tar.gz
-  )
+  set(CXXOPTS_URL https://github.com/jarro2783/cxxopts/archive/refs/tags/v${CXXOPTS_VERSION}.tar.gz)
   if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-    FetchContent_Declare(cxxopts URL ${CXXOPTS_URL} FIND_PACKAGE_ARGS
-                                     ${CXXOPTS_VERSION})
+    FetchContent_Declare(cxxopts URL ${CXXOPTS_URL} FIND_PACKAGE_ARGS ${CXXOPTS_VERSION})
     list(APPEND FETCH_PACKAGES cxxopts)
   else()
     find_package(cxxopts ${CXXOPTS_VERSION} QUIET)
@@ -132,8 +124,7 @@ if(BUILD_MQT_DDSIM_BINDINGS)
   else()
     find_package(pybind11_json QUIET)
     if(NOT pybind11_json_FOUND)
-      FetchContent_Declare(
-        pybind11_json GIT_REPOSITORY https://github.com/pybind/pybind11_json)
+      FetchContent_Declare(pybind11_json GIT_REPOSITORY https://github.com/pybind/pybind11_json)
       list(APPEND FETCH_PACKAGES pybind11_json)
     endif()
   endif()
