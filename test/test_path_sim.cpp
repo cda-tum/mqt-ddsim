@@ -1,10 +1,15 @@
 #include "PathSimulator.hpp"
-#include "algorithms/Entanglement.hpp"
+#include "QuantumComputation.hpp"
 #include "algorithms/Grover.hpp"
+#include "dd/DDDefinitions.hpp"
 #include "dd/Export.hpp"
 
-#include "gtest/gtest.h"
+#include <complex>
+#include <gtest/gtest.h>
+#include <iostream>
 #include <memory>
+#include <stdexcept>
+#include <utility>
 
 using namespace qc::literals;
 

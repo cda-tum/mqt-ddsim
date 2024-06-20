@@ -1,9 +1,19 @@
 #include "GroverSimulator.hpp"
 
+#include "Definitions.hpp"
 #include "QuantumComputation.hpp"
+#include "Simulator.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "dd/DDpackageConfig.hpp"
+#include "dd/Edge.hpp"
 #include "dd/FunctionalityConstruction.hpp"
+#include "operations/Control.hpp"
 
-#include <chrono>
+#include <cassert>
+#include <cstddef>
+#include <limits>
+#include <map>
+#include <string>
 
 template <class Config>
 std::map<std::string, std::size_t>

@@ -1,7 +1,24 @@
 #include "PathSimulator.hpp"
 
-#include <iterator>
+#include "CircuitSimulator.hpp"
+#include "Definitions.hpp"
+#include "QuantumComputation.hpp"
+#include "Simulator.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "dd/DDpackageConfig.hpp"
+#include "dd/Operations.hpp"
+#include "dd/Package_fwd.hpp"
+
+#include <cmath>
+#include <cstddef>
+#include <list>
+#include <map>
+#include <set>
+#include <stdexcept>
+#include <string>
 #include <utility>
+#include <variant>
+#include <vector>
 
 template <class Config>
 PathSimulator<Config>::SimulationPath::SimulationPath(
@@ -228,7 +245,7 @@ void PathSimulator<Config>::generateBracketSimulationPath(
   }
   memoryLeft = CircuitSimulator<Config>::qc->getNops() + bracketSize;
   // Creating the brackets by sequentially adding the individual operations
-  while (!rightSingle) {
+  while (true) {
     for (auto i = 0U; i < bracketSize - 1; i++) {
       // Checking for stray elements
       if (startElemBracket == CircuitSimulator<Config>::qc->getNops()) {
@@ -281,10 +298,8 @@ void PathSimulator<Config>::generateBracketSimulationPath(
     }
   }
   // Adding the last stray element on the right-hand side
-  if (rightSingle) {
-    components.emplace_back(memoryLeft + (bracketSize)*bracketMemory + opMemory,
-                            strayElem);
-  }
+  components.emplace_back(memoryLeft + (bracketSize)*bracketMemory + opMemory,
+                          strayElem);
   setSimulationPath(components, true);
 }
 

@@ -2,9 +2,15 @@
 
 #include "CircuitSimulator.hpp"
 #include "QuantumComputation.hpp"
+#include "dd/DDpackageConfig.hpp"
 #include "dd/NoiseFunctionality.hpp"
 #include "dd/Package.hpp"
 
+#include <cstddef>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
 #include <utility>
 
 class DeterministicNoiseSimulator

@@ -1,8 +1,34 @@
 #include "HybridSchrodingerFeynmanSimulator.hpp"
 
+#include "CircuitSimulator.hpp"
+#include "Definitions.hpp"
+#include "Simulator.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "dd/DDpackageConfig.hpp"
+#include "dd/Export.hpp"
+#include "dd/Node.hpp"
+#include "dd/Package.hpp"
+#include "dd/Package_fwd.hpp"
+#include "operations/Control.hpp"
+#include "operations/OpType.hpp"
+#include "operations/StandardOperation.hpp"
+
+#include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <taskflow/taskflow.hpp>
+#include <complex>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <functional>
+#include <map>
+#include <memory>
+#include <ostream>
+#include <stdexcept>
+#include <string>
+#include <taskflow/core/executor.hpp>
+#include <utility>
+#include <vector>
 
 template <class Config>
 std::size_t
@@ -123,8 +149,7 @@ bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(
         auto tmp = edge;
         edge = sliceDD->deleteEdge(
             edge, static_cast<dd::Qubit>(c.qubit),
-            control ? (c.type == qc::Control::Type::Pos ? 0 : 1)
-                    : (c.type == qc::Control::Type::Pos ? 1 : 0));
+            control != (c.type == qc::Control::Type::Neg) ? 1 : 0);
         // TODO incref and decref could be integrated in delete edge
         sliceDD->incRef(edge);
         sliceDD->decRef(tmp);

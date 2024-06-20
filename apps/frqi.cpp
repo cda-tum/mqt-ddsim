@@ -2,16 +2,27 @@
  * Based on code by Christoph Brandner, MedUni Wien
  */
 #include "CircuitSimulator.hpp"
+#include "Definitions.hpp"
+#include "QuantumComputation.hpp"
 #include "cxxopts.hpp"
+#include "operations/Control.hpp"
 
 #include <chrono>
 #include <cmath>
+#include <cstddef>
+#include <cstdlib>
 #include <iostream>
 #include <map>
-#include <opencv2/opencv.hpp>
+#include <memory>
+#include <opencv2/core/hal/interface.h>
+#include <opencv2/core/mat.hpp>
+#include <opencv2/core/types.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
 #include <string>
-
-using namespace dd::literals;
+#include <utility>
+#include <vector>
 
 int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
   cxxopts::Options options(
@@ -38,12 +49,12 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
   cv::Mat dest;
   const cv::Mat genimg;
   const cv::Size size(32, 32);
-  const dd::QubitCount nqubits = 11;
+  const std::size_t nqubits = 11;
 
   image = imread(filename, cv::IMREAD_GRAYSCALE);
   if (image.data == nullptr) {
     std::cerr << "Could not open or find the image '" << filename << "'"
-              << std::endl;
+              << '\n';
     return -1;
   }
   cv::resize(image, dest, size, 0, 0, cv::INTER_AREA);
@@ -65,8 +76,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
 
   const auto t0start = std::chrono::steady_clock::now();
   /* Preparation of the quantum circuit */
-  std::unique_ptr<qc::QuantumComputation> qc =
-      std::make_unique<qc::QuantumComputation>(nqubits);
+  auto qc = std::make_unique<qc::QuantumComputation>(nqubits);
 
   for (qc::Qubit i = 1; i < 11; i++) {
     qc->h(i); // add Hadamard gates
@@ -81,7 +91,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
                          (cnt & 1LL << i) != 0 ? qc::Control::Type::Pos
                                                : qc::Control::Type::Neg});
       }
-      qc->ry(0, controls, (*it) * 2);
+      qc->mcry((*it) * 2, controls, 0);
     }
     cnt++;
   }
@@ -93,7 +103,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
 
   std::clog << "Elapsed time for quantum circuit preparation: "
             << std::chrono::duration<float>(t0end - t0start).count() << "s"
-            << std::endl;
+            << '\n';
 
   const auto t1start = std::chrono::steady_clock::now();
   CircuitSimulator<> ddsim(std::move(qc));
@@ -109,15 +119,15 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
 
   std::clog << "Elapsed time for quantum simulation and measurement "
             << std::chrono::duration<float>(t1end - t1start).count() << " s"
-            << std::endl;
-  std::clog << "size of image: " << colrows << std::endl;
+            << '\n';
+  std::clog << "size of image: " << colrows << '\n';
 
   unsigned int result = 0;
   for (const auto& [bitstring, count] : mCounter) {
     result += count;
   }
   std::clog << "Number of distinct measurements: " << mCounter.size() << "\n";
-  std::clog << "RESULT: " << result << std::endl;
+  std::clog << "RESULT: " << result << '\n';
 
   std::vector<double> prob(1024, 0);
 

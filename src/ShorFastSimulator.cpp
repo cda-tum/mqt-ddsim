@@ -1,11 +1,13 @@
 #include "ShorFastSimulator.hpp"
 
+#include "dd/DDpackageConfig.hpp"
+
 #include <chrono>
 #include <cmath>
 #include <dd/ComplexNumbers.hpp>
 #include <iostream>
-#include <limits>
 #include <random>
+#include <string>
 
 template <class Config>
 std::map<std::string, std::size_t>

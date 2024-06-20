@@ -1,7 +1,17 @@
+#include "CircuitSimulator.hpp"
 #include "HybridSchrodingerFeynmanSimulator.hpp"
+#include "QuantumComputation.hpp"
+#include "dd/Export.hpp"
+#include "dd/Node.hpp"
+#include "dd/Package.hpp"
 
-#include "gtest/gtest.h"
+#include <cstddef>
+#include <cstdlib>
+#include <gtest/gtest.h>
+#include <iostream>
 #include <memory>
+#include <stdexcept>
+#include <utility>
 
 using namespace qc::literals;
 

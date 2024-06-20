@@ -1,13 +1,19 @@
+#include "CircuitSimulator.hpp"
 #include "DeterministicNoiseSimulator.hpp"
+#include "QuantumComputation.hpp"
 #include "StochasticNoiseSimulator.hpp"
 #include "cxxopts.hpp"
 #include "nlohmann/json.hpp"
 
 #include <chrono>
+#include <cstddef>
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <string>
+#include <utility>
 
 namespace nl = nlohmann;
 
@@ -83,7 +89,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
 
     const std::chrono::duration<float> durationSimulation = t2 - t1;
 
-    nl::json outputObj;
+    nl::basic_json outputObj;
 
     if (vm.count("ps") > 0) {
       outputObj["statistics"] = {
@@ -121,7 +127,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
 
     const std::chrono::duration<float> durationSimulation = t2 - t1;
 
-    nl::json outputObj;
+    nl::basic_json outputObj;
 
     if (vm.count("ps") > 0) {
       outputObj["statistics"] = {

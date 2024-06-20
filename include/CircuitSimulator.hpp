@@ -1,18 +1,25 @@
 #ifndef DDSIM_CIRCUITSIMULATOR_HPP
 #define DDSIM_CIRCUITSIMULATOR_HPP
 
+#include "Definitions.hpp"
 #include "QuantumComputation.hpp"
 #include "Simulator.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "dd/DDpackageConfig.hpp"
+#include "operations/NonUnitaryOperation.hpp"
+#include "operations/Operation.hpp"
 
 #include <cstddef>
+#include <cstdint>
 #include <istream>
 #include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 struct ApproximationInfo {
-  enum ApproximationStrategy { FidelityDriven, MemoryDriven };
+  enum ApproximationStrategy : std::uint8_t { FidelityDriven, MemoryDriven };
 
   /* Default to no approximation */
   ApproximationInfo() = default;

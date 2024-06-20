@@ -3,15 +3,24 @@
 
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
-#include "dd/Operations.hpp"
-#include "nlohmann/json.hpp"
+#include "QuantumComputation.hpp"
+#include "Simulator.hpp"
+#include "dd/DDpackageConfig.hpp"
+#include "dd/Package_fwd.hpp"
 
-#include <future>
+#include <cstddef>
+#include <cstdint>
 #include <limits>
-#include <taskflow/taskflow.hpp>
-#include <thread>
+#include <list>
+#include <map>
+#include <memory>
+#include <nlohmann/json_fwd.hpp>
+#include <stdexcept>
+#include <string>
+#include <taskflow/core/executor.hpp>
+#include <taskflow/core/task.hpp>
+#include <taskflow/core/taskflow.hpp>
 #include <unordered_map>
-#include <unordered_set>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -45,7 +54,7 @@ public:
                    const qc::QuantumComputation* qc_,
                    bool assumeCorrectOrder = false);
 
-    Components components{};
+    Components components;
     Steps steps{};
     std::size_t nleaves{};
     const qc::QuantumComputation* qc{};
@@ -53,7 +62,7 @@ public:
 
   struct Configuration {
     // Add new strategies here
-    enum class Mode {
+    enum class Mode : std::uint8_t {
       Sequential,
       PairwiseRecursiveGrouping,
       BracketGrouping,
@@ -216,12 +225,12 @@ public:
                                       std::list<std::size_t>& gateCosts);
 
 private:
-  std::unordered_map<std::size_t, tf::Task> tasks{};
+  std::unordered_map<std::size_t, tf::Task> tasks;
   std::unordered_map<std::size_t, std::variant<qc::VectorDD, qc::MatrixDD>>
-      results{};
+      results;
 
-  tf::Taskflow taskflow{};
-  tf::Executor executor{};
+  tf::Taskflow taskflow;
+  tf::Executor executor;
   SimulationPath simulationPath{};
 
   void constructTaskGraph();

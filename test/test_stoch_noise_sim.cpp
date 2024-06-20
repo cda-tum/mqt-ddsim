@@ -3,8 +3,8 @@
 #include "StochasticNoiseSimulator.hpp"
 #include "operations/OpType.hpp"
 
-#include "gtest/gtest.h"
 #include <cstddef>
+#include <gtest/gtest.h>
 #include <iostream>
 #include <memory>
 #include <stdexcept>

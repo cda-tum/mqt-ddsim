@@ -1,7 +1,6 @@
 #include "ShorFastSimulator.hpp"
 
-#include "gtest/gtest.h"
-#include <memory>
+#include <gtest/gtest.h>
 
 /**
  * These tests may have to be adjusted if something about the random-number

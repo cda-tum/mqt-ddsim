@@ -1,6 +1,7 @@
 #include "CircuitSimulator.hpp"
 #include "GroverSimulator.hpp"
 #include "HybridSchrodingerFeynmanSimulator.hpp"
+#include "QuantumComputation.hpp"
 #include "ShorFastSimulator.hpp"
 #include "ShorSimulator.hpp"
 #include "Simulator.hpp"
@@ -8,27 +9,33 @@
 #include "algorithms/Grover.hpp"
 #include "algorithms/QFT.hpp"
 #include "cxxopts.hpp"
+#include "dd/DDpackageConfig.hpp"
 #include "dd/Export.hpp"
 #include "nlohmann/json.hpp"
 
 #include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <string>
+#include <utility>
 
 namespace nl = nlohmann;
 
 namespace std {
 template <class T>
-void to_json(
-    nl::json& j,
-    const std::complex<T>& p) { // NOLINT(readability-identifier-naming)
-  j = nl::json{p.real(), p.imag()};
+void to_json( // NOLINT(readability-identifier-naming)
+    nl::basic_json<>& j, const std::complex<T>& p) {
+  j = nl::basic_json<>{p.real(), p.imag()};
 }
 template <class T>
-void from_json(const nl::json& j,
-               std::complex<T>& p) { // NOLINT(readability-identifier-naming)
+void from_json(
+    const nl::basic_json<>& j, // NOLINT(readability-identifier-naming)
+    std::complex<T>& p) {
   p.real(j.at(0));
   p.imag(j.at(1));
 }
@@ -240,7 +247,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
     }
   }
 
-  nl::json outputObj;
+  nl::basic_json outputObj;
 
   if (vm.count("pm") > 0) {
     outputObj["measurement_results"] = m;

@@ -1,9 +1,13 @@
 #include "UnitarySimulator.hpp"
 
+#include "CircuitSimulator.hpp"
+#include "Simulator.hpp"
+#include "dd/DDpackageConfig.hpp"
 #include "dd/Export.hpp"
 #include "dd/FunctionalityConstruction.hpp"
 
 #include <chrono>
+#include <ostream>
 
 template <class Config> void UnitarySimulator<Config>::construct() {
   // carry out actual computation

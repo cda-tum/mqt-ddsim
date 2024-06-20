@@ -1,11 +1,16 @@
 #ifndef DDSIM_GROVERSIMULATOR_HPP
 #define DDSIM_GROVERSIMULATOR_HPP
 
-#include "QuantumComputation.hpp"
+#include "Definitions.hpp"
 #include "Simulator.hpp"
+#include "dd/DDpackageConfig.hpp"
 
 #include <cmath>
-#include <utility>
+#include <cstddef>
+#include <cstdint>
+#include <map>
+#include <random>
+#include <string>
 
 template <class Config = dd::DDPackageConfig>
 class GroverSimulator : public Simulator<Config> {
