@@ -1,0 +1,17 @@
+name: Update MQT Core
+on:
+  schedule:
+    # run once a month on the first day of the month at 00:00 UTC
+    - cron: "0 0 1 * *"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/update-mqt-core.yml
+
+jobs:
+  update-mqt-core:
+    name: ⬆️ Update MQT Core
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-mqt-core-update.yml@v1.1.1
+    with:
+      # Replace with a PAT if the created PRs should automatically trigger workflows.
+      token: ${{ github.token }}
