@@ -26,6 +26,7 @@
 #include <ostream>
 #include <stdexcept>
 #include <string>
+#include <taskflow/core/async.hpp>
 #include <taskflow/core/executor.hpp>
 #include <utility>
 #include <vector>
