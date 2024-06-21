@@ -19,15 +19,12 @@ if(BUILD_MQT_DDSIM_BINDINGS)
   find_package(pybind11 CONFIG REQUIRED)
 endif()
 
-set(FETCHCONTENT_SOURCE_DIR_MQT-CORE
-    ${PROJECT_SOURCE_DIR}/extern/mqt-core
-    CACHE
-      PATH
-      "Path to the source directory of the mqt-core library. This variable is used by FetchContent to download the library if it is not already available."
-)
-set(MQT_CORE_VERSION
-    2.2.2
+# cmake-format: off
+set(MQT_CORE_VERSION 
     CACHE STRING "MQT Core version")
+set(MQT_CORE_REV ""
+    CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
+# cmake-format: on
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
   FetchContent_Declare(
     mqt-core
