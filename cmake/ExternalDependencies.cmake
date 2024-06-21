@@ -19,20 +19,17 @@ if(BUILD_MQT_DDSIM_BINDINGS)
   find_package(pybind11 CONFIG REQUIRED)
 endif()
 
-set(FETCHCONTENT_SOURCE_DIR_MQT-CORE
-    ${PROJECT_SOURCE_DIR}/extern/mqt-core
-    CACHE
-      PATH
-      "Path to the source directory of the mqt-core library. This variable is used by FetchContent to download the library if it is not already available."
-)
-set(MQT_CORE_VERSION
-    2.2.2
+# cmake-format: off
+set(MQT_CORE_VERSION 2.5.1
     CACHE STRING "MQT Core version")
+set(MQT_CORE_REV "0e4ff9e0521886449027b252c65913e1afa863b0"
+    CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
+# cmake-format: on
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
   FetchContent_Declare(
     mqt-core
     GIT_REPOSITORY https://github.com/cda-tum/mqt-core.git
-    GIT_TAG v${MQT_CORE_VERSION}
+    GIT_TAG ${MQT_CORE_REV}
     FIND_PACKAGE_ARGS ${MQT_CORE_VERSION})
   list(APPEND FETCH_PACKAGES mqt-core)
 else()
@@ -41,7 +38,7 @@ else()
     FetchContent_Declare(
       mqt-core
       GIT_REPOSITORY https://github.com/cda-tum/mqt-core.git
-      GIT_TAG v${MQT_CORE_VERSION})
+      GIT_TAG ${MQT_CORE_REV})
     list(APPEND FETCH_PACKAGES mqt-core)
   endif()
 endif()
