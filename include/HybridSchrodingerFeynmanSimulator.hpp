@@ -1,5 +1,4 @@
-#ifndef DDSIM_HYBRIDSCHRODINGERFEYNMANSIMULATOR_HPP
-#define DDSIM_HYBRIDSCHRODINGERFEYNMANSIMULATOR_HPP
+#pragma once
 
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
@@ -122,5 +121,3 @@ private:
                const std::unique_ptr<qc::Operation>& op);
   };
 };
-
-#endif // DDSIM_HYBRIDSCHRODINGERFEYNMANSIMULATOR_HPP

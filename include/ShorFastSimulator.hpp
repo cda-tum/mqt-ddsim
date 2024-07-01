@@ -1,5 +1,4 @@
-#ifndef DDSIM_SHORFASTSIMULATOR_HPP
-#define DDSIM_SHORFASTSIMULATOR_HPP
+#pragma once
 
 #include "QuantumComputation.hpp"
 #include "Simulator.hpp"
@@ -118,5 +117,3 @@ public:
             {"sim_factor2", std::to_string(simFactors.second)}};
   }
 };
-
-#endif // DDSIM_SHORFASTSIMULATOR_HPP

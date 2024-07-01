@@ -1,5 +1,4 @@
-#ifndef DDSIM_PATHSIMULATOR_HPP
-#define DDSIM_PATHSIMULATOR_HPP
+#pragma once
 
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
@@ -237,5 +236,3 @@ private:
   void addSimulationTask(std::size_t leftID, std::size_t rightID,
                          std::size_t resultID);
 };
-
-#endif // DDSIM_PATHSIMULATOR_HPP

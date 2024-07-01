@@ -1,5 +1,4 @@
-#ifndef DDSIM_CIRCUITSIMULATOR_HPP
-#define DDSIM_CIRCUITSIMULATOR_HPP
+#pragma once
 
 #include "Definitions.hpp"
 #include "QuantumComputation.hpp"
@@ -131,5 +130,3 @@ protected:
   virtual void reset(qc::NonUnitaryOperation* nonUnitaryOp);
   virtual void applyOperationToState(std::unique_ptr<qc::Operation>& op);
 };
-
-#endif // DDSIM_CIRCUITSIMULATOR_HPP

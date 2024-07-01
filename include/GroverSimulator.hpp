@@ -1,5 +1,4 @@
-#ifndef DDSIM_GROVERSIMULATOR_HPP
-#define DDSIM_GROVERSIMULATOR_HPP
+#pragma once
 
 #include "Definitions.hpp"
 #include "Simulator.hpp"
@@ -89,5 +88,3 @@ protected:
   qc::Qubit nAnciallae = 1;
   std::size_t iterations;
 };
-
-#endif // DDSIM_GROVERSIMULATOR_HPP

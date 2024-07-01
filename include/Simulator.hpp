@@ -1,5 +1,4 @@
-#ifndef DDSIMULATOR_H
-#define DDSIMULATOR_H
+#pragma once
 
 #include "Definitions.hpp"
 #include "dd/Package.hpp"
@@ -199,5 +198,3 @@ protected:
                                   bool edgeLabels, bool classic, bool memory,
                                   bool formatAsPolar);
 };
-
-#endif // DDSIMULATOR_H

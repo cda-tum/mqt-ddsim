@@ -1,5 +1,4 @@
-#ifndef DDSIM_UNITARYSIMULATOR_HPP
-#define DDSIM_UNITARYSIMULATOR_HPP
+#pragma once
 
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
@@ -63,5 +62,3 @@ private:
 
   double constructionTime = 0.;
 };
-
-#endif // DDSIM_UNITARYSIMULATOR_HPP

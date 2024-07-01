@@ -1,5 +1,4 @@
-#ifndef DDSIM_SHORSIMULATOR_HPP
-#define DDSIM_SHORSIMULATOR_HPP
+#pragma once
 
 #include "QuantumComputation.hpp"
 #include "Simulator.hpp"
@@ -150,5 +149,3 @@ public:
     };
   }
 };
-
-#endif // DDSIM_SHORSIMULATOR_HPP
