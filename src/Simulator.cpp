@@ -8,6 +8,7 @@
 #include <queue>
 #include <set>
 #include <stdexcept>
+#include <vector>
 
 using CN = dd::ComplexNumbers;
 

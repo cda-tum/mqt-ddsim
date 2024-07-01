@@ -265,8 +265,8 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(
                             std::to_string(current.second) + ".dd",
                         true);
 
-          remove(filenameLeft.c_str());
-          remove(filenameRight.c_str());
+          std::remove(filenameLeft.c_str());
+          std::remove(filenameRight.c_str());
         }
 
         if (current.first < lastLevel) {
@@ -312,7 +312,7 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(
   Simulator<Config>::rootEdge =
       Simulator<Config>::dd->template deserialize<dd::vNode>(filename, true);
   Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
-  remove(filename.c_str());
+  std::remove(filename.c_str());
 }
 
 template <class Config>

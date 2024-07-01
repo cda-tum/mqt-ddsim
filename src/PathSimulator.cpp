@@ -7,7 +7,7 @@
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Operations.hpp"
-#include "dd/Package_fwd.hpp"
+#include "dd/Package.hpp"
 
 #include <cmath>
 #include <cstddef>

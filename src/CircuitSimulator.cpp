@@ -1,9 +1,19 @@
 #include "CircuitSimulator.hpp"
 
-#include "CircuitOptimizer.hpp"
-#include "dd/Export.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "dd/DDpackageConfig.hpp"
 #include "dd/FunctionalityConstruction.hpp"
+#include "dd/Node.hpp"
 #include "dd/Operations.hpp"
+#include "operations/ClassicControlledOperation.hpp"
+#include "operations/OpType.hpp"
+
+#include <cassert>
+#include <cmath>
+#include <cstdint>
+#include <map>
+#include <memory>
+#include <string>
 
 template <class Config>
 std::map<std::string, std::size_t>

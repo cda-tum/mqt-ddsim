@@ -1,7 +1,20 @@
 #include "DeterministicNoiseSimulator.hpp"
 
-#include "dd/Export.hpp"
+#include "Simulator.hpp"
+#include "dd/ComplexNumbers.hpp"
+#include "dd/DDDefinitions.hpp"
 #include "dd/Operations.hpp"
+#include "operations/NonUnitaryOperation.hpp"
+#include "operations/OpType.hpp"
+#include "operations/Operation.hpp"
+
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
 
 using CN = dd::ComplexNumbers;
 
