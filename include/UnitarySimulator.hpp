@@ -3,15 +3,21 @@
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
 #include "QuantumComputation.hpp"
-#include "dd/Operations.hpp"
-#include "dd/Package.hpp"
+#include "Simulator.hpp"
+#include "dd/DDpackageConfig.hpp"
+#include "dd/Node.hpp"
+#include "dd/Package_fwd.hpp"
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
+#include <ostream>
+#include <utility>
 
 template <class Config = dd::DDPackageConfig>
 class UnitarySimulator : public CircuitSimulator<Config> {
 public:
-  enum class Mode { Sequential, Recursive };
+  enum class Mode : std::uint8_t { Sequential, Recursive };
 
   UnitarySimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
                    const ApproximationInfo& approximationInfo_,

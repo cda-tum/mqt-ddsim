@@ -1,16 +1,24 @@
 #pragma once
 
-#include "Definitions.hpp"
+#include "dd/ComplexValue.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "dd/DDpackageConfig.hpp"
+#include "dd/Node.hpp"
 #include "dd/Package.hpp"
-#include "operations/OpType.hpp"
+#include "dd/RealNumber.hpp"
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <complex>
 #include <cstddef>
+#include <cstdint>
 #include <map>
 #include <memory>
+#include <ostream>
+#include <queue>
 #include <random>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <utility>

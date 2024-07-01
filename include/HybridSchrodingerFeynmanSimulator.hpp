@@ -2,18 +2,27 @@
 
 #include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
+#include "Definitions.hpp"
 #include "QuantumComputation.hpp"
-#include "dd/Export.hpp"
-#include "dd/Operations.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "dd/DDpackageConfig.hpp"
 #include "dd/Package.hpp"
+#include "dd/Package_fwd.hpp"
+#include "operations/Operation.hpp"
 
-#include <complex>
+#include <cstddef>
+#include <cstdint>
+#include <map>
 #include <memory>
+#include <ostream>
+#include <stdexcept>
+#include <string>
+#include <utility>
 
 template <class Config = dd::DDPackageConfig>
 class HybridSchrodingerFeynmanSimulator : public CircuitSimulator<Config> {
 public:
-  enum class Mode { DD, Amplitude };
+  enum class Mode : std::uint8_t { DD, Amplitude };
 
   HybridSchrodingerFeynmanSimulator(
       std::unique_ptr<qc::QuantumComputation>&& qc_,
@@ -73,7 +82,7 @@ protected:
 
 private:
   std::size_t nthreads = 2;
-  dd::CVec finalAmplitudes{};
+  dd::CVec finalAmplitudes;
 
   void simulateHybridTaskflow(qc::Qubit splitQubit);
   void simulateHybridAmplitudes(qc::Qubit splitQubit);

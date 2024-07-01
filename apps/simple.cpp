@@ -33,9 +33,8 @@ void to_json( // NOLINT(readability-identifier-naming)
   j = nl::basic_json<>{p.real(), p.imag()};
 }
 template <class T>
-void from_json(
-    const nl::basic_json<>& j, // NOLINT(readability-identifier-naming)
-    std::complex<T>& p) {
+void from_json( // NOLINT(readability-identifier-naming)
+    const nl::basic_json<>& j, std::complex<T>& p) {
   p.real(j.at(0));
   p.imag(j.at(1));
 }

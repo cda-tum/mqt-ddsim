@@ -1,7 +1,18 @@
 #pragma once
 
-#include "QuantumComputation.hpp"
 #include "Simulator.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "dd/DDpackageConfig.hpp"
+#include "dd/Node.hpp"
+#include "operations/Control.hpp"
+
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
 
 template <class Config = dd::DDPackageConfig>
 class ShorSimulator : public Simulator<Config> {
