@@ -20,7 +20,7 @@ if(BUILD_MQT_DDSIM_BINDINGS)
 endif()
 
 # cmake-format: off
-set(MQT_CORE_VERSION 
+set(MQT_CORE_VERSION
     CACHE STRING "MQT Core version")
 set(MQT_CORE_REV ""
     CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
