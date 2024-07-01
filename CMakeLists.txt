@@ -4,8 +4,7 @@ cmake_minimum_required(VERSION 3.19...3.28)
 project(
   mqt-ddsim
   LANGUAGES CXX
-  DESCRIPTION
-    "MQT DDSIM - A quantum circuit simulator based on decision diagrams")
+  DESCRIPTION "MQT DDSIM - A quantum circuit simulator based on decision diagrams")
 
 option(BUILD_MQT_DDSIM_TESTS "Also build tests for the MQT DDSIM project" ON)
 option(BUILD_MQT_DDSIM_BINDINGS "Build the MQT DDSIM Python bindings" OFF)
@@ -25,9 +24,7 @@ if(BUILD_MQT_DDSIM_BINDINGS)
       CACHE STRING "Prefer Brew/Conda to Apple framework Python")
   set(Python_ARTIFACTS_INTERACTIVE
       ON
-      CACHE
-        BOOL
-        "Prevent multiple searches for Python and instead cache the results.")
+      CACHE BOOL "Prevent multiple searches for Python and instead cache the results.")
 
   # top-level call to find Python
   find_package(

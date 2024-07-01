@@ -19,20 +19,19 @@ if(BUILD_MQT_DDSIM_BINDINGS)
   find_package(pybind11 CONFIG REQUIRED)
 endif()
 
-set(FETCHCONTENT_SOURCE_DIR_MQT-CORE
-    ${PROJECT_SOURCE_DIR}/extern/mqt-core
-    CACHE
-      PATH
-      "Path to the source directory of the mqt-core library. This variable is used by FetchContent to download the library if it is not already available."
-)
-set(MQT_CORE_VERSION
-    2.2.2
+# cmake-format: off
+set(MQT_CORE_VERSION 2.5.1
     CACHE STRING "MQT Core version")
+set(MQT_CORE_REV "0e4ff9e0521886449027b252c65913e1afa863b0"
+    CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
+set(MQT_CORE_REPO_OWNER "cda-tum"
+    CACHE STRING "MQT Core repository owner (change when using a fork)")
+# cmake-format: on
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
   FetchContent_Declare(
     mqt-core
-    GIT_REPOSITORY https://github.com/cda-tum/mqt-core.git
-    GIT_TAG v${MQT_CORE_VERSION}
+    GIT_REPOSITORY https://github.com/${MQT_CORE_REPO_OWNER}/mqt-core.git
+    GIT_TAG ${MQT_CORE_REV}
     FIND_PACKAGE_ARGS ${MQT_CORE_VERSION})
   list(APPEND FETCH_PACKAGES mqt-core)
 else()
@@ -40,8 +39,8 @@ else()
   if(NOT mqt-core_FOUND)
     FetchContent_Declare(
       mqt-core
-      GIT_REPOSITORY https://github.com/cda-tum/mqt-core.git
-      GIT_TAG v${MQT_CORE_VERSION})
+      GIT_REPOSITORY https://github.com/${MQT_CORE_REPO_OWNER}/mqt-core.git
+      GIT_TAG ${MQT_CORE_REV})
     list(APPEND FETCH_PACKAGES mqt-core)
   endif()
 endif()
@@ -53,12 +52,9 @@ if(BUILD_MQT_DDSIM_TESTS)
   set(GTEST_VERSION
       1.14.0
       CACHE STRING "Google Test version")
-  set(GTEST_URL
-      https://github.com/google/googletest/archive/refs/tags/v${GTEST_VERSION}.tar.gz
-  )
+  set(GTEST_URL https://github.com/google/googletest/archive/refs/tags/v${GTEST_VERSION}.tar.gz)
   if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-    FetchContent_Declare(googletest URL ${GTEST_URL} FIND_PACKAGE_ARGS
-                                        ${GTEST_VERSION} NAMES GTest)
+    FetchContent_Declare(googletest URL ${GTEST_URL} FIND_PACKAGE_ARGS ${GTEST_VERSION} NAMES GTest)
     list(APPEND FETCH_PACKAGES googletest)
   else()
     find_package(googletest ${GTEST_VERSION} QUIET NAMES GTest)
@@ -81,9 +77,7 @@ set(TF_BUILD_PROFILER
 set(TF_VERSION
     3.6.0
     CACHE STRING "Taskflow version")
-set(TF_URL
-    https://github.com/taskflow/taskflow/archive/refs/tags/v${TF_VERSION}.tar.gz
-)
+set(TF_URL https://github.com/taskflow/taskflow/archive/refs/tags/v${TF_VERSION}.tar.gz)
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
   FetchContent_Declare(taskflow URL ${TF_URL} FIND_PACKAGE_ARGS)
   list(APPEND FETCH_PACKAGES taskflow)
@@ -103,12 +97,9 @@ if(BUILD_MQT_DDSIM_CLI)
   set(CXXOPTS_VERSION
       3.1.1
       CACHE STRING "cxxopts version")
-  set(CXXOPTS_URL
-      https://github.com/jarro2783/cxxopts/archive/refs/tags/v${CXXOPTS_VERSION}.tar.gz
-  )
+  set(CXXOPTS_URL https://github.com/jarro2783/cxxopts/archive/refs/tags/v${CXXOPTS_VERSION}.tar.gz)
   if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-    FetchContent_Declare(cxxopts URL ${CXXOPTS_URL} FIND_PACKAGE_ARGS
-                                     ${CXXOPTS_VERSION})
+    FetchContent_Declare(cxxopts URL ${CXXOPTS_URL} FIND_PACKAGE_ARGS ${CXXOPTS_VERSION})
     list(APPEND FETCH_PACKAGES cxxopts)
   else()
     find_package(cxxopts ${CXXOPTS_VERSION} QUIET)
@@ -130,8 +121,7 @@ if(BUILD_MQT_DDSIM_BINDINGS)
   else()
     find_package(pybind11_json QUIET)
     if(NOT pybind11_json_FOUND)
-      FetchContent_Declare(
-        pybind11_json GIT_REPOSITORY https://github.com/pybind/pybind11_json)
+      FetchContent_Declare(pybind11_json GIT_REPOSITORY https://github.com/pybind/pybind11_json)
       list(APPEND FETCH_PACKAGES pybind11_json)
     endif()
   endif()
