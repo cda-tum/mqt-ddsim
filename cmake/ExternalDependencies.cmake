@@ -100,8 +100,6 @@ if(BUILD_MQT_DDSIM_CLI)
   find_package(Threads)
   link_libraries(Threads::Threads)
 
-  find_package(OpenCV QUIET)
-
   set(CXXOPTS_VERSION
       3.1.1
       CACHE STRING "cxxopts version")

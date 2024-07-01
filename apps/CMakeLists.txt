@@ -10,8 +10,3 @@ if(Threads_FOUND)
   add_sim_executable(noise_aware cxxopts::cxxopts)
   target_link_libraries(mqt-ddsim-noise_aware PRIVATE Threads::Threads)
 endif()
-
-if(OpenCV_FOUND)
-  add_sim_executable(frqi cxxopts::cxxopts ${OpenCV_LIBRARIES})
-endif()
-add_sim_executable(vectors)
