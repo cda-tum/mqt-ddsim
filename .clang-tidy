@@ -1,13 +1,13 @@
 FormatStyle: file
 
 Checks: |
-  clang-diagnostic-*,
-  clang-analyzer-*,
   boost-*,
   bugprone-*,
   -bugprone-easily-swappable-parameters,
+  -bugprone-unchecked-optional-access,
   clang-analyzer-*,
   -clang-analyzer-core.NullDereference,
+  clang-diagnostic-*,
   cppcoreguidelines-*,
   -cppcoreguidelines-non-private-member-variables-in-classes,
   -cppcoreguidelines-special-member-functions,
@@ -28,6 +28,7 @@ Checks: |
   -readability-identifier-length,
   -readability-magic-numbers,
   -readability-function-cognitive-complexity
+
 CheckOptions:
   - key: readability-identifier-naming.ClassCase
     value: CamelCase

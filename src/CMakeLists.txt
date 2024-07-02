@@ -26,19 +26,16 @@ add_library(
   PathSimulator.cpp)
 
 # set include directories
-target_include_directories(
-  ${MQT_DDSIM_TARGET_NAME}
-  PUBLIC $<BUILD_INTERFACE:${MQT_DDSIM_INCLUDE_BUILD_DIR}>)
+target_include_directories(${MQT_DDSIM_TARGET_NAME}
+                           PUBLIC $<BUILD_INTERFACE:${MQT_DDSIM_INCLUDE_BUILD_DIR}>)
 
 # link to the MQT::Core and Taskflow libraries
 target_link_libraries(${MQT_DDSIM_TARGET_NAME} PUBLIC MQT::CoreDD Taskflow)
-target_link_libraries(${MQT_DDSIM_TARGET_NAME} PRIVATE MQT::ProjectWarnings
-                                                       MQT::ProjectOptions)
+target_link_libraries(${MQT_DDSIM_TARGET_NAME} PRIVATE MQT::ProjectWarnings MQT::ProjectOptions)
 
 # the following sets the SYSTEM flag for the include dirs of the taskflow libs
-set_target_properties(
-  Taskflow PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
-                      $<TARGET_PROPERTY:Taskflow,INTERFACE_INCLUDE_DIRECTORIES>)
+set_target_properties(Taskflow PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+                                          $<TARGET_PROPERTY:Taskflow,INTERFACE_INCLUDE_DIRECTORIES>)
 
 # add MQT alias
 add_library(MQT::DDSim ALIAS ${MQT_DDSIM_TARGET_NAME})
