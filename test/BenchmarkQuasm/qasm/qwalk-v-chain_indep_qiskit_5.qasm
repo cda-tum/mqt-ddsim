@@ -1,0 +1,66 @@
+// Benchmark was created by MQT Bench on 2024-03-19
+// For more information about MQT Bench, please visit https://www.cda.cit.tum.de/mqtbench/
+// MQT Bench version: 1.1.0
+// Qiskit version: 1.0.2
+
+OPENQASM 2.0;
+include "qelib1.inc";
+qreg node[3];
+qreg coin[1];
+qreg anc[1];
+creg meas[5];
+h coin[0];
+rccx coin[0],node[1],anc[0];
+ccx node[2],anc[0],node[0];
+rccx coin[0],node[1],anc[0];
+ccx coin[0],node[2],node[1];
+x node[1];
+cx coin[0],node[2];
+x node[2];
+x coin[0];
+rccx coin[0],node[1],anc[0];
+ccx node[2],anc[0],node[0];
+rccx coin[0],node[1],anc[0];
+ccx coin[0],node[2],node[1];
+x node[1];
+cx coin[0],node[2];
+x node[2];
+u2(-pi,-pi) coin[0];
+rccx coin[0],node[1],anc[0];
+ccx node[2],anc[0],node[0];
+rccx coin[0],node[1],anc[0];
+ccx coin[0],node[2],node[1];
+x node[1];
+cx coin[0],node[2];
+x node[2];
+x coin[0];
+rccx coin[0],node[1],anc[0];
+ccx node[2],anc[0],node[0];
+rccx coin[0],node[1],anc[0];
+ccx coin[0],node[2],node[1];
+x node[1];
+cx coin[0],node[2];
+x node[2];
+u2(-pi,-pi) coin[0];
+rccx coin[0],node[1],anc[0];
+ccx node[2],anc[0],node[0];
+rccx coin[0],node[1],anc[0];
+ccx coin[0],node[2],node[1];
+x node[1];
+cx coin[0],node[2];
+x node[2];
+x coin[0];
+rccx coin[0],node[1],anc[0];
+ccx node[2],anc[0],node[0];
+rccx coin[0],node[1],anc[0];
+ccx coin[0],node[2],node[1];
+x node[1];
+cx coin[0],node[2];
+x node[2];
+x coin[0];
+barrier node[0],node[1],node[2],coin[0],anc[0];
+measure node[0] -> meas[0];
+measure node[1] -> meas[1];
+measure node[2] -> meas[2];
+measure coin[0] -> meas[3];
+measure anc[0] -> meas[4];

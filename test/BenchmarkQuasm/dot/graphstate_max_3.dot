@@ -1,0 +1,5 @@
+digraph "DD" {graph[];node[shape=plain];edge[arrowhead=none]
+root [label="",shape=point,style=invis]
+t [label=<<font point-size="20">1</font>>,shape=box,tooltip="1",width=0.3,height=0.3]
+root->t[penwidth="3",tooltip="1" color="0.000 0.667 0.750",label=<<font point-size="8">&nbsp;[1]</font>>]
+}
