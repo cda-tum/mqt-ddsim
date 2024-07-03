@@ -21,6 +21,8 @@ jobs:
       url: https://pypi.org/p/mqt.ddsim
     permissions:
       id-token: write
+      attestations: write
+      contents: read
     needs: [python-packaging]
     steps:
       - uses: actions/download-artifact@v4
@@ -28,4 +30,8 @@ jobs:
           pattern: cibw-*
           path: dist
           merge-multiple: true
+      - name: Generate artifact attestation for sdist and wheel(s)
+        uses: actions/attest-build-provenance@v1.3.2
+        with:
+          subject-path: "dist/*"
       - uses: pypa/gh-action-pypi-publish@release/v1
