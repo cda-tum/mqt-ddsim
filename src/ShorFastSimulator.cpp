@@ -152,7 +152,6 @@ ShorFastSimulator<Config>::postProcessing(const std::string& sample) const {
         static_cast<std::uint64_t>(sample.at(2 * requiredBits - 1 - i) == '1');
     res = (res << 1U) + currentBit;
   }
-
   log << " = " << res << "\n";
   if (res == 0) {
     log << "Factorization failed (measured 0)!\n";
@@ -169,30 +168,25 @@ ShorFastSimulator<Config>::postProcessing(const std::string& sample) const {
     denom = res;
     res = tmp;
   }
-
   for (const auto i : cf) {
     log << i << " ";
   }
   log << "\n";
   for (int i = 0; static_cast<std::size_t>(i) < cf.size(); i++) {
-    // determine candidate
     std::uint64_t denominator = cf[static_cast<std::size_t>(i)];
     std::uint64_t numerator = 1;
-
     for (int j = i - 1; j >= 0; j--) {
       const auto tmp =
           numerator + cf[static_cast<std::size_t>(j)] * denominator;
       numerator = denominator;
       denominator = tmp;
     }
-
     log << "  Candidate " << numerator << "/" << denominator << ": ";
     if (denominator > compositeN) {
       log << " denominator too large (greater than " << compositeN
           << ")!\nFactorization failed!\n";
       return {0, 0};
     }
-
     const double delta =
         static_cast<double>(oldRes) / static_cast<double>(oldDenom) -
         static_cast<double>(numerator) / static_cast<double>(denominator);
@@ -200,25 +194,21 @@ ShorFastSimulator<Config>::postProcessing(const std::string& sample) const {
       log << "delta is too big (" << delta << ")\n";
       continue;
     }
-
     std::uint64_t fact = 1;
     while (denominator * fact < compositeN &&
            modpow(coprimeA, denominator * fact, compositeN) != 1) {
       fact++;
     }
-
     if (modpow(coprimeA, denominator * fact, compositeN) != 1) {
       log << "failed\n";
       continue;
     }
-
     log << "found period: " << denominator << " * " << fact << " = "
         << (denominator * fact) << "\n";
     if (((denominator * fact) & 1U) > 0) {
       log << "Factorization failed (period is odd)!\n";
       return {0, 0};
     }
-
     auto f1 = modpow(coprimeA, (denominator * fact) / 2, compositeN);
     auto f2 = (f1 + 1) % compositeN;
     f1 = (f1 == 0) ? compositeN - 1 : f1 - 1;
