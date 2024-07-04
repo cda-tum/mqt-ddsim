@@ -18,8 +18,6 @@ public:
    */
   static qc::Permutation createControlBasedPermutation(qc::QuantumComputation& qc);
 
-  static void sortPhysicalQubits(std::vector<Qubit>& physicalQubits, const std::map<Qubit, int>& qubitWeights);
-
   /**
    * @brief creates a vector of all possible permutations of the initialLayout
    * @param QuantumComputation

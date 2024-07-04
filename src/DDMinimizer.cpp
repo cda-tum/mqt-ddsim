@@ -26,7 +26,7 @@ static void optimizeInputPermutation(qc::QuantumComputation& qc){
     qc::CircuitOptimizer::elidePermutations(qc); 
 }
 
- qc::Permutation DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc){
+qc::Permutation DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc){
     
     std::map<Qubit, std::set<Qubit>> controlToTargets = createControlToTargetMap(qc);
     for (const auto& pair : controlToTargets) {
@@ -40,44 +40,39 @@ static void optimizeInputPermutation(qc::QuantumComputation& qc){
     std::size_t bits = qc.getNqubits();
     std::vector<Qubit> logicalQubits(bits);
     std::vector<Qubit> physicalQubits(bits);
-    for (std::size_t i = 0; i < bits; ++i) {
+    std::map<Qubit, int> qubitWeights;
+    for (Qubit i = 0; i < bits; ++i) {
           physicalQubits[i] = i;
           logicalQubits[i] = i;
-     }
-    qc::Permutation perm = qc.initialLayout;
-
-    //trying the approach of  control > target
-
-    //Adjust the permutation to ensure all controls are higher than their targets
-    std::map<Qubit, int> qubitWeights;
-    int currentWeight = 0;
-    for (const auto& pair : controlToTargets) {
-        // Ensure the control has a weight assigned
-        if (qubitWeights.find(pair.first) == qubitWeights.end()) {
-            qubitWeights[pair.first] = currentWeight++;
-        }
-        for (const auto& target : pair.second) {
-            // Assign or update the target's weight to be higher than the control's
-            qubitWeights[target] = std::max(qubitWeights[target], qubitWeights[pair.first] + 1);
-        }
+          qubitWeights.insert({i, 1});
     }
 
-    qc::DDMinimizer::sortPhysicalQubits(physicalQubits, qubitWeights);
+    //trying the approach of  control > target
+    int weight = 1;
+    for (const auto& pair : controlToTargets) {
+    weight = qubitWeights[pair.first];
+
+    for (const auto& target : pair.second) {
+        weight = std::max(qubitWeights[target], weight+1);
+    }
+    weight++;
+    qubitWeights[pair.first] = weight;
+    }
+
+    sort(physicalQubits.begin(), physicalQubits.end(), [&qubitWeights](const Qubit& a, const Qubit& b) {
+        auto weightA = qubitWeights.find(a) != qubitWeights.end() ? qubitWeights.at(a) : 0;
+        auto weightB = qubitWeights.find(b) != qubitWeights.end() ? qubitWeights.at(b) : 0;
+        return weightA < weightB;
+    });   
+    
+    qc::Permutation perm;
 
     for (std::size_t m = 0; m < bits; m++) {
                perm[logicalQubits[m]] = physicalQubits[m];
           }
     return perm;
-}
 
- void DDMinimizer::sortPhysicalQubits(std::vector<Qubit>& physicalQubits, const std::map<Qubit, int>& qubitWeights) {
-    std::sort(physicalQubits.begin(), physicalQubits.end(), [&qubitWeights](const Qubit& a, const Qubit& b) {
-        auto weightA = qubitWeights.find(a) != qubitWeights.end() ? qubitWeights.at(a) : 0;
-        auto weightB = qubitWeights.find(b) != qubitWeights.end() ? qubitWeights.at(b) : 0;
-        return weightA < weightB;
-    });
 }
-
 
 
  std::vector<qc::Permutation> DDMinimizer::createAllPermutations(qc::QuantumComputation& qc) {
@@ -139,8 +134,7 @@ std::string DDMinimizer::readFileIntoString(const std::string& filePath) {
 
     std::stringstream buffer;
     std::string line;
-    bool replaced = false;
-    while (std::getline(fileStream, line)) {
+        while (std::getline(fileStream, line)) {
         // Remove comments and trim the line if necessary
         std::size_t commentPos = line.find('//');
         if (commentPos != std::string::npos) {

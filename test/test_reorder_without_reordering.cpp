@@ -14,7 +14,7 @@ using namespace qc;
 using namespace std;
 
   TEST(ReorderWithoutReorderingTest, reorderByControls) {
-    for(int k = 3; k < 5; k++){
+    for(int k = 3; k < 7; k++){
        std::cout << "Start Simulation number " + std::to_string(k) + ".......................................................\n";
       //Read in the file into a string
       std::string qasmString;
@@ -51,6 +51,8 @@ using namespace std;
 
       std::chrono::duration<double> duration_qc;
       std::chrono::duration<double> duration_qcc;
+      std::size_t size_max_qc = 0;
+      std::size_t size_max_qcc = 0;
       std::size_t size_qc = 0;
       std::size_t size_qcc = 0;
 
@@ -58,13 +60,16 @@ using namespace std;
       ddsim_qc.simulate(1); 
       auto end_qc = std::chrono::high_resolution_clock::now();
       duration_qc = end_qc - start_qc;
-      size_qc = ddsim_qc.getMaxNodeCount(); 
+      size_max_qc = ddsim_qc.getMaxNodeCount(); 
+      size_qc = ddsim_qc.getActiveNodeCount();
 
       auto start_qcc = std::chrono::high_resolution_clock::now();
       ddsim_qcc.simulate(1); 
       auto end_qcc = std::chrono::high_resolution_clock::now();
       duration_qcc = end_qcc - start_qcc;
-      size_qcc = ddsim_qcc.getMaxNodeCount();
+      size_max_qcc = ddsim_qcc.getMaxNodeCount();
+      size_qcc = ddsim_qcc.getActiveNodeCount();
+
 
       std::string graphvizString_qc = ddsim_qc.exportDDtoGraphvizString(true, true, true, true, true);
       std::string graphvizString_qcc = ddsim_qcc.exportDDtoGraphvizString(true, true, true, true, true);
@@ -82,17 +87,20 @@ using namespace std;
       std::cout << "Permuted Duration: " << std::fixed << std::setprecision(6) << duration_qcc.count() << " seconds\n";
       std::cout << "Identity Size: " << size_qc << " qubits\n";
       std::cout << "Permuted Size: " << size_qcc << " qubits\n";
+      std::cout << "Identity max Size: " << size_max_qc << " qubits\n";
+      std::cout << "Permuted max Size: " << size_max_qcc << " qubits\n";
+      std::cout.flush();
   }
 
   }
 
   TEST(ReorderWithoutReorderingTest, measureAllPermutations) {
-  for(int k = 3; k < 5; k++){
-      std::cout << "Start Simulation number " + std::to_string(k) + ".......................................................\n";
+  for(int k = 3; k < 7; k++){
+       std::cout << "Start Simulation number " + std::to_string(k) + ".......................................................\n";
       //Read in the file into a string
       std::string qasmString;
       try {
-          std::string fn = "test/BenchmarkQuasm/qasm/ae_indep_qiskit_" + std::to_string(k) + ".qasm";
+          std::string fn = "BenchmarkQuasm/qasm/graphstate_indep_qiskit_" + std::to_string(k) + ".qasm";
           qasmString = DDMinimizer::readFileIntoString(fn);
           //std::cout << qasmString;
       } catch (const std::exception& e) {
@@ -248,7 +256,7 @@ using namespace std;
       const auto& perm = entry.second;
       size_t amount = perm.size();
       std::cout << "Size: " << size << " has " << amount << " permutations:\n";
-        for (const auto& permutation : perm) {
+        /*for (const auto& permutation : perm) {
             size_t index = permutation.first;
             auto time = permutation.second;
             std::cout << "Index: " << index << ": " << time.count() << ": ";
@@ -258,7 +266,7 @@ using namespace std;
               std::cout << entryy.first << " -> " << entryy.second << "|";
             }
             std::cout << "\n"; 
-        }
+        }*/
         std::cout << "\n";
       }
     
