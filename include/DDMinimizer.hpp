@@ -1,5 +1,7 @@
 #include "Definitions.hpp"
+#include "Permutation.hpp"
 #include "QuantumComputation.hpp"
+#include <chrono>
 
 namespace qc {
 class DDMinimizer {
@@ -34,6 +36,10 @@ public:
 
   static std::map<Qubit, std::set<Qubit>> createControlToTargetMap(qc::QuantumComputation& qc);
 
+  static std::string permToString(Permutation perm);
+
+  static std::string measurementToString(std::vector<bool> code, size_t index, size_t max_nodes, size_t active_nodes, std::chrono::duration<double> time);
+  static std::string formatSize_t(size_t t);
 
 
 }; // class DDMinimizer

@@ -14,6 +14,7 @@
 #include <string>
 #include <map>
 #include <set>
+#include <chrono>
 
 namespace qc {
 
@@ -184,5 +185,61 @@ std::map<Qubit, std::set<Qubit>> DDMinimizer::createControlToTargetMap(qc::Quant
     }
     return controlToTargets;
 }
+
+std::string DDMinimizer::permToString(Permutation perm){
+    std::ostringstream oss;
+    for (const auto& entry : perm) {
+        oss << entry.first << " -> " << entry.second << "|";
+    }
+    return oss.str();
+}
+
+/*
+@param code 1: active, 2: max, 3: time
+*/
+std::string DDMinimizer::measurementToString(std::vector<bool> code, size_t index, size_t max_nodes, size_t active_nodes, std::chrono::duration<double> time){
+    std::ostringstream oss;
+
+    if(index > 9){
+        oss << "Index: " << index <<" | ";
+    }
+    else{
+        oss << "Index: " << index <<"  | ";
+    }
+
+    if(code[0]){
+        if(max_nodes > 9){
+            oss << "Max_nodes: " << max_nodes << " | ";
+        }
+        else{
+            oss << "Max_nodes: " << max_nodes << "  | ";
+        }
+    }
+    if(code[1]){
+        if(active_nodes > 9){
+            oss << "Active_nodes: " << active_nodes << " | ";
+        }
+        else{
+            oss << "Active_nodes: " << active_nodes << "  | ";
+        }
+    }
+    if(code[2]){
+        oss << "Time: " << std::scientific << std::setprecision(4) << time.count() << "s | ";
+    }
+    return oss.str();
+}
+
+std::string DDMinimizer::formatSize_t(size_t t){
+    std::ostringstream oss;
+    if(t > 9){
+        oss << t;
+    }
+    else{
+        oss << t << " ";
+    }
+    return oss.str();
+}
+
+
 
 }// namespace qc
