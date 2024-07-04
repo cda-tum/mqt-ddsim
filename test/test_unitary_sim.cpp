@@ -1,3 +1,4 @@
+#include "QuantumComputation.hpp"
 #include "UnitarySimulator.hpp"
 
 #include <gtest/gtest.h>

@@ -3,6 +3,7 @@
 #include "Definitions.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
+#include "dd/Node.hpp"
 #include "dd/Operations.hpp"
 #include "dd/Package.hpp"
 #include "operations/ClassicControlledOperation.hpp"

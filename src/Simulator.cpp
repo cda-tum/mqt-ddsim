@@ -2,9 +2,11 @@
 
 #include "dd/ComplexNumbers.hpp"
 #include "dd/ComplexValue.hpp"
+#include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Edge.hpp"
 #include "dd/Export.hpp"
+#include "dd/Node.hpp"
 #include "dd/Package.hpp"
 #include "dd/RealNumber.hpp"
 
