@@ -189,7 +189,6 @@ ShorSimulator<Config>::postProcessing(const std::string& sample) const {
   }
 
   log << " = " << res << "\n";
-
   if (res == 0) {
     log << "Factorization failed (measured 0)!\n";
     return {0, 0};
@@ -199,11 +198,9 @@ ShorSimulator<Config>::postProcessing(const std::string& sample) const {
   const auto oldDenom = denom;
   const auto oldRes = res;
 
-  log << "Continued fraction expansion of " << res << "/" << denom << " = "
-      << std::flush;
-
+  log << "Continued fraction expansion of " << res << "/" << denom << " = ";
   while (res != 0) {
-    cf.push_back(denom / res);
+    cf.emplace_back(denom / res);
     const auto tmp = denom % res;
     denom = res;
     res = tmp;
@@ -213,12 +210,10 @@ ShorSimulator<Config>::postProcessing(const std::string& sample) const {
     log << i << " ";
   }
   log << "\n";
-
   for (std::uint32_t i = 0; i < cf.size(); i++) {
     // determine candidate
     std::uint64_t denominator = cf[i];
     std::uint64_t numerator = 1;
-
     for (std::int32_t j = static_cast<std::int32_t>(i) - 1; j >= 0; j--) {
       const auto tmp =
           numerator + cf[static_cast<std::size_t>(j)] * denominator;
@@ -227,7 +222,6 @@ ShorSimulator<Config>::postProcessing(const std::string& sample) const {
     }
 
     log << "  Candidate " << numerator << "/" << denominator << ": ";
-
     if (denominator > compositeN) {
       log << " denominator too large (greater than " << compositeN
           << ")!\nFactorization failed!\n";
@@ -255,7 +249,6 @@ ShorSimulator<Config>::postProcessing(const std::string& sample) const {
 
     log << "found period: " << denominator << " * " << fact << " = "
         << (denominator * fact) << "\n";
-
     if (((denominator * fact) & 1U) > 0) {
       log << "Factorization failed (period is odd)!\n";
       return {0, 0};
@@ -266,7 +259,6 @@ ShorSimulator<Config>::postProcessing(const std::string& sample) const {
     f1 = (f1 == 0) ? compositeN - 1 : f1 - 1;
     f1 = gcd(f1, compositeN);
     f2 = gcd(f2, compositeN);
-
     if (f1 == 1ULL || f2 == 1ULL) {
       log << "Factorization failed: found trivial factors " << f1 << " and "
           << f2 << "\n";

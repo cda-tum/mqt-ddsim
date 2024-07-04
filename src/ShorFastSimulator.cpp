@@ -145,7 +145,6 @@ ShorFastSimulator<Config>::postProcessing(const std::string& sample) const {
     log.rdbuf(std::clog.rdbuf());
   }
   std::uint64_t res = 0;
-
   log << "measurement: ";
   for (std::uint32_t i = 0; i < 2 * requiredBits; i++) {
     log << sample.at(2 * requiredBits - 1 - i);
@@ -155,7 +154,6 @@ ShorFastSimulator<Config>::postProcessing(const std::string& sample) const {
   }
 
   log << " = " << res << "\n";
-
   if (res == 0) {
     log << "Factorization failed (measured 0)!\n";
     return {0, 0};
@@ -164,12 +162,9 @@ ShorFastSimulator<Config>::postProcessing(const std::string& sample) const {
   auto denom = 1ULL << (2 * requiredBits);
   const auto oldDenom = denom;
   const auto oldRes = res;
-
-  log << "Continued fraction expansion of " << res << "/" << denom << " = "
-      << std::flush;
-
+  log << "Continued fraction expansion of " << res << "/" << denom << " = ";
   while (res != 0) {
-    cf.push_back(denom / res);
+    cf.emplace_back(denom / res);
     const auto tmp = denom % res;
     denom = res;
     res = tmp;
@@ -179,7 +174,6 @@ ShorFastSimulator<Config>::postProcessing(const std::string& sample) const {
     log << i << " ";
   }
   log << "\n";
-
   for (int i = 0; static_cast<std::size_t>(i) < cf.size(); i++) {
     // determine candidate
     std::uint64_t denominator = cf[static_cast<std::size_t>(i)];
@@ -193,7 +187,6 @@ ShorFastSimulator<Config>::postProcessing(const std::string& sample) const {
     }
 
     log << "  Candidate " << numerator << "/" << denominator << ": ";
-
     if (denominator > compositeN) {
       log << " denominator too large (greater than " << compositeN
           << ")!\nFactorization failed!\n";
@@ -221,7 +214,6 @@ ShorFastSimulator<Config>::postProcessing(const std::string& sample) const {
 
     log << "found period: " << denominator << " * " << fact << " = "
         << (denominator * fact) << "\n";
-
     if (((denominator * fact) & 1U) > 0) {
       log << "Factorization failed (period is odd)!\n";
       return {0, 0};
@@ -232,7 +224,6 @@ ShorFastSimulator<Config>::postProcessing(const std::string& sample) const {
     f1 = (f1 == 0) ? compositeN - 1 : f1 - 1;
     f1 = gcd(f1, compositeN);
     f2 = gcd(f2, compositeN);
-
     if (f1 == 1ULL || f2 == 1ULL) {
       log << "Factorization failed: found trivial factors " << f1 << " and "
           << f2 << "\n";
