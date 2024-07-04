@@ -20,9 +20,9 @@ if(BUILD_MQT_DDSIM_BINDINGS)
 endif()
 
 # cmake-format: off
-set(MQT_CORE_VERSION 2.5.1
+set(MQT_CORE_VERSION 2.5.2
     CACHE STRING "MQT Core version")
-set(MQT_CORE_REV "35e06ca3067ca3cf36bda1f0c38edf5bd7456fb6"
+set(MQT_CORE_REV "78a8d6bbecf10a2e09b994eb6705fd5d19415065"
     CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
 set(MQT_CORE_REPO_OWNER "cda-tum"
     CACHE STRING "MQT Core repository owner (change when using a fork)")
@@ -93,8 +93,6 @@ if(BUILD_MQT_DDSIM_CLI)
   set(THREADS_PREFER_PTHREAD_FLAG ON)
   find_package(Threads)
   link_libraries(Threads::Threads)
-
-  find_package(OpenCV QUIET)
 
   set(CXXOPTS_VERSION
       3.1.1
