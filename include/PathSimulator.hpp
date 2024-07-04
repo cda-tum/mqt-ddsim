@@ -16,6 +16,7 @@
 #include <nlohmann/json_fwd.hpp>
 #include <stdexcept>
 #include <string>
+#include <taskflow/core/async.hpp>
 #include <taskflow/core/executor.hpp>
 #include <taskflow/core/task.hpp>
 #include <taskflow/core/taskflow.hpp>
