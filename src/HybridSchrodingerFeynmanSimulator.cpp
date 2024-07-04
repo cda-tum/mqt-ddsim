@@ -150,7 +150,7 @@ bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(
         auto tmp = edge;
         edge = sliceDD->deleteEdge(
             edge, static_cast<dd::Qubit>(c.qubit),
-            control != (c.type == qc::Control::Type::Neg) ? 1 : 0);
+            control != (c.type == qc::Control::Type::Neg) ? 0 : 1);
         // TODO incref and decref could be integrated in delete edge
         sliceDD->incRef(edge);
         sliceDD->decRef(tmp);
