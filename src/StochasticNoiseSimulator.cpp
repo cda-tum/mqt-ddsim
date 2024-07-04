@@ -1,9 +1,26 @@
 #include "StochasticNoiseSimulator.hpp"
 
+#include "Definitions.hpp"
+#include "dd/DDDefinitions.hpp"
+#include "dd/DDpackageConfig.hpp"
 #include "dd/Operations.hpp"
+#include "dd/Package.hpp"
+#include "operations/ClassicControlledOperation.hpp"
+#include "operations/NonUnitaryOperation.hpp"
+#include "operations/OpType.hpp"
 
-#include <queue>
+#include <cassert>
+#include <chrono>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <map>
+#include <memory>
 #include <stdexcept>
+#include <string>
+#include <thread>
+#include <vector>
 
 std::map<std::string, std::size_t>
 StochasticNoiseSimulator::simulate(const size_t nshots) {

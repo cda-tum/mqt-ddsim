@@ -1,18 +1,22 @@
 #include "CircuitSimulator.hpp"
 
+#include "Simulator.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/FunctionalityConstruction.hpp"
 #include "dd/Node.hpp"
 #include "dd/Operations.hpp"
 #include "operations/ClassicControlledOperation.hpp"
+#include "operations/NonUnitaryOperation.hpp"
 #include "operations/OpType.hpp"
 
 #include <cassert>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 template <class Config>

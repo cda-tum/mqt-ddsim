@@ -1,13 +1,29 @@
 #include "Simulator.hpp"
 
+#include "dd/ComplexNumbers.hpp"
+#include "dd/ComplexValue.hpp"
+#include "dd/DDpackageConfig.hpp"
+#include "dd/Edge.hpp"
 #include "dd/Export.hpp"
+#include "dd/Package.hpp"
+#include "dd/RealNumber.hpp"
 
+#include <array>
 #include <cassert>
 #include <cmath>
+#include <complex>
+#include <cstddef>
+#include <fstream>
 #include <iostream>
+#include <map>
+#include <memory>
 #include <queue>
+#include <random>
 #include <set>
+#include <sstream>
 #include <stdexcept>
+#include <string>
+#include <utility>
 #include <vector>
 
 using CN = dd::ComplexNumbers;
@@ -182,10 +198,8 @@ double Simulator<Config>::approximateByFidelity(
     const auto sizeAfter = newEdge.size();
     std::cout << getName() << "," << +getNumberOfQubits()
               << "," // unary plus for int promotion
-              << sizeBefore << ","
-              << "fixed_fidelity"
-              << "," << allLevels << "," << targetFidelity << "," << sizeAfter
-              << ","
+              << sizeBefore << "," << "fixed_fidelity" << "," << allLevels
+              << "," << targetFidelity << "," << sizeAfter << ","
               << static_cast<double>(sizeAfter) /
                      static_cast<double>(sizeBefore)
               << "," << fidelity << "\n";
@@ -271,9 +285,8 @@ double Simulator<Config>::approximateBySampling(
     const auto sizeBefore = edge.size();
     std::cout << getName() << "," << +getNumberOfQubits()
               << "," // unary plus for int promotion
-              << sizeBefore << ","
-              << "sampling"
-              << "," << nSamples << "," << threshold << "," << sizeAfter << ","
+              << sizeBefore << "," << "sampling" << "," << nSamples << ","
+              << threshold << "," << sizeAfter << ","
               << static_cast<double>(sizeAfter) /
                      static_cast<double>(sizeBefore)
               << "," << fidelity << "\n";

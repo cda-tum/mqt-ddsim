@@ -1,5 +1,6 @@
 #include "ShorFastSimulator.hpp"
 
+#include <cstdint>
 #include <gtest/gtest.h>
 
 /**

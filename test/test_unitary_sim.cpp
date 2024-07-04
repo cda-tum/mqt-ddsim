@@ -1,7 +1,10 @@
 #include "UnitarySimulator.hpp"
 
 #include <gtest/gtest.h>
+#include <iostream>
 #include <memory>
+#include <stdexcept>
+#include <utility>
 
 using namespace qc::literals;
 

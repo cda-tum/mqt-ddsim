@@ -33,9 +33,11 @@ TEST(TaskBasedSimTest, Configuration) {
   EXPECT_EQ(PathSimulator<>::Configuration::modeToString(
                 PathSimulator<>::Configuration::Mode::GateCost),
             "gate_cost");
-  EXPECT_THROW(PathSimulator<>::Configuration::modeToString(
-                   PathSimulator<>::Configuration::Mode(32)),
-               std::invalid_argument);
+  EXPECT_THROW(
+      PathSimulator<>::Configuration::modeToString(
+          // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
+          PathSimulator<>::Configuration::Mode(32)),
+      std::invalid_argument);
 
   EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("sequential"),
             PathSimulator<>::Configuration::Mode::Sequential);

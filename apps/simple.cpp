@@ -14,6 +14,7 @@
 #include "nlohmann/json.hpp"
 
 #include <chrono>
+#include <complex>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
