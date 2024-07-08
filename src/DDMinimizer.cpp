@@ -33,9 +33,11 @@ namespace qc {
  ***/
 
 void optimizeInputPermutation(qc::QuantumComputation qc){
+    /*TODO
     qc::Permutation perm = DDMinimizer::createControlBasedPermutation(qc);
     qc.initialLayout = perm;
     qc::CircuitOptimizer::elidePermutations(qc); 
+    */
 }
 
 void DDMinimizer::parseOptions(bool gateBased,  bool controlBased, bool allPermutations, std::string file, int qubits){
@@ -44,24 +46,24 @@ void DDMinimizer::parseOptions(bool gateBased,  bool controlBased, bool allPermu
     {"dj_indep_qiskit_", {2, 7}},
     {"ghz_indep_qiskit_", {2, 10}},
     {"graphstate_indep_qiskit_", {3, 7}},
-    //{"grover-noancilla_indep_qiskit_", {2, 7}},
-    //{"grover-v-chain_indep_qiskit_", {2, 7}},
-    //{"portfolioqaoa_indep_qiskit_", {3, 7}},
+    {"grover-noancilla_indep_qiskit_", {2, 7}},
+    {"grover-v-chain_indep_qiskit_", {2, 7}},
+    {"portfolioqaoa_indep_qiskit_", {3, 7}},
     {"portfoliovqe_indep_qiskit_", {3, 7}},
     {"qaoa_indep_qiskit_", {3, 10}},
-    //{"qftentangled_indep_qiskit_", {2, 7}},
-    //{"qft_indep_qiskit_", {2, 10}},
+    {"qftentangled_indep_qiskit_", {2, 7}},
+    {"qft_indep_qiskit_", {2, 10}},
     {"qnn_indep_qiskit_", {2, 7}},
-    //{"qpeexact_indep_qiskit_", {2, 10}},
-    //{"qpeinexact_indep_qiskit_", {2, 7}},
-    //{"qwalk-noancilla_indep_qiskit_", {3, 7}},
+    {"qpeexact_indep_qiskit_", {2, 10}},
+    {"qpeinexact_indep_qiskit_", {2, 7}},
+    {"qwalk-noancilla_indep_qiskit_", {3, 7}},
     {"qwalk-v-chain_indep_qiskit_", {3, 7}},
-    //{"random_indep_qiskit_", {2, 7}},
+    {"random_indep_qiskit_", {2, 7}},
     {"realamprandom_indep_qiskit_", {2, 7}},
     {"su2random_indep_qiskit_", {2, 7}},
     {"twolocalrandom_indep_qiskit_", {2, 7}},
     {"vqe_indep_qiskit_", {3, 10}},
-    //{"wstate_indep_qiskit_", {2, 7}}
+    {"wstate_indep_qiskit_", {2, 7}}
     };
 
     if(file.compare(" ") != 0){
@@ -92,51 +94,98 @@ void DDMinimizer::parseOptions(bool gateBased,  bool controlBased, bool allPermu
 
 void DDMinimizer::runInputCompariston(int from, int to, bool gateBased,  bool controlBased, bool allPermutations, std::string file){
     std::string qasmString;
-    std::string fname;
+ 
     if(gateBased){
-        fname = "BenchmarkQuasm/results/" + file+ "_gates.txt";
-    }
-    if(controlBased){ 
-        fname = "BenchmarkQuasm/results/" + file+ "_controls.txt";
-    }
-    if(allPermutations){
-            fname = "BenchmarkQuasm/results/" + file+ "_all.txt";
-    }
-    std::ofstream out(fname);
-    for(int k = from; k <= to; k++){
-        try {
-            std::string fn = "BenchmarkQuasm/qasm/" + file + std::to_string(k) + ".qasm";
-            qasmString = DDMinimizer::readFileIntoString(fn);
-        } catch (const std::exception& e) {
-            std::cout << e.what() << "\n";
-        }
-        out << "Start Simulation of " + file + std::to_string(k) + "__________________________________________________\n";            
-        auto qc = QuantumComputation::fromQASM(qasmString);
-        out << qc;
+        std::string fname_gate = "BenchmarkQuasm/results/" + file+ "gates.txt";
+        std::cout << "Start measuring of gate based permutations for " + fname_gate + "\n"; 
+        std::cout.flush();
+        std::ofstream out_gate(fname_gate);
+        for(int k = from; k <= to; k++){
+            if(file.compare("random_indep_qiskit_") == 0 && k == 6){
+                continue;
+            }
+            try {
+                std::string fn = "BenchmarkQuasm/qasm/" + file + std::to_string(k) + ".qasm";
+                qasmString = DDMinimizer::readFileIntoString(fn);
+            } catch (const std::exception& e) {
+                std::cout << e.what() << "\n";
+            }
 
-        if(gateBased){
-            qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
-            DDMinimizer::runLayoutComparison(out, qc, perm, file, k);
+            out_gate << "Start Simulation of " + file + std::to_string(k) + "__________________________________________________\n";            
+            auto qc = QuantumComputation::fromQASM(qasmString);
+            auto qcc = QuantumComputation::fromQASM(qasmString);
+            out_gate << qc;
+            qc::Permutation perm = DDMinimizer::createGateBasedPermutation(out_gate, qc);
+            qcc.initialLayout = perm; 
+            qc::CircuitOptimizer::elidePermutations(qcc);
+            DDMinimizer::runLayoutComparison(out_gate, qc, qcc, perm, file, k);
+        } 
+        out_gate.close();
+        DDMinimizer::removeAnsi(fname_gate);
+    }
+
+
+    if(controlBased){ 
+        std::string fname_control = "BenchmarkQuasm/results/" + file+ "controls.txt";
+        std::cout << "Start measuring of cotrol based permutations for " + fname_control + "\n"; 
+        std::cout.flush();
+        std::ofstream out_control(fname_control);
+        for(int k = from; k <= to; k++){
+             if(file.compare("random_indep_qiskit_") == 0 && k == 6){
+                continue;
+            }
+            try {
+                std::string fn = "BenchmarkQuasm/qasm/" + file + std::to_string(k) + ".qasm";
+                qasmString = DDMinimizer::readFileIntoString(fn);
+                std::cout << "Version: " + std::to_string(k) + ", file: " + fn + "\n";
+            } catch (const std::exception& e) {
+                std::cout << e.what() << "\n";
+            }
+            out_control << "Start Simulation of " + file + std::to_string(k) + "__________________________________________________\n";            
+            auto qc = QuantumComputation::fromQASM(qasmString);
+            auto qcc = QuantumComputation::fromQASM(qasmString);
+            out_control << qc;
+            qc::Permutation perm = DDMinimizer::createControlBasedPermutation(out_control, qc);
+            qcc.initialLayout = perm; 
+            qc::CircuitOptimizer::elidePermutations(qcc);
+            DDMinimizer::runLayoutComparison(out_control, qc, qcc, perm, file, k);
         }
-        if(controlBased){
-            qc::Permutation perm = DDMinimizer::createControlBasedPermutation(qc);
-            DDMinimizer::runLayoutComparison(out, qc, perm, file, k);
-        }
-        if(allPermutations){
-            DDMinimizer::runAllComparisons(out, qc, file, k);
-        }
+         out_control.close();
+        DDMinimizer::removeAnsi(fname_control);
     } 
-    out.close();
+    
+    if(allPermutations){
+        std::string fname_all = "BenchmarkQuasm/results/" + file+ "all.txt";
+        std::cout << "Start measuring all permutations for " + fname_all + "\n";
+        std::cout.flush();
+        std::ofstream out_all(fname_all);
+        for(int k = from; k <= to && k <= 6; k++){
+            if(file.compare("random_indep_qiskit_") == 0 && k == 6){
+                continue;
+            }
+            try {
+                std::string fn = "BenchmarkQuasm/qasm/" + file + std::to_string(k) + ".qasm";
+                qasmString = DDMinimizer::readFileIntoString(fn);
+            } catch (const std::exception& e) {
+                std::cout << e.what() << "\n";
+            }
+            out_all << "Start Simulation of " + file + std::to_string(k) + "__________________________________________________\n";            
+            auto qc = QuantumComputation::fromQASM(qasmString);
+            out_all << qc;
+            DDMinimizer::runAllComparisons(out_all, qc, file, k);
+        }
+        out_all.close();
+        DDMinimizer::removeAnsi(fname_all);
+    } 
 }
 
-void DDMinimizer::runLayoutComparison(std::ofstream& out, qc::QuantumComputation& qc, qc::Permutation perm, std::string file,  int qubits){
-    QuantumComputation qcc = qc;
-    qcc.initialLayout = perm; 
-    qc::CircuitOptimizer::elidePermutations(qcc);
+void DDMinimizer::runLayoutComparison(std::ofstream& out, qc::QuantumComputation& qc, qc::QuantumComputation& qcc, qc::Permutation perm, std::string file,  int qubits){
+    out << left << setfill(' ') << setw(30) << "Computed Permutation: " << right << setfill('.') << setw(30) <<DDMinimizer::permToString(perm) << "\n";
+    out << left << setfill(' ') << setw(30) << "Original Permutation: " << right << setfill('.') << setw(30) <<DDMinimizer::permToString(qc.initialLayout) << "\n";
 
     auto qcc_unique_ptr = std::make_unique<qc::QuantumComputation>(std::move(qcc));        
     CircuitSimulator ddsim_qcc(std::move(qcc_unique_ptr), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
-    auto qc_unique_ptr = std::make_unique<qc::QuantumComputation>(std::move(qcc));        
+    auto qc_unique_ptr = std::make_unique<qc::QuantumComputation>(std::move(qc));        
     CircuitSimulator ddsim_qc(std::move(qc_unique_ptr), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
     
 
@@ -145,22 +194,58 @@ void DDMinimizer::runLayoutComparison(std::ofstream& out, qc::QuantumComputation
     std::size_t size_max_qc = 0;
     std::size_t size_max_qcc = 0;
     std::size_t size_qc = 0;
-    std::size_t size_qcc = 0;
-
-    auto start_qc = std::chrono::high_resolution_clock::now();
+    std::size_t size_qcc = 0;  
+    
+    auto start1_qc = std::chrono::high_resolution_clock::now();
     ddsim_qc.simulate(1); 
-    auto end_qc = std::chrono::high_resolution_clock::now();
-    duration_qc = end_qc - start_qc;
+    auto end1_qc = std::chrono::high_resolution_clock::now();
+    
+    auto start1_qcc = std::chrono::high_resolution_clock::now();
+    ddsim_qcc.simulate(1); 
+    auto end1_qcc = std::chrono::high_resolution_clock::now();
+    auto start2_qcc = std::chrono::high_resolution_clock::now();
+    ddsim_qcc.simulate(1); 
+    auto end2_qcc = std::chrono::high_resolution_clock::now();
+
+    auto start2_qc = std::chrono::high_resolution_clock::now();
+    ddsim_qc.simulate(1); 
+    auto end2_qc = std::chrono::high_resolution_clock::now();
+    auto start3_qc = std::chrono::high_resolution_clock::now();
+    ddsim_qc.simulate(1); 
+    auto end3_qc = std::chrono::high_resolution_clock::now();
+    
+    auto start3_qcc = std::chrono::high_resolution_clock::now();
+    ddsim_qcc.simulate(1); 
+    auto end3_qcc = std::chrono::high_resolution_clock::now();
+    auto start4_qcc = std::chrono::high_resolution_clock::now();
+    ddsim_qcc.simulate(1); 
+    auto end4_qcc = std::chrono::high_resolution_clock::now();
+
+    auto start4_qc = std::chrono::high_resolution_clock::now();
+    ddsim_qc.simulate(1); 
+    auto end4_qc = std::chrono::high_resolution_clock::now();
+    auto start5_qc = std::chrono::high_resolution_clock::now();
+    ddsim_qc.simulate(1); 
+    auto end5_qc = std::chrono::high_resolution_clock::now();
+
+    auto start5_qcc = std::chrono::high_resolution_clock::now();
+    ddsim_qcc.simulate(1); 
+    auto end5_qcc = std::chrono::high_resolution_clock::now();
+    auto start6_qcc = std::chrono::high_resolution_clock::now();
+    ddsim_qcc.simulate(1); 
+    auto end6_qcc = std::chrono::high_resolution_clock::now();
+    
+    auto start6_qc = std::chrono::high_resolution_clock::now();
+    ddsim_qc.simulate(1); 
+    auto end6_qc = std::chrono::high_resolution_clock::now();
+
+    duration_qc = (end3_qc - start3_qc + end4_qc - start4_qc + end5_qc - start5_qc + end6_qc - start6_qc) / 4.0;
     size_max_qc = ddsim_qc.getMaxNodeCount(); 
     size_qc = ddsim_qc.getActiveNodeCount();
 
-    auto start_qcc = std::chrono::high_resolution_clock::now();
-    ddsim_qcc.simulate(1); 
-    auto end_qcc = std::chrono::high_resolution_clock::now();
-    duration_qcc = end_qcc - start_qcc;
+    duration_qcc = (end3_qcc - start3_qcc + end4_qcc - start4_qcc + end5_qcc - start5_qcc + end6_qcc - start6_qcc) / 4.0;
     size_max_qcc = ddsim_qcc.getMaxNodeCount();
     size_qcc = ddsim_qcc.getActiveNodeCount();
-
 
     std::string graphvizString_qc = ddsim_qc.exportDDtoGraphvizString(true, true, true, true, true);
     std::string graphvizString_qcc = ddsim_qcc.exportDDtoGraphvizString(true, true, true, true, true);
@@ -174,8 +259,6 @@ void DDMinimizer::runLayoutComparison(std::ofstream& out, qc::QuantumComputation
     out_qcc << graphvizString_qcc;
     out_qcc.close();
 
-    out << left << setfill(' ') << setw(30) << "Computed Permutation: " << right << setfill('.') << setw(30) <<DDMinimizer::permToString(perm) << "\n";
-    out << left << setfill(' ') << setw(30) << "Original Permutation: " << right << setfill('.') << setw(30) <<DDMinimizer::permToString(qc.initialLayout) << "\n";
     out << std::left << std::setfill(' ') << std::setw(30) << "Identity Duration: " << std::scientific << std::setprecision(4) << duration_qc.count() << "s" << std::right << std::setfill('.') << std::setw(30) << "\n";
     out << std::left << std::setfill(' ') << std::setw(30) << "Permuted Duration: " << std::scientific << std::setprecision(4) << duration_qcc.count() << "s" << std::right << std::setfill('.') << std::setw(30) << "\n";
     out << std::left << std::setfill(' ') << std::setw(30) << "Identity active_nodes: " << DDMinimizer::formatSize_t(size_qc)  << std::right << std::setfill('.') << std::setw(39) << "\n";
@@ -242,13 +325,28 @@ void DDMinimizer::runAllComparisons(std::ofstream& out, qc::QuantumComputation& 
     CircuitSimulator ddsim(std::move(qc_unique_ptr), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
 
     //Save the time before and after the simulation and run the simulation once
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start1_qc = std::chrono::high_resolution_clock::now();
     ddsim.simulate(1); 
-    auto end = std::chrono::high_resolution_clock::now();
+    auto end1_qc = std::chrono::high_resolution_clock::now();
+    auto start2_qc = std::chrono::high_resolution_clock::now();
+    ddsim.simulate(1); 
+    auto end2_qc = std::chrono::high_resolution_clock::now();
+    auto start3_qc = std::chrono::high_resolution_clock::now();
+    ddsim.simulate(1); 
+    auto end3_qc = std::chrono::high_resolution_clock::now();
+    auto start4_qc = std::chrono::high_resolution_clock::now();
+    ddsim.simulate(1); 
+    auto end4_qc = std::chrono::high_resolution_clock::now();
+    auto start5_qc = std::chrono::high_resolution_clock::now();
+    ddsim.simulate(1); 
+    auto end5_qc = std::chrono::high_resolution_clock::now();
+    auto start6_qc = std::chrono::high_resolution_clock::now();
+    ddsim.simulate(1); 
+    auto end6_qc = std::chrono::high_resolution_clock::now();
 
     //collect measruements as in execution time, active nodes, max nodes
     //set min and max values and save positions
-    duration = end - start;
+    duration = (end3_qc - start3_qc + end4_qc - start4_qc + end5_qc - start5_qc  + end6_qc - start6_qc) / 4.0;
     if (duration < min_time) {
         min_time = duration;
         min_time_pos = i;
@@ -347,6 +445,7 @@ void DDMinimizer::runAllComparisons(std::ofstream& out, qc::QuantumComputation& 
     size_t max_nodes = 0;
     size_t active_nodes = 0;
     std::chrono::duration<double> time;
+    std::chrono::duration<double> sum_time(0);
 
     for (const auto& entry : perm_by_active_nodes) {
     //save the vecotr of all permutation indices (also simulation time and max_nodes) with the same active_nodes count 
@@ -357,10 +456,13 @@ void DDMinimizer::runAllComparisons(std::ofstream& out, qc::QuantumComputation& 
         index =  std::get<0>(permutation);
         max_nodes=  std::get<1>(permutation);
         time =  std::get<2>(permutation);
+        sum_time += time;
         out << DDMinimizer::measurementToString({true,false,true}, index, max_nodes, active_nodes, time);
         out << DDMinimizer::permToString(permutations[index]) <<"\n";
-    }
-    out << "\n";
+        }
+    out << "\n...........................\n";
+    out << "Average time: " << std::scientific << std::setprecision(4) << (sum_time / vec.size()).count() << "s\n\n";
+    sum_time = std::chrono::duration<double>(0);
     }
     out << "________________________________________________________________________________________________\n\n";
     for (const auto& entry : perm_by_max_nodes) {
@@ -372,10 +474,13 @@ void DDMinimizer::runAllComparisons(std::ofstream& out, qc::QuantumComputation& 
             index = std::get<0>(permutation);
             active_nodes = std::get<1>(permutation);
             time = std::get<2>(permutation);
+            sum_time += time;
             out << DDMinimizer::measurementToString({false,true,true}, index, max_nodes, active_nodes, time );;
             out << DDMinimizer::permToString(permutations[index]) <<"\n";
         }
-        out << "\n";
+        out << "\n...........................\n";
+        out << "Average time: " << std::scientific << std::setprecision(4) << (sum_time / vec.size()).count() << "s\n\n";
+        sum_time = std::chrono::duration<double>(0);
     }
     out << "________________________________________________________________________________________________\n\n";
     for (const auto& entry : perm_by_time) {
@@ -396,12 +501,12 @@ void DDMinimizer::runAllComparisons(std::ofstream& out, qc::QuantumComputation& 
     out << "________________________________________________________________________________________________\n\n";
 }
 
-qc::Permutation DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc){
+qc::Permutation DDMinimizer::createGateBasedPermutation(std::ofstream& out, qc::QuantumComputation& qc){
     return qc.initialLayout;
 }
 
 
-qc::Permutation DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc){
+qc::Permutation DDMinimizer::createControlBasedPermutation(std::ofstream& out, qc::QuantumComputation& qc){
     std::map<Qubit, std::set<Qubit>> controlToTargets;
 
     for (const auto& op : qc.ops) {
@@ -447,7 +552,12 @@ qc::Permutation DDMinimizer::createControlBasedPermutation(qc::QuantumComputatio
         auto weightA = qubitWeights.find(a) != qubitWeights.end() ? qubitWeights.at(a) : 0;
         auto weightB = qubitWeights.find(b) != qubitWeights.end() ? qubitWeights.at(b) : 0;
         return weightA < weightB;
-    });   
+    });
+
+    for(int i = 0; i < bits; i++){
+        out << "Q: " << i << " w: " << qubitWeights[i] << " | ";
+    }
+    out << "\n";   
     
     qc::Permutation perm;
 
@@ -515,18 +625,7 @@ std::string DDMinimizer::readFileIntoString(const std::string& filePath) {
     std::stringstream buffer;
     std::string line;
         while (std::getline(fileStream, line)) {
-        // Remove comments and trim the line if necessary
-        std::size_t commentPos = line.find('//');
-        if (commentPos != std::string::npos) {
-            line = line.substr(0, commentPos);
-        }
-        // Remove leading and trailing whitespace
-        line.erase(0, line.find_first_not_of(" \t\n\r\f\v"));
-        line.erase(line.find_last_not_of(" \t\n\r\f\v") + 1);
-
-        if (!line.empty()) {
             buffer << line << '\n';
-        }
     }
     return buffer.str();
 }
@@ -544,29 +643,13 @@ std::string DDMinimizer::permToString(Permutation perm){
 */
 std::string DDMinimizer::measurementToString(std::vector<bool> code, size_t index, size_t max_nodes, size_t active_nodes, std::chrono::duration<double> time){
     std::ostringstream oss;
-
-    if(index > 9){
-        oss << "Index: " << index <<" | ";
-    }
-    else{
-        oss << "Index: " << index <<"  | ";
-    }
+    oss << "Index: " << DDMinimizer::formatSize_t(index) <<" | ";
 
     if(code[0]){
-        if(max_nodes > 9){
-            oss << "Max_nodes: " << max_nodes << " | ";
-        }
-        else{
-            oss << "Max_nodes: " << max_nodes << "  | ";
-        }
+        oss << "Max_nodes: " << DDMinimizer::formatSize_t(max_nodes) << " | ";
     }
     if(code[1]){
-        if(active_nodes > 9){
-            oss << "Active_nodes: " << active_nodes << " | ";
-        }
-        else{
-            oss << "Active_nodes: " << active_nodes << "  | ";
-        }
+        oss << "Active_nodes: " << DDMinimizer::formatSize_t(active_nodes) << " | ";
     }
     if(code[2]){
         oss << "Time: " << std::scientific << std::setprecision(4) << time.count() << "s | ";
@@ -576,13 +659,45 @@ std::string DDMinimizer::measurementToString(std::vector<bool> code, size_t inde
 
 std::string DDMinimizer::formatSize_t(size_t t){
     std::ostringstream oss;
-    if(t > 9){
+    if(t > 99){
         oss << t;
     }
-    else{
+    else if(t > 9){
         oss << t << " ";
     }
+    else{
+        oss << t << "  ";
+    }
     return oss.str();
+}
+
+void DDMinimizer::removeAnsi(std::string filePath){
+    // Open input file in read mode
+    std::ifstream inputFile(filePath);
+    if (!inputFile.is_open()) {
+        std::cout << "Failed to open file: " << filePath << std::endl;
+        return;
+    }
+
+    // Read the contents of the file into a string using stringstream
+    std::stringstream buffer;
+    buffer << inputFile.rdbuf();
+    inputFile.close();
+
+    const std::regex ansi_escape(R"(\x1B\[[0-?]*[ -/]*[@-~])");
+    // Remove ANSI escape codes
+    std::string cleanedContents = std::regex_replace(buffer.str(), ansi_escape, "");
+
+    // Open the same file in write mode to overwrite it
+    std::ofstream outputFile(filePath);
+    if (!outputFile.is_open()) {
+        std::cout << "Failed to open file for writing: " << filePath << std::endl;
+        return;
+    }
+
+    // Write the cleaned contents back to the file
+    outputFile << cleanedContents;
+    outputFile.close();
 }
 
 

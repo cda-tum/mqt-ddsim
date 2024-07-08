@@ -1,0 +1,362 @@
+Simplest way to reproduce:
+
+-uncomment the line 
+    45: {"ae_indep_qiskit_", {2, 7}}, 
+in the  parseOptions function or remove the if statement in line 134 in the runInputCompariston function:
+
+    if(file.compare("random_indep_qiskit_") == 0 && k == 6){
+                continue;
+            }
+-for testing a version of the ae_indep_qiskit_, replace "from" witht the version number in the for loop in line 133 in the runInputCompariston function.
+
+-run the test ReorderWithoutReorderingTest, reorderAllByControls with 
+ctest -C Release --test-dir build --tests-regex "reorderAllByControl" --verbose --output-on-failure
+
+(don`t worry about the error like "could not open file: BenchmarkQuasm/qasm/grover-v-chain_indep_qiskit_6.qasm", those files don`t exist.)
+
+
+the files can be found in /home/mqt-ddsim/test/BenchmarkQuasm/qasm/ae_indep_qiskit_2.qasm:
+
+ae_indep_qiskit_2.qasm: 
+
+// Benchmark was created by MQT Bench on 2024-03-17
+// For more information about MQT Bench, please visit https://www.cda.cit.tum.de/mqtbench/
+// MQT Bench version: 1.1.0
+// Qiskit version: 1.0.2
+
+OPENQASM 2.0;
+include "qelib1.inc";
+qreg eval[1];
+qreg q[1];
+creg meas[2];
+u2(0,-pi) eval[0];
+u3(0.9272952180016122,0,0) q[0];
+cx eval[0],q[0];
+u(-0.9272952180016122,0,0) q[0]; //line 14
+cx eval[0],q[0];
+h eval[0];
+u(0.9272952180016122,0,0) q[0];
+barrier eval[0],q[0];
+measure eval[0] -> meas[0];
+measure q[0] -> meas[1];
+
+Error: 
+<input>:14:1:
+Usage of unknown gate 'u'.
+unknown file: Failure
+C++ exception with description "<input>:14:1:
+Usage of unknown gate 'u'." thrown in the test body.
+
+ae_indep_qiskit_3.qasm: 
+// Benchmark was created by MQT Bench on 2024-03-17
+// For more information about MQT Bench, please visit https://www.cda.cit.tum.de/mqtbench/
+// MQT Bench version: 1.1.0
+// Qiskit version: 1.0.2
+
+OPENQASM 2.0;
+include "qelib1.inc";
+qreg eval[2];
+qreg q[1];
+creg meas[3];
+u2(0,-pi) eval[0];
+u2(0,-pi) eval[1];
+u3(0.9272952180016122,0,0) q[0];
+cx eval[0],q[0];
+u(-0.9272952180016122,0,0) q[0]; //line 15
+cx eval[0],q[0];
+u3(0.9272952180016122,0,0) q[0];
+cx eval[1],q[0];
+u(-1.8545904360032244,0,0) q[0];
+cx eval[1],q[0];
+h eval[1];
+cp(-pi/2) eval[0],eval[1];
+h eval[0];
+u(1.8545904360032244,0,0) q[0];
+barrier eval[0],eval[1],q[0];
+measure eval[0] -> meas[0];
+measure eval[1] -> meas[1];
+measure q[0] -> meas[2];
+
+Error:
+<input>:15:1:
+Usage of unknown gate 'u'.
+unknown file: Failure
+C++ exception with description "<input>:15:1:
+Usage of unknown gate 'u'." thrown in the test body.
+
+// Benchmark was created by MQT Bench on 2024-03-17
+// For more information about MQT Bench, please visit https://www.cda.cit.tum.de/mqtbench/
+// MQT Bench version: 1.1.0
+// Qiskit version: 1.0.2
+
+ae_indep_qiskit_4.qasm:
+
+OPENQASM 2.0;
+include "qelib1.inc";
+qreg eval[3];
+qreg q[1];
+creg meas[4];
+u2(0,-pi) eval[0];
+u2(0,-pi) eval[1];
+u2(0,-pi) eval[2];
+u3(0.9272952180016122,0,0) q[0];
+cx eval[0],q[0];
+u(-0.9272952180016122,0,0) q[0]; //line 16
+cx eval[0],q[0];
+u3(0.9272952180016122,0,0) q[0];
+cx eval[1],q[0];
+u(-1.8545904360032244,0,0) q[0];
+cx eval[1],q[0];
+u3(1.8545904360032244,0,0) q[0];
+cx eval[2],q[0];
+u(-3.7091808720064487,0,0) q[0];
+cx eval[2],q[0];
+h eval[2];
+cp(-pi/2) eval[1],eval[2];
+cp(-pi/4) eval[0],eval[2];
+h eval[1];
+cp(-pi/2) eval[0],eval[1];
+h eval[0];
+u(3.7091808720064487,0,0) q[0];
+barrier eval[0],eval[1],eval[2],q[0];
+measure eval[0] -> meas[0];
+measure eval[1] -> meas[1];
+measure eval[2] -> meas[2];
+measure q[0] -> meas[3];
+
+Error: 
+<input>:16:1:
+Usage of unknown gate 'u'.
+unknown file: Failure
+C++ exception with description "<input>:16:1:
+Usage of unknown gate 'u'." thrown in the test body.
+
+ae_indep_qiskit_5.qasm:
+
+// Benchmark was created by MQT Bench on 2024-03-17
+// For more information about MQT Bench, please visit https://www.cda.cit.tum.de/mqtbench/
+// MQT Bench version: 1.1.0
+// Qiskit version: 1.0.2
+
+OPENQASM 2.0;
+include "qelib1.inc";
+qreg eval[4];
+qreg q[1];
+creg meas[5];
+u2(0,-pi) eval[0];
+u2(0,-pi) eval[1];
+u2(0,-pi) eval[2];
+u2(0,-pi) eval[3];
+u3(0.9272952180016122,0,0) q[0];
+cx eval[0],q[0];
+u(-0.9272952180016122,0,0) q[0]; //line 17
+cx eval[0],q[0];
+u3(0.9272952180016122,0,0) q[0];
+cx eval[1],q[0];
+u(-1.8545904360032244,0,0) q[0];
+cx eval[1],q[0];
+u3(1.8545904360032244,0,0) q[0];
+cx eval[2],q[0];
+u(-3.7091808720064487,0,0) q[0];
+cx eval[2],q[0];
+u3(2.574004435173138,-pi,-pi) q[0];
+cx eval[3],q[0];
+u(-7.4183617440128975,0,0) q[0];
+cx eval[3],q[0];
+h eval[3];
+cp(-pi/2) eval[2],eval[3];
+cp(-pi/4) eval[1],eval[3];
+cp(-pi/8) eval[0],eval[3];
+h eval[2];
+cp(-pi/2) eval[1],eval[2];
+cp(-pi/4) eval[0],eval[2];
+h eval[1];
+cp(-pi/2) eval[0],eval[1];
+h eval[0];
+u(7.4183617440128975,0,0) q[0];
+barrier eval[0],eval[1],eval[2],eval[3],q[0];
+measure eval[0] -> meas[0];
+measure eval[1] -> meas[1];
+measure eval[2] -> meas[2];
+measure eval[3] -> meas[3];
+measure q[0] -> meas[4];
+
+Error:
+<input>:17:1:
+Usage of unknown gate 'u'.
+unknown file: Failure
+C++ exception with description "<input>:17:1:
+Usage of unknown gate 'u'." thrown in the test body.
+
+ae_indep_qiskit_6.qasm:
+
+// Benchmark was created by MQT Bench on 2024-03-17
+// For more information about MQT Bench, please visit https://www.cda.cit.tum.de/mqtbench/
+// MQT Bench version: 1.1.0
+// Qiskit version: 1.0.2
+
+OPENQASM 2.0;
+include "qelib1.inc";
+qreg eval[5];
+qreg q[1];
+creg meas[6];
+u2(0,-pi) eval[0];
+u2(0,-pi) eval[1];
+u2(0,-pi) eval[2];
+u2(0,-pi) eval[3];
+u2(0,-pi) eval[4];
+u3(0.9272952180016122,0,0) q[0];
+cx eval[0],q[0];
+u(-0.9272952180016122,0,0) q[0]; //line 18
+cx eval[0],q[0];
+u3(0.9272952180016122,0,0) q[0];
+cx eval[1],q[0];
+u(-1.8545904360032244,0,0) q[0];
+cx eval[1],q[0];
+u3(1.8545904360032244,0,0) q[0];
+cx eval[2],q[0];
+u(-3.7091808720064487,0,0) q[0];
+cx eval[2],q[0];
+u3(2.574004435173138,-pi,-pi) q[0];
+cx eval[3],q[0];
+u(-7.4183617440128975,0,0) q[0];
+cx eval[3],q[0];
+u3(1.135176436833311,0,0) q[0];
+cx eval[4],q[0];
+u(-14.836723488025795,0,0) q[0];
+cx eval[4],q[0];
+h eval[4];
+cp(-pi/2) eval[3],eval[4];
+cp(-pi/4) eval[2],eval[4];
+cp(-pi/8) eval[1],eval[4];
+cp(-pi/16) eval[0],eval[4];
+h eval[3];
+cp(-pi/2) eval[2],eval[3];
+cp(-pi/4) eval[1],eval[3];
+cp(-pi/8) eval[0],eval[3];
+h eval[2];
+cp(-pi/2) eval[1],eval[2];
+cp(-pi/4) eval[0],eval[2];
+h eval[1];
+cp(-pi/2) eval[0],eval[1];
+h eval[0];
+u(14.836723488025795,0,0) q[0];
+barrier eval[0],eval[1],eval[2],eval[3],eval[4],q[0];
+measure eval[0] -> meas[0];
+measure eval[1] -> meas[1];
+measure eval[2] -> meas[2];
+measure eval[3] -> meas[3];
+measure eval[4] -> meas[4];
+measure q[0] -> meas[5];
+
+Error:
+<input>:18:1:
+Usage of unknown gate 'u'.
+unknown file: Failure
+C++ exception with description "<input>:18:1:
+Usage of unknown gate 'u'." thrown in the test body.
+
+
+random_indep_qiskit_6.qasm: 
+
+// Benchmark was created by MQT Bench on 2024-03-18
+// For more information about MQT Bench, please visit https://www.cda.cit.tum.de/mqtbench/
+// MQT Bench version: 1.1.0
+// Qiskit version: 1.0.2
+
+OPENQASM 2.0;
+include "qelib1.inc";
+qreg q[6];
+creg meas[6];
+u2(pi/4,-pi) q[0];
+u2(0,0) q[1];
+cx q[2],q[0];
+tdg q[0];
+tdg q[3];
+u1(-1.4903425489366011) q[4];
+cx q[1],q[4];
+ry(-0.4689836211867622) q[1];
+ry(-0.4689836211867622) q[4];
+cx q[1],q[4];
+u2(-pi,-pi) q[1];
+u1(1.4903425489366011) q[4];
+crz(3.6176102152986354) q[3],q[4];
+u3(2.0589924944056586,-0.7004749084304418,-2.7250308023543615) q[3];
+cx q[5],q[0];
+t q[0];
+cx q[2],q[0];
+u2(0,-2.0023389049491893) q[0];
+cx q[1],q[2];
+cx q[2],q[1];
+u2(0,2.952031266380736) q[1];
+swap q[2],q[4];
+cx q[2],q[1];
+h q[1];
+cu1(pi/2) q[2],q[1];
+h q[2];
+u2(0,3*pi/4) q[4];
+u2(-pi/2,-pi/2) q[5];
+cry(0.9702813337800618) q[0],q[5];
+cz q[0],q[1];
+u2(5.076820509783505,5.29650934899458) q[0];
+cy q[3],q[1];
+u(5.235334184033243,2.1426712012556,3.265946359235374) q[3]; // line 42
+cx q[5],q[2];
+rz(2.1332392738715247) q[2];
+cx q[5],q[2];
+u2(1.6516969124742982,-pi) q[2];
+cx q[4],q[2];
+ry(-2.4103587426616264) q[2];
+ry(2.4103587426616264) q[4];
+cx q[4],q[2];
+u1(1.0093350642122303) q[2];
+cu3(0.43137627135395684,5.131693955927891,5.540732708314469) q[2],q[0];
+cy q[0],q[3];
+sdg q[2];
+cry(0.40662204129964163) q[3],q[0];
+u3(3.3401519228349494,-1.4888797250120758,1.4888797250120758) q[0];
+u3(1.2926439519212476,-0.012304969156963885,-0.7348141993399975) q[3];
+u2(-pi,-pi) q[4];
+cx q[4],q[1];
+cx q[1],q[4];
+rz(2.917738905811407) q[1];
+sdg q[4];
+rxx(3.2899582493108444) q[2],q[4];
+s q[2];
+s q[4];
+cswap q[2],q[1],q[4];
+u3(0.12487864535773079,0.8822725062196755,-0.8822725062196755) q[1];
+cx q[0],q[1];
+s q[0];
+t q[1];
+u3(1.5699311213649152,2.6845301397458154,-1.3162425160573001) q[4];
+u3(2.301477786351963,-pi,3*pi/4) q[5];
+crx(4.973898923189498) q[2],q[5];
+cu1(pi/2) q[2],q[4];
+u2(1.4683194020151475,3.4154613287486493) q[2];
+u2(0,-pi/2) q[4];
+cx q[4],q[0];
+cx q[0],q[4];
+h q[0];
+u3(2.2426295156381317,-pi/2,pi/2) q[5];
+cu1(pi/2) q[3],q[5];
+barrier q[0],q[1],q[2],q[3],q[4],q[5];
+measure q[0] -> meas[0];
+measure q[1] -> meas[1];
+measure q[2] -> meas[2];
+measure q[3] -> meas[3];
+measure q[4] -> meas[4];
+measure q[5] -> meas[5];
+
+Error: 
+<input>:42:1:
+Usage of unknown gate 'u'.
+unknown file: Failure
+C++ exception with description "<input>:42:1:
+Usage of unknown gate 'u'." thrown in the test body.
+
+
+
+
+
+

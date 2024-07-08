@@ -1,0 +1,243 @@
+// GPhase
+// QASM does not have a gphase gate directly, usually it's implemented in specific quantum frameworks
+
+// Identity
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+id q[0];
+id q[1];
+nothing happens
+
+// Hadamard
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+h q[0];
+h q[1];
+
+// Pauli-X
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+x q[0];
+x q[1];
+
+// Pauli-Y
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+y q[0];
+y q[1];
+
+// Pauli-Z
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+z q[0];
+z q[1];
+
+// S
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+s q[0];
+s q[1];
+
+// Sdg
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+sdg q[0];
+sdg q[1];
+
+// T
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+t q[0];
+t q[1];
+
+// Tdg
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+tdg q[0];
+tdg q[1];
+
+// V
+// V gate is also known as the square root of NOT, typically not directly available in QASM but can be implemented as:
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+u3(pi/2, -pi/2, pi/2) q[0];
+u3(pi/2, -pi/2, pi/2) q[1];
+
+// Vdg
+// The inverse of the V gate:
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+u3(-pi/2, pi/2, -pi/2) q[0];
+u3(-pi/2, pi/2, -pi/2) q[1];
+
+// U
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+u3(theta, phi, lambda) q[0]; // replace theta, phi, lambda with appropriate values
+u3(theta, phi, lambda) q[1];
+
+// U2
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+u2(phi, lambda) q[0]; // replace phi, lambda with appropriate values
+u2(phi, lambda) q[1];
+
+// P (Phase)
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+p(lambda) q[0]; // replace lambda with appropriate value
+p(lambda) q[1];
+
+// SX
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+sx q[0];
+sx q[1];
+
+// SXdg
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+sxdg q[0];
+sxdg q[1];
+
+// RX
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+rx(theta) q[0]; // replace theta with appropriate value
+rx(theta) q[1];
+
+// RY
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+ry(theta) q[0]; // replace theta with appropriate value
+ry(theta) q[1];
+
+// RZ
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+rz(lambda) q[0]; // replace lambda with appropriate value
+rz(lambda) q[1];
+
+// SWAP
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+swap q[0], q[1];
+
+// iSWAP
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+iswap q[0], q[1];
+
+// iSWAPdg
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+isdg q[0], q[1]; // if not directly available, implement as needed
+
+// Peres
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+cx q[0], q[1];
+ccx q[0], q[1], q[2];
+
+// Peresdg
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+// Implement inverse of Peres gate as needed
+
+// DCX
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+dcx q[0], q[1];
+
+// ECR
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+ecr q[0], q[1];
+
+// RXX
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+rxx(theta) q[0], q[1]; // replace theta with appropriate value
+
+// RYY
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+ryy(theta) q[0], q[1]; // replace theta with appropriate value
+
+// RZZ
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+rzz(theta) q[0], q[1]; // replace theta with appropriate value
+
+// RZX
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+rzx(theta) q[0], q[1]; // replace theta with appropriate value
+
+// XXminusYY
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+// Implement XX - YY interaction as needed
+
+// XXplusYY
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+// Implement XX + YY interaction as needed
+
+// Compound
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+// Implement compound gate logic as needed
+
+// Measure
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+measure q[0] -> c[0];
+measure q[1] -> c[1];
+
+// Reset
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+reset q[0];
+reset q[1];
+
+// Barrier
+OPENQASM 2.0;
+qreg q[2];
+creg c[2];
+barrier q[0], q[1];

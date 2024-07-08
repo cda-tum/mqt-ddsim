@@ -36,17 +36,17 @@ public:
    */
   static void parseOptions(bool gateBased,  bool controlBased, bool allPermutations, std::string file, int qubits);
   static void runInputCompariston(int from, int to, bool gateBased,  bool controlBased, bool allPermutations, std::string file);
-  static void runLayoutComparison(std::ofstream& out, qc::QuantumComputation& qc, qc::Permutation perm, std::string file, int qubits);
+  static void runLayoutComparison(std::ofstream& out, qc::QuantumComputation& qc, qc::QuantumComputation& qcc, qc::Permutation perm, std::string file, int qubits);
   static void runAllComparisons(std::ofstream& out, qc::QuantumComputation& qc, std::string file, int qubits);
 
 
-  static qc::Permutation createGateBasedPermutation(qc::QuantumComputation& qc);
+  static qc::Permutation createGateBasedPermutation(std::ofstream& out, qc::QuantumComputation& qc);
 
    /**
    * @brief creates a possible permutations of the initialLayout based on how to control bits are located
    * @param QuantumComputation
    */
-  static qc::Permutation createControlBasedPermutation(qc::QuantumComputation& qc);
+  static qc::Permutation createControlBasedPermutation(std::ofstream& out, qc::QuantumComputation& qc);
 
   /**
    * @brief creates a vector of all possible permutations of the initialLayout
@@ -66,6 +66,8 @@ public:
 
   static std::string measurementToString(std::vector<bool> code, size_t index, size_t max_nodes, size_t active_nodes, std::chrono::duration<double> time);
   static std::string formatSize_t(size_t t);
+
+  static void removeAnsi(std::string filePath);
 
 }; // class DDMinimizer
 } // namespace qc
