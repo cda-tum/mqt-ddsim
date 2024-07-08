@@ -10,7 +10,7 @@ from qiskit.transpiler import Target
 from mqt.ddsim.target import DDSIMTargetBuilder
 
 
-@pytest.fixture()
+@pytest.fixture
 def target() -> Target:
     """The target fixture for the tests in this file."""
     target = Target(num_qubits=8)
