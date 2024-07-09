@@ -10,13 +10,13 @@ from qiskit.quantum_info import Operator, Pauli, SparsePauliOp
 from mqt.ddsim.primitives.estimator import Estimator
 
 
-@pytest.fixture()
+@pytest.fixture
 def estimator() -> Estimator:
     """The estimator fixture for the tests in this file."""
     return Estimator()
 
 
-@pytest.fixture()
+@pytest.fixture
 def circuits() -> list[QuantumCircuit]:
     """The circuit fixture for the tests in this file."""
     qc_z = QuantumCircuit(1)
@@ -37,7 +37,7 @@ def circuits() -> list[QuantumCircuit]:
     return [ansatz, [param_qc_1, param_qc_2], [qc_x, qc_y, qc_z]]
 
 
-@pytest.fixture()
+@pytest.fixture
 def observables() -> list[SparsePauliOp]:
     """The observable fixture for the tests in this file."""
     observable = SparsePauliOp.from_list([
