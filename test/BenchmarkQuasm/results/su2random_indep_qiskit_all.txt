@@ -1,0 +1,1217 @@
+Start Simulation of su2random_indep_qiskit_2__________________________________________________
+
+ i:   0   1
+ 1:   u   |  p: (1.43683) (0.839737) (-3.14159) 
+ 2:   |   u  p: (0.130388) (-1.57831) 
+ 3:   c   x
+ 4:   u   |  p: (3.13221) (1.24447) 
+ 5:   |   u  p: (1.41244) (-1.50463) 
+ 6:   c   x
+ 7:   u   |  p: (1.06255) (-1.97694) 
+ 8:   |   u  p: (0.555055) (-0.292838) 
+ 9:   c   x
+10:   u   |  p: (0.0248077) (-1.17734) 
+11:   |   u  p: (3.06499) (0.707022) (-3.14159) 
+12:========
+13:   0   |
+14:   |   1
+ o:   0   1
+Total Permutations: 2
+Min time:           5.6050e-06s................. Permutation 1  : 0 -> 1|1 -> 0|
+Max time:           6.4750e-06s................. Permutation 0  : 0 -> 0|1 -> 1|
+Min active nodes:   3   nodes.................... Permutation 0  : 0 -> 0|1 -> 1|
+Min max nodes:      9   nodes.................... Permutation 0  : 0 -> 0|1 -> 1|
+Max active nodes:   3   nodes.................... Permutation 0  : 0 -> 0|1 -> 1|
+Max max nodes:      9   nodes.................... Permutation 0  : 0 -> 0|1 -> 1|
+________________________________________________________________________________________________
+
+2 permutations have 3 active nodes.
+
+...........................
+Average time: 6.0400e-06s
+
+________________________________________________________________________________________________
+
+2 permutations have 9 max nodes.
+
+...........................
+Average time: 6.0400e-06s
+
+________________________________________________________________________________________________
+
+execution time of: 5.6050e-06s: Index: 1   | Max_nodes: 9   | Active_nodes: 3   | 0 -> 1|1 -> 0|
+execution time of: 6.4750e-06s: Index: 0   | Max_nodes: 9   | Active_nodes: 3   | 0 -> 0|1 -> 1|
+________________________________________________________________________________________________
+
+Start Simulation of su2random_indep_qiskit_3__________________________________________________
+
+.i:...0...1...2
+.1:...u...|...|  p: (1.4368e+00) (1.5633e+00) (-3.1416e+00) 
+.2:...|...u...|  p: (1.3039e-01) (3.1322e+00) 
+.3:...c...x...|
+.4:...|...|...u  p: (2.3019e+00) (-1.7292e+00) (-3.1416e+00) 
+.5:...c...|...x
+.6:...u...|...|  p: (1.2445e+00) (5.5506e-01) 
+.7:...|...c...x
+.8:...|...u...|  p: (1.5046e+00) (1.1647e+00) (-3.1416e+00) 
+.9:...c...x...|
+10:...|...|...u  p: (1.0626e+00) (-2.9284e-01) 
+11:...c...|...x
+12:...u...|...|  p: (2.4808e-02) (-2.4346e+00) 
+13:...|...c...x
+14:...|...u...|  p: (3.0650e+00) (1.3933e+00) (-3.1416e+00) 
+15:...c...x...|
+16:...|...|...u  p: (1.1773e+00) (-1.3077e+00) (-3.1416e+00) 
+17:...c...|...x
+18:...u...|...|  p: (5.1664e-01) (-2.2483e+00) (-3.1416e+00) 
+19:...|...c...x
+20:...|...u...|  p: (1.7934e+00) (-7.9582e-01) (-3.1416e+00) 
+21:...|...|...u  p: (2.8743e+00) (1.0941e+00) (-3.1416e+00) 
+22:============
+23:...0...|...|
+24:...|...1...|
+25:...|...|...2
+.o:...0...1...2
+Total Permutations: 6
+Min time:           1.3078e-05s................. Permutation 5  : 0 -> 2|1 -> 1|2 -> 0|
+Max time:           1.5833e-05s................. Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|
+Min active nodes:   7   nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|
+Min max nodes:      21  nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|
+Max active nodes:   7   nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|
+Max max nodes:      21  nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|
+________________________________________________________________________________________________
+
+6 permutations have 7 active nodes.
+
+...........................
+Average time: 1.4441e-05s
+
+________________________________________________________________________________________________
+
+6 permutations have 21 max nodes.
+
+...........................
+Average time: 1.4441e-05s
+
+________________________________________________________________________________________________
+
+execution time of: 1.3078e-05s: Index: 5   | Max_nodes: 21  | Active_nodes: 7   | 0 -> 2|1 -> 1|2 -> 0|
+execution time of: 1.3742e-05s: Index: 3   | Max_nodes: 21  | Active_nodes: 7   | 0 -> 1|1 -> 2|2 -> 0|
+execution time of: 1.3868e-05s: Index: 4   | Max_nodes: 21  | Active_nodes: 7   | 0 -> 2|1 -> 0|2 -> 1|
+execution time of: 1.5043e-05s: Index: 1   | Max_nodes: 21  | Active_nodes: 7   | 0 -> 0|1 -> 2|2 -> 1|
+execution time of: 1.5080e-05s: Index: 2   | Max_nodes: 21  | Active_nodes: 7   | 0 -> 1|1 -> 0|2 -> 2|
+execution time of: 1.5833e-05s: Index: 0   | Max_nodes: 21  | Active_nodes: 7   | 0 -> 0|1 -> 1|2 -> 2|
+________________________________________________________________________________________________
+
+Start Simulation of su2random_indep_qiskit_4__________________________________________________
+
+.i:...0...1...2...3
+.1:...u...|...|...|  p: (1.4368e+00) (-9.3807e-03) (-3.1416e+00) 
+.2:...|...u...|...|  p: (1.3039e-01) (1.4124e+00) 
+.3:...c...x...|...|
+.4:...|...|...u...|  p: (2.3019e+00) (-1.8971e+00) (-3.1416e+00) 
+.5:...c...|...x...|
+.6:...|...c...x...|
+.7:...|...|...|...u  p: (1.5783e+00) (1.6370e+00) (-3.1416e+00) 
+.8:...c...|...|...x
+.9:...u...|...|...|  p: (1.0626e+00) (2.4808e-02) 
+10:...|...c...|...x
+11:...|...u...|...|  p: (5.5506e-01) (-3.0650e+00) 
+12:...c...x...|...|
+13:...|...|...c...x
+14:...|...|...u...|  p: (1.9769e+00) (1.9643e+00) (-3.1416e+00) 
+15:...c...|...x...|
+16:...|...c...x...|
+17:...|...|...|...u  p: (2.9284e-01) (7.0702e-01) (-3.1416e+00) 
+18:...c...|...|...x
+19:...u...|...|...|  p: (1.7483e+00) (2.6731e-01) (-3.1416e+00) 
+20:...|...c...|...x
+21:...|...u...|...|  p: (1.8339e+00) (8.9328e-01) 
+22:...c...x...|...|
+23:...|...|...c...x
+24:...|...|...u...|  p: (5.1664e-01) (-7.9582e-01) (-3.1416e+00) 
+25:...c...|...x...|
+26:...|...c...x...|
+27:...|...|...|...u  p: (1.7934e+00) (1.0941e+00) (-3.1416e+00) 
+28:...c...|...|...x
+29:...u...|...|...|  p: (2.7761e+00) (-2.1966e+00) 
+30:...|...c...|...x
+31:...|...u...|...|  p: (2.7270e+00) (-2.5067e+00) 
+32:...|...|...c...x
+33:...|...|...u...|  p: (2.4016e+00) (1.9178e+00) (-3.1416e+00) 
+34:...|...|...|...u  p: (3.0590e+00) (1.3601e-01) (-3.1416e+00) 
+35:================
+36:...0...|...|...|
+37:...|...1...|...|
+38:...|...|...2...|
+39:...|...|...|...3
+.o:...0...1...2...3
+Total Permutations: 24
+Min time:           2.7730e-05s................. Permutation 23 : 0 -> 3|1 -> 2|2 -> 1|3 -> 0|
+Max time:           5.4816e-05s................. Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|3 -> 3|
+Min active nodes:   15  nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|3 -> 3|
+Min max nodes:      45  nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|3 -> 3|
+Max active nodes:   15  nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|3 -> 3|
+Max max nodes:      45  nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|3 -> 3|
+________________________________________________________________________________________________
+
+24 permutations have 15 active nodes.
+
+...........................
+Average time: 3.2826e-05s
+
+________________________________________________________________________________________________
+
+24 permutations have 45 max nodes.
+
+...........................
+Average time: 3.2826e-05s
+
+________________________________________________________________________________________________
+
+execution time of: 2.7730e-05s: Index: 23  | Max_nodes: 45  | Active_nodes: 15  | 0 -> 3|1 -> 2|2 -> 1|3 -> 0|
+execution time of: 2.8840e-05s: Index: 17  | Max_nodes: 45  | Active_nodes: 15  | 0 -> 2|1 -> 3|2 -> 1|3 -> 0|
+execution time of: 2.9128e-05s: Index: 21  | Max_nodes: 45  | Active_nodes: 15  | 0 -> 3|1 -> 1|2 -> 2|3 -> 0|
+execution time of: 2.9296e-05s: Index: 22  | Max_nodes: 45  | Active_nodes: 15  | 0 -> 3|1 -> 2|2 -> 0|3 -> 1|
+execution time of: 3.0595e-05s: Index: 16  | Max_nodes: 45  | Active_nodes: 15  | 0 -> 2|1 -> 3|2 -> 0|3 -> 1|
+execution time of: 3.0740e-05s: Index: 11  | Max_nodes: 45  | Active_nodes: 15  | 0 -> 1|1 -> 3|2 -> 2|3 -> 0|
+execution time of: 3.0741e-05s: Index: 15  | Max_nodes: 45  | Active_nodes: 15  | 0 -> 2|1 -> 1|2 -> 3|3 -> 0|
+execution time of: 3.0800e-05s: Index: 20  | Max_nodes: 45  | Active_nodes: 15  | 0 -> 3|1 -> 1|2 -> 0|3 -> 2|
+execution time of: 3.1010e-05s: Index: 19  | Max_nodes: 45  | Active_nodes: 15  | 0 -> 3|1 -> 0|2 -> 2|3 -> 1|
+execution time of: 3.1423e-05s: Index: 14  | Max_nodes: 45  | Active_nodes: 15  | 0 -> 2|1 -> 1|2 -> 0|3 -> 3|
+execution time of: 3.1783e-05s: Index: 9   | Max_nodes: 45  | Active_nodes: 15  | 0 -> 1|1 -> 2|2 -> 3|3 -> 0|
+execution time of: 3.1801e-05s: Index: 10  | Max_nodes: 45  | Active_nodes: 15  | 0 -> 1|1 -> 3|2 -> 0|3 -> 2|
+execution time of: 3.1948e-05s: Index: 18  | Max_nodes: 45  | Active_nodes: 15  | 0 -> 3|1 -> 0|2 -> 1|3 -> 2|
+execution time of: 3.1990e-05s: Index: 13  | Max_nodes: 45  | Active_nodes: 15  | 0 -> 2|1 -> 0|2 -> 3|3 -> 1|
+execution time of: 3.2275e-05s: Index: 8   | Max_nodes: 45  | Active_nodes: 15  | 0 -> 1|1 -> 2|2 -> 0|3 -> 3|
+execution time of: 3.2586e-05s: Index: 5   | Max_nodes: 45  | Active_nodes: 15  | 0 -> 0|1 -> 3|2 -> 2|3 -> 1|
+execution time of: 3.2685e-05s: Index: 12  | Max_nodes: 45  | Active_nodes: 15  | 0 -> 2|1 -> 0|2 -> 1|3 -> 3|
+execution time of: 3.3041e-05s: Index: 4   | Max_nodes: 45  | Active_nodes: 15  | 0 -> 0|1 -> 3|2 -> 1|3 -> 2|
+execution time of: 3.3868e-05s: Index: 6   | Max_nodes: 45  | Active_nodes: 15  | 0 -> 1|1 -> 0|2 -> 2|3 -> 3|
+execution time of: 3.3913e-05s: Index: 2   | Max_nodes: 45  | Active_nodes: 15  | 0 -> 0|1 -> 2|2 -> 1|3 -> 3|
+execution time of: 3.3973e-05s: Index: 1   | Max_nodes: 45  | Active_nodes: 15  | 0 -> 0|1 -> 1|2 -> 3|3 -> 2|
+execution time of: 3.4405e-05s: Index: 7   | Max_nodes: 45  | Active_nodes: 15  | 0 -> 1|1 -> 0|2 -> 3|3 -> 2|
+execution time of: 3.8425e-05s: Index: 3   | Max_nodes: 45  | Active_nodes: 15  | 0 -> 0|1 -> 2|2 -> 3|3 -> 1|
+execution time of: 5.4816e-05s: Index: 0   | Max_nodes: 45  | Active_nodes: 15  | 0 -> 0|1 -> 1|2 -> 2|3 -> 3|
+________________________________________________________________________________________________
+
+Start Simulation of su2random_indep_qiskit_5__________________________________________________
+
+.i:...0...1...2...3...4
+.1:...u...|...|...|...|  p: (1.4368e+00) (-1.7292e+00) (-3.1416e+00) 
+.2:...|...u...|...|...|  p: (1.3039e-01) (1.2445e+00) 
+.3:...c...x...|...|...|
+.4:...|...|...u...|...|  p: (2.3019e+00) (1.6370e+00) (-3.1416e+00) 
+.5:...c...|...x...|...|
+.6:...|...c...x...|...|
+.7:...|...|...|...u...|  p: (1.5783e+00) (-2.0790e+00) (-3.1416e+00) 
+.8:...c...|...|...x...|
+.9:...|...c...|...x...|
+10:...|...|...c...x...|
+11:...|...|...|...|...u  p: (3.1322e+00) (5.5506e-01) 
+12:...c...|...|...|...x
+13:...u...|...|...|...|  p: (1.9769e+00) (7.0702e-01) (-3.1416e+00) 
+14:...|...c...|...|...x
+15:...|...u...|...|...|  p: (2.9284e-01) (1.3933e+00) (-3.1416e+00) 
+16:...c...x...|...|...|
+17:...|...|...c...|...x
+18:...|...|...u...|...|  p: (2.4808e-02) (1.8339e+00) 
+19:...c...|...x...|...|
+20:...|...c...x...|...|
+21:...|...|...|...c...x
+22:...|...|...|...u...|  p: (3.0650e+00) (2.6250e+00) (-3.1416e+00) 
+23:...c...|...|...x...|
+24:...|...c...|...x...|
+25:...|...|...c...x...|
+26:...|...|...|...|...u  p: (1.1773e+00) (1.3482e+00) (-3.1416e+00) 
+27:...c...|...|...|...x
+28:...u...|...|...|...|  p: (2.8743e+00) (-4.1460e-01) (-3.1416e+00) 
+29:...|...c...|...|...x
+30:...|...u...|...|...|  p: (8.9328e-01) (-2.4016e+00) 
+31:...c...x...|...|...|
+32:...|...|...c...|...x
+33:...|...|...u...|...|  p: (2.3458e+00) (-3.0590e+00) 
+34:...c...|...x...|...|
+35:...|...c...x...|...|
+36:...|...|...|...c...x
+37:...|...|...|...u...|  p: (2.0475e+00) (9.4497e-01) (-3.1416e+00) 
+38:...c...|...|...x...|
+39:...|...c...|...x...|
+40:...|...|...c...x...|
+41:...|...|...|...|...u  p: (2.7761e+00) (-2.5067e+00) 
+42:...c...|...|...|...x
+43:...u...|...|...|...|  p: (1.2238e+00) (-1.2522e+00) (-3.1416e+00) 
+44:...|...c...|...|...x
+45:...|...u...|...|...|  p: (3.0056e+00) (-2.4254e+00) (-3.1416e+00) 
+46:...|...|...c...|...x
+47:...|...|...u...|...|  p: (5.7398e-01) (2.0652e+00) (-3.1416e+00) 
+48:...|...|...|...c...x
+49:...|...|...|...u...|  p: (2.0058e+00) (2.9466e-01) 
+50:...|...|...|...|...u  p: (5.6837e-01) (-2.3481e+00) 
+51:====================
+52:...0...|...|...|...|
+53:...|...1...|...|...|
+54:...|...|...2...|...|
+55:...|...|...|...3...|
+56:...|...|...|...|...4
+.o:...0...1...2...3...4
+Total Permutations: 120
+Min time:           6.2693e-05s................. Permutation 119: 0 -> 4|1 -> 3|2 -> 2|3 -> 1|4 -> 0|
+Max time:           1.4449e-04s................. Permutation 84 : 0 -> 3|1 -> 2|2 -> 0|3 -> 1|4 -> 4|
+Min active nodes:   31  nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|3 -> 3|4 -> 4|
+Min max nodes:      93  nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|3 -> 3|4 -> 4|
+Max active nodes:   31  nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|3 -> 3|4 -> 4|
+Max max nodes:      93  nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|3 -> 3|4 -> 4|
+________________________________________________________________________________________________
+
+120 permutations have 31 active nodes.
+
+...........................
+Average time: 7.3487e-05s
+
+________________________________________________________________________________________________
+
+120 permutations have 93 max nodes.
+
+...........................
+Average time: 7.3487e-05s
+
+________________________________________________________________________________________________
+
+execution time of: 6.2693e-05s: Index: 119 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 3|2 -> 2|3 -> 1|4 -> 0|
+execution time of: 6.4223e-05s: Index: 95  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 4|2 -> 2|3 -> 1|4 -> 0|
+execution time of: 6.4633e-05s: Index: 117 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 3|2 -> 1|3 -> 2|4 -> 0|
+execution time of: 6.5318e-05s: Index: 71  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 4|2 -> 3|3 -> 1|4 -> 0|
+execution time of: 6.5598e-05s: Index: 89  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 2|2 -> 4|3 -> 1|4 -> 0|
+execution time of: 6.5799e-05s: Index: 118 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 3|2 -> 2|3 -> 0|4 -> 1|
+execution time of: 6.5931e-05s: Index: 94  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 4|2 -> 2|3 -> 0|4 -> 1|
+execution time of: 6.6138e-05s: Index: 113 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 2|2 -> 3|3 -> 1|4 -> 0|
+execution time of: 6.6361e-05s: Index: 65  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 3|2 -> 4|3 -> 1|4 -> 0|
+execution time of: 6.6396e-05s: Index: 116 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 3|2 -> 1|3 -> 0|4 -> 2|
+execution time of: 6.6883e-05s: Index: 70  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 4|2 -> 3|3 -> 0|4 -> 1|
+execution time of: 6.7291e-05s: Index: 115 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 3|2 -> 0|3 -> 2|4 -> 1|
+execution time of: 6.7358e-05s: Index: 92  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 4|2 -> 1|3 -> 0|4 -> 2|
+execution time of: 6.7401e-05s: Index: 93  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 4|2 -> 1|3 -> 2|4 -> 0|
+execution time of: 6.7861e-05s: Index: 69  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 4|2 -> 1|3 -> 3|4 -> 0|
+execution time of: 6.8151e-05s: Index: 114 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 3|2 -> 0|3 -> 1|4 -> 2|
+execution time of: 6.8213e-05s: Index: 64  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 3|2 -> 4|3 -> 0|4 -> 1|
+execution time of: 6.8246e-05s: Index: 112 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 2|2 -> 3|3 -> 0|4 -> 1|
+execution time of: 6.8361e-05s: Index: 63  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 3|2 -> 1|3 -> 4|4 -> 0|
+execution time of: 6.8711e-05s: Index: 87  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 2|2 -> 1|3 -> 4|4 -> 0|
+execution time of: 6.8931e-05s: Index: 91  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 4|2 -> 0|3 -> 2|4 -> 1|
+execution time of: 6.9031e-05s: Index: 90  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 4|2 -> 0|3 -> 1|4 -> 2|
+execution time of: 6.9049e-05s: Index: 110 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 2|2 -> 1|3 -> 0|4 -> 3|
+execution time of: 6.9291e-05s: Index: 62  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 3|2 -> 1|3 -> 0|4 -> 4|
+execution time of: 6.9621e-05s: Index: 67  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 4|2 -> 0|3 -> 3|4 -> 1|
+execution time of: 6.9821e-05s: Index: 86  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 2|2 -> 1|3 -> 0|4 -> 4|
+execution time of: 6.9841e-05s: Index: 111 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 2|2 -> 1|3 -> 3|4 -> 0|
+execution time of: 6.9853e-05s: Index: 83  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 1|2 -> 4|3 -> 2|4 -> 0|
+execution time of: 6.9866e-05s: Index: 88  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 2|2 -> 4|3 -> 0|4 -> 1|
+execution time of: 7.0131e-05s: Index: 85  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 2|2 -> 0|3 -> 4|4 -> 1|
+execution time of: 7.0141e-05s: Index: 68  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 4|2 -> 1|3 -> 0|4 -> 3|
+execution time of: 7.0356e-05s: Index: 109 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 2|2 -> 0|3 -> 3|4 -> 1|
+execution time of: 7.0374e-05s: Index: 46  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 4|2 -> 3|3 -> 0|4 -> 2|
+execution time of: 7.0628e-05s: Index: 41  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 3|2 -> 4|3 -> 2|4 -> 0|
+execution time of: 7.0721e-05s: Index: 108 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 2|2 -> 0|3 -> 1|4 -> 3|
+execution time of: 7.0818e-05s: Index: 44  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 4|2 -> 2|3 -> 0|4 -> 3|
+execution time of: 7.0819e-05s: Index: 104 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 1|2 -> 2|3 -> 0|4 -> 3|
+execution time of: 7.0946e-05s: Index: 66  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 4|2 -> 0|3 -> 1|4 -> 3|
+execution time of: 7.0981e-05s: Index: 59  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 1|2 -> 4|3 -> 3|4 -> 0|
+execution time of: 7.1076e-05s: Index: 107 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 1|2 -> 3|3 -> 2|4 -> 0|
+execution time of: 7.1294e-05s: Index: 47  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 4|2 -> 3|3 -> 2|4 -> 0|
+execution time of: 7.1343e-05s: Index: 106 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 1|2 -> 3|3 -> 0|4 -> 2|
+execution time of: 7.1371e-05s: Index: 105 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 1|2 -> 2|3 -> 3|4 -> 0|
+execution time of: 7.1438e-05s: Index: 81  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 1|2 -> 2|3 -> 4|4 -> 0|
+execution time of: 7.1459e-05s: Index: 57  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 1|2 -> 3|3 -> 4|4 -> 0|
+execution time of: 7.1646e-05s: Index: 58  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 1|2 -> 4|3 -> 0|4 -> 3|
+execution time of: 7.1833e-05s: Index: 60  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 3|2 -> 0|3 -> 1|4 -> 4|
+execution time of: 7.1968e-05s: Index: 39  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 3|2 -> 2|3 -> 4|4 -> 0|
+execution time of: 7.2011e-05s: Index: 82  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 1|2 -> 4|3 -> 0|4 -> 2|
+execution time of: 7.2036e-05s: Index: 45  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 4|2 -> 2|3 -> 3|4 -> 0|
+execution time of: 7.2051e-05s: Index: 80  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 1|2 -> 2|3 -> 0|4 -> 4|
+execution time of: 7.2078e-05s: Index: 103 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 1|2 -> 0|3 -> 3|4 -> 2|
+execution time of: 7.2176e-05s: Index: 101 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 0|2 -> 3|3 -> 2|4 -> 1|
+execution time of: 7.2431e-05s: Index: 55  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 1|2 -> 0|3 -> 4|4 -> 3|
+execution time of: 7.2481e-05s: Index: 61  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 3|2 -> 0|3 -> 4|4 -> 1|
+execution time of: 7.2494e-05s: Index: 40  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 3|2 -> 4|3 -> 0|4 -> 2|
+execution time of: 7.2586e-05s: Index: 75  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 0|2 -> 2|3 -> 4|4 -> 1|
+execution time of: 7.2648e-05s: Index: 77  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 0|2 -> 4|3 -> 2|4 -> 1|
+execution time of: 7.2878e-05s: Index: 35  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 2|2 -> 4|3 -> 3|4 -> 0|
+execution time of: 7.2918e-05s: Index: 99  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 0|2 -> 2|3 -> 3|4 -> 1|
+execution time of: 7.2961e-05s: Index: 23  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 4|2 -> 3|3 -> 2|4 -> 1|
+execution time of: 7.2988e-05s: Index: 34  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 2|2 -> 4|3 -> 0|4 -> 3|
+execution time of: 7.3111e-05s: Index: 54  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 1|2 -> 0|3 -> 3|4 -> 4|
+execution time of: 7.3234e-05s: Index: 43  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 4|2 -> 0|3 -> 3|4 -> 2|
+execution time of: 7.3246e-05s: Index: 79  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 1|2 -> 0|3 -> 4|4 -> 2|
+execution time of: 7.3266e-05s: Index: 100 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 0|2 -> 3|3 -> 1|4 -> 2|
+execution time of: 7.3521e-05s: Index: 32  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 2|2 -> 3|3 -> 0|4 -> 4|
+execution time of: 7.3543e-05s: Index: 56  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 1|2 -> 3|3 -> 0|4 -> 4|
+execution time of: 7.3581e-05s: Index: 21  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 4|2 -> 2|3 -> 3|4 -> 1|
+execution time of: 7.3881e-05s: Index: 53  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 0|2 -> 4|3 -> 3|4 -> 1|
+execution time of: 7.4041e-05s: Index: 37  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 3|2 -> 0|3 -> 4|4 -> 2|
+execution time of: 7.4076e-05s: Index: 15  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 3|2 -> 2|3 -> 4|4 -> 1|
+execution time of: 7.4096e-05s: Index: 74  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 0|2 -> 2|3 -> 1|4 -> 4|
+execution time of: 7.4119e-05s: Index: 78  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 1|2 -> 0|3 -> 2|4 -> 4|
+execution time of: 7.4129e-05s: Index: 17  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 3|2 -> 4|3 -> 2|4 -> 1|
+execution time of: 7.4238e-05s: Index: 73  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 0|2 -> 1|3 -> 4|4 -> 2|
+execution time of: 7.4329e-05s: Index: 97  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 0|2 -> 1|3 -> 3|4 -> 2|
+execution time of: 7.4331e-05s: Index: 22  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 4|2 -> 3|3 -> 1|4 -> 2|
+execution time of: 7.4331e-05s: Index: 102 | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 1|2 -> 0|3 -> 2|4 -> 3|
+execution time of: 7.4433e-05s: Index: 76  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 0|2 -> 4|3 -> 1|4 -> 2|
+execution time of: 7.4538e-05s: Index: 98  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 0|2 -> 2|3 -> 1|4 -> 3|
+execution time of: 7.4616e-05s: Index: 42  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 4|2 -> 0|3 -> 2|4 -> 3|
+execution time of: 7.4746e-05s: Index: 52  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 0|2 -> 4|3 -> 1|4 -> 3|
+execution time of: 7.4816e-05s: Index: 51  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 0|2 -> 3|3 -> 4|4 -> 1|
+execution time of: 7.4953e-05s: Index: 30  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 2|2 -> 0|3 -> 3|4 -> 4|
+execution time of: 7.4996e-05s: Index: 50  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 0|2 -> 3|3 -> 1|4 -> 4|
+execution time of: 7.5014e-05s: Index: 38  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 3|2 -> 2|3 -> 0|4 -> 4|
+execution time of: 7.5028e-05s: Index: 19  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 4|2 -> 1|3 -> 3|4 -> 2|
+execution time of: 7.5176e-05s: Index: 72  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 0|2 -> 1|3 -> 2|4 -> 4|
+execution time of: 7.5224e-05s: Index: 20  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 4|2 -> 2|3 -> 1|4 -> 3|
+execution time of: 7.5281e-05s: Index: 49  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 0|2 -> 1|3 -> 4|4 -> 3|
+execution time of: 7.5361e-05s: Index: 96  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 4|1 -> 0|2 -> 1|3 -> 2|4 -> 3|
+execution time of: 7.6061e-05s: Index: 31  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 2|2 -> 0|3 -> 4|4 -> 3|
+execution time of: 7.6171e-05s: Index: 29  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 0|2 -> 4|3 -> 3|4 -> 2|
+execution time of: 7.6291e-05s: Index: 13  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 3|2 -> 1|3 -> 4|4 -> 2|
+execution time of: 7.6311e-05s: Index: 10  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 2|2 -> 4|3 -> 1|4 -> 3|
+execution time of: 7.6591e-05s: Index: 7   | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 2|2 -> 1|3 -> 4|4 -> 3|
+execution time of: 7.6756e-05s: Index: 6   | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 2|2 -> 1|3 -> 3|4 -> 4|
+execution time of: 7.6856e-05s: Index: 25  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 0|2 -> 2|3 -> 4|4 -> 3|
+execution time of: 7.7008e-05s: Index: 5   | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 1|2 -> 4|3 -> 3|4 -> 2|
+execution time of: 7.7056e-05s: Index: 12  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 3|2 -> 1|3 -> 2|4 -> 4|
+execution time of: 7.7273e-05s: Index: 18  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 4|2 -> 1|3 -> 2|4 -> 3|
+execution time of: 7.7328e-05s: Index: 36  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 3|2 -> 0|3 -> 2|4 -> 4|
+execution time of: 7.7641e-05s: Index: 27  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 0|2 -> 3|3 -> 4|4 -> 2|
+execution time of: 7.7668e-05s: Index: 4   | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 1|2 -> 4|3 -> 2|4 -> 3|
+execution time of: 7.7696e-05s: Index: 8   | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 2|2 -> 3|3 -> 1|4 -> 4|
+execution time of: 7.7759e-05s: Index: 48  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 2|1 -> 0|2 -> 1|3 -> 3|4 -> 4|
+execution time of: 7.7768e-05s: Index: 3   | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 1|2 -> 3|3 -> 4|4 -> 2|
+execution time of: 7.7793e-05s: Index: 14  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 3|2 -> 2|3 -> 1|4 -> 4|
+execution time of: 7.7924e-05s: Index: 0   | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 1|2 -> 2|3 -> 3|4 -> 4|
+execution time of: 7.8176e-05s: Index: 28  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 0|2 -> 4|3 -> 2|4 -> 3|
+execution time of: 7.8389e-05s: Index: 26  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 0|2 -> 3|3 -> 2|4 -> 4|
+execution time of: 7.8398e-05s: Index: 16  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 3|2 -> 4|3 -> 1|4 -> 2|
+execution time of: 7.8438e-05s: Index: 11  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 2|2 -> 4|3 -> 3|4 -> 1|
+execution time of: 7.9249e-05s: Index: 24  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 0|2 -> 2|3 -> 3|4 -> 4|
+execution time of: 7.9831e-05s: Index: 2   | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 1|2 -> 3|3 -> 2|4 -> 4|
+execution time of: 8.1248e-05s: Index: 33  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 1|1 -> 2|2 -> 3|3 -> 4|4 -> 0|
+execution time of: 8.1283e-05s: Index: 1   | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 1|2 -> 2|3 -> 4|4 -> 3|
+execution time of: 1.0083e-04s: Index: 9   | Max_nodes: 93  | Active_nodes: 31  | 0 -> 0|1 -> 2|2 -> 3|3 -> 4|4 -> 1|
+execution time of: 1.4449e-04s: Index: 84  | Max_nodes: 93  | Active_nodes: 31  | 0 -> 3|1 -> 2|2 -> 0|3 -> 1|4 -> 4|
+________________________________________________________________________________________________
+
+Start Simulation of su2random_indep_qiskit_6__________________________________________________
+
+.i:...0...1...2...3...4...5
+.1:...u...|...|...|...|...|  p: (1.4368e+00) (-1.8971e+00) (-3.1416e+00) 
+.2:...|...u...|...|...|...|  p: (1.3039e-01) (-1.5046e+00) 
+.3:...c...x...|...|...|...|
+.4:...|...|...u...|...|...|  p: (2.3019e+00) (-2.0790e+00) (-3.1416e+00) 
+.5:...c...|...x...|...|...|
+.6:...|...c...x...|...|...|
+.7:...|...|...|...u...|...|  p: (1.5783e+00) (-2.5865e+00) (-3.1416e+00) 
+.8:...c...|...|...x...|...|
+.9:...|...c...|...x...|...|
+10:...|...|...c...x...|...|
+11:...|...|...|...|...u...|  p: (3.1322e+00) (-1.9769e+00) 
+12:...c...|...|...|...x...|
+13:...|...c...|...|...x...|
+14:...|...|...c...|...x...|
+15:...|...|...|...c...x...|
+16:...|...|...|...|...|...u  p: (1.4124e+00) (-2.9284e-01) 
+17:...c...|...|...|...|...x
+18:...u...|...|...|...|...|  p: (2.4808e-02) (-5.1664e-01) 
+19:...|...c...|...|...|...x
+20:...|...u...|...|...|...|  p: (3.0650e+00) (1.3482e+00) (-3.1416e+00) 
+21:...c...x...|...|...|...|
+22:...|...|...c...|...|...x
+23:...|...|...u...|...|...|  p: (1.1773e+00) (2.6731e-01) (-3.1416e+00) 
+24:...c...|...x...|...|...|
+25:...|...c...x...|...|...|
+26:...|...|...|...c...|...x
+27:...|...|...|...u...|...|  p: (2.4346e+00) (-2.2483e+00) (-3.1416e+00) 
+28:...c...|...|...x...|...|
+29:...|...c...|...x...|...|
+30:...|...|...c...x...|...|
+31:...|...|...|...|...c...x
+32:...|...|...|...|...u...|  p: (1.7483e+00) (-7.9582e-01) (-3.1416e+00) 
+33:...c...|...|...|...x...|
+34:...|...c...|...|...x...|
+35:...|...|...c...|...x...|
+36:...|...|...|...c...x...|
+37:...|...|...|...|...|...u  p: (1.8339e+00) (-2.0475e+00) 
+38:...c...|...|...|...|...x
+39:...u...|...|...|...|...|  p: (2.7761e+00) (-1.2238e+00) 
+40:...|...c...|...|...|...x
+41:...|...u...|...|...|...|  p: (2.7270e+00) (-3.0056e+00) 
+42:...c...x...|...|...|...|
+43:...|...|...c...|...|...x
+44:...|...|...u...|...|...|  p: (2.4016e+00) (2.5676e+00) (-3.1416e+00) 
+45:...c...|...x...|...|...|
+46:...|...c...x...|...|...|
+47:...|...|...|...c...|...x
+48:...|...|...|...u...|...|  p: (3.0590e+00) (-1.1358e+00) (-3.1416e+00) 
+49:...c...|...|...x...|...|
+50:...|...c...|...x...|...|
+51:...|...|...c...x...|...|
+52:...|...|...|...|...c...x
+53:...|...|...|...|...u...|  p: (2.1966e+00) (-2.5732e+00) (-3.1416e+00) 
+54:...c...|...|...|...x...|
+55:...|...c...|...|...x...|
+56:...|...|...c...|...x...|
+57:...|...|...|...c...x...|
+58:...|...|...|...|...|...u  p: (2.5067e+00) (-1.2522e+00) (-3.1416e+00) 
+59:...c...|...|...|...|...x
+60:...u...|...|...|...|...|  p: (7.1618e-01) (1.2500e+00) 
+61:...|...c...|...|...|...x
+62:...|...u...|...|...|...|  p: (1.0764e+00) (2.2422e+00) (-3.1416e+00) 
+63:...|...|...c...|...|...x
+64:...|...|...u...|...|...|  p: (2.9466e-01) (2.2095e+00) 
+65:...|...|...|...c...|...x
+66:...|...|...|...u...|...|  p: (2.3481e+00) (1.6000e+00) (-3.1416e+00) 
+67:...|...|...|...|...c...x
+68:...|...|...|...|...u...|  p: (2.8426e+00) (-1.2820e+00) (-3.1416e+00) 
+69:...|...|...|...|...|...u  p: (1.1355e+00) (2.4123e+00) (-3.1416e+00) 
+70:========================
+71:...0...|...|...|...|...|
+72:...|...1...|...|...|...|
+73:...|...|...2...|...|...|
+74:...|...|...|...3...|...|
+75:...|...|...|...|...4...|
+76:...|...|...|...|...|...5
+.o:...0...1...2...3...4...5
+Total Permutations: 720
+Min time:           1.3630e-04s................. Permutation 718: 0 -> 5|1 -> 4|2 -> 3|3 -> 2|4 -> 0|5 -> 1|
+Max time:           3.4147e-04s................. Permutation 600: 0 -> 5|1 -> 0|2 -> 1|3 -> 2|4 -> 3|5 -> 4|
+Min active nodes:   63  nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|3 -> 3|4 -> 4|5 -> 5|
+Min max nodes:      189 nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|3 -> 3|4 -> 4|5 -> 5|
+Max active nodes:   63  nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|3 -> 3|4 -> 4|5 -> 5|
+Max max nodes:      189 nodes.................... Permutation 0  : 0 -> 0|1 -> 1|2 -> 2|3 -> 3|4 -> 4|5 -> 5|
+________________________________________________________________________________________________
+
+720 permutations have 63 active nodes.
+
+...........................
+Average time: 1.6395e-04s
+
+________________________________________________________________________________________________
+
+720 permutations have 189 max nodes.
+
+...........................
+Average time: 1.6395e-04s
+
+________________________________________________________________________________________________
+
+execution time of: 1.3630e-04s: Index: 718 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 3|3 -> 2|4 -> 0|5 -> 1|
+execution time of: 1.3690e-04s: Index: 599 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 3|3 -> 2|4 -> 1|5 -> 0|
+execution time of: 1.3769e-04s: Index: 598 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 3|3 -> 2|4 -> 0|5 -> 1|
+execution time of: 1.3782e-04s: Index: 719 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 3|3 -> 2|4 -> 1|5 -> 0|
+execution time of: 1.3817e-04s: Index: 695 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 4|3 -> 2|4 -> 1|5 -> 0|
+execution time of: 1.4058e-04s: Index: 717 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 3|3 -> 1|4 -> 2|5 -> 0|
+execution time of: 1.4058e-04s: Index: 597 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 3|3 -> 1|4 -> 2|5 -> 0|
+execution time of: 1.4108e-04s: Index: 596 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 3|3 -> 1|4 -> 0|5 -> 2|
+execution time of: 1.4128e-04s: Index: 593 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 2|3 -> 3|4 -> 1|5 -> 0|
+execution time of: 1.4147e-04s: Index: 575 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 5|3 -> 2|4 -> 1|5 -> 0|
+execution time of: 1.4167e-04s: Index: 594 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 3|3 -> 0|4 -> 1|5 -> 2|
+execution time of: 1.4173e-04s: Index: 479 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 4|3 -> 2|4 -> 1|5 -> 0|
+execution time of: 1.4217e-04s: Index: 478 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 4|3 -> 2|4 -> 0|5 -> 1|
+execution time of: 1.4218e-04s: Index: 595 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 3|3 -> 0|4 -> 2|5 -> 1|
+execution time of: 1.4234e-04s: Index: 574 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 5|3 -> 2|4 -> 0|5 -> 1|
+execution time of: 1.4252e-04s: Index: 716 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 3|3 -> 1|4 -> 0|5 -> 2|
+execution time of: 1.4258e-04s: Index: 694 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 4|3 -> 2|4 -> 0|5 -> 1|
+execution time of: 1.4279e-04s: Index: 712 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 2|3 -> 3|4 -> 0|5 -> 1|
+execution time of: 1.4288e-04s: Index: 713 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 2|3 -> 3|4 -> 1|5 -> 0|
+execution time of: 1.4335e-04s: Index: 455 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 5|3 -> 2|4 -> 1|5 -> 0|
+execution time of: 1.4359e-04s: Index: 573 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 5|3 -> 1|4 -> 2|5 -> 0|
+execution time of: 1.4361e-04s: Index: 592 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 2|3 -> 3|4 -> 0|5 -> 1|
+execution time of: 1.4423e-04s: Index: 715 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 3|3 -> 0|4 -> 2|5 -> 1|
+execution time of: 1.4424e-04s: Index: 477 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 4|3 -> 1|4 -> 2|5 -> 0|
+execution time of: 1.4432e-04s: Index: 571 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 5|3 -> 0|4 -> 2|5 -> 1|
+execution time of: 1.4478e-04s: Index: 454 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 5|3 -> 2|4 -> 0|5 -> 1|
+execution time of: 1.4553e-04s: Index: 572 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 5|3 -> 1|4 -> 0|5 -> 2|
+execution time of: 1.4577e-04s: Index: 693 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 4|3 -> 1|4 -> 2|5 -> 0|
+execution time of: 1.4586e-04s: Index: 692 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 4|3 -> 1|4 -> 0|5 -> 2|
+execution time of: 1.4640e-04s: Index: 689 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 2|3 -> 4|4 -> 1|5 -> 0|
+execution time of: 1.4649e-04s: Index: 569 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 2|3 -> 5|4 -> 1|5 -> 0|
+execution time of: 1.4650e-04s: Index: 590 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 2|3 -> 1|4 -> 0|5 -> 3|
+execution time of: 1.4657e-04s: Index: 690 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 4|3 -> 0|4 -> 1|5 -> 2|
+execution time of: 1.4669e-04s: Index: 688 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 2|3 -> 4|4 -> 0|5 -> 1|
+execution time of: 1.4672e-04s: Index: 714 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 3|3 -> 0|4 -> 1|5 -> 2|
+execution time of: 1.4710e-04s: Index: 475 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 4|3 -> 0|4 -> 2|5 -> 1|
+execution time of: 1.4712e-04s: Index: 564 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 2|3 -> 0|4 -> 1|5 -> 5|
+execution time of: 1.4749e-04s: Index: 570 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 5|3 -> 0|4 -> 1|5 -> 2|
+execution time of: 1.4755e-04s: Index: 708 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 2|3 -> 0|4 -> 1|5 -> 3|
+execution time of: 1.4768e-04s: Index: 545 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 3|3 -> 5|4 -> 1|5 -> 0|
+execution time of: 1.4774e-04s: Index: 589 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 2|3 -> 0|4 -> 3|5 -> 1|
+execution time of: 1.4793e-04s: Index: 591 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 2|3 -> 1|4 -> 3|5 -> 0|
+execution time of: 1.4801e-04s: Index: 473 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 2|3 -> 4|4 -> 1|5 -> 0|
+execution time of: 1.4803e-04s: Index: 710 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 2|3 -> 1|4 -> 0|5 -> 3|
+execution time of: 1.4810e-04s: Index: 665 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 3|3 -> 4|4 -> 1|5 -> 0|
+execution time of: 1.4814e-04s: Index: 474 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 4|3 -> 0|4 -> 1|5 -> 2|
+execution time of: 1.4855e-04s: Index: 470 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 2|3 -> 1|4 -> 0|5 -> 4|
+execution time of: 1.4866e-04s: Index: 568 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 2|3 -> 5|4 -> 0|5 -> 1|
+execution time of: 1.4876e-04s: Index: 709 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 2|3 -> 0|4 -> 3|5 -> 1|
+execution time of: 1.4879e-04s: Index: 566 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 2|3 -> 1|4 -> 0|5 -> 5|
+execution time of: 1.4916e-04s: Index: 472 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 2|3 -> 4|4 -> 0|5 -> 1|
+execution time of: 1.4929e-04s: Index: 449 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 2|3 -> 5|4 -> 1|5 -> 0|
+execution time of: 1.4945e-04s: Index: 452 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 5|3 -> 1|4 -> 0|5 -> 2|
+execution time of: 1.4957e-04s: Index: 670 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 4|3 -> 3|4 -> 0|5 -> 1|
+execution time of: 1.4959e-04s: Index: 424 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 4|3 -> 5|4 -> 0|5 -> 1|
+execution time of: 1.4965e-04s: Index: 691 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 4|3 -> 0|4 -> 2|5 -> 1|
+execution time of: 1.4969e-04s: Index: 671 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 4|3 -> 3|4 -> 1|5 -> 0|
+execution time of: 1.4973e-04s: Index: 359 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 4|3 -> 3|4 -> 1|5 -> 0|
+execution time of: 1.4976e-04s: Index: 588 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 2|3 -> 0|4 -> 1|5 -> 3|
+execution time of: 1.4978e-04s: Index: 686 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 2|3 -> 1|4 -> 0|5 -> 4|
+execution time of: 1.4981e-04s: Index: 551 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 5|3 -> 3|4 -> 1|5 -> 0|
+execution time of: 1.4985e-04s: Index: 548 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 5|3 -> 1|4 -> 0|5 -> 3|
+execution time of: 1.4985e-04s: Index: 444 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 2|3 -> 0|4 -> 1|5 -> 5|
+execution time of: 1.5008e-04s: Index: 662 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 3|3 -> 1|4 -> 0|5 -> 4|
+execution time of: 1.5009e-04s: Index: 567 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 2|3 -> 1|4 -> 5|5 -> 0|
+execution time of: 1.5015e-04s: Index: 587 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 1|3 -> 3|4 -> 2|5 -> 0|
+execution time of: 1.5018e-04s: Index: 448 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 2|3 -> 5|4 -> 0|5 -> 1|
+execution time of: 1.5023e-04s: Index: 453 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 5|3 -> 1|4 -> 2|5 -> 0|
+execution time of: 1.5028e-04s: Index: 476 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 4|3 -> 1|4 -> 0|5 -> 2|
+execution time of: 1.5029e-04s: Index: 707 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 1|3 -> 3|4 -> 2|5 -> 0|
+execution time of: 1.5036e-04s: Index: 586 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 1|3 -> 3|4 -> 0|5 -> 2|
+execution time of: 1.5046e-04s: Index: 581 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 0|3 -> 3|4 -> 2|5 -> 1|
+execution time of: 1.5049e-04s: Index: 451 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 5|3 -> 0|4 -> 2|5 -> 1|
+execution time of: 1.5058e-04s: Index: 711 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 2|3 -> 1|4 -> 3|5 -> 0|
+execution time of: 1.5059e-04s: Index: 550 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 5|3 -> 3|4 -> 0|5 -> 1|
+execution time of: 1.5069e-04s: Index: 468 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 2|3 -> 0|4 -> 1|5 -> 4|
+execution time of: 1.5082e-04s: Index: 584 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 1|3 -> 2|4 -> 0|5 -> 3|
+execution time of: 1.5088e-04s: Index: 701 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 0|3 -> 3|4 -> 2|5 -> 1|
+execution time of: 1.5105e-04s: Index: 310 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 5|3 -> 4|4 -> 0|5 -> 1|
+execution time of: 1.5115e-04s: Index: 684 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 2|3 -> 0|4 -> 1|5 -> 4|
+execution time of: 1.5119e-04s: Index: 542 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 3|3 -> 1|4 -> 0|5 -> 5|
+execution time of: 1.5119e-04s: Index: 335 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 5|3 -> 3|4 -> 1|5 -> 0|
+execution time of: 1.5148e-04s: Index: 565 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 2|3 -> 0|4 -> 5|5 -> 1|
+execution time of: 1.5154e-04s: Index: 422 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 4|3 -> 1|4 -> 0|5 -> 5|
+execution time of: 1.5164e-04s: Index: 431 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 5|3 -> 4|4 -> 1|5 -> 0|
+execution time of: 1.5165e-04s: Index: 668 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 4|3 -> 1|4 -> 0|5 -> 3|
+execution time of: 1.5166e-04s: Index: 353 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 3|3 -> 4|4 -> 1|5 -> 0|
+execution time of: 1.5182e-04s: Index: 544 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 3|3 -> 5|4 -> 0|5 -> 1|
+execution time of: 1.5184e-04s: Index: 699 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 0|3 -> 2|4 -> 3|5 -> 1|
+execution time of: 1.5202e-04s: Index: 546 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 5|3 -> 0|4 -> 1|5 -> 3|
+execution time of: 1.5208e-04s: Index: 685 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 2|3 -> 0|4 -> 4|5 -> 1|
+execution time of: 1.5212e-04s: Index: 660 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 3|3 -> 0|4 -> 1|5 -> 4|
+execution time of: 1.5217e-04s: Index: 304 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 4|3 -> 5|4 -> 0|5 -> 1|
+execution time of: 1.5220e-04s: Index: 702 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 1|3 -> 0|4 -> 2|5 -> 3|
+execution time of: 1.5224e-04s: Index: 582 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 1|3 -> 0|4 -> 2|5 -> 3|
+execution time of: 1.5230e-04s: Index: 704 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 1|3 -> 2|4 -> 0|5 -> 3|
+execution time of: 1.5245e-04s: Index: 562 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 1|3 -> 5|4 -> 0|5 -> 2|
+execution time of: 1.5245e-04s: Index: 334 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 5|3 -> 3|4 -> 0|5 -> 1|
+execution time of: 1.5245e-04s: Index: 666 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 4|3 -> 0|4 -> 1|5 -> 3|
+execution time of: 1.5246e-04s: Index: 680 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 1|3 -> 2|4 -> 0|5 -> 4|
+execution time of: 1.5257e-04s: Index: 706 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 1|3 -> 3|4 -> 0|5 -> 2|
+execution time of: 1.5271e-04s: Index: 664 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 3|3 -> 4|4 -> 0|5 -> 1|
+execution time of: 1.5272e-04s: Index: 469 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 2|3 -> 0|4 -> 4|5 -> 1|
+execution time of: 1.5318e-04s: Index: 540 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 3|3 -> 0|4 -> 1|5 -> 5|
+execution time of: 1.5324e-04s: Index: 447 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 2|3 -> 1|4 -> 5|5 -> 0|
+execution time of: 1.5326e-04s: Index: 428 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 5|3 -> 1|4 -> 0|5 -> 4|
+execution time of: 1.5327e-04s: Index: 420 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 4|3 -> 0|4 -> 1|5 -> 5|
+execution time of: 1.5331e-04s: Index: 558 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 1|3 -> 0|4 -> 2|5 -> 5|
+execution time of: 1.5334e-04s: Index: 305 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 4|3 -> 5|4 -> 1|5 -> 0|
+execution time of: 1.5334e-04s: Index: 705 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 1|3 -> 2|4 -> 3|5 -> 0|
+execution time of: 1.5337e-04s: Index: 667 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 4|3 -> 0|4 -> 3|5 -> 1|
+execution time of: 1.5337e-04s: Index: 583 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 1|3 -> 0|4 -> 3|5 -> 2|
+execution time of: 1.5347e-04s: Index: 682 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 1|3 -> 4|4 -> 0|5 -> 2|
+execution time of: 1.5349e-04s: Index: 352 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 3|3 -> 4|4 -> 0|5 -> 1|
+execution time of: 1.5352e-04s: Index: 687 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 2|3 -> 1|4 -> 4|5 -> 0|
+execution time of: 1.5355e-04s: Index: 306 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 5|3 -> 0|4 -> 1|5 -> 4|
+execution time of: 1.5358e-04s: Index: 464 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 1|3 -> 2|4 -> 0|5 -> 4|
+execution time of: 1.5359e-04s: Index: 311 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 5|3 -> 4|4 -> 1|5 -> 0|
+execution time of: 1.5372e-04s: Index: 358 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 4|3 -> 3|4 -> 0|5 -> 1|
+execution time of: 1.5374e-04s: Index: 425 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 4|3 -> 5|4 -> 1|5 -> 0|
+execution time of: 1.5378e-04s: Index: 329 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 3|3 -> 5|4 -> 1|5 -> 0|
+execution time of: 1.5382e-04s: Index: 326 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 3|3 -> 1|4 -> 0|5 -> 5|
+execution time of: 1.5403e-04s: Index: 677 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 0|3 -> 4|4 -> 2|5 -> 1|
+execution time of: 1.5403e-04s: Index: 681 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 1|3 -> 2|4 -> 4|5 -> 0|
+execution time of: 1.5413e-04s: Index: 585 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 1|3 -> 2|4 -> 3|5 -> 0|
+execution time of: 1.5423e-04s: Index: 446 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 2|3 -> 1|4 -> 0|5 -> 5|
+execution time of: 1.5423e-04s: Index: 445 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 2|3 -> 0|4 -> 5|5 -> 1|
+execution time of: 1.5429e-04s: Index: 308 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 5|3 -> 1|4 -> 0|5 -> 4|
+execution time of: 1.5434e-04s: Index: 661 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 3|3 -> 0|4 -> 4|5 -> 1|
+execution time of: 1.5439e-04s: Index: 580 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 0|3 -> 3|4 -> 1|5 -> 2|
+execution time of: 1.5447e-04s: Index: 669 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 4|3 -> 1|4 -> 3|5 -> 0|
+execution time of: 1.5453e-04s: Index: 430 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 5|3 -> 4|4 -> 0|5 -> 1|
+execution time of: 1.5457e-04s: Index: 563 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 1|3 -> 5|4 -> 2|5 -> 0|
+execution time of: 1.5458e-04s: Index: 471 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 2|3 -> 1|4 -> 4|5 -> 0|
+execution time of: 1.5468e-04s: Index: 300 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 4|3 -> 0|4 -> 1|5 -> 5|
+execution time of: 1.5475e-04s: Index: 579 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 0|3 -> 2|4 -> 3|5 -> 1|
+execution time of: 1.5476e-04s: Index: 663 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 3|3 -> 1|4 -> 4|5 -> 0|
+execution time of: 1.5477e-04s: Index: 350 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 3|3 -> 1|4 -> 0|5 -> 4|
+execution time of: 1.5479e-04s: Index: 348 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 3|3 -> 0|4 -> 1|5 -> 4|
+execution time of: 1.5481e-04s: Index: 656 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 1|3 -> 3|4 -> 0|5 -> 4|
+execution time of: 1.5483e-04s: Index: 302 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 4|3 -> 1|4 -> 0|5 -> 5|
+execution time of: 1.5489e-04s: Index: 578 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 0|3 -> 2|4 -> 1|5 -> 3|
+execution time of: 1.5494e-04s: Index: 426 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 5|3 -> 0|4 -> 1|5 -> 4|
+execution time of: 1.5498e-04s: Index: 324 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 3|3 -> 0|4 -> 1|5 -> 5|
+execution time of: 1.5508e-04s: Index: 328 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 3|3 -> 5|4 -> 0|5 -> 1|
+execution time of: 1.5508e-04s: Index: 557 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 0|3 -> 5|4 -> 2|5 -> 1|
+execution time of: 1.5514e-04s: Index: 357 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 4|3 -> 1|4 -> 3|5 -> 0|
+execution time of: 1.5533e-04s: Index: 543 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 3|3 -> 1|4 -> 5|5 -> 0|
+execution time of: 1.5553e-04s: Index: 418 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 1|3 -> 5|4 -> 0|5 -> 4|
+execution time of: 1.5561e-04s: Index: 354 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 4|3 -> 0|4 -> 1|5 -> 3|
+execution time of: 1.5562e-04s: Index: 679 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 1|3 -> 0|4 -> 4|5 -> 2|
+execution time of: 1.5566e-04s: Index: 458 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 0|3 -> 2|4 -> 1|5 -> 4|
+execution time of: 1.5569e-04s: Index: 703 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 1|3 -> 0|4 -> 3|5 -> 2|
+execution time of: 1.5595e-04s: Index: 541 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 3|3 -> 0|4 -> 5|5 -> 1|
+execution time of: 1.5613e-04s: Index: 696 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 0|3 -> 1|4 -> 2|5 -> 3|
+execution time of: 1.5618e-04s: Index: 462 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 1|3 -> 0|4 -> 2|5 -> 4|
+execution time of: 1.5621e-04s: Index: 442 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 1|3 -> 5|4 -> 0|5 -> 2|
+execution time of: 1.5622e-04s: Index: 440 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 1|3 -> 2|4 -> 0|5 -> 5|
+execution time of: 1.5625e-04s: Index: 466 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 1|3 -> 4|4 -> 0|5 -> 2|
+execution time of: 1.5637e-04s: Index: 355 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 4|3 -> 0|4 -> 3|5 -> 1|
+execution time of: 1.5640e-04s: Index: 356 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 4|3 -> 1|4 -> 0|5 -> 3|
+execution time of: 1.5641e-04s: Index: 576 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 0|3 -> 1|4 -> 2|5 -> 3|
+execution time of: 1.5649e-04s: Index: 437 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 0|3 -> 5|4 -> 2|5 -> 1|
+execution time of: 1.5652e-04s: Index: 678 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 1|3 -> 0|4 -> 2|5 -> 4|
+execution time of: 1.5656e-04s: Index: 332 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 5|3 -> 1|4 -> 0|5 -> 3|
+execution time of: 1.5664e-04s: Index: 465 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 1|3 -> 2|4 -> 4|5 -> 0|
+execution time of: 1.5675e-04s: Index: 467 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 1|3 -> 4|4 -> 2|5 -> 0|
+execution time of: 1.5678e-04s: Index: 700 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 0|3 -> 3|4 -> 1|5 -> 2|
+execution time of: 1.5681e-04s: Index: 421 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 4|3 -> 0|4 -> 5|5 -> 1|
+execution time of: 1.5695e-04s: Index: 547 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 5|3 -> 0|4 -> 3|5 -> 1|
+execution time of: 1.5697e-04s: Index: 697 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 0|3 -> 1|4 -> 3|5 -> 2|
+execution time of: 1.5704e-04s: Index: 683 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 1|3 -> 4|4 -> 2|5 -> 0|
+execution time of: 1.5706e-04s: Index: 561 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 1|3 -> 2|4 -> 5|5 -> 0|
+execution time of: 1.5718e-04s: Index: 623 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 4|3 -> 3|4 -> 2|5 -> 1|
+execution time of: 1.5721e-04s: Index: 539 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 1|3 -> 5|4 -> 3|5 -> 0|
+execution time of: 1.5725e-04s: Index: 423 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 4|3 -> 1|4 -> 5|5 -> 0|
+execution time of: 1.5731e-04s: Index: 659 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 1|3 -> 4|4 -> 3|5 -> 0|
+execution time of: 1.5737e-04s: Index: 658 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 1|3 -> 4|4 -> 0|5 -> 3|
+execution time of: 1.5739e-04s: Index: 674 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 0|3 -> 2|4 -> 1|5 -> 4|
+execution time of: 1.5750e-04s: Index: 675 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 0|3 -> 2|4 -> 4|5 -> 1|
+execution time of: 1.5754e-04s: Index: 438 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 1|3 -> 0|4 -> 2|5 -> 5|
+execution time of: 1.5760e-04s: Index: 536 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 1|3 -> 3|4 -> 0|5 -> 5|
+execution time of: 1.5786e-04s: Index: 327 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 3|3 -> 1|4 -> 5|5 -> 0|
+execution time of: 1.5788e-04s: Index: 427 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 5|3 -> 0|4 -> 4|5 -> 1|
+execution time of: 1.5791e-04s: Index: 435 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 0|3 -> 2|4 -> 5|5 -> 1|
+execution time of: 1.5795e-04s: Index: 535 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 1|3 -> 0|4 -> 5|5 -> 3|
+execution time of: 1.5802e-04s: Index: 635 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 2|3 -> 4|4 -> 3|5 -> 0|
+execution time of: 1.5802e-04s: Index: 303 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 4|3 -> 1|4 -> 5|5 -> 0|
+execution time of: 1.5804e-04s: Index: 309 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 5|3 -> 1|4 -> 4|5 -> 0|
+execution time of: 1.5809e-04s: Index: 441 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 1|3 -> 2|4 -> 5|5 -> 0|
+execution time of: 1.5810e-04s: Index: 527 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 5|3 -> 3|4 -> 2|5 -> 0|
+execution time of: 1.5811e-04s: Index: 645 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 4|3 -> 2|4 -> 3|5 -> 0|
+execution time of: 1.5813e-04s: Index: 534 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 1|3 -> 0|4 -> 3|5 -> 5|
+execution time of: 1.5815e-04s: Index: 644 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 4|3 -> 2|4 -> 0|5 -> 3|
+execution time of: 1.5816e-04s: Index: 549 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 5|3 -> 1|4 -> 3|5 -> 0|
+execution time of: 1.5817e-04s: Index: 652 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 0|3 -> 4|4 -> 1|5 -> 3|
+execution time of: 1.5824e-04s: Index: 577 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 5|2 -> 0|3 -> 1|4 -> 3|5 -> 2|
+execution time of: 1.5833e-04s: Index: 518 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 3|3 -> 2|4 -> 0|5 -> 5|
+execution time of: 1.5834e-04s: Index: 521 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 3|3 -> 5|4 -> 2|5 -> 0|
+execution time of: 1.5835e-04s: Index: 537 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 1|3 -> 3|4 -> 5|5 -> 0|
+execution time of: 1.5840e-04s: Index: 415 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 1|3 -> 0|4 -> 5|5 -> 4|
+execution time of: 1.5855e-04s: Index: 673 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 0|3 -> 1|4 -> 4|5 -> 2|
+execution time of: 1.5858e-04s: Index: 653 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 0|3 -> 4|4 -> 3|5 -> 1|
+execution time of: 1.5871e-04s: Index: 330 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 5|3 -> 0|4 -> 1|5 -> 3|
+execution time of: 1.5880e-04s: Index: 416 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 1|3 -> 4|4 -> 0|5 -> 5|
+execution time of: 1.5887e-04s: Index: 552 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 0|3 -> 1|4 -> 2|5 -> 5|
+execution time of: 1.5887e-04s: Index: 632 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 2|3 -> 3|4 -> 0|5 -> 4|
+execution time of: 1.5888e-04s: Index: 514 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 2|3 -> 5|4 -> 0|5 -> 3|
+execution time of: 1.5891e-04s: Index: 503 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 5|3 -> 3|4 -> 2|5 -> 1|
+execution time of: 1.5903e-04s: Index: 655 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 1|3 -> 0|4 -> 4|5 -> 3|
+execution time of: 1.5904e-04s: Index: 333 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 5|3 -> 1|4 -> 3|5 -> 0|
+execution time of: 1.5909e-04s: Index: 331 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 5|3 -> 0|4 -> 3|5 -> 1|
+execution time of: 1.5911e-04s: Index: 287 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 5|3 -> 4|4 -> 3|5 -> 0|
+execution time of: 1.5938e-04s: Index: 672 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 0|3 -> 1|4 -> 2|5 -> 4|
+execution time of: 1.5944e-04s: Index: 525 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 5|3 -> 2|4 -> 3|5 -> 0|
+execution time of: 1.5945e-04s: Index: 344 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 1|3 -> 3|4 -> 0|5 -> 4|
+execution time of: 1.5946e-04s: Index: 443 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 1|3 -> 5|4 -> 2|5 -> 0|
+execution time of: 1.5946e-04s: Index: 322 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 1|3 -> 5|4 -> 0|5 -> 3|
+execution time of: 1.5948e-04s: Index: 461 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 0|3 -> 4|4 -> 2|5 -> 1|
+execution time of: 1.5949e-04s: Index: 351 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 3|3 -> 1|4 -> 4|5 -> 0|
+execution time of: 1.5952e-04s: Index: 641 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 3|3 -> 4|4 -> 2|5 -> 0|
+execution time of: 1.5954e-04s: Index: 459 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 0|3 -> 2|4 -> 4|5 -> 1|
+execution time of: 1.5956e-04s: Index: 538 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 1|3 -> 5|4 -> 0|5 -> 3|
+execution time of: 1.5958e-04s: Index: 299 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 1|3 -> 5|4 -> 4|5 -> 0|
+execution time of: 1.5963e-04s: Index: 301 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 4|3 -> 0|4 -> 5|5 -> 1|
+execution time of: 1.5963e-04s: Index: 434 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 0|3 -> 2|4 -> 1|5 -> 5|
+execution time of: 1.5966e-04s: Index: 559 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 1|3 -> 0|4 -> 5|5 -> 2|
+execution time of: 1.5966e-04s: Index: 654 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 1|3 -> 0|4 -> 3|5 -> 4|
+execution time of: 1.5967e-04s: Index: 325 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 3|3 -> 0|4 -> 5|5 -> 1|
+execution time of: 1.5967e-04s: Index: 617 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 3|3 -> 4|4 -> 2|5 -> 1|
+execution time of: 1.5971e-04s: Index: 643 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 4|3 -> 0|4 -> 3|5 -> 2|
+execution time of: 1.5973e-04s: Index: 556 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 0|3 -> 5|4 -> 1|5 -> 2|
+execution time of: 1.5977e-04s: Index: 349 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 3|3 -> 0|4 -> 4|5 -> 1|
+execution time of: 1.5977e-04s: Index: 463 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 1|3 -> 0|4 -> 4|5 -> 2|
+execution time of: 1.5991e-04s: Index: 651 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 0|3 -> 3|4 -> 4|5 -> 1|
+execution time of: 1.5998e-04s: Index: 657 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 1|3 -> 3|4 -> 4|5 -> 0|
+execution time of: 1.5998e-04s: Index: 526 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 5|3 -> 3|4 -> 0|5 -> 2|
+execution time of: 1.6002e-04s: Index: 456 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 0|3 -> 1|4 -> 2|5 -> 4|
+execution time of: 1.6008e-04s: Index: 676 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 3|2 -> 0|3 -> 4|4 -> 1|5 -> 2|
+execution time of: 1.6017e-04s: Index: 296 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 1|3 -> 4|4 -> 0|5 -> 5|
+execution time of: 1.6017e-04s: Index: 414 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 1|3 -> 0|4 -> 4|5 -> 5|
+execution time of: 1.6030e-04s: Index: 513 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 2|3 -> 3|4 -> 5|5 -> 0|
+execution time of: 1.6040e-04s: Index: 533 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 0|3 -> 5|4 -> 3|5 -> 1|
+execution time of: 1.6048e-04s: Index: 429 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 5|3 -> 1|4 -> 4|5 -> 0|
+execution time of: 1.6050e-04s: Index: 346 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 1|3 -> 4|4 -> 0|5 -> 3|
+execution time of: 1.6059e-04s: Index: 554 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 0|3 -> 2|4 -> 1|5 -> 5|
+execution time of: 1.6068e-04s: Index: 307 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 5|3 -> 0|4 -> 4|5 -> 1|
+execution time of: 1.6069e-04s: Index: 555 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 0|3 -> 2|4 -> 5|5 -> 1|
+execution time of: 1.6077e-04s: Index: 621 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 4|3 -> 2|4 -> 3|5 -> 1|
+execution time of: 1.6085e-04s: Index: 404 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 5|3 -> 2|4 -> 0|5 -> 4|
+execution time of: 1.6098e-04s: Index: 634 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 2|3 -> 4|4 -> 0|5 -> 3|
+execution time of: 1.6099e-04s: Index: 401 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 4|3 -> 5|4 -> 2|5 -> 0|
+execution time of: 1.6106e-04s: Index: 281 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 4|3 -> 5|4 -> 3|5 -> 0|
+execution time of: 1.6109e-04s: Index: 520 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 3|3 -> 5|4 -> 0|5 -> 2|
+execution time of: 1.6112e-04s: Index: 323 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 1|3 -> 5|4 -> 3|5 -> 0|
+execution time of: 1.6116e-04s: Index: 239 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 4|3 -> 3|4 -> 2|5 -> 0|
+execution time of: 1.6117e-04s: Index: 637 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 3|3 -> 0|4 -> 4|5 -> 2|
+execution time of: 1.6118e-04s: Index: 630 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 2|3 -> 0|4 -> 3|5 -> 4|
+execution time of: 1.6123e-04s: Index: 318 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 1|3 -> 0|4 -> 3|5 -> 5|
+execution time of: 1.6131e-04s: Index: 407 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 5|3 -> 4|4 -> 2|5 -> 0|
+execution time of: 1.6140e-04s: Index: 209 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 3|3 -> 5|4 -> 2|5 -> 0|
+execution time of: 1.6142e-04s: Index: 512 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 2|3 -> 3|4 -> 0|5 -> 5|
+execution time of: 1.6145e-04s: Index: 417 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 1|3 -> 4|4 -> 5|5 -> 0|
+execution time of: 1.6146e-04s: Index: 392 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 2|3 -> 4|4 -> 0|5 -> 5|
+execution time of: 1.6146e-04s: Index: 342 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 1|3 -> 0|4 -> 3|5 -> 4|
+execution time of: 1.6150e-04s: Index: 233 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 3|3 -> 4|4 -> 2|5 -> 0|
+execution time of: 1.6150e-04s: Index: 515 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 2|3 -> 5|4 -> 3|5 -> 0|
+execution time of: 1.6151e-04s: Index: 633 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 2|3 -> 3|4 -> 4|5 -> 0|
+execution time of: 1.6153e-04s: Index: 212 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 5|3 -> 2|4 -> 0|5 -> 3|
+execution time of: 1.6155e-04s: Index: 560 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 1|3 -> 2|4 -> 0|5 -> 5|
+execution time of: 1.6157e-04s: Index: 206 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 3|3 -> 2|4 -> 0|5 -> 5|
+execution time of: 1.6157e-04s: Index: 298 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 1|3 -> 5|4 -> 0|5 -> 4|
+execution time of: 1.6173e-04s: Index: 511 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 2|3 -> 0|4 -> 5|5 -> 3|
+execution time of: 1.6185e-04s: Index: 642 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 4|3 -> 0|4 -> 2|5 -> 3|
+execution time of: 1.6187e-04s: Index: 647 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 4|3 -> 3|4 -> 2|5 -> 0|
+execution time of: 1.6188e-04s: Index: 406 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 5|3 -> 4|4 -> 0|5 -> 2|
+execution time of: 1.6190e-04s: Index: 640 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 3|3 -> 4|4 -> 0|5 -> 2|
+execution time of: 1.6192e-04s: Index: 274 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 3|3 -> 5|4 -> 0|5 -> 4|
+execution time of: 1.6192e-04s: Index: 182 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 4|3 -> 2|4 -> 0|5 -> 5|
+execution time of: 1.6193e-04s: Index: 215 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 5|3 -> 3|4 -> 2|5 -> 0|
+execution time of: 1.6201e-04s: Index: 319 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 1|3 -> 0|4 -> 5|5 -> 3|
+execution time of: 1.6202e-04s: Index: 294 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 1|3 -> 0|4 -> 4|5 -> 5|
+execution time of: 1.6204e-04s: Index: 650 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 0|3 -> 3|4 -> 1|5 -> 4|
+execution time of: 1.6205e-04s: Index: 213 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 5|3 -> 2|4 -> 3|5 -> 0|
+execution time of: 1.6207e-04s: Index: 500 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 5|3 -> 2|4 -> 1|5 -> 3|
+execution time of: 1.6209e-04s: Index: 343 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 1|3 -> 0|4 -> 4|5 -> 3|
+execution time of: 1.6213e-04s: Index: 412 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 0|3 -> 5|4 -> 1|5 -> 4|
+execution time of: 1.6217e-04s: Index: 188 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 5|3 -> 2|4 -> 0|5 -> 4|
+execution time of: 1.6217e-04s: Index: 341 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 0|3 -> 4|4 -> 3|5 -> 1|
+execution time of: 1.6220e-04s: Index: 208 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 3|3 -> 5|4 -> 0|5 -> 2|
+execution time of: 1.6234e-04s: Index: 272 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 3|3 -> 4|4 -> 0|5 -> 5|
+execution time of: 1.6234e-04s: Index: 347 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 1|3 -> 4|4 -> 3|5 -> 0|
+execution time of: 1.6243e-04s: Index: 279 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 4|3 -> 3|4 -> 5|5 -> 0|
+execution time of: 1.6244e-04s: Index: 411 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 0|3 -> 4|4 -> 5|5 -> 1|
+execution time of: 1.6254e-04s: Index: 626 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 0|3 -> 3|4 -> 2|5 -> 4|
+execution time of: 1.6258e-04s: Index: 413 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 0|3 -> 5|4 -> 4|5 -> 1|
+execution time of: 1.6258e-04s: Index: 628 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 0|3 -> 4|4 -> 2|5 -> 3|
+execution time of: 1.6265e-04s: Index: 410 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 0|3 -> 4|4 -> 1|5 -> 5|
+execution time of: 1.6266e-04s: Index: 648 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 0|3 -> 1|4 -> 3|5 -> 4|
+execution time of: 1.6267e-04s: Index: 523 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 5|3 -> 0|4 -> 3|5 -> 2|
+execution time of: 1.6269e-04s: Index: 232 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 3|3 -> 4|4 -> 0|5 -> 2|
+execution time of: 1.6271e-04s: Index: 167 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 5|3 -> 4|4 -> 3|5 -> 0|
+execution time of: 1.6273e-04s: Index: 439 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 1|3 -> 0|4 -> 5|5 -> 2|
+execution time of: 1.6277e-04s: Index: 433 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 0|3 -> 1|4 -> 5|5 -> 2|
+execution time of: 1.6281e-04s: Index: 524 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 5|3 -> 2|4 -> 0|5 -> 3|
+execution time of: 1.6282e-04s: Index: 283 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 5|3 -> 0|4 -> 4|5 -> 3|
+execution time of: 1.6286e-04s: Index: 320 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 1|3 -> 3|4 -> 0|5 -> 5|
+execution time of: 1.6289e-04s: Index: 400 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 4|3 -> 5|4 -> 0|5 -> 2|
+execution time of: 1.6291e-04s: Index: 395 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 2|3 -> 5|4 -> 4|5 -> 0|
+execution time of: 1.6297e-04s: Index: 631 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 2|3 -> 0|4 -> 4|5 -> 3|
+execution time of: 1.6300e-04s: Index: 398 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 4|3 -> 2|4 -> 0|5 -> 5|
+execution time of: 1.6301e-04s: Index: 377 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 4|3 -> 5|4 -> 2|5 -> 1|
+execution time of: 1.6304e-04s: Index: 506 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 0|3 -> 3|4 -> 2|5 -> 5|
+execution time of: 1.6305e-04s: Index: 432 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 0|3 -> 1|4 -> 2|5 -> 5|
+execution time of: 1.6310e-04s: Index: 530 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 0|3 -> 3|4 -> 1|5 -> 5|
+execution time of: 1.6313e-04s: Index: 383 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 5|3 -> 4|4 -> 2|5 -> 1|
+execution time of: 1.6318e-04s: Index: 531 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 0|3 -> 3|4 -> 5|5 -> 1|
+execution time of: 1.6322e-04s: Index: 293 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 0|3 -> 5|4 -> 4|5 -> 1|
+execution time of: 1.6323e-04s: Index: 204 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 3|3 -> 0|4 -> 2|5 -> 5|
+execution time of: 1.6326e-04s: Index: 185 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 4|3 -> 5|4 -> 2|5 -> 0|
+execution time of: 1.6326e-04s: Index: 399 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 4|3 -> 2|4 -> 5|5 -> 0|
+execution time of: 1.6333e-04s: Index: 224 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 2|3 -> 3|4 -> 0|5 -> 4|
+execution time of: 1.6338e-04s: Index: 517 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 3|3 -> 0|4 -> 5|5 -> 2|
+execution time of: 1.6340e-04s: Index: 629 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 0|3 -> 4|4 -> 3|5 -> 2|
+execution time of: 1.6344e-04s: Index: 227 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 2|3 -> 4|4 -> 3|5 -> 0|
+execution time of: 1.6345e-04s: Index: 460 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 0|3 -> 4|4 -> 1|5 -> 2|
+execution time of: 1.6346e-04s: Index: 369 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 2|3 -> 4|4 -> 5|5 -> 1|
+execution time of: 1.6350e-04s: Index: 234 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 4|3 -> 0|4 -> 2|5 -> 3|
+execution time of: 1.6352e-04s: Index: 615 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 3|3 -> 2|4 -> 4|5 -> 1|
+execution time of: 1.6353e-04s: Index: 291 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 0|3 -> 4|4 -> 5|5 -> 1|
+execution time of: 1.6354e-04s: Index: 317 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 0|3 -> 5|4 -> 3|5 -> 1|
+execution time of: 1.6355e-04s: Index: 394 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 2|3 -> 5|4 -> 0|5 -> 4|
+execution time of: 1.6357e-04s: Index: 321 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 1|3 -> 3|4 -> 5|5 -> 0|
+execution time of: 1.6357e-04s: Index: 457 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 5|2 -> 0|3 -> 1|4 -> 4|5 -> 2|
+execution time of: 1.6358e-04s: Index: 618 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 4|3 -> 1|4 -> 2|5 -> 3|
+execution time of: 1.6358e-04s: Index: 393 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 2|3 -> 4|4 -> 5|5 -> 0|
+execution time of: 1.6366e-04s: Index: 210 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 5|3 -> 0|4 -> 2|5 -> 3|
+execution time of: 1.6370e-04s: Index: 190 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 5|3 -> 4|4 -> 0|5 -> 2|
+execution time of: 1.6371e-04s: Index: 158 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 4|3 -> 3|4 -> 0|5 -> 5|
+execution time of: 1.6371e-04s: Index: 390 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 2|3 -> 0|4 -> 4|5 -> 5|
+execution time of: 1.6372e-04s: Index: 113 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 3|3 -> 4|4 -> 2|5 -> 1|
+execution time of: 1.6378e-04s: Index: 622 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 4|3 -> 3|4 -> 1|5 -> 2|
+execution time of: 1.6381e-04s: Index: 522 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 5|3 -> 0|4 -> 2|5 -> 3|
+execution time of: 1.6382e-04s: Index: 189 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 5|3 -> 2|4 -> 4|5 -> 0|
+execution time of: 1.6385e-04s: Index: 510 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 2|3 -> 0|4 -> 3|5 -> 5|
+execution time of: 1.6387e-04s: Index: 497 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 3|3 -> 5|4 -> 2|5 -> 1|
+execution time of: 1.6394e-04s: Index: 609 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 2|3 -> 3|4 -> 4|5 -> 1|
+execution time of: 1.6397e-04s: Index: 611 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 2|3 -> 4|4 -> 3|5 -> 1|
+execution time of: 1.6400e-04s: Index: 191 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 5|3 -> 4|4 -> 2|5 -> 0|
+execution time of: 1.6401e-04s: Index: 184 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 4|3 -> 5|4 -> 0|5 -> 2|
+execution time of: 1.6405e-04s: Index: 271 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 3|3 -> 0|4 -> 5|5 -> 4|
+execution time of: 1.6405e-04s: Index: 295 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 1|3 -> 0|4 -> 5|5 -> 4|
+execution time of: 1.6407e-04s: Index: 419 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 1|3 -> 5|4 -> 4|5 -> 0|
+execution time of: 1.6408e-04s: Index: 161 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 4|3 -> 5|4 -> 3|5 -> 0|
+execution time of: 1.6408e-04s: Index: 519 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 3|3 -> 2|4 -> 5|5 -> 0|
+execution time of: 1.6408e-04s: Index: 636 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 3|3 -> 0|4 -> 2|5 -> 4|
+execution time of: 1.6419e-04s: Index: 160 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 4|3 -> 5|4 -> 0|5 -> 3|
+execution time of: 1.6421e-04s: Index: 211 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 5|3 -> 0|4 -> 3|5 -> 2|
+execution time of: 1.6423e-04s: Index: 176 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 2|3 -> 4|4 -> 0|5 -> 5|
+execution time of: 1.6424e-04s: Index: 202 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 2|3 -> 5|4 -> 0|5 -> 3|
+execution time of: 1.6426e-04s: Index: 374 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 4|3 -> 2|4 -> 1|5 -> 5|
+execution time of: 1.6428e-04s: Index: 263 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 5|3 -> 4|4 -> 3|5 -> 1|
+execution time of: 1.6429e-04s: Index: 180 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 4|3 -> 0|4 -> 2|5 -> 5|
+execution time of: 1.6429e-04s: Index: 649 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 2|2 -> 0|3 -> 1|4 -> 4|5 -> 3|
+execution time of: 1.6437e-04s: Index: 165 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 5|3 -> 3|4 -> 4|5 -> 0|
+execution time of: 1.6437e-04s: Index: 203 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 2|3 -> 5|4 -> 3|5 -> 0|
+execution time of: 1.6439e-04s: Index: 277 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 4|3 -> 0|4 -> 5|5 -> 3|
+execution time of: 1.6447e-04s: Index: 238 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 4|3 -> 3|4 -> 0|5 -> 2|
+execution time of: 1.6448e-04s: Index: 286 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 5|3 -> 4|4 -> 0|5 -> 3|
+execution time of: 1.6449e-04s: Index: 504 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 0|3 -> 2|4 -> 3|5 -> 5|
+execution time of: 1.6454e-04s: Index: 198 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 2|3 -> 0|4 -> 3|5 -> 5|
+execution time of: 1.6458e-04s: Index: 516 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 3|3 -> 0|4 -> 2|5 -> 5|
+execution time of: 1.6459e-04s: Index: 174 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 2|3 -> 0|4 -> 4|5 -> 5|
+execution time of: 1.6462e-04s: Index: 237 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 4|3 -> 2|4 -> 3|5 -> 0|
+execution time of: 1.6469e-04s: Index: 226 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 2|3 -> 4|4 -> 0|5 -> 3|
+execution time of: 1.6469e-04s: Index: 280 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 4|3 -> 5|4 -> 0|5 -> 3|
+execution time of: 1.6476e-04s: Index: 297 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 1|3 -> 4|4 -> 5|5 -> 0|
+execution time of: 1.6478e-04s: Index: 627 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 0|3 -> 3|4 -> 4|5 -> 2|
+execution time of: 1.6480e-04s: Index: 495 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 3|3 -> 2|4 -> 5|5 -> 1|
+execution time of: 1.6486e-04s: Index: 608 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 2|3 -> 3|4 -> 1|5 -> 4|
+execution time of: 1.6489e-04s: Index: 371 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 2|3 -> 5|4 -> 4|5 -> 1|
+execution time of: 1.6490e-04s: Index: 313 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 0|3 -> 1|4 -> 5|5 -> 3|
+execution time of: 1.6491e-04s: Index: 152 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 3|3 -> 4|4 -> 0|5 -> 5|
+execution time of: 1.6492e-04s: Index: 528 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 0|3 -> 1|4 -> 3|5 -> 5|
+execution time of: 1.6493e-04s: Index: 95  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 5|3 -> 3|4 -> 2|5 -> 1|
+execution time of: 1.6494e-04s: Index: 166 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 5|3 -> 4|4 -> 0|5 -> 3|
+execution time of: 1.6495e-04s: Index: 278 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 4|3 -> 3|4 -> 0|5 -> 5|
+execution time of: 1.6501e-04s: Index: 340 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 0|3 -> 4|4 -> 1|5 -> 3|
+execution time of: 1.6502e-04s: Index: 509 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 0|3 -> 5|4 -> 3|5 -> 2|
+execution time of: 1.6503e-04s: Index: 223 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 2|3 -> 0|4 -> 4|5 -> 3|
+execution time of: 1.6504e-04s: Index: 616 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 3|3 -> 4|4 -> 1|5 -> 2|
+execution time of: 1.6506e-04s: Index: 214 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 5|3 -> 3|4 -> 0|5 -> 2|
+execution time of: 1.6506e-04s: Index: 222 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 2|3 -> 0|4 -> 3|5 -> 4|
+execution time of: 1.6509e-04s: Index: 314 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 0|3 -> 3|4 -> 1|5 -> 5|
+execution time of: 1.6513e-04s: Index: 230 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 3|3 -> 2|4 -> 0|5 -> 4|
+execution time of: 1.6519e-04s: Index: 187 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 5|3 -> 0|4 -> 4|5 -> 2|
+execution time of: 1.6521e-04s: Index: 316 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 0|3 -> 5|4 -> 1|5 -> 3|
+execution time of: 1.6523e-04s: Index: 175 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 2|3 -> 0|4 -> 5|5 -> 4|
+execution time of: 1.6523e-04s: Index: 275 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 3|3 -> 5|4 -> 4|5 -> 0|
+execution time of: 1.6523e-04s: Index: 619 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 4|3 -> 1|4 -> 3|5 -> 2|
+execution time of: 1.6524e-04s: Index: 164 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 5|3 -> 3|4 -> 0|5 -> 4|
+execution time of: 1.6525e-04s: Index: 267 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 0|3 -> 4|4 -> 5|5 -> 3|
+execution time of: 1.6527e-04s: Index: 505 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 0|3 -> 2|4 -> 5|5 -> 3|
+execution time of: 1.6527e-04s: Index: 625 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 0|3 -> 2|4 -> 4|5 -> 3|
+execution time of: 1.6530e-04s: Index: 436 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 0|3 -> 5|4 -> 1|5 -> 2|
+execution time of: 1.6532e-04s: Index: 207 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 3|3 -> 2|4 -> 5|5 -> 0|
+execution time of: 1.6536e-04s: Index: 200 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 2|3 -> 3|4 -> 0|5 -> 5|
+execution time of: 1.6538e-04s: Index: 375 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 4|3 -> 2|4 -> 5|5 -> 1|
+execution time of: 1.6540e-04s: Index: 225 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 2|3 -> 3|4 -> 4|5 -> 0|
+execution time of: 1.6546e-04s: Index: 179 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 2|3 -> 5|4 -> 4|5 -> 0|
+execution time of: 1.6548e-04s: Index: 553 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 3|2 -> 0|3 -> 1|4 -> 5|5 -> 2|
+execution time of: 1.6549e-04s: Index: 502 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 5|3 -> 3|4 -> 1|5 -> 2|
+execution time of: 1.6556e-04s: Index: 285 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 5|3 -> 3|4 -> 4|5 -> 0|
+execution time of: 1.6566e-04s: Index: 409 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 0|3 -> 1|4 -> 5|5 -> 4|
+execution time of: 1.6579e-04s: Index: 388 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 0|3 -> 5|4 -> 2|5 -> 4|
+execution time of: 1.6582e-04s: Index: 610 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 2|3 -> 4|4 -> 1|5 -> 3|
+execution time of: 1.6583e-04s: Index: 494 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 3|3 -> 2|4 -> 1|5 -> 5|
+execution time of: 1.6585e-04s: Index: 119 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 4|3 -> 3|4 -> 2|5 -> 1|
+execution time of: 1.6589e-04s: Index: 236 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 4|3 -> 2|4 -> 0|5 -> 3|
+execution time of: 1.6591e-04s: Index: 153 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 3|3 -> 4|4 -> 5|5 -> 0|
+execution time of: 1.6594e-04s: Index: 289 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 0|3 -> 1|4 -> 5|5 -> 4|
+execution time of: 1.6594e-04s: Index: 604 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 1|3 -> 4|4 -> 2|5 -> 3|
+execution time of: 1.6596e-04s: Index: 229 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 3|3 -> 0|4 -> 4|5 -> 2|
+execution time of: 1.6596e-04s: Index: 65  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 4|3 -> 5|4 -> 2|5 -> 1|
+execution time of: 1.6602e-04s: Index: 178 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 2|3 -> 5|4 -> 0|5 -> 4|
+execution time of: 1.6602e-04s: Index: 290 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 0|3 -> 4|4 -> 1|5 -> 5|
+execution time of: 1.6607e-04s: Index: 183 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 4|3 -> 2|4 -> 5|5 -> 0|
+execution time of: 1.6607e-04s: Index: 269 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 0|3 -> 5|4 -> 4|5 -> 3|
+execution time of: 1.6609e-04s: Index: 614 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 3|3 -> 2|4 -> 1|5 -> 4|
+execution time of: 1.6609e-04s: Index: 488 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 2|3 -> 3|4 -> 1|5 -> 5|
+execution time of: 1.6613e-04s: Index: 339 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 0|3 -> 3|4 -> 4|5 -> 1|
+execution time of: 1.6614e-04s: Index: 380 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 5|3 -> 2|4 -> 1|5 -> 4|
+execution time of: 1.6617e-04s: Index: 605 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 1|3 -> 4|4 -> 3|5 -> 2|
+execution time of: 1.6621e-04s: Index: 118 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 4|3 -> 3|4 -> 1|5 -> 2|
+execution time of: 1.6621e-04s: Index: 345 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 1|3 -> 3|4 -> 4|5 -> 0|
+execution time of: 1.6622e-04s: Index: 221 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 0|3 -> 4|4 -> 3|5 -> 2|
+execution time of: 1.6624e-04s: Index: 529 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 0|3 -> 1|4 -> 5|5 -> 3|
+execution time of: 1.6625e-04s: Index: 147 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 0|3 -> 4|4 -> 5|5 -> 3|
+execution time of: 1.6629e-04s: Index: 47  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 5|3 -> 4|4 -> 3|5 -> 1|
+execution time of: 1.6630e-04s: Index: 391 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 2|3 -> 0|4 -> 5|5 -> 4|
+execution time of: 1.6633e-04s: Index: 336 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 0|3 -> 1|4 -> 3|5 -> 4|
+execution time of: 1.6638e-04s: Index: 159 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 4|3 -> 3|4 -> 5|5 -> 0|
+execution time of: 1.6640e-04s: Index: 499 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 5|3 -> 1|4 -> 3|5 -> 2|
+execution time of: 1.6641e-04s: Index: 405 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 5|3 -> 2|4 -> 4|5 -> 0|
+execution time of: 1.6642e-04s: Index: 292 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 0|3 -> 5|4 -> 1|5 -> 4|
+execution time of: 1.6643e-04s: Index: 620 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 4|3 -> 2|4 -> 1|5 -> 3|
+execution time of: 1.6648e-04s: Index: 482 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 1|3 -> 3|4 -> 2|5 -> 5|
+execution time of: 1.6652e-04s: Index: 220 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 0|3 -> 4|4 -> 2|5 -> 3|
+execution time of: 1.6653e-04s: Index: 186 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 5|3 -> 0|4 -> 2|5 -> 4|
+execution time of: 1.6655e-04s: Index: 231 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 3|3 -> 2|4 -> 4|5 -> 0|
+execution time of: 1.6658e-04s: Index: 402 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 5|3 -> 0|4 -> 2|5 -> 4|
+execution time of: 1.6660e-04s: Index: 490 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 2|3 -> 5|4 -> 1|5 -> 3|
+execution time of: 1.6663e-04s: Index: 315 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 0|3 -> 3|4 -> 5|5 -> 1|
+execution time of: 1.6663e-04s: Index: 276 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 4|3 -> 0|4 -> 3|5 -> 5|
+execution time of: 1.6665e-04s: Index: 381 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 5|3 -> 2|4 -> 4|5 -> 1|
+execution time of: 1.6670e-04s: Index: 148 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 0|3 -> 5|4 -> 3|5 -> 4|
+execution time of: 1.6670e-04s: Index: 624 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 1|2 -> 0|3 -> 2|4 -> 3|5 -> 4|
+execution time of: 1.6675e-04s: Index: 149 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 0|3 -> 5|4 -> 4|5 -> 3|
+execution time of: 1.6689e-04s: Index: 493 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 3|3 -> 1|4 -> 5|5 -> 2|
+execution time of: 1.6691e-04s: Index: 403 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 5|3 -> 0|4 -> 4|5 -> 2|
+execution time of: 1.6708e-04s: Index: 257 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 4|3 -> 5|4 -> 3|5 -> 1|
+execution time of: 1.6710e-04s: Index: 249 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 3|3 -> 4|4 -> 5|5 -> 1|
+execution time of: 1.6712e-04s: Index: 282 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 5|3 -> 0|4 -> 3|5 -> 4|
+execution time of: 1.6714e-04s: Index: 607 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 2|3 -> 1|4 -> 4|5 -> 3|
+execution time of: 1.6717e-04s: Index: 338 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 0|3 -> 3|4 -> 1|5 -> 4|
+execution time of: 1.6725e-04s: Index: 268 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 0|3 -> 5|4 -> 3|5 -> 4|
+execution time of: 1.6730e-04s: Index: 408 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 2|2 -> 0|3 -> 1|4 -> 4|5 -> 5|
+execution time of: 1.6732e-04s: Index: 110 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 3|3 -> 2|4 -> 1|5 -> 4|
+execution time of: 1.6734e-04s: Index: 270 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 3|3 -> 0|4 -> 4|5 -> 5|
+execution time of: 1.6736e-04s: Index: 368 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 2|3 -> 4|4 -> 1|5 -> 5|
+execution time of: 1.6738e-04s: Index: 603 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 1|3 -> 3|4 -> 4|5 -> 2|
+execution time of: 1.6739e-04s: Index: 155 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 3|3 -> 5|4 -> 4|5 -> 0|
+execution time of: 1.6741e-04s: Index: 384 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 0|3 -> 2|4 -> 4|5 -> 5|
+execution time of: 1.6742e-04s: Index: 228 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 3|3 -> 0|4 -> 2|5 -> 4|
+execution time of: 1.6743e-04s: Index: 163 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 5|3 -> 0|4 -> 4|5 -> 3|
+execution time of: 1.6744e-04s: Index: 201 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 2|3 -> 3|4 -> 5|5 -> 0|
+execution time of: 1.6746e-04s: Index: 156 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 4|3 -> 0|4 -> 3|5 -> 5|
+execution time of: 1.6747e-04s: Index: 386 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 0|3 -> 4|4 -> 2|5 -> 5|
+execution time of: 1.6748e-04s: Index: 150 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 3|3 -> 0|4 -> 4|5 -> 5|
+execution time of: 1.6750e-04s: Index: 170 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 0|3 -> 4|4 -> 2|5 -> 5|
+execution time of: 1.6751e-04s: Index: 508 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 0|3 -> 5|4 -> 2|5 -> 3|
+execution time of: 1.6754e-04s: Index: 151 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 3|3 -> 0|4 -> 5|5 -> 4|
+execution time of: 1.6763e-04s: Index: 379 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 5|3 -> 1|4 -> 4|5 -> 2|
+execution time of: 1.6768e-04s: Index: 177 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 2|3 -> 4|4 -> 5|5 -> 0|
+execution time of: 1.6769e-04s: Index: 273 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 3|3 -> 4|4 -> 5|5 -> 0|
+execution time of: 1.6778e-04s: Index: 264 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 0|3 -> 3|4 -> 4|5 -> 5|
+execution time of: 1.6779e-04s: Index: 255 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 4|3 -> 3|4 -> 5|5 -> 1|
+execution time of: 1.6783e-04s: Index: 94  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 5|3 -> 3|4 -> 1|5 -> 2|
+execution time of: 1.6784e-04s: Index: 205 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 3|3 -> 0|4 -> 5|5 -> 2|
+execution time of: 1.6784e-04s: Index: 105 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 2|3 -> 3|4 -> 4|5 -> 1|
+execution time of: 1.6787e-04s: Index: 107 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 2|3 -> 4|4 -> 3|5 -> 1|
+execution time of: 1.6787e-04s: Index: 45  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 5|3 -> 3|4 -> 4|5 -> 1|
+execution time of: 1.6792e-04s: Index: 507 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 1|2 -> 0|3 -> 3|4 -> 5|5 -> 2|
+execution time of: 1.6799e-04s: Index: 376 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 4|3 -> 5|4 -> 1|5 -> 2|
+execution time of: 1.6802e-04s: Index: 265 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 0|3 -> 3|4 -> 5|5 -> 4|
+execution time of: 1.6807e-04s: Index: 117 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 4|3 -> 2|4 -> 3|5 -> 1|
+execution time of: 1.6812e-04s: Index: 373 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 4|3 -> 1|4 -> 5|5 -> 2|
+execution time of: 1.6812e-04s: Index: 199 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 2|3 -> 0|4 -> 5|5 -> 3|
+execution time of: 1.6814e-04s: Index: 195 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 0|3 -> 3|4 -> 5|5 -> 2|
+execution time of: 1.6821e-04s: Index: 83  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 2|3 -> 5|4 -> 3|5 -> 1|
+execution time of: 1.6821e-04s: Index: 140 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 5|3 -> 3|4 -> 2|5 -> 4|
+execution time of: 1.6822e-04s: Index: 193 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 0|3 -> 2|4 -> 5|5 -> 3|
+execution time of: 1.6825e-04s: Index: 364 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 1|3 -> 5|4 -> 2|5 -> 4|
+execution time of: 1.6841e-04s: Index: 35  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 3|3 -> 5|4 -> 4|5 -> 1|
+execution time of: 1.6847e-04s: Index: 173 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 0|3 -> 5|4 -> 4|5 -> 2|
+execution time of: 1.6849e-04s: Index: 172 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 0|3 -> 5|4 -> 2|5 -> 4|
+execution time of: 1.6851e-04s: Index: 602 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 1|3 -> 3|4 -> 2|5 -> 4|
+execution time of: 1.6859e-04s: Index: 492 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 3|3 -> 1|4 -> 2|5 -> 5|
+execution time of: 1.6861e-04s: Index: 312 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 4|2 -> 0|3 -> 1|4 -> 3|5 -> 5|
+execution time of: 1.6863e-04s: Index: 89  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 3|3 -> 5|4 -> 2|5 -> 1|
+execution time of: 1.6866e-04s: Index: 251 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 3|3 -> 5|4 -> 4|5 -> 1|
+execution time of: 1.6870e-04s: Index: 86  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 3|3 -> 2|4 -> 1|5 -> 5|
+execution time of: 1.6873e-04s: Index: 218 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 0|3 -> 3|4 -> 2|5 -> 4|
+execution time of: 1.6875e-04s: Index: 84  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 3|3 -> 1|4 -> 2|5 -> 5|
+execution time of: 1.6875e-04s: Index: 111 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 3|3 -> 2|4 -> 4|5 -> 1|
+execution time of: 1.6876e-04s: Index: 397 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 4|3 -> 0|4 -> 5|5 -> 2|
+execution time of: 1.6881e-04s: Index: 181 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 4|3 -> 0|4 -> 5|5 -> 2|
+execution time of: 1.6884e-04s: Index: 100 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 1|3 -> 4|4 -> 2|5 -> 3|
+execution time of: 1.6888e-04s: Index: 370 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 2|3 -> 5|4 -> 1|5 -> 4|
+execution time of: 1.6889e-04s: Index: 108 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 3|3 -> 1|4 -> 2|5 -> 4|
+execution time of: 1.6890e-04s: Index: 606 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 2|3 -> 1|4 -> 3|5 -> 4|
+execution time of: 1.6890e-04s: Index: 62  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 4|3 -> 2|4 -> 1|5 -> 5|
+execution time of: 1.6890e-04s: Index: 91  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 5|3 -> 1|4 -> 3|5 -> 2|
+execution time of: 1.6895e-04s: Index: 487 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 2|3 -> 1|4 -> 5|5 -> 3|
+execution time of: 1.6896e-04s: Index: 143 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 5|3 -> 4|4 -> 3|5 -> 2|
+execution time of: 1.6900e-04s: Index: 136 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 4|3 -> 5|4 -> 2|5 -> 3|
+execution time of: 1.6905e-04s: Index: 365 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 1|3 -> 5|4 -> 4|5 -> 2|
+execution time of: 1.6908e-04s: Index: 112 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 3|3 -> 4|4 -> 1|5 -> 2|
+execution time of: 1.6908e-04s: Index: 145 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 0|3 -> 3|4 -> 5|5 -> 4|
+execution time of: 1.6911e-04s: Index: 382 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 5|3 -> 4|4 -> 1|5 -> 2|
+execution time of: 1.6918e-04s: Index: 115 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 4|3 -> 1|4 -> 3|5 -> 2|
+execution time of: 1.6921e-04s: Index: 154 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 3|3 -> 5|4 -> 0|5 -> 4|
+execution time of: 1.6930e-04s: Index: 217 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 0|3 -> 2|4 -> 4|5 -> 3|
+execution time of: 1.6931e-04s: Index: 162 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 5|3 -> 0|4 -> 3|5 -> 4|
+execution time of: 1.6934e-04s: Index: 171 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 0|3 -> 4|4 -> 5|5 -> 2|
+execution time of: 1.6939e-04s: Index: 367 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 2|3 -> 1|4 -> 5|5 -> 4|
+execution time of: 1.6944e-04s: Index: 496 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 3|3 -> 5|4 -> 1|5 -> 2|
+execution time of: 1.6948e-04s: Index: 92  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 5|3 -> 2|4 -> 1|5 -> 3|
+execution time of: 1.6950e-04s: Index: 157 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 4|3 -> 0|4 -> 5|5 -> 3|
+execution time of: 1.6950e-04s: Index: 366 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 2|3 -> 1|4 -> 4|5 -> 5|
+execution time of: 1.6951e-04s: Index: 288 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 3|2 -> 0|3 -> 1|4 -> 4|5 -> 5|
+execution time of: 1.6955e-04s: Index: 491 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 2|3 -> 5|4 -> 3|5 -> 1|
+execution time of: 1.6959e-04s: Index: 17  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 4|3 -> 5|4 -> 3|5 -> 2|
+execution time of: 1.6962e-04s: Index: 483 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 1|3 -> 3|4 -> 5|5 -> 2|
+execution time of: 1.6964e-04s: Index: 68  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 5|3 -> 2|4 -> 1|5 -> 4|
+execution time of: 1.6966e-04s: Index: 71  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 5|3 -> 4|4 -> 2|5 -> 1|
+execution time of: 1.6967e-04s: Index: 98  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 1|3 -> 3|4 -> 2|5 -> 4|
+execution time of: 1.6968e-04s: Index: 144 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 0|3 -> 3|4 -> 4|5 -> 5|
+execution time of: 1.6968e-04s: Index: 146 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 2|2 -> 0|3 -> 4|4 -> 3|5 -> 5|
+execution time of: 1.6970e-04s: Index: 266 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 0|3 -> 4|4 -> 3|5 -> 5|
+execution time of: 1.6970e-04s: Index: 88  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 3|3 -> 5|4 -> 1|5 -> 2|
+execution time of: 1.6971e-04s: Index: 169 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 0|3 -> 2|4 -> 5|5 -> 4|
+execution time of: 1.6980e-04s: Index: 41  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 4|3 -> 5|4 -> 3|5 -> 1|
+execution time of: 1.6980e-04s: Index: 489 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 2|3 -> 3|4 -> 5|5 -> 1|
+execution time of: 1.6980e-04s: Index: 389 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 0|3 -> 5|4 -> 4|5 -> 2|
+execution time of: 1.6982e-04s: Index: 82  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 2|3 -> 5|4 -> 1|5 -> 3|
+execution time of: 1.6982e-04s: Index: 216 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 0|3 -> 2|4 -> 3|5 -> 4|
+execution time of: 1.6982e-04s: Index: 361 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 1|3 -> 2|4 -> 5|5 -> 4|
+execution time of: 1.6983e-04s: Index: 501 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 5|3 -> 2|4 -> 3|5 -> 1|
+execution time of: 1.6985e-04s: Index: 137 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 4|3 -> 5|4 -> 3|5 -> 2|
+execution time of: 1.6989e-04s: Index: 142 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 5|3 -> 4|4 -> 2|5 -> 3|
+execution time of: 1.6993e-04s: Index: 196 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 0|3 -> 5|4 -> 2|5 -> 3|
+execution time of: 1.7006e-04s: Index: 114 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 4|3 -> 1|4 -> 2|5 -> 3|
+execution time of: 1.7006e-04s: Index: 484 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 1|3 -> 5|4 -> 2|5 -> 3|
+execution time of: 1.7020e-04s: Index: 78  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 2|3 -> 1|4 -> 3|5 -> 5|
+execution time of: 1.7025e-04s: Index: 129 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 3|3 -> 4|4 -> 5|5 -> 2|
+execution time of: 1.7025e-04s: Index: 64  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 4|3 -> 5|4 -> 1|5 -> 2|
+execution time of: 1.7027e-04s: Index: 23  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 5|3 -> 4|4 -> 3|5 -> 2|
+execution time of: 1.7028e-04s: Index: 362 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 1|3 -> 4|4 -> 2|5 -> 5|
+execution time of: 1.7028e-04s: Index: 46  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 5|3 -> 4|4 -> 1|5 -> 3|
+execution time of: 1.7029e-04s: Index: 261 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 5|3 -> 3|4 -> 4|5 -> 1|
+execution time of: 1.7034e-04s: Index: 116 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 4|3 -> 2|4 -> 1|5 -> 3|
+execution time of: 1.7035e-04s: Index: 121 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 2|3 -> 3|4 -> 5|5 -> 4|
+execution time of: 1.7039e-04s: Index: 131 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 3|3 -> 5|4 -> 4|5 -> 2|
+execution time of: 1.7041e-04s: Index: 235 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 4|3 -> 0|4 -> 3|5 -> 2|
+execution time of: 1.7042e-04s: Index: 33  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 3|3 -> 4|4 -> 5|5 -> 1|
+execution time of: 1.7045e-04s: Index: 42  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 5|3 -> 1|4 -> 3|5 -> 4|
+execution time of: 1.7046e-04s: Index: 74  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 1|3 -> 3|4 -> 2|5 -> 5|
+execution time of: 1.7049e-04s: Index: 219 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 5|2 -> 0|3 -> 3|4 -> 4|5 -> 2|
+execution time of: 1.7049e-04s: Index: 39  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 4|3 -> 3|4 -> 5|5 -> 1|
+execution time of: 1.7053e-04s: Index: 168 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 3|2 -> 0|3 -> 2|4 -> 4|5 -> 5|
+execution time of: 1.7053e-04s: Index: 337 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 5|2 -> 0|3 -> 1|4 -> 4|5 -> 3|
+execution time of: 1.7069e-04s: Index: 613 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 3|3 -> 1|4 -> 4|5 -> 2|
+execution time of: 1.7071e-04s: Index: 480 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 1|3 -> 2|4 -> 3|5 -> 5|
+execution time of: 1.7081e-04s: Index: 11  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 3|3 -> 5|4 -> 4|5 -> 2|
+execution time of: 1.7082e-04s: Index: 122 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 2|3 -> 4|4 -> 3|5 -> 5|
+execution time of: 1.7090e-04s: Index: 120 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 2|3 -> 3|4 -> 4|5 -> 5|
+execution time of: 1.7095e-04s: Index: 485 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 1|3 -> 5|4 -> 3|5 -> 2|
+execution time of: 1.7102e-04s: Index: 44  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 5|3 -> 3|4 -> 1|5 -> 4|
+execution time of: 1.7108e-04s: Index: 102 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 2|3 -> 1|4 -> 3|5 -> 4|
+execution time of: 1.7111e-04s: Index: 245 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 1|3 -> 5|4 -> 4|5 -> 3|
+execution time of: 1.7114e-04s: Index: 387 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 1|2 -> 0|3 -> 4|4 -> 5|5 -> 2|
+execution time of: 1.7114e-04s: Index: 250 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 3|3 -> 5|4 -> 1|5 -> 4|
+execution time of: 1.7115e-04s: Index: 103 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 2|3 -> 1|4 -> 4|5 -> 3|
+execution time of: 1.7118e-04s: Index: 124 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 2|3 -> 5|4 -> 3|5 -> 4|
+execution time of: 1.7121e-04s: Index: 260 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 5|3 -> 3|4 -> 1|5 -> 4|
+execution time of: 1.7122e-04s: Index: 63  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 4|3 -> 2|4 -> 5|5 -> 1|
+execution time of: 1.7131e-04s: Index: 56  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 2|3 -> 4|4 -> 1|5 -> 5|
+execution time of: 1.7135e-04s: Index: 43  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 5|3 -> 1|4 -> 4|5 -> 3|
+execution time of: 1.7140e-04s: Index: 1   | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 2|3 -> 3|4 -> 5|5 -> 4|
+execution time of: 1.7140e-04s: Index: 57  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 2|3 -> 4|4 -> 5|5 -> 1|
+execution time of: 1.7144e-04s: Index: 133 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 4|3 -> 2|4 -> 5|5 -> 3|
+execution time of: 1.7151e-04s: Index: 60  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 4|3 -> 1|4 -> 2|5 -> 5|
+execution time of: 1.7152e-04s: Index: 128 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 3|3 -> 4|4 -> 2|5 -> 5|
+execution time of: 1.7153e-04s: Index: 138 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 5|3 -> 2|4 -> 3|5 -> 4|
+execution time of: 1.7158e-04s: Index: 135 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 4|3 -> 3|4 -> 5|5 -> 2|
+execution time of: 1.7161e-04s: Index: 125 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 2|3 -> 5|4 -> 4|5 -> 3|
+execution time of: 1.7163e-04s: Index: 254 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 4|3 -> 3|4 -> 1|5 -> 5|
+execution time of: 1.7165e-04s: Index: 28  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 1|3 -> 5|4 -> 3|5 -> 4|
+execution time of: 1.7167e-04s: Index: 55  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 2|3 -> 1|4 -> 5|5 -> 4|
+execution time of: 1.7171e-04s: Index: 90  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 5|3 -> 1|4 -> 2|5 -> 3|
+execution time of: 1.7173e-04s: Index: 104 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 2|3 -> 3|4 -> 1|5 -> 4|
+execution time of: 1.7175e-04s: Index: 123 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 2|3 -> 4|4 -> 5|5 -> 3|
+execution time of: 1.7175e-04s: Index: 192 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 0|3 -> 2|4 -> 3|5 -> 5|
+execution time of: 1.7177e-04s: Index: 242 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 1|3 -> 4|4 -> 3|5 -> 5|
+execution time of: 1.7184e-04s: Index: 9   | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 3|3 -> 4|4 -> 5|5 -> 2|
+execution time of: 1.7186e-04s: Index: 243 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 1|3 -> 4|4 -> 5|5 -> 3|
+execution time of: 1.7192e-04s: Index: 75  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 1|3 -> 3|4 -> 5|5 -> 2|
+execution time of: 1.7197e-04s: Index: 109 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 3|3 -> 1|4 -> 4|5 -> 2|
+execution time of: 1.7199e-04s: Index: 70  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 5|3 -> 4|4 -> 1|5 -> 2|
+execution time of: 1.7200e-04s: Index: 8   | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 3|3 -> 4|4 -> 2|5 -> 5|
+execution time of: 1.7202e-04s: Index: 3   | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 2|3 -> 4|4 -> 5|5 -> 3|
+execution time of: 1.7208e-04s: Index: 5   | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 2|3 -> 5|4 -> 4|5 -> 3|
+execution time of: 1.7210e-04s: Index: 106 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 2|3 -> 4|4 -> 1|5 -> 3|
+execution time of: 1.7211e-04s: Index: 38  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 4|3 -> 3|4 -> 1|5 -> 5|
+execution time of: 1.7220e-04s: Index: 378 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 5|3 -> 1|4 -> 2|5 -> 4|
+execution time of: 1.7223e-04s: Index: 73  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 1|3 -> 2|4 -> 5|5 -> 3|
+execution time of: 1.7233e-04s: Index: 256 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 4|3 -> 5|4 -> 1|5 -> 3|
+execution time of: 1.7233e-04s: Index: 481 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 1|3 -> 2|4 -> 5|5 -> 3|
+execution time of: 1.7234e-04s: Index: 246 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 3|3 -> 1|4 -> 4|5 -> 5|
+execution time of: 1.7236e-04s: Index: 12  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 4|3 -> 2|4 -> 3|5 -> 5|
+execution time of: 1.7239e-04s: Index: 76  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 1|3 -> 5|4 -> 2|5 -> 3|
+execution time of: 1.7241e-04s: Index: 130 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 3|3 -> 5|4 -> 2|5 -> 4|
+execution time of: 1.7245e-04s: Index: 363 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 1|3 -> 4|4 -> 5|5 -> 2|
+execution time of: 1.7254e-04s: Index: 101 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 1|3 -> 4|4 -> 3|5 -> 2|
+execution time of: 1.7258e-04s: Index: 26  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 1|3 -> 4|4 -> 3|5 -> 5|
+execution time of: 1.7262e-04s: Index: 21  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 5|3 -> 3|4 -> 4|5 -> 2|
+execution time of: 1.7272e-04s: Index: 96  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 1|3 -> 2|4 -> 3|5 -> 4|
+execution time of: 1.7274e-04s: Index: 141 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 5|3 -> 3|4 -> 4|5 -> 2|
+execution time of: 1.7279e-04s: Index: 48  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 1|3 -> 2|4 -> 4|5 -> 5|
+execution time of: 1.7284e-04s: Index: 31  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 3|3 -> 1|4 -> 5|5 -> 4|
+execution time of: 1.7290e-04s: Index: 16  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 4|3 -> 5|4 -> 2|5 -> 3|
+execution time of: 1.7292e-04s: Index: 259 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 5|3 -> 1|4 -> 4|5 -> 3|
+execution time of: 1.7292e-04s: Index: 53  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 1|3 -> 5|4 -> 4|5 -> 2|
+execution time of: 1.7295e-04s: Index: 127 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 3|3 -> 2|4 -> 5|5 -> 4|
+execution time of: 1.7302e-04s: Index: 52  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 1|3 -> 5|4 -> 2|5 -> 4|
+execution time of: 1.7306e-04s: Index: 240 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 1|3 -> 3|4 -> 4|5 -> 5|
+execution time of: 1.7307e-04s: Index: 36  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 4|3 -> 1|4 -> 3|5 -> 5|
+execution time of: 1.7311e-04s: Index: 85  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 3|3 -> 1|4 -> 5|5 -> 2|
+execution time of: 1.7316e-04s: Index: 25  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 1|3 -> 3|4 -> 5|5 -> 4|
+execution time of: 1.7322e-04s: Index: 49  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 1|3 -> 2|4 -> 5|5 -> 4|
+execution time of: 1.7322e-04s: Index: 7   | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 3|3 -> 2|4 -> 5|5 -> 4|
+execution time of: 1.7327e-04s: Index: 20  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 5|3 -> 3|4 -> 2|5 -> 4|
+execution time of: 1.7330e-04s: Index: 498 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 5|3 -> 1|4 -> 2|5 -> 3|
+execution time of: 1.7330e-04s: Index: 244 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 1|3 -> 5|4 -> 3|5 -> 4|
+execution time of: 1.7349e-04s: Index: 77  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 1|3 -> 5|4 -> 3|5 -> 2|
+execution time of: 1.7352e-04s: Index: 253 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 4|3 -> 1|4 -> 5|5 -> 3|
+execution time of: 1.7359e-04s: Index: 80  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 2|3 -> 3|4 -> 1|5 -> 5|
+execution time of: 1.7361e-04s: Index: 79  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 2|3 -> 1|4 -> 5|5 -> 3|
+execution time of: 1.7362e-04s: Index: 139 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 5|3 -> 2|4 -> 4|5 -> 3|
+execution time of: 1.7366e-04s: Index: 99  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 1|3 -> 3|4 -> 4|5 -> 2|
+execution time of: 1.7367e-04s: Index: 72  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 1|3 -> 2|4 -> 3|5 -> 5|
+execution time of: 1.7371e-04s: Index: 40  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 4|3 -> 5|4 -> 1|5 -> 3|
+execution time of: 1.7372e-04s: Index: 248 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 3|3 -> 4|4 -> 1|5 -> 5|
+execution time of: 1.7372e-04s: Index: 61  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 4|3 -> 1|4 -> 5|5 -> 2|
+execution time of: 1.7373e-04s: Index: 10  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 3|3 -> 5|4 -> 2|5 -> 4|
+execution time of: 1.7373e-04s: Index: 132 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 4|3 -> 2|4 -> 3|5 -> 5|
+execution time of: 1.7379e-04s: Index: 241 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 1|3 -> 3|4 -> 5|5 -> 4|
+execution time of: 1.7382e-04s: Index: 58  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 2|3 -> 5|4 -> 1|5 -> 4|
+execution time of: 1.7383e-04s: Index: 29  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 1|3 -> 5|4 -> 4|5 -> 3|
+execution time of: 1.7388e-04s: Index: 81  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 2|3 -> 3|4 -> 5|5 -> 1|
+execution time of: 1.7396e-04s: Index: 22  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 5|3 -> 4|4 -> 2|5 -> 3|
+execution time of: 1.7403e-04s: Index: 258 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 5|3 -> 1|4 -> 3|5 -> 4|
+execution time of: 1.7405e-04s: Index: 97  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 5|2 -> 1|3 -> 2|4 -> 4|5 -> 3|
+execution time of: 1.7410e-04s: Index: 67  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 5|3 -> 1|4 -> 4|5 -> 2|
+execution time of: 1.7412e-04s: Index: 6   | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 3|3 -> 2|4 -> 4|5 -> 5|
+execution time of: 1.7413e-04s: Index: 66  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 5|3 -> 1|4 -> 2|5 -> 4|
+execution time of: 1.7417e-04s: Index: 360 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 0|2 -> 1|3 -> 2|4 -> 4|5 -> 5|
+execution time of: 1.7428e-04s: Index: 30  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 3|3 -> 1|4 -> 4|5 -> 5|
+execution time of: 1.7430e-04s: Index: 126 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 3|3 -> 2|4 -> 4|5 -> 5|
+execution time of: 1.7459e-04s: Index: 14  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 4|3 -> 3|4 -> 2|5 -> 5|
+execution time of: 1.7471e-04s: Index: 50  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 1|3 -> 4|4 -> 2|5 -> 5|
+execution time of: 1.7479e-04s: Index: 13  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 4|3 -> 2|4 -> 5|5 -> 3|
+execution time of: 1.7481e-04s: Index: 34  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 3|3 -> 5|4 -> 1|5 -> 4|
+execution time of: 1.7481e-04s: Index: 37  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 4|3 -> 1|4 -> 5|5 -> 3|
+execution time of: 1.7493e-04s: Index: 134 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 0|2 -> 4|3 -> 3|4 -> 2|5 -> 5|
+execution time of: 1.7536e-04s: Index: 18  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 5|3 -> 2|4 -> 3|5 -> 4|
+execution time of: 1.7541e-04s: Index: 262 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 5|3 -> 4|4 -> 1|5 -> 3|
+execution time of: 1.7556e-04s: Index: 601 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 1|3 -> 2|4 -> 4|5 -> 3|
+execution time of: 1.7561e-04s: Index: 194 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 1|1 -> 4|2 -> 0|3 -> 3|4 -> 2|5 -> 5|
+execution time of: 1.7580e-04s: Index: 32  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 3|3 -> 4|4 -> 1|5 -> 5|
+execution time of: 1.7608e-04s: Index: 24  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 1|3 -> 3|4 -> 4|5 -> 5|
+execution time of: 1.7616e-04s: Index: 19  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 5|3 -> 2|4 -> 4|5 -> 3|
+execution time of: 1.7621e-04s: Index: 2   | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 2|3 -> 4|4 -> 3|5 -> 5|
+execution time of: 1.7627e-04s: Index: 486 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 0|2 -> 2|3 -> 1|4 -> 3|5 -> 5|
+execution time of: 1.7631e-04s: Index: 252 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 0|2 -> 4|3 -> 1|4 -> 3|5 -> 5|
+execution time of: 1.7663e-04s: Index: 27  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 2|2 -> 1|3 -> 4|4 -> 5|5 -> 3|
+execution time of: 1.7705e-04s: Index: 15  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 4|3 -> 3|4 -> 5|5 -> 2|
+execution time of: 1.7740e-04s: Index: 4   | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 2|3 -> 5|4 -> 3|5 -> 4|
+execution time of: 1.7815e-04s: Index: 284 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 2|1 -> 1|2 -> 5|3 -> 3|4 -> 0|5 -> 4|
+execution time of: 1.7823e-04s: Index: 69  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 5|3 -> 2|4 -> 4|5 -> 1|
+execution time of: 1.7891e-04s: Index: 51  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 1|3 -> 4|4 -> 5|5 -> 2|
+execution time of: 1.8077e-04s: Index: 87  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 3|3 -> 2|4 -> 5|5 -> 1|
+execution time of: 2.4579e-04s: Index: 698 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 4|2 -> 0|3 -> 2|4 -> 1|5 -> 3|
+execution time of: 2.7150e-04s: Index: 59  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 3|2 -> 2|3 -> 5|4 -> 4|5 -> 1|
+execution time of: 2.7671e-04s: Index: 0   | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 1|2 -> 2|3 -> 3|4 -> 4|5 -> 5|
+execution time of: 2.9578e-04s: Index: 532 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 4|1 -> 2|2 -> 0|3 -> 5|4 -> 1|5 -> 3|
+execution time of: 3.0438e-04s: Index: 450 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 3|1 -> 4|2 -> 5|3 -> 0|4 -> 1|5 -> 2|
+execution time of: 3.2415e-04s: Index: 93  | Max_nodes: 189 | Active_nodes: 63  | 0 -> 0|1 -> 4|2 -> 5|3 -> 2|4 -> 3|5 -> 1|
+execution time of: 3.4147e-04s: Index: 600 | Max_nodes: 189 | Active_nodes: 63  | 0 -> 5|1 -> 0|2 -> 1|3 -> 2|4 -> 3|5 -> 4|
+________________________________________________________________________________________________
+

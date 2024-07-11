@@ -42,10 +42,11 @@ void optimizeInputPermutation(qc::QuantumComputation qc){
 
 void DDMinimizer::parseOptions(bool gateBased,  bool controlBased, bool allPermutations, std::string file, int qubits){
     std::map<std::string, std::pair<int, int>> fileNames = {
-    //{"ae_indep_qiskit_", {2, 7}},
+    {"ae_indep_qiskit_", {2, 7}},
     {"dj_indep_qiskit_", {2, 7}},
     {"ghz_indep_qiskit_", {2, 10}},
     {"graphstate_indep_qiskit_", {3, 7}},
+    {"grover_", {5, 5}},
     {"grover-noancilla_indep_qiskit_", {2, 7}},
     {"grover-v-chain_indep_qiskit_", {2, 7}},
     {"portfolioqaoa_indep_qiskit_", {3, 7}},
@@ -72,12 +73,16 @@ void DDMinimizer::parseOptions(bool gateBased,  bool controlBased, bool allPermu
             if (it != fileNames.end()) {
                 std::pair<int, int> minMaxQubits = it->second;
                  if(qubits != 0){
-                    if(qubits < minMaxQubits.first || qubits > minMaxQubits.second)
+                    if(qubits < minMaxQubits.first || qubits > minMaxQubits.second) {
                          std::cout << std::to_string(qubits) + " not valid for " + file + ". Please check list for available versions again.\n";
                     }
                     else{
                         DDMinimizer::runInputCompariston(qubits, qubits, gateBased, controlBased, allPermutations, file);      
                     }
+                }
+                else{
+                    DDMinimizer::runInputCompariston(minMaxQubits.first, minMaxQubits.second, gateBased, controlBased, allPermutations, file);
+                }
             }
             else {
                 std::cout << file + " not found. Please check list of available circuits again. \n";
@@ -137,7 +142,6 @@ void DDMinimizer::runInputCompariston(int from, int to, bool gateBased,  bool co
             try {
                 std::string fn = "BenchmarkQuasm/qasm/" + file + std::to_string(k) + ".qasm";
                 qasmString = DDMinimizer::readFileIntoString(fn);
-                std::cout << "Version: " + std::to_string(k) + ", file: " + fn + "\n";
             } catch (const std::exception& e) {
                 std::cout << e.what() << "\n";
             }
@@ -412,7 +416,7 @@ void DDMinimizer::runAllComparisons(std::ofstream& out, qc::QuantumComputation& 
     out << left << setfill(' ') << setw(20) << "Min active nodes: "<< DDMinimizer::formatSize_t(min_active_nodes) << " nodes" << right << setfill('.') << setw(33) << " Permutation " << DDMinimizer::formatSize_t(min_active_nodes_pos) << ": "<< DDMinimizer::permToString(permutations[min_active_nodes_pos]) << "\n";
     out << left << setfill(' ') << setw(20) << "Min max nodes: "<< DDMinimizer::formatSize_t(min_max_nodes) << " nodes" << right << setfill('.') << setw(33) << " Permutation " << DDMinimizer::formatSize_t(min_max_nodes_pos) << ": "<< DDMinimizer::permToString(permutations[min_max_nodes_pos]) << "\n";
     out << left << setfill(' ') << setw(20) << "Max active nodes: "<< DDMinimizer::formatSize_t(max_active_nodes) << " nodes" << right << setfill('.') << setw(33) << " Permutation " << DDMinimizer::formatSize_t(max_active_nodes_pos) << ": "<< DDMinimizer::permToString(permutations[max_active_nodes_pos]) << "\n";
-    out << left << setfill(' ') << setw(20) << "Max max nodes: "<< DDMinimizer::formatSize_t(max_active_nodes_pos) << " nodes" << right << setfill('.') << setw(33) << " Permutation " << DDMinimizer::formatSize_t(max_max_nodes_pos) << ": "<< DDMinimizer::permToString(permutations[max_max_nodes_pos]) << "\n";
+    out << left << setfill(' ') << setw(20) << "Max max nodes: "<< DDMinimizer::formatSize_t(max_max_nodes) << " nodes" << right << setfill('.') << setw(33) << " Permutation " << DDMinimizer::formatSize_t(max_max_nodes_pos) << ": "<< DDMinimizer::permToString(permutations[max_max_nodes_pos]) << "\n";
     out << "________________________________________________________________________________________________\n\n";
     
     
@@ -453,12 +457,12 @@ void DDMinimizer::runAllComparisons(std::ofstream& out, qc::QuantumComputation& 
     out << vec.size() << " permutations have " << entry.first << " active nodes.\n";
     //iterate over all the permutations that have the same active_nodes/ are in the vector and print the max_nodes, simulation time and the permutation itself
     for (const auto& permutation : vec) {
-        index =  std::get<0>(permutation);
-        max_nodes=  std::get<1>(permutation);
+        //index =  std::get<0>(permutation);
+        //max_nodes=  std::get<1>(permutation);
         time =  std::get<2>(permutation);
         sum_time += time;
-        out << DDMinimizer::measurementToString({true,false,true}, index, max_nodes, active_nodes, time);
-        out << DDMinimizer::permToString(permutations[index]) <<"\n";
+        //out << DDMinimizer::measurementToString({true,false,true}, index, max_nodes, active_nodes, time);
+        //out << DDMinimizer::permToString(permutations[index]) <<"\n";
         }
     out << "\n...........................\n";
     out << "Average time: " << std::scientific << std::setprecision(4) << (sum_time / vec.size()).count() << "s\n\n";
@@ -471,12 +475,12 @@ void DDMinimizer::runAllComparisons(std::ofstream& out, qc::QuantumComputation& 
         out << vec.size() << " permutations have " << entry.first << " max nodes.\n";
         //iterate over all the permutations that have the same max_nodes/ are in the vector and print the active_nodes, simulation time and the permutation itself
         for (const auto& permutation : vec) {
-            index = std::get<0>(permutation);
-            active_nodes = std::get<1>(permutation);
+            //index = std::get<0>(permutation);
+            //active_nodes = std::get<1>(permutation);
             time = std::get<2>(permutation);
             sum_time += time;
-            out << DDMinimizer::measurementToString({false,true,true}, index, max_nodes, active_nodes, time );;
-            out << DDMinimizer::permToString(permutations[index]) <<"\n";
+            //out << DDMinimizer::measurementToString({false,true,true}, index, max_nodes, active_nodes, time );;
+            //out << DDMinimizer::permToString(permutations[index]) <<"\n";
         }
         out << "\n...........................\n";
         out << "Average time: " << std::scientific << std::setprecision(4) << (sum_time / vec.size()).count() << "s\n\n";
