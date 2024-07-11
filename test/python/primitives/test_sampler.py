@@ -12,19 +12,19 @@ from mqt.ddsim.primitives import Sampler
 T = TypeVar("T", str, int)
 
 
-@pytest.fixture()
+@pytest.fixture
 def sampler() -> Sampler:
     """The sampler fixture for the tests in this file."""
     return Sampler()
 
 
-@pytest.fixture()
+@pytest.fixture
 def shots() -> int:
     """Number of shots for the tests in this file."""
     return 32768
 
 
-@pytest.fixture()
+@pytest.fixture
 def circuits() -> list[QuantumCircuit]:
     """The circuit lists fixture for the tests in this file."""
 

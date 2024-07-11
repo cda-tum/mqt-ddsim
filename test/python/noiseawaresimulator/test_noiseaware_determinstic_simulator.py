@@ -6,7 +6,7 @@ from qiskit import QuantumCircuit, qasm2
 from mqt.ddsim.deterministicnoisesimulator import DeterministicNoiseSimulatorBackend
 
 
-@pytest.fixture()
+@pytest.fixture
 def circuit() -> QuantumCircuit:
     """The circuit fixture for the tests in this file."""
     circ = qasm2.loads(
@@ -45,7 +45,7 @@ def circuit() -> QuantumCircuit:
     return circ
 
 
-@pytest.fixture()
+@pytest.fixture
 def backend() -> DeterministicNoiseSimulatorBackend:
     """The backend fixture for the tests in this file."""
     return DeterministicNoiseSimulatorBackend()

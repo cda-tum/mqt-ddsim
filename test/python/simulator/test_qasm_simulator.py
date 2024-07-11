@@ -13,13 +13,13 @@ from qiskit.circuit import Parameter
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
 
-@pytest.fixture()
+@pytest.fixture
 def backend() -> QasmSimulatorBackend:
     """The backend fixture for the tests in this file."""
     return QasmSimulatorBackend()
 
 
-@pytest.fixture()
+@pytest.fixture
 def circuit() -> QuantumCircuit:
     """The circuit fixture for the tests in this file."""
     qc = QuantumCircuit(name="test")
@@ -39,7 +39,7 @@ def circuit() -> QuantumCircuit:
     return qc
 
 
-@pytest.fixture()
+@pytest.fixture
 def shots() -> int:
     """Number of shots for the tests in this file."""
     return 8192
