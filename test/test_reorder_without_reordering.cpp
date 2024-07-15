@@ -20,6 +20,11 @@ using namespace std;
 
 std::string emptyfile = " ";
 
+
+TEST(ReorderWithoutReorderingTest, longRun) {
+     qc::DDMinimizer::runOverNight();
+}
+
 TEST(ReorderWithoutReorderingTest, runAll) {
      qc::DDMinimizer::parseOptions(true, true, true, emptyfile, 0);
 }
@@ -35,3 +40,7 @@ TEST(ReorderWithoutReorderingTest, reorderAllByGates) {
   TEST(ReorderWithoutReorderingTest, reorderAllByAll) {
      qc::DDMinimizer::parseOptions(false, false, true, emptyfile, 0);
 }
+
+ TEST(ReorderWithoutReorderingTest, grover) {
+     qc::DDMinimizer::parseOptions(false, false, true, "grover_", 5);
+}         
