@@ -39,7 +39,7 @@ namespace qc {
 
 void DDMinimizer::runOverNight(){
     std::map<std::string, std::pair<std::map<std::size_t, std::chrono::duration<long double>>, std::chrono::duration<long double>>> data = {
-        {"ae_indep_qiskit_2.qasm", {}},
+        /*{"ae_indep_qiskit_2.qasm", {}},
         {"ae_indep_qiskit_3.qasm", {}},
         {"ae_indep_qiskit_4.qasm", {}},
         {"ae_indep_qiskit_5.qasm", {}},
@@ -138,7 +138,17 @@ void DDMinimizer::runOverNight(){
         {"wstate_indep_qiskit_3.qasm", {}},
         {"wstate_indep_qiskit_4.qasm", {}},
         {"wstate_indep_qiskit_5.qasm", {}},
-        {"wstate_indep_qiskit_6.qasm", {}},
+        {"wstate_indep_qiskit_6.qasm", {}},*/
+        {"aa_0.qasm", {}},
+        {"aa_1.qasm", {}},
+        {"aa_2.qasm", {}},
+        {"aa_3.qasm", {}},
+        {"aa_4.qasm", {}},
+        {"aa_5.qasm", {}},
+        {"aa_6.qasm", {}},
+        {"aa_7.qasm", {}},
+        {"aa_8.qasm", {}},
+        {"aa_9.qasm", {}},
     };
 
     std::string input; 
@@ -334,7 +344,7 @@ std::map<std::size_t, std::chrono::duration<long double>> DDMinimizer::measureAl
 
 void DDMinimizer::printResults(std::map<std::string, std::pair<std::map<std::size_t, std::chrono::duration<long double>>, std::chrono::duration<long double>>> data){
     std::map<std::string, std::pair<int, int>> fileNames = {
-    {"ae_indep_qiskit_", {2, 6}},
+    /*{"ae_indep_qiskit_", {2, 6}},
     {"dj_indep_qiskit_", {2, 6}},
     {"ghz_indep_qiskit_", {2, 6}},
     {"graphstate_indep_qiskit_", {3, 5}},
@@ -355,7 +365,8 @@ void DDMinimizer::printResults(std::map<std::string, std::pair<std::map<std::siz
     {"su2random_indep_qiskit_", {2, 6}},
     {"twolocalrandom_indep_qiskit_", {2, 6}},
     {"vqe_indep_qiskit_", {3, 6}},
-    {"wstate_indep_qiskit_", {2, 6}}
+    {"wstate_indep_qiskit_", {2, 6}}*/
+    {"aa_", {0,9}},
     };
 
     std::string qasmString;
@@ -394,7 +405,7 @@ void DDMinimizer::printResults(std::map<std::string, std::pair<std::map<std::siz
         std::cout << "Start measuring all permutations for " + fname_all + "\n";
         std::cout.flush();
         std::ofstream out_all(fname_all);
-        for(int k = from; k <= to && k <= 6; k++){
+        for(int k = from; k <= to; k++){
             if(file.compare("random_indep_qiskit_") == 0 && k == 6){
                 continue;
             }
@@ -649,7 +660,7 @@ void DDMinimizer::finalAll(std::string name, std::ofstream& out, qc::QuantumComp
     std::chrono::duration<long double> time;
     std::chrono::duration<long double> sum_time(0);
 
-    for (const auto& entry : perm_by_active_nodes) {
+    /*for (const auto& entry : perm_by_active_nodes) {
     //save the vecotr of all permutation indices (also simulation time and max_nodes) with the same active_nodes count 
     auto& vec = entry.second;
     out << vec.size() << " permutations have " << entry.first << " active nodes.\n";
@@ -684,8 +695,14 @@ void DDMinimizer::finalAll(std::string name, std::ofstream& out, qc::QuantumComp
         out << "Average time: " << std::scientific << std::setprecision(4) << (sum_time / vec.size()).count() << "s\n\n";
         sum_time = std::chrono::duration<long double>(0);
     }
+    */
+    int max = 20;
     out << "________________________________________________________________________________________________\n\n";
     for (const auto& entry : perm_by_time) {
+        if(max == 0) {
+            break;
+        }
+        max --;
         time = entry.first; 
         const auto& perm = entry.second;
         out << "execution time of: " << std::scientific << std::setprecision(4) << time.count() << "s: ";

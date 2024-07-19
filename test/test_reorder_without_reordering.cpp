@@ -43,4 +43,8 @@ TEST(ReorderWithoutReorderingTest, reorderAllByGates) {
 
  TEST(ReorderWithoutReorderingTest, grover) {
      qc::DDMinimizer::parseOptions(false, false, true, "grover_", 5);
-}         
+}       
+
+ TEST(ReorderWithoutReorderingTest, assumption) {
+     qc::DDMinimizer::parseOptions(false, false, true, "aa", 0);
+}  
