@@ -383,3 +383,10 @@ TEST(CircuitSimTest, QFTDynamicTest) {
   const auto result = circSim->simulate(1024U);
   EXPECT_GE(result.size(), 1);
 }
+
+TEST(CircuitSimTest, GetVectorBeforeSimulate) {
+  auto qc = std::make_unique<qc::QuantumComputation>(1);
+  const CircuitSimulator ddsim(std::move(qc));
+  const auto vec = ddsim.getVector();
+  EXPECT_EQ(vec[0], 1.);
+}
