@@ -52,6 +52,8 @@ public:
 
 
   static qc::Permutation createGateBasedPermutation(std::ofstream& out, qc::QuantumComputation& qc);
+  static std::vector<std::pair<std::string, std::map<std::pair<Qubit, Qubit>, int>>>  createMaps(qc::QuantumComputation& qc);
+
 
    /**
    * @brief creates a possible permutations of the initialLayout based on how to control bits are located

@@ -139,7 +139,7 @@ void DDMinimizer::runOverNight(){
         {"wstate_indep_qiskit_4.qasm", {}},
         {"wstate_indep_qiskit_5.qasm", {}},
         {"wstate_indep_qiskit_6.qasm", {}},*/
-        {"aa_0.qasm", {}},
+        /*{"aa_0.qasm", {}},
         {"aa_1.qasm", {}},
         {"aa_2.qasm", {}},
         {"aa_3.qasm", {}},
@@ -149,6 +149,28 @@ void DDMinimizer::runOverNight(){
         {"aa_7.qasm", {}},
         {"aa_8.qasm", {}},
         {"aa_9.qasm", {}},
+        {"aa_10.qasm", {}},
+        {"aa_11.qasm", {}},
+        {"aa_12.qasm", {}},
+        {"aa_13.qasm", {}},
+        {"aa_14.qasm", {}},
+        {"aa_15.qasm", {}},
+        {"aa_16.qasm", {}},
+        {"aa_17.qasm", {}},
+        {"aa_18.qasm", {}},
+        {"aa_19.qasm", {}},*/
+        {"aaa_0.qasm", {}},
+        {"aaa_1.qasm", {}},
+        {"aaa_2.qasm", {}},
+        {"aaa_3.qasm", {}},
+        /*{"aaa_4.qasm", {}},
+        {"aaa_5.qasm", {}},
+        {"aaa_6.qasm", {}},
+        {"aaa_7.qasm", {}},
+        {"aaa_8.qasm", {}},
+        {"aaa_9.qasm", {}},
+        {"aaa_10.qasm", {}},
+        {"aaa_11.qasm", {}},*/
     };
 
     std::string input; 
@@ -194,7 +216,7 @@ void DDMinimizer::runOverNight(){
 
     } while (input != "stop");
 
-
+    std::cout << "\n Start final run for measurement!  \n";
     DDMinimizer::printResults(data);
     std::cout << "You made it!  \n";
 }
@@ -243,19 +265,21 @@ std::map<std::string, std::pair<std::map<std::size_t, std::chrono::duration<long
             qc.initialLayout = perm; 
             qc::CircuitOptimizer::elidePermutations(qc);
             std::chrono::duration<long double> resControl =  DDMinimizer::measureControl(qc); 
-            std::chrono::duration<long double> averageResControl = std::chrono::duration_cast<std::chrono::duration<long double>>(resControl + entry.second.second) / 2.0;
+
+            //std::chrono::duration<long double> min_res = std::chrono::duration<long double> (resControl +  entry.second.second) / 2.0;
+
+            std::chrono::duration<long double> min_res = std::min({resControl, entry.second.second});
 
             auto qcc = QuantumComputation::fromQASM(qasmString);
             std::map<std::size_t, std::chrono::duration<long double>> resAll = DDMinimizer::measureAll(qcc); 
 
-            data[entry.first] = std::make_pair(DDMinimizer::makeAverage(resAll, entry.second.first), averageResControl);   
+            data[entry.first] = std::make_pair(DDMinimizer::makeAverage(resAll, entry.second.first), min_res);   
 }
     return data;
 }
 
 std::map<std::size_t, std::chrono::duration<long double>> DDMinimizer::makeAverage(std::map<std::size_t, std::chrono::duration<long double>> res1, std::map<std::size_t, std::chrono::duration<long double>> res2){
-    std::map<std::size_t, std::chrono::duration<long double>> avgRes;
-        std::chrono::duration<long double> totalDifference = std::chrono::duration<long double>::zero();
+    std::map<std::size_t, std::chrono::duration<long double>> min_time;
 
         // Combine keys from both maps
         std::map<std::size_t, std::chrono::duration<long double>> combined = res1;
@@ -270,39 +294,49 @@ std::map<std::size_t, std::chrono::duration<long double>> DDMinimizer::makeAvera
                 auto duration1 = it1->second;
                 auto duration2 = it2->second;
 
-                avgRes[key] = std::chrono::duration_cast<std::chrono::duration<long double>> (duration1 + duration2) / 2.0;
-                totalDifference += std::chrono::duration<long double>(std::abs(duration1.count() - duration2.count()));
+
+                //min_time[key] = std::chrono::duration<long double> (duration1 + duration2) / 2.0;
+
+                min_time[key] = std::min({duration1, duration2});
             }
         }
-
-        std::cout << "Total Difference: " << std::scientific << std::setprecision(4) << totalDifference.count() << "\n";
-        return avgRes;
+        return min_time;
 }
 
 std::chrono::duration<long double> DDMinimizer::measureControl(qc::QuantumComputation& qc){
     auto qc_unique_ptr = std::make_unique<qc::QuantumComputation>(std::move(qc));        
-    CircuitSimulator ddsim_qc(std::move(qc_unique_ptr), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
+    CircuitSimulator ddsim(std::move(qc_unique_ptr), ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
     
-    std::chrono::duration<long double> duration_qc;
+    std::chrono::duration<long double> duration_1;
+    std::chrono::duration<long double> duration_2;
+    std::chrono::duration<long double> duration_3;
+    std::chrono::duration<long double> duration_4;
 
-    ddsim_qc.simulate(1); 
-    ddsim_qc.simulate(1); 
+    ddsim.simulate(1); 
+    ddsim.simulate(1); 
+    auto start1_qc = std::chrono::high_resolution_clock::now();
+    ddsim.simulate(1); 
+    auto end1_qc = std::chrono::high_resolution_clock::now();
+    auto start2_qc = std::chrono::high_resolution_clock::now();
+    ddsim.simulate(1); 
+    auto end2_qc = std::chrono::high_resolution_clock::now();
     auto start3_qc = std::chrono::high_resolution_clock::now();
-    ddsim_qc.simulate(1); 
+    ddsim.simulate(1); 
     auto end3_qc = std::chrono::high_resolution_clock::now();
     auto start4_qc = std::chrono::high_resolution_clock::now();
-    ddsim_qc.simulate(1); 
+    ddsim.simulate(1); 
     auto end4_qc = std::chrono::high_resolution_clock::now();
-    auto start5_qc = std::chrono::high_resolution_clock::now();
-    ddsim_qc.simulate(1); 
-    auto end5_qc = std::chrono::high_resolution_clock::now();
-    auto start6_qc = std::chrono::high_resolution_clock::now();
-    ddsim_qc.simulate(1); 
-    auto end6_qc = std::chrono::high_resolution_clock::now();
     
-    duration_qc = std::chrono::duration_cast<std::chrono::duration<long double>> (end3_qc - start3_qc + end4_qc - start4_qc + end5_qc - start5_qc + end6_qc - start6_qc) / 4.0;
-    return duration_qc;
+    duration_1 = std::chrono::duration_cast<std::chrono::duration<long double>> (end1_qc - start1_qc);
+    duration_2 = std::chrono::duration_cast<std::chrono::duration<long double>> (end2_qc - start2_qc);
+    duration_3 = std::chrono::duration_cast<std::chrono::duration<long double>> (end3_qc - start3_qc);
+    duration_4 = std::chrono::duration_cast<std::chrono::duration<long double>> (end4_qc - start4_qc);
+
+    //return std::chrono::duration_cast<std::chrono::duration<long double>> (duration_1 + duration_2 + duration_3 + duration_4) / 4.0;
+
+    return std::min({duration_1, duration_2, duration_3, duration_4});
 }
+
 
 std::map<std::size_t, std::chrono::duration<long double>> DDMinimizer::measureAll(qc::QuantumComputation& qc){
     std::map<std::size_t, std::chrono::duration<long double>> res;
@@ -310,7 +344,10 @@ std::map<std::size_t, std::chrono::duration<long double>> DDMinimizer::measureAl
     std::size_t permutation_count = DDMinimizer::factorial(bits);
     std::vector<qc::Permutation> permutations = DDMinimizer::createAllPermutations(qc);
 
-    std::chrono::duration<long double> duration;
+    std::chrono::duration<long double> duration_1;
+    std::chrono::duration<long double> duration_2;
+    std::chrono::duration<long double> duration_3;
+    std::chrono::duration<long double> duration_4;
 
     /* Simulate the circuit using each permutation
     */
@@ -323,21 +360,28 @@ std::map<std::size_t, std::chrono::duration<long double>> DDMinimizer::measureAl
 
     ddsim.simulate(1); 
     ddsim.simulate(1); 
+    auto start1_qc = std::chrono::high_resolution_clock::now();
+    ddsim.simulate(1); 
+    auto end1_qc = std::chrono::high_resolution_clock::now();
+    auto start2_qc = std::chrono::high_resolution_clock::now();
+    ddsim.simulate(1); 
+    auto end2_qc = std::chrono::high_resolution_clock::now();
     auto start3_qc = std::chrono::high_resolution_clock::now();
     ddsim.simulate(1); 
     auto end3_qc = std::chrono::high_resolution_clock::now();
     auto start4_qc = std::chrono::high_resolution_clock::now();
     ddsim.simulate(1); 
     auto end4_qc = std::chrono::high_resolution_clock::now();
-    auto start5_qc = std::chrono::high_resolution_clock::now();
-    ddsim.simulate(1); 
-    auto end5_qc = std::chrono::high_resolution_clock::now();
-    auto start6_qc = std::chrono::high_resolution_clock::now();
-    ddsim.simulate(1); 
-    auto end6_qc = std::chrono::high_resolution_clock::now();
+    
+    duration_1 = std::chrono::duration_cast<std::chrono::duration<long double>> (end1_qc - start1_qc);
+    duration_2 = std::chrono::duration_cast<std::chrono::duration<long double>> (end2_qc - start2_qc);
+    duration_3 = std::chrono::duration_cast<std::chrono::duration<long double>> (end3_qc - start3_qc);
+    duration_4 = std::chrono::duration_cast<std::chrono::duration<long double>> (end4_qc - start4_qc);
 
-    duration = std::chrono::duration_cast<std::chrono::duration<long double>> (end3_qc - start3_qc + end4_qc - start4_qc + end5_qc - start5_qc  + end6_qc - start6_qc) / 4.0;
-    res[i] = duration;
+    //res[i]  = std::chrono::duration_cast<std::chrono::duration<long double>> (duration_1 + duration_2 + duration_3 + duration_4) / 4.0;
+
+    res[i]  = std::min({duration_1, duration_2, duration_3, duration_4});
+
     }
     return res;
 }
@@ -365,8 +409,9 @@ void DDMinimizer::printResults(std::map<std::string, std::pair<std::map<std::siz
     {"su2random_indep_qiskit_", {2, 6}},
     {"twolocalrandom_indep_qiskit_", {2, 6}},
     {"vqe_indep_qiskit_", {3, 6}},
-    {"wstate_indep_qiskit_", {2, 6}}*/
-    {"aa_", {0,9}},
+    {"wstate_indep_qiskit_", {5, 6}}*/
+    //{"aa_", {0,19}},
+    {"aaa_", {0, 3}},
     };
 
     std::string qasmString;
@@ -468,7 +513,7 @@ void DDMinimizer::finalControl(std::string name, std::ofstream& out, qc::Quantum
         duration_qcc = value_pair.second;
     }
     else {
-        std::cout << "Key not found in map\n";
+        std::cout << "Key not fstopound in map\n";
     }
 
     out << std::left << std::setfill(' ') << std::setw(30) << "Identity Duration: " << std::scientific << std::setprecision(4) << duration_qc.count() << "s" << std::right << std::setfill('.') << std::setw(30) << "\n";
@@ -660,12 +705,13 @@ void DDMinimizer::finalAll(std::string name, std::ofstream& out, qc::QuantumComp
     std::chrono::duration<long double> time;
     std::chrono::duration<long double> sum_time(0);
 
-    /*for (const auto& entry : perm_by_active_nodes) {
+    
+    for (const auto& entry : perm_by_active_nodes) {
     //save the vecotr of all permutation indices (also simulation time and max_nodes) with the same active_nodes count 
     auto& vec = entry.second;
     out << vec.size() << " permutations have " << entry.first << " active nodes.\n";
     //iterate over all the permutations that have the same active_nodes/ are in the vector and print the max_nodes, simulation time and the permutation itself
-    for (const auto& permutation : vec) {
+    /*for (const auto& permutation : vec) {
         index =  std::get<0>(permutation);
         max_nodes=  std::get<1>(permutation);
         time =  std::get<2>(permutation);
@@ -673,17 +719,18 @@ void DDMinimizer::finalAll(std::string name, std::ofstream& out, qc::QuantumComp
         out << DDMinimizer::measurementToString({true,false,true}, index, max_nodes, active_nodes, time);
         out << DDMinimizer::permToString(permutations[index]) <<"\n";
         }
-    out << "\n...........................\n";
+    out << "\n...........................\n";*/
     out << "Average time: " << std::scientific << std::setprecision(4) << (sum_time / vec.size()).count() << "s\n\n";
     sum_time = std::chrono::duration<long double>(0);
     }
+
     out << "________________________________________________________________________________________________\n\n";
     for (const auto& entry : perm_by_max_nodes) {
         //save the vecotr of all permutation indices (also simulation time and active_nodes) with the same max_nodes count 
         const auto& vec = entry.second;
         out << vec.size() << " permutations have " << entry.first << " max nodes.\n";
         //iterate over all the permutations that have the same max_nodes/ are in the vector and print the active_nodes, simulation time and the permutation itself
-        for (const auto& permutation : vec) {
+        /*for (const auto& permutation : vec) {
             index = std::get<0>(permutation);
             active_nodes = std::get<1>(permutation);
             time = std::get<2>(permutation);
@@ -691,31 +738,28 @@ void DDMinimizer::finalAll(std::string name, std::ofstream& out, qc::QuantumComp
             out << DDMinimizer::measurementToString({false,true,true}, index, max_nodes, active_nodes, time );;
             out << DDMinimizer::permToString(permutations[index]) <<"\n";
         }
-        out << "\n...........................\n";
+        out << "\n...........................\n";*/
         out << "Average time: " << std::scientific << std::setprecision(4) << (sum_time / vec.size()).count() << "s\n\n";
         sum_time = std::chrono::duration<long double>(0);
     }
-    */
     int max = 20;
     out << "________________________________________________________________________________________________\n\n";
     for (const auto& entry : perm_by_time) {
-        if(max == 0) {
+        time = entry.first; 
+        const auto& perm = entry.second;
+        //Each time should only have one entry. I think
+        for (const auto& permutation : perm) {
+        if(max <= 0) {
             break;
         }
         max --;
-        time = entry.first; 
-        const auto& perm = entry.second;
         out << "execution time of: " << std::scientific << std::setprecision(4) << time.count() << "s: ";
-        //Each time should only have one entry. I think
-        for (const auto& permutation : perm) {
         index = std::get<0>(permutation);
         active_nodes = std::get<1>(permutation);
         max_nodes = std::get<2>(permutation);
-        // Assuming measurementToString and permToString functions can handle each permutation's details
         out << DDMinimizer::measurementToString({true, true, false}, index, max_nodes, active_nodes, time);
         out << DDMinimizer::permToString(permutations[index]) << "\n";
     }
-        out << "\n";
     }
     out << "________________________________________________________________________________________________\n\n";
 }
@@ -745,11 +789,9 @@ void DDMinimizer::finalAll(std::string name, std::ofstream& out, qc::QuantumComp
 
 
 void optimizeInputPermutation(qc::QuantumComputation qc){
-    /*TODO
     qc::Permutation perm = DDMinimizer::createControlBasedPermutation(qc);
     qc.initialLayout = perm;
     qc::CircuitOptimizer::elidePermutations(qc); 
-    */
 }
 
 void DDMinimizer::parseOptions(bool gateBased,  bool controlBased, bool allPermutations, std::string file, int qubits){
@@ -1209,7 +1251,137 @@ void DDMinimizer::runAllComparisons(std::ofstream& out, qc::QuantumComputation& 
 }
 
 qc::Permutation DDMinimizer::createGateBasedPermutation(std::ofstream& out, qc::QuantumComputation& qc){
-    return qc.initialLayout;
+    std::vector<std::pair<std::string, std::map<std::pair<Qubit, Qubit>, int>>> maps = DDMinimizer::createMaps(qc);
+    std::size_t bits = qc.getNqubits();
+
+    //iterate over all the ops and mark the found x-c pairs in the maps.
+    int instruction_index = 0;
+    for (const auto& op : qc.ops) {
+        if(!op->isStandardOperation()){
+            continue;
+        }
+        Controls controls = op->getControls();
+        std::vector<Qubit> targets = {op->getTargets().begin(), op->getTargets().end()};
+
+        for (const auto& control : controls) {
+            for(const auto& target : targets){
+                for(auto& map : maps){
+                    auto it = map.second.find({control.qubit, target});
+                    if (it != map.second.end()) {
+                        it->second = instruction_index; // Modify the map through the iterator
+                    }
+                }
+            }
+        }
+        instruction_index++;
+    }
+
+    std::vector<std::pair<std::string, int>> map_instruction_index_sum; 
+    for(const auto& map : maps){
+        int sum = 0;
+        for(const auto& pair : map.second){
+            if(pair.second != -1){
+                sum += pair.second;
+            }
+            else{
+                sum = -1;
+                break;
+            }
+        }
+        map_instruction_index_sum.push_back({map.first, sum});
+    }
+
+    std::vector<Qubit> layout;
+    for(const auto& map : map_instruction_index_sum){
+       switch(map.first[0]){
+            case 'c':
+                if(map.first[2] == 'x'){
+                    if(map.second != -1){
+                        std::sort(layout.begin(), layout.begin() + bits/2);
+                    }
+                }
+                else{
+                    int stat = map.first[2] - '0';
+                    if(map.second != -1){
+                        std::sort(layout.begin(), layout.end());
+                    }
+                } 
+                break;
+            case 'x':
+                if(map.first[2] == 'c'){
+                    if(map.second != -1){
+                        std::sort(layout.begin(), layout.begin() + bits/2);
+                    }
+                }
+                else{
+                    int stat = map.first[2] - '0';
+                    if(map.second != -1){
+                        std::sort(layout.begin(), layout.end());
+                    }
+                } 
+            default:
+                std::cout << "Error: No valid map name! \n";
+                break;
+        }
+    }
+
+    qc::Permutation perm;
+    std::vector<Qubit> physicalQubits(bits);
+    for (qc::Qubit i = 0; i < bits; i++) {
+          physicalQubits[i] = i;
+    }
+    for (qc::Qubit i = 0; i < bits; i++) {
+        perm[physicalQubits[i]] = layout[i];
+    }
+    return perm;
+}  
+
+std::vector<std::pair<std::string, std::map<std::pair<Qubit, Qubit>, int>>> DDMinimizer::createMaps(qc::QuantumComputation& qc){
+    std::size_t bits = qc.getNqubits();
+    std::vector<std::pair<std::string, std::map<std::pair<Qubit, Qubit>, int>>> maps; 
+    
+    //create c-x ladder
+    std::map<pair<Qubit, Qubit>, int> c_x_map; //c -> x
+    for(size_t i = 0; i < bits; i++){
+        c_x_map.insert({{i, i+1}, -1});
+    }
+    maps.push_back({"c_x", c_x_map});
+
+    //create x-c ladder
+    std::map<pair<Qubit, Qubit>, int> x_c_map;
+    for(size_t i = 0; i < bits; i++){
+        x_c_map.insert({{i+1, i}, -1});
+    }
+    maps.push_back({"x_c", x_c_map});
+
+    std::size_t halfBits = bits/2;
+    for(size_t i = 0; i < bits; i++){
+        if(i< halfBits){    
+            std::map<pair<Qubit, Qubit>, int> x_map;
+            std::map<pair<Qubit, Qubit>, int> c_map;
+            for(size_t j = 0; j < bits; j++){
+                if(i>j){
+                x_map.insert({{i, j}, -1});
+                c_map.insert({{j, i}, -1});
+                }
+            }
+            maps.push_back({"x_" + std::to_string(i), x_map});
+            maps.push_back({"c_" + std::to_string(i), c_map});
+        }
+        else {
+            std::map<pair<Qubit, Qubit>, int> x_map;
+            std::map<pair<Qubit, Qubit>, int> c_map;
+            for(size_t j = 0; j < bits; j++){
+                if(i<j){
+                x_map.insert({{i, j}, -1});
+                c_map.insert({{j, i}, -1});
+                }
+            }
+            maps.push_back({"x_" + std::to_string(i), x_map});
+            maps.push_back({"c_" + std::to_string(i), c_map});
+        }
+    }
+    return maps;
 }
 
 
@@ -1259,12 +1431,7 @@ qc::Permutation DDMinimizer::createControlBasedPermutation(qc::QuantumComputatio
         auto weightA = qubitWeights.find(a) != qubitWeights.end() ? qubitWeights.at(a) : 0;
         auto weightB = qubitWeights.find(b) != qubitWeights.end() ? qubitWeights.at(b) : 0;
         return weightA < weightB;
-    });
-
-    /*for(int i = 0; i < bits; i++){
-        std::cout << "Q: " << i << " w: " << qubitWeights[i] << " | ";
-    }
-    std::cout << "\n";*/   
+    });  
     
     qc::Permutation perm;
 
