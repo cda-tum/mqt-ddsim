@@ -46,5 +46,5 @@ TEST(ReorderWithoutReorderingTest, reorderAllByGates) {
 }       
 
  TEST(ReorderWithoutReorderingTest, assumption) {
-     qc::DDMinimizer::parseOptions(false, false, true, "aa", 0);
+     qc::DDMinimizer::parseOptions(true, false, false, "aaa_", 0);
 }  
