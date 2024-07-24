@@ -50,9 +50,16 @@ public:
   static void runLayoutComparison(std::ofstream& out, qc::QuantumComputation& qc, qc::QuantumComputation& qcc, qc::Permutation perm, std::string file, int qubits);
   static void runAllComparisons(std::ofstream& out, qc::QuantumComputation& qc, std::string file, int qubits);
 
+  static qc::Permutation createGateBasedPermutation(qc::QuantumComputation& qc);
 
-  static qc::Permutation createGateBasedPermutation(std::ofstream& out, qc::QuantumComputation& qc);
-  static std::vector<std::pair<std::string, std::map<std::pair<Qubit, Qubit>, int>>>  createMaps(qc::QuantumComputation& qc);
+  static bool isFull(std::vector<int> vec);
+  static int getStairCount(std::vector<int> vec);
+  static int getLadderPosition(std::vector<int> vec, int laadder);
+  static std::vector<Qubit> reverseLayout(std::vector<Qubit> layout);
+  static std::vector<Qubit> rotateRight(std::vector<Qubit> layout);
+  static std::vector<Qubit> rotateLeft(std::vector<Qubit> layout);
+  static std::pair<std::map<std::string, std::map<std::pair<Qubit, Qubit>, int>>,std::map<std::string, std::vector<int>>> makeDataStructure(qc::QuantumComputation& qc);
+
 
 
    /**
