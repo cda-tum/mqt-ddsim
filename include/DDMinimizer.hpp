@@ -1,54 +1,25 @@
 #include "Definitions.hpp"
 #include "Permutation.hpp"
 #include "QuantumComputation.hpp"
-#include <chrono>
-
 
 #include <cstddef>
-#include <iostream>
-#include <fstream>
-#include <memory>
-#include <algorithm>
-#include <tuple>
-#include <map>
-#include <cctype>
-#include <random>
 #include <utility>
 #include <vector>
-#include <sstream>
+#include <map>
 #include <string>
-#include <set>
+#include <algorithm>
 
 namespace qc {
 class DDMinimizer {
 
 
-
-
-
-
 public:
-  static void runOverNight();
-  static std::map<std::string, std::pair<std::map<std::size_t, std::chrono::duration<long double>>, std::chrono::duration<long double>>> initializeMap(std::map<std::string, std::pair<std::map<std::size_t, std::chrono::duration<long double>>, std::chrono::duration<long double>>> data);
-  static std::map<std::string, std::pair<std::map<std::size_t, std::chrono::duration<long double>>, std::chrono::duration<long double>>> refineMap(std::map<std::string, std::pair<std::map<std::size_t, std::chrono::duration<long double>>, std::chrono::duration<long double>>> data);
-  static std::map<std::size_t, std::chrono::duration<long double>> makeAverage(std::map<std::size_t, std::chrono::duration<long double>> res1, std::map<std::size_t, std::chrono::duration<long double>> res2);
-  static std::chrono::duration<long double> measureControl(qc::QuantumComputation& qc);
-  static std::map<std::size_t, std::chrono::duration<long double>> measureAll(qc::QuantumComputation& qc);
-  static void printResults(std::map<std::string, std::pair<std::map<std::size_t, std::chrono::duration<long double>>, std::chrono::duration<long double>>> data);
-  static void finalControl(std::string name, std::ofstream& out, qc::QuantumComputation& qc, qc::QuantumComputation& qcc, qc::Permutation perm, std::map<std::string, std::pair<std::map<std::size_t, std::chrono::duration<long double>>, std::chrono::duration<long double>>> data);
-  static void finalAll(std::string name, std::ofstream& out, qc::QuantumComputation& qc, std::map<std::string, std::pair<std::map<std::size_t, std::chrono::duration<long double>>, std::chrono::duration<long double>>> data, int qubits);
-
-
-  static void optimizeInputPermutation(qc::QuantumComputation);
-
   /**
    * @brief creates a vector hopefully the best initial Layout and applies it
    * @param QuantumComputation
    */
-  static void parseOptions(bool gateBased,  bool controlBased, bool allPermutations, std::string file, int qubits);
-  static void runInputCompariston(int from, int to, bool gateBased,  bool controlBased, bool allPermutations, std::string file);
-  static void runLayoutComparison(std::ofstream& out, qc::QuantumComputation& qc, qc::QuantumComputation& qcc, qc::Permutation perm, std::string file, int qubits);
-  static void runAllComparisons(std::ofstream& out, qc::QuantumComputation& qc, std::string file, int qubits);
+  static void optimizeInputPermutation(qc::QuantumComputation);
+
 
   static qc::Permutation createGateBasedPermutation(qc::QuantumComputation& qc);
 
@@ -59,7 +30,6 @@ public:
   static std::vector<Qubit> rotateRight(std::vector<Qubit> layout);
   static std::vector<Qubit> rotateLeft(std::vector<Qubit> layout);
   static std::pair<std::map<std::string, std::map<std::pair<Qubit, Qubit>, int>>,std::map<std::string, std::vector<int>>> makeDataStructure(qc::QuantumComputation& qc);
-
 
 
    /**
@@ -79,15 +49,6 @@ public:
    * @param number of Bits
    */
   static std::size_t factorial(std::size_t n);
-
-  static std::string readFileIntoString(const std::string& filePath);
-
-  static std::string permToString(Permutation perm);
-
-  static std::string measurementToString(std::vector<bool> code, size_t index, size_t max_nodes, size_t active_nodes, std::chrono::duration<long double> time);
-  static std::string formatSize_t(size_t t);
-
-  static void removeAnsi(std::string filePath);
 
 }; // class DDMinimizer
 } // namespace qc
