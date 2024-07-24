@@ -2,16 +2,15 @@
 #include "Permutation.hpp"
 #include "QuantumComputation.hpp"
 
+#include <algorithm>
 #include <cstddef>
-#include <utility>
-#include <vector>
 #include <map>
 #include <string>
-#include <algorithm>
+#include <utility>
+#include <vector>
 
 namespace qc {
 class DDMinimizer {
-
 
 public:
   /**
@@ -19,7 +18,6 @@ public:
    * @param QuantumComputation
    */
   static void optimizeInputPermutation(qc::QuantumComputation);
-
 
   static qc::Permutation createGateBasedPermutation(qc::QuantumComputation& qc);
 
@@ -29,23 +27,29 @@ public:
   static std::vector<Qubit> reverseLayout(std::vector<Qubit> layout);
   static std::vector<Qubit> rotateRight(std::vector<Qubit> layout);
   static std::vector<Qubit> rotateLeft(std::vector<Qubit> layout);
-  static std::pair<std::map<std::string, std::map<std::pair<Qubit, Qubit>, int>>,std::map<std::string, std::vector<int>>> makeDataStructure(qc::QuantumComputation& qc);
+  static std::pair<
+      std::map<std::string, std::map<std::pair<Qubit, Qubit>, int>>,
+      std::map<std::string, std::vector<int>>>
+  makeDataStructure(qc::QuantumComputation& qc);
 
-
-   /**
-   * @brief creates a possible permutations of the initialLayout based on how to control bits are located
+  /**
+   * @brief creates a possible permutations of the initialLayout based on how to
+   * control bits are located
    * @param QuantumComputation
    */
-  static qc::Permutation createControlBasedPermutation(qc::QuantumComputation& qc);
+  static qc::Permutation
+  createControlBasedPermutation(qc::QuantumComputation& qc);
 
   /**
    * @brief creates a vector of all possible permutations of the initialLayout
    * @param QuantumComputation
    */
-  static std::vector<qc::Permutation> createAllPermutations(qc::QuantumComputation& qc);
+  static std::vector<qc::Permutation>
+  createAllPermutations(qc::QuantumComputation& qc);
 
-   /**
-   * @brief Helper function to compute how many permutations there are for a number of qubits
+  /**
+   * @brief Helper function to compute how many permutations there are for a
+   * number of qubits
    * @param number of Bits
    */
   static std::size_t factorial(std::size_t n);
