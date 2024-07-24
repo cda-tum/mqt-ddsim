@@ -193,7 +193,7 @@ public:
 
   std::unique_ptr<dd::Package<Config>> dd =
       std::make_unique<dd::Package<Config>>();
-  dd::vEdge rootEdge{};
+  dd::vEdge rootEdge = dd::vEdge::one();
 
 protected:
   std::mt19937_64 mt;
