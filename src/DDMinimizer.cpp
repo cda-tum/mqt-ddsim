@@ -293,7 +293,7 @@ qc::Permutation
 DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc) {
   std::map<Qubit, std::set<Qubit>> controlToTargets;
 
-  for (const auto& op : qc.ops) {
+  for (const auto& op : qc) {
     if (!op->isStandardOperation()) {
       continue;
     }
