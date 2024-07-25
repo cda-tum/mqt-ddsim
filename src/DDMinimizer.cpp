@@ -40,7 +40,7 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
   // iterate over all the ops and mark the index of the found x-c pairs in the
   // map.
   int instruction_index = 0;
-  for (const auto& op : qc.ops) {
+  for (const auto& op : qc) {
     if (!op->isStandardOperation()) {
       continue;
     }
