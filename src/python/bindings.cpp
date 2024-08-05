@@ -194,7 +194,7 @@ py::class_<Sim> createSimulator(py::module_ m, const std::string& name) {
   return sim;
 }
 
-PYBIND11_MODULE(pyddsim, m) {
+PYBIND11_MODULE(pyddsim, m, py::mod_gil_not_used()) {
   m.doc() = "Python interface for the MQT DDSIM quantum circuit simulator";
 
   // Circuit Simulator

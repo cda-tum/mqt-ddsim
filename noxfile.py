@@ -18,7 +18,7 @@ nox.options.default_venv_backend = "uv|virtualenv"
 
 nox.options.sessions = ["lint", "tests"]
 
-PYTHON_ALL_VERSIONS = ["3.8", "3.9", "3.10", "3.11", "3.12"]
+PYTHON_ALL_VERSIONS = ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
 # The following lists all the build requirements for building the package.
 # Note that this includes transitive build dependencies of package dependencies,
@@ -28,7 +28,7 @@ PYTHON_ALL_VERSIONS = ["3.8", "3.9", "3.10", "3.11", "3.12"]
 BUILD_REQUIREMENTS = [
     "scikit-build-core[pyproject]>=0.8.1",
     "setuptools_scm>=7",
-    "pybind11>=2.12",
+    "pybind11>=2.13",
     "wheel>=0.40",  # transitive dependency of pytest on Windows
 ]
 
