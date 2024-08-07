@@ -1,5 +1,5 @@
 [build-system]
-requires = ["scikit-build-core>=0.8.1", "setuptools-scm>=7", "pybind11>=2.13"]
+requires = ["scikit-build-core>=0.10.1", "setuptools-scm>=7", "pybind11>=2.13"]
 build-backend = "scikit_build_core.build"
 
 [project]
@@ -81,13 +81,12 @@ Discussions = "https://github.com/cda-tum/mqt-ddsim/discussions"
 
 [tool.scikit-build]
 # Protect the configuration against future changes in scikit-build-core
-minimum-version = "0.8.1"
+minimum-version = "build-system.requires"
 
 # Set the wheel install directory
 wheel.install-dir = "mqt/ddsim"
 
-# Set required CMake and Ninja versions
-cmake.version = ">=3.19"
+# Set required Ninja version
 ninja.version = ">=1.10"
 
 # Setuptools-style build caching in a local directory
@@ -97,7 +96,7 @@ build-dir = "build/{wheel_tag}"
 wheel.packages = ["src/mqt"]
 
 # Only build the Python bindings target
-cmake.targets = ["pyddsim"]
+build.targets = ["pyddsim"]
 
 # Only install the Python package component
 install.components = ["mqt-ddsim_Python"]
@@ -112,14 +111,6 @@ sdist.exclude = [
     "**/plots",
     "**/test",
     "**/tests",
-    "extern/mqt-core/extern/json/include",
-    "extern/mqt-core/extern/googletest",
-    "extern/mqt-core/extern/boost/config/checks",
-    "extern/mqt-core/extern/boost/config/tools",
-    "extern/mqt-core/extern/boost/multiprecision/config",
-    "extern/mqt-core/extern/boost/multiprecision/example",
-    "extern/mqt-core/extern/boost/multiprecision/performance",
-    "extern/mqt-core/extern/boost/multiprecision/tools"
 ]
 
 [tool.scikit-build.cmake.define]
