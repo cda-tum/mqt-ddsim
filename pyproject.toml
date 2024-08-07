@@ -254,6 +254,8 @@ convention = "google"
 [tool.typos]
 default.extend-ignore-re = [
   '"id": ".*",',
+  "(?Rm)^.*(#|//)\\s*spellchecker:disable-line$",  # ignore line
+  "(?s)(#|//)\\s*spellchecker:off.*?\\n\\s*(#|//)\\s*spellchecker:on" # ignore block
 ]
 default.extend-ignore-identifiers-re = [
   "BasicAer",
