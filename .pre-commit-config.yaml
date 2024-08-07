@@ -105,11 +105,10 @@ repos:
           - pytest
 
   # Check for spelling
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.23.6
     hooks:
-      - id: codespell
-        args: ["-L", "wille,linz,coo", "--skip", "*.ipynb"]
+      - id: typos
 
   # Catch common capitalization mistakes
   - repo: local
