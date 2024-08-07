@@ -474,8 +474,8 @@ template <class Config> void PathSimulator<Config>::constructTaskGraph() {
         }
       };
       auto storeResultTask = taskflow.emplace(runner).name("store result");
-      auto preceedingTask = tasks.at(resultStep.id);
-      preceedingTask.precede(storeResultTask);
+      auto precedingTask = tasks.at(resultStep.id);
+      precedingTask.precede(storeResultTask);
     }
   }
 }
