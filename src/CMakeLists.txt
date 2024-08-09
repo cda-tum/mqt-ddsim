@@ -10,6 +10,8 @@ add_library(
   GroverSimulator.cpp
   ${MQT_DDSIM_INCLUDE_BUILD_DIR}/ShorSimulator.hpp
   ShorSimulator.cpp
+  ${MQT_DDSIM_INCLUDE_BUILD_DIR}/DDMinimizer.hpp
+  DDMinimizer.cpp
   ${MQT_DDSIM_INCLUDE_BUILD_DIR}/ShorFastSimulator.hpp
   ShorFastSimulator.cpp
   ${MQT_DDSIM_INCLUDE_BUILD_DIR}/StochasticNoiseSimulator.hpp
