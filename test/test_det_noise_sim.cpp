@@ -350,7 +350,7 @@ TEST(DeterministicNoiseSimTest, TestSimulateInterface) {
   }
 }
 
-TEST(DeterministicNoiseSimTest, TestSimulateInterfaceWithMeasurments) {
+TEST(DeterministicNoiseSimTest, TestSimulateInterfaceWithMeasurements) {
   auto quantumComputation = detGetAdder4Circuit();
   quantumComputation->addClassicalRegister(4);
   quantumComputation->measure(0, 0);

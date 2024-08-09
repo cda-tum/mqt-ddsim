@@ -251,8 +251,27 @@ allow-star-arg-any = true
 convention = "google"
 
 
+[tool.typos]
+default.extend-ignore-re = [
+  '"id": ".*",',
+  "(?Rm)^.*(#|//)\\s*spellchecker:disable-line$",  # ignore line
+  "(?s)(#|//)\\s*spellchecker:off.*?\\n\\s*(#|//)\\s*spellchecker:on" # ignore block
+]
+default.extend-ignore-identifiers-re = [
+  "BasicAer",
+  "qiskit_aer",
+  "AerSimulator",
+]
+[tool.typos.default.extend-words]
+wille = "wille"
+mone = "mone"
+anc = "anc"
+optin = "optin"
+
+
 [tool.repo-review]
 ignore = [
+  "PC160", # "Uses codespell" -> switched to https://github.com/crate-ci/typos
   "PC180", # "Uses prettier" -> switched to different prettier-mirror that is not recognized by the check
 ]
 
