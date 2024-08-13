@@ -25,8 +25,8 @@ public:
   static int getStairCount(std::vector<int> vec);
   static int getLadderPosition(std::vector<int> vec, int laadder);
   static std::vector<Qubit> reverseLayout(std::vector<Qubit> layout);
-  static std::vector<Qubit> rotateRight(std::vector<Qubit> layout);
-  static std::vector<Qubit> rotateLeft(std::vector<Qubit> layout);
+  static std::vector<Qubit> rotateRight(std::vector<Qubit> layout, int stairs);
+  static std::vector<Qubit> rotateLeft(std::vector<Qubit> layout, int stairs);
   static std::pair<
       std::map<std::string, std::map<std::pair<Qubit, Qubit>, int>>,
       std::map<std::string, std::vector<int>>>
@@ -39,6 +39,8 @@ public:
    */
   static qc::Permutation
   createControlBasedPermutation(qc::QuantumComputation& qc);
+
+  static std::map<Qubit, int> adjustWeights(std::map<Qubit, int> qubitWeights, std::set<Qubit> targets, Qubit ctrl, std::map<Qubit, std::set<Qubit>> controlToTargets, int count);
 
   /**
    * @brief creates a vector of all possible permutations of the initialLayout
