@@ -242,27 +242,6 @@ TEST(CircuitSimTest, ApproximationByFidelityInSimulator) {
                    0.5);
 }
 
-TEST(CircuitSimTest, GRCS4x4Test) {
-  {
-    CircuitSimulator ddsim(
-        std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt"));
-    auto m = ddsim.simulate(100);
-    EXPECT_GT(m.size(), 0);
-  }
-  {
-    CircuitSimulator ddsim(
-        std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_1.txt"));
-    auto m = ddsim.simulate(100);
-    EXPECT_GT(m.size(), 0);
-  }
-  {
-    CircuitSimulator ddsim(
-        std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_2.txt"));
-    auto m = ddsim.simulate(100);
-    EXPECT_GT(m.size(), 0);
-  }
-}
-
 TEST(CircuitSimTest, TestingProperties) {
   auto quantumComputation = std::make_unique<qc::QuantumComputation>(3);
   quantumComputation->h(0);

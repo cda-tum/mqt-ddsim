@@ -13,15 +13,3 @@ package_add_test(
   test_output_ddvis.cpp)
 
 target_link_libraries(mqt-ddsim-test PRIVATE MQT::CoreAlgorithms)
-
-add_custom_command(
-  TARGET mqt-ddsim-test
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE_DIR:mqt-ddsim-test>/mqt-ddsim-test
-          ${CMAKE_BINARY_DIR}/mqt-ddsim-test
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/circuits
-          $<TARGET_FILE_DIR:mqt-ddsim-test>/circuits
-  COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE_DIR:mqt-ddsim-test>/circuits
-          ${CMAKE_BINARY_DIR}/circuits
-  COMMENT "Copying circuits and creating symlinks for mqt-ddsim-test"
-  VERBATIM)
