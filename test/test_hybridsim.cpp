@@ -1,9 +1,9 @@
 #include "CircuitSimulator.hpp"
 #include "HybridSchrodingerFeynmanSimulator.hpp"
-#include "QuantumComputation.hpp"
 #include "dd/Export.hpp"
 #include "dd/Node.hpp"
 #include "dd/Package.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <cstddef>
 #include <cstdlib>

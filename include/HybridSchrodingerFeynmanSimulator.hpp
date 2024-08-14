@@ -1,14 +1,14 @@
 #pragma once
 
-#include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
 #include "Definitions.hpp"
-#include "QuantumComputation.hpp"
+#include "circuit_optimizer/CircuitOptimizer.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Package.hpp"
 #include "dd/Package_fwd.hpp"
-#include "operations/Operation.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/operations/Operation.hpp"
 
 #include <cstddef>
 #include <cstdint>

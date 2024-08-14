@@ -12,6 +12,8 @@ package_add_test(
   test_path_sim.cpp
   test_output_ddvis.cpp)
 
+target_link_libraries(mqt-ddsim-test PRIVATE MQT::CoreAlgorithms)
+
 add_custom_command(
   TARGET mqt-ddsim-test
   POST_BUILD

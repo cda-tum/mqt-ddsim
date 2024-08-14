@@ -2,9 +2,9 @@
 
 #include "CircuitSimulator.hpp"
 #include "Definitions.hpp"
-#include "QuantumComputation.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/NoiseFunctionality.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <cstddef>
 #include <cstdint>

@@ -1,8 +1,8 @@
 #include "PathSimulator.hpp"
-#include "QuantumComputation.hpp"
 #include "algorithms/Grover.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/Export.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <complex>
 #include <gtest/gtest.h>

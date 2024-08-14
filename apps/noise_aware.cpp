@@ -1,16 +1,16 @@
 #include "CircuitSimulator.hpp"
 #include "DeterministicNoiseSimulator.hpp"
-#include "QuantumComputation.hpp"
 #include "StochasticNoiseSimulator.hpp"
-#include "cxxopts.hpp"
-#include "nlohmann/json.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <chrono>
 #include <cstddef>
 #include <cstdlib>
+#include <cxxopts.hpp>
 #include <iomanip>
 #include <iostream>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
 #include <utility>

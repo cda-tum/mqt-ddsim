@@ -1,27 +1,27 @@
 #include "CircuitSimulator.hpp"
 #include "GroverSimulator.hpp"
 #include "HybridSchrodingerFeynmanSimulator.hpp"
-#include "QuantumComputation.hpp"
 #include "ShorFastSimulator.hpp"
 #include "ShorSimulator.hpp"
 #include "Simulator.hpp"
 #include "algorithms/Entanglement.hpp"
 #include "algorithms/Grover.hpp"
 #include "algorithms/QFT.hpp"
-#include "cxxopts.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Export.hpp"
-#include "nlohmann/json.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <chrono>
 #include <complex>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <cxxopts.hpp>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <string>
 #include <utility>
 

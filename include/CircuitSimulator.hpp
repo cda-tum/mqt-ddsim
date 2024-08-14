@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Definitions.hpp"
-#include "QuantumComputation.hpp"
 #include "Simulator.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
-#include "operations/NonUnitaryOperation.hpp"
-#include "operations/Operation.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/operations/NonUnitaryOperation.hpp"
+#include "ir/operations/Operation.hpp"
 
 #include <cstddef>
 #include <cstdint>

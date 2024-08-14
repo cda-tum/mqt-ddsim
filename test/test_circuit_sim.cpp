@@ -1,12 +1,12 @@
 #include "CircuitSimulator.hpp"
 #include "Definitions.hpp"
-#include "QuantumComputation.hpp"
 #include "algorithms/BernsteinVazirani.hpp"
 #include "algorithms/Grover.hpp"
 #include "algorithms/QFT.hpp"
 #include "algorithms/QPE.hpp"
 #include "dd/DDDefinitions.hpp"
-#include "operations/OpType.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/operations/OpType.hpp"
 
 #include <cmath>
 #include <cstddef>

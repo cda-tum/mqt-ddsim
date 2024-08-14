@@ -6,9 +6,9 @@
 #include "dd/FunctionalityConstruction.hpp"
 #include "dd/Node.hpp"
 #include "dd/Operations.hpp"
-#include "operations/ClassicControlledOperation.hpp"
-#include "operations/NonUnitaryOperation.hpp"
-#include "operations/OpType.hpp"
+#include "ir/operations/ClassicControlledOperation.hpp"
+#include "ir/operations/NonUnitaryOperation.hpp"
+#include "ir/operations/OpType.hpp"
 
 #include <cassert>
 #include <cmath>

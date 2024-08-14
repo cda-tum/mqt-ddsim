@@ -1,6 +1,6 @@
 #include "DeterministicNoiseSimulator.hpp"
-#include "QuantumComputation.hpp"
-#include "operations/OpType.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/operations/OpType.hpp"
 
 #include <array>
 #include <cstddef>

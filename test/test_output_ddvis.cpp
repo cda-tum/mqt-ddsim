@@ -1,7 +1,7 @@
 #include "CircuitSimulator.hpp"
 #include "HybridSchrodingerFeynmanSimulator.hpp"
-#include "QuantumComputation.hpp"
 #include "UnitarySimulator.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <cstddef>
 #include <filesystem>

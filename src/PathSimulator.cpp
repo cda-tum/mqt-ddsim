@@ -2,12 +2,12 @@
 
 #include "CircuitSimulator.hpp"
 #include "Definitions.hpp"
-#include "QuantumComputation.hpp"
 #include "Simulator.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Operations.hpp"
 #include "dd/Package.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <cmath>
 #include <cstddef>
