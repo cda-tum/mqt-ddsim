@@ -71,7 +71,7 @@ def _run_tests(
 
     session.install(*BUILD_REQUIREMENTS, *install_args, env=env)
     install_arg = f"-ve.[{','.join(_extras)}]"
-    session.install("--no-build-isolation", install_arg, *install_args, env=env)
+    session.install("--no-build-isolation", "--reinstall-package", "mqt.ddsim", install_arg, *install_args, env=env)
     session.run("pytest", *run_args, *posargs, env=env)
 
 
@@ -103,7 +103,7 @@ def docs(session: nox.Session) -> None:
     serve = args.builder == "html" and session.interactive
     extra_installs = ["sphinx-autobuild"] if serve else []
     session.install(*BUILD_REQUIREMENTS, *extra_installs)
-    session.install("--no-build-isolation", "-ve.[docs]")
+    session.install("--no-build-isolation", "-ve.[docs]", "--reinstall-package", "mqt.ddsim")
     session.chdir("docs")
 
     if args.builder == "linkcheck":
