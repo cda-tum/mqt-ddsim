@@ -110,6 +110,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
                 qc.metadata["shots"] = 1
 
             for instruction in qc.data:
-                if instruction.name in {"measure", "reset"}:
-                    msg = f"Unsupported '{self.name}' instruction '{instruction.name}' in circuit '{name}'."
+                operation = instruction.operation
+                if operation.name in {"measure", "reset"}:
+                    msg = f"Unsupported '{self.name}' instruction '{operation.name}' in circuit '{name}'."
                     raise QiskitError(msg)

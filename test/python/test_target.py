@@ -31,7 +31,7 @@ def test_transpilation_preserves_1q_0p_target_gates(target: Target, gate: str) -
     getattr(qc, gate)(0)
     qc_transpiled = transpile(qc, target=target)
     assert len(qc_transpiled.data) == 1
-    assert qc_transpiled.data[0].name == gate
+    assert qc_transpiled.data[0].operation.name == gate
 
 
 @pytest.mark.parametrize("gate", ["rx", "ry", "rz", "p"])
@@ -41,10 +41,7 @@ def test_transpile_preserves_1q_1p_target_gates(target: Target, gate: str) -> No
     getattr(qc, gate)(np.pi, 0)
     qc_transpiled = transpile(qc, target=target)
     assert len(qc_transpiled.data) == 1
-    # A bug in the Qiskit compiler unrolls gates even though they are in the native gate-set.
-    # See https://github.com/Qiskit/qiskit/issues/10568
-    # As a result, the following check fails as of qiskit-terra 0.25:
-    # assert qc_transpiled.data[0][0].name == gate
+    assert qc_transpiled.data[0].operation.name == gate
 
 
 @pytest.mark.parametrize("gate", ["cx", "cy", "cz", "ch", "cs", "csdg", "csx", "swap", "iswap", "dcx", "ecr"])
@@ -56,7 +53,7 @@ def test_transpilation_preserves_2q_0p_target_gates(target: Target, gate: str) -
         qc_transpiled = transpile(qc, target=target)
         print(qc_transpiled)
         assert len(qc_transpiled.data) == 1
-        assert qc_transpiled.data[0].name == gate
+        assert qc_transpiled.data[0].operation.name == gate
 
 
 @pytest.mark.parametrize("gate", ["rxx", "ryy", "rzz", "rzx", "cp", "crx", "cry", "crz"])
@@ -66,7 +63,7 @@ def test_transpilation_preserves_2q_1p_target_gates(target: Target, gate: str) -
     getattr(qc, gate)(np.pi, 0, 1)
     qc_transpiled = transpile(qc, target=target)
     assert len(qc_transpiled.data) == 1
-    assert qc_transpiled.data[0].name == gate
+    assert qc_transpiled.data[0].operation.name == gate
 
 
 @pytest.mark.parametrize("gate", ["ccx", "ccz", "cswap"])
@@ -77,7 +74,7 @@ def test_transpilation_preserves_3q_target_gates(target: Target, gate: str) -> N
         getattr(qc, gate)(0, 1, 2)
         qc_transpiled = transpile(qc, target=target)
         assert len(qc_transpiled.data) == 1
-        assert qc_transpiled.data[0].name == gate
+        assert qc_transpiled.data[0].operation.name == gate
 
 
 @pytest.mark.parametrize("num_controls", list(range(3, 6)))
@@ -96,11 +93,11 @@ def test_transpilation_preserves_mcx_target_gates(target: Target, num_controls: 
     qc_transpiled = transpile(qc, target=target)
     assert len(qc_transpiled.data) == 1
     if mode == "noancilla":
-        assert qc_transpiled.data[0].name in {"mcx_gray", "mcx"}
+        assert qc_transpiled.data[0].operation.name in {"mcx_gray", "mcx"}
     elif mode == "recursion":
-        assert qc_transpiled.data[0].name == "mcx_recursive"
+        assert qc_transpiled.data[0].operation.name == "mcx_recursive"
     elif mode == "v-chain":
-        assert qc_transpiled.data[0].name == "mcx_vchain"
+        assert qc_transpiled.data[0].operation.name == "mcx_vchain"
 
 
 @pytest.mark.parametrize("num_controls", list(range(3, 6)))
@@ -112,4 +109,4 @@ def test_transpilation_preserves_mcp_target_gates(target: Target, num_controls: 
     qc.mcp(np.pi, controls, 0)
     qc_transpiled = transpile(qc, target=target)
     assert len(qc_transpiled.data) == 1
-    assert qc_transpiled.data[0].name == "mcphase"
+    assert qc_transpiled.data[0].operation.name == "mcphase"
