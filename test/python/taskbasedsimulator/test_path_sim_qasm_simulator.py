@@ -25,10 +25,6 @@ class MQTQasmSimulatorTest(unittest.TestCase):
             measure r->d;""")
         self.circuit.name = "test"
 
-    def test_status(self) -> None:
-        """Test backend.status()."""
-        self.backend.status()
-
     def test_qasm_simulator_single_shot(self) -> None:
         """Test single shot run."""
         assert self.backend.run(self.circuit, shots=1).result().success

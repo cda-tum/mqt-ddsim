@@ -1,12 +1,12 @@
 #pragma once
 
-#include "CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
-#include "QuantumComputation.hpp"
 #include "Simulator.hpp"
+#include "circuit_optimizer/CircuitOptimizer.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Node.hpp"
 #include "dd/Package_fwd.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <cstddef>
 #include <cstdint>

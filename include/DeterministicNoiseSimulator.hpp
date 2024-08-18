@@ -1,15 +1,15 @@
 #pragma once
 
 #include "CircuitSimulator.hpp"
-#include "QuantumComputation.hpp"
 #include "Simulator.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Node.hpp"
 #include "dd/NoiseFunctionality.hpp"
 #include "dd/Package.hpp"
-#include "operations/NonUnitaryOperation.hpp"
-#include "operations/Operation.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/operations/NonUnitaryOperation.hpp"
+#include "ir/operations/Operation.hpp"
 
 #include <cstddef>
 #include <map>

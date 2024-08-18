@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union, cast
 
 from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
-from qiskit.providers.models import BackendStatus
 from qiskit.result import Result
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
@@ -58,7 +57,8 @@ class QasmSimulatorBackend(BackendV2):  # type: ignore[misc]
     @classmethod
     def _default_options(cls) -> Options:
         return Options(
-            shots=None,
+            shots=1024,
+            memory=False,
             parameter_binds=None,
             seed_simulator=None,
             approximation_step_fidelity=1.0,
@@ -175,18 +175,4 @@ class QasmSimulatorBackend(BackendV2):  # type: ignore[misc]
             data=data,
             metadata=qc.metadata,
             header=DDSIMHeader(qc),
-        )
-
-    def status(self) -> BackendStatus:
-        """Return backend status.
-
-        Returns:
-            BackendStatus: the status of the backend.
-        """
-        return BackendStatus(
-            backend_name=self.name,
-            backend_version=self.backend_version,
-            operational=True,
-            pending_jobs=0,
-            status_msg="",
         )

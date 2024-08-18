@@ -4,9 +4,9 @@
 #include "dd/ComplexNumbers.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/Operations.hpp"
-#include "operations/NonUnitaryOperation.hpp"
-#include "operations/OpType.hpp"
-#include "operations/Operation.hpp"
+#include "ir/operations/NonUnitaryOperation.hpp"
+#include "ir/operations/OpType.hpp"
+#include "ir/operations/Operation.hpp"
 
 #include <cstddef>
 #include <cstdint>

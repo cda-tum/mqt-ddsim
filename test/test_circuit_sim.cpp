@@ -1,12 +1,12 @@
 #include "CircuitSimulator.hpp"
 #include "Definitions.hpp"
-#include "QuantumComputation.hpp"
 #include "algorithms/BernsteinVazirani.hpp"
 #include "algorithms/Grover.hpp"
 #include "algorithms/QFT.hpp"
 #include "algorithms/QPE.hpp"
 #include "dd/DDDefinitions.hpp"
-#include "operations/OpType.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/operations/OpType.hpp"
 
 #include <cmath>
 #include <cstddef>
@@ -240,27 +240,6 @@ TEST(CircuitSimTest, ApproximationByFidelityInSimulator) {
   ASSERT_EQ(ddsim.getActiveNodeCount(), 3);
   ASSERT_DOUBLE_EQ(std::stod(ddsim.additionalStatistics()["final_fidelity"]),
                    0.5);
-}
-
-TEST(CircuitSimTest, GRCS4x4Test) {
-  {
-    CircuitSimulator ddsim(
-        std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_0.txt"));
-    auto m = ddsim.simulate(100);
-    EXPECT_GT(m.size(), 0);
-  }
-  {
-    CircuitSimulator ddsim(
-        std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_1.txt"));
-    auto m = ddsim.simulate(100);
-    EXPECT_GT(m.size(), 0);
-  }
-  {
-    CircuitSimulator ddsim(
-        std::make_unique<qc::QuantumComputation>("circuits/inst_4x4_10_2.txt"));
-    auto m = ddsim.simulate(100);
-    EXPECT_GT(m.size(), 0);
-  }
 }
 
 TEST(CircuitSimTest, TestingProperties) {

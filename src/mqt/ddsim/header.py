@@ -23,7 +23,7 @@ class DDSIMHeader(QobjExperimentHeader):  # type: ignore[misc]
     qubit_labels: list[tuple[str, int]]
 
     def __init__(self, qc: QuantumCircuit) -> None:
-        super().__init__()
+        # no call to super class constructor because this would trigger deprecation warnings
         self.name = qc.name
         self.n_qubits = qc.num_qubits
         self.memory_slots = qc.num_clbits
