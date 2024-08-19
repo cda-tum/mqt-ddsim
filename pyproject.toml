@@ -169,7 +169,6 @@ warn_unreachable = true
 
 [tool.ruff]
 line-length = 120
-src = ["src"]
 preview = true
 unsafe-fixes = true
 
@@ -268,6 +267,7 @@ optin = "optin"
 ignore = [
   "PC160", # "Uses codespell" -> switched to https://github.com/crate-ci/typos
   "PC180", # "Uses prettier" -> switched to different prettier-mirror that is not recognized by the check
+  "RF003", # "src directory specified if used" -> obsolete for new ruff versions
 ]
 
 
