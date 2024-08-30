@@ -56,7 +56,7 @@ repos:
 
   # Python linting using ruff
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.2
+    rev: v0.6.3
     hooks:
       - id: ruff
         args: ["--fix", "--show-fixes"]
@@ -134,6 +134,6 @@ repos:
 
   # Check the pyproject.toml file
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2024.08.19
+    rev: 2024.08.26
     hooks:
       - id: validate-pyproject
