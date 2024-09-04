@@ -118,6 +118,13 @@ BUILD_MQT_DDSIM_TESTS = "OFF"
 BUILD_MQT_DDSIM_BINDINGS = "ON"
 BUILD_MQT_DDSIM_CLI = "OFF"
 
+[[tool.scikit-build.overrides]]
+if.python-version = ">=3.13"
+if.abi-flags = "t"
+if.platform-system = "win32"
+inherit.cmake.define = "append"
+cmake.define.DISABLE_GIL = "1"
+
 
 [tool.check-sdist]
 sdist-only = ["src/mqt/ddsim/_version.py"]
