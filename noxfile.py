@@ -18,7 +18,7 @@ nox.options.default_venv_backend = "uv|virtualenv"
 
 nox.options.sessions = ["lint", "tests"]
 
-PYTHON_ALL_VERSIONS = ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+PYTHON_ALL_VERSIONS = ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
 # The following lists all the build requirements for building the package.
 # Note that this includes transitive build dependencies of package dependencies,
@@ -104,18 +104,17 @@ def docs(session: nox.Session) -> None:
     extra_installs = ["sphinx-autobuild"] if serve else []
     session.install(*BUILD_REQUIREMENTS, *extra_installs)
     session.install("--no-build-isolation", "-ve.[docs]", "--reinstall-package", "mqt.ddsim")
-    session.chdir("docs")
 
     if args.builder == "linkcheck":
-        session.run("sphinx-build", "-b", "linkcheck", "source", "_build/linkcheck", *posargs)
+        session.run("sphinx-build", "-b", "linkcheck", "docs", "docs/_build/linkcheck", *posargs)
         return
 
     shared_args = (
         "-n",  # nitpicky mode
         "-T",  # full tracebacks
         f"-b={args.builder}",
-        "source",
-        f"_build/{args.builder}",
+        "docs",
+        f"docs/_build/{args.builder}",
         *posargs,
     )
 
