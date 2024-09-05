@@ -19,6 +19,8 @@ if TYPE_CHECKING:
 
 
 class Sampler(QiskitSampler):  # type: ignore[misc]
+    """Sampler implementation using QasmSimulatorBackend."""
+
     _BACKEND = QasmSimulatorBackend()
 
     def __init__(
@@ -26,16 +28,16 @@ class Sampler(QiskitSampler):  # type: ignore[misc]
         *,
         options: dict[str, Any] | None = None,
     ) -> None:
-        """Initialize a new DDSIM Sampler
+        """Initialize a new DDSIM Sampler.
 
         Args:
             options: Default options.
         """
-
         super().__init__(options=options)
 
     @property
     def backend(self) -> QasmSimulatorBackend:
+        """The backend used by the sampler."""
         return self._BACKEND
 
     @property
@@ -49,7 +51,7 @@ class Sampler(QiskitSampler):  # type: ignore[misc]
         parameter_values: Sequence[Parameters],
         **run_options: Any,
     ) -> SamplerResult:
-        """Runs DDSIM backend
+        """Runs DDSIM backend.
 
         Args:
             circuits: List of circuit indices to simulate
@@ -59,14 +61,13 @@ class Sampler(QiskitSampler):  # type: ignore[misc]
         Returns:
             The result of the sampling process.
         """
-
         result = self.backend.run([self._circuits[i] for i in circuits], parameter_values, **run_options).result()
 
         return self._postprocessing(result, circuits)
 
     @staticmethod
     def _postprocessing(result: Result, circuits: Sequence[int]) -> SamplerResult:
-        """Converts counts into quasi-probability distributions
+        """Converts counts into quasi-probability distributions.
 
         Args:
             result: Result from DDSIM backend
@@ -75,7 +76,6 @@ class Sampler(QiskitSampler):  # type: ignore[misc]
         Returns:
             The result of the sampling process.
         """
-
         counts = result.get_counts()
         if not isinstance(counts, list):
             counts = [counts]

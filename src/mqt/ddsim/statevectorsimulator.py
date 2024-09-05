@@ -17,8 +17,10 @@ class StatevectorSimulatorBackend(QasmSimulatorBackend):
     )
 
     def __init__(self) -> None:
+        """Constructor for the DDSIM Statevector simulator backend."""
         super().__init__(name="statevector_simulator", description="MQT DDSIM Statevector Simulator")
 
     @property
     def target(self) -> Target:
+        """Return the target of the backend."""
         return self._SV_TARGET

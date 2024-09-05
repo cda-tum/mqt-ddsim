@@ -23,6 +23,14 @@ from .target import DDSIMTargetBuilder
 
 
 def read_tensor_network_file(filename: str) -> list[Tensor]:
+    """Read a tensor network from a file.
+
+    Args:
+        filename: The name of the file to read the tensor network from.
+
+    Returns:
+        The tensor network read from the file.
+    """
     import numpy as np
     import pandas as pd
     import quimb.tensor as qtn
@@ -41,6 +49,14 @@ def read_tensor_network_file(filename: str) -> list[Tensor]:
 
 
 def create_tensor_network(qc: QuantumCircuit) -> TensorNetwork:
+    """Create a tensor network from a quantum circuit.
+
+    Args:
+        qc: The quantum circuit to be simulated.
+
+    Returns:
+        The tensor network representing the quantum circuit.
+    """
     import quimb.tensor as qtn
     import sparse
 
@@ -87,6 +103,19 @@ def get_simulation_path(
     dump_path: bool = True,
     plot_ring: bool = False,
 ) -> list[tuple[int, int]]:
+    """Determine a simulation path via computing a contraction path using cotengra.
+
+    Args:
+        qc: The quantum circuit to be simulated.
+        max_time: The maximum time in seconds to spend on optimization.
+        max_repeats: The maximum number of repetitions for optimization.
+        parallel_runs: The number of parallel runs for optimization.
+        dump_path: Whether to dump the path to a file.
+        plot_ring: Whether to plot the contraction tree as a ring.
+
+    Returns:
+        The simulation path as a list of tuples.
+    """
     import cotengra as ctg
     from opt_einsum.paths import linear_to_ssa
 
@@ -134,6 +163,12 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
         name: str = "path_sim_qasm_simulator",
         description: str = "MQT DDSIM Simulation Path Framework",
     ) -> None:
+        """Constructor for the DDSIM Simulation Path Framework QASM Simulator backend.
+
+        Args:
+            name: The name of the backend.
+            description: The description of the backend.
+        """
         super().__init__(name=name, description=description)
 
     @classmethod
@@ -156,6 +191,7 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
 
     @property
     def target(self) -> Target:
+        """Return the target of the backend."""
         return self._PATH_TARGET
 
     def _run_experiment(self, qc: QuantumCircuit, **options: Any) -> ExperimentResult:

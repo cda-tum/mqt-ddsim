@@ -25,6 +25,7 @@ class StochasticNoiseSimulatorBackend(QasmSimulatorBackend):
         name: str = "stochastic_dd_simulator",
         description: str = "MQT DDSIM noise-aware stochastic simulator based on decision diagrams",
     ) -> None:
+        """Constructor for the DDSIM stochastic simulator backend."""
         super().__init__(name=name, description=description)
 
     @classmethod

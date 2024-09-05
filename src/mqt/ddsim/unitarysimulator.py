@@ -39,6 +39,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
         DDSIMTargetBuilder.add_barrier(target)
 
     def __init__(self) -> None:
+        """Constructor for the DDSIM unitary simulator backend."""
         super().__init__(name="unitary_simulator", description="MQT DDSIM Unitary Simulator")
 
     @classmethod
@@ -47,6 +48,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
 
     @property
     def target(self) -> Target:
+        """Return the target of the backend."""
         return self._US_TARGET
 
     @classmethod

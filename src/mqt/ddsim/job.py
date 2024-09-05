@@ -1,3 +1,5 @@
+"""Job module for DDSIM backend."""
+
 from __future__ import annotations
 
 import functools
@@ -17,8 +19,7 @@ if TYPE_CHECKING:
 
 
 def requires_submit(func: Callable[..., Any]) -> Callable[..., Any]:
-    """Decorator to ensure that a submit has been performed before
-    calling the method.
+    """Decorator to ensure that a submit has been performed before calling the method.
 
     Args:
         func (callable): test function to be decorated.
@@ -55,6 +56,16 @@ class DDSIMJob(JobV1):  # type: ignore[misc]
         parameter_values: Sequence[Parameters] | None,
         **args: dict[str, Any],
     ) -> None:
+        """Constructor.
+
+        Args:
+            backend: the backend instance used to run the job.
+            job_id: job ID.
+            fn: function to be run by the job.
+            experiments: circuits to be executed.
+            parameter_values: the parameters for each circuit.
+            args: additional arguments for the function
+        """
         super().__init__(backend, job_id)
         self._fn = fn
         self._experiments = experiments
@@ -83,15 +94,17 @@ class DDSIMJob(JobV1):  # type: ignore[misc]
     @requires_submit
     def result(self, timeout: float | None = None) -> Result:
         # pylint: disable=arguments-differ
-        """Get job result. The behavior is the same as the underlying
+        """Get job result.
+
+        The behavior is the same as the underlying
         concurrent Future objects,
         https://docs.python.org/3/library/concurrent.futures.html#future-objects.
 
         Args:
-            timeout (float): number of seconds to wait for results.
+            timeout: number of seconds to wait for results.
 
         Returns:
-            qiskit.Result: Result object
+            Result object
         Raises:
             concurrent.futures.TimeoutError: if timeout occurred.
             concurrent.futures.CancelledError: if job cancelled before completed.
