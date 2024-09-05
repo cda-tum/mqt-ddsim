@@ -246,10 +246,10 @@ isort.required-imports = ["from __future__ import annotations"]
 "typing.Set".msg = "Use collections.abc.Set instead."
 
 [tool.ruff.lint.per-file-ignores]
-"test/python/**" = ["T20", "ANN", "D"]
+"test/python/**" = ["T20", "ANN", "D10"]
 "docs/**" = ["T20"]
 "noxfile.py" = ["T20", "TID251"]
-"*.pyi" = ["D"]  # pydocstyle
+"*.pyi" = ["D418", "PYI021"]  # pydocstyle
 "*.ipynb" = [
     "D",    # pydocstyle
     "E402", # Allow imports to appear anywhere in Jupyter notebooks
