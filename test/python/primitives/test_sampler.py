@@ -27,7 +27,6 @@ def shots() -> int:
 @pytest.fixture
 def circuits() -> list[QuantumCircuit]:
     """The circuit lists fixture for the tests in this file."""
-
     bell_1 = QuantumCircuit(2)
     bell_1.h(0)
     bell_1.cx(0, 1)
@@ -69,7 +68,7 @@ def compare_probs(
 
 
 def test_sampler_run_single_circuit(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
-    """Test Sampler.run() with single circuits"""
+    """Test Sampler.run() with single circuits."""
     bell = circuits[0]
     target = {0: 0.5, 1: 0, 2: 0, 3: 0.5}
     target_binary = {"00": 0.5, "11": 0.5, "01": 0, "10": 0}
@@ -120,6 +119,7 @@ def test_sampler_run_with_parameterized_circuits(circuits: list[QuantumCircuit],
 
 def test_sequential_run(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
     """Sampler stores the information about the circuits in an instance attribute.
+
     If the same instance is used multiple times, the attribute still keeps the information about the circuits involved in previous runs.
     This test ensures that if a circuit is analyzed in different runs, the information about this circuit is not saved twice.
     """

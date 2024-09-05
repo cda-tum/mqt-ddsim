@@ -17,6 +17,7 @@ class PathStatevectorSimulatorBackend(PathQasmSimulatorBackend):
     )
 
     def __init__(self) -> None:
+        """Constructor for the DDSIM Simulation Path Framework Statevector Simulator backend."""
         super().__init__(
             name="path_sim_statevector_simulator",
             description="MQT DDSIM Simulation Path Framework Statevector Simulator",
@@ -24,4 +25,5 @@ class PathStatevectorSimulatorBackend(PathQasmSimulatorBackend):
 
     @property
     def target(self) -> Target:
+        """Return the target of the backend."""
         return self._Path_SV_TARGET

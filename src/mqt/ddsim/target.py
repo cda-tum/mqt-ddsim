@@ -13,13 +13,16 @@ if TYPE_CHECKING:
 
 
 class DDSIMTargetBuilder:
+    """Class for building DDSIM targets."""
+
     @classmethod
     def add_0q_gates(cls, target: Target) -> None:
-        with contextlib.suppress(AttributeError):
-            target.add_instruction(qcl.GlobalPhaseGate(Parameter("phase")))
+        """Add 0-qubit gates to the target."""
+        target.add_instruction(qcl.GlobalPhaseGate(Parameter("phase")))
 
     @classmethod
     def add_1q_clifford_gates(cls, target: Target) -> None:
+        """Add 1-qubit Clifford gates to the target."""
         target.add_instruction(qcl.IGate())
         target.add_instruction(qcl.XGate())
         target.add_instruction(qcl.YGate())
@@ -32,6 +35,7 @@ class DDSIMTargetBuilder:
 
     @classmethod
     def add_1q_gates(cls, target: Target) -> None:
+        """Add 1-qubit gates to the target."""
         cls.add_1q_clifford_gates(target)
 
         theta = Parameter("theta")
@@ -50,12 +54,14 @@ class DDSIMTargetBuilder:
 
     @classmethod
     def add_2q_controlled_clifford_gates(cls, target: Target) -> None:
+        """Add 2-qubit controlled Clifford gates to the target."""
         target.add_instruction(qcl.CXGate())
         target.add_instruction(qcl.CYGate())
         target.add_instruction(qcl.CZGate())
 
     @classmethod
     def add_2q_controlled_gates(cls, target: Target) -> None:
+        """Add 2-qubit controlled gates to the target."""
         cls.add_2q_controlled_clifford_gates(target)
 
         theta = Parameter("theta")
@@ -76,6 +82,7 @@ class DDSIMTargetBuilder:
 
     @classmethod
     def add_2q_non_controlled_clifford_gates(cls, target: Target) -> None:
+        """Add 2-qubit non-controlled Clifford gates to the target."""
         target.add_instruction(qcl.SwapGate())
         target.add_instruction(qcl.iSwapGate())
         target.add_instruction(qcl.DCXGate())
@@ -83,6 +90,7 @@ class DDSIMTargetBuilder:
 
     @classmethod
     def add_2q_non_controlled_gates(cls, target: Target) -> None:
+        """Add 2-qubit non-controlled gates to the target."""
         cls.add_2q_non_controlled_clifford_gates(target)
 
         beta = Parameter("beta")
@@ -97,11 +105,13 @@ class DDSIMTargetBuilder:
 
     @classmethod
     def add_2q_gates(cls, target: Target) -> None:
+        """Add 2-qubit gates to the target."""
         cls.add_2q_controlled_gates(target)
         cls.add_2q_non_controlled_gates(target)
 
     @classmethod
     def add_3q_gates(cls, target: Target) -> None:
+        """Add 3-qubit gates to the target."""
         target.add_instruction(qcl.CCXGate())
         target.add_instruction(qcl.CSwapGate())
         with contextlib.suppress(AttributeError):
@@ -109,6 +119,7 @@ class DDSIMTargetBuilder:
 
     @classmethod
     def add_multi_qubit_gates(cls, target: Target) -> None:
+        """Add multi-qubit gates to the target."""
         target.add_instruction(qcl.MCXGate, name="mcx")
         target.add_instruction(qcl.MCXGrayCode, name="mcx_gray")
         target.add_instruction(qcl.MCXRecursive, name="mcx_recursive")
@@ -118,17 +129,21 @@ class DDSIMTargetBuilder:
 
     @classmethod
     def add_measure(cls, target: Target) -> None:
+        """Add a measure instruction to the target."""
         target.add_instruction(qcl.Measure())
 
     @classmethod
     def add_reset(cls, target: Target) -> None:
+        """Add a reset instruction to the target."""
         target.add_instruction(qcl.Reset())
 
     @classmethod
     def add_non_unitary_operations(cls, target: Target) -> None:
+        """Add non-unitary operations to the target."""
         cls.add_measure(target)
         cls.add_reset(target)
 
     @classmethod
     def add_barrier(cls, target: Target) -> None:
+        """Add a barrier instruction to the target."""
         target.add_instruction(qcl.Barrier, name="barrier")

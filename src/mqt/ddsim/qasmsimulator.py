@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import time
 import uuid
-from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union, cast
+from typing import TYPE_CHECKING, Any, Union, cast
 
 from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
@@ -19,6 +19,8 @@ from .pyddsim import CircuitSimulator
 from .target import DDSIMTargetBuilder
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
     from qiskit.circuit import Parameter
     from qiskit.circuit.parameterexpression import ParameterValueType
 
@@ -51,6 +53,7 @@ class QasmSimulatorBackend(BackendV2):  # type: ignore[misc]
         name: str = "qasm_simulator",
         description: str = "MQT DDSIM QASM Simulator",
     ) -> None:
+        """Constructor for the DDSIM QASM simulator backend."""
         super().__init__(name=name, description=description, backend_version=__version__)
         self._initialize_target()
 
@@ -68,10 +71,12 @@ class QasmSimulatorBackend(BackendV2):  # type: ignore[misc]
 
     @property
     def target(self) -> Target:
+        """Return the target of the backend."""
         return self._TARGET
 
     @property
     def max_circuits(self) -> int | None:
+        """Return the maximum number of circuits that can be run in a single job."""
         return None
 
     @staticmethod
@@ -79,6 +84,18 @@ class QasmSimulatorBackend(BackendV2):  # type: ignore[misc]
         quantum_circuits: Sequence[QuantumCircuit],
         parameter_values: Sequence[Parameters] | None,
     ) -> list[QuantumCircuit]:
+        """Assign parameter values to the circuits.
+
+        Args:
+            quantum_circuits: The quantum circuits to assign parameters to.
+            parameter_values: The parameter values to bind to the circuits.
+
+        Returns:
+            The bound circuits.
+
+        Raises:
+            ValueError: If the number of circuits does not match the number of provided parameter sets.
+        """
         if not any(qc.parameters for qc in quantum_circuits) and not parameter_values:
             return list(quantum_circuits)
 
@@ -106,6 +123,16 @@ class QasmSimulatorBackend(BackendV2):  # type: ignore[misc]
         parameter_values: Sequence[Parameters] | None = None,
         **options: Any,
     ) -> DDSIMJob:
+        """Run a quantum circuit or list of quantum circuits on the DDSIM backend.
+
+        Args:
+            quantum_circuits: The quantum circuit(s) to run.
+            parameter_values: The parameter values to bind to the circuits.
+            options: Additional run options.
+
+        Returns:
+            The DDSIM job
+        """
         if isinstance(quantum_circuits, QuantumCircuit):
             quantum_circuits = [quantum_circuits]
 

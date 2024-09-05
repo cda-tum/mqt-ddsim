@@ -13,6 +13,8 @@ if TYPE_CHECKING:
 
 @dataclass
 class DDSIMHeader(QobjExperimentHeader):  # type: ignore[misc]
+    """Qiskit experiment header for DDSIM backends."""
+
     name: str
     n_qubits: int
     memory_slots: int
@@ -23,6 +25,7 @@ class DDSIMHeader(QobjExperimentHeader):  # type: ignore[misc]
     qubit_labels: list[tuple[str, int]]
 
     def __init__(self, qc: QuantumCircuit) -> None:
+        """Initialize a new DDSIM experiment header."""
         # no call to super class constructor because this would trigger deprecation warnings
         self.name = qc.name
         self.n_qubits = qc.num_qubits

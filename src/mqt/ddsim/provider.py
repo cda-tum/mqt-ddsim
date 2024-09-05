@@ -1,6 +1,8 @@
+"""Provider for DDSIM backends."""
+
 from __future__ import annotations
 
-from typing import Any, Callable, List, cast
+from typing import TYPE_CHECKING, Any, List, cast
 
 from qiskit.providers import BackendV2
 from qiskit.providers.exceptions import QiskitBackendNotFoundError
@@ -16,8 +18,13 @@ from .statevectorsimulator import StatevectorSimulatorBackend
 from .stochasticnoisesimulator import StochasticNoiseSimulatorBackend
 from .unitarysimulator import UnitarySimulatorBackend
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 
 class DDSIMProvider:
+    """Provider for DDSIM backends."""
+
     _BACKENDS = (
         ("qasm_simulator", QasmSimulatorBackend),
         ("statevector_simulator", StatevectorSimulatorBackend),
@@ -31,6 +38,12 @@ class DDSIMProvider:
     )
 
     def get_backend(self, name: str | None = None, **kwargs: Any) -> BackendV2:
+        """Return a backend matching the specified criteria.
+
+        Args:
+            name: Name of the backend.
+            kwargs: Additional filtering criteria.
+        """
         backends = self.backends(name, **kwargs)
         if len(backends) > 1:
             msg = "More than one backend matches the criteria"
@@ -47,10 +60,18 @@ class DDSIMProvider:
         filters: Callable[[list[BackendV2]], list[BackendV2]] | None = None,
         **kwargs: dict[str, Any],
     ) -> list[BackendV2]:
+        """Return a list of backends matching the specified criteria.
+
+        Args:
+            name: Name of the backend.
+            filters: Additional filtering criteria.
+            kwargs: Additional filtering criteria.
+        """
         backends = [
             backend_cls() for backend_name, backend_cls in self._BACKENDS if name is None or backend_name == name
         ]
         return cast(List[BackendV2], filter_backends(backends, filters=filters, **kwargs))
 
     def __str__(self) -> str:
+        """Return the provider name."""
         return "DDSIMProvider"

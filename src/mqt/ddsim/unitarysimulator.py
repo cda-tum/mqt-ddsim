@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING, Any, Sequence
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import numpy.typing as npt
@@ -18,6 +18,8 @@ from .qasmsimulator import QasmSimulatorBackend
 from .target import DDSIMTargetBuilder
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from qiskit import QuantumCircuit
 
 
@@ -39,6 +41,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
         DDSIMTargetBuilder.add_barrier(target)
 
     def __init__(self) -> None:
+        """Constructor for the DDSIM unitary simulator backend."""
         super().__init__(name="unitary_simulator", description="MQT DDSIM Unitary Simulator")
 
     @classmethod
@@ -47,6 +50,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
 
     @property
     def target(self) -> Target:
+        """Return the target of the backend."""
         return self._US_TARGET
 
     @classmethod
