@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union
+from typing import TYPE_CHECKING, Any, Union
 
 from qiskit.primitives import SamplerResult
 from qiskit.primitives.sampler import Sampler as QiskitSampler
@@ -12,6 +12,8 @@ from qiskit.result import QuasiDistribution, Result
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
     from qiskit.circuit import Parameter
     from qiskit.circuit.parameterexpression import ParameterValueType
 

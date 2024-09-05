@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from itertools import accumulate
-from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union, cast
+from typing import TYPE_CHECKING, Any, Union, cast
 
 import numpy as np
 from qiskit.circuit import QuantumCircuit
@@ -15,6 +15,8 @@ from mqt.ddsim.pyddsim import CircuitSimulator
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
     from qiskit.circuit import Parameter
     from qiskit.circuit.parameterexpression import ParameterValueType
 

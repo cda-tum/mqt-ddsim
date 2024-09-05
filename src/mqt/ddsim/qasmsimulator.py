@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import time
 import uuid
-from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union, cast
+from typing import TYPE_CHECKING, Any, Union, cast
 
 from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
@@ -19,6 +19,8 @@ from .pyddsim import CircuitSimulator
 from .target import DDSIMTargetBuilder
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
     from qiskit.circuit import Parameter
     from qiskit.circuit.parameterexpression import ParameterValueType
 

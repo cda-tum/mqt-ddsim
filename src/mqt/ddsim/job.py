@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import functools
 from concurrent import futures
-from typing import TYPE_CHECKING, Any, Callable, Mapping, Sequence, Union
+from typing import TYPE_CHECKING, Any, Union
 
 from qiskit.providers import JobError, JobStatus, JobV1
 
 if TYPE_CHECKING:
+    from collections.abc import Callable, Mapping, Sequence
+
     from qiskit import QuantumCircuit
     from qiskit.circuit import Parameter
     from qiskit.circuit.parameterexpression import ParameterValueType

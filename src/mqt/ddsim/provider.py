@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable, List, cast
+from typing import TYPE_CHECKING, Any, List, cast
 
 from qiskit.providers import BackendV2
 from qiskit.providers.exceptions import QiskitBackendNotFoundError
@@ -17,6 +17,9 @@ from .qasmsimulator import QasmSimulatorBackend
 from .statevectorsimulator import StatevectorSimulatorBackend
 from .stochasticnoisesimulator import StochasticNoiseSimulatorBackend
 from .unitarysimulator import UnitarySimulatorBackend
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class DDSIMProvider:

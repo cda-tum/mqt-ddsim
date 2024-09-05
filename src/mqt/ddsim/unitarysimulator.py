@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING, Any, Sequence
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import numpy.typing as npt
@@ -18,6 +18,8 @@ from .qasmsimulator import QasmSimulatorBackend
 from .target import DDSIMTargetBuilder
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from qiskit import QuantumCircuit
 
 
