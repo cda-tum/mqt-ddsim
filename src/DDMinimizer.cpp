@@ -140,9 +140,6 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
       layout = DDMinimizer::rotateLeft(layout, stairs_c_l);
     } else if (prio_x_r == 0 && stairs_x_r > 0) {
       layout = DDMinimizer::rotateRight(layout, stairs_x_r);
-    } else if (prio_c_l > 0 || prio_x_r > 0 ||
-               (prio_c_l == 0 && prio_x_r == 0)) {
-      // do nothing cause identity is what we need anyway
     }
   } else if ((DDMinimizer::isFull(x_r->second) ||
               DDMinimizer::isFull(c_l->second))) {
