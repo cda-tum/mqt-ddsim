@@ -1,5 +1,4 @@
 #include "Definitions.hpp"
-#include "Permutation.hpp"
 #include "QuantumComputation.hpp"
 
 #include <algorithm>
