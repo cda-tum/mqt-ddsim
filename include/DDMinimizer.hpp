@@ -40,7 +40,10 @@ public:
   static qc::Permutation
   createControlBasedPermutation(qc::QuantumComputation& qc);
 
-  static std::map<Qubit, int> adjustWeights(std::map<Qubit, int> qubitWeights, std::set<Qubit> targets, Qubit ctrl, std::map<Qubit, std::set<Qubit>> controlToTargets, int count);
+  static std::map<Qubit, int>
+  adjustWeights(std::map<Qubit, int> qubitWeights, std::set<Qubit> targets,
+                Qubit ctrl, std::map<Qubit, std::set<Qubit>> controlToTargets,
+                int count);
 
   /**
    * @brief creates a vector of all possible permutations of the initialLayout
