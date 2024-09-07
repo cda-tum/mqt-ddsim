@@ -1,9 +1,9 @@
-"""Estimator implementation using DDSIM CircuitSimulator"""
+"""Estimator implementation using DDSIM CircuitSimulator."""
 
 from __future__ import annotations
 
 from itertools import accumulate
-from typing import TYPE_CHECKING, Any, Mapping, Sequence, Union, cast
+from typing import TYPE_CHECKING, Any, Union, cast
 
 import numpy as np
 from qiskit.circuit import QuantumCircuit
@@ -15,6 +15,8 @@ from mqt.ddsim.pyddsim import CircuitSimulator
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
     from qiskit.circuit import Parameter
     from qiskit.circuit.parameterexpression import ParameterValueType
 
@@ -23,6 +25,7 @@ if TYPE_CHECKING:
 
 class Estimator(QiskitEstimator):  # type: ignore[misc]
     """DDSIM implementation of qiskit's sampler.
+
     Code adapted from Qiskit's BackendEstimator class.
     """
 
@@ -31,7 +34,7 @@ class Estimator(QiskitEstimator):  # type: ignore[misc]
         options: dict[str, Any] | None = None,
         abelian_grouping: bool = False,
     ) -> None:
-        """Initialize a new Estimator instance
+        """Initialize a new Estimator instance.
 
         Args:
             options: Default options.
@@ -50,8 +53,7 @@ class Estimator(QiskitEstimator):  # type: ignore[misc]
     def preprocessed_circuits(
         self,
     ) -> tuple[list[QuantumCircuit], list[list[QuantumCircuit]]]:
-        """
-        Generate quantum circuits for states and observables produced by preprocessing.
+        """Generate quantum circuits for states and observables produced by preprocessing.
 
         Returns:
         Tuple: A tuple containing two entries:
@@ -62,8 +64,7 @@ class Estimator(QiskitEstimator):  # type: ignore[misc]
         return self._preprocessed_circuits
 
     def _preprocessing(self) -> tuple[list[QuantumCircuit], list[list[QuantumCircuit]]]:
-        """
-        Perform preprocessing for circuit arranging and packaging.
+        """Perform preprocessing for circuit arranging and packaging.
 
         Returns:
         Tuple:
@@ -116,8 +117,7 @@ class Estimator(QiskitEstimator):  # type: ignore[misc]
 
     @staticmethod
     def _observable_circuit(num_qubits: int, pauli: Pauli) -> tuple[QuantumCircuit, list[int]]:
-        """
-        Creates the quantum circuit representation of an observable given as a Pauli string.
+        """Creates the quantum circuit representation of an observable given as a Pauli string.
 
         Parameters:
             - num_qubits: Number of qubits of the observable.
@@ -197,8 +197,7 @@ class Estimator(QiskitEstimator):  # type: ignore[misc]
 
     @staticmethod
     def _postprocessing(result_list: list[float], accum: list[int], metadata: list[dict[str, Any]]) -> EstimatorResult:
-        """
-        Perform postprocessing for the evaluation of expectation values.
+        """Perform postprocessing for the evaluation of expectation values.
 
         Parameters:
         - result_list (list[float]): A list of measurement results.

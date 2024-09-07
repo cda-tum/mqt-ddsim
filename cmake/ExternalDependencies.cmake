@@ -16,15 +16,15 @@ if(BUILD_MQT_DDSIM_BINDINGS)
   endif()
 
   # add pybind11 library
-  find_package(pybind11 CONFIG REQUIRED)
+  find_package(pybind11 2.13.5 CONFIG REQUIRED)
 endif()
 
 # cmake-format: off
-set(MQT_CORE_VERSION 2.5.2
+set(MQT_CORE_VERSION 2.6.1
     CACHE STRING "MQT Core version")
-#set(MQT_CORE_REV "78a8d6bbecf10a2e09b994eb6705fd5d19415065"
-#    CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
-set(MQT_CORE_REPO_OWNER "Claudiaaaaaaaaa"
+set(MQT_CORE_REV "9be91674dddcf1f73143d9509e8e4ad806f47592"
+    CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
+set(MQT_CORE_REPO_OWNER "cda-tum"
     CACHE STRING "MQT Core repository owner (change when using a fork)")
 # cmake-format: on
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)

@@ -30,7 +30,7 @@ If you have any questions, feel free to contact us via [quantum.cda@xcit.tum.de]
 
 ## Getting Started
 
-DDSIM bundled with the provider and backends for Qiskit is available via [PyPI](https://pypi.org/project/mqt.ddsim/) for Linux, macOS, and Windows and supports Python 3.8 to 3.12.
+DDSIM bundled with the provider and backends for Qiskit is available via [PyPI](https://pypi.org/project/mqt.ddsim/) for Linux, macOS, and Windows and supports Python 3.9 to 3.13.
 
 ```console
 (venv) $ pip install mqt.ddsim

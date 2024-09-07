@@ -2,12 +2,12 @@
 
 #include "CircuitSimulator.hpp"
 #include "Definitions.hpp"
-#include "QuantumComputation.hpp"
 #include "Simulator.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Operations.hpp"
 #include "dd/Package.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <cmath>
 #include <cstddef>
@@ -474,8 +474,8 @@ template <class Config> void PathSimulator<Config>::constructTaskGraph() {
         }
       };
       auto storeResultTask = taskflow.emplace(runner).name("store result");
-      auto preceedingTask = tasks.at(resultStep.id);
-      preceedingTask.precede(storeResultTask);
+      auto precedingTask = tasks.at(resultStep.id);
+      precedingTask.precede(storeResultTask);
     }
   }
 }

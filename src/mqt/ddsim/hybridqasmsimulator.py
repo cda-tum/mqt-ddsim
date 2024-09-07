@@ -38,6 +38,12 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
         name: str = "hybrid_qasm_simulator",
         description: str = "MQT DDSIM Hybrid Schrodinger-Feynman simulator",
     ) -> None:
+        """Constructor for the DDSIM Hybrid Schrodinger-Feynman simulator backend.
+
+        Args:
+            name: The name of the backend.
+            description: The description of the backend.
+        """
         super().__init__(name=name, description=description)
 
     @classmethod
@@ -52,6 +58,7 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
 
     @property
     def target(self) -> Target:
+        """Return the target of the backend."""
         return self._HSF_TARGET
 
     def _run_experiment(self, qc: QuantumCircuit, **options: Any) -> ExperimentResult:

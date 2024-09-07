@@ -17,6 +17,7 @@ class HybridStatevectorSimulatorBackend(HybridQasmSimulatorBackend):
     )
 
     def __init__(self) -> None:
+        """Constructor for the DDSIM Hybrid Schrodinger-Feynman Statevector simulator backend."""
         super().__init__(
             name="hybrid_statevector_simulator",
             description="MQT DDSIM Hybrid Schrodinger-Feynman Statevector simulator",
@@ -24,4 +25,5 @@ class HybridStatevectorSimulatorBackend(HybridQasmSimulatorBackend):
 
     @property
     def target(self) -> Target:
+        """Return the target of the backend."""
         return self._HSF_SV_TARGET

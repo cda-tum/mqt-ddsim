@@ -1,5 +1,5 @@
-#include "QuantumComputation.hpp"
 #include "UnitarySimulator.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <gtest/gtest.h>
 #include <iostream>

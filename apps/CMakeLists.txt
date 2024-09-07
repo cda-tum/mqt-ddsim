@@ -5,6 +5,8 @@ macro(ADD_SIM_EXECUTABLE appname)
 endmacro()
 
 add_sim_executable(simple cxxopts::cxxopts)
+target_link_libraries(mqt-ddsim-simple PRIVATE MQT::CoreAlgorithms)
+
 add_sim_executable(primebases cxxopts::cxxopts)
 if(Threads_FOUND)
   add_sim_executable(noise_aware cxxopts::cxxopts)

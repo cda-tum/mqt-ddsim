@@ -1,7 +1,7 @@
 #include "Definitions.hpp"
-#include "QuantumComputation.hpp"
 #include "StochasticNoiseSimulator.hpp"
-#include "operations/OpType.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/operations/OpType.hpp"
 
 #include <cstddef>
 #include <gtest/gtest.h>

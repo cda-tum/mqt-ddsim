@@ -25,6 +25,12 @@ class DeterministicNoiseSimulatorBackend(QasmSimulatorBackend):
         name: str = "dd_simulator_density_matrix",
         description: str = "MQT DDSIM noise-aware density matrix simulator based on decision diagrams",
     ) -> None:
+        """Constructor for the DDSIM density matrix simulator backend.
+
+        Args:
+            name: The name of the backend.
+            description: The description of the backend.
+        """
         super().__init__(name=name, description=description)
 
     @classmethod

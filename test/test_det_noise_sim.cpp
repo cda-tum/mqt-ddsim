@@ -1,6 +1,6 @@
 #include "DeterministicNoiseSimulator.hpp"
-#include "QuantumComputation.hpp"
-#include "operations/OpType.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/operations/OpType.hpp"
 
 #include <array>
 #include <cstddef>
@@ -350,7 +350,7 @@ TEST(DeterministicNoiseSimTest, TestSimulateInterface) {
   }
 }
 
-TEST(DeterministicNoiseSimTest, TestSimulateInterfaceWithMeasurments) {
+TEST(DeterministicNoiseSimTest, TestSimulateInterfaceWithMeasurements) {
   auto quantumComputation = detGetAdder4Circuit();
   quantumComputation->addClassicalRegister(4);
   quantumComputation->measure(0, 0);

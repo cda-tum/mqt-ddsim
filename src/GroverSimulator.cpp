@@ -1,13 +1,13 @@
 #include "GroverSimulator.hpp"
 
 #include "Definitions.hpp"
-#include "QuantumComputation.hpp"
 #include "Simulator.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Edge.hpp"
 #include "dd/FunctionalityConstruction.hpp"
-#include "operations/Control.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/operations/Control.hpp"
 
 #include <cassert>
 #include <cstddef>

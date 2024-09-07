@@ -68,7 +68,7 @@ def test_estimator_run_single_circuit__observable_no_params(
     observables: list[SparsePauliOp],
     estimator: Estimator,
 ) -> None:
-    """test for estimator with a single circuit/observable and no parameters"""
+    """Test for estimator with a single circuit/observable and no parameters."""
     circuit = circuits[0].assign_parameters([0, 1, 1, 2, 3, 5])
     observable = observables[0]
 
@@ -86,7 +86,7 @@ def test_estimator_run_single_circuit__observable_no_params(
 
 
 def test_run_with_operator(circuits: list[QuantumCircuit], estimator: Estimator) -> None:
-    """test for run with Operator as an observable"""
+    """Test for run with Operator as an observable."""
     circuit = circuits[0].assign_parameters([0, 1, 1, 2, 3, 5])
     matrix = SparsePauliOp.from_operator(
         Operator([
@@ -107,7 +107,7 @@ def test_estimator_run_single_circuit__observable_with_params(
     observables: list[SparsePauliOp],
     estimator: Estimator,
 ) -> None:
-    """test for estimator with a single circuit/observable and parameters"""
+    """Test for estimator with a single circuit/observable and parameters."""
     circuit = circuits[0]
     observable = observables[0]
 
@@ -129,7 +129,7 @@ def test_estimator_run_multiple_circuits_observables_no_params(
     observables: list[SparsePauliOp],
     estimator: Estimator,
 ) -> None:
-    """test for estimator with multiple circuits/observables and no parameters"""
+    """Test for estimator with multiple circuits/observables and no parameters."""
     qc_x, qc_y, qc_z = circuits[2]
     pauli_x, pauli_y, pauli_z = observables[2]
 
@@ -144,7 +144,7 @@ def test_estimator_run_multiple_circuits_observables_with_params(
     observables: list[SparsePauliOp],
     estimator: Estimator,
 ) -> None:
-    """test for estimator with multiple circuits/observables with parameters"""
+    """Test for estimator with multiple circuits/observables with parameters."""
     psi1, psi2 = circuits[1]
     hamiltonian_1, hamiltonian_2, hamiltonian_3 = observables[1]
     theta_1, theta_2, theta_3 = (
@@ -168,7 +168,7 @@ def test_estimator_sequenctial_run(
     observables: list[SparsePauliOp],
     estimator: Estimator,
 ) -> None:
-    """test for estimator's sequenctial run"""
+    """Test for estimator's sequenctial run."""
     psi1, psi2 = circuits[1]
     hamiltonian_1, hamiltonian_2, hamiltonian_3 = observables[1]
     theta_1, theta_2, theta_3 = (
