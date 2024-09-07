@@ -1,7 +1,7 @@
 #include "DDMinimizer.hpp"
 
-#include "circuit_optimizer/CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
+#include "circuit_optimizer/CircuitOptimizer.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "ir/operations/OpType.hpp"
 
