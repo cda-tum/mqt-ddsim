@@ -1,9 +1,9 @@
 #include "DDMinimizer.hpp"
 
-#include "CircuitOptimizer.hpp"
+#include "circuit_optimizer/CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
-#include "QuantumComputation.hpp"
-#include "operations/OpType.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/operations/OpType.hpp"
 
 #include <algorithm>
 #include <cstddef>

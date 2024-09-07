@@ -1,7 +1,7 @@
-#include "CircuitOptimizer.hpp"
+#include "circuit_optimizer/CircuitOptimizer.hpp"
 #include "CircuitSimulator.hpp"
 #include "DDMinimizer.hpp"
-#include "QuantumComputation.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <gtest/gtest.h>
 

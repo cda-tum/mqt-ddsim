@@ -1,4 +1,6 @@
 #include "Definitions.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/Permutation.hpp"
 
 #include <algorithm>
 #include <cstddef>
