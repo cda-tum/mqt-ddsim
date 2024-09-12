@@ -40,27 +40,52 @@ HybridSchrodingerFeynmanSimulator<Config>::getNDecisions(qc::Qubit splitQubit) {
     if (op->getType() == qc::Barrier) {
       continue;
     }
-    if (op->isStandardOperation()) {
-      bool targetInLowerSlice = false;
-      bool targetInUpperSlice = false;
-      bool controlInLowerSlice = false;
-      bool controlInUpperSlice = false;
-      for (const auto& target : op->getTargets()) {
-        targetInLowerSlice = targetInLowerSlice || target < splitQubit;
-        targetInUpperSlice = targetInUpperSlice || target >= splitQubit;
+
+    assert(op->isStandardOperation());
+
+    bool targetInLowerSlice = false;
+    bool targetInUpperSlice = false;
+    bool controlInLowerSlice = false;
+    size_t nControlsInLowerSlice = 0;
+    bool controlInUpperSlice = false;
+    size_t nControlsInUpperSlice = 0;
+    for (const auto& target : op->getTargets()) {
+      targetInLowerSlice = targetInLowerSlice || target < splitQubit;
+      targetInUpperSlice = targetInUpperSlice || target >= splitQubit;
+    }
+    for (const auto& control : op->getControls()) {
+      if (control.qubit < splitQubit) {
+        controlInLowerSlice = true;
+        nControlsInLowerSlice++;
+      } else {
+        controlInUpperSlice = true;
+        nControlsInUpperSlice++;
       }
-      for (const auto& control : op->getControls()) {
-        controlInLowerSlice = controlInLowerSlice || control.qubit < splitQubit;
-        controlInUpperSlice =
-            controlInUpperSlice || control.qubit >= splitQubit;
-      }
-      if ((targetInLowerSlice && controlInUpperSlice) ||
-          (targetInUpperSlice && controlInLowerSlice)) {
-        ndecisions++;
-      }
-    } else {
+    }
+
+    if (targetInLowerSlice && targetInUpperSlice) {
       throw std::invalid_argument(
-          "Only StandardOperations are supported for now.");
+          "Multiple targets spread across the cut through the circuit are not "
+          "supported at the moment as this would require actually computing "
+          "the Schmidt decomposition of the gate being cut.");
+    }
+
+    if (targetInLowerSlice && controlInUpperSlice) {
+      if (nControlsInUpperSlice > 1) {
+        throw std::invalid_argument(
+            "Multiple controls in the control part of the gate being cut are "
+            "not supported at the moment as this would require actually "
+            "computing the Schmidt decomposition of the gate being cut.");
+      }
+      ++ndecisions;
+    } else if (targetInUpperSlice && controlInLowerSlice) {
+      if (nControlsInLowerSlice > 1) {
+        throw std::invalid_argument(
+            "Multiple controls in the control part of the gate being cut are "
+            "not supported at the moment as this would require actually "
+            "computing the Schmidt decomposition of the gate being cut.");
+      }
+      ++ndecisions;
     }
   }
   return ndecisions;
@@ -77,11 +102,10 @@ qc::VectorDD HybridSchrodingerFeynmanSimulator<Config>::simulateSlicing(
       controls);
 
   for (const auto& op : *CircuitSimulator<Config>::qc) {
-    if (op->isUnitary()) {
-      [[maybe_unused]] auto l = lower.apply(sliceDD, op);
-      [[maybe_unused]] auto u = upper.apply(sliceDD, op);
-      assert(l == u);
-    }
+    assert(op->isUnitary());
+    [[maybe_unused]] auto l = lower.apply(sliceDD, op);
+    [[maybe_unused]] auto u = upper.apply(sliceDD, op);
+    assert(l == u);
     sliceDD->garbageCollect();
   }
 
@@ -97,76 +121,67 @@ bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(
     std::unique_ptr<dd::Package<Config>>& sliceDD,
     const std::unique_ptr<qc::Operation>& op) {
   bool isSplitOp = false;
-  if (dynamic_cast<qc::StandardOperation*>(op.get()) !=
-      nullptr) { // TODO change control and target if wrong direction
-    qc::Targets opTargets{};
-    qc::Controls opControls{};
+  assert(op->isStandardOperation());
+  qc::Targets opTargets{};
+  qc::Controls opControls{};
 
-    // check targets
-    bool targetInSplit = false;
-    bool targetInOtherSplit = false;
-    for (const auto& target : op->getTargets()) {
-      if (start <= target && target <= end) {
-        opTargets.push_back(target);
-        targetInSplit = true;
-      } else {
-        targetInOtherSplit = true;
-      }
+  // check targets
+  bool targetInSplit = false;
+  bool targetInOtherSplit = false;
+  for (const auto& target : op->getTargets()) {
+    if (start <= target && target <= end) {
+      opTargets.emplace_back(target);
+      targetInSplit = true;
+    } else {
+      targetInOtherSplit = true;
     }
+  }
 
-    if (targetInSplit && targetInOtherSplit && !op->getControls().empty()) {
-      throw std::invalid_argument("Multiple Targets that are in different "
-                                  "slices are not supported at the moment");
-    }
+  // Ensured in the getNDecisions function
+  assert(!(targetInSplit && targetInOtherSplit));
 
-    // check controls
-    for (const auto& control : op->getControls()) {
-      if (start <= control.qubit && control.qubit <= end) {
-        opControls.emplace(control.qubit, control.type);
-      } else { // other controls are set to the corresponding value
-        if (targetInSplit) {
-          isSplitOp = true;
-          const bool nextControl = getNextControl();
-          if ((control.type == qc::Control::Type::Pos &&
-               !nextControl) || // break if control is not activated
-              (control.type == qc::Control::Type::Neg && nextControl)) {
-            nDecisionsExecuted++;
-            return true;
-          }
+  // check controls
+  for (const auto& control : op->getControls()) {
+    if (start <= control.qubit && control.qubit <= end) {
+      opControls.emplace(control);
+    } else { // other controls are set to the corresponding value
+      if (targetInSplit) {
+        isSplitOp = true;
+        const bool nextControl = getNextControl();
+        // break if control is not activated
+        if ((control.type == qc::Control::Type::Pos && !nextControl) ||
+            (control.type == qc::Control::Type::Neg && nextControl)) {
+          nDecisionsExecuted++;
+          return true;
         }
       }
     }
+  }
 
-    if (targetInOtherSplit && !opControls.empty()) { // control slice for split
-      if (opControls.size() > 1) {
-        throw std::invalid_argument(
-            "Multiple controls in control slice of operation are not supported "
-            "at the moment");
-      }
+  if (targetInOtherSplit && !opControls.empty()) { // control slice for split
+    // Ensured in the getNDecisions function
+    assert(opControls.size() == 1);
 
-      isSplitOp = true;
-      const bool control = getNextControl();
-      for (const auto& c : opControls) {
-        auto tmp = edge;
-        edge = sliceDD->deleteEdge(
-            edge, static_cast<dd::Qubit>(c.qubit),
-            control != (c.type == qc::Control::Type::Neg) ? 0 : 1);
-        // TODO incref and decref could be integrated in delete edge
-        sliceDD->incRef(edge);
-        sliceDD->decRef(tmp);
-      }
-    } else if (targetInSplit) { // target slice for split or operation in split
-      const auto& param = op->getParameter();
-      qc::StandardOperation newOp(opControls, opTargets, op->getType(), param);
+    isSplitOp = true;
+    const bool control = getNextControl();
+    for (const auto& c : opControls) {
       auto tmp = edge;
-      edge = sliceDD->multiply(dd::getDD(&newOp, *sliceDD), edge);
+      edge = sliceDD->deleteEdge(
+          edge, static_cast<dd::Qubit>(c.qubit),
+          control != (c.type == qc::Control::Type::Neg) ? 0 : 1);
+      // TODO incref and decref could be integrated in delete edge
       sliceDD->incRef(edge);
       sliceDD->decRef(tmp);
     }
-  } else {
-    throw std::invalid_argument(
-        "Only StandardOperations are supported for now.");
+  } else if (targetInSplit) { // target slice for split or operation in split
+    const auto& param = op->getParameter();
+    qc::StandardOperation newOp(opControls, opTargets, op->getType(), param);
+    auto tmp = edge;
+    edge = sliceDD->multiply(dd::getDD(&newOp, *sliceDD), edge);
+    sliceDD->incRef(edge);
+    sliceDD->decRef(tmp);
   }
+
   if (isSplitOp) {
     nDecisionsExecuted++;
   }
@@ -176,6 +191,20 @@ bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(
 template <class Config>
 std::map<std::string, std::size_t>
 HybridSchrodingerFeynmanSimulator<Config>::simulate(std::size_t shots) {
+  if (CircuitSimulator<Config>::qc->isDynamic()) {
+    throw std::invalid_argument(
+        "Dynamic quantum circuits containing mid-circuit measurements, resets, "
+        "or classical control flow are not supported by this simulator.");
+  }
+
+  for (const auto& op : *CircuitSimulator<Config>::qc) {
+    if (!op->isStandardOperation()) {
+      throw std::invalid_argument("This simulator only supports regular gates "
+                                  "(`StandardOperation`). \"" +
+                                  op->getName() + "\" is not supported.");
+    }
+  }
+
   auto nqubits = CircuitSimulator<Config>::getNumberOfQubits();
   auto splitQubit = static_cast<qc::Qubit>(nqubits / 2);
   if (mode == Mode::DD) {
