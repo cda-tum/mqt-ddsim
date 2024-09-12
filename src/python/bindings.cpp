@@ -100,8 +100,7 @@ void getNumPyMatrixRec(const qc::MatrixDD& e, const std::complex<dd::fp>& amp,
   }
 }
 
-template <class Config = dd::DDPackageConfig>
-void getNumPyMatrix(UnitarySimulator<Config>& sim,
+void getNumPyMatrix(UnitarySimulator& sim,
                     py::array_t<std::complex<dd::fp>>& matrix) {
   const auto& e = sim.getConstructedDD();
   py::buffer_info matrixBuffer = matrix.request();
@@ -181,7 +180,7 @@ py::class_<Sim> createSimulator(py::module_ m, const std::string& name) {
            "Write a Graphviz representation of the currently stored DD to a "
            "file.");
 
-  if constexpr (std::is_same_v<Sim, UnitarySimulator<>>) {
+  if constexpr (std::is_same_v<Sim, UnitarySimulator>) {
     sim.def("construct", &Sim::construct,
             "Construct the DD representing the unitary matrix of the circuit.");
   } else {
@@ -308,26 +307,26 @@ PYBIND11_MODULE(pyddsim, m, py::mod_gil_not_used()) {
            "path"_a, "assume_correct_order"_a = false);
 
   // Unitary Simulator
-  py::enum_<UnitarySimulator<>::Mode>(m, "ConstructionMode")
-      .value("recursive", UnitarySimulator<>::Mode::Recursive)
-      .value("sequential", UnitarySimulator<>::Mode::Sequential)
+  py::enum_<UnitarySimulator::Mode>(m, "ConstructionMode")
+      .value("recursive", UnitarySimulator::Mode::Recursive)
+      .value("sequential", UnitarySimulator::Mode::Sequential)
       .export_values();
 
   auto unitarySimulator =
-      createSimulator<UnitarySimulator<>>(m, "UnitarySimulator");
+      createSimulator<UnitarySimulator>(m, "UnitarySimulator");
   unitarySimulator
-      .def(py::init<>(&constructSimulator<UnitarySimulator<>,
-                                          UnitarySimulator<>::Mode&>),
+      .def(py::init<>(
+               &constructSimulator<UnitarySimulator, UnitarySimulator::Mode&>),
            "circ"_a, "approximation_step_fidelity"_a = 1.,
            "approximation_steps"_a = 1, "approximation_strategy"_a = "fidelity",
-           "seed"_a = -1, "mode"_a = UnitarySimulator<>::Mode::Recursive)
-      .def("get_mode", &UnitarySimulator<>::getMode)
-      .def("get_construction_time", &UnitarySimulator<>::getConstructionTime)
-      .def("get_final_node_count", &UnitarySimulator<>::getFinalNodeCount)
-      .def("get_max_node_count", &UnitarySimulator<>::getMaxNodeCount);
+           "seed"_a = -1, "mode"_a = UnitarySimulator::Mode::Recursive)
+      .def("get_mode", &UnitarySimulator::getMode)
+      .def("get_construction_time", &UnitarySimulator::getConstructionTime)
+      .def("get_final_node_count", &UnitarySimulator::getFinalNodeCount)
+      .def("get_max_node_count", &UnitarySimulator::getMaxNodeCount);
 
   // Miscellaneous functions
-  m.def("get_matrix", &getNumPyMatrix<>, "sim"_a, "mat"_a);
+  m.def("get_matrix", &getNumPyMatrix, "sim"_a, "mat"_a);
 
   m.def("dump_tensor_network", &dumpTensorNetwork,
         "dump a tensor network representation of the given circuit", "circ"_a,

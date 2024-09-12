@@ -15,7 +15,7 @@ TEST(UnitarySimTest, ConstructSimpleCircuitSequential) {
   quantumComputation->ch(2, 1);
   quantumComputation->ch(2, 0);
   UnitarySimulator ddsim(std::move(quantumComputation),
-                         UnitarySimulator<>::Mode::Sequential);
+                         UnitarySimulator::Mode::Sequential);
   ASSERT_NO_THROW(ddsim.construct());
   const auto& e = ddsim.getConstructedDD();
   EXPECT_TRUE(e.p->e[0].isIdentity());
@@ -34,7 +34,7 @@ TEST(UnitarySimTest, ConstructSimpleCircuitRecursive) {
   quantumComputation->ch(2, 1);
   quantumComputation->ch(2, 0);
   UnitarySimulator ddsim(std::move(quantumComputation),
-                         UnitarySimulator<>::Mode::Recursive);
+                         UnitarySimulator::Mode::Recursive);
   ASSERT_NO_THROW(ddsim.construct());
   const auto& e = ddsim.getConstructedDD();
   EXPECT_TRUE(e.p->e[0].isIdentity());
@@ -53,7 +53,7 @@ TEST(UnitarySimTest, ConstructSimpleCircuitRecursiveWithSeed) {
   quantumComputation->ch(2, 1);
   quantumComputation->ch(2, 0);
   UnitarySimulator ddsim(std::move(quantumComputation), ApproximationInfo{},
-                         1337, UnitarySimulator<>::Mode::Recursive);
+                         1337, UnitarySimulator::Mode::Recursive);
   ASSERT_NO_THROW(ddsim.construct());
   const auto& e = ddsim.getConstructedDD();
   EXPECT_TRUE(e.p->e[0].isIdentity());
@@ -69,6 +69,6 @@ TEST(UnitarySimTest, NonStandardOperation) {
   quantumComputation->measure(0, 0);
 
   UnitarySimulator ddsim(std::move(quantumComputation));
-  EXPECT_TRUE(ddsim.getMode() == UnitarySimulator<>::Mode::Recursive);
+  EXPECT_TRUE(ddsim.getMode() == UnitarySimulator::Mode::Recursive);
   EXPECT_THROW(ddsim.construct(), std::invalid_argument);
 }
