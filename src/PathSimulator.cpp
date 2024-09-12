@@ -142,6 +142,12 @@ PathSimulator<Config>::SimulationPath::SimulationPath(
 template <class Config>
 std::map<std::string, std::size_t>
 PathSimulator<Config>::simulate(std::size_t shots) {
+  if (CircuitSimulator<Config>::qc->isDynamic()) {
+    throw std::invalid_argument(
+        "Dynamic quantum circuits containing mid-circuit measurements, resets, "
+        "or classical control flow are not supported by this simulator.");
+  }
+
   // build task graph from simulation path
   constructTaskGraph();
   /// Enable the following statements to generate a .dot file of the resulting
