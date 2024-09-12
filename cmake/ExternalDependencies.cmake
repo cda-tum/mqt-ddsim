@@ -75,7 +75,7 @@ set(TF_BUILD_PROFILER
     OFF
     CACHE INTERNAL "")
 set(TF_VERSION
-    3.6.0
+    3.7.0
     CACHE STRING "Taskflow version")
 set(TF_URL https://github.com/taskflow/taskflow/archive/refs/tags/v${TF_VERSION}.tar.gz)
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
