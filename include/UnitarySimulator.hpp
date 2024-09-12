@@ -1,10 +1,7 @@
 #pragma once
 
 #include "CircuitSimulator.hpp"
-#include "Simulator.hpp"
-#include "circuit_optimizer/CircuitOptimizer.hpp"
 #include "dd/DDpackageConfig.hpp"
-#include "dd/Node.hpp"
 #include "dd/Package_fwd.hpp"
 #include "ir/QuantumComputation.hpp"
 
@@ -12,37 +9,22 @@
 #include <cstdint>
 #include <memory>
 #include <ostream>
-#include <utility>
 
-template <class Config = dd::DDPackageConfig>
-class UnitarySimulator : public CircuitSimulator<Config> {
+class UnitarySimulator
+    : public CircuitSimulator<dd::UnitarySimulatorDDPackageConfig> {
 public:
   enum class Mode : std::uint8_t { Sequential, Recursive };
 
   UnitarySimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
                    const ApproximationInfo& approximationInfo_,
-                   Mode simMode = Mode::Recursive)
-      : CircuitSimulator<Config>(std::move(qc_), approximationInfo_),
-        mode(simMode) {
-    // remove final measurements
-    qc::CircuitOptimizer::removeFinalMeasurements(
-        *(CircuitSimulator<Config>::qc));
-  }
+                   Mode simMode = Mode::Recursive);
 
   explicit UnitarySimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
-                            Mode simMode = Mode::Recursive)
-      : UnitarySimulator(std::move(qc_), {}, simMode) {}
+                            Mode simMode = Mode::Recursive);
 
   UnitarySimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
                    const ApproximationInfo& approximationInfo_,
-                   const std::uint64_t seed_,
-                   const Mode simMode = Mode::Recursive)
-      : CircuitSimulator<Config>(std::move(qc_), approximationInfo_, seed_),
-        mode(simMode) {
-    // remove final measurements
-    qc::CircuitOptimizer::removeFinalMeasurements(
-        *(CircuitSimulator<Config>::qc));
-  }
+                   std::uint64_t seed_, Mode simMode = Mode::Recursive);
 
   void construct();
 
@@ -50,10 +32,7 @@ public:
   [[nodiscard]] qc::MatrixDD getConstructedDD() const { return e; }
   [[nodiscard]] double getConstructionTime() const { return constructionTime; }
   [[nodiscard]] std::size_t getFinalNodeCount() const { return e.size(); }
-  [[nodiscard]] std::size_t getMaxNodeCount() const override {
-    return Simulator<Config>::dd->template getUniqueTable<dd::mNode>()
-        .getPeakNumActiveEntries();
-  }
+  [[nodiscard]] std::size_t getMaxNodeCount() const override;
 
 protected:
   /// See Simulator<Config>::exportDDtoGraphviz
