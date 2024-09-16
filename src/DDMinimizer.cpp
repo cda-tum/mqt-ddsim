@@ -1,12 +1,11 @@
 #include "DDMinimizer.hpp"
 
 #include "CircuitSimulator.hpp"
-#include "ir/QuantumComputation.hpp"
-#include "ir/operations/OpType.hpp"
-#include "ir/Permutation.hpp"
-#include "ir/operations/Control.hpp"
 #include "circuit_optimizer/CircuitOptimizer.hpp"
-
+#include "ir/Permutation.hpp"
+#include "ir/QuantumComputation.hpp"
+#include "ir/operations/Control.hpp"
+#include "ir/operations/OpType.hpp"
 
 #include <cstddef>
 #include <map>
@@ -26,7 +25,7 @@ namespace qc {
  ***/
 
 void optimizeInputPermutation(qc::QuantumComputation qc) {
-  //create, set and apply the heuristics based permutation
+  // create, set and apply the heuristics based permutation
   const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
   qc.initialLayout = perm;
   qc::CircuitOptimizer::elidePermutations(qc);
@@ -53,7 +52,7 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
     }
     const Controls controls = op->getControls();
     const std::vector<Qubit> targets = {op->getTargets().begin(),
-                                  op->getTargets().end()};
+                                        op->getTargets().end()};
 
     for (const auto& control : controls) {
       for (const auto& target : targets) {
@@ -79,7 +78,8 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
       if (pair.second == -1) {
         max = -1;
         break;
-      } if (pair.second > max) {
+      }
+      if (pair.second > max) {
         max = pair.second;
       }
     }
@@ -110,12 +110,16 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
   auto c_r = indices.find("c_r");
   auto x_r = indices.find("x_r");
 
-  const int prio_c_r = DDMinimizer::getLadderPosition(c_r->second, x_c->second[0]);
-  const int prio_x_l = DDMinimizer::getLadderPosition(x_l->second, x_c->second[0]);
+  const int prio_c_r =
+      DDMinimizer::getLadderPosition(c_r->second, x_c->second[0]);
+  const int prio_x_l =
+      DDMinimizer::getLadderPosition(x_l->second, x_c->second[0]);
   const int stairs_c_r = DDMinimizer::getStairCount(c_r->second);
   const int stairs_x_l = DDMinimizer::getStairCount(x_l->second);
-  const int prio_c_l = DDMinimizer::getLadderPosition(c_l->second, c_x->second[0]);
-  const int prio_x_r = DDMinimizer::getLadderPosition(x_r->second, c_x->second[0]);
+  const int prio_c_l =
+      DDMinimizer::getLadderPosition(c_l->second, c_x->second[0]);
+  const int prio_x_r =
+      DDMinimizer::getLadderPosition(x_r->second, c_x->second[0]);
   const int stairs_c_l = DDMinimizer::getStairCount(c_l->second);
   const int stairs_x_r = DDMinimizer::getStairCount(x_r->second);
 
@@ -186,8 +190,9 @@ DDMinimizer::makeDataStructure(qc::QuantumComputation& qc) {
 
   // create x-c ladder
   const std::size_t max = bits - 1;
-  
-  //maps for the x-c and c-x ladder with pair of control qubit and target qubit to index
+
+  // maps for the x-c and c-x ladder with pair of control qubit and target qubit
+  // to index
   std::map<pair<Qubit, Qubit>, int> x_c_map;
   std::map<pair<Qubit, Qubit>, int> c_x_map;
   for (size_t i = 0; i < max; i++) {
@@ -317,7 +322,7 @@ std::vector<Qubit> DDMinimizer::rotateRight(std::vector<Qubit> layout,
 
 std::vector<Qubit> DDMinimizer::rotateLeft(std::vector<Qubit> layout,
                                            int stairs) {
- const std::vector<Qubit>::size_type size = layout.size();
+  const std::vector<Qubit>::size_type size = layout.size();
   std::vector<Qubit> rotated_layout(size);
   for (int r = 0; r < stairs; ++r) {
     if (!layout.empty()) {
@@ -351,7 +356,7 @@ DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc) {
     }
     const Controls controls = op->getControls();
     const std::set<Qubit> targets = {op->getTargets().begin(),
-                               op->getTargets().end()};
+                                     op->getTargets().end()};
 
     for (const auto& control : controls) {
       if (controlToTargets.find(control.qubit) == controlToTargets.end()) {
@@ -369,7 +374,7 @@ DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc) {
     return qc.initialLayout;
   }
 
-  //create a weights map for the qubits to evaluate the order of the qubits
+  // create a weights map for the qubits to evaluate the order of the qubits
   const std::size_t bits = qc.getNqubits();
 
   std::vector<Qubit> qubit(bits);
