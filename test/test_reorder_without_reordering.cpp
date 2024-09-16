@@ -1,6 +1,5 @@
 #include "DDMinimizer.hpp"
 
-
 #include <gtest/gtest.h>
 
 using namespace qc;
@@ -12,7 +11,7 @@ TEST(ReorderWithoutReorderingTest, x_c) {
   #include "DDMinimizer.hpp"
   #include "circuit_optimizer/CircuitOptimizer.hpp"
   #include "ir/QuantumComputation.hpp"*/
-  // TODO 
+  // TODO
 }
 
 TEST(ReorderWithoutReorderingTest, c_x) {

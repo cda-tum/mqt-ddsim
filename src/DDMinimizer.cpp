@@ -1,11 +1,11 @@
 #include "DDMinimizer.hpp"
 
 #include "circuit_optimizer/CircuitOptimizer.hpp"
+#include "dd/DDDefinitions.hpp"
 #include "ir/Permutation.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "ir/operations/Control.hpp"
 #include "ir/operations/OpType.hpp"
-#include "dd/DDDefinitions.hpp"
 
 #include <algorithm>
 #include <cstddef>
