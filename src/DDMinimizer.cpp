@@ -1,6 +1,5 @@
 #include "DDMinimizer.hpp"
 
-#include "CircuitSimulator.hpp"
 #include "circuit_optimizer/CircuitOptimizer.hpp"
 #include "ir/Permutation.hpp"
 #include "ir/QuantumComputation.hpp"
@@ -14,6 +13,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <algorithm>
 
 using namespace qc;
 using namespace std;
@@ -44,7 +44,7 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
 
   // iterate over all the ops and mark the index of the found x-c pairs in the
   // map.
-  int instruction_index = 0;
+  int instructionIndex = 0;
   bool found = false;
   for (const auto& op : qc) {
     if (!op->isStandardOperation() || op->getType() == Z) {
@@ -59,13 +59,13 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
         for (auto& map : maps) {
           auto it = map.second.find({control.qubit, target});
           if (it != map.second.end()) {
-            it->second = instruction_index;
+            it->second = instructionIndex;
             found = true;
           }
         }
       }
     }
-    instruction_index++;
+    instructionIndex++;
   }
   if (!found) {
     return qc.initialLayout;
@@ -103,57 +103,57 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
   std::vector<Qubit> layout(bits);
   std::iota(layout.begin(), layout.end(), 0);
 
-  auto c_x = indices.find("c_x");
-  auto x_c = indices.find("x_c");
-  auto c_l = indices.find("c_l");
-  auto x_l = indices.find("x_l");
-  auto c_r = indices.find("c_r");
-  auto x_r = indices.find("x_r");
+  auto cX = indices.find("cX");
+  auto xC = indices.find("xC");
+  auto cL = indices.find("cL");
+  auto xL = indices.find("xL");
+  auto cR = indices.find("cR");
+  auto xR = indices.find("xR");
 
-  const int prio_c_r =
-      DDMinimizer::getLadderPosition(c_r->second, x_c->second[0]);
-  const int prio_x_l =
-      DDMinimizer::getLadderPosition(x_l->second, x_c->second[0]);
-  const int stairs_c_r = DDMinimizer::getStairCount(c_r->second);
-  const int stairs_x_l = DDMinimizer::getStairCount(x_l->second);
-  const int prio_c_l =
-      DDMinimizer::getLadderPosition(c_l->second, c_x->second[0]);
-  const int prio_x_r =
-      DDMinimizer::getLadderPosition(x_r->second, c_x->second[0]);
-  const int stairs_c_l = DDMinimizer::getStairCount(c_l->second);
-  const int stairs_x_r = DDMinimizer::getStairCount(x_r->second);
+  const int prio_cR =
+      DDMinimizer::getLadderPosition(cR->second, xC->second[0]);
+  const int prio_xL =
+      DDMinimizer::getLadderPosition(xL->second, xC->second[0]);
+  const int stairs_cR = DDMinimizer::getStairCount(cR->second);
+  const int stairs_xL = DDMinimizer::getStairCount(xL->second);
+  const int prio_cL =
+      DDMinimizer::getLadderPosition(cL->second, cX->second[0]);
+  const int prio_xR =
+      DDMinimizer::getLadderPosition(xR->second, cX->second[0]);
+  const int stairs_cL = DDMinimizer::getStairCount(cL->second);
+  const int stairs_xR = DDMinimizer::getStairCount(xR->second);
 
   // complete case checkins and adjust the layout
-  if ((c_x->second[0] != -1) &&
-      (x_c->second[0] == -1 || c_x->second[0] < x_c->second[0])) {
+  if ((cX->second[0] != -1) &&
+      (xC->second[0] == -1 || cX->second[0] < xC->second[0])) {
 
-    if ((prio_c_r == 0 && DDMinimizer::isFull(c_r->second)) ||
-        (prio_x_l == 0 && DDMinimizer::isFull(x_l->second))) {
-    } else if (prio_c_r == 0 && stairs_c_r > 0) {
+    if ((prio_cR == 0 && DDMinimizer::isFull(cR->second)) ||
+        (prio_xL == 0 && DDMinimizer::isFull(xL->second))) {
+    } else if (prio_cR == 0 && stairs_cR > 0) {
       layout = DDMinimizer::reverseLayout(layout);
-      layout = DDMinimizer::rotateRight(layout, stairs_c_r);
-    } else if (prio_x_l == 0 && stairs_x_l > 0) {
+      layout = DDMinimizer::rotateRight(layout, stairs_cR);
+    } else if (prio_xL == 0 && stairs_xL > 0) {
       layout = DDMinimizer::reverseLayout(layout);
-      layout = DDMinimizer::rotateLeft(layout, stairs_x_l);
-    } else if (prio_c_r > 0 || prio_x_l > 0 ||
-               (prio_c_r == 0 && prio_x_l == 0)) {
+      layout = DDMinimizer::rotateLeft(layout, stairs_xL);
+    } else if (prio_cR > 0 || prio_xL > 0 ||
+               (prio_cR == 0 && prio_xL == 0)) {
       layout = DDMinimizer::reverseLayout(layout);
     }
-  } else if ((x_c->second[0] != -1) &&
-             (c_x->second[0] == -1 || c_x->second[0] > x_c->second[0])) {
+  } else if ((xC->second[0] != -1) &&
+             (cX->second[0] == -1 || cX->second[0] > xC->second[0])) {
 
-    if ((prio_c_l == 0 && DDMinimizer::isFull(c_l->second)) ||
-        (prio_x_r == 0 && DDMinimizer::isFull(x_r->second))) {
+    if ((prio_cL == 0 && DDMinimizer::isFull(cL->second)) ||
+        (prio_xR == 0 && DDMinimizer::isFull(xR->second))) {
       layout = DDMinimizer::reverseLayout(layout);
     }
 
-    else if (prio_c_l == 0 && stairs_c_l > 0) {
-      layout = DDMinimizer::rotateLeft(layout, stairs_c_l);
-    } else if (prio_x_r == 0 && stairs_x_r > 0) {
-      layout = DDMinimizer::rotateRight(layout, stairs_x_r);
+    else if (prio_cL == 0 && stairs_cL > 0) {
+      layout = DDMinimizer::rotateLeft(layout, stairs_cL);
+    } else if (prio_xR == 0 && stairs_xR > 0) {
+      layout = DDMinimizer::rotateRight(layout, stairs_xR);
     }
-  } else if ((DDMinimizer::isFull(x_r->second) ||
-              DDMinimizer::isFull(c_l->second))) {
+  } else if ((DDMinimizer::isFull(xR->second) ||
+              DDMinimizer::isFull(cL->second))) {
     layout = DDMinimizer::reverseLayout(layout);
   } else {
     return DDMinimizer::createControlBasedPermutation(qc);
@@ -178,13 +178,13 @@ std::pair<std::map<std::string, std::map<std::pair<Qubit, Qubit>, int>>,
 DDMinimizer::makeDataStructure(qc::QuantumComputation& qc) {
   const std::size_t bits = qc.getNqubits();
 
-  // map string of c_x, x_c, c_l, x_l, c_r, x_r to map of control and target bit
+  // map string of cX, xC, cL, xL, cR, xR to map of control and target bit
   // to the index of the gate
   std::map<std::string, std::map<std::pair<Qubit, Qubit>, int>> maps;
 
-  // string of c_x, x_c, c_l, x_l, c_r, x_r to vector of max index of gate
-  // for c_l and x_l position 0 in the vector marks the line of c(x) at 0 -> we
-  // count the left most as the first for c_r and x_r position 0 in the vector
+  // string of cX, xC, cL, xL, cR, xR to vector of max index of gate
+  // for cL and xL position 0 in the vector marks the line of c(x) at 0 -> we
+  // count the left most as the first for cR and xR position 0 in the vector
   // marks the line of c(x) at bits - 1 -> we count the right most as the first
   std::map<std::string, std::vector<int>> indices;
 
@@ -194,63 +194,63 @@ DDMinimizer::makeDataStructure(qc::QuantumComputation& qc) {
   // maps for the x-c and c-x ladder with pair of control qubit and target qubit
   // to index
   std::map<pair<Qubit, Qubit>, int> x_c_map;
-  std::map<pair<Qubit, Qubit>, int> c_x_map;
+  std::map<pair<Qubit, Qubit>, int> cX_map;
   for (size_t i = 0; i < max; i++) {
     x_c_map.insert({{i + 1, i}, -1});
-    c_x_map.insert({{i, i + 1}, -1});
+    cX_map.insert({{i, i + 1}, -1});
   }
   // save complete maps of ladder and for max index evaluation
-  maps.insert({"x_c", x_c_map});
-  indices.insert({"x_c", std::vector<int>(1, 0)});
-  maps.insert({"c_x", c_x_map});
-  indices.insert({"c_x", std::vector<int>(1, 0)});
+  maps.insert({"xC", x_c_map});
+  indices.insert({"xC", std::vector<int>(1, 0)});
+  maps.insert({"cX", cX_map});
+  indices.insert({"cX", std::vector<int>(1, 0)});
 
   // create c-l and x-l ladder
   for (size_t i = 0; i < max; i++) {
-    std::map<pair<Qubit, Qubit>, int> x_l_map;
-    std::map<pair<Qubit, Qubit>, int> c_l_map;
+    std::map<pair<Qubit, Qubit>, int> xL_map;
+    std::map<pair<Qubit, Qubit>, int> cL_map;
     // create the steps of the ladder
     for (size_t j = 0; j < bits; j++) {
       if (i < j) {
-        x_l_map.insert({{j, i}, -1});
-        c_l_map.insert({{i, j}, -1});
+        xL_map.insert({{j, i}, -1});
+        cL_map.insert({{i, j}, -1});
       }
     }
     // save the steps in the maps
-    maps.insert({"x_l_" + std::to_string(i), x_l_map});
-    maps.insert({"c_l_" + std::to_string(i), c_l_map});
+    maps.insert({"xL_" + std::to_string(i), xL_map});
+    maps.insert({"cL_" + std::to_string(i), cL_map});
   }
   // save the complete ladder for max index evaluation
-  indices.insert({"x_l", std::vector<int>(bits - 1, 0)});
-  indices.insert({"c_l", std::vector<int>(bits - 1, 0)});
+  indices.insert({"xL", std::vector<int>(bits - 1, 0)});
+  indices.insert({"cL", std::vector<int>(bits - 1, 0)});
 
   // create c-r and x-r ladder
   for (size_t i = max; i > 0; i--) {
-    std::map<pair<Qubit, Qubit>, int> x_r_map;
-    std::map<pair<Qubit, Qubit>, int> c_r_map;
+    std::map<pair<Qubit, Qubit>, int> xR_map;
+    std::map<pair<Qubit, Qubit>, int> cR_map;
     // create the steps of the ladder
     for (size_t j = 0; j < bits; j++) {
       if (i > j) {
-        x_r_map.insert({{j, i}, -1});
-        c_r_map.insert({{i, j}, -1});
+        xR_map.insert({{j, i}, -1});
+        cR_map.insert({{i, j}, -1});
       }
     }
     // save the steps in the maps
-    maps.insert({"x_r_" + std::to_string(i), x_r_map});
-    maps.insert({"c_r_" + std::to_string(i), c_r_map});
+    maps.insert({"xR_" + std::to_string(i), xR_map});
+    maps.insert({"cR_" + std::to_string(i), cR_map});
   }
   // save the complete ladder for max index evaluation
-  indices.insert({"x_r", std::vector<int>(bits - 1, 0)});
-  indices.insert({"c_r", std::vector<int>(bits - 1, 0)});
+  indices.insert({"xR", std::vector<int>(bits - 1, 0)});
+  indices.insert({"cR", std::vector<int>(bits - 1, 0)});
 
   return std::make_pair(maps, indices);
 }
 
 // Helper function to check if the vector of a ladder step is full, meaning each
 // gate appeared in the circuit
-bool DDMinimizer::isFull(std::vector<int> vec) {
+bool DDMinimizer::isFull(const std::vector<int>& vec) {
   std::size_t countNegativeOne = 0;
-  for (int value : vec) {
+  for (const int value : vec) {
     if (value == -1) {
       countNegativeOne++;
     }
@@ -262,9 +262,9 @@ bool DDMinimizer::isFull(std::vector<int> vec) {
 }
 
 // Helper function to get the number of complete stairs in a ladder
-int DDMinimizer::getStairCount(std::vector<int> vec) {
+int DDMinimizer::getStairCount(const std::vector<int>& vec) {
   int count = 0;
-  for (int value : vec) {
+  for (const int value : vec) {
     if (value != -1) {
       count++;
     } else {
@@ -275,10 +275,10 @@ int DDMinimizer::getStairCount(std::vector<int> vec) {
 }
 
 // Helper function to get the position of a ladder in comparison to other steps
-int DDMinimizer::getLadderPosition(std::vector<int> vec, int ladder) {
+int DDMinimizer::getLadderPosition(const std::vector<int>& vec, int ladder) {
   int count = 0;
   for (size_t i = 0; i < vec.size(); i++) {
-    int value = vec[i];
+    const int value = vec[i];
 
     if (i == vec.size() - 1 && count != 0) {
       if (value != -1 && value < ladder) {
@@ -292,20 +292,20 @@ int DDMinimizer::getLadderPosition(std::vector<int> vec, int ladder) {
 // Helper functions to manipulate the Layout: reverse, rotate right and left
 
 std::vector<Qubit> DDMinimizer::reverseLayout(std::vector<Qubit> layout) {
-  std::vector<Qubit> reversed_layout(layout.size());
+  std::vector<Qubit> reversedLayout(layout.size());
   for (std::size_t i = 0; i < layout.size(); i++) {
-    reversed_layout[i] = layout[layout.size() - 1 - i];
+    reversedLayout[i] = layout[layout.size() - 1 - i];
   }
-  return reversed_layout;
+  return reversedLayout;
 }
 
 std::vector<Qubit> DDMinimizer::rotateRight(std::vector<Qubit> layout,
                                             int stairs) {
   const std::vector<Qubit>::size_type size = layout.size();
-  std::vector<Qubit> rotated_layout(size);
+  std::vector<Qubit> rotatedLayout(size);
   for (int r = 0; r < stairs; ++r) {
     if (!layout.empty()) {
-      rotated_layout[size - static_cast<std::vector<Qubit>::size_type>(r + 1)] =
+      rotatedLayout[size - static_cast<std::vector<Qubit>::size_type>(r + 1)] =
           layout[static_cast<std::vector<Qubit>::size_type>(r)];
     }
   }
@@ -313,20 +313,20 @@ std::vector<Qubit> DDMinimizer::rotateRight(std::vector<Qubit> layout,
       size - static_cast<std::vector<Qubit>::size_type>(stairs);
   for (std::vector<Qubit>::size_type r = 0; r < left; ++r) {
     if (!layout.empty()) {
-      rotated_layout[r] =
+      rotatedLayout[r] =
           layout[r + static_cast<std::vector<Qubit>::size_type>(stairs)];
     }
   }
-  return rotated_layout;
+  return rotatedLayout;
 }
 
 std::vector<Qubit> DDMinimizer::rotateLeft(std::vector<Qubit> layout,
                                            int stairs) {
   const std::vector<Qubit>::size_type size = layout.size();
-  std::vector<Qubit> rotated_layout(size);
+  std::vector<Qubit> rotatedLayout(size);
   for (int r = 0; r < stairs; ++r) {
     if (!layout.empty()) {
-      rotated_layout[static_cast<std::vector<Qubit>::size_type>(r)] =
+      rotatedLayout[static_cast<std::vector<Qubit>::size_type>(r)] =
           layout[size - static_cast<std::vector<Qubit>::size_type>(r + 1)];
     }
   }
@@ -334,11 +334,11 @@ std::vector<Qubit> DDMinimizer::rotateLeft(std::vector<Qubit> layout,
       size - static_cast<std::vector<Qubit>::size_type>(stairs);
   for (std::vector<Qubit>::size_type r = 0; r < left; ++r) {
     if (!layout.empty()) {
-      rotated_layout[r + static_cast<std::vector<Qubit>::size_type>(stairs)] =
+      rotatedLayout[r + static_cast<std::vector<Qubit>::size_type>(stairs)] =
           layout[r];
     }
   }
-  return rotated_layout;
+  return rotatedLayout;
 }
 
 // Fallback function to create a control based permutation if no pattern is
@@ -355,7 +355,7 @@ DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc) {
       continue;
     }
     const Controls controls = op->getControls();
-    const std::set<Qubit> targets = {op->getTargets().begin(),
+    const std::set<Qubit>& targets = {op->getTargets().begin(),
                                      op->getTargets().end()};
 
     for (const auto& control : controls) {
@@ -436,10 +436,11 @@ DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc) {
 // Helper function to adjust the weights of the qubits when a controlling qubit
 // was previously a target
 std::map<Qubit, int> DDMinimizer::adjustWeights(
-    std::map<Qubit, int> qubitWeights, std::set<Qubit> targets, Qubit ctrl,
-    std::map<Qubit, std::set<Qubit>> controlToTargets, int count) {
+    std::map<Qubit, int> qubitWeights, const std::set<Qubit>& targets,
+    Qubit ctrl, const std::map<Qubit, std::set<Qubit>>& controlToTargets, 
+    int count) {
   // avoid infinite loop
-  if (count == controlToTargets.size()) {
+  if (count == static_cast<int>(controlToTargets.size())) {    
     return qubitWeights;
   }
   // recoursively increase all the weights of the control qubits where the
