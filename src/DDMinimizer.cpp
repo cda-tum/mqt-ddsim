@@ -6,6 +6,7 @@
 #include "ir/operations/Control.hpp"
 #include "ir/operations/OpType.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <map>
 #include <numeric>
@@ -13,7 +14,6 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <algorithm>
 
 using namespace qc;
 using namespace std;
@@ -110,16 +110,12 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
   auto cR = indices.find("cR");
   auto xR = indices.find("xR");
 
-  const int prio_cR =
-      DDMinimizer::getLadderPosition(cR->second, xC->second[0]);
-  const int prio_xL =
-      DDMinimizer::getLadderPosition(xL->second, xC->second[0]);
+  const int prio_cR = DDMinimizer::getLadderPosition(cR->second, xC->second[0]);
+  const int prio_xL = DDMinimizer::getLadderPosition(xL->second, xC->second[0]);
   const int stairs_cR = DDMinimizer::getStairCount(cR->second);
   const int stairs_xL = DDMinimizer::getStairCount(xL->second);
-  const int prio_cL =
-      DDMinimizer::getLadderPosition(cL->second, cX->second[0]);
-  const int prio_xR =
-      DDMinimizer::getLadderPosition(xR->second, cX->second[0]);
+  const int prio_cL = DDMinimizer::getLadderPosition(cL->second, cX->second[0]);
+  const int prio_xR = DDMinimizer::getLadderPosition(xR->second, cX->second[0]);
   const int stairs_cL = DDMinimizer::getStairCount(cL->second);
   const int stairs_xR = DDMinimizer::getStairCount(xR->second);
 
@@ -135,8 +131,7 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
     } else if (prio_xL == 0 && stairs_xL > 0) {
       layout = DDMinimizer::reverseLayout(layout);
       layout = DDMinimizer::rotateLeft(layout, stairs_xL);
-    } else if (prio_cR > 0 || prio_xL > 0 ||
-               (prio_cR == 0 && prio_xL == 0)) {
+    } else if (prio_cR > 0 || prio_xL > 0 || (prio_cR == 0 && prio_xL == 0)) {
       layout = DDMinimizer::reverseLayout(layout);
     }
   } else if ((xC->second[0] != -1) &&
@@ -356,7 +351,7 @@ DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc) {
     }
     const Controls controls = op->getControls();
     const std::set<Qubit>& targets = {op->getTargets().begin(),
-                                     op->getTargets().end()};
+                                      op->getTargets().end()};
 
     for (const auto& control : controls) {
       if (controlToTargets.find(control.qubit) == controlToTargets.end()) {
@@ -437,10 +432,10 @@ DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc) {
 // was previously a target
 std::map<Qubit, int> DDMinimizer::adjustWeights(
     std::map<Qubit, int> qubitWeights, const std::set<Qubit>& targets,
-    Qubit ctrl, const std::map<Qubit, std::set<Qubit>>& controlToTargets, 
+    Qubit ctrl, const std::map<Qubit, std::set<Qubit>>& controlToTargets,
     int count) {
   // avoid infinite loop
-  if (count == static_cast<int>(controlToTargets.size())) {    
+  if (count == static_cast<int>(controlToTargets.size())) {
     return qubitWeights;
   }
   // recoursively increase all the weights of the control qubits where the
