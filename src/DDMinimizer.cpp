@@ -245,7 +245,8 @@ DDMinimizer::makeDataStructure(qc::QuantumComputation& qc) {
 // Helper function to check if the vector of a ladder step is full, meaning each
 // gate appeared in the circuit
 bool DDMinimizer::isFull(const std::vector<int>& vec) {
-  return std::all_of(vec.begin(), vec.end(), [](int value) { return value != -1; });
+  return std::all_of(vec.begin(), vec.end(),
+                     [](int value) { return value != -1; });
 }
 
 // Helper function to get the number of complete stairs in a ladder
