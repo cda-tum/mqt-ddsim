@@ -2,7 +2,6 @@
 #include "ir/Permutation.hpp"
 #include "ir/QuantumComputation.hpp"
 
-#include <algorithm>
 #include <cstddef>
 #include <map>
 #include <set>
@@ -50,9 +49,9 @@ public:
   makeDataStructure(qc::QuantumComputation& qc);
 
   // Functions to analyze the pattern of the controlled gates
-  static bool isFull(std::vector<int> vec);
-  static int getStairCount(std::vector<int> vec);
-  static int getLadderPosition(std::vector<int> vec, int laadder);
+  static bool isFull(const std::vector<int>& vec);
+  static int getStairCount(const std::vector<int>& vec);
+  static int getLadderPosition(const std::vector<int>& vec, int laadder);
 
   // Functions to adjust the layout based on the pattern of the controlled gates
   static std::vector<Qubit> reverseLayout(std::vector<Qubit> layout);
@@ -80,8 +79,8 @@ public:
    * @return adjusted map of qubit to weight
    */
   static std::map<Qubit, int>
-  adjustWeights(std::map<Qubit, int> qubitWeights, std::set<Qubit> targets,
-                Qubit ctrl, std::map<Qubit, std::set<Qubit>> controlToTargets,
+  adjustWeights(std::map<Qubit, int> qubitWeights, const std::set<Qubit>& targets,
+                Qubit ctrl, const std::map<Qubit, std::set<Qubit>>& controlToTargets,
                 int count);
 
   /**
