@@ -1,7 +1,7 @@
 #include "DDMinimizer.hpp"
 
+#include "Definitions.hpp"
 #include "circuit_optimizer/CircuitOptimizer.hpp"
-#include "dd/DDDefinitions.hpp"
 #include "ir/Permutation.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "ir/operations/Control.hpp"
@@ -111,42 +111,42 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
   auto cR = indices.find("cR");
   auto xR = indices.find("xR");
 
-  const int PRIO_CR = DDMinimizer::getLadderPosition(cR->second, xC->second[0]);
-  const int PRIO_XL = DDMinimizer::getLadderPosition(xL->second, xC->second[0]);
-  const int STAIRS_CR = DDMinimizer::getStairCount(cR->second);
-  const int STAIRS_XL = DDMinimizer::getStairCount(xL->second);
-  const int PRIO_CL = DDMinimizer::getLadderPosition(cL->second, cX->second[0]);
-  const int PRIO_XR = DDMinimizer::getLadderPosition(xR->second, cX->second[0]);
-  const int STAIRS_CL = DDMinimizer::getStairCount(cL->second);
-  const int STAIRS_XR = DDMinimizer::getStairCount(xR->second);
+  const int prioCr = DDMinimizer::getLadderPosition(cR->second, xC->second[0]);
+  const int prioXl = DDMinimizer::getLadderPosition(xL->second, xC->second[0]);
+  const int stairsCr = DDMinimizer::getStairCount(cR->second);
+  const int stairsXl = DDMinimizer::getStairCount(xL->second);
+  const int prioCl = DDMinimizer::getLadderPosition(cL->second, cX->second[0]);
+  const int prioXr = DDMinimizer::getLadderPosition(xR->second, cX->second[0]);
+  const int stairsCl = DDMinimizer::getStairCount(cL->second);
+  const int stairsXr = DDMinimizer::getStairCount(xR->second);
 
   // complete case checkins and adjust the layout
   if ((cX->second[0] != -1) &&
       (xC->second[0] == -1 || cX->second[0] < xC->second[0])) {
 
-    if ((PRIO_CR == 0 && DDMinimizer::isFull(cR->second)) ||
-        (PRIO_XL == 0 && DDMinimizer::isFull(xL->second))) {
-    } else if (PRIO_CR == 0 && STAIRS_CR > 0) {
+    if ((prioCr == 0 && DDMinimizer::isFull(cR->second)) ||
+        (prioXl == 0 && DDMinimizer::isFull(xL->second))) {
+    } else if (prioCr == 0 && stairsCr > 0) {
       layout = DDMinimizer::reverseLayout(layout);
-      layout = DDMinimizer::rotateRight(layout, STAIRS_CR);
-    } else if (PRIO_XL == 0 && STAIRS_XL > 0) {
+      layout = DDMinimizer::rotateRight(layout, stairsCr);
+    } else if (prioXl == 0 && stairsXl > 0) {
       layout = DDMinimizer::reverseLayout(layout);
-      layout = DDMinimizer::rotateLeft(layout, STAIRS_XL);
-    } else if (PRIO_CR > 0 || PRIO_XL > 0 || (PRIO_CR == 0 && PRIO_XL == 0)) {
+      layout = DDMinimizer::rotateLeft(layout, stairsXl);
+    } else if (prioCr > 0 || prioXl > 0 || (prioCr == 0 && prioXl == 0)) {
       layout = DDMinimizer::reverseLayout(layout);
     }
   } else if ((xC->second[0] != -1) &&
              (cX->second[0] == -1 || cX->second[0] > xC->second[0])) {
 
-    if ((PRIO_CL == 0 && DDMinimizer::isFull(cL->second)) ||
-        (PRIO_XR == 0 && DDMinimizer::isFull(xR->second))) {
+    if ((prioCl == 0 && DDMinimizer::isFull(cL->second)) ||
+        (prioXr == 0 && DDMinimizer::isFull(xR->second))) {
       layout = DDMinimizer::reverseLayout(layout);
     }
 
-    else if (PRIO_CL == 0 && STAIRS_CL > 0) {
-      layout = DDMinimizer::rotateLeft(layout, STAIRS_CL);
-    } else if (PRIO_XR == 0 && STAIRS_XR > 0) {
-      layout = DDMinimizer::rotateRight(layout, STAIRS_XR);
+    else if (prioCl == 0 && stairsCl > 0) {
+      layout = DDMinimizer::rotateLeft(layout, stairsCl);
+    } else if (prioXr == 0 && stairsXr > 0) {
+      layout = DDMinimizer::rotateRight(layout, stairsXr);
     }
   } else if ((DDMinimizer::isFull(xR->second) ||
               DDMinimizer::isFull(cL->second))) {
@@ -189,32 +189,32 @@ DDMinimizer::makeDataStructure(qc::QuantumComputation& qc) {
 
   // maps for the x-c and c-x ladder with pair of control qubit and target qubit
   // to index
-  std::map<pair<Qubit, Qubit>, int> x_c_map;
-  std::map<pair<Qubit, Qubit>, int> cX_map;
+  std::map<pair<Qubit, Qubit>, int> xCMap;
+  std::map<pair<Qubit, Qubit>, int> cXMap;
   for (size_t i = 0; i < max; i++) {
-    x_c_map.insert({{i + 1, i}, -1});
-    cX_map.insert({{i, i + 1}, -1});
+    xCMap.insert({{i + 1, i}, -1});
+    cXMap.insert({{i, i + 1}, -1});
   }
   // save complete maps of ladder and for max index evaluation
-  maps.insert({"xC", x_c_map});
+  maps.insert({"xC", xCMap});
   indices.insert({"xC", std::vector<int>(1, 0)});
-  maps.insert({"cX", cX_map});
+  maps.insert({"cX", cXMap});
   indices.insert({"cX", std::vector<int>(1, 0)});
 
   // create c-l and x-l ladder
   for (size_t i = 0; i < max; i++) {
-    std::map<pair<Qubit, Qubit>, int> xL_map;
-    std::map<pair<Qubit, Qubit>, int> cL_map;
+    std::map<pair<Qubit, Qubit>, int> xLMap;
+    std::map<pair<Qubit, Qubit>, int> cLMap;
     // create the steps of the ladder
     for (size_t j = 0; j < bits; j++) {
       if (i < j) {
-        xL_map.insert({{j, i}, -1});
-        cL_map.insert({{i, j}, -1});
+        xLMap.insert({{j, i}, -1});
+        cLMap.insert({{i, j}, -1});
       }
     }
     // save the steps in the maps
-    maps.insert({"xL_" + std::to_string(i), xL_map});
-    maps.insert({"cL_" + std::to_string(i), cL_map});
+    maps.insert({"xL_" + std::to_string(i), xLMap});
+    maps.insert({"cL_" + std::to_string(i), cLMap});
   }
   // save the complete ladder for max index evaluation
   indices.insert({"xL", std::vector<int>(bits - 1, 0)});
@@ -222,18 +222,18 @@ DDMinimizer::makeDataStructure(qc::QuantumComputation& qc) {
 
   // create c-r and x-r ladder
   for (size_t i = max; i > 0; i--) {
-    std::map<pair<Qubit, Qubit>, int> xR_map;
-    std::map<pair<Qubit, Qubit>, int> cR_map;
+    std::map<pair<Qubit, Qubit>, int> xRMap;
+    std::map<pair<Qubit, Qubit>, int> cRMap;
     // create the steps of the ladder
     for (size_t j = 0; j < bits; j++) {
       if (i > j) {
-        xR_map.insert({{j, i}, -1});
-        cR_map.insert({{i, j}, -1});
+        xRMap.insert({{j, i}, -1});
+        cRMap.insert({{i, j}, -1});
       }
     }
     // save the steps in the maps
-    maps.insert({"xR_" + std::to_string(i), xR_map});
-    maps.insert({"cR_" + std::to_string(i), cR_map});
+    maps.insert({"xR_" + std::to_string(i), xRMap});
+    maps.insert({"cR_" + std::to_string(i), cRMap});
   }
   // save the complete ladder for max index evaluation
   indices.insert({"xR", std::vector<int>(bits - 1, 0)});
@@ -245,12 +245,7 @@ DDMinimizer::makeDataStructure(qc::QuantumComputation& qc) {
 // Helper function to check if the vector of a ladder step is full, meaning each
 // gate appeared in the circuit
 bool DDMinimizer::isFull(const std::vector<int>& vec) {
-  for (const int value : vec) {
-    if (value == -1) {
-      return false;
-    }
-  }
-  return true;
+  return std::all_of(vec.begin(), vec.end(), [](int value) { return value != -1; });
 }
 
 // Helper function to get the number of complete stairs in a ladder

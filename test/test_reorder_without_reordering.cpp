@@ -14,26 +14,26 @@ TEST(ReorderWithoutReorderingTest, x_c) {
   // TODO
 }
 
-TEST(ReorderWithoutReorderingTest, c_x) {
+TEST(ReorderWithoutReorderingTest, cx) {
   // TODO
 }
 
-TEST(ReorderWithoutReorderingTest, x_c_cl3) {
+TEST(ReorderWithoutReorderingTest, xccl3) {
   // TODO
 }
 
-TEST(ReorderWithoutReorderingTest, x_c_xr3) {
+TEST(ReorderWithoutReorderingTest, xcxr3) {
   // TODO
 }
 
-TEST(ReorderWithoutReorderingTest, c_x_cr3) {
+TEST(ReorderWithoutReorderingTest, cxcr3) {
   // TODO
 }
 
-TEST(ReorderWithoutReorderingTest, c_x_xl3) {
+TEST(ReorderWithoutReorderingTest, cxxl3) {
   // TODO
 }
 
-TEST(ReorderWithoutReorderingTest, no_pattern) {
+TEST(ReorderWithoutReorderingTest, noPattern) {
   // TODO
 }
