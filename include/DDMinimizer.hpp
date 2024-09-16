@@ -5,11 +5,10 @@
 #include <algorithm>
 #include <cstddef>
 #include <map>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
-#include <set>
-
 
 namespace qc {
 class DDMinimizer {
