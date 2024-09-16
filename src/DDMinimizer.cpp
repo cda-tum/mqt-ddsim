@@ -5,6 +5,7 @@
 #include "ir/QuantumComputation.hpp"
 #include "ir/operations/Control.hpp"
 #include "ir/operations/OpType.hpp"
+#include "dd/DDDefinitions.hpp"
 
 #include <algorithm>
 #include <cstddef>
@@ -83,14 +84,14 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
         max = pair.second;
       }
     }
-    std::string map_name = map.first.substr(0, 3);
-    auto it = indices.find(map_name);
+    std::string mapName = map.first.substr(0, 3);
+    auto it = indices.find(mapName);
 
     if (it != indices.end()) {
-      if (map_name[2] == 'r') {
+      if (mapName[2] == 'r') {
         const auto column = static_cast<std::size_t>(map.first[4] - '0');
         it->second[bits - 1 - column] = max;
-      } else if (map_name[2] == 'l') {
+      } else if (mapName[2] == 'l') {
         const auto column = static_cast<std::size_t>(map.first[4] - '0');
         it->second[column] = max;
       } else {
@@ -110,42 +111,42 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
   auto cR = indices.find("cR");
   auto xR = indices.find("xR");
 
-  const int prio_cR = DDMinimizer::getLadderPosition(cR->second, xC->second[0]);
-  const int prio_xL = DDMinimizer::getLadderPosition(xL->second, xC->second[0]);
-  const int stairs_cR = DDMinimizer::getStairCount(cR->second);
-  const int stairs_xL = DDMinimizer::getStairCount(xL->second);
-  const int prio_cL = DDMinimizer::getLadderPosition(cL->second, cX->second[0]);
-  const int prio_xR = DDMinimizer::getLadderPosition(xR->second, cX->second[0]);
-  const int stairs_cL = DDMinimizer::getStairCount(cL->second);
-  const int stairs_xR = DDMinimizer::getStairCount(xR->second);
+  const int PRIO_CR = DDMinimizer::getLadderPosition(cR->second, xC->second[0]);
+  const int PRIO_XL = DDMinimizer::getLadderPosition(xL->second, xC->second[0]);
+  const int STAIRS_CR = DDMinimizer::getStairCount(cR->second);
+  const int STAIRS_XL = DDMinimizer::getStairCount(xL->second);
+  const int PRIO_CL = DDMinimizer::getLadderPosition(cL->second, cX->second[0]);
+  const int PRIO_XR = DDMinimizer::getLadderPosition(xR->second, cX->second[0]);
+  const int STAIRS_CL = DDMinimizer::getStairCount(cL->second);
+  const int STAIRS_XR = DDMinimizer::getStairCount(xR->second);
 
   // complete case checkins and adjust the layout
   if ((cX->second[0] != -1) &&
       (xC->second[0] == -1 || cX->second[0] < xC->second[0])) {
 
-    if ((prio_cR == 0 && DDMinimizer::isFull(cR->second)) ||
-        (prio_xL == 0 && DDMinimizer::isFull(xL->second))) {
-    } else if (prio_cR == 0 && stairs_cR > 0) {
+    if ((PRIO_CR == 0 && DDMinimizer::isFull(cR->second)) ||
+        (PRIO_XL == 0 && DDMinimizer::isFull(xL->second))) {
+    } else if (PRIO_CR == 0 && STAIRS_CR > 0) {
       layout = DDMinimizer::reverseLayout(layout);
-      layout = DDMinimizer::rotateRight(layout, stairs_cR);
-    } else if (prio_xL == 0 && stairs_xL > 0) {
+      layout = DDMinimizer::rotateRight(layout, STAIRS_CR);
+    } else if (PRIO_XL == 0 && STAIRS_XL > 0) {
       layout = DDMinimizer::reverseLayout(layout);
-      layout = DDMinimizer::rotateLeft(layout, stairs_xL);
-    } else if (prio_cR > 0 || prio_xL > 0 || (prio_cR == 0 && prio_xL == 0)) {
+      layout = DDMinimizer::rotateLeft(layout, STAIRS_XL);
+    } else if (PRIO_CR > 0 || PRIO_XL > 0 || (PRIO_CR == 0 && PRIO_XL == 0)) {
       layout = DDMinimizer::reverseLayout(layout);
     }
   } else if ((xC->second[0] != -1) &&
              (cX->second[0] == -1 || cX->second[0] > xC->second[0])) {
 
-    if ((prio_cL == 0 && DDMinimizer::isFull(cL->second)) ||
-        (prio_xR == 0 && DDMinimizer::isFull(xR->second))) {
+    if ((PRIO_CL == 0 && DDMinimizer::isFull(cL->second)) ||
+        (PRIO_XR == 0 && DDMinimizer::isFull(xR->second))) {
       layout = DDMinimizer::reverseLayout(layout);
     }
 
-    else if (prio_cL == 0 && stairs_cL > 0) {
-      layout = DDMinimizer::rotateLeft(layout, stairs_cL);
-    } else if (prio_xR == 0 && stairs_xR > 0) {
-      layout = DDMinimizer::rotateRight(layout, stairs_xR);
+    else if (PRIO_CL == 0 && STAIRS_CL > 0) {
+      layout = DDMinimizer::rotateLeft(layout, STAIRS_CL);
+    } else if (PRIO_XR == 0 && STAIRS_XR > 0) {
+      layout = DDMinimizer::rotateRight(layout, STAIRS_XR);
     }
   } else if ((DDMinimizer::isFull(xR->second) ||
               DDMinimizer::isFull(cL->second))) {
@@ -244,16 +245,12 @@ DDMinimizer::makeDataStructure(qc::QuantumComputation& qc) {
 // Helper function to check if the vector of a ladder step is full, meaning each
 // gate appeared in the circuit
 bool DDMinimizer::isFull(const std::vector<int>& vec) {
-  std::size_t countNegativeOne = 0;
   for (const int value : vec) {
     if (value == -1) {
-      countNegativeOne++;
+      return false;
     }
   }
-  if (countNegativeOne == 0) {
-    return true;
-  }
-  return false;
+  return true;
 }
 
 // Helper function to get the number of complete stairs in a ladder
