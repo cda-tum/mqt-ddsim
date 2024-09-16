@@ -401,5 +401,6 @@ void Simulator<Config>::exportDDtoGraphvizFile(
 }
 
 template class Simulator<dd::DDPackageConfig>;
+template class Simulator<dd::UnitarySimulatorDDPackageConfig>;
 template class Simulator<dd::StochasticNoiseSimulatorDDPackageConfig>;
 template class Simulator<dd::DensityMatrixSimulatorDDPackageConfig>;

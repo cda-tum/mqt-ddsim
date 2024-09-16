@@ -1,6 +1,7 @@
 #include "CircuitSimulator.hpp"
 #include "HybridSchrodingerFeynmanSimulator.hpp"
 #include "ir/QuantumComputation.hpp"
+#include "ir/operations/OpType.hpp"
 
 #include <cstdlib>
 #include <gtest/gtest.h>
@@ -79,18 +80,6 @@ TEST(HybridSimTest, TrivialParallelAmplitude) {
   it = resultAmp.find("0111");
   ASSERT_TRUE(it != resultAmp.end());
   EXPECT_NEAR(static_cast<double>(it->second), 2048, 128);
-}
-
-TEST(HybridSimTest, NonStandardOperation) {
-  auto quantumComputation = std::make_unique<qc::QuantumComputation>(1, 1);
-  quantumComputation->h(0);
-  quantumComputation->measure(0, 0);
-  quantumComputation->barrier(0);
-  quantumComputation->h(0);
-  quantumComputation->measure(0, 0);
-
-  HybridSchrodingerFeynmanSimulator ddsim(std::move(quantumComputation));
-  EXPECT_THROW(ddsim.simulate(0), std::invalid_argument);
 }
 
 TEST(HybridSimTest, TooManyQubitsForVectorTest) {
@@ -203,4 +192,42 @@ TEST(HybridSimTest, RegressionTestAmplitudeModeMoreChunksAsThreads) {
   EXPECT_EQ(result.size(), 1U);
   EXPECT_EQ(result.begin()->first, "10");
   EXPECT_EQ(result.begin()->second, 1024U);
+}
+
+TEST(HybridSimTest, DynamicCircuitSupport) {
+  auto qc = std::make_unique<qc::QuantumComputation>(1, 1);
+  qc->h(0);
+  qc->measure(0, 0);
+  qc->classicControlled(qc::X, 0, {0, 1}, 1);
+  std::cout << *qc << "\n";
+
+  HybridSchrodingerFeynmanSimulator sim(std::move(qc));
+  EXPECT_THROW(sim.simulate(1024), std::invalid_argument);
+}
+
+TEST(HybridSimTest, TwoTargetGateSupport) {
+  auto qc = std::make_unique<qc::QuantumComputation>(2);
+  qc->rzz(1., 0, 1);
+  std::cout << *qc << "\n";
+
+  HybridSchrodingerFeynmanSimulator sim(std::move(qc));
+  EXPECT_THROW(sim.simulate(1024), std::invalid_argument);
+}
+
+TEST(HybridSimTest, TwoControlGateSupportLowerHalf) {
+  auto qc = std::make_unique<qc::QuantumComputation>(4);
+  qc->mcx({0, 1}, 2);
+  std::cout << *qc << "\n";
+
+  HybridSchrodingerFeynmanSimulator sim(std::move(qc));
+  EXPECT_THROW(sim.simulate(1024), std::invalid_argument);
+}
+
+TEST(HybridSimTest, TwoControlGateSupportUpperHalf) {
+  auto qc = std::make_unique<qc::QuantumComputation>(4);
+  qc->mcx({3, 2}, 1);
+  std::cout << *qc << "\n";
+
+  HybridSchrodingerFeynmanSimulator sim(std::move(qc));
+  EXPECT_THROW(sim.simulate(1024), std::invalid_argument);
 }

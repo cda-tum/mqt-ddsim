@@ -3,6 +3,7 @@
 #include "dd/DDDefinitions.hpp"
 #include "dd/Export.hpp"
 #include "ir/QuantumComputation.hpp"
+#include "ir/operations/OpType.hpp"
 
 #include <complex>
 #include <gtest/gtest.h>
@@ -294,4 +295,15 @@ TEST(TaskBasedSimTest, SimpleCircuitGatecostConfigurationObject) {
   for (const auto& [state, count] : counts) {
     std::cout << state << ": " << count << "\n";
   }
+}
+
+TEST(TaskBasedSimTest, DynamicCircuitSupport) {
+  auto qc = std::make_unique<qc::QuantumComputation>(1, 1);
+  qc->h(0);
+  qc->measure(0, 0);
+  qc->classicControlled(qc::X, 0, {0, 1}, 1);
+  std::cout << *qc << "\n";
+
+  PathSimulator sim(std::move(qc));
+  EXPECT_THROW(sim.simulate(1024), std::invalid_argument);
 }

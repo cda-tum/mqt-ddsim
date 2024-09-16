@@ -30,6 +30,7 @@ public:
       const std::size_t nthreads_ = 2)
       : CircuitSimulator<Config>(std::move(qc_), approxInfo_), mode(mode_),
         nthreads(nthreads_) {
+    qc::CircuitOptimizer::flattenOperations(*(CircuitSimulator<Config>::qc));
     // remove final measurements
     qc::CircuitOptimizer::removeFinalMeasurements(
         *(CircuitSimulator<Config>::qc));
@@ -48,6 +49,7 @@ public:
       : CircuitSimulator<Config>(std::move(qc_), approxInfo_, seed_),
         mode(mode_), nthreads(nthreads_) {
     // remove final measurements
+    qc::CircuitOptimizer::flattenOperations(*(CircuitSimulator<Config>::qc));
     qc::CircuitOptimizer::removeFinalMeasurements(
         *(CircuitSimulator<Config>::qc));
   }

@@ -267,5 +267,6 @@ CircuitSimulator<Config>::singleShot(const bool ignoreNonUnitaries) {
 }
 
 template class CircuitSimulator<dd::DDPackageConfig>;
+template class CircuitSimulator<dd::UnitarySimulatorDDPackageConfig>;
 template class CircuitSimulator<dd::DensityMatrixSimulatorDDPackageConfig>;
 template class CircuitSimulator<dd::StochasticNoiseSimulatorDDPackageConfig>;
