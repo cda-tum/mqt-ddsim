@@ -79,8 +79,9 @@ public:
    * @return adjusted map of qubit to weight
    */
   static std::map<Qubit, int>
-  adjustWeights(std::map<Qubit, int> qubitWeights, const std::set<Qubit>& targets,
-                Qubit ctrl, const std::map<Qubit, std::set<Qubit>>& controlToTargets,
+  adjustWeights(std::map<Qubit, int> qubitWeights,
+                const std::set<Qubit>& targets, Qubit ctrl,
+                const std::map<Qubit, std::set<Qubit>>& controlToTargets,
                 int count);
 
   /**
