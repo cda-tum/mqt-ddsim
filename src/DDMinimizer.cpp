@@ -35,14 +35,16 @@ void optimizeInputPermutation(qc::QuantumComputation qc) {
 qc::Permutation
 DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
 
-  // create the data structure to store the indices in the pattern maps as well as the max indices of the ladders
+  // create the data structure to store the indices in the pattern maps as well
+  // as the max indices of the ladders
   std::map<std::string, std::map<std::pair<Qubit, Qubit>, int>> maps =
       DDMinimizer::makeDataStructure(qc).first;
   std::map<std::string, std::vector<int>> indices =
       DDMinimizer::makeDataStructure(qc).second;
   const std::size_t bits = qc.getNqubits();
 
-  // iterate over all the ops and mark the index of the found x-c pairs in the map.
+  // iterate over all the ops and mark the index of the found x-c pairs in the
+  // map.
   int instruction_index = 0;
   bool found = false;
   for (const auto& op : qc) {
@@ -117,7 +119,7 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
   const int stairs_c_l = DDMinimizer::getStairCount(c_l->second);
   const int stairs_x_r = DDMinimizer::getStairCount(x_r->second);
 
-  //complete case checkings and adjust the layout
+  // complete case checkins and adjust the layout
   if ((c_x->second[0] != -1) &&
       (x_c->second[0] == -1 || c_x->second[0] < x_c->second[0])) {
 
@@ -165,13 +167,15 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
   return perm;
 }
 
-// Helper function to create the data structure for the pattern analysis of controlled gates
+// Helper function to create the data structure for the pattern analysis of
+// controlled gates
 std::pair<std::map<std::string, std::map<std::pair<Qubit, Qubit>, int>>,
           std::map<std::string, std::vector<int>>>
 DDMinimizer::makeDataStructure(qc::QuantumComputation& qc) {
   const std::size_t bits = qc.getNqubits();
 
-  // map string of c_x, x_c, c_l, x_l, c_r, x_r to map of control and target bit to the index of the gate
+  // map string of c_x, x_c, c_l, x_l, c_r, x_r to map of control and target bit
+  // to the index of the gate
   std::map<std::string, std::map<std::pair<Qubit, Qubit>, int>> maps;
 
   // string of c_x, x_c, c_l, x_l, c_r, x_r to vector of max index of gate
@@ -190,54 +194,55 @@ DDMinimizer::makeDataStructure(qc::QuantumComputation& qc) {
     x_c_map.insert({{i + 1, i}, -1});
     c_x_map.insert({{i, i + 1}, -1});
   }
-  //save complete maps of ladder and for max index evaluation
+  // save complete maps of ladder and for max index evaluation
   maps.insert({"x_c", x_c_map});
   indices.insert({"x_c", std::vector<int>(1, 0)});
   maps.insert({"c_x", c_x_map});
   indices.insert({"c_x", std::vector<int>(1, 0)});
 
-  //create c-l and x-l ladder
+  // create c-l and x-l ladder
   for (size_t i = 0; i < max; i++) {
     std::map<pair<Qubit, Qubit>, int> x_l_map;
     std::map<pair<Qubit, Qubit>, int> c_l_map;
-    //create the steps of the ladder
+    // create the steps of the ladder
     for (size_t j = 0; j < bits; j++) {
       if (i < j) {
         x_l_map.insert({{j, i}, -1});
         c_l_map.insert({{i, j}, -1});
       }
     }
-    //save the steps in the maps
+    // save the steps in the maps
     maps.insert({"x_l_" + std::to_string(i), x_l_map});
     maps.insert({"c_l_" + std::to_string(i), c_l_map});
   }
-  //save the complete ladder for max index evaluation
+  // save the complete ladder for max index evaluation
   indices.insert({"x_l", std::vector<int>(bits - 1, 0)});
   indices.insert({"c_l", std::vector<int>(bits - 1, 0)});
 
-  //create c-r and x-r ladder
+  // create c-r and x-r ladder
   for (size_t i = max; i > 0; i--) {
     std::map<pair<Qubit, Qubit>, int> x_r_map;
     std::map<pair<Qubit, Qubit>, int> c_r_map;
-    //create the steps of the ladder
+    // create the steps of the ladder
     for (size_t j = 0; j < bits; j++) {
       if (i > j) {
         x_r_map.insert({{j, i}, -1});
         c_r_map.insert({{i, j}, -1});
       }
     }
-    //save the steps in the maps
+    // save the steps in the maps
     maps.insert({"x_r_" + std::to_string(i), x_r_map});
     maps.insert({"c_r_" + std::to_string(i), c_r_map});
   }
-  //save the complete ladder for max index evaluation
+  // save the complete ladder for max index evaluation
   indices.insert({"x_r", std::vector<int>(bits - 1, 0)});
   indices.insert({"c_r", std::vector<int>(bits - 1, 0)});
 
   return std::make_pair(maps, indices);
 }
 
-// Helper function to check if the vector of a ladder step is full, meaning each gate appeared in the circuit
+// Helper function to check if the vector of a ladder step is full, meaning each
+// gate appeared in the circuit
 bool DDMinimizer::isFull(std::vector<int> vec) {
   std::size_t countNegativeOne = 0;
   for (int value : vec) {
@@ -251,7 +256,7 @@ bool DDMinimizer::isFull(std::vector<int> vec) {
   return false;
 }
 
-//Helper function to get the number of complete stairs in a ladder
+// Helper function to get the number of complete stairs in a ladder
 int DDMinimizer::getStairCount(std::vector<int> vec) {
   int count = 0;
   for (int value : vec) {
@@ -264,7 +269,7 @@ int DDMinimizer::getStairCount(std::vector<int> vec) {
   return count;
 }
 
-//Helper function to get the position of a ladder in comparison to other steps
+// Helper function to get the position of a ladder in comparison to other steps
 int DDMinimizer::getLadderPosition(std::vector<int> vec, int ladder) {
   int count = 0;
   for (size_t i = 0; i < vec.size(); i++) {
@@ -279,7 +284,7 @@ int DDMinimizer::getLadderPosition(std::vector<int> vec, int ladder) {
   return count;
 }
 
-//Helper functions to manipulate the Layout: reverse, rotate right and left
+// Helper functions to manipulate the Layout: reverse, rotate right and left
 
 std::vector<Qubit> DDMinimizer::reverseLayout(std::vector<Qubit> layout) {
   std::vector<Qubit> reversed_layout(layout.size());
@@ -331,14 +336,15 @@ std::vector<Qubit> DDMinimizer::rotateLeft(std::vector<Qubit> layout,
   return rotated_layout;
 }
 
-
-//Fallback function to create a control based permutation if no pattern is found in the controlled gates
+// Fallback function to create a control based permutation if no pattern is
+// found in the controlled gates
 qc::Permutation
 DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc) {
-  //create and fill a map of each qubit to all the qubits it controls
+  // create and fill a map of each qubit to all the qubits it controls
   std::map<Qubit, std::set<Qubit>> controlToTargets;
 
-  //iterate over all the ops to mark which qubits are controlled by which qubits
+  // iterate over all the ops to mark which qubits are controlled by which
+  // qubits
   for (const auto& op : qc) {
     if (!op->isStandardOperation()) {
       continue;
@@ -365,6 +371,7 @@ DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc) {
 
   //create a weights map for the qubits to evaluate the order of the qubits
   const std::size_t bits = qc.getNqubits();
+
   std::vector<Qubit> qubit(bits);
   std::vector<Qubit> layer(bits);
   std::map<Qubit, int> qubitWeights;
@@ -376,28 +383,32 @@ DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc) {
 
   std::set<Qubit> encounteredTargets;
   int weight = 1;
-  //compute and anjust the weight of the controlling qubit based on all control to target relations
+  // compute and anjust the weight of the controlling qubit based on all control
+  // to target relations
   for (const auto& pair : controlToTargets) {
-    //if the current control qubit is already encountered as a previous target, adjust the weights 
+    // if the current control qubit is already encountered as a previous target,
+    // adjust the weights
     if (encounteredTargets.find(pair.first) != encounteredTargets.end()) {
       qubitWeights = DDMinimizer::adjustWeights(
           qubitWeights, encounteredTargets, pair.first, controlToTargets, 1);
     }
-    //get a base line weight for the control qubit as the previous one
+    // get a base line weight for the control qubit as the previous one
     weight = qubitWeights[pair.first];
 
-    //iterate over all the targets that are controlled by the current qubit in current item of the control to target map
+    // iterate over all the targets that are controlled by the current qubit in
+    // current item of the control to target map
     for (const auto& target : pair.second) {
-      //save all the encountered targets
+      // save all the encountered targets
       encounteredTargets.insert(target);
-      //compute the new weight of the control qubit based on all its targets and the base line
+      // compute the new weight of the control qubit based on all its targets
+      // and the base line
       weight = std::max(qubitWeights[target], weight + 1);
     }
     weight++;
     qubitWeights[pair.first] = weight;
   }
 
-  //sort the layout based on the weights of the qubits
+  // sort the layout based on the weights of the qubits
   sort(layer.begin(), layer.end(),
        [&qubitWeights](const Qubit& a, const Qubit& b) {
          auto weightA = qubitWeights.find(a) != qubitWeights.end()
@@ -408,9 +419,8 @@ DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc) {
                             : 0;
          return weightA < weightB;
        });
-  
 
-  //transform the layout into a permutationq
+  // transform the layout into a permutationq
   qc::Permutation perm;
   for (std::size_t m = 0; m < bits; m++) {
     perm[qubit[m]] = layer[m];
@@ -418,15 +428,17 @@ DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc) {
   return perm;
 }
 
-//Helper function to adjust the weights of the qubits when a controlling qubit was previously a target
+// Helper function to adjust the weights of the qubits when a controlling qubit
+// was previously a target
 std::map<Qubit, int> DDMinimizer::adjustWeights(
     std::map<Qubit, int> qubitWeights, std::set<Qubit> targets, Qubit ctrl,
     std::map<Qubit, std::set<Qubit>> controlToTargets, int count) {
-  //avoid infinite loop
+  // avoid infinite loop
   if (count == controlToTargets.size()) {
     return qubitWeights;
   }
-  //recoursively increase all the weights of the control qubits where the current controlling one was a target
+  // recoursively increase all the weights of the control qubits where the
+  // current controlling one was a target
   for (const auto& controlPair : controlToTargets) {
     if (controlPair.second.find(ctrl) != controlPair.second.end()) {
       const Qubit control = controlPair.first;
@@ -438,7 +450,8 @@ std::map<Qubit, int> DDMinimizer::adjustWeights(
   return qubitWeights;
 }
 
-//Helper function to compute how many permutations there are for a set number of qubits
+// Helper function to compute how many permutations there are for a set number
+// of qubits
 std::size_t DDMinimizer::factorial(std::size_t n) {
   std::size_t result = 1;
   for (std::size_t i = 1; i <= n; ++i) {
