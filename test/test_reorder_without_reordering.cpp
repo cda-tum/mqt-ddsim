@@ -5,7 +5,7 @@
 using namespace qc;
 using namespace std;
 
-TEST(ReorderWithoutReorderingTest, x_c) {
+TEST(ReorderWithoutReorderingTest, xc) {
   /*
   #include "CircuitSimulator.hpp"
   #include "DDMinimizer.hpp"
