@@ -19,7 +19,7 @@ public:
    controlled gates
    * @param QuantumComputation
   */
-  static void optimizeInputPermutation(qc::QuantumComputation);
+  static void optimizeInputPermutation(qc::QuantumComputation& qc);
 
   /**
    * @brief creates a Heuristic based initialLayout for the QuantumComputation.
