@@ -5,21 +5,13 @@
 
 #include <cstddef> // For std::size_t
 #include <gtest/gtest.h>
-#include <iostream>
 #include <string> // For std::string
 #include <vector> // For std::vector
 
 using namespace qc;
 using namespace std;
 
-void printPermutation(const Permutation& perm, const std::string& name) {
-  std::cout << name << ": {";
-  for (const auto& [key, value] : perm) {
-    std::cout << key << " -> " << value << ", ";
-  }
-  std::cout << "}\n";
-  std::cout.flush();
-}
+
 
 TEST(ReorderWithoutReorderingTest, xc) {
   // control -> target
@@ -51,9 +43,6 @@ TEST(ReorderWithoutReorderingTest, xc) {
   for (Qubit i = 0; i < bits; i++) {
     expectedPerm[i] = layout[i];
   }
-
-  printPermutation(expectedPerm, "Expected Permutation");
-  printPermutation(qc.initialLayout, "Actual Permutation");
 
   EXPECT_EQ(expectedPerm, qc.initialLayout);
 }
@@ -88,9 +77,6 @@ TEST(ReorderWithoutReorderingTest, cx) {
   for (Qubit i = 0; i < bits; i++) {
     expectedPerm[i] = layout[i];
   }
-
-  printPermutation(expectedPerm, "Expected Permutation");
-  printPermutation(qc.initialLayout, "Actual Permutation");
 
   EXPECT_EQ(expectedPerm, qc.initialLayout);
 }
