@@ -11,7 +11,7 @@
 using namespace qc;
 using namespace std;
 
-TEST(ReorderWithoutReorderingTest, xc) {
+TEST(ReorderWithoutReorderingTest, reorder_xc) {
   // control -> target
   const std::string testfile = "OPENQASM 2.0;\n"
                                "include \"qelib1.inc\";\n"
@@ -31,21 +31,20 @@ TEST(ReorderWithoutReorderingTest, xc) {
                                "measure q[3] -> meas[3];\n";
 
   auto qc = QuantumComputation::fromQASM(testfile);
-  DDMinimizer::optimizeInputPermutation(qc);
+  const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
 
   const std::size_t bits = 4;
   std::vector<Qubit> layout = {0, 1, 2, 3};
 
-  // Create the expected permutation
   Permutation expectedPerm;
   for (Qubit i = 0; i < bits; i++) {
     expectedPerm[i] = layout[i];
   }
 
-  EXPECT_EQ(expectedPerm, qc.initialLayout);
+  EXPECT_EQ(expectedPerm, perm);
 }
 
-TEST(ReorderWithoutReorderingTest, cx) {
+TEST(ReorderWithoutReorderingTest, reorder_cx) {
   const std::string testfile = "OPENQASM 2.0;\n"
                                "include \"qelib1.inc\";\n"
                                "qreg q[4];\n"
@@ -65,36 +64,184 @@ TEST(ReorderWithoutReorderingTest, cx) {
 
   auto qc = QuantumComputation::fromQASM(testfile);
   const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
-  qc.initialLayout = perm;
 
   const std::size_t bits = 4;
   std::vector<Qubit> layout = {3, 2, 1, 0};
 
-  // Create the expected permutation
   Permutation expectedPerm;
   for (Qubit i = 0; i < bits; i++) {
     expectedPerm[i] = layout[i];
   }
 
-  EXPECT_EQ(expectedPerm, qc.initialLayout);
+  EXPECT_EQ(expectedPerm, perm);
 }
 
-TEST(ReorderWithoutReorderingTest, xccl3) {
-  // TODO
+TEST(ReorderWithoutReorderingTest, reorder_xccl) {
+   const std::string testfile = "OPENQASM 2.0;\n"
+                               "include \"qelib1.inc\";\n"
+                               "qreg q[4];\n"
+                               "creg meas[4];"
+                               "h q[0];\n"
+                               "h q[1];\n"
+                               "h q[2];\n"
+                               "h q[3];\n"
+                               "cx q[1],q[0];\n"
+                               "cx q[2],q[1];\n"
+                               "cx q[3],q[2];\n"
+                               "cx q[0],q[1];\n"
+                               "cx q[0],q[2];\n"
+                               "cx q[0],q[3];\n"
+                               "barrier q[0],q[1],q[2],q[3];\n"
+                               "measure q[0] -> meas[0];\n"
+                               "measure q[1] -> meas[1];\n"
+                               "measure q[2] -> meas[2];\n"
+                               "measure q[3] -> meas[3];\n";
+
+  auto qc = QuantumComputation::fromQASM(testfile);
+  const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
+
+  const std::size_t bits = 4;
+  std::vector<Qubit> layout = {1, 2, 3, 0};
+
+  Permutation expectedPerm;
+  for (Qubit i = 0; i < bits; i++) {
+    expectedPerm[i] = layout[i];
+  }
+
+  EXPECT_EQ(expectedPerm, perm);
 }
 
-TEST(ReorderWithoutReorderingTest, xcxr3) {
-  // TODO
+TEST(ReorderWithoutReorderingTest, reorder_xcxr) {
+  const std::string testfile = "OPENQASM 2.0;\n"
+                              "include \"qelib1.inc\";\n"
+                              "qreg q[4];\n"
+                              "creg meas[4];"
+                              "h q[0];\n"
+                              "h q[1];\n"
+                              "h q[2];\n"
+                              "h q[3];\n"
+                              "cx q[1],q[0];\n"
+                              "cx q[2],q[1];\n"
+                              "cx q[3],q[2];\n"
+                              "cx q[0],q[3];\n"
+                              "cx q[1],q[3];\n"
+                              "cx q[2],q[3];\n"
+                              "barrier q[0],q[1],q[2],q[3];\n"
+                              "measure q[0] -> meas[0];\n"
+                              "measure q[1] -> meas[1];\n"
+                              "measure q[2] -> meas[2];\n"
+                              "measure q[3] -> meas[3];\n";
+
+  auto qc = QuantumComputation::fromQASM(testfile);
+  const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
+
+  const std::size_t bits = 4;
+  std::vector<Qubit> layout = {3, 0, 1, 2};
+
+  Permutation expectedPerm;
+  for (Qubit i = 0; i < bits; i++) {
+    expectedPerm[i] = layout[i];
+  }
+
+  EXPECT_EQ(expectedPerm, perm);
 }
 
-TEST(ReorderWithoutReorderingTest, cxcr3) {
-  // TODO
+TEST(ReorderWithoutReorderingTest, reorder_cxcr) {
+  const std::string testfile = "OPENQASM 2.0;\n"
+                               "include \"qelib1.inc\";\n"
+                               "qreg q[4];\n"
+                               "creg meas[4];"
+                               "h q[0];\n"
+                               "h q[1];\n"
+                               "h q[2];\n"
+                               "h q[3];\n"
+                               "cx q[0],q[1];\n"
+                               "cx q[1],q[2];\n"
+                               "cx q[2],q[3];\n"
+                               "cx q[1],q[0];\n"
+                               "cx q[2],q[0];\n"
+                               "cx q[3],q[0];\n"
+                               "barrier q[0],q[1],q[2],q[3];\n"
+                               "measure q[0] -> meas[0];\n"
+                               "measure q[1] -> meas[1];\n"
+                               "measure q[2] -> meas[2];\n"
+                               "measure q[3] -> meas[3];\n";
+
+  auto qc = QuantumComputation::fromQASM(testfile);
+  const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
+
+  const std::size_t bits = 4;
+  std::vector<Qubit> layout = {2, 1, 0, 3};
+
+  Permutation expectedPerm;
+  for (Qubit i = 0; i < bits; i++) {
+    expectedPerm[i] = layout[i];
+  }
+
+  EXPECT_EQ(expectedPerm, perm);
 }
 
-TEST(ReorderWithoutReorderingTest, cxxl3) {
-  // TODO
+TEST(ReorderWithoutReorderingTest, reorder_cxxl) {
+  const std::string testfile = "OPENQASM 2.0;\n"
+                               "include \"qelib1.inc\";\n"
+                               "qreg q[4];\n"
+                               "creg meas[4];"
+                               "h q[0];\n"
+                               "h q[1];\n"
+                               "h q[2];\n"
+                               "h q[3];\n"
+                               "cx q[0],q[1];\n"
+                               "cx q[1],q[2];\n"
+                               "cx q[2],q[3];\n"
+                               "cx q[3],q[0];\n"
+                               "cx q[3],q[1];\n"
+                               "cx q[3],q[2];\n"
+                               "barrier q[0],q[1],q[2],q[3];\n"
+                               "measure q[0] -> meas[0];\n"
+                               "measure q[1] -> meas[1];\n"
+                               "measure q[2] -> meas[2];\n"
+                               "measure q[3] -> meas[3];\n";
+
+  auto qc = QuantumComputation::fromQASM(testfile);
+  const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
+
+  const std::size_t bits = 4;
+  std::vector<Qubit> layout = {0, 3, 2, 1};
+
+  Permutation expectedPerm;
+  for (Qubit i = 0; i < bits; i++) {
+    expectedPerm[i] = layout[i];
+  }
+
+  EXPECT_EQ(expectedPerm, perm);
 }
 
-TEST(ReorderWithoutReorderingTest, noPattern) {
-  // TODO
+TEST(ReorderWithoutReorderingTest, reorder_noPattern) {
+   const std::string testfile = "OPENQASM 2.0;\n"
+                               "include \"qelib1.inc\";\n"
+                               "qreg q[4];\n"
+                               "creg meas[4];"
+                               "h q[0];\n"
+                               "h q[1];\n"
+                               "h q[2];\n"
+                               "h q[3];\n"
+                               "cx q[2],q[3];\n"
+                               "barrier q[0],q[1],q[2],q[3];\n"
+                               "measure q[0] -> meas[0];\n"
+                               "measure q[1] -> meas[1];\n"
+                               "measure q[2] -> meas[2];\n"
+                               "measure q[3] -> meas[3];\n";
+
+  auto qc = QuantumComputation::fromQASM(testfile);
+  const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
+
+  const std::size_t bits = 4;
+  std::vector<Qubit> layout = {0, 1, 3, 2};
+
+  Permutation expectedPerm;
+  for (Qubit i = 0; i < bits; i++) {
+    expectedPerm[i] = layout[i];
+  }
+
+  EXPECT_EQ(expectedPerm, perm);
 }

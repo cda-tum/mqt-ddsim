@@ -84,23 +84,23 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
         max = pair.second;
       }
     }
-    std::string mapName = map.first.substr(0, 3);
+    std::string mapName = map.first.substr(0, 2);
     auto it = indices.find(mapName);
 
     if (it != indices.end()) {
-      if (mapName[2] == 'r') {
-        const auto column = static_cast<std::size_t>(map.first[4] - '0');
+      if (mapName[1] == 'R') {
+        const auto column = static_cast<std::size_t>(map.first[2] - '0');
         it->second[bits - 1 - column] = max;
-      } else if (mapName[2] == 'l') {
-        const auto column = static_cast<std::size_t>(map.first[4] - '0');
+      } else if (mapName[1] == 'L') {
+        const auto column = static_cast<std::size_t>(map.first[2] - '0');
         it->second[column] = max;
-      } else if (max == -1) {
-        it->second[0] = 0;
-      } else {
+      }
+      else {
         it->second[0] = max;
       }
     }
   }
+
 
   // create the permutation based on the order of max index in the complete maps
   std::vector<Qubit> layout(bits);
@@ -130,10 +130,10 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
         (prioXl == 0 && DDMinimizer::isFull(xL->second))) {
     } else if (prioCr == 0 && stairsCr > 0) {
       layout = DDMinimizer::reverseLayout(layout);
-      layout = DDMinimizer::rotateRight(layout, stairsCr);
+      layout = DDMinimizer::rotateLeft(layout, stairsCr);
     } else if (prioXl == 0 && stairsXl > 0) {
       layout = DDMinimizer::reverseLayout(layout);
-      layout = DDMinimizer::rotateLeft(layout, stairsXl);
+      layout = DDMinimizer::rotateRight(layout, stairsXl);
     } else if (prioCr > 0 || prioXl > 0 || (prioCr == 0 && prioXl == 0)) {
       layout = DDMinimizer::reverseLayout(layout);
     }
@@ -146,9 +146,9 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
     }
 
     else if (prioCl == 0 && stairsCl > 0) {
-      layout = DDMinimizer::rotateLeft(layout, stairsCl);
+      layout = DDMinimizer::rotateRight(layout, stairsCl);
     } else if (prioXr == 0 && stairsXr > 0) {
-      layout = DDMinimizer::rotateRight(layout, stairsXr);
+      layout = DDMinimizer::rotateLeft(layout, stairsXr);
     }
   } else if ((DDMinimizer::isFull(xR->second) ||
               DDMinimizer::isFull(cL->second))) {
@@ -215,8 +215,8 @@ DDMinimizer::makeDataStructure(qc::QuantumComputation& qc) {
       }
     }
     // save the steps in the maps
-    maps.insert({"xL_" + std::to_string(i), xLMap});
-    maps.insert({"cL_" + std::to_string(i), cLMap});
+    maps.insert({"xL" + std::to_string(i), xLMap});
+    maps.insert({"cL" + std::to_string(i), cLMap});
   }
   // save the complete ladder for max index evaluation
   indices.insert({"xL", std::vector<int>(bits - 1, 0)});
@@ -234,8 +234,8 @@ DDMinimizer::makeDataStructure(qc::QuantumComputation& qc) {
       }
     }
     // save the steps in the maps
-    maps.insert({"xR_" + std::to_string(i), xRMap});
-    maps.insert({"cR_" + std::to_string(i), cRMap});
+    maps.insert({"xR" + std::to_string(i), xRMap});
+    maps.insert({"cR" + std::to_string(i), cRMap});
   }
   // save the complete ladder for max index evaluation
   indices.insert({"xR", std::vector<int>(bits - 1, 0)});
