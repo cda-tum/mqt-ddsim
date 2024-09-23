@@ -11,7 +11,7 @@
 using namespace qc;
 using namespace std;
 
-TEST(ReorderWithoutReorderingTest, reorder_xc) {
+TEST(ReorderWithoutReorderingTest, reorderXc) {
   // control -> target
   const std::string testfile = "OPENQASM 2.0;\n"
                                "include \"qelib1.inc\";\n"
@@ -44,7 +44,7 @@ TEST(ReorderWithoutReorderingTest, reorder_xc) {
   EXPECT_EQ(expectedPerm, perm);
 }
 
-TEST(ReorderWithoutReorderingTest, reorder_cx) {
+TEST(ReorderWithoutReorderingTest, reorderCx) {
   const std::string testfile = "OPENQASM 2.0;\n"
                                "include \"qelib1.inc\";\n"
                                "qreg q[4];\n"
@@ -76,7 +76,7 @@ TEST(ReorderWithoutReorderingTest, reorder_cx) {
   EXPECT_EQ(expectedPerm, perm);
 }
 
-TEST(ReorderWithoutReorderingTest, reorder_xccl) {
+TEST(ReorderWithoutReorderingTest, reorderXccl) {
   const std::string testfile = "OPENQASM 2.0;\n"
                                "include \"qelib1.inc\";\n"
                                "qreg q[4];\n"
@@ -111,7 +111,7 @@ TEST(ReorderWithoutReorderingTest, reorder_xccl) {
   EXPECT_EQ(expectedPerm, perm);
 }
 
-TEST(ReorderWithoutReorderingTest, reorder_xcxr) {
+TEST(ReorderWithoutReorderingTest, reorderXcxr) {
   const std::string testfile = "OPENQASM 2.0;\n"
                                "include \"qelib1.inc\";\n"
                                "qreg q[4];\n"
@@ -146,7 +146,7 @@ TEST(ReorderWithoutReorderingTest, reorder_xcxr) {
   EXPECT_EQ(expectedPerm, perm);
 }
 
-TEST(ReorderWithoutReorderingTest, reorder_cxcr) {
+TEST(ReorderWithoutReorderingTest, reorderCxcr) {
   const std::string testfile = "OPENQASM 2.0;\n"
                                "include \"qelib1.inc\";\n"
                                "qreg q[4];\n"
@@ -181,7 +181,7 @@ TEST(ReorderWithoutReorderingTest, reorder_cxcr) {
   EXPECT_EQ(expectedPerm, perm);
 }
 
-TEST(ReorderWithoutReorderingTest, reorder_cxxl) {
+TEST(ReorderWithoutReorderingTest, reorderCxxl) {
   const std::string testfile = "OPENQASM 2.0;\n"
                                "include \"qelib1.inc\";\n"
                                "qreg q[4];\n"
@@ -216,7 +216,7 @@ TEST(ReorderWithoutReorderingTest, reorder_cxxl) {
   EXPECT_EQ(expectedPerm, perm);
 }
 
-TEST(ReorderWithoutReorderingTest, reorder_noPattern) {
+TEST(ReorderWithoutReorderingTest, reorderNoPattern) {
   const std::string testfile = "OPENQASM 2.0;\n"
                                "include \"qelib1.inc\";\n"
                                "qreg q[4];\n"
