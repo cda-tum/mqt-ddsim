@@ -399,7 +399,6 @@ DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc) {
     qubitWeights[pair.first] = weight;
   }
 
-
   // sort the layout based on the weights of the qubits
   sort(layer.begin(), layer.end(),
        [&qubitWeights](const Qubit& a, const Qubit& b) {

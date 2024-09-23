@@ -218,21 +218,21 @@ TEST(ReorderWithoutReorderingTest, reorderCxxl) {
 
 TEST(ReorderWithoutReorderingTest, reorderInterlacedQubits) {
   const std::string testfile = "OPENQASM 2.0;\n"
-                              "include \"qelib1.inc\";\n"
-                              "qreg q[4];\n"
-                              "creg meas[4];"
-                              "h q[0];\n"
-                              "h q[1];\n"
-                              "h q[2];\n"
-                              "h q[3];\n"
-                              "cx q[0],q[1];\n"
-                              "cx q[1],q[3];\n"
-                              "cx q[3],q[2];\n"
-                              "barrier q[0],q[1],q[2],q[3];\n"
-                              "measure q[0] -> meas[0];\n"
-                              "measure q[1] -> meas[1];\n"
-                              "measure q[2] -> meas[2];\n"
-                              "measure q[3] -> meas[3];\n";
+                               "include \"qelib1.inc\";\n"
+                               "qreg q[4];\n"
+                               "creg meas[4];"
+                               "h q[0];\n"
+                               "h q[1];\n"
+                               "h q[2];\n"
+                               "h q[3];\n"
+                               "cx q[0],q[1];\n"
+                               "cx q[1],q[3];\n"
+                               "cx q[3],q[2];\n"
+                               "barrier q[0],q[1],q[2],q[3];\n"
+                               "measure q[0] -> meas[0];\n"
+                               "measure q[1] -> meas[1];\n"
+                               "measure q[2] -> meas[2];\n"
+                               "measure q[3] -> meas[3];\n";
 
   auto qc = QuantumComputation::fromQASM(testfile);
   const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
@@ -246,5 +246,4 @@ TEST(ReorderWithoutReorderingTest, reorderInterlacedQubits) {
   }
 
   EXPECT_EQ(expectedPerm, perm);
-
 }
