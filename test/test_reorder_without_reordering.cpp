@@ -35,7 +35,7 @@ TEST(ReorderWithoutReorderingTest, xc) {
   auto qc = QuantumComputation::fromQASM(testfile);
   DDMinimizer::optimizeInputPermutation(qc);
 
-  const std::size_t bits = 4; 
+  const std::size_t bits = 4;
   std::vector<Qubit> layout = {0, 1, 2, 3};
 
   // Create the expected permutation
@@ -48,7 +48,7 @@ TEST(ReorderWithoutReorderingTest, xc) {
 }
 
 TEST(ReorderWithoutReorderingTest, cx) {
-    const std::string testfile = "OPENQASM 2.0;\n"
+  const std::string testfile = "OPENQASM 2.0;\n"
                                "include \"qelib1.inc\";\n"
                                "qreg q[4];\n"
                                "creg meas[4];"
@@ -69,7 +69,7 @@ TEST(ReorderWithoutReorderingTest, cx) {
   const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
   qc.initialLayout = perm;
 
-  const std::size_t bits = 4; 
+  const std::size_t bits = 4;
   std::vector<Qubit> layout = {3, 2, 1, 0};
 
   // Create the expected permutation
