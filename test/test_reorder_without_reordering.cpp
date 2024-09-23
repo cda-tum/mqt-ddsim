@@ -11,8 +11,6 @@
 using namespace qc;
 using namespace std;
 
-
-
 TEST(ReorderWithoutReorderingTest, xc) {
   // control -> target
   const std::string testfile = "OPENQASM 2.0;\n"
