@@ -28,7 +28,7 @@ namespace qc {
 
 void DDMinimizer::optimizeInputPermutation(qc::QuantumComputation& qc) {
   // create, set and apply the heuristics based permutation
-  qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
+  const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
   qc.initialLayout = perm;
   qc::CircuitOptimizer::elidePermutations(qc);
 }
