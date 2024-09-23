@@ -94,13 +94,11 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
       } else if (mapName[1] == 'L') {
         const auto column = static_cast<std::size_t>(map.first[2] - '0');
         it->second[column] = max;
-      }
-      else {
+      } else {
         it->second[0] = max;
       }
     }
   }
-
 
   // create the permutation based on the order of max index in the complete maps
   std::vector<Qubit> layout(bits);
