@@ -9,14 +9,13 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <iostream>
 #include <map>
 #include <numeric>
 #include <set>
 #include <string>
 #include <utility>
 #include <vector>
-#include <iostream>
-
 
 using namespace qc;
 using namespace std;
@@ -96,10 +95,9 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
       } else if (mapName[2] == 'l') {
         const auto column = static_cast<std::size_t>(map.first[4] - '0');
         it->second[column] = max;
-      } else if ( max == -1) {
+      } else if (max == -1) {
         it->second[0] = 0;
-      }
-      else {
+      } else {
         it->second[0] = max;
       }
     }
