@@ -15,6 +15,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <iostream>
+
 
 using namespace qc;
 using namespace std;
@@ -27,7 +29,7 @@ namespace qc {
 
 void DDMinimizer::optimizeInputPermutation(qc::QuantumComputation& qc) {
   // create, set and apply the heuristics based permutation
-  const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
+  qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
   qc.initialLayout = perm;
   qc::CircuitOptimizer::elidePermutations(qc);
 }
@@ -94,7 +96,10 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
       } else if (mapName[2] == 'l') {
         const auto column = static_cast<std::size_t>(map.first[4] - '0');
         it->second[column] = max;
-      } else {
+      } else if ( max == -1) {
+        it->second[0] = 0;
+      }
+      else {
         it->second[0] = max;
       }
     }
