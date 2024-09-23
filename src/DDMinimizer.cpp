@@ -124,9 +124,7 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
   if ((cX->second[0] != -1) &&
       (xC->second[0] == -1 || cX->second[0] < xC->second[0])) {
 
-    if ((prioCr == 0 && DDMinimizer::isFull(cR->second)) ||
-        (prioXl == 0 && DDMinimizer::isFull(xL->second))) {
-    } else if (prioCr == 0 && stairsCr > 0) {
+    if (prioCr == 0 && stairsCr > 0) {
       layout = DDMinimizer::reverseLayout(layout);
       layout = DDMinimizer::rotateLeft(layout, stairsCr);
     } else if (prioXl == 0 && stairsXl > 0) {
@@ -401,6 +399,7 @@ DDMinimizer::createControlBasedPermutation(qc::QuantumComputation& qc) {
     qubitWeights[pair.first] = weight;
   }
 
+
   // sort the layout based on the weights of the qubits
   sort(layer.begin(), layer.end(),
        [&qubitWeights](const Qubit& a, const Qubit& b) {
@@ -442,16 +441,6 @@ std::map<Qubit, int> DDMinimizer::adjustWeights(
     }
   }
   return qubitWeights;
-}
-
-// Helper function to compute how many permutations there are for a set number
-// of qubits
-std::size_t DDMinimizer::factorial(std::size_t n) {
-  std::size_t result = 1;
-  for (std::size_t i = 1; i <= n; ++i) {
-    result *= i;
-  }
-  return result;
 }
 
 }; // namespace qc
