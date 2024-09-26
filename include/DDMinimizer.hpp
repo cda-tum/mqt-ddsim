@@ -14,12 +14,16 @@ class DDMinimizer {
 
 public:
   /**
-   * @brief Changes the order of qubits in a QuantumComputation to heuristically optimize for short running times of the DD-simulator.
-   * @detail Computes an initialLayout for the QuantumComputation based on a heuristic to optimize the running time of the DD-simulator.
-   * After that, the initialLayout is applied, i.e. the qubits in the QuantumComputation are re-ordered such that the resulting QuantumComputation's initialLayout is the identity again.
-   * The current implementation is based on patterns found in the controlled gates.
+   * @brief Changes the order of qubits in a QuantumComputation to heuristically
+   * optimize for short running times of the DD-simulator.
+   * @detail Computes an initialLayout for the QuantumComputation based on a
+   * heuristic to optimize the running time of the DD-simulator. After that, the
+   * initialLayout is applied, i.e. the qubits in the QuantumComputation are
+   * re-ordered such that the resulting QuantumComputation's initialLayout is
+   * the identity again. The current implementation is based on patterns found
+   * in the controlled gates.
    * @param QuantumComputation
-  */
+   */
   static void optimizeInputPermutation(qc::QuantumComputation& qc);
 
   /**
