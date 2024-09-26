@@ -83,7 +83,7 @@ public:
   // Functions to analyze the pattern of the controlled gates
   static bool isFull(const std::vector<int>& vec);
   static std::size_t getStairCount(const std::vector<int>& vec);
-  static int getLadderPosition(const std::vector<int>& vec, int laadder);
+  static int getLadderPosition(const std::vector<int>& vec, int ladder);
 
   // Functions to adjust the layout based on the pattern of the controlled
   // gates:
