@@ -26,13 +26,17 @@ public:
    */
   static void optimizeInputPermutation(qc::QuantumComputation& qc);
 
- /**
-   * @brief Computes a permutation for the QuantumComputation based on a heuristic to optimize the running time of the DD-simulator.
+  /**
+   * @brief Computes a permutation for the QuantumComputation based on a
+   * heuristic to optimize the running time of the DD-simulator.
    * @param QuantumComputation
-   * @return the qc::Permutation The computed permutation to be used as the initialLayout for a QuantumComputation
-   * @details First collects operation indices of controlled operation for patterns (s. makeDataStructure). 
-   * Then, based on the pattern of the controlled gates, the layout is adjusted. If no pattern is found, the control based permutation is created.
-  */
+   * @return the qc::Permutation The computed permutation to be used as the
+   * initialLayout for a QuantumComputation
+   * @details First collects operation indices of controlled operation for
+   * patterns (s. makeDataStructure). Then, based on the pattern of the
+   * controlled gates, the layout is adjusted. If no pattern is found, the
+   * control based permutation is created.
+   */
   static qc::Permutation createGateBasedPermutation(qc::QuantumComputation& qc);
 
   // Helper functions for createGateBasedPermutation
@@ -41,31 +45,35 @@ public:
   * @param QuantumComputation
   * @return a pair of maps to save indices of controlled gates
   * @details the data structure consists of two maps:
-  * 1. map: string of ladder (step) name to control and target bit to the index of the operation
-  * 2. map: string of ladder name to vector: max index of operation for each step or the c_x or x_c ladder
-  * for c_l and x_l position 0 in the vector marks the line of c(x) at 0 -> we count the left most as the first 
-  * for c_r and x_r position 0 in the vector marks the line of c(x) at bits - 1 -> we count theright most as the first
-  * 
-  * The ladder (steps) describe the following controlled gates (c: control qubit, x: target qubit):
-        e.g. for three qubits
+  * 1. map: string of ladder (step) name to control and target bit to the index
+  of the operation
+  * 2. map: string of ladder name to vector: max index of operation for each
+  step or the c_x or x_c ladder
+  * for c_l and x_l position 0 in the vector marks the line of c(x) at 0 -> we
+  count the left most as the first
+  * for c_r and x_r position 0 in the vector marks the line of c(x) at bits - 1
+  -> we count theright most as the first
+  *
+  * The ladder (steps) describe the following controlled gates (c: control
+  qubit, x: target qubit): e.g. for three qubits
         * c_x: c | 0  1  2
                x | 1  2  3
 
         * x_c: c | 1  2  3
-               x | 0  1  2 
+               x | 0  1  2
 
         * c_l_1: c | 0  0  0  and  c_l_2: c | 1  1  and  c_l_3: c | 2
                  x | 1  2  3              x | 2  3              x | 3
-                 
+
         * c_r_1: c | 3  3  3  and  c_r_2: c | 2  2  and  c_r_3: c | 1
                  x | 0  1  2              x | 0  1              x | 0
-        
+
         * x_l_1: c | 1  2  3  and  x_l_2: c | 2  3  and  x_l_3: c | 3
                  x | 0  0  0              x | 1  1              x | 2
-        
+
         * x_r_1: c | 0  1  2  and  x_r_2: c | 0  1  and  x_r_3: c | 0
                  x | 3  3  3              x | 2  2              x | 1
-        
+
   */
   static std::pair<
       std::map<std::string, std::map<std::pair<Qubit, Qubit>, int>>,
@@ -77,43 +85,50 @@ public:
   static std::size_t getStairCount(const std::vector<int>& vec);
   static int getLadderPosition(const std::vector<int>& vec, int laadder);
 
-// Functions to adjust the layout based on the pattern of the controlled gates:
+  // Functions to adjust the layout based on the pattern of the controlled
+  // gates:
 
-      /**
-        * @brief Helper function to reverse the layout (q: qubit, l: layer)
-        * @param layout
-        * @return the reversed layout
-        * @details q | 0  1  2  3  turns to q | 0  1  2  3
-        *          l | 0  1  2  3           l | 3  2  1  0
-        */
+  /**
+   * @brief Helper function to reverse the layout (q: qubit, l: layer)
+   * @param layout
+   * @return the reversed layout
+   * @details q | 0  1  2  3  turns to q | 0  1  2  3
+   *          l | 0  1  2  3           l | 3  2  1  0
+   */
   static std::vector<Qubit> reverseLayout(std::vector<Qubit> layout);
 
-      /**
-        * @brief Helper function to rotate the layout to the right (q: qubit, l: layer)
-        * @param layout, stairs (number of steps to rotate)
-        * @return the rotated layout
-        * @details q | 0  1  2  3 and 1 stairs turns to q | 0  1  2  3
-        *          l | 0  1  2  3                       l | 1  2  3  0
-        */
-  static std::vector<Qubit> rotateRight(std::vector<Qubit> layout, std::size_t stairs);
+  /**
+   * @brief Helper function to rotate the layout to the right (q: qubit, l:
+   * layer)
+   * @param layout, stairs (number of steps to rotate)
+   * @return the rotated layout
+   * @details q | 0  1  2  3 and 1 stairs turns to q | 0  1  2  3
+   *          l | 0  1  2  3                       l | 1  2  3  0
+   */
+  static std::vector<Qubit> rotateRight(std::vector<Qubit> layout,
+                                        std::size_t stairs);
 
-        /**
-        * @brief Helper function to rotate the layout to the left (q: qubit, l: layer)
-        * @param layout, stairs (number of steps to rotate)
-        * @return the rotated layout
-        * @details q | 0  1  2  3 and 2 stairs turns to q | 0  1  2  3
-        *          l | 0  1  2  3                       l | 3  0  1  2
-        */
-  static std::vector<Qubit> rotateLeft(std::vector<Qubit> layout, std::size_t stairs);
- 
+  /**
+   * @brief Helper function to rotate the layout to the left (q: qubit, l:
+   * layer)
+   * @param layout, stairs (number of steps to rotate)
+   * @return the rotated layout
+   * @details q | 0  1  2  3 and 2 stairs turns to q | 0  1  2  3
+   *          l | 0  1  2  3                       l | 3  0  1  2
+   */
+  static std::vector<Qubit> rotateLeft(std::vector<Qubit> layout,
+                                       std::size_t stairs);
+
   /**
    * @brief creates a Heuristic based initialLayout for the QuantumComputation.
      This implementation is based on which qubits are controlled by whichqubits
    * @param QuantumComputation
    * @return the qc::Permutation
-   * @details The function creates a map of each qubit to all the qubits it controls.
-   * Based on the control to target relationship, a weight for each qubit is calculated. 
-   * The qubits are then sorted based on the weight in increasing order, 
+   * @details The function creates a map of each qubit to all the qubits it
+   controls.
+   * Based on the control to target relationship, a weight for each qubit is
+   calculated.
+   * The qubits are then sorted based on the weight in increasing order,
    * each controlling qubit is placed after its targets
    */
   static qc::Permutation

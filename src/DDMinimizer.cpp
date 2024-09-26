@@ -290,8 +290,8 @@ std::vector<Qubit> DDMinimizer::rotateRight(std::vector<Qubit> layout,
   const std::size_t size = layout.size();
   std::vector<Qubit> rotatedLayout(size);
   for (std::size_t r = 0; r < stairs; ++r) {
-      if (!layout.empty()) {
-        rotatedLayout[size - (r + 1)] = layout[r];
+    if (!layout.empty()) {
+      rotatedLayout[size - (r + 1)] = layout[r];
     }
   }
   const std::size_t left = size - stairs;
@@ -308,8 +308,8 @@ std::vector<Qubit> DDMinimizer::rotateLeft(std::vector<Qubit> layout,
   const std::size_t size = layout.size();
   std::vector<Qubit> rotatedLayout(size);
   for (std::size_t r = 0; r < stairs; ++r) {
-      if (!layout.empty()) {
-        rotatedLayout[r] = layout[size - (r + 1)];
+    if (!layout.empty()) {
+      rotatedLayout[r] = layout[size - (r + 1)];
     }
   }
   const std::size_t left = size - stairs;
