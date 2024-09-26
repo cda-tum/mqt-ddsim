@@ -27,7 +27,7 @@ namespace qc {
 
 void DDMinimizer::optimizeInputPermutation(qc::QuantumComputation& qc) {
   // create, set and apply the heuristics based permutation
-  const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
+  const qc::Permutation& perm = DDMinimizer::createGateBasedPermutation(qc);
   qc.initialLayout = perm;
   qc::CircuitOptimizer::elidePermutations(qc);
 }
@@ -113,12 +113,12 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
 
   const int prioCr = DDMinimizer::getLadderPosition(cR->second, xC->second[0]);
   const int prioXl = DDMinimizer::getLadderPosition(xL->second, xC->second[0]);
-  const int stairsCr = DDMinimizer::getStairCount(cR->second);
-  const int stairsXl = DDMinimizer::getStairCount(xL->second);
+  const std::size_t stairsCr = DDMinimizer::getStairCount(cR->second);
+  const std::size_t stairsXl = DDMinimizer::getStairCount(xL->second);
   const int prioCl = DDMinimizer::getLadderPosition(cL->second, cX->second[0]);
   const int prioXr = DDMinimizer::getLadderPosition(xR->second, cX->second[0]);
-  const int stairsCl = DDMinimizer::getStairCount(cL->second);
-  const int stairsXr = DDMinimizer::getStairCount(xR->second);
+  const std::size_t stairsCl = DDMinimizer::getStairCount(cL->second);
+  const std::size_t stairsXr = DDMinimizer::getStairCount(xR->second);
 
   // complete case checkins and adjust the layout
   if ((cX->second[0] != -1) &&
@@ -248,8 +248,8 @@ bool DDMinimizer::isFull(const std::vector<int>& vec) {
 }
 
 // Helper function to get the number of complete stairs in a ladder
-int DDMinimizer::getStairCount(const std::vector<int>& vec) {
-  int count = 0;
+std::size_t DDMinimizer::getStairCount(const std::vector<int>& vec) {
+  std::size_t count = 0;
   for (const int value : vec) {
     if (value != -1) {
       count++;
@@ -286,42 +286,36 @@ std::vector<Qubit> DDMinimizer::reverseLayout(std::vector<Qubit> layout) {
 }
 
 std::vector<Qubit> DDMinimizer::rotateRight(std::vector<Qubit> layout,
-                                            int stairs) {
-  const std::vector<Qubit>::size_type size = layout.size();
+                                            std::size_t stairs) {
+  const std::size_t size = layout.size();
   std::vector<Qubit> rotatedLayout(size);
-  for (int r = 0; r < stairs; ++r) {
-    if (!layout.empty()) {
-      rotatedLayout[size - static_cast<std::vector<Qubit>::size_type>(r + 1)] =
-          layout[static_cast<std::vector<Qubit>::size_type>(r)];
+  for (std::size_t r = 0; r < stairs; ++r) {
+      if (!layout.empty()) {
+        rotatedLayout[size - (r + 1)] = layout[r];
     }
   }
-  const std::vector<Qubit>::size_type left =
-      size - static_cast<std::vector<Qubit>::size_type>(stairs);
-  for (std::vector<Qubit>::size_type r = 0; r < left; ++r) {
+  const std::size_t left = size - stairs;
+  for (std::size_t r = 0; r < left; ++r) {
     if (!layout.empty()) {
-      rotatedLayout[r] =
-          layout[r + static_cast<std::vector<Qubit>::size_type>(stairs)];
+      rotatedLayout[r] = layout[r + stairs];
     }
   }
   return rotatedLayout;
 }
 
 std::vector<Qubit> DDMinimizer::rotateLeft(std::vector<Qubit> layout,
-                                           int stairs) {
-  const std::vector<Qubit>::size_type size = layout.size();
+                                           std::size_t stairs) {
+  const std::size_t size = layout.size();
   std::vector<Qubit> rotatedLayout(size);
-  for (int r = 0; r < stairs; ++r) {
-    if (!layout.empty()) {
-      rotatedLayout[static_cast<std::vector<Qubit>::size_type>(r)] =
-          layout[size - static_cast<std::vector<Qubit>::size_type>(r + 1)];
+  for (std::size_t r = 0; r < stairs; ++r) {
+      if (!layout.empty()) {
+        rotatedLayout[r] = layout[size - (r + 1)];
     }
   }
-  const std::vector<Qubit>::size_type left =
-      size - static_cast<std::vector<Qubit>::size_type>(stairs);
-  for (std::vector<Qubit>::size_type r = 0; r < left; ++r) {
+  const std::size_t left = size - stairs;
+  for (std::size_t r = 0; r < left; ++r) {
     if (!layout.empty()) {
-      rotatedLayout[r + static_cast<std::vector<Qubit>::size_type>(stairs)] =
-          layout[r];
+      rotatedLayout[r + stairs] = layout[r];
     }
   }
   return rotatedLayout;
