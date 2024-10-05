@@ -143,9 +143,9 @@ napoleon_use_rtype = False
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
 
-breathe_projects = {"mqt.ddsim": "../doxygen/xml"}
+breathe_projects = {"mqt.ddsim": "doxygen/xml"}
 breathe_default_project = "mqt.ddsim"
-subprocess.call("cd ..; doxygen", shell=True)  # noqa: S602, S607
+subprocess.call("doxygen", shell=True)  # noqa: S602, S607
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "furo"
