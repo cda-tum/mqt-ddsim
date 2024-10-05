@@ -148,7 +148,6 @@ xfail_strict = true
 filterwarnings = [
   "error",
   'ignore:.*datetime\.datetime\.utcfromtimestamp.*:DeprecationWarning:',
-  'ignore:.*Qiskit with Python 3.8.*:DeprecationWarning:',
   # The warning filters below are only temporary and should be removed once the Sampler and the Estimator are updated
   'ignore:.*BaseSamplerV1.*:DeprecationWarning:',
   'ignore:.*BaseEstimatorV1.*:DeprecationWarning:',
