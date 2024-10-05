@@ -59,7 +59,6 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinxcontrib.bibtex",
     "sphinx_copybutton",
-    "hoverxref.extension",
     "nbsphinx",
     "sphinxext.opengraph",
     "sphinx_autodoc_typehints",
@@ -94,20 +93,6 @@ nbsphinx_kernel_name = "python3"
 
 autosectionlabel_prefix_document = True
 
-hoverxref_auto_ref = True
-hoverxref_domains = ["cite", "py"]
-hoverxref_roles = []
-hoverxref_mathjax = True
-hoverxref_role_types = {
-    "ref": "tooltip",
-    "p": "tooltip",
-    "labelpar": "tooltip",
-    "class": "tooltip",
-    "meth": "tooltip",
-    "func": "tooltip",
-    "attr": "tooltip",
-    "property": "tooltip",
-}
 exclude_patterns = [
     "_build",
     "build",
@@ -143,9 +128,9 @@ napoleon_use_rtype = False
 napoleon_google_docstring = True
 napoleon_numpy_docstring = False
 
-breathe_projects = {"mqt.ddsim": "../doxygen/xml"}
+breathe_projects = {"mqt.ddsim": "doxygen/xml"}
 breathe_default_project = "mqt.ddsim"
-subprocess.call("cd ..; doxygen", shell=True)  # noqa: S602, S607
+subprocess.call("doxygen", shell=True)  # noqa: S602, S607
 
 # -- Options for HTML output -------------------------------------------------
 html_theme = "furo"
