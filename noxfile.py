@@ -85,7 +85,6 @@ def minimums(session: nox.Session) -> None:
         session,
         install_args=["--resolution=lowest-direct"],
         run_args=["-Wdefault"],
-        extras=["qiskit", "evaluation"],
     )
     session.run("uv", "pip", "list")
 

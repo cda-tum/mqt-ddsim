@@ -31,7 +31,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
 
     def test_qasm_simulator(self) -> None:
         """Test data counts output for single circuit run against reference."""
-        shots = 1024
+        shots = 8192
         result = self.backend.run(self.circuit, shots=shots).result()
         threshold = 0.04 * shots
         counts = result.get_counts()
@@ -53,7 +53,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
 
     def test_qasm_simulator_access(self) -> None:
         """Test data counts output for multiple quantum circuits in a single job."""
-        shots = 1024
+        shots = 8192
         circuit_1 = QuantumCircuit(2, name="c1")
         circuit_2 = QuantumCircuit(2, name="c2")
         circuit_2.x(0)
@@ -70,7 +70,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
 
     def test_qasm_simulator_pairwise(self) -> None:
         """Test data counts output for single circuit run against reference."""
-        shots = 1024
+        shots = 8192
         result = self.backend.run(self.circuit, shots=shots, mode="pairwise_recursive").result()
         threshold = 0.04 * shots
         counts = result.get_counts()
@@ -92,7 +92,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
 
     def test_qasm_simulator_bracket(self) -> None:
         """Test data counts output for single circuit run against reference."""
-        shots = 1024
+        shots = 8192
         result = self.backend.run(self.circuit, shots=shots, mode="bracket").result()
 
         print(result)
@@ -116,7 +116,7 @@ class MQTQasmSimulatorTest(unittest.TestCase):
 
     def test_qasm_simulator_alternating(self) -> None:
         """Test data counts output for single circuit run against reference."""
-        shots = 1024
+        shots = 8192
         result = self.backend.run(self.circuit, shots=shots, mode="alternating").result()
 
         print(result)
