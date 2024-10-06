@@ -1,7 +1,7 @@
 [build-system]
 requires = [
   "scikit-build-core>=0.10.1",
-  "setuptools-scm>=7",
+  "setuptools-scm>=8.1",
   "pybind11>=2.13.5",
 ]
 build-backend = "scikit_build_core.build"
@@ -53,22 +53,18 @@ tnflow = [
     "kahypar",
     "networkx",
 ]
-test = ["pytest>=7.0"]
+test = ["pytest>=7.2"]
 coverage = ["mqt.ddsim[test]", "pytest-cov>=4"]
 docs = [
     "mqt.ddsim[tnflow]",
-    "furo>=2023.08.17",
-    "sphinx",
-    "setuptools-scm>=7",
+    "furo>=2023.9.10",
+    "setuptools-scm>=8.1",
     "sphinxcontrib-bibtex>=2.4.2",
-    "sphinx-copybutton",
-    "sphinx-hoverxref",
-    "pybtex>=0.24",
-    "ipython",
+    "sphinx-copybutton>=0.5",
     "ipykernel",
     "nbsphinx",
     "breathe",
-    "sphinxext-opengraph",
+    "sphinxext-opengraph>=0.9",
     "sphinx-autodoc-typehints",
     "qiskit[visualization]",
     "graphviz",
@@ -144,7 +140,7 @@ write_to = "src/mqt/ddsim/_version.py"
 
 
 [tool.pytest.ini_options]
-minversion = "7.0"
+minversion = "7.2"
 testpaths = ["test/python"]
 addopts = ["-ra", "--strict-markers", "--strict-config", "--showlocals"]
 log_cli_level = "INFO"
@@ -152,7 +148,6 @@ xfail_strict = true
 filterwarnings = [
   "error",
   'ignore:.*datetime\.datetime\.utcfromtimestamp.*:DeprecationWarning:',
-  'ignore:.*Qiskit with Python 3.8.*:DeprecationWarning:',
   # The warning filters below are only temporary and should be removed once the Sampler and the Estimator are updated
   'ignore:.*BaseSamplerV1.*:DeprecationWarning:',
   'ignore:.*BaseEstimatorV1.*:DeprecationWarning:',
@@ -303,3 +298,7 @@ environment = { MACOSX_DEPLOYMENT_TARGET = "10.15" }
 before-build = "pip install delvewheel>=1.7.3"
 repair-wheel-command = "delvewheel repair -v -w {dest_dir} {wheel} --namespace-pkg mqt"
 environment = { CMAKE_ARGS = "-T ClangCL", SKBUILD_CMAKE_ARGS="--fresh" }
+
+
+[tool.uv]
+reinstall-package = ["mqt.ddsim"]
