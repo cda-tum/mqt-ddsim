@@ -45,6 +45,12 @@ jobs:
     if: fromJSON(needs.change-detection.outputs.run-code-ql)
     uses: cda-tum/mqt-workflows/.github/workflows/reusable-code-ql.yml@v1.4
 
+  cd:
+    name: 🚀 CD
+    needs: change-detection
+    if: fromJSON(needs.change-detection.outputs.run-cd)
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-packaging.yml@v1.4
+
   required-checks-pass: # This job does nothing and is only used for branch protection
     name: 🚦 Check
     if: always()
@@ -54,6 +60,7 @@ jobs:
       - cpp-linter
       - python-tests
       - code-ql
+      - cd
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether the needed jobs succeeded or failed
@@ -75,5 +82,9 @@ jobs:
             ${{
               fromJSON(needs.change-detection.outputs.run-code-ql)
               && '' || 'code-ql,'
+            }}
+            ${{
+              fromJSON(needs.change-detection.outputs.run-cd)
+              && '' || 'cd,'
             }}
           jobs: ${{ toJSON(needs) }}
