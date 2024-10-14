@@ -33,7 +33,6 @@ void DDMinimizer::optimizeInputPermutation(qc::QuantumComputation& qc) {
 
 qc::Permutation
 DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
-
   // create the data structure to store the indices in the pattern maps as well
   // as the max indices of the ladders
 
