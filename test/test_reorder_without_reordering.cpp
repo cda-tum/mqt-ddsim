@@ -30,7 +30,7 @@ TEST(ReorderWithoutReorderingTest, reorderXc) {
   auto qc = QuantumComputation::fromQASM(testfile);
   const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
 
-  Permutation expectedPerm = {{{0, 0}, {1, 1}, {2, 2}, {3, 3}}};
+  const Permutation expectedPerm = {{{0, 0}, {1, 1}, {2, 2}, {3, 3}}};
 
   EXPECT_EQ(expectedPerm, perm);
 }
@@ -56,7 +56,7 @@ TEST(ReorderWithoutReorderingTest, reorderCx) {
   auto qc = QuantumComputation::fromQASM(testfile);
   const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
 
-  Permutation expectedPerm = {{{0, 3}, {1, 2}, {2, 1}, {3, 0}}};
+  const Permutation expectedPerm = {{{0, 3}, {1, 2}, {2, 1}, {3, 0}}};
 
   EXPECT_EQ(expectedPerm, perm);
 }
@@ -85,7 +85,7 @@ TEST(ReorderWithoutReorderingTest, reorderXccl) {
   auto qc = QuantumComputation::fromQASM(testfile);
   const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
 
-  Permutation expectedPerm = {{{0, 1}, {1, 2}, {2, 3}, {3, 0}}};
+  const Permutation expectedPerm = {{{0, 1}, {1, 2}, {2, 3}, {3, 0}}};
 
   EXPECT_EQ(expectedPerm, perm);
 }
@@ -115,7 +115,7 @@ TEST(ReorderWithoutReorderingTest, reorderXcxh) {
   auto qc = QuantumComputation::fromQASM(testfile);
   const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
 
-  Permutation expectedPerm = {{{0, 3}, {1, 0}, {2, 1}, {3, 2}}};
+  const Permutation expectedPerm = {{{0, 3}, {1, 0}, {2, 1}, {3, 2}}};
 
   EXPECT_EQ(expectedPerm, perm);
 }
@@ -144,7 +144,7 @@ TEST(ReorderWithoutReorderingTest, reorderCxch) {
   auto qc = QuantumComputation::fromQASM(testfile);
   const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
 
-  Permutation expectedPerm = {{{0, 2}, {1, 1}, {2, 0}, {3, 3}}};
+  const Permutation expectedPerm = {{{0, 2}, {1, 1}, {2, 0}, {3, 3}}};
 
   EXPECT_EQ(expectedPerm, perm);
 }
@@ -174,7 +174,7 @@ TEST(ReorderWithoutReorderingTest, reorderCxxl) {
   auto qc = QuantumComputation::fromQASM(testfile);
   const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
 
-  Permutation expectedPerm = {{{0, 0}, {1, 3}, {2, 2}, {3, 1}}};
+  const Permutation expectedPerm = {{{0, 0}, {1, 3}, {2, 2}, {3, 1}}};
 
   EXPECT_EQ(expectedPerm, perm);
 }
@@ -200,7 +200,7 @@ TEST(ReorderWithoutReorderingTest, reorderInterlacedQubits) {
   auto qc = QuantumComputation::fromQASM(testfile);
   const qc::Permutation perm = DDMinimizer::createGateBasedPermutation(qc);
 
-  Permutation expectedPerm = {{{0, 2}, {1, 3}, {2, 1}, {3, 0}}};
+  const Permutation expectedPerm = {{{0, 2}, {1, 3}, {2, 1}, {3, 0}}};
 
   EXPECT_EQ(expectedPerm, perm);
 }
