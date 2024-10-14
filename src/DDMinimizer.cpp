@@ -41,10 +41,10 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
 
   std::map<std::pair<Qubit, Qubit>, int> xCMap;
   std::map<std::pair<Qubit, Qubit>, int> cXMap;
-  std::vector<std::map<std::pair<Qubit, Qubit>, int>> cLMap(bits-1);
-  std::vector<std::map<std::pair<Qubit, Qubit>, int>> cHMap(bits-1);
-  std::vector<std::map<std::pair<Qubit, Qubit>, int>> xLMap(bits-1);
-  std::vector<std::map<std::pair<Qubit, Qubit>, int>> xHMap(bits-1);
+  std::vector<std::map<std::pair<Qubit, Qubit>, int>> cLMap(bits - 1);
+  std::vector<std::map<std::pair<Qubit, Qubit>, int>> cHMap(bits - 1);
+  std::vector<std::map<std::pair<Qubit, Qubit>, int>> xLMap(bits - 1);
+  std::vector<std::map<std::pair<Qubit, Qubit>, int>> xHMap(bits - 1);
   int cXIndex = 0;
   int xCIndex = 0;
   std::vector<int> cLIndex(bits - 1, 0);
@@ -53,7 +53,8 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
   std::vector<int> xHIndex(bits - 1, 0);
 
   // initialize the maps with the control and target qubits of the pattern
-  DDMinimizer::initializeDataStructure(bits, xCMap, cXMap, cLMap, cHMap, xLMap, xHMap);
+  DDMinimizer::initializeDataStructure(bits, xCMap, cXMap, cLMap, cHMap, xLMap,
+                                       xHMap);
 
   // iterate over all the ops and mark the index of the found x-c pairs in the
   // map.
@@ -68,15 +69,15 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
       for (const auto& target : op->getTargets()) {
         auto itxC = xCMap.find({control.qubit, target});
         if (itxC != xCMap.end()) {
-            itxC->second = instructionIndex;
-            found = true;
+          itxC->second = instructionIndex;
+          found = true;
         }
         auto itcX = cXMap.find({control.qubit, target});
         if (itcX != cXMap.end()) {
-            itcX->second = instructionIndex;
-            found = true;
-        } 
-      for (size_t i = 0; i < bits - 1; i++) {
+          itcX->second = instructionIndex;
+          found = true;
+        }
+        for (size_t i = 0; i < bits - 1; i++) {
           auto itcL = cLMap[i].find({control.qubit, target});
           if (itcL != cLMap[i].end()) {
             itcL->second = instructionIndex;
@@ -103,7 +104,6 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
     instructionIndex++;
   }
   if (!found) {
-
 
     return qc.initialLayout;
   }
@@ -132,8 +132,7 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
   const std::size_t stairsXh = DDMinimizer::getStairCount(xHIndex);
 
   // complete case checkins and adjust the layout
-  if ((cXIndex != -1) &&
-      (xCIndex == -1 || cXIndex < xCIndex)) {
+  if ((cXIndex != -1) && (xCIndex == -1 || cXIndex < xCIndex)) {
 
     if (prioCh == 0 && stairsCh > 0) {
       layout = DDMinimizer::reverseLayout(layout);
@@ -144,8 +143,7 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
     } else if (prioCh > 0 || prioXl > 0 || (prioCh == 0 && prioXl == 0)) {
       layout = DDMinimizer::reverseLayout(layout);
     }
-  } else if ((xCIndex != -1) &&
-             (cXIndex == -1 || cXIndex > xCIndex)) {
+  } else if ((xCIndex != -1) && (cXIndex == -1 || cXIndex > xCIndex)) {
 
     if ((prioCl == 0 && DDMinimizer::isFullLadder(cLIndex)) ||
         (prioXh == 0 && DDMinimizer::isFullLadder(xHIndex))) {
@@ -161,7 +159,8 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
               DDMinimizer::isFullLadder(cLIndex))) {
     layout = DDMinimizer::reverseLayout(layout);
   } else {
-    //in case no full pattern was identified, call fallback function to determine ordering based on singular controlled operations
+    // in case no full pattern was identified, call fallback function to
+    // determine ordering based on singular controlled operations
     return DDMinimizer::createControlBasedPermutation(qc);
   }
 
@@ -177,13 +176,13 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
   return perm;
 }
 
-void DDMinimizer::initializeDataStructure(std::size_t bits,
-                                          std::map<std::pair<Qubit, Qubit>, int>& xCMap,
-                                          std::map<std::pair<Qubit, Qubit>, int>& cXMap,
-                                          std::vector<std::map<std::pair<Qubit, Qubit>, int>>& cLMap,
-                                          std::vector<std::map<std::pair<Qubit, Qubit>, int>>& cHMap,
-                                          std::vector<std::map<std::pair<Qubit, Qubit>, int>>& xLMap,
-                                          std::vector<std::map<std::pair<Qubit, Qubit>, int>>& xHMap) {
+void DDMinimizer::initializeDataStructure(
+    std::size_t bits, std::map<std::pair<Qubit, Qubit>, int>& xCMap,
+    std::map<std::pair<Qubit, Qubit>, int>& cXMap,
+    std::vector<std::map<std::pair<Qubit, Qubit>, int>>& cLMap,
+    std::vector<std::map<std::pair<Qubit, Qubit>, int>>& cHMap,
+    std::vector<std::map<std::pair<Qubit, Qubit>, int>>& xLMap,
+    std::vector<std::map<std::pair<Qubit, Qubit>, int>>& xHMap) {
   const std::size_t max = bits - 1;
   // create x-c ladder
   for (size_t i = 0; i < max; i++) {
@@ -205,29 +204,29 @@ void DDMinimizer::initializeDataStructure(std::size_t bits,
   for (size_t i = max; i > 0; i--) {
     for (size_t j = 0; j < bits; j++) {
       if (i > j) {
-        xHMap[bits - i -1].insert({{j, i}, -1});
-        cHMap[bits - i -1].insert({{i, j}, -1});
+        xHMap[bits - i - 1].insert({{j, i}, -1});
+        cHMap[bits - i - 1].insert({{i, j}, -1});
       }
     }
   }
 }
 
-int DDMinimizer::findMaxIndex(const std::map<std::pair<Qubit, Qubit>, int>& map) {
-    int maxIndex = -1; // Initialize to the smallest possible value
+int DDMinimizer::findMaxIndex(
+    const std::map<std::pair<Qubit, Qubit>, int>& map) {
+  int maxIndex = -1; // Initialize to the smallest possible value
 
-    for (const auto& entry : map) {
-       if (entry.second == -1) {
-        maxIndex = -1;
-        break;
-      }
-        if (entry.second > maxIndex) {
-            maxIndex = entry.second;
-        }
+  for (const auto& entry : map) {
+    if (entry.second == -1) {
+      maxIndex = -1;
+      break;
     }
+    if (entry.second > maxIndex) {
+      maxIndex = entry.second;
+    }
+  }
 
-    return maxIndex;
+  return maxIndex;
 }
-
 
 // Helper function to check if the vector of a ladder step is full, meaning each
 // gate appeared in the circuit

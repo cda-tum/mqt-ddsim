@@ -80,17 +80,15 @@ public:
       std::map<std::string, std::vector<int>>>
   makeDataStructure(qc::QuantumComputation& qc);
 
-
-  static void initializeDataStructure(std::size_t bits,
-                                      std::map<std::pair<Qubit, Qubit>, int>& xCMap,
-                                      std::map<std::pair<Qubit, Qubit>, int>& cXMap,
-                                      std::vector<std::map<std::pair<Qubit, Qubit>, int>>& cLMap,
-                                      std::vector<std::map<std::pair<Qubit, Qubit>, int>>& cHMap,
-                                      std::vector<std::map<std::pair<Qubit, Qubit>, int>>& xLMap,
-                                      std::vector<std::map<std::pair<Qubit, Qubit>, int>>& xHMap);
+  static void initializeDataStructure(
+      std::size_t bits, std::map<std::pair<Qubit, Qubit>, int>& xCMap,
+      std::map<std::pair<Qubit, Qubit>, int>& cXMap,
+      std::vector<std::map<std::pair<Qubit, Qubit>, int>>& cLMap,
+      std::vector<std::map<std::pair<Qubit, Qubit>, int>>& cHMap,
+      std::vector<std::map<std::pair<Qubit, Qubit>, int>>& xLMap,
+      std::vector<std::map<std::pair<Qubit, Qubit>, int>>& xHMap);
 
   static int findMaxIndex(const std::map<std::pair<Qubit, Qubit>, int>& map);
-
 
   // Functions to analyze the pattern of the controlled gates
   static bool isFullLadder(const std::vector<int>& vec);
