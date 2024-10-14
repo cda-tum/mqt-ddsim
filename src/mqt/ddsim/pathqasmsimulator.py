@@ -199,23 +199,23 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
 
         pathsim_configuration = options.get("pathsim_configuration", PathSimulatorConfiguration())
 
-        mode = options.get("mode", None)
+        mode = options.get("mode")
         if mode is not None:
             pathsim_configuration.mode = PathSimulatorMode(mode)
 
-        bracket_size = options.get("bracket_size", None)
+        bracket_size = options.get("bracket_size")
         if bracket_size is not None:
             pathsim_configuration.bracket_size = bracket_size
 
-        alternating_start = options.get("alternating_start", None)
+        alternating_start = options.get("alternating_start")
         if alternating_start is not None:
             pathsim_configuration.alternating_start = alternating_start
 
-        gate_cost = options.get("gate_cost", None)
+        gate_cost = options.get("gate_cost")
         if gate_cost is not None:
             pathsim_configuration.gate_cost = gate_cost
 
-        seed: int | None = options.get("seed", None)
+        seed: int | None = options.get("seed")
         if seed is not None:
             pathsim_configuration.seed = seed
 
