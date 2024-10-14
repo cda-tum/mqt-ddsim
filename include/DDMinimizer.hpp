@@ -80,8 +80,20 @@ public:
       std::map<std::string, std::vector<int>>>
   makeDataStructure(qc::QuantumComputation& qc);
 
+
+  static void initializeDataStructure(std::size_t bits,
+                                      std::map<std::pair<Qubit, Qubit>, int>& xCMap,
+                                      std::map<std::pair<Qubit, Qubit>, int>& cXMap,
+                                      std::vector<std::map<std::pair<Qubit, Qubit>, int>>& cLMap,
+                                      std::vector<std::map<std::pair<Qubit, Qubit>, int>>& cHMap,
+                                      std::vector<std::map<std::pair<Qubit, Qubit>, int>>& xLMap,
+                                      std::vector<std::map<std::pair<Qubit, Qubit>, int>>& xHMap);
+
+  static int findMaxIndex(const std::map<std::pair<Qubit, Qubit>, int>& map);
+
+
   // Functions to analyze the pattern of the controlled gates
-  static bool isFull(const std::vector<int>& vec);
+  static bool isFullLadder(const std::vector<int>& vec);
   static std::size_t getStairCount(const std::vector<int>& vec);
   static int getLadderPosition(const std::vector<int>& vec, int ladder);
 
@@ -95,7 +107,7 @@ public:
    * @details q | 0  1  2  3  turns to q | 0  1  2  3
    *          l | 0  1  2  3           l | 3  2  1  0
    */
-  static std::vector<Qubit> reverseLayout(std::vector<Qubit> layout);
+  static std::vector<Qubit> reverseLayout(std::vector<Qubit>& layout);
 
   /**
    * @brief Helper function to rotate the layout to the right (q: qubit, l:
