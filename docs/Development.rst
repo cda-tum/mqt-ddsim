@@ -40,9 +40,9 @@ Some operating systems and developer environments explicitly require a configura
 
 Building the project this way generates
 
-- the main library :code:`libddsim.a` (Unix) / :code:`ddsim.lib` (Windows) in the :code:`build/src` directory
-- a test executable :code:`ddsim_test` containing unit tests in the :code:`build/test` directory (this requires passing :code:`-DBUILD_DDSIM_TESTS=ON` to CMake during configuration)
-- the Python bindings library :code:`pyddsim.<...>` in the :code:`build/mqt/ddsim` directory (this requires passing :code:`-DBINDINGS=ON` to CMake during configuration)
+- the main library :code:`libmqt-ddsim.a` (Unix) / :code:`mqt-ddsim.lib` (Windows) in the :code:`build/src` directory
+- a test executable :code:`mqt-ddsim-test` containing unit tests in the :code:`build/test` directory (enabled by default, requires passing :code:`-DBUILD_MQT_DDSIM_TESTS=ON` to CMake during configuration, when DDSIM is used as a submodule in another project)
+- the Python bindings library :code:`pyddsim.<...>` in the :code:`build/mqt/ddsim` directory (this requires passing :code:`-DBUILD_MQT_DDSIM_BINDINGS=ON` to CMake during configuration)
 
 Working on the Python module
 ############################

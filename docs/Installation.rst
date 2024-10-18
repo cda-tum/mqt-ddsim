@@ -119,7 +119,7 @@ python bindings) in *Release* mode for DDSIM.
     $ git clone --recurse-submodules https://github.com/cda-tum/mqt-ddsim
     [...]
     $ cd mqt-ddsim
-    $ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBINDINGS=ON -DBUILD_DDSIM_TESTS=ON
+    $ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_MQT_DDSIM_BINDINGS=ON
     [...]
     $ cmake --build build --config Release
     [...]

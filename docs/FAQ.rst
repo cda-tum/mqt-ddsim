@@ -11,22 +11,8 @@ of the tool. They can be built and executed in the following way:
 
     $ cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
     $ cmake --build build/ --config Release
-    $ ./build/test/ddsim_test
+    $ ./build/test/mqt-ddsim-test
     [...]
-
-----
-
-**Why does generation step of CMake fail?**
-
-If you see the following error message
-
-.. code-block:: console
-
-    $ cmake -S . -B <build target directory>
-    CMake Error at CMakeLists.txt:27 (message):
-    mqt-core was not found.  Please init/update submodules (git submodule update --init --recursive) and try again.
-
-Please run :code:`git submodule update --init --recursive` and try again.
 
 ----
 
@@ -47,4 +33,4 @@ If you are using gcc for building, and you get the error message
     make[2]: *** [test/CMakeFiles/ddsim_test.dir/build.make:166: test/ddsim_test] Error 1
     make[1]: *** [CMakeFiles/Makefile2:464: test/CMakeFiles/ddsim_test.dir/all] Error 2
 
-Configure the simulator again and add the parameter :code:`-DBINDINGS=ON`
+Configure the simulator again and add the parameter :code:`-DBUILD_MQT_DDSIM_BINDINGS=ON`
