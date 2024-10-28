@@ -26,8 +26,7 @@ public:
    */
   static void optimizeInputPermutation(qc::QuantumComputation& qc);
 
-
- /**
+  /**
    * @details First collects operation indices of controlled operation for
    * patterns (s. makeDataStructure). Then, based on the pattern of the
    * controlled gates, the layout is adjusted. If no pattern is found, the
@@ -36,13 +35,13 @@ public:
    * @return the qc::Permutation The computed permutation to be used as the
    * initialLayout for a QuantumComputation
    */
-  static qc::Permutation createGateBasedPermutation(qc::QuantumComputation& qc); 
+  static qc::Permutation createGateBasedPermutation(qc::QuantumComputation& qc);
 
 private:
-  //The data structure for the pattern analysis of controlled gates: 
+  // The data structure for the pattern analysis of controlled gates:
   /**
-   *The ladder x_c and c_x describe for three qubits the following controlled gates (c: control
-    qubit, x: target qubit):
+   *The ladder x_c and c_x describe for three qubits the following controlled
+   gates (c: control qubit, x: target qubit):
 
     * c_x: c | 0  1  2
            x | 1  2  3
@@ -54,9 +53,9 @@ private:
   std::map<std::pair<Qubit, Qubit>, int> cXMap;
 
   /**
-    *The ladders c_l, c_r, x_l, x_r consist of several steps, hence the vector of maps. 
-     They describe for three qubits the following controlled gates (c: control
-     qubit, x: target qubit):
+    *The ladders c_l, c_r, x_l, x_r consist of several steps, hence the vector
+    of maps. They describe for three qubits the following controlled gates (c:
+    control qubit, x: target qubit):
     * c_l_1: c | 0  0  0  and  c_l_2: c | 1  1  and  c_l_3: c | 2
              x | 1  2  3              x | 2  3              x | 3
 
@@ -73,8 +72,6 @@ private:
   std::vector<std::map<std::pair<Qubit, Qubit>, int>> cHMap;
   std::vector<std::map<std::pair<Qubit, Qubit>, int>> xLMap;
   std::vector<std::map<std::pair<Qubit, Qubit>, int>> xHMap;
-
-  
 
   // Helper functions for createGateBasedPermutation
   /**
@@ -110,16 +107,18 @@ private:
                  x | 3  3  3              x | 2  2              x | 1
   */
 
-  /** 
-    * @brief initializes the data structure for the pattern analysis of controlled gates
-    * @details The function sets the qubits of the xCMap, cXMap, cLMap, cHMap, xLMap, xHMap depending on the number of qubits in the QuantumComputation
-    * @param bits is the number of qubits in the QuantumComputation
-  */
+  /**
+   * @brief initializes the data structure for the pattern analysis of
+   * controlled gates
+   * @details The function sets the qubits of the xCMap, cXMap, cLMap, cHMap,
+   * xLMap, xHMap depending on the number of qubits in the QuantumComputation
+   * @param bits is the number of qubits in the QuantumComputation
+   */
   void initializeDataStructure(std::size_t bits);
 
-
   /**
-   * @brief Helper function to find the maximum Instruction index of the coplete patterns
+   * @brief Helper function to find the maximum Instruction index of the complete
+   * patterns
    * @details Returns the max index if the pattern is complete, otherwise -1
    * @param map of the pattern map
    * @return the maximum index
