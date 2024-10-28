@@ -126,7 +126,7 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
 
   // complete case checkins and adjust the layout
   // reverse of  q | 0  1  2  3  turns to q | 0  1  2  3
-  //             l | 0  1  2  3           l | 3  2  1  0 
+  //             l | 0  1  2  3           l | 3  2  1  0
 
   if ((cXIndex != -1) && (xCIndex == -1 || cXIndex < xCIndex)) {
 
@@ -161,7 +161,7 @@ DDMinimizer::createGateBasedPermutation(qc::QuantumComputation& qc) {
   }
 
   // transform layout into permutation
-  //Permutation is std::map<Qubit, Qubit>
+  // Permutation is std::map<Qubit, Qubit>
   qc::Permutation perm;
   for (qc::Qubit i = 0; i < bits; i++) {
     perm[i] = layout[i];
@@ -210,8 +210,10 @@ int DDMinimizer::findMaxIndex(
   int maxIndex = -1; // Initialize to the smallest possible value
 
   for (const auto& entry : map) {
-    //in case the index of -1 is encountered, this indicates that the overall pattern is not completely present in the circuit.
-    //Therefore we set the overall maxIndex to -1. With that we are able to filter out uncomplete patterns as they do not impact the order of the permutation.
+    // in case the index of -1 is encountered, this indicates that the overall
+    // pattern is not completely present in the circuit. Therefore we set the
+    // overall maxIndex to -1. With that we are able to filter out incomplete
+    // patterns as they do not impact the order of the permutation.
     if (entry.second == -1) {
       maxIndex = -1;
       break;
