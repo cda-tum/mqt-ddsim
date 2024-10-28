@@ -116,8 +116,8 @@ private:
   void initializeDataStructure(std::size_t bits);
 
   /**
-   * @brief Helper function to find the maximum Instruction index of the complete
-   * patterns
+   * @brief Helper function to find the maximum Instruction index of the
+   * complete patterns
    * @details Returns the max index if the pattern is complete, otherwise -1
    * @param map of the pattern map
    * @return the maximum index
