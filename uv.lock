@@ -1206,7 +1206,7 @@ wheels = [
 
 [[package]]
 name = "mqt-ddsim"
-version = "1.24.1.dev28+g7ca6eea"
+version = "1.24.1.dev29+g4942331"
 source = { editable = "." }
 dependencies = [
     { name = "qiskit", extra = ["qasm3-import"] },
