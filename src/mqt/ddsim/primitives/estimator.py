@@ -180,10 +180,10 @@ class Estimator(QiskitEstimator):  # type: ignore[misc]
         obs_circ_list: list[QuantumCircuit],
         **options: dict[str, Any],
     ) -> list[float]:
-        approximation_step_fidelity = cast(float, options.get("approximation_step_fidelity", 1.0))
-        approximation_steps = cast(int, options.get("approximation_steps", 1))
+        approximation_step_fidelity = cast("float", options.get("approximation_step_fidelity", 1.0))
+        approximation_steps = cast("int", options.get("approximation_steps", 1))
         approximation_strategy = str(options.get("approximation_strategy", "fidelity"))
-        seed = cast(int, options.get("seed_simulator", -1))
+        seed = cast("int", options.get("seed_simulator", -1))
 
         sim = CircuitSimulator(
             circ,

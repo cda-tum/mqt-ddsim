@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, cast
 
-from qiskit.providers import BackendV2
 from qiskit.providers.exceptions import QiskitBackendNotFoundError
 from qiskit.providers.providerutils import filter_backends
 
@@ -20,6 +19,8 @@ from .unitarysimulator import UnitarySimulatorBackend
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+
+    from qiskit.providers import BackendV2
 
 
 class DDSIMProvider:
@@ -70,7 +71,7 @@ class DDSIMProvider:
         backends = [
             backend_cls() for backend_name, backend_cls in self._BACKENDS if name is None or backend_name == name
         ]
-        return cast(list[BackendV2], filter_backends(backends, filters=filters, **kwargs))
+        return cast("list[BackendV2]", filter_backends(backends, filters=filters, **kwargs))
 
     def __str__(self) -> str:
         """Return the provider name."""
