@@ -48,12 +48,12 @@ class DeterministicNoiseSimulatorBackend(QasmSimulatorBackend):
     @staticmethod
     def _run_experiment(qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
         start_time = time.time()
-        noise_effects = cast(str, options.get("noise_effects", "APD"))
-        noise_probability = cast(float, options.get("noise_probability", 0.01))
-        amp_damping_probability = cast(float, options.get("amp_damping_probability", 0.02))
-        multi_qubit_gate_factor = cast(float, options.get("multi_qubit_gate_factor", 2))
-        seed = cast(int, options.get("simulator_seed", -1))
-        shots = cast(int, options.get("shots", 1024))
+        noise_effects = cast("str", options.get("noise_effects", "APD"))
+        noise_probability = cast("float", options.get("noise_probability", 0.01))
+        amp_damping_probability = cast("float", options.get("amp_damping_probability", 0.02))
+        multi_qubit_gate_factor = cast("float", options.get("multi_qubit_gate_factor", 2))
+        seed = cast("int", options.get("simulator_seed", -1))
+        shots = cast("int", options.get("shots", 1024))
 
         sim = ddsim.DeterministicNoiseSimulator(
             circ=qc,
