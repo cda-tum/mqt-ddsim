@@ -75,8 +75,8 @@ def test_qasm_simulator(circuit: QuantumCircuit, backend: QasmSimulatorBackend, 
         assert abs(value - counts[key]) < threshold
 
 
-def test_qasm_simulator_support_parametrized_gates(backend: QasmSimulatorBackend, shots: int) -> None:
-    """Test backend's adequate support of parametrized gates."""
+def test_qasm_simulator_support_parameterized_gates(backend: QasmSimulatorBackend, shots: int) -> None:
+    """Test backend's adequate support of parameterized gates."""
     theta_a = Parameter("theta_a")
     theta_b = Parameter("theta_b")
     theta_c = Parameter("theta_c")
