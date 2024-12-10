@@ -129,7 +129,7 @@ def get_simulation_path(
         minimize="flops",
     )
     info = tn.contract(all, get="path-info", optimize=opt)
-    path = cast(list[tuple[int, int]], linear_to_ssa(info.path))
+    path = cast("list[tuple[int, int]]", linear_to_ssa(info.path))
 
     if dump_path:
         filename = qc.name + "_" + str(qc.num_qubits) + ".path" if isinstance(qc, QuantumCircuit) else "simulation.path"

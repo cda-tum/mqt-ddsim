@@ -172,11 +172,11 @@ class QasmSimulatorBackend(BackendV2):  # type: ignore[misc]
 
     def _run_experiment(self, qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
         start_time = time.time()
-        approximation_step_fidelity = cast(float, options.get("approximation_step_fidelity", 1.0))
-        approximation_steps = cast(int, options.get("approximation_steps", 1))
+        approximation_step_fidelity = cast("float", options.get("approximation_step_fidelity", 1.0))
+        approximation_steps = cast("int", options.get("approximation_steps", 1))
         approximation_strategy = str(options.get("approximation_strategy", "fidelity"))
-        seed = cast(int, options.get("seed_simulator", -1))
-        shots = cast(int, options.get("shots", 1024))
+        seed = cast("int", options.get("seed_simulator", -1))
+        shots = cast("int", options.get("shots", 1024))
 
         sim = CircuitSimulator(
             qc,

@@ -46,15 +46,15 @@ class StochasticNoiseSimulatorBackend(QasmSimulatorBackend):
     @staticmethod
     def _run_experiment(qc: QuantumCircuit, **options: dict[str, Any]) -> ExperimentResult:
         start_time = time.time()
-        approximation_step_fidelity = cast(float, options.get("approximation_step_fidelity", 1.0))
-        approximation_steps = cast(int, options.get("approximation_steps", 1))
-        approximation_strategy = cast(str, options.get("approximation_strategy", "fidelity"))
-        noise_effects = cast(str, options.get("noise_effects", "APD"))
-        noise_probability = cast(float, options.get("noise_probability", 0.01))
-        amp_damping_probability = cast(float, options.get("amp_damping_probability", 0.02))
-        multi_qubit_gate_factor = cast(float, options.get("multi_qubit_gate_factor", 2))
-        seed = cast(int, options.get("seed_simulator", -1))
-        shots = cast(int, options.get("shots", 1024))
+        approximation_step_fidelity = cast("float", options.get("approximation_step_fidelity", 1.0))
+        approximation_steps = cast("int", options.get("approximation_steps", 1))
+        approximation_strategy = cast("str", options.get("approximation_strategy", "fidelity"))
+        noise_effects = cast("str", options.get("noise_effects", "APD"))
+        noise_probability = cast("float", options.get("noise_probability", 0.01))
+        amp_damping_probability = cast("float", options.get("amp_damping_probability", 0.02))
+        multi_qubit_gate_factor = cast("float", options.get("multi_qubit_gate_factor", 2))
+        seed = cast("int", options.get("seed_simulator", -1))
+        shots = cast("int", options.get("shots", 1024))
 
         sim = ddsim.StochasticNoiseSimulator(
             circ=qc,
