@@ -148,6 +148,11 @@ xfail_strict = true
 filterwarnings = [
   "error",
   'ignore:.*datetime\.datetime\.utcfromtimestamp.*:DeprecationWarning:',
+  # Qiskit 1.3 deprecations
+  'ignore:.*``qiskit.dagcircuit.dagcircuit.DAGCircuit.*`` is deprecated as of qiskit 1.3.0.*:DeprecationWarning:',
+  'ignore:.*``qiskit.circuit.instruction.Instruction.condition`` is deprecated as of qiskit 1.3.0.*:DeprecationWarning:',
+  'ignore:.*``qiskit.circuit.library.standard_gates.x.*`` is pending deprecation as of qiskit 1.3.*:PendingDeprecationWarning:',
+  'ignore:.*``qiskit.circuit.library.n_local.*`` is pending deprecation as of qiskit 1.3.*:PendingDeprecationWarning:',
   # The warning filters below are only temporary and should be removed once the Sampler and the Estimator are updated
   'ignore:.*BaseSamplerV1.*:DeprecationWarning:',
   'ignore:.*BaseEstimatorV1.*:DeprecationWarning:',
@@ -213,20 +218,17 @@ extend-select = [
     "SLOT",        # flake8-slots
     "SIM",         # flake8-simplify
     "T20",         # flake8-print
-    "TCH",         # flake8-type-checking
+    "TC",          # flake8-type-checking
     "TID",         # flake8-tidy-imports
     "TRY",         # tryceratops
     "UP",          # pyupgrade
     "YTT",         # flake8-2020
 ]
 ignore = [
-    "ANN101",  # Missing type annotation for `self` in method
-    "ANN102",  # Missing type annotation for `cls` in classmethod
     "ISC001",  # Conflicts with formatter
     "PLR09",   # Too many <...>
     "PLR2004", # Magic value used in comparison
     "PLC0415", # Import should be at top of file
-    "PT004",   # Incorrect, just usefixtures instead.
     "S101",    # Use of assert detected
     "S404",    # `subprocess` module is possibly insecure
 ]
@@ -286,7 +288,7 @@ archs = "auto64"
 test-command = "python -c \"from mqt import ddsim\""
 test-skip = ["cp313*"] # skip testing on Python 3.13 until our dependencies are ready
 build-frontend = "build[uv]"
-free-threaded-support = true
+enable = ["cpython-freethreading"]
 manylinux-x86_64-image = "manylinux_2_28"
 manylinux-aarch64-image = "manylinux_2_28"
 manylinux-ppc64le-image = "manylinux_2_28"
