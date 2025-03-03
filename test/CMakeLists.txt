@@ -10,6 +10,7 @@ package_add_test(
   test_det_noise_sim.cpp
   test_unitary_sim.cpp
   test_path_sim.cpp
-  test_output_ddvis.cpp)
+  test_output_ddvis.cpp
+  test_reorder_without_reordering.cpp)
 
 target_link_libraries(mqt-ddsim-test PRIVATE MQT::CoreAlgorithms)
