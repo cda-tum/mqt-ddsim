@@ -1,7 +1,6 @@
 #include "CircuitSimulator.hpp"
 #include "Definitions.hpp"
 #include "algorithms/BernsteinVazirani.hpp"
-#include "algorithms/Grover.hpp"
 #include "algorithms/QFT.hpp"
 #include "algorithms/QPE.hpp"
 #include "dd/DDDefinitions.hpp"
@@ -31,7 +30,7 @@ TEST(CircuitSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
 
   EXPECT_EQ(ddsim.getMaxNodeCount(), 4);
 
-  auto m = ddsim.measureAll(false);
+  const auto m = ddsim.measureAll(false);
 
   ASSERT_EQ("01", m);
 }
@@ -95,8 +94,8 @@ TEST(CircuitSimTest, ClassicControlledOp) {
   auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);
   quantumComputation->x(0);
   quantumComputation->measure(0, 0);
-  quantumComputation->classicControlled(qc::X, 1U,
-                                        quantumComputation->getCregs().at("c"));
+  quantumComputation->classicControlled(
+      qc::X, 1U, quantumComputation->getClassicalRegisters().at("c"));
 
   CircuitSimulator ddsim(
       std::move(quantumComputation),
@@ -113,7 +112,7 @@ TEST(CircuitSimTest, ClassicControlledOpAsNop) {
   quantumComputation->x(0);
   quantumComputation->measure(0, 0);
   quantumComputation->classicControlled(
-      qc::X, 1U, quantumComputation->getCregs().at("c"), 0);
+      qc::X, 1U, quantumComputation->getClassicalRegisters().at("c"), 0);
 
   CircuitSimulator ddsim(
       std::move(quantumComputation),
@@ -143,33 +142,6 @@ TEST(CircuitSimTest, DestructiveMeasurementAll) {
 
   ASSERT_EQ(vAfter[i].real(), 1.0);
   ASSERT_EQ(vAfter[i].imag(), 0.0);
-}
-
-TEST(CircuitSimTest, DestructiveMeasurementOne) {
-  auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
-  quantumComputation->h(0);
-  quantumComputation->h(1);
-  CircuitSimulator ddsim(
-      std::move(quantumComputation),
-      ApproximationInfo(1, 1, ApproximationInfo::FidelityDriven));
-  ddsim.simulate(1);
-
-  const char m = ddsim.measureOneCollapsing(0);
-  const auto vAfter = ddsim.getVector();
-
-  if (m == '0') {
-    ASSERT_EQ(vAfter[0], dd::SQRT2_2);
-    ASSERT_EQ(vAfter[2], dd::SQRT2_2);
-    ASSERT_EQ(vAfter[1], 0.);
-    ASSERT_EQ(vAfter[3], 0.);
-  } else if (m == '1') {
-    ASSERT_EQ(vAfter[0], 0.);
-    ASSERT_EQ(vAfter[2], 0.);
-    ASSERT_EQ(vAfter[1], dd::SQRT2_2);
-    ASSERT_EQ(vAfter[3], dd::SQRT2_2);
-  } else {
-    FAIL() << "Measurement result not in {0,1}!";
-  }
 }
 
 TEST(CircuitSimTest, ApproximateByFidelity) {
@@ -208,19 +180,6 @@ TEST(CircuitSimTest, ApproximateBySampling) {
 
   ASSERT_EQ(ddsim.getActiveNodeCount(), 3);
   ASSERT_LE(resultingFidelity, 0.75); // the least contributing path has .25
-}
-
-TEST(CircuitSimTest, ApproximationByMemoryInSimulator) {
-  std::unique_ptr<qc::QuantumComputation> quantumComputation =
-      std::make_unique<qc::Grover>(17, 0);
-  CircuitSimulator ddsim(
-      std::move(quantumComputation),
-      ApproximationInfo(0.3, 1, ApproximationInfo::MemoryDriven));
-  ddsim.simulate(1);
-
-  // Memory driven approximation is triggered only on quite large DDs,
-  // unsuitable for testing
-  // TODO Allow adjusting the limits at runtime?
 }
 
 TEST(CircuitSimTest, ApproximationByFidelityInSimulator) {
@@ -339,17 +298,19 @@ TEST(CircuitSimTest, TooManyQubitsForVectorTest) {
 
 TEST(CircuitSimTest, BernsteinVaziraniDynamicTest) {
   std::size_t const n = 3;
-  auto qc = std::make_unique<qc::BernsteinVazirani>(n, true);
-  const auto expected = qc->expected; // qc will be undefined after move
+  const auto expectedString = "101";
+  const qc::BVBitString expected{expectedString};
+  auto qc = std::make_unique<qc::QuantumComputation>(
+      qc::createIterativeBernsteinVazirani(expected, n));
   auto circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
   const auto result = circSim->simulate(1024U);
   EXPECT_EQ(result.size(), 1);
-  EXPECT_EQ(result.at(expected), 1024);
+  EXPECT_EQ(result.at(expectedString), 1024);
 }
 
 TEST(CircuitSimTest, QPEDynamicTest) {
   std::size_t const n = 3;
-  auto qc = std::make_unique<qc::QPE>(n, true, true);
+  auto qc = std::make_unique<qc::QuantumComputation>(qc::createIterativeQPE(n));
   auto circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
   const auto result = circSim->simulate(1024U);
   EXPECT_GE(result.size(), 1);
@@ -357,7 +318,7 @@ TEST(CircuitSimTest, QPEDynamicTest) {
 
 TEST(CircuitSimTest, QFTDynamicTest) {
   std::size_t const n = 3;
-  auto qc = std::make_unique<qc::QFT>(n, true, true);
+  auto qc = std::make_unique<qc::QuantumComputation>(qc::createIterativeQFT(n));
   auto circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
   const auto result = circSim->simulate(1024U);
   EXPECT_GE(result.size(), 1);

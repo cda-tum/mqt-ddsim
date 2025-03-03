@@ -157,10 +157,10 @@ TEST(TaskBasedSimTest, SimpleCircuitBracket) {
 }
 
 TEST(TaskBasedSimTest, GroverCircuitBracket) {
-  std::unique_ptr<qc::QuantumComputation> qc =
-      std::make_unique<qc::Grover>(4, 12345);
-  auto* grover = dynamic_cast<qc::Grover*>(qc.get());
-  auto targetValue = grover->targetValue;
+  const auto* const expected = "1111";
+  const auto targetValue = qc::GroverBitString{expected};
+  auto qc = std::make_unique<qc::QuantumComputation>(
+      qc::createGrover(4, targetValue));
 
   // construct simulator and generate bracketing contraction plan
   auto config = PathSimulator<>::Configuration{};
@@ -183,10 +183,10 @@ TEST(TaskBasedSimTest, GroverCircuitBracket) {
 }
 
 TEST(TaskBasedSimTest, GroverCircuitAlternatingMiddle) {
-  std::unique_ptr<qc::QuantumComputation> qc =
-      std::make_unique<qc::Grover>(4, 12345);
-  auto* grover = dynamic_cast<qc::Grover*>(qc.get());
-  auto targetValue = grover->targetValue;
+  const auto* const expected = "1111";
+  const auto targetValue = qc::GroverBitString{expected};
+  auto qc = std::make_unique<qc::QuantumComputation>(
+      qc::createGrover(4, targetValue));
 
   // construct simulator and generate alternating contraction plan
   auto config = PathSimulator<>::Configuration{};
@@ -208,10 +208,10 @@ TEST(TaskBasedSimTest, GroverCircuitAlternatingMiddle) {
 }
 
 TEST(TaskBasedSimTest, GroverCircuitPairwiseGrouping) {
-  std::unique_ptr<qc::QuantumComputation> qc =
-      std::make_unique<qc::Grover>(4, 12345);
-  auto* grover = dynamic_cast<qc::Grover*>(qc.get());
-  auto targetValue = grover->targetValue;
+  const auto* const expected = "1111";
+  const auto targetValue = qc::GroverBitString{expected};
+  auto qc = std::make_unique<qc::QuantumComputation>(
+      qc::createGrover(4, targetValue));
 
   // construct simulator and generate pairwise recursive contraction plan
   auto config = PathSimulator<>::Configuration{};
@@ -301,7 +301,7 @@ TEST(TaskBasedSimTest, DynamicCircuitSupport) {
   auto qc = std::make_unique<qc::QuantumComputation>(1, 1);
   qc->h(0);
   qc->measure(0, 0);
-  qc->classicControlled(qc::X, 0, {0, 1}, 1);
+  qc->classicControlled(qc::X, 0, 0, 1);
   std::cout << *qc << "\n";
 
   PathSimulator sim(std::move(qc));

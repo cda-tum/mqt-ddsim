@@ -70,13 +70,6 @@ public:
     return results;
   }
 
-  char measureOneCollapsing(const dd::Qubit index,
-                            const bool assumeProbabilityNormalization = true) {
-    assert(index < getNumberOfQubits());
-    return dd->measureOneCollapsing(
-        rootEdge, index, assumeProbabilityNormalization, mt, epsilon);
-  }
-
   std::map<std::string, std::size_t> sampleFromAmplitudeVectorInPlace(
       std::vector<std::complex<dd::fp>>& amplitudes, std::size_t shots);
 

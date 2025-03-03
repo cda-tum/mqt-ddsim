@@ -177,7 +177,7 @@ bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(
     const auto& param = op->getParameter();
     qc::StandardOperation newOp(opControls, opTargets, op->getType(), param);
     auto tmp = edge;
-    edge = sliceDD->multiply(dd::getDD(&newOp, *sliceDD), edge);
+    edge = sliceDD->multiply(dd::getDD(newOp, *sliceDD), edge);
     sliceDD->incRef(edge);
     sliceDD->decRef(tmp);
   }

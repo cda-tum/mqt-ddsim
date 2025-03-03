@@ -6,8 +6,9 @@
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Edge.hpp"
-#include "dd/GateMatrixDefinitions.hpp"
 #include "dd/Node.hpp"
+#include "dd/Operations.hpp"
+#include "ir/operations/OpType.hpp"
 
 #include <array>
 #include <cassert>
@@ -35,7 +36,9 @@ ShorSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
   Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
   // Initialize qubits
   // TODO: other init method where the initial value can be chosen
-  applyGate(dd::X_MAT, 0);
+  Simulator<Config>::rootEdge = dd::applyUnitaryOperation(
+      qc::StandardOperation(0, qc::X), Simulator<Config>::rootEdge,
+      *Simulator<Config>::dd);
 
   if (verbose) {
     std::clog << " (requires " << nQubits << " qubits):\n";
@@ -73,7 +76,10 @@ ShorSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
   }
 
   for (std::uint32_t i = 0; i < 2 * requiredBits; i++) {
-    applyGate(dd::H_MAT, static_cast<dd::Qubit>((nQubits - 1) - i));
+    const auto target = static_cast<qc::Qubit>(nQubits - 1 - i);
+    Simulator<Config>::rootEdge = dd::applyUnitaryOperation(
+        qc::StandardOperation(target, qc::H), Simulator<Config>::rootEdge,
+        *Simulator<Config>::dd);
   }
   const auto mod = static_cast<std::int32_t>(
       std::ceil(2.0 * static_cast<double>(requiredBits) /
@@ -112,10 +118,13 @@ ShorSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
       double qR = cosine(1, -q);
       double qI = sine(1, -q);
       const dd::GateMatrix qm{1, 0, 0, {qR, qI}};
-      applyGate(
-          qm, static_cast<dd::Qubit>(nQubits - 1 - static_cast<std::size_t>(i)),
-          qc::Control{static_cast<qc::Qubit>(nQubits - 1 -
-                                             static_cast<std::size_t>(j))});
+      auto gate = Simulator<Config>::dd->makeGateDD(
+          qm,
+          qc::Control{static_cast<dd::Qubit>(nQubits - 1 -
+                                             static_cast<std::size_t>(j))},
+          static_cast<dd::Qubit>(nQubits - 1 - static_cast<std::size_t>(i)));
+      Simulator<Config>::rootEdge = Simulator<Config>::dd->applyOperation(
+          gate, Simulator<Config>::rootEdge);
       q *= 2;
     }
 
@@ -124,9 +133,11 @@ ShorSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
           Simulator<Config>::approximateByFidelity(stepFidelity, false, true));
       approximationRuns++;
     }
-
-    applyGate(dd::H_MAT, static_cast<dd::Qubit>(nQubits - 1 -
-                                                static_cast<std::size_t>(i)));
+    const auto target =
+        static_cast<qc::Qubit>(nQubits - 1 - static_cast<std::size_t>(i));
+    Simulator<Config>::rootEdge = dd::applyUnitaryOperation(
+        qc::StandardOperation(target, qc::H), Simulator<Config>::rootEdge,
+        *Simulator<Config>::dd);
   }
 
   // Non-Quantum Post Processing
@@ -472,31 +483,6 @@ void ShorSimulator<Config>::uAEmulate(std::uint64_t a, std::int32_t q) {
 
   const dd::vEdge tmp =
       Simulator<Config>::dd->multiply(e, Simulator<Config>::rootEdge);
-  Simulator<Config>::dd->incRef(tmp);
-  Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
-  Simulator<Config>::rootEdge = tmp;
-
-  Simulator<Config>::dd->garbageCollect();
-}
-
-template <class Config>
-void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target) {
-  applyGate(matrix, target, qc::Controls{});
-}
-
-template <class Config>
-void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target,
-                                      qc::Control control) {
-  applyGate(matrix, target, qc::Controls{control});
-}
-
-template <class Config>
-void ShorSimulator<Config>::applyGate(dd::GateMatrix matrix, dd::Qubit target,
-                                      const qc::Controls& controls) {
-  const dd::Edge gate =
-      Simulator<Config>::dd->makeGateDD(matrix, controls, target);
-  const dd::Edge tmp =
-      Simulator<Config>::dd->multiply(gate, Simulator<Config>::rootEdge);
   Simulator<Config>::dd->incRef(tmp);
   Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
   Simulator<Config>::rootEdge = tmp;

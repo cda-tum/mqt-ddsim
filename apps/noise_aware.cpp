@@ -2,6 +2,7 @@
 #include "DeterministicNoiseSimulator.hpp"
 #include "StochasticNoiseSimulator.hpp"
 #include "ir/QuantumComputation.hpp"
+#include "qasm3/Importer.hpp"
 
 #include <chrono>
 #include <cstddef>
@@ -17,7 +18,8 @@
 
 namespace nl = nlohmann;
 
-int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
+int main(int argc, char** argv) {
+  // NOLINT(bugprone-exception-escape)
   cxxopts::Options options(
       "MQT DDSIM", "see for more information https://www.cda.cit.tum.de/");
   // clang-format off
@@ -28,7 +30,7 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
         ("ps", "print simulation stats (applied gates, sim. time, and maximal size of the DD)")
         ("verbose", "Causes some simulators to print additional information to STDERR")
 
-        ("simulate_file", "simulate a quantum circuit given by file (detection by the file extension)", cxxopts::value<std::string>())
+        ("simulate_file", "simulate a quantum circuit given by an OpenQASM file", cxxopts::value<std::string>())
         ("step_fidelity", "target fidelity for each approximation run (>=1 = disable approximation)", cxxopts::value<double>()->default_value("1.0"))
         ("steps", "number of approximation steps", cxxopts::value<unsigned int>()->default_value("1"))
         // Parameters for noise aware simulation
@@ -52,7 +54,8 @@ int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
 
   if (vm.count("simulate_file") > 0) {
     const std::string fname = vm["simulate_file"].as<std::string>();
-    quantumComputation = std::make_unique<qc::QuantumComputation>(fname);
+    quantumComputation = std::make_unique<qc::QuantumComputation>(
+        qasm3::Importer::importf(fname));
   } else {
     std::cerr << "Did not find anything to simulate. See help below.\n"
               << options.help() << "\n";

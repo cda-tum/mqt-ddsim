@@ -113,7 +113,7 @@ dd::fp CircuitSimulator<Config>::expectationValue(
 
   // construct the DD for the observable
   const auto observableDD =
-      dd::buildFunctionality(&observable, *Simulator<Config>::dd);
+      dd::buildFunctionality(observable, *Simulator<Config>::dd);
 
   // calculate the expectation value
   return Simulator<Config>::dd->expectationValue(observableDD,
@@ -124,42 +124,27 @@ template <class Config>
 void CircuitSimulator<Config>::initializeSimulation(const std::size_t nQubits) {
   Simulator<Config>::rootEdge =
       Simulator<Config>::dd->makeZeroState(static_cast<dd::Qubit>(nQubits));
-  Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
 }
 
 template <class Config>
 char CircuitSimulator<Config>::measure(const dd::Qubit i) {
-  return Simulator<Config>::measureOneCollapsing(i);
+  return Simulator<Config>::dd->measureOneCollapsing(
+      Simulator<Config>::rootEdge, static_cast<dd::Qubit>(i),
+      Simulator<Config>::mt);
 }
 
 template <class Config>
 void CircuitSimulator<Config>::reset(qc::NonUnitaryOperation* nonUnitaryOp) {
-  const auto& qubits = nonUnitaryOp->getTargets();
-  for (const auto& qubit : qubits) {
-    auto bit = Simulator<Config>::dd->measureOneCollapsing(
-        Simulator<Config>::rootEdge, static_cast<dd::Qubit>(qubit), true,
-        Simulator<Config>::mt);
-    // apply an X operation whenever the measured result is one
-    if (bit == '1') {
-      const auto x = qc::StandardOperation(qubit, qc::X);
-      auto tmp = Simulator<Config>::dd->multiply(
-          dd::getDD(&x, *Simulator<Config>::dd), Simulator<Config>::rootEdge);
-      Simulator<Config>::dd->incRef(tmp);
-      Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
-      Simulator<Config>::rootEdge = tmp;
-      Simulator<Config>::dd->garbageCollect();
-    }
-  }
+  Simulator<Config>::rootEdge =
+      dd::applyReset(*nonUnitaryOp, Simulator<Config>::rootEdge,
+                     *Simulator<Config>::dd, Simulator<Config>::mt);
 }
 
 template <class Config>
 void CircuitSimulator<Config>::applyOperationToState(
     std::unique_ptr<qc::Operation>& op) {
-  auto ddOp = dd::getDD(op.get(), *Simulator<Config>::dd);
-  auto tmp = Simulator<Config>::dd->multiply(ddOp, Simulator<Config>::rootEdge);
-  Simulator<Config>::dd->incRef(tmp);
-  Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
-  Simulator<Config>::rootEdge = tmp;
+  Simulator<Config>::rootEdge = dd::applyUnitaryOperation(
+      *op, Simulator<Config>::rootEdge, *Simulator<Config>::dd);
 }
 
 template <class Config>

@@ -1,7 +1,7 @@
 # macro to add a executable with the given libraries
 macro(ADD_SIM_EXECUTABLE appname)
   add_executable(mqt-ddsim-${appname} ${appname}.cpp)
-  target_link_libraries(mqt-ddsim-${appname} PRIVATE MQT::DDSim ${ARGN})
+  target_link_libraries(mqt-ddsim-${appname} PRIVATE MQT::DDSim MQT::CoreQASM ${ARGN})
 endmacro()
 
 add_sim_executable(simple cxxopts::cxxopts)

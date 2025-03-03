@@ -18,9 +18,9 @@ void UnitarySimulator::construct() {
   // carry out actual computation
   auto start = std::chrono::steady_clock::now();
   if (mode == Mode::Sequential) {
-    e = dd::buildFunctionality(qc.get(), *dd);
+    e = dd::buildFunctionality(*qc, *dd);
   } else if (mode == Mode::Recursive) {
-    e = dd::buildFunctionalityRecursive(qc.get(), *dd);
+    e = dd::buildFunctionalityRecursive(*qc, *dd);
   }
   auto end = std::chrono::steady_clock::now();
   constructionTime = std::chrono::duration<double>(end - start).count();
