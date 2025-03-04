@@ -4,14 +4,14 @@ import unittest
 
 import numpy as np
 import numpy.typing as npt
-from qiskit import QuantumCircuit
 
+from mqt.core.ir import QuantumComputation
 from mqt.ddsim import ConstructionMode, UnitarySimulator, get_matrix
 
 
 class MQTStandaloneUnitarySimulatorTests(unittest.TestCase):
     def setUp(self) -> None:
-        circ = QuantumCircuit(3)
+        circ = QuantumComputation(3)
         circ.h(0)
         circ.cx(0, 1)
         circ.cx(0, 2)

@@ -10,8 +10,6 @@
 #include "PathSimulator.hpp"
 #include "StochasticNoiseSimulator.hpp"
 #include "UnitarySimulator.hpp"
-#include "dd/FunctionalityConstruction.hpp"
-#include "python/qiskit/QuantumCircuit.hpp"
 
 #include <memory>
 #include <pybind11/numpy.h>
@@ -21,31 +19,13 @@
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-static qc::QuantumComputation importCircuit(const py::object& circ) {
-  const py::object quantumCircuit =
-      py::module::import("qiskit").attr("QuantumCircuit");
-
-  auto qc = qc::QuantumComputation();
-
-  if (py::isinstance<py::str>(circ)) {
-    const auto file = circ.cast<std::string>();
-    qc.import(file);
-  } else if (py::isinstance(circ, quantumCircuit)) {
-    qc::qiskit::QuantumCircuit::import(qc, circ);
-  } else {
-    throw std::runtime_error("PyObject is neither py::str nor QuantumCircuit");
-  }
-
-  return qc;
-}
-
 template <class Simulator, typename... Args>
 std::unique_ptr<Simulator>
-constructSimulator(const py::object& circ, const double stepFidelity,
-                   const unsigned int stepNumber,
+constructSimulator(const qc::QuantumComputation& circ,
+                   const double stepFidelity, const unsigned int stepNumber,
                    const std::string& approximationStrategy,
                    const std::int64_t seed, Args&&... args) {
-  auto qc = std::make_unique<qc::QuantumComputation>(importCircuit(circ));
+  auto qc = std::make_unique<qc::QuantumComputation>(circ);
   const auto approx =
       ApproximationInfo{stepFidelity, stepNumber,
                         ApproximationInfo::fromString(approximationStrategy)};
@@ -63,8 +43,9 @@ constructSimulator(const py::object& circ, const double stepFidelity,
 }
 
 template <class Simulator, typename... Args>
-std::unique_ptr<Simulator> constructSimulatorWithoutSeed(const py::object& circ,
-                                                         Args&&... args) {
+std::unique_ptr<Simulator>
+constructSimulatorWithoutSeed(const qc::QuantumComputation& circ,
+                              Args&&... args) {
   return constructSimulator<Simulator>(circ, 1., 1, "fidelity", -1,
                                        std::forward<Args>(args)...);
 }
@@ -118,30 +99,6 @@ void getNumPyMatrix(UnitarySimulator& sim,
 
   getNumPyMatrixRec(e, std::complex<dd::fp>{1.0, 0.0}, 0, 0, dim, dataPtr,
                     sim.getNumberOfQubits());
-}
-
-void dumpTensorNetwork(const py::object& circ, const std::string& filename) {
-  const py::object quantumCircuit =
-      py::module::import("qiskit").attr("QuantumCircuit");
-
-  std::unique_ptr<qc::QuantumComputation> qc =
-      std::make_unique<qc::QuantumComputation>();
-
-  if (py::isinstance<py::str>(circ)) {
-    auto&& file1 = circ.cast<std::string>();
-    qc->import(file1);
-  } else if (py::isinstance(circ, quantumCircuit)) {
-    qc::qiskit::QuantumCircuit::import(*qc, circ);
-  } else {
-    throw std::runtime_error("PyObject is neither py::str nor QuantumCircuit");
-  }
-  std::ofstream ofs(filename);
-  dd::dumpTensorNetwork(ofs, *qc);
-}
-
-dd::fp expectationValue(CircuitSimulator<>& sim, const py::object& observable) {
-  const auto observableCircuit = importCircuit(observable);
-  return sim.expectationValue(observableCircuit);
 }
 
 template <class Sim>
@@ -203,7 +160,8 @@ PYBIND11_MODULE(pyddsim, m, py::mod_gil_not_used()) {
       .def(py::init<>(&constructSimulator<CircuitSimulator<>>), "circ"_a,
            "approximation_step_fidelity"_a = 1., "approximation_steps"_a = 1,
            "approximation_strategy"_a = "fidelity", "seed"_a = -1)
-      .def("expectation_value", &expectationValue, "observable"_a);
+      .def("expectation_value", &CircuitSimulator<>::expectationValue,
+           "observable"_a);
 
   // Stoch simulator
   auto stochasticNoiseSimulator =
@@ -327,8 +285,4 @@ PYBIND11_MODULE(pyddsim, m, py::mod_gil_not_used()) {
 
   // Miscellaneous functions
   m.def("get_matrix", &getNumPyMatrix, "sim"_a, "mat"_a);
-
-  m.def("dump_tensor_network", &dumpTensorNetwork,
-        "dump a tensor network representation of the given circuit", "circ"_a,
-        "filename"_a);
 }

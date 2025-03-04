@@ -103,6 +103,7 @@ repos:
           - nox
           - numpy
           - pytest
+          - mqt.core>=3.0.0b5
 
   # Check for spelling
   - repo: https://github.com/crate-ci/typos

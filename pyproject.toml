@@ -1,8 +1,9 @@
 [build-system]
 requires = [
-  "scikit-build-core>=0.10.1",
-  "setuptools-scm>=8.1",
-  "pybind11>=2.13.5",
+    "scikit-build-core>=0.10.1",
+    "setuptools-scm>=8.1",
+    "pybind11>=2.13.5",
+    "mqt.core>=3.0.0b5",
 ]
 build-backend = "scikit_build_core.build"
 
@@ -38,7 +39,7 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "qiskit[qasm3-import]>=1.0.0"
+    "mqt.core[qiskit]>=3.0.0b5",
 ]
 dynamic = ["version"]
 
@@ -308,6 +309,7 @@ build = [
   "pybind11>=2.13.6",
   "scikit-build-core>=0.10.1",
   "setuptools-scm>=8.1",
+  "mqt.core>=3.0.0b5",
 ]
 docs = [
   "furo>=2024.8.6",

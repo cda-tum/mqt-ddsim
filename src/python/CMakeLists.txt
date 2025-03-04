@@ -26,7 +26,7 @@ pybind11_add_module(
   # Source code goes here
   bindings.cpp)
 target_link_libraries(pyddsim PRIVATE MQT::DDSim MQT::ProjectOptions MQT::ProjectWarnings
-                                      MQT::CorePython pybind11_json)
+                                      pybind11_json)
 
 # Install directive for scikit-build-core
 install(

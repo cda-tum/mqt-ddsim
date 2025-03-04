@@ -9,6 +9,7 @@ from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 
 from mqt import ddsim
+from mqt.core import load
 
 from .header import DDSIMHeader
 from .qasmsimulator import QasmSimulatorBackend
@@ -56,8 +57,9 @@ class StochasticNoiseSimulatorBackend(QasmSimulatorBackend):
         seed = cast("int", options.get("seed_simulator", -1))
         shots = cast("int", options.get("shots", 1024))
 
+        circ = load(qc)
         sim = ddsim.StochasticNoiseSimulator(
-            circ=qc,
+            circ=circ,
             approximation_step_fidelity=approximation_step_fidelity,
             approximation_steps=approximation_steps,
             approximation_strategy=approximation_strategy,

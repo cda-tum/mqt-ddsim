@@ -12,6 +12,8 @@ from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 
+from mqt.core import load
+
 from .header import DDSIMHeader
 from .pyddsim import ConstructionMode, UnitarySimulator, get_matrix
 from .qasmsimulator import QasmSimulatorBackend
@@ -70,7 +72,8 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
             )
             raise QiskitError(msg)
 
-        sim = UnitarySimulator(qc, seed=seed, mode=construction_mode)
+        circuit = load(qc)
+        sim = UnitarySimulator(circuit, seed=seed, mode=construction_mode)
         sim.construct()
         # Extract resulting matrix from final DD and write data
         unitary: npt.NDArray[np.complex128] = np.zeros((2**qc.num_qubits, 2**qc.num_qubits), dtype=np.complex128)

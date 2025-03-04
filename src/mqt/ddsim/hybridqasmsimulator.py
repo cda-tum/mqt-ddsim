@@ -14,6 +14,8 @@ from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 from qiskit.utils.multiprocessing import local_hardware_info
 
+from mqt.core import load
+
 from .header import DDSIMHeader
 from .pyddsim import HybridCircuitSimulator, HybridMode
 from .qasmsimulator import QasmSimulatorBackend
@@ -81,7 +83,8 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
             msg = f"Simulation mode{mode} not supported by hybrid simulator. Available modes are 'amplitude' and 'dd'."
             raise QiskitError(msg)
 
-        sim = HybridCircuitSimulator(qc, seed=seed, mode=hybrid_mode, nthreads=nthreads)
+        circuit = load(qc)
+        sim = HybridCircuitSimulator(circuit, seed=seed, mode=hybrid_mode, nthreads=nthreads)
 
         shots = options.get("shots", 1024)
         if self._SHOW_STATE_VECTOR and shots > 0:

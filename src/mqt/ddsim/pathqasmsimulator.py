@@ -7,14 +7,18 @@ import time
 from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
+    from qiskit import QuantumCircuit
     from quimb.tensor import Tensor, TensorNetwork
+
+    from mqt.core.ir import QuantumComputation
 
 import locale
 
-from qiskit import QuantumCircuit
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
+
+from mqt.core import load
 
 from .header import DDSIMHeader
 from .pyddsim import PathCircuitSimulator, PathSimulatorConfiguration, PathSimulatorMode
@@ -48,7 +52,7 @@ def read_tensor_network_file(filename: str) -> list[Tensor]:
     return tensors
 
 
-def create_tensor_network(qc: QuantumCircuit) -> TensorNetwork:
+def create_tensor_network(qc: QuantumComputation) -> TensorNetwork:
     """Create a tensor network from a quantum circuit.
 
     Args:
@@ -62,12 +66,8 @@ def create_tensor_network(qc: QuantumCircuit) -> TensorNetwork:
 
     from mqt.ddsim import dump_tensor_network
 
-    if isinstance(qc, QuantumCircuit):
-        filename = qc.name + "_" + str(qc.num_qubits) + ".tensor"
-        nqubits = qc.num_qubits
-    else:
-        filename = "tensor.tensor"
-        nqubits = qc.header.n_qubits
+    filename = qc.name + "_" + str(qc.num_qubits) + ".tensor"
+    nqubits = qc.num_qubits
 
     dump_tensor_network(qc, filename)
     tensors = read_tensor_network_file(filename)
@@ -96,7 +96,7 @@ def create_tensor_network(qc: QuantumCircuit) -> TensorNetwork:
 
 
 def get_simulation_path(
-    qc: QuantumCircuit,
+    qc: QuantumComputation,
     max_time: int = 60,
     max_repeats: int = 1024,
     parallel_runs: int = 1,
@@ -132,7 +132,7 @@ def get_simulation_path(
     path = cast("list[tuple[int, int]]", linear_to_ssa(info.path))
 
     if dump_path:
-        filename = qc.name + "_" + str(qc.num_qubits) + ".path" if isinstance(qc, QuantumCircuit) else "simulation.path"
+        filename = qc.name + "_" + str(qc.num_qubits) + ".path"
         with pathlib.Path(filename).open("w", encoding=locale.getpreferredencoding(False)) as file:
             file.write(str(path))
 
@@ -219,7 +219,8 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
         if seed is not None:
             pathsim_configuration.seed = seed
 
-        sim = PathCircuitSimulator(qc, config=pathsim_configuration)
+        circuit = load(qc)
+        sim = PathCircuitSimulator(circuit, config=pathsim_configuration)
 
         # determine the contraction path using cotengra in case this is requested
         if pathsim_configuration.mode == PathSimulatorMode.cotengra:
@@ -228,7 +229,7 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
             dump_path = options.get("cotengra_dump_path", False)
             plot_ring = options.get("cotengra_plot_ring", False)
             path = get_simulation_path(
-                qc,
+                circuit,
                 max_time=max_time,
                 max_repeats=max_repeats,
                 dump_path=dump_path,

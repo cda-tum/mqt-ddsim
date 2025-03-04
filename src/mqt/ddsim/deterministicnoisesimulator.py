@@ -9,6 +9,7 @@ from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 
 from mqt import ddsim
+from mqt.core import load
 
 from .header import DDSIMHeader
 from .qasmsimulator import QasmSimulatorBackend
@@ -55,8 +56,9 @@ class DeterministicNoiseSimulatorBackend(QasmSimulatorBackend):
         seed = cast("int", options.get("simulator_seed", -1))
         shots = cast("int", options.get("shots", 1024))
 
+        circ = load(qc)
         sim = ddsim.DeterministicNoiseSimulator(
-            circ=qc,
+            circ=circ,
             seed=seed,
             noise_effects=noise_effects,
             noise_probability=noise_probability,
