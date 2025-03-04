@@ -33,7 +33,6 @@ from .pyddsim import (
     PathSimulatorMode,
     StochasticNoiseSimulator,
     UnitarySimulator,
-    dump_tensor_network,
     get_matrix,
 )
 
@@ -50,6 +49,5 @@ __all__ = [
     "StochasticNoiseSimulator",
     "UnitarySimulator",
     "__version__",
-    "dump_tensor_network",
     "get_matrix",
 ]

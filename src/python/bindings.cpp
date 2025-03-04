@@ -213,7 +213,6 @@ PYBIND11_MODULE(pyddsim, m, py::mod_gil_not_used()) {
       .value("sequential", PathSimulator<>::Configuration::Mode::Sequential)
       .value("pairwise_recursive",
              PathSimulator<>::Configuration::Mode::PairwiseRecursiveGrouping)
-      .value("cotengra", PathSimulator<>::Configuration::Mode::Cotengra)
       .value("bracket", PathSimulator<>::Configuration::Mode::BracketGrouping)
       .value("alternating", PathSimulator<>::Configuration::Mode::Alternating)
       .value("gate_cost", PathSimulator<>::Configuration::Mode::GateCost)

@@ -43,18 +43,6 @@ dependencies = [
 ]
 dynamic = ["version"]
 
-[project.optional-dependencies]
-tnflow = [
-    "cotengra",
-    "sparse",
-    "opt-einsum",
-    "quimb",
-    "pandas",
-    "numpy",
-    "kahypar",
-    "networkx",
-]
-
 [project.urls]
 Homepage = "https://github.com/cda-tum/mqt-ddsim"
 Documentation = "https://mqt.readthedocs.io/projects/ddsim"

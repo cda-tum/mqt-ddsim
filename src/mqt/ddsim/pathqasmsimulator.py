@@ -2,17 +2,12 @@
 
 from __future__ import annotations
 
-import pathlib
 import time
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
-    from quimb.tensor import Tensor, TensorNetwork
 
-    from mqt.core.ir import QuantumComputation
-
-import locale
 
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
@@ -24,123 +19,6 @@ from .header import DDSIMHeader
 from .pyddsim import PathCircuitSimulator, PathSimulatorConfiguration, PathSimulatorMode
 from .qasmsimulator import QasmSimulatorBackend
 from .target import DDSIMTargetBuilder
-
-
-def read_tensor_network_file(filename: str) -> list[Tensor]:
-    """Read a tensor network from a file.
-
-    Args:
-        filename: The name of the file to read the tensor network from.
-
-    Returns:
-        The tensor network read from the file.
-    """
-    import numpy as np
-    import pandas as pd
-    import quimb.tensor as qtn
-
-    df = pd.read_json(filename)
-    tensors = []
-
-    for i in range(len(df["tensors"])):
-        tens_data = [complex(real, imag) for [real, imag] in df["tensors"][i][3]]
-        tens_shape = df["tensors"][i][2]
-        data = np.array(tens_data).reshape(tens_shape)
-        inds = df["tensors"][i][1]
-        tags = df["tensors"][i][0]
-        tensors.append(qtn.Tensor(data, inds, tags, left_inds=inds[: len(inds) // 2]))
-    return tensors
-
-
-def create_tensor_network(qc: QuantumComputation) -> TensorNetwork:
-    """Create a tensor network from a quantum circuit.
-
-    Args:
-        qc: The quantum circuit to be simulated.
-
-    Returns:
-        The tensor network representing the quantum circuit.
-    """
-    import quimb.tensor as qtn
-    import sparse
-
-    from mqt.ddsim import dump_tensor_network
-
-    filename = qc.name + "_" + str(qc.num_qubits) + ".tensor"
-    nqubits = qc.num_qubits
-
-    dump_tensor_network(qc, filename)
-    tensors = read_tensor_network_file(filename)
-    pathlib.Path(filename).unlink()
-
-    # add the zero state tensor |0...0> at the beginning
-    shape = [2] * nqubits
-    data = sparse.COO(coords=[[0]] * nqubits, data=1, shape=shape, sorted=True, has_duplicates=False)
-    inds = ["q" + str(i) + "_0" for i in range(nqubits)]
-    tags = ["Q" + str(i) for i in range(nqubits)]
-    tensors.insert(0, qtn.Tensor(data=data, inds=inds, tags=tags))
-
-    # using the following lines instead would allow much greater flexibility,
-    # but is not supported for DD-based simulation at the moment
-
-    # add the zero state tensor |0>...|0> at the beginning
-    # shape = [2]
-    # data = np.zeros(2)
-    # data[0] = 1.0
-    # for i in range(qc.num_qubits):
-    #     inds = ['q'+str(i)+'_0']
-    #     tags = ['Q'+str(i)]
-    #     tensors.insert(0, qtn.Tensor(data=data.reshape(shape), inds=inds, tags=tags))
-
-    return qtn.TensorNetwork(tensors)
-
-
-def get_simulation_path(
-    qc: QuantumComputation,
-    max_time: int = 60,
-    max_repeats: int = 1024,
-    parallel_runs: int = 1,
-    dump_path: bool = True,
-    plot_ring: bool = False,
-) -> list[tuple[int, int]]:
-    """Determine a simulation path via computing a contraction path using cotengra.
-
-    Args:
-        qc: The quantum circuit to be simulated.
-        max_time: The maximum time in seconds to spend on optimization.
-        max_repeats: The maximum number of repetitions for optimization.
-        parallel_runs: The number of parallel runs for optimization.
-        dump_path: Whether to dump the path to a file.
-        plot_ring: Whether to plot the contraction tree as a ring.
-
-    Returns:
-        The simulation path as a list of tuples.
-    """
-    import cotengra as ctg
-    from opt_einsum.paths import linear_to_ssa
-
-    tn = create_tensor_network(qc)
-
-    opt = ctg.HyperOptimizer(
-        max_time=max_time,
-        max_repeats=max_repeats,
-        progbar=True,
-        parallel=parallel_runs,
-        minimize="flops",
-    )
-    info = tn.contract(all, get="path-info", optimize=opt)
-    path = cast("list[tuple[int, int]]", linear_to_ssa(info.path))
-
-    if dump_path:
-        filename = qc.name + "_" + str(qc.num_qubits) + ".path"
-        with pathlib.Path(filename).open("w", encoding=locale.getpreferredencoding(False)) as file:
-            file.write(str(path))
-
-    if plot_ring:
-        fig, _ = opt.get_tree().plot_ring()
-        fig.savefig("simulation_ring.svg", bbox_inches="tight")
-
-    return path
 
 
 class PathQasmSimulatorBackend(QasmSimulatorBackend):
@@ -183,10 +61,6 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
             alternating_start=None,
             gate_cost=None,
             seed=None,
-            cotengra_max_time=60,
-            cotengra_max_repeats=1024,
-            cotengra_plot_ring=False,
-            cotengra_dump_path=True,
         )
 
     @property
@@ -221,21 +95,6 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
 
         circuit = load(qc)
         sim = PathCircuitSimulator(circuit, config=pathsim_configuration)
-
-        # determine the contraction path using cotengra in case this is requested
-        if pathsim_configuration.mode == PathSimulatorMode.cotengra:
-            max_time = options.get("cotengra_max_time", 60)
-            max_repeats = options.get("cotengra_max_repeats", 1024)
-            dump_path = options.get("cotengra_dump_path", False)
-            plot_ring = options.get("cotengra_plot_ring", False)
-            path = get_simulation_path(
-                circuit,
-                max_time=max_time,
-                max_repeats=max_repeats,
-                dump_path=dump_path,
-                plot_ring=plot_ring,
-            )
-            sim.set_simulation_path(path, False)
 
         shots = options.get("shots", 1024)
         setup_time = time.time()
