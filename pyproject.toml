@@ -99,6 +99,7 @@ sdist.exclude = [
 BUILD_MQT_DDSIM_TESTS = "OFF"
 BUILD_MQT_DDSIM_BINDINGS = "ON"
 BUILD_MQT_DDSIM_CLI = "OFF"
+ENABLE_IPO = "ON"
 
 [[tool.scikit-build.overrides]]
 if.python-version = ">=3.13"
@@ -162,6 +163,7 @@ warn_unreachable = true
 
 [tool.ruff]
 line-length = 120
+namespace-packages = ["mqt"]
 preview = true
 unsafe-fixes = true
 
@@ -294,6 +296,7 @@ environment = { MACOSX_DEPLOYMENT_TARGET = "11.0" }
 
 
 [tool.uv]
+required-version = ">=0.5.20"
 reinstall-package = ["mqt.ddsim"]
 
 
