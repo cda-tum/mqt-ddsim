@@ -33,7 +33,6 @@ from .pyddsim import (
     PathSimulatorMode,
     StochasticNoiseSimulator,
     UnitarySimulator,
-    get_matrix,
 )
 
 __all__ = [
@@ -49,5 +48,4 @@ __all__ = [
     "StochasticNoiseSimulator",
     "UnitarySimulator",
     "__version__",
-    "get_matrix",
 ]

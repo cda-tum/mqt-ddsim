@@ -6,6 +6,7 @@ import time
 import uuid
 from typing import TYPE_CHECKING, Any, Union, cast
 
+import numpy as np
 from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
 from qiskit.result import Result
@@ -193,7 +194,7 @@ class QasmSimulatorBackend(BackendV2):  # type: ignore[misc]
 
         data = ExperimentResultData(
             counts={hex(int(result, 2)): count for result, count in counts.items()},
-            statevector=None if not self._SHOW_STATE_VECTOR else sim.get_vector(),
+            statevector=None if not self._SHOW_STATE_VECTOR else np.array(sim.get_constructed_dd().get_vector()),
             time_taken=end_time - start_time,
         )
 

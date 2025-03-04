@@ -131,13 +131,13 @@ TEST(CircuitSimTest, DestructiveMeasurementAll) {
   CircuitSimulator ddsim(std::move(quantumComputation), 42);
   ddsim.simulate(1);
 
-  const auto vBefore = ddsim.getVector();
+  const auto vBefore = ddsim.getCurrentDD().getVector();
   ASSERT_EQ(vBefore[0], vBefore[1]);
   ASSERT_EQ(vBefore[0], vBefore[2]);
   ASSERT_EQ(vBefore[0], vBefore[3]);
 
   const std::string m = ddsim.measureAll(true);
-  const auto vAfter = ddsim.getVector();
+  const auto vAfter = ddsim.getCurrentDD().getVector();
   const std::size_t i = std::stoul(m, nullptr, 2);
 
   ASSERT_EQ(vAfter[i].real(), 1.0);
@@ -232,7 +232,7 @@ TEST(CircuitSimTest, ApproximationTest) {
       std::move(qc),
       ApproximationInfo(0.98, 2, ApproximationInfo::FidelityDriven));
   ddsim.simulate(4096);
-  const auto vec = ddsim.getVector();
+  const auto vec = ddsim.getCurrentDD().getVector();
   EXPECT_EQ(abs(vec[2]), 0);
   EXPECT_EQ(abs(vec[3]), 0);
 }
@@ -288,14 +288,6 @@ TEST(CircuitSimTest, ToleranceTest) {
   EXPECT_EQ(ddsim.getTolerance(), tolerance);
 }
 
-TEST(CircuitSimTest, TooManyQubitsForVectorTest) {
-  auto qc = std::make_unique<qc::QuantumComputation>(61);
-  CircuitSimulator ddsim(std::move(qc));
-  ddsim.simulate(0);
-  EXPECT_THROW(
-      { [[maybe_unused]] auto _ = ddsim.getVector(); }, std::range_error);
-}
-
 TEST(CircuitSimTest, BernsteinVaziraniDynamicTest) {
   std::size_t const n = 3;
   const auto expectedString = "101";
@@ -327,6 +319,6 @@ TEST(CircuitSimTest, QFTDynamicTest) {
 TEST(CircuitSimTest, GetVectorBeforeSimulate) {
   auto qc = std::make_unique<qc::QuantumComputation>(1);
   const CircuitSimulator ddsim(std::move(qc));
-  const auto vec = ddsim.getVector();
+  const auto vec = ddsim.getCurrentDD().getVector();
   EXPECT_EQ(vec[0], 1.);
 }

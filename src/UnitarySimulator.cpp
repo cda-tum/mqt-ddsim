@@ -26,13 +26,6 @@ void UnitarySimulator::construct() {
   constructionTime = std::chrono::duration<double>(end - start).count();
 }
 
-void UnitarySimulator::exportDDtoGraphviz(std::ostream& os, const bool colored,
-                                          const bool edgeLabels,
-                                          const bool classic, const bool memory,
-                                          const bool formatAsPolar) {
-  dd::toDot(e, os, colored, edgeLabels, classic, memory, formatAsPolar);
-}
-
 UnitarySimulator::UnitarySimulator(
     std::unique_ptr<qc::QuantumComputation>&& qc_,
     const ApproximationInfo& approximationInfo_, UnitarySimulator::Mode simMode)

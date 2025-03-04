@@ -6,7 +6,6 @@ import time
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import numpy.typing as npt
 from qiskit import QiskitError
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
@@ -15,7 +14,7 @@ from qiskit.transpiler import Target
 from mqt.core import load
 
 from .header import DDSIMHeader
-from .pyddsim import ConstructionMode, UnitarySimulator, get_matrix
+from .pyddsim import ConstructionMode, UnitarySimulator
 from .qasmsimulator import QasmSimulatorBackend
 from .target import DDSIMTargetBuilder
 
@@ -76,8 +75,9 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
         sim = UnitarySimulator(circuit, seed=seed, mode=construction_mode)
         sim.construct()
         # Extract resulting matrix from final DD and write data
-        unitary: npt.NDArray[np.complex128] = np.zeros((2**qc.num_qubits, 2**qc.num_qubits), dtype=np.complex128)
-        get_matrix(sim, unitary)
+        dd = sim.get_constructed_dd()
+        mat = dd.get_matrix(sim.get_number_of_qubits())
+        unitary = np.array(mat, copy=False)
         end_time = time.time()
 
         data = ExperimentResultData(

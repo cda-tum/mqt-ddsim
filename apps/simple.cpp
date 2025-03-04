@@ -265,7 +265,7 @@ int main(int argc, char** argv) {
             dynamic_cast<HybridSchrodingerFeynmanSimulator<>*>(ddsim.get())) {
       outputObj["state_vector"] = hsfSim->getVectorFromHybridSimulation();
     } else {
-      outputObj["state_vector"] = ddsim->getVector();
+      outputObj["state_vector"] = ddsim->getCurrentDD().getVector();
     }
   }
 

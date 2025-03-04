@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
 
+import numpy as np
 from qiskit import QiskitError
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
@@ -97,7 +98,7 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
             counts={hex(int(result, 2)): count for result, count in counts.items()},
             statevector=None
             if not self._SHOW_STATE_VECTOR
-            else sim.get_vector()
+            else np.array(sim.get_constructed_dd().get_vector(), copy=False)
             if sim.get_mode() == HybridMode.DD
             else sim.get_final_amplitudes(),
             time_taken=end_time - start_time,

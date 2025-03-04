@@ -73,15 +73,6 @@ public:
   std::map<std::string, std::size_t> sampleFromAmplitudeVectorInPlace(
       std::vector<std::complex<dd::fp>>& amplitudes, std::size_t shots);
 
-  [[nodiscard]] dd::CVec getVector() const {
-    if (getNumberOfQubits() >= 60) {
-      // On 64bit system the vector can hold up to (2^60)-1 elements, if memory
-      // permits
-      throw std::range_error("getVector only supports less than 60 qubits.");
-    }
-    return rootEdge.getVector();
-  }
-
   [[nodiscard]] virtual std::size_t getActiveNodeCount() const {
     return dd->template getUniqueTable<dd::vNode>().getNumActiveEntries();
   }
@@ -100,6 +91,10 @@ public:
 
   [[nodiscard]] virtual std::size_t countNodesFromRoot() {
     return rootEdge.size();
+  }
+
+  [[nodiscard]] auto getCurrentDD() const -> const dd::vEdge& {
+    return rootEdge;
   }
 
   [[nodiscard]] std::pair<dd::ComplexValue, std::string>
@@ -147,43 +142,6 @@ public:
                                dd::vEdge edge,
                                std::map<dd::vNode*, dd::vEdge>& dagEdges);
 
-  /**
-   * @brief Get a GraphViz representation of the currently stored DD.
-   * @param colored Whether to output color-coded edge weights or black and
-   * white.
-   * @param edgeLabels Whether to output edge labels.
-   * @param classic Whether to use the classic visualization or a more modern
-   * representation.
-   * @param memory An alternative representation for nodes that includes
-   * detailed memory information.
-   * @param formatAsPolar Whether to format the complex numbers as polar or
-   * cartesian coordinates.
-   * @returns A Graphviz program representing the current DD
-   */
-  std::string exportDDtoGraphvizString(bool colored = true,
-                                       bool edgeLabels = false,
-                                       bool classic = false,
-                                       bool memory = false,
-                                       bool formatAsPolar = true);
-
-  /**
-   * @brief Write a GraphViz representation of the currently stored DD to a
-   * file.
-   * @param filename The name of the file to write to.
-   * @param colored Whether to output color-coded edge weights or black and
-   * white.
-   * @param edgeLabels Whether to output edge labels.
-   * @param classic Whether to use the classic visualization or a more modern
-   * representation.
-   * @param memory An alternative representation for nodes that includes
-   * detailed memory information.
-   * @param formatAsPolar Whether to format the complex numbers as polar or
-   * cartesian coordinates.
-   */
-  void exportDDtoGraphvizFile(const std::string& filename, bool colored = true,
-                              bool edgeLabels = false, bool classic = false,
-                              bool memory = false, bool formatAsPolar = true);
-
   std::unique_ptr<dd::Package<Config>> dd =
       std::make_unique<dd::Package<Config>>();
   dd::vEdge rootEdge = dd::vEdge::one();
@@ -194,8 +152,4 @@ protected:
   std::uint64_t seed = 0;
   bool hasFixedSeed;
   dd::fp epsilon = 0.001;
-
-  virtual void exportDDtoGraphviz(std::ostream& os, bool colored,
-                                  bool edgeLabels, bool classic, bool memory,
-                                  bool formatAsPolar);
 };

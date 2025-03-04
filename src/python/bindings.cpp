@@ -11,7 +11,10 @@
 #include "StochasticNoiseSimulator.hpp"
 #include "UnitarySimulator.hpp"
 
+#include <cstddef>
+#include <list>
 #include <memory>
+#include <optional>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -50,57 +53,6 @@ constructSimulatorWithoutSeed(const qc::QuantumComputation& circ,
                                        std::forward<Args>(args)...);
 }
 
-void getNumPyMatrixRec(const qc::MatrixDD& e, const std::complex<dd::fp>& amp,
-                       std::size_t i, std::size_t j, std::size_t dim,
-                       std::complex<dd::fp>* mat, std::size_t level) {
-  // calculate new accumulated amplitude
-  const auto c = amp * static_cast<std::complex<dd::fp>>(e.w);
-
-  // base case
-  if (level == 0U) {
-    mat[i * dim + j] =
-        c; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    return;
-  }
-
-  const auto nextLevel = static_cast<dd::Qubit>(level - 1U);
-  const std::size_t x = i | (1 << nextLevel);
-  const std::size_t y = j | (1 << nextLevel);
-  if (e.isTerminal() || e.p->v < nextLevel) {
-    getNumPyMatrixRec(e, c, i, j, dim, mat, nextLevel);
-    getNumPyMatrixRec(e, c, x, y, dim, mat, nextLevel);
-    return;
-  }
-
-  const auto coords = {std::pair{i, j}, {i, y}, {x, j}, {x, y}};
-  std::size_t k = 0U;
-  for (const auto& [a, b] : coords) {
-    if (auto& f = e.p->e[k++]; !f.w.exactlyZero()) {
-      getNumPyMatrixRec(f, c, a, b, dim, mat, nextLevel);
-    }
-  }
-}
-
-void getNumPyMatrix(UnitarySimulator& sim,
-                    py::array_t<std::complex<dd::fp>>& matrix) {
-  const auto& e = sim.getConstructedDD();
-  py::buffer_info matrixBuffer = matrix.request();
-  auto* dataPtr = static_cast<std::complex<dd::fp>*>(matrixBuffer.ptr);
-  const auto rows = matrixBuffer.shape[0];
-  const auto cols = matrixBuffer.shape[1];
-  if (rows != cols) {
-    throw std::runtime_error("Provided matrix is not a square matrix.");
-  }
-
-  const std::size_t dim = 1ULL << sim.getNumberOfQubits();
-  if (static_cast<std::size_t>(rows) != dim) {
-    throw std::runtime_error("Provided matrix does not have the right size.");
-  }
-
-  getNumPyMatrixRec(e, std::complex<dd::fp>{1.0, 0.0}, 0, 0, dim, dataPtr,
-                    sim.getNumberOfQubits());
-}
-
 template <class Sim>
 py::class_<Sim> createSimulator(py::module_ m, const std::string& name) {
   auto sim = py::class_<Sim>(m, name.c_str());
@@ -126,16 +78,7 @@ py::class_<Sim> createSimulator(py::module_ m, const std::string& name) {
       .def("get_tolerance", &Sim::getTolerance,
            "Get the tolerance for the DD package.")
       .def("set_tolerance", &Sim::setTolerance, "tol"_a,
-           "Set the tolerance for the DD package.")
-      .def("export_dd_to_graphviz_str", &Sim::exportDDtoGraphvizString,
-           "colored"_a = true, "edge_labels"_a = false, "classic"_a = false,
-           "memory"_a = false, "format_as_polar"_a = true,
-           "Get a Graphviz representation of the currently stored DD.")
-      .def("export_dd_to_graphviz_file", &Sim::exportDDtoGraphvizFile,
-           "filename"_a, "colored"_a = true, "edge_labels"_a = false,
-           "classic"_a = false, "memory"_a = false, "format_as_polar"_a = true,
-           "Write a Graphviz representation of the currently stored DD to a "
-           "file.");
+           "Set the tolerance for the DD package.");
 
   if constexpr (std::is_same_v<Sim, UnitarySimulator>) {
     sim.def("construct", &Sim::construct,
@@ -144,13 +87,14 @@ py::class_<Sim> createSimulator(py::module_ m, const std::string& name) {
     sim.def("simulate", &Sim::simulate, "shots"_a,
             "Simulate the circuit and return the result as a dictionary of "
             "counts.");
-    sim.def("get_vector", &Sim::getVector,
-            "Get the state vector resulting from the simulation.");
+    sim.def("get_constructed_dd", &Sim::getCurrentDD,
+            "Get the vector DD resulting from the simulation.");
   }
   return sim;
 }
 
 PYBIND11_MODULE(pyddsim, m, py::mod_gil_not_used()) {
+  py::module::import("mqt.core.dd");
   m.doc() = "Python interface for the MQT DDSIM quantum circuit simulator";
 
   // Circuit Simulator
@@ -280,8 +224,6 @@ PYBIND11_MODULE(pyddsim, m, py::mod_gil_not_used()) {
       .def("get_mode", &UnitarySimulator::getMode)
       .def("get_construction_time", &UnitarySimulator::getConstructionTime)
       .def("get_final_node_count", &UnitarySimulator::getFinalNodeCount)
-      .def("get_max_node_count", &UnitarySimulator::getMaxNodeCount);
-
-  // Miscellaneous functions
-  m.def("get_matrix", &getNumPyMatrix, "sim"_a, "mat"_a);
+      .def("get_max_node_count", &UnitarySimulator::getMaxNodeCount)
+      .def("get_constructed_dd", &UnitarySimulator::getConstructedDD);
 }

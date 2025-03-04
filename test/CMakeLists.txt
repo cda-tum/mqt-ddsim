@@ -9,7 +9,6 @@ package_add_test(
   test_stoch_noise_sim.cpp
   test_det_noise_sim.cpp
   test_unitary_sim.cpp
-  test_path_sim.cpp
-  test_output_ddvis.cpp)
+  test_path_sim.cpp)
 
 target_link_libraries(mqt-ddsim-test PRIVATE MQT::CoreAlgorithms)

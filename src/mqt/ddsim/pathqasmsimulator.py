@@ -9,6 +9,7 @@ if TYPE_CHECKING:
     from qiskit import QuantumCircuit
 
 
+import numpy as np
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
@@ -103,7 +104,7 @@ class PathQasmSimulatorBackend(QasmSimulatorBackend):
 
         data = ExperimentResultData(
             counts={hex(int(result, 2)): count for result, count in counts.items()},
-            statevector=None if not self._SHOW_STATE_VECTOR else sim.get_vector(),
+            statevector=None if not self._SHOW_STATE_VECTOR else np.array(sim.get_constructed_dd().get_vector()),
             time_taken=end_time - start_time,
             time_setup=setup_time - start_time,
             time_sim=end_time - setup_time,
