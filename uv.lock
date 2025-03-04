@@ -1507,9 +1507,9 @@ build = [
     { name = "setuptools-scm", specifier = ">=8.1" },
 ]
 dev = [
-    { name = "breathe" },
+    { name = "breathe", specifier = ">=4.36.0" },
     { name = "furo", specifier = ">=2024.8.6" },
-    { name = "graphviz" },
+    { name = "graphviz", specifier = ">=0.20.3" },
     { name = "ipykernel", specifier = ">=6.29.5" },
     { name = "mqt-core", specifier = ">=3.0.0b5" },
     { name = "nbsphinx", specifier = ">=0.9.6" },
@@ -1531,9 +1531,9 @@ dev = [
     { name = "sphinxext-opengraph", specifier = ">=0.9.1" },
 ]
 docs = [
-    { name = "breathe" },
+    { name = "breathe", specifier = ">=4.36.0" },
     { name = "furo", specifier = ">=2024.8.6" },
-    { name = "graphviz" },
+    { name = "graphviz", specifier = ">=0.20.3" },
     { name = "ipykernel", specifier = ">=6.29.5" },
     { name = "nbsphinx", specifier = ">=0.9.6" },
     { name = "qiskit", extras = ["visualization"], specifier = ">=1.0.0" },
