@@ -14,22 +14,11 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
 
 nox.needs_version = ">=2024.3.2"
-nox.options.default_venv_backend = "uv|virtualenv"
+nox.options.default_venv_backend = "uv"
 
 nox.options.sessions = ["lint", "tests", "minimums"]
 
-PYTHON_ALL_VERSIONS = ["3.9", "3.10", "3.11", "3.12"]
-
-# The following lists all the build requirements for building the package.
-# Note that this includes transitive build dependencies of package dependencies,
-# since we use `--no-build-isolation` to install the package in editable mode
-# and get better caching performance. This only concerns dependencies that are
-# not available via wheels on PyPI (i.e., only as source distributions).
-BUILD_REQUIREMENTS = [
-    "scikit-build-core>=0.10.1",
-    "setuptools_scm>=8.1",
-    "pybind11>=2.13.5",
-]
+PYTHON_ALL_VERSIONS = ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
 if os.environ.get("CI", None):
     nox.options.error_on_missing_interpreters = True
@@ -49,10 +38,8 @@ def _run_tests(
     *,
     install_args: Sequence[str] = (),
     run_args: Sequence[str] = (),
-    extras: Sequence[str] = (),
 ) -> None:
-    posargs = list(session.posargs)
-    env = {}
+    env = {"UV_PROJECT_ENVIRONMENT": session.virtualenv.location}
     if os.environ.get("CI", None) and sys.platform == "win32":
         env["SKBUILD_CMAKE_ARGS"] = "-T ClangCL"
 
@@ -61,15 +48,38 @@ def _run_tests(
     if shutil.which("ninja") is None:
         session.install("ninja")
 
-    extras_ = ["test", *extras]
-    if "--cov" in posargs:
-        extras_.append("coverage")
-        posargs.append("--cov-config=pyproject.toml")
-
-    session.install(*BUILD_REQUIREMENTS, *install_args, env=env)
-    install_arg = f"-ve.[{','.join(extras_)}]"
-    session.install("--no-build-isolation", install_arg, *install_args, env=env)
-    session.run("pytest", *run_args, *posargs, env=env)
+    # install build and test dependencies on top of the existing environment
+    session.run(
+        "uv",
+        "sync",
+        "--inexact",
+        "--only-group",
+        "build",
+        "--only-group",
+        "test",
+        "--verbose",
+        # Build mqt-core from source to work around pybind believing that two
+        # compiled extensions might not be binary compatible.
+        # This will be fixed in a new pybind11 release that includes https://github.com/pybind/pybind11/pull/5439.
+        "--no-binary-package",
+        "mqt-core",
+        *install_args,
+        env=env,
+    )
+    session.run(
+        "uv",
+        "run",
+        "--no-dev",  # do not auto-install dev dependencies
+        "--no-build-isolation-package",
+        "mqt-ddsim",  # build the project without isolation
+        "--verbose",
+        *install_args,
+        "pytest",
+        *run_args,
+        *session.posargs,
+        "--cov-config=pyproject.toml",
+        env=env,
+    )
 
 
 @nox.session(reuse_venv=True, python=PYTHON_ALL_VERSIONS)
@@ -86,7 +96,9 @@ def minimums(session: nox.Session) -> None:
         install_args=["--resolution=lowest-direct"],
         run_args=["-Wdefault"],
     )
-    session.run("uv", "pip", "list")
+    env = {"UV_PROJECT_ENVIRONMENT": session.virtualenv.location}
+    session.run("uv", "tree", "--frozen", env=env)
+    session.run("uv", "lock", "--refresh", env=env)
 
 
 @nox.session(reuse_venv=True)
@@ -97,13 +109,26 @@ def docs(session: nox.Session) -> None:
     args, posargs = parser.parse_known_args(session.posargs)
 
     serve = args.builder == "html" and session.interactive
-    extra_installs = ["sphinx-autobuild"] if serve else []
-    session.install(*BUILD_REQUIREMENTS, *extra_installs)
-    session.install("--no-build-isolation", "-ve.[docs]")
+    if serve:
+        session.install("sphinx-autobuild")
 
-    if args.builder == "linkcheck":
-        session.run("sphinx-build", "-b", "linkcheck", "docs", "docs/_build/linkcheck", *posargs)
-        return
+    env = {"UV_PROJECT_ENVIRONMENT": session.virtualenv.location}
+    # install build and docs dependencies on top of the existing environment
+    session.run(
+        "uv",
+        "sync",
+        "--inexact",
+        "--only-group",
+        "build",
+        "--only-group",
+        "docs",
+        # Build mqt-core from source to work around pybind believing that two
+        # compiled extensions might not be binary compatible.
+        # This will be fixed in a new pybind11 release that includes https://github.com/pybind/pybind11/pull/5439.
+        "--no-binary-package",
+        "mqt-core",
+        env=env,
+    )
 
     shared_args = (
         "-n",  # nitpicky mode
@@ -114,7 +139,13 @@ def docs(session: nox.Session) -> None:
         *posargs,
     )
 
-    if serve:
-        session.run("sphinx-autobuild", *shared_args)
-    else:
-        session.run("sphinx-build", "--keep-going", *shared_args)
+    session.run(
+        "uv",
+        "run",
+        "--no-dev",  # do not auto-install dev dependencies
+        "--no-build-isolation-package",
+        "mqt-ddsim",  # build the project without isolation
+        "sphinx-autobuild" if serve else "sphinx-build",
+        *shared_args,
+        env=env,
+    )
