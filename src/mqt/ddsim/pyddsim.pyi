@@ -2,7 +2,8 @@ from typing import Any, ClassVar, overload
 
 import numpy as np
 from numpy.typing import NDArray
-from qiskit import QuantumCircuit
+
+from mqt.core.ir import QuantumComputation
 
 __all__ = [
     "CircuitSimulator",
@@ -15,20 +16,19 @@ __all__ = [
     "PathSimulatorMode",
     "StochasticNoiseSimulator",
     "UnitarySimulator",
-    "dump_tensor_network",
     "get_matrix",
 ]
 
 class CircuitSimulator:
     def __init__(
         self,
-        circ: QuantumCircuit | str,
+        circ: QuantumComputation,
         approximation_step_fidelity: float = 1.0,
         approximation_steps: int = 1,
         approximation_strategy: str = "fidelity",
         seed: int = -1,
     ) -> None: ...
-    def expectation_value(self, observable: QuantumCircuit | str) -> float: ...
+    def expectation_value(self, observable: QuantumComputation) -> float: ...
     def export_dd_to_graphviz_file(
         self,
         filename: str,
@@ -61,7 +61,7 @@ class CircuitSimulator:
 class DeterministicNoiseSimulator:
     def __init__(
         self,
-        circ: QuantumCircuit | str,
+        circ: QuantumComputation,
         approximation_step_fidelity: float = 1.0,
         approximation_steps: int = 1,
         approximation_strategy: str = "fidelity",
@@ -123,7 +123,7 @@ class HybridMode:
 class HybridCircuitSimulator:
     def __init__(
         self,
-        circ: QuantumCircuit | str,
+        circ: QuantumComputation,
         approximation_step_fidelity: float = 1.0,
         approximation_steps: int = 1,
         approximation_strategy: str = "fidelity",
@@ -165,11 +165,10 @@ class HybridCircuitSimulator:
 class PathSimulatorMode:
     __members__: ClassVar[
         dict[str, PathSimulatorMode]
-    ]  # value = {'sequential': <PathSimulatorMode.sequential: 0>, 'pairwise_recursive': <PathSimulatorMode.pairwise_recursive: 1>, 'cotengra': <PathSimulatorMode.cotengra: 4>, 'bracket': <PathSimulatorMode.bracket: 2>, 'alternating': <PathSimulatorMode.alternating: 3>, 'gate_cost': <PathSimulatorMode.gate_cost: 5>}
+    ]  # value = {'sequential': <PathSimulatorMode.sequential: 0>, 'pairwise_recursive': <PathSimulatorMode.pairwise_recursive: 1>, 'bracket': <PathSimulatorMode.bracket: 2>, 'alternating': <PathSimulatorMode.alternating: 3>, 'gate_cost': <PathSimulatorMode.gate_cost: 4>}
     alternating: ClassVar[PathSimulatorMode]  # value = <PathSimulatorMode.alternating: 3>
     bracket: ClassVar[PathSimulatorMode]  # value = <PathSimulatorMode.bracket: 2>
-    cotengra: ClassVar[PathSimulatorMode]  # value = <PathSimulatorMode.cotengra: 4>
-    gate_cost: ClassVar[PathSimulatorMode]  # value = <PathSimulatorMode.gate_cost: 5>
+    gate_cost: ClassVar[PathSimulatorMode]  # value = <PathSimulatorMode.gate_cost: 4>
     pairwise_recursive: ClassVar[PathSimulatorMode]  # value = <PathSimulatorMode.pairwise_recursive: 1>
     sequential: ClassVar[PathSimulatorMode]  # value = <PathSimulatorMode.sequential: 0>
 
@@ -215,11 +214,11 @@ class PathSimulatorConfiguration:
 
 class PathCircuitSimulator:
     @overload
-    def __init__(self, circ: QuantumCircuit | str, config: PathSimulatorConfiguration = ...) -> None: ...
+    def __init__(self, circ: QuantumComputation, config: PathSimulatorConfiguration = ...) -> None: ...
     @overload
     def __init__(
         self,
-        circ: QuantumCircuit | str,
+        circ: QuantumComputation,
         mode: PathSimulatorMode = ...,
         bracket_size: int = 2,
         starting_point: int = 0,
@@ -259,7 +258,7 @@ class PathCircuitSimulator:
 class StochasticNoiseSimulator:
     def __init__(
         self,
-        circ: QuantumCircuit | str,
+        circ: QuantumComputation,
         approximation_step_fidelity: float = 1.0,
         approximation_steps: int = 1,
         approximation_strategy: str = "fidelity",
@@ -321,7 +320,7 @@ class ConstructionMode:
 class UnitarySimulator:
     def __init__(
         self,
-        circ: QuantumCircuit | str,
+        circ: QuantumComputation,
         approximation_step_fidelity: float = 1.0,
         approximation_steps: int = 1,
         approximation_strategy: str = "fidelity",
@@ -360,5 +359,4 @@ class UnitarySimulator:
     def set_tolerance(self, tol: float) -> None: ...
     def statistics(self) -> dict[str, str]: ...
 
-def dump_tensor_network(circ: QuantumCircuit | str, filename: str) -> None: ...
 def get_matrix(sim: UnitarySimulator, mat: NDArray[np.complex128]) -> None: ...
