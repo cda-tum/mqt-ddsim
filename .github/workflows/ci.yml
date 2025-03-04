@@ -14,50 +14,177 @@ concurrency:
 jobs:
   change-detection:
     name: 🔍 Change
-    uses: cda-tum/mqt-workflows/.github/workflows/reusable-change-detection.yml@v1.5
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-change-detection.yml@v1.7
 
   cpp-tests:
     name: 🇨‌ Test
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-tests)
-    uses: cda-tum/mqt-workflows/.github/workflows/reusable-cpp-ci.yml@v1.5
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-cpp-ci.yml@v1.7
+    with:
+      # Runs to enable
+      enable-ubuntu2404-gcc-release: true
+      enable-ubuntu2404-arm-gcc-release: true
+      enable-macos13-clang-release: true
+      enable-macos14-clang-release: true
+      enable-windows2022-msvc-release: true
+      # Runs to disable
+      enable-ubuntu2404-gcc-debug: false
+      enable-ubuntu2404-clang-release: false
+      enable-ubuntu2404-clang-debug: false
+      enable-ubuntu2204-gcc-release: false
+      enable-ubuntu2204-gcc-debug: false
+      enable-ubuntu2204-clang-release: false
+      enable-ubuntu2204-clang-debug: false
+      enable-ubuntu2404-arm-gcc-debug: false
+      enable-ubuntu2404-arm-clang-release: false
+      enable-ubuntu2404-arm-clang-debug: false
+      enable-ubuntu2204-arm-gcc-release: false
+      enable-ubuntu2204-arm-gcc-debug: false
+      enable-ubuntu2204-arm-clang-release: false
+      enable-ubuntu2204-arm-clang-debug: false
+      enable-macos13-clang-debug: false
+      enable-macos13-gcc-release: false
+      enable-macos13-gcc-debug: false
+      enable-macos14-clang-debug: false
+      enable-macos14-gcc-release: false
+      enable-macos14-gcc-debug: false
+      enable-macos15-clang-release: false
+      enable-macos15-clang-debug: false
+      enable-macos15-gcc-release: false
+      enable-macos15-gcc-debug: false
+      enable-windows2022-msvc-debug: false
+      enable-windows2022-clang-release: false
+      enable-windows2022-clang-debug: false
+      enable-windows2025-msvc-release: false
+      enable-windows2025-msvc-debug: false
+      enable-windows2025-clang-release: false
+      enable-windows2025-clang-debug: false
+
+  # run extensive C++ tests whenever this is on a PR and the PR has the `extensive-cpp-ci` label
+  cpp-tests-extensive:
+    name: 🇨‌ Test (Extensive)
+    needs: change-detection
+    if: fromJSON(needs.change-detection.outputs.run-cpp-tests) && github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'extensive-cpp-ci')
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-cpp-ci.yml@v1.7
+    with:
+      # Runs to enable
+      enable-ubuntu2404-gcc-debug: true
+      enable-ubuntu2404-clang-release: true
+      enable-ubuntu2404-clang-debug: true
+      enable-ubuntu2204-gcc-release: true
+      enable-ubuntu2204-gcc-debug: true
+      enable-ubuntu2204-clang-release: true
+      enable-ubuntu2204-clang-debug: true
+      enable-ubuntu2404-arm-gcc-debug: true
+      enable-ubuntu2404-arm-clang-release: true
+      enable-ubuntu2404-arm-clang-debug: true
+      enable-ubuntu2204-arm-gcc-release: true
+      enable-ubuntu2204-arm-gcc-debug: true
+      enable-ubuntu2204-arm-clang-release: true
+      enable-ubuntu2204-arm-clang-debug: true
+      enable-macos13-clang-debug: true
+      enable-macos13-gcc-release: true
+      enable-macos13-gcc-debug: true
+      enable-macos14-clang-debug: true
+      enable-macos14-gcc-release: true
+      enable-macos14-gcc-debug: true
+      enable-macos15-clang-release: true
+      enable-macos15-clang-debug: true
+      enable-macos15-gcc-release: true
+      enable-macos15-gcc-debug: true
+      enable-windows2022-msvc-debug: true
+      enable-windows2022-clang-release: true
+      enable-windows2022-clang-debug: true
+      enable-windows2025-msvc-release: true
+      enable-windows2025-msvc-debug: true
+      enable-windows2025-clang-release: true
+      enable-windows2025-clang-debug: true
+      # Runs to disable (these are already enabled in the non-extensive run)
+      enable-ubuntu2404-gcc-release: false
+      enable-ubuntu2404-arm-gcc-release: false
+      enable-macos13-clang-release: false
+      enable-macos14-clang-release: false
+      enable-windows2022-msvc-release: false
+
+  cpp-coverage:
+    name: 🇨‌ Coverage
+    needs: change-detection
+    if: fromJSON(needs.change-detection.outputs.run-cpp-tests)
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-cpp-coverage.yml@v1.7
     # Explicitly set permissions so that the workflows also work from forks.
     permissions:
       contents: read # Required for the `actions/checkout` action
       id-token: write # Required for the `codecov/codecov-action` action
-    with:
-      cmake-args: ""
-      cmake-args-ubuntu: -G Ninja
-      cmake-args-macos: -G Ninja
-      cmake-args-windows: -T ClangCL
 
   cpp-linter:
     name: 🇨‌ Lint
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-linter)
-    uses: cda-tum/mqt-workflows/.github/workflows/reusable-cpp-linter.yml@v1.5
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-cpp-linter.yml@v1.7
 
+  # run extensive Python tests whenever this is on a PR and the PR has the `extensive-python-ci` label
   python-tests:
     name: 🐍 Test
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-python-tests)
-    uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-ci.yml@v1.5
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-ci.yml@v1.7
     # Explicitly set permissions so that the workflows also work from forks.
     permissions:
       contents: read # Required for the `actions/checkout` action
       id-token: write # Required for the `codecov/codecov-action` action
+    with:
+      # Runs to enable
+      enable-ubuntu2404: true
+      enable-ubuntu2404-arm: true
+      enable-macos13: true
+      enable-macos14: true
+      enable-windows2022: true
+      # Runs to disable
+      enable-ubuntu2204: false
+      enable-ubuntu2204-arm: false
+      enable-macos15: false
+      enable-windows2025: false
+
+  python-tests-extensive:
+    name: 🐍 Test (Extensive)
+    needs: change-detection
+    if: fromJSON(needs.change-detection.outputs.run-python-tests) && github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'extensive-python-ci')
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-ci.yml@v1.7
+    # Explicitly set permissions so that the workflows also work from forks.
+    permissions:
+      contents: read # Required for the `actions/checkout` action
+      id-token: write # Required for the `codecov/codecov-action` action
+    with:
+      # Runs to enable
+      enable-ubuntu2204: true
+      enable-ubuntu2204-arm: true
+      enable-macos15: true
+      enable-windows2025: true
+      # Runs to disable (these are already enabled in the non-extensive run)
+      enable-ubuntu2404: false
+      enable-ubuntu2404-arm: false
+      enable-macos13: false
+      enable-macos14: false
+      enable-windows2022: false
+
+  python-linter:
+    name: 🐍 Lint
+    needs: change-detection
+    if: fromJSON(needs.change-detection.outputs.run-python-tests)
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-linter.yml@v1.7
 
   code-ql:
     name: 📝 CodeQL
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-code-ql)
-    uses: cda-tum/mqt-workflows/.github/workflows/reusable-code-ql.yml@v1.5
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-code-ql.yml@v1.7
 
   cd:
     name: 🚀 CD
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cd)
-    uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-packaging.yml@v1.5
+    uses: cda-tum/mqt-workflows/.github/workflows/reusable-python-packaging.yml@v1.7
 
   required-checks-pass: # This job does nothing and is only used for branch protection
     name: 🚦 Check
@@ -65,8 +192,12 @@ jobs:
     needs:
       - change-detection
       - cpp-tests
+      - cpp-tests-extensive
+      - cpp-coverage
       - cpp-linter
       - python-tests
+      - python-tests-extensive
+      - python-linter
       - code-ql
       - cd
     runs-on: ubuntu-latest
@@ -80,12 +211,28 @@ jobs:
               && '' || 'cpp-tests,'
             }}
             ${{
+              fromJSON(needs.change-detection.outputs.run-cpp-tests) && github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'extensive-cpp-ci')
+              && '' || 'cpp-tests-extensive,'
+            }}
+            ${{
+              fromJSON(needs.change-detection.outputs.run-cpp-tests)
+              && '' || 'cpp-coverage,'
+            }}
+            ${{
               fromJSON(needs.change-detection.outputs.run-cpp-linter)
               && '' || 'cpp-linter,'
             }}
             ${{
               fromJSON(needs.change-detection.outputs.run-python-tests)
               && '' || 'python-tests,'
+            }}
+            ${{
+              fromJSON(needs.change-detection.outputs.run-python-tests) && github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'extensive-python-ci')
+              && '' || 'python-tests-extensive,'
+            }}
+            ${{
+              fromJSON(needs.change-detection.outputs.run-python-tests)
+              && '' || 'python-linter,'
             }}
             ${{
               fromJSON(needs.change-detection.outputs.run-code-ql)
