@@ -16,7 +16,8 @@ authors = [
     { name = "Stefan Hillmich", email = "stefan.hillmich@scch.at" },
 ]
 keywords = ["MQT", "quantum-computing", "design-automation", "quantum-circuit-sim", "simulation"]
-license = { file = "LICENSE.md" }
+license = "MIT"
+license-files = ["LICENSE.md"]
 
 classifiers = [
     "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
@@ -25,7 +26,6 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: C++",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
