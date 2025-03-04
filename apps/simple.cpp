@@ -42,8 +42,7 @@ void from_json( // NOLINT(readability-identifier-naming)
 }
 } /* namespace std */
 
-int main(int argc, char** argv) {
-  // NOLINT(bugprone-exception-escape)
+int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
   cxxopts::Options options(
       "MQT DDSIM", "for more information see https://www.cda.cit.tum.de/");
   // clang-format off
@@ -79,7 +78,7 @@ int main(int argc, char** argv) {
   auto vm = options.parse(argc, argv);
   if (vm.count("help") > 0) {
     std::cout << options.help();
-    std::exit(0);
+    return 0;
   }
 
   const auto seed = vm["seed"].as<std::uint64_t>();
@@ -177,7 +176,7 @@ int main(int argc, char** argv) {
   } else {
     std::cerr << "Did not find anything to simulate. See help below.\n"
               << options.help() << "\n";
-    std::exit(1);
+    return 1;
   }
 
   if (ddsim->getNumberOfQubits() > 100) {

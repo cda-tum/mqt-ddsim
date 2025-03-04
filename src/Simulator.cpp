@@ -5,7 +5,6 @@
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Edge.hpp"
-#include "dd/Export.hpp"
 #include "dd/Node.hpp"
 #include "dd/Package.hpp"
 #include "dd/RealNumber.hpp"
@@ -15,14 +14,12 @@
 #include <cmath>
 #include <complex>
 #include <cstddef>
-#include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <queue>
 #include <random>
 #include <set>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <utility>

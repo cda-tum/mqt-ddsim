@@ -4,7 +4,6 @@
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Node.hpp"
-#include "ir/operations/Control.hpp"
 
 #include <cmath>
 #include <cstddef>

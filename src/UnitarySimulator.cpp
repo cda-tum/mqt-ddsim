@@ -2,7 +2,6 @@
 
 #include "CircuitSimulator.hpp"
 #include "circuit_optimizer/CircuitOptimizer.hpp"
-#include "dd/Export.hpp"
 #include "dd/FunctionalityConstruction.hpp"
 #include "dd/Node.hpp"
 #include "ir/QuantumComputation.hpp"
@@ -11,7 +10,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <ostream>
 #include <utility>
 
 void UnitarySimulator::construct() {

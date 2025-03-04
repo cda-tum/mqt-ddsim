@@ -11,6 +11,7 @@
 #include "dd/Package.hpp"
 #include "ir/operations/Control.hpp"
 #include "ir/operations/OpType.hpp"
+#include "ir/operations/Operation.hpp"
 #include "ir/operations/StandardOperation.hpp"
 
 #include <algorithm>
@@ -23,7 +24,6 @@
 #include <functional>
 #include <map>
 #include <memory>
-#include <ostream>
 #include <stdexcept>
 #include <string>
 #include <taskflow/core/async.hpp>
@@ -144,7 +144,8 @@ bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(
   for (const auto& control : op->getControls()) {
     if (start <= control.qubit && control.qubit <= end) {
       opControls.emplace(control);
-    } else { // other controls are set to the corresponding value
+    } else {
+      // other controls are set to the corresponding value
       if (targetInSplit) {
         isSplitOp = true;
         const bool nextControl = getNextControl();
@@ -158,7 +159,8 @@ bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(
     }
   }
 
-  if (targetInOtherSplit && !opControls.empty()) { // control slice for split
+  if (targetInOtherSplit && !opControls.empty()) {
+    // control slice for split
     // Ensured in the getNDecisions function
     assert(opControls.size() == 1);
 
@@ -173,9 +175,11 @@ bool HybridSchrodingerFeynmanSimulator<Config>::Slice::apply(
       sliceDD->incRef(edge);
       sliceDD->decRef(tmp);
     }
-  } else if (targetInSplit) { // target slice for split or operation in split
+  } else if (targetInSplit) {
+    // target slice for split or operation in split
     const auto& param = op->getParameter();
-    qc::StandardOperation newOp(opControls, opTargets, op->getType(), param);
+    const qc::StandardOperation newOp(opControls, opTargets, op->getType(),
+                                      param);
     auto tmp = edge;
     edge = sliceDD->multiply(dd::getDD(newOp, *sliceDD), edge);
     sliceDD->incRef(edge);
@@ -247,7 +251,8 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(
       [this, &computePair, &computed, &executor, nslicesOnOneCpu, splitQubit,
        maxControl, nqubits,
        lastLevel](std::pair<std::size_t, std::size_t> current) {
-        if (current.first == 0) { // slice
+        if (current.first == 0) {
+          // slice
           std::unique_ptr<dd::Package<Config>> oldDD;
           qc::VectorDD edge{};
           for (std::size_t i = 0; i < nslicesOnOneCpu; ++i) {
@@ -264,13 +269,14 @@ void HybridSchrodingerFeynmanSimulator<Config>::simulateHybridTaskflow(
             }
             oldDD = std::move(
                 sliceDD); // this might seem unused, but it keeps the DD package
-                          // alive for the serialization below
+            // alive for the serialization below
           }
           dd::serialize(edge,
                         "slice_" + std::to_string(current.first) + "_" +
                             std::to_string(current.second) + ".dd",
                         true);
-        } else { // adding
+        } else {
+          // adding
           const std::string filename =
               "slice_" + std::to_string(current.first - 1) + "_";
           const std::string filenameLeft =

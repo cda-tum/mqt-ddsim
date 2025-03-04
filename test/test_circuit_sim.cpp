@@ -13,7 +13,6 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <utility>
 
@@ -281,7 +280,7 @@ TEST(CircuitSimTest, ToleranceTest) {
   auto qc = std::make_unique<qc::QuantumComputation>(2);
   CircuitSimulator ddsim(std::move(qc));
   const auto tolerance = ddsim.getTolerance();
-  const auto newTolerance = 0.1;
+  constexpr auto newTolerance = 0.1;
   ddsim.setTolerance(newTolerance);
   EXPECT_EQ(ddsim.getTolerance(), newTolerance);
   ddsim.setTolerance(tolerance);
@@ -289,29 +288,29 @@ TEST(CircuitSimTest, ToleranceTest) {
 }
 
 TEST(CircuitSimTest, BernsteinVaziraniDynamicTest) {
-  std::size_t const n = 3;
-  const auto expectedString = "101";
+  constexpr std::size_t n = 3;
+  const auto* const expectedString = "101";
   const qc::BVBitString expected{expectedString};
   auto qc = std::make_unique<qc::QuantumComputation>(
       qc::createIterativeBernsteinVazirani(expected, n));
-  auto circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
+  const auto circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
   const auto result = circSim->simulate(1024U);
   EXPECT_EQ(result.size(), 1);
   EXPECT_EQ(result.at(expectedString), 1024);
 }
 
 TEST(CircuitSimTest, QPEDynamicTest) {
-  std::size_t const n = 3;
+  constexpr std::size_t n = 3;
   auto qc = std::make_unique<qc::QuantumComputation>(qc::createIterativeQPE(n));
-  auto circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
+  const auto circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
   const auto result = circSim->simulate(1024U);
   EXPECT_GE(result.size(), 1);
 }
 
 TEST(CircuitSimTest, QFTDynamicTest) {
-  std::size_t const n = 3;
+  constexpr std::size_t n = 3;
   auto qc = std::make_unique<qc::QuantumComputation>(qc::createIterativeQFT(n));
-  auto circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
+  const auto circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
   const auto result = circSim->simulate(1024U);
   EXPECT_GE(result.size(), 1);
 }
