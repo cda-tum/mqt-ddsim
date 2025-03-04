@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "scikit-build-core>=0.10.1",
+    "scikit-build-core>=0.11.0",
     "setuptools-scm>=8.1",
     "pybind11>=2.13.5",
     "mqt.core>=3.0.0b5",
@@ -322,7 +322,7 @@ mqt-ddsim = { workspace = true }
 [dependency-groups]
 build = [
   "pybind11>=2.13.6",
-  "scikit-build-core>=0.10.1",
+  "scikit-build-core>=0.11.0",
   "setuptools-scm>=8.1",
   "mqt.core>=3.0.0b5",
 ]
