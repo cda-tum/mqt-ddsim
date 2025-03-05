@@ -2,13 +2,8 @@ from __future__ import annotations
 
 import unittest
 
-from qiskit import QuantumCircuit
-
-from mqt.ddsim import (
-    PathCircuitSimulator,
-    PathSimulatorConfiguration,
-    PathSimulatorMode,
-)
+from mqt.core.ir import QuantumComputation
+from mqt.ddsim import PathCircuitSimulator, PathSimulatorConfiguration, PathSimulatorMode
 
 
 class MQTStandaloneSimulatorTests(unittest.TestCase):
@@ -16,7 +11,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         self.nonzero_states_ghz = 2
 
     def test_standalone(self) -> None:
-        circ = QuantumCircuit(3)
+        circ = QuantumComputation(3)
         circ.h(0)
         circ.cx(0, 1)
         circ.cx(0, 2)
@@ -28,7 +23,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         assert "111" in result
 
     def test_standalone_with_config(self) -> None:
-        circ = QuantumCircuit(3)
+        circ = QuantumComputation(3)
         circ.h(0)
         circ.cx(0, 1)
         circ.cx(0, 2)
@@ -40,7 +35,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         assert "111" in result
 
     def test_standalone_with_seed(self) -> None:
-        circ = QuantumCircuit(3)
+        circ = QuantumComputation(3)
         circ.h(0)
         circ.cx(0, 1)
         circ.cx(0, 2)
@@ -52,7 +47,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         assert "111" in result
 
     def test_standalone_individual_objects(self) -> None:
-        circ = QuantumCircuit(3)
+        circ = QuantumComputation(3)
         circ.h(0)
         circ.cx(0, 1)
         circ.cx(0, 2)
@@ -64,7 +59,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         assert "111" in result
 
     def test_standalone_pairwise_only(self) -> None:
-        circ = QuantumCircuit(3)
+        circ = QuantumComputation(3)
         circ.h(0)
         circ.cx(0, 1)
         circ.cx(0, 2)
@@ -81,7 +76,7 @@ class MQTStandaloneSimulatorTests(unittest.TestCase):
         assert "111" in result
 
     def test_standalone_gatecost_only(self) -> None:
-        circ = QuantumCircuit(3)
+        circ = QuantumComputation(3)
         circ.h(0)
         circ.cx(0, 1)
         circ.cx(0, 2)

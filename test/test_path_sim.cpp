@@ -29,9 +29,6 @@ TEST(TaskBasedSimTest, Configuration) {
                 PathSimulator<>::Configuration::Mode::Alternating),
             "alternating");
   EXPECT_EQ(PathSimulator<>::Configuration::modeToString(
-                PathSimulator<>::Configuration::Mode::Cotengra),
-            "cotengra");
-  EXPECT_EQ(PathSimulator<>::Configuration::modeToString(
                 PathSimulator<>::Configuration::Mode::GateCost),
             "gate_cost");
   EXPECT_THROW(
@@ -49,8 +46,6 @@ TEST(TaskBasedSimTest, Configuration) {
             PathSimulator<>::Configuration::Mode::BracketGrouping);
   EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("alternating"),
             PathSimulator<>::Configuration::Mode::Alternating);
-  EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("cotengra"),
-            PathSimulator<>::Configuration::Mode::Cotengra);
   EXPECT_EQ(PathSimulator<>::Configuration::modeFromString("gate_cost"),
             PathSimulator<>::Configuration::Mode::GateCost);
   EXPECT_THROW(
@@ -157,10 +152,10 @@ TEST(TaskBasedSimTest, SimpleCircuitBracket) {
 }
 
 TEST(TaskBasedSimTest, GroverCircuitBracket) {
-  std::unique_ptr<qc::QuantumComputation> qc =
-      std::make_unique<qc::Grover>(4, 12345);
-  auto* grover = dynamic_cast<qc::Grover*>(qc.get());
-  auto targetValue = grover->targetValue;
+  const auto* const expected = "1111";
+  const auto targetValue = qc::GroverBitString{expected};
+  auto qc = std::make_unique<qc::QuantumComputation>(
+      qc::createGrover(4, targetValue));
 
   // construct simulator and generate bracketing contraction plan
   auto config = PathSimulator<>::Configuration{};
@@ -183,10 +178,10 @@ TEST(TaskBasedSimTest, GroverCircuitBracket) {
 }
 
 TEST(TaskBasedSimTest, GroverCircuitAlternatingMiddle) {
-  std::unique_ptr<qc::QuantumComputation> qc =
-      std::make_unique<qc::Grover>(4, 12345);
-  auto* grover = dynamic_cast<qc::Grover*>(qc.get());
-  auto targetValue = grover->targetValue;
+  const auto* const expected = "1111";
+  const auto targetValue = qc::GroverBitString{expected};
+  auto qc = std::make_unique<qc::QuantumComputation>(
+      qc::createGrover(4, targetValue));
 
   // construct simulator and generate alternating contraction plan
   auto config = PathSimulator<>::Configuration{};
@@ -208,10 +203,10 @@ TEST(TaskBasedSimTest, GroverCircuitAlternatingMiddle) {
 }
 
 TEST(TaskBasedSimTest, GroverCircuitPairwiseGrouping) {
-  std::unique_ptr<qc::QuantumComputation> qc =
-      std::make_unique<qc::Grover>(4, 12345);
-  auto* grover = dynamic_cast<qc::Grover*>(qc.get());
-  auto targetValue = grover->targetValue;
+  const auto* const expected = "1111";
+  const auto targetValue = qc::GroverBitString{expected};
+  auto qc = std::make_unique<qc::QuantumComputation>(
+      qc::createGrover(4, targetValue));
 
   // construct simulator and generate pairwise recursive contraction plan
   auto config = PathSimulator<>::Configuration{};
@@ -301,7 +296,7 @@ TEST(TaskBasedSimTest, DynamicCircuitSupport) {
   auto qc = std::make_unique<qc::QuantumComputation>(1, 1);
   qc->h(0);
   qc->measure(0, 0);
-  qc->classicControlled(qc::X, 0, {0, 1}, 1);
+  qc->classicControlled(qc::X, 0, 0, 1);
   std::cout << *qc << "\n";
 
   PathSimulator sim(std::move(qc));

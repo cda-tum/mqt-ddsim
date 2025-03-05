@@ -4,7 +4,6 @@
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Node.hpp"
-#include "ir/operations/Control.hpp"
 
 #include <cmath>
 #include <cstddef>
@@ -48,13 +47,6 @@ class ShorSimulator : public Simulator<Config> {
   }
 
   void uAEmulate(std::uint64_t a, std::int32_t q);
-
-  void applyGate(dd::GateMatrix matrix, dd::Qubit target,
-                 const qc::Controls& controls);
-
-  void applyGate(dd::GateMatrix matrix, dd::Qubit target, qc::Control control);
-
-  void applyGate(dd::GateMatrix matrix, dd::Qubit target);
 
   std::vector<std::uint64_t> ts;
 

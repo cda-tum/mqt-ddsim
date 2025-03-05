@@ -1,7 +1,6 @@
 FormatStyle: file
 
 Checks: |
-  boost-*,
   bugprone-*,
   -bugprone-easily-swappable-parameters,
   -bugprone-unchecked-optional-access,
@@ -13,6 +12,8 @@ Checks: |
   -cppcoreguidelines-special-member-functions,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-macro-usage,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
   -cppcoreguidelines-avoid-do-while,
   google-*,
   -google-readability-todo,
@@ -23,6 +24,7 @@ Checks: |
   modernize-*,
   -modernize-use-trailing-return-type,
   performance-*,
+  -performance-no-int-to-ptr,
   portability-*,
   readability-*,
   -readability-identifier-length,
@@ -72,3 +74,5 @@ CheckOptions:
     value: CamelCase
   - key: readability-identifier-naming.VariableCase
     value: camelBack
+  - key: misc-include-cleaner.IgnoreHeaders
+    value: pybind11/detail/.*

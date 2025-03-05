@@ -6,8 +6,9 @@
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Edge.hpp"
-#include "dd/GateMatrixDefinitions.hpp"
 #include "dd/Node.hpp"
+#include "dd/Operations.hpp"
+#include "ir/operations/OpType.hpp"
 
 #include <array>
 #include <cassert>
@@ -34,7 +35,9 @@ ShorFastSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
   Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
   // Initialize qubits
   // TODO: other init method where the initial value can be chosen
-  applyGate(dd::X_MAT, 0);
+  Simulator<Config>::rootEdge = dd::applyUnitaryOperation(
+      qc::StandardOperation(0, qc::X), Simulator<Config>::rootEdge,
+      *Simulator<Config>::dd);
 
   if (verbose) {
     std::clog << " (requires " << +nQubits << " qubits):\n";
@@ -75,7 +78,10 @@ ShorFastSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
   std::string measurements(2 * requiredBits, '0');
 
   for (std::size_t i = 0; i < 2 * requiredBits; i++) {
-    applyGate(dd::H_MAT, static_cast<dd::Qubit>(nQubits - 1));
+    const auto target = static_cast<qc::Qubit>(nQubits - 1);
+    Simulator<Config>::rootEdge = dd::applyUnitaryOperation(
+        qc::StandardOperation(target, qc::H), Simulator<Config>::rootEdge,
+        *Simulator<Config>::dd);
 
     if (verbose) {
       std::clog << "[ " << (i + 1) << "/" << 2 * requiredBits
@@ -100,19 +106,26 @@ ShorFastSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
         double qR = cosine(1, -q);
         double qI = sine(1, -q);
         const dd::GateMatrix qm{1, 0, 0, {qR, qI}};
-        applyGate(qm, static_cast<dd::Qubit>(nQubits - 1));
+        auto gate = Simulator<Config>::dd->makeGateDD(qm, target);
+        Simulator<Config>::rootEdge = Simulator<Config>::dd->applyOperation(
+            gate, Simulator<Config>::rootEdge);
       }
       q *= 2;
     }
 
-    applyGate(dd::H_MAT, static_cast<dd::Qubit>(nQubits - 1));
+    Simulator<Config>::rootEdge = dd::applyUnitaryOperation(
+        qc::StandardOperation(target, qc::H), Simulator<Config>::rootEdge,
+        *Simulator<Config>::dd);
 
-    measurements[i] = Simulator<Config>::measureOneCollapsing(
-        static_cast<dd::Qubit>(nQubits - 1), false);
+    measurements[i] = Simulator<Config>::dd->measureOneCollapsing(
+        Simulator<Config>::rootEdge, static_cast<dd::Qubit>(nQubits - 1),
+        Simulator<Config>::mt);
     Simulator<Config>::dd->garbageCollect();
 
     if (measurements[i] == '1') {
-      applyGate(dd::X_MAT, static_cast<dd::Qubit>(nQubits - 1));
+      Simulator<Config>::rootEdge = dd::applyUnitaryOperation(
+          qc::StandardOperation(target, qc::X), Simulator<Config>::rootEdge,
+          *Simulator<Config>::dd);
     }
   }
 

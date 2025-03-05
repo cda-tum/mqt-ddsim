@@ -234,8 +234,13 @@ def test_qasm_simulator_mcx_vchain(backend: QasmSimulatorBackend, num_controls: 
     nqubits = num_controls + 1
     q = QuantumRegister(nqubits)
     c = ClassicalRegister(nqubits)
-    anc = AncillaRegister(max(0, num_controls - 2))
-    circuit = QuantumCircuit(q, c, anc)
+    num_ancilla = max(0, num_controls - 2)
+    circuit = QuantumCircuit(q, c)
+    if num_ancilla > 0:
+        anc = AncillaRegister(num_ancilla)
+        circuit.add_register(anc)
+    else:
+        anc = None
     controls = q[1:nqubits]
     circuit.x(controls)
     circuit.mcx(controls, q[0], ancilla_qubits=anc, mode="v-chain")

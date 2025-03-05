@@ -198,7 +198,7 @@ TEST(HybridSimTest, DynamicCircuitSupport) {
   auto qc = std::make_unique<qc::QuantumComputation>(1, 1);
   qc->h(0);
   qc->measure(0, 0);
-  qc->classicControlled(qc::X, 0, {0, 1}, 1);
+  qc->classicControlled(qc::X, 0, 0, 1);
   std::cout << *qc << "\n";
 
   HybridSchrodingerFeynmanSimulator sim(std::move(qc));

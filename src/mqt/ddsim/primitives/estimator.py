@@ -11,6 +11,7 @@ from qiskit.primitives import Estimator as QiskitEstimator
 from qiskit.primitives import EstimatorResult
 from qiskit.quantum_info import Pauli, PauliList
 
+from mqt.core import load
 from mqt.ddsim.pyddsim import CircuitSimulator
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
@@ -55,10 +56,7 @@ class Estimator(QiskitEstimator):  # type: ignore[misc]
     ) -> tuple[list[QuantumCircuit], list[list[QuantumCircuit]]]:
         """Generate quantum circuits for states and observables produced by preprocessing.
 
-        Returns:
-        Tuple: A tuple containing two entries:
-            - List: Quantum circuits list entered in run() method.
-            - List: Quantum circuit representations of the observables.
+        Returns: A tuple containing two entries: the quantum circuits for the states and observables.
         """
         self._preprocessed_circuits = self._preprocessing()
         return self._preprocessed_circuits
@@ -185,15 +183,16 @@ class Estimator(QiskitEstimator):  # type: ignore[misc]
         approximation_strategy = str(options.get("approximation_strategy", "fidelity"))
         seed = cast("int", options.get("seed_simulator", -1))
 
+        qc = load(circ)
         sim = CircuitSimulator(
-            circ,
+            qc,
             approximation_step_fidelity=approximation_step_fidelity,
             approximation_steps=approximation_steps,
             approximation_strategy=approximation_strategy,
             seed=seed,
         )
 
-        return [sim.expectation_value(observable=obs) for obs in obs_circ_list]
+        return [sim.expectation_value(observable=load(obs)) for obs in obs_circ_list]
 
     @staticmethod
     def _postprocessing(result_list: list[float], accum: list[int], metadata: list[dict[str, Any]]) -> EstimatorResult:

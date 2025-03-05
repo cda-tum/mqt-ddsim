@@ -5,7 +5,6 @@
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Edge.hpp"
-#include "dd/Export.hpp"
 #include "dd/Node.hpp"
 #include "dd/Package.hpp"
 #include "dd/RealNumber.hpp"
@@ -15,14 +14,12 @@
 #include <cmath>
 #include <complex>
 #include <cstddef>
-#include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <queue>
 #include <random>
 #include <set>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -371,33 +368,6 @@ Simulator<Config>::getPathOfLeastResistance() const {
   }
 
   return {pathValue, std::string{result.rbegin(), result.rend()}};
-}
-
-template <class Config>
-void Simulator<Config>::exportDDtoGraphviz(std::ostream& os, const bool colored,
-                                           const bool edgeLabels,
-                                           const bool classic,
-                                           const bool memory,
-                                           const bool formatAsPolar) {
-  assert(os.good());
-  dd::toDot(rootEdge, os, colored, edgeLabels, classic, memory, formatAsPolar);
-}
-
-template <class Config>
-std::string Simulator<Config>::exportDDtoGraphvizString(
-    const bool colored, const bool edgeLabels, const bool classic,
-    const bool memory, const bool formatAsPolar) {
-  std::ostringstream oss{};
-  exportDDtoGraphviz(oss, colored, edgeLabels, classic, memory, formatAsPolar);
-  return oss.str();
-}
-
-template <class Config>
-void Simulator<Config>::exportDDtoGraphvizFile(
-    const std::string& filename, const bool colored, const bool edgeLabels,
-    const bool classic, const bool memory, const bool formatAsPolar) {
-  std::ofstream ofs(filename);
-  exportDDtoGraphviz(ofs, colored, edgeLabels, classic, memory, formatAsPolar);
 }
 
 template class Simulator<dd::DDPackageConfig>;

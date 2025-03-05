@@ -8,11 +8,14 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
 
+import numpy as np
 from qiskit import QiskitError
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 from qiskit.utils.multiprocessing import local_hardware_info
+
+from mqt.core import load
 
 from .header import DDSIMHeader
 from .pyddsim import HybridCircuitSimulator, HybridMode
@@ -81,7 +84,8 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
             msg = f"Simulation mode{mode} not supported by hybrid simulator. Available modes are 'amplitude' and 'dd'."
             raise QiskitError(msg)
 
-        sim = HybridCircuitSimulator(qc, seed=seed, mode=hybrid_mode, nthreads=nthreads)
+        circuit = load(qc)
+        sim = HybridCircuitSimulator(circuit, seed=seed, mode=hybrid_mode, nthreads=nthreads)
 
         shots = options.get("shots", 1024)
         if self._SHOW_STATE_VECTOR and shots > 0:
@@ -94,7 +98,7 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
             counts={hex(int(result, 2)): count for result, count in counts.items()},
             statevector=None
             if not self._SHOW_STATE_VECTOR
-            else sim.get_vector()
+            else np.array(sim.get_constructed_dd().get_vector(), copy=False)
             if sim.get_mode() == HybridMode.DD
             else sim.get_final_amplitudes(),
             time_taken=end_time - start_time,

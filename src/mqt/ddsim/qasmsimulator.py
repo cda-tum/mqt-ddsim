@@ -6,11 +6,14 @@ import time
 import uuid
 from typing import TYPE_CHECKING, Any, Union, cast
 
+import numpy as np
 from qiskit import QuantumCircuit
 from qiskit.providers import BackendV2, Options
 from qiskit.result import Result
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
+
+from mqt.core import load
 
 from . import __version__
 from .header import DDSIMHeader
@@ -178,8 +181,9 @@ class QasmSimulatorBackend(BackendV2):  # type: ignore[misc]
         seed = cast("int", options.get("seed_simulator", -1))
         shots = cast("int", options.get("shots", 1024))
 
+        circuit = load(qc)
         sim = CircuitSimulator(
-            qc,
+            circuit,
             approximation_step_fidelity=approximation_step_fidelity,
             approximation_steps=approximation_steps,
             approximation_strategy=approximation_strategy,
@@ -190,7 +194,7 @@ class QasmSimulatorBackend(BackendV2):  # type: ignore[misc]
 
         data = ExperimentResultData(
             counts={hex(int(result, 2)): count for result, count in counts.items()},
-            statevector=None if not self._SHOW_STATE_VECTOR else sim.get_vector(),
+            statevector=None if not self._SHOW_STATE_VECTOR else np.array(sim.get_constructed_dd().get_vector()),
             time_taken=end_time - start_time,
         )
 

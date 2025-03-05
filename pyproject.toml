@@ -1,8 +1,9 @@
 [build-system]
 requires = [
-  "scikit-build-core>=0.10.1",
-  "setuptools-scm>=8.1",
-  "pybind11>=2.13.5",
+    "scikit-build-core>=0.11.0",
+    "setuptools-scm>=8.1",
+    "pybind11>=2.13.5",
+    "mqt.core>=3.0.0b5",
 ]
 build-backend = "scikit_build_core.build"
 
@@ -15,7 +16,8 @@ authors = [
     { name = "Stefan Hillmich", email = "stefan.hillmich@scch.at" },
 ]
 keywords = ["MQT", "quantum-computing", "design-automation", "quantum-circuit-sim", "simulation"]
-license = { file = "LICENSE.md" }
+license = "MIT"
+license-files = ["LICENSE.md"]
 
 classifiers = [
     "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
@@ -24,7 +26,6 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: C++",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
@@ -38,38 +39,9 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "qiskit[qasm3-import]>=1.0.0"
+    "mqt.core[qiskit]>=3.0.0b5",
 ]
 dynamic = ["version"]
-
-[project.optional-dependencies]
-tnflow = [
-    "cotengra",
-    "sparse",
-    "opt-einsum",
-    "quimb",
-    "pandas",
-    "numpy",
-    "kahypar",
-    "networkx",
-]
-test = ["pytest>=7.2"]
-coverage = ["mqt.ddsim[test]", "pytest-cov>=4"]
-docs = [
-    "mqt.ddsim[tnflow]",
-    "furo>=2023.9.10",
-    "setuptools-scm>=8.1",
-    "sphinxcontrib-bibtex>=2.4.2",
-    "sphinx-copybutton>=0.5",
-    "ipykernel",
-    "nbsphinx",
-    "breathe",
-    "sphinxext-opengraph>=0.9",
-    "sphinx-autodoc-typehints",
-    "qiskit[visualization]",
-    "graphviz",
-]
-dev = ["mqt.ddsim[tnflow, coverage, docs]"]
 
 [project.urls]
 Homepage = "https://github.com/cda-tum/mqt-ddsim"
@@ -116,6 +88,7 @@ sdist.exclude = [
 BUILD_MQT_DDSIM_TESTS = "OFF"
 BUILD_MQT_DDSIM_BINDINGS = "ON"
 BUILD_MQT_DDSIM_CLI = "OFF"
+ENABLE_IPO = "ON"
 
 [[tool.scikit-build.overrides]]
 if.python-version = ">=3.13"
@@ -179,6 +152,7 @@ warn_unreachable = true
 
 [tool.ruff]
 line-length = 120
+namespace-packages = ["mqt"]
 preview = true
 unsafe-fixes = true
 
@@ -294,15 +268,30 @@ manylinux-aarch64-image = "manylinux_2_28"
 manylinux-ppc64le-image = "manylinux_2_28"
 manylinux-s390x-image = "manylinux_2_28"
 
+# The mqt-core shared libraries are provided by the mqt-core Python package.
+# They should not be vendorized into the mqt-qcec wheel. This requires
+# excluding the shared libraries from the repair process.
+
 [tool.cibuildwheel.linux]
 environment = { DEPLOY = "ON" }
+# The SOVERSION needs to be updated when the shared libraries are updated.
+repair-wheel-command = """auditwheel repair -w {dest_dir} {wheel} \
+--exclude libmqt-core-ir.so.3.0 \
+--exclude libmqt-core-qasm.so.3.0 \
+--exclude libmqt-core-circuit-optimizer.so.3.0 \
+--exclude libmqt-core-dd.so.3.0"""
 
 [tool.cibuildwheel.macos]
 environment = { MACOSX_DEPLOYMENT_TARGET = "10.15" }
+repair-wheel-command = "delocate-wheel --require-archs {delocate_archs} -w {dest_dir} -v {wheel} --ignore-missing-dependencies"
 
 [tool.cibuildwheel.windows]
-before-build = "pip install delvewheel>=1.7.3"
-repair-wheel-command = "delvewheel repair -v -w {dest_dir} {wheel} --namespace-pkg mqt"
+before-build = "uv pip install delvewheel>=1.9.0"
+repair-wheel-command = """delvewheel repair -w {dest_dir} {wheel} --namespace-pkg mqt \
+--exclude mqt-core-ir.dll \
+--exclude mqt-core-qasm.dll \
+--exclude mqt-core-circuit-optimizer.dll \
+--exclude mqt-core-dd.dll"""
 environment = { CMAKE_ARGS = "-T ClangCL" }
 
 [[tool.cibuildwheel.overrides]]
@@ -311,4 +300,45 @@ environment = { MACOSX_DEPLOYMENT_TARGET = "11.0" }
 
 
 [tool.uv]
+required-version = ">=0.5.20"
 reinstall-package = ["mqt.ddsim"]
+
+
+[tool.uv.sources]
+mqt-ddsim = { workspace = true }
+
+[dependency-groups]
+build = [
+  "pybind11>=2.13.6",
+  "scikit-build-core>=0.11.0",
+  "setuptools-scm>=8.1",
+  "mqt.core>=3.0.0b5",
+]
+docs = [
+  "furo>=2024.8.6",
+  "qiskit[visualization]>=1.0.0",
+  "setuptools-scm>=8.1",
+  "sphinx-autoapi>=3.6.0",
+  "sphinx-copybutton>=0.5.2",
+  "sphinx-design>=0.6.1",
+  "sphinxcontrib-bibtex>=2.6.3",
+  "sphinxcontrib-svg2pdfconverter>=1.2.3",
+  "sphinxext-opengraph>=0.9.1",
+  "ipykernel>=6.29.5",
+  "nbsphinx>=0.9.6",
+  "sphinx-autodoc-typehints>=2.3.0",
+  "sphinx>=7.4.7",
+  "sphinx>=8.1.3; python_version >= '3.10'",
+  "sphinx>=8.2.3; python_version >= '3.11'",
+  "breathe>=4.36.0",
+  "graphviz>=0.20.3",
+]
+test = [
+  "pytest>=8.3.4",
+  "pytest-cov>=6",
+]
+dev = [
+  {include-group = "build"},
+  {include-group = "docs"},
+  {include-group = "test"},
+]

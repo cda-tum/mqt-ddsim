@@ -8,7 +8,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <ostream>
 
 class UnitarySimulator
     : public CircuitSimulator<dd::UnitarySimulatorDDPackageConfig> {
@@ -33,12 +32,6 @@ public:
   [[nodiscard]] double getConstructionTime() const { return constructionTime; }
   [[nodiscard]] std::size_t getFinalNodeCount() const { return e.size(); }
   [[nodiscard]] std::size_t getMaxNodeCount() const override;
-
-protected:
-  /// See Simulator<Config>::exportDDtoGraphviz
-  void exportDDtoGraphviz(std::ostream& os, bool colored, bool edgeLabels,
-                          bool classic, bool memory,
-                          bool formatAsPolar) override;
 
 private:
   qc::MatrixDD e{};

@@ -10,10 +10,11 @@
 #include "PathSimulator.hpp"
 #include "StochasticNoiseSimulator.hpp"
 #include "UnitarySimulator.hpp"
-#include "dd/FunctionalityConstruction.hpp"
-#include "python/qiskit/QuantumCircuit.hpp"
 
+#include <cstddef>
+#include <list>
 #include <memory>
+#include <optional>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -21,31 +22,13 @@
 namespace py = pybind11;
 using namespace pybind11::literals;
 
-static qc::QuantumComputation importCircuit(const py::object& circ) {
-  const py::object quantumCircuit =
-      py::module::import("qiskit").attr("QuantumCircuit");
-
-  auto qc = qc::QuantumComputation();
-
-  if (py::isinstance<py::str>(circ)) {
-    const auto file = circ.cast<std::string>();
-    qc.import(file);
-  } else if (py::isinstance(circ, quantumCircuit)) {
-    qc::qiskit::QuantumCircuit::import(qc, circ);
-  } else {
-    throw std::runtime_error("PyObject is neither py::str nor QuantumCircuit");
-  }
-
-  return qc;
-}
-
 template <class Simulator, typename... Args>
 std::unique_ptr<Simulator>
-constructSimulator(const py::object& circ, const double stepFidelity,
-                   const unsigned int stepNumber,
+constructSimulator(const qc::QuantumComputation& circ,
+                   const double stepFidelity, const unsigned int stepNumber,
                    const std::string& approximationStrategy,
                    const std::int64_t seed, Args&&... args) {
-  auto qc = std::make_unique<qc::QuantumComputation>(importCircuit(circ));
+  auto qc = std::make_unique<qc::QuantumComputation>(circ);
   const auto approx =
       ApproximationInfo{stepFidelity, stepNumber,
                         ApproximationInfo::fromString(approximationStrategy)};
@@ -63,85 +46,11 @@ constructSimulator(const py::object& circ, const double stepFidelity,
 }
 
 template <class Simulator, typename... Args>
-std::unique_ptr<Simulator> constructSimulatorWithoutSeed(const py::object& circ,
-                                                         Args&&... args) {
+std::unique_ptr<Simulator>
+constructSimulatorWithoutSeed(const qc::QuantumComputation& circ,
+                              Args&&... args) {
   return constructSimulator<Simulator>(circ, 1., 1, "fidelity", -1,
                                        std::forward<Args>(args)...);
-}
-
-void getNumPyMatrixRec(const qc::MatrixDD& e, const std::complex<dd::fp>& amp,
-                       std::size_t i, std::size_t j, std::size_t dim,
-                       std::complex<dd::fp>* mat, std::size_t level) {
-  // calculate new accumulated amplitude
-  const auto c = amp * static_cast<std::complex<dd::fp>>(e.w);
-
-  // base case
-  if (level == 0U) {
-    mat[i * dim + j] =
-        c; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    return;
-  }
-
-  const auto nextLevel = static_cast<dd::Qubit>(level - 1U);
-  const std::size_t x = i | (1 << nextLevel);
-  const std::size_t y = j | (1 << nextLevel);
-  if (e.isTerminal() || e.p->v < nextLevel) {
-    getNumPyMatrixRec(e, c, i, j, dim, mat, nextLevel);
-    getNumPyMatrixRec(e, c, x, y, dim, mat, nextLevel);
-    return;
-  }
-
-  const auto coords = {std::pair{i, j}, {i, y}, {x, j}, {x, y}};
-  std::size_t k = 0U;
-  for (const auto& [a, b] : coords) {
-    if (auto& f = e.p->e[k++]; !f.w.exactlyZero()) {
-      getNumPyMatrixRec(f, c, a, b, dim, mat, nextLevel);
-    }
-  }
-}
-
-void getNumPyMatrix(UnitarySimulator& sim,
-                    py::array_t<std::complex<dd::fp>>& matrix) {
-  const auto& e = sim.getConstructedDD();
-  py::buffer_info matrixBuffer = matrix.request();
-  auto* dataPtr = static_cast<std::complex<dd::fp>*>(matrixBuffer.ptr);
-  const auto rows = matrixBuffer.shape[0];
-  const auto cols = matrixBuffer.shape[1];
-  if (rows != cols) {
-    throw std::runtime_error("Provided matrix is not a square matrix.");
-  }
-
-  const std::size_t dim = 1ULL << sim.getNumberOfQubits();
-  if (static_cast<std::size_t>(rows) != dim) {
-    throw std::runtime_error("Provided matrix does not have the right size.");
-  }
-
-  getNumPyMatrixRec(e, std::complex<dd::fp>{1.0, 0.0}, 0, 0, dim, dataPtr,
-                    sim.getNumberOfQubits());
-}
-
-void dumpTensorNetwork(const py::object& circ, const std::string& filename) {
-  const py::object quantumCircuit =
-      py::module::import("qiskit").attr("QuantumCircuit");
-
-  std::unique_ptr<qc::QuantumComputation> qc =
-      std::make_unique<qc::QuantumComputation>();
-
-  if (py::isinstance<py::str>(circ)) {
-    auto&& file1 = circ.cast<std::string>();
-    qc->import(file1);
-  } else if (py::isinstance(circ, quantumCircuit)) {
-    qc::qiskit::QuantumCircuit::import(*qc, circ);
-  } else {
-    throw std::runtime_error("PyObject is neither py::str nor QuantumCircuit");
-  }
-  std::ofstream ofs(filename);
-  dd::dumpTensorNetwork(ofs, *qc);
-}
-
-dd::fp expectationValue(CircuitSimulator<>& sim, const py::object& observable) {
-  const auto observableCircuit = importCircuit(observable);
-  return sim.expectationValue(observableCircuit);
 }
 
 template <class Sim>
@@ -169,16 +78,7 @@ py::class_<Sim> createSimulator(py::module_ m, const std::string& name) {
       .def("get_tolerance", &Sim::getTolerance,
            "Get the tolerance for the DD package.")
       .def("set_tolerance", &Sim::setTolerance, "tol"_a,
-           "Set the tolerance for the DD package.")
-      .def("export_dd_to_graphviz_str", &Sim::exportDDtoGraphvizString,
-           "colored"_a = true, "edge_labels"_a = false, "classic"_a = false,
-           "memory"_a = false, "format_as_polar"_a = true,
-           "Get a Graphviz representation of the currently stored DD.")
-      .def("export_dd_to_graphviz_file", &Sim::exportDDtoGraphvizFile,
-           "filename"_a, "colored"_a = true, "edge_labels"_a = false,
-           "classic"_a = false, "memory"_a = false, "format_as_polar"_a = true,
-           "Write a Graphviz representation of the currently stored DD to a "
-           "file.");
+           "Set the tolerance for the DD package.");
 
   if constexpr (std::is_same_v<Sim, UnitarySimulator>) {
     sim.def("construct", &Sim::construct,
@@ -187,13 +87,14 @@ py::class_<Sim> createSimulator(py::module_ m, const std::string& name) {
     sim.def("simulate", &Sim::simulate, "shots"_a,
             "Simulate the circuit and return the result as a dictionary of "
             "counts.");
-    sim.def("get_vector", &Sim::getVector,
-            "Get the state vector resulting from the simulation.");
+    sim.def("get_constructed_dd", &Sim::getCurrentDD,
+            "Get the vector DD resulting from the simulation.");
   }
   return sim;
 }
 
 PYBIND11_MODULE(pyddsim, m, py::mod_gil_not_used()) {
+  py::module::import("mqt.core.dd");
   m.doc() = "Python interface for the MQT DDSIM quantum circuit simulator";
 
   // Circuit Simulator
@@ -203,7 +104,8 @@ PYBIND11_MODULE(pyddsim, m, py::mod_gil_not_used()) {
       .def(py::init<>(&constructSimulator<CircuitSimulator<>>), "circ"_a,
            "approximation_step_fidelity"_a = 1., "approximation_steps"_a = 1,
            "approximation_strategy"_a = "fidelity", "seed"_a = -1)
-      .def("expectation_value", &expectationValue, "observable"_a);
+      .def("expectation_value", &CircuitSimulator<>::expectationValue,
+           "observable"_a);
 
   // Stoch simulator
   auto stochasticNoiseSimulator =
@@ -255,7 +157,6 @@ PYBIND11_MODULE(pyddsim, m, py::mod_gil_not_used()) {
       .value("sequential", PathSimulator<>::Configuration::Mode::Sequential)
       .value("pairwise_recursive",
              PathSimulator<>::Configuration::Mode::PairwiseRecursiveGrouping)
-      .value("cotengra", PathSimulator<>::Configuration::Mode::Cotengra)
       .value("bracket", PathSimulator<>::Configuration::Mode::BracketGrouping)
       .value("alternating", PathSimulator<>::Configuration::Mode::Alternating)
       .value("gate_cost", PathSimulator<>::Configuration::Mode::GateCost)
@@ -323,12 +224,6 @@ PYBIND11_MODULE(pyddsim, m, py::mod_gil_not_used()) {
       .def("get_mode", &UnitarySimulator::getMode)
       .def("get_construction_time", &UnitarySimulator::getConstructionTime)
       .def("get_final_node_count", &UnitarySimulator::getFinalNodeCount)
-      .def("get_max_node_count", &UnitarySimulator::getMaxNodeCount);
-
-  // Miscellaneous functions
-  m.def("get_matrix", &getNumPyMatrix, "sim"_a, "mat"_a);
-
-  m.def("dump_tensor_network", &dumpTensorNetwork,
-        "dump a tensor network representation of the given circuit", "circ"_a,
-        "filename"_a);
+      .def("get_max_node_count", &UnitarySimulator::getMaxNodeCount)
+      .def("get_constructed_dd", &UnitarySimulator::getConstructedDD);
 }

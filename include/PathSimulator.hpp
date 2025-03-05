@@ -67,7 +67,6 @@ public:
       PairwiseRecursiveGrouping,
       BracketGrouping,
       Alternating,
-      Cotengra,
       GateCost
     };
 
@@ -106,10 +105,7 @@ public:
       if (mode == "alternating" || mode == "3") {
         return Mode::Alternating;
       }
-      if (mode == "cotengra" || mode == "4") {
-        return Mode::Cotengra;
-      }
-      if (mode == "gate_cost" || mode == "5") {
+      if (mode == "gate_cost" || mode == "4") {
         return Mode::GateCost;
       }
 
@@ -126,8 +122,6 @@ public:
         return "bracket";
       case Mode::Alternating:
         return "alternating";
-      case Mode::Cotengra:
-        return "cotengra";
       case Mode::GateCost:
         return "gate_cost";
       default:
@@ -181,8 +175,6 @@ public:
       break;
     case Configuration::Mode::PairwiseRecursiveGrouping:
       generatePairwiseRecursiveGroupingSimulationPath();
-      break;
-    case Configuration::Mode::Cotengra:
       break;
     case Configuration::Mode::Alternating:
       generateAlternatingSimulationPath(configuration.startingPoint);

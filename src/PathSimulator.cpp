@@ -437,7 +437,7 @@ template <class Config> void PathSimulator<Config>::constructTaskGraph() {
         results.emplace(leftID, zeroState);
       } else {
         const auto& op = CircuitSimulator<Config>::qc->at(leftID - 1);
-        qc::MatrixDD opDD = dd::getDD(op.get(), *Simulator<Config>::dd);
+        qc::MatrixDD opDD = dd::getDD(*op, *Simulator<Config>::dd);
         Simulator<Config>::dd->incRef(opDD);
         results.emplace(leftID, opDD);
       }
@@ -449,7 +449,7 @@ template <class Config> void PathSimulator<Config>::constructTaskGraph() {
                                  "of the simulation path member.");
       }
       const auto& op = CircuitSimulator<Config>::qc->at(rightID - 1);
-      qc::MatrixDD opDD = dd::getDD(op.get(), *Simulator<Config>::dd);
+      qc::MatrixDD opDD = dd::getDD(*op, *Simulator<Config>::dd);
       Simulator<Config>::dd->incRef(opDD);
       results.emplace(rightID, opDD);
     }
