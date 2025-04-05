@@ -1,11 +1,9 @@
 #include "GroverSimulator.hpp"
 
-#include "Definitions.hpp"
-#include "Simulator.hpp"
 #include "dd/DDDefinitions.hpp"
-#include "dd/DDpackageConfig.hpp"
 #include "dd/Edge.hpp"
 #include "dd/FunctionalityConstruction.hpp"
+#include "ir/Definitions.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "ir/operations/Control.hpp"
 
@@ -15,9 +13,8 @@
 #include <map>
 #include <string>
 
-template <class Config>
 std::map<std::string, std::size_t>
-GroverSimulator<Config>::simulate(std::size_t shots) {
+GroverSimulator::simulate(std::size_t shots) {
   // Setup X on the last, Hadamard on all qubits
   qc::QuantumComputation qcSetup(nQubits + nAnciallae);
   qcSetup.x(nQubits);
@@ -25,8 +22,7 @@ GroverSimulator<Config>::simulate(std::size_t shots) {
     qcSetup.h(i);
   }
 
-  const dd::Edge setupOp{
-      dd::buildFunctionality(qcSetup, *Simulator<Config>::dd)};
+  const dd::Edge setupOp{dd::buildFunctionality(qcSetup, *dd)};
 
   // Build the oracle
   qc::QuantumComputation qcOracle(nQubits + nAnciallae);
@@ -37,8 +33,7 @@ GroverSimulator<Config>::simulate(std::size_t shots) {
   }
   qcOracle.mcz(controls, nQubits);
 
-  const dd::Edge oracleOp{
-      dd::buildFunctionality(qcOracle, *Simulator<Config>::dd)};
+  const dd::Edge oracleOp{dd::buildFunctionality(qcOracle, *dd)};
 
   // Build the diffusion stage.
   qc::QuantumComputation qcDiffusion(nQubits + nAnciallae);
@@ -67,49 +62,37 @@ GroverSimulator<Config>::simulate(std::size_t shots) {
     qcDiffusion.h(i);
   }
 
-  const dd::Edge diffusionOp{
-      dd::buildFunctionality(qcDiffusion, *Simulator<Config>::dd)};
+  const dd::Edge diffusionOp{dd::buildFunctionality(qcDiffusion, *dd)};
 
-  const dd::Edge fullIteration{
-      Simulator<Config>::dd->multiply(oracleOp, diffusionOp)};
-  Simulator<Config>::dd->incRef(fullIteration);
+  const dd::Edge fullIteration{dd->multiply(oracleOp, diffusionOp)};
+  dd->incRef(fullIteration);
 
   assert(nQubits + nAnciallae <= std::numeric_limits<dd::Qubit>::max());
-  Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(
-      static_cast<dd::Qubit>(nQubits + nAnciallae));
-  Simulator<Config>::rootEdge =
-      Simulator<Config>::dd->multiply(setupOp, Simulator<Config>::rootEdge);
-  Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
+  rootEdge = dd->makeZeroState(static_cast<dd::Qubit>(nQubits + nAnciallae));
+  rootEdge = dd->multiply(setupOp, rootEdge);
+  dd->incRef(rootEdge);
 
   std::size_t jPre = 0;
 
   while ((iterations - jPre) % 8 != 0) {
-    // std::clog << "[INFO]  Pre-Iteration " << j_pre+1 << " of " <<
-    // iterations%8 << " -- size:" << dd->size(rootEdge)  << "\n";
-    auto tmp = Simulator<Config>::dd->multiply(fullIteration,
-                                               Simulator<Config>::rootEdge);
-    Simulator<Config>::dd->incRef(tmp);
-    Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
-    Simulator<Config>::rootEdge = tmp;
-    Simulator<Config>::dd->garbageCollect();
+    auto tmp = dd->multiply(fullIteration, rootEdge);
+    dd->incRef(tmp);
+    dd->decRef(rootEdge);
+    rootEdge = tmp;
+    dd->garbageCollect();
     jPre++;
   }
 
   for (std::size_t j = jPre; j < iterations; j += 8) {
-    // std::clog << "[INFO]  Iteration " << j+1 << " of " << iterations << " --
-    // size:" << dd->size(rootEdge)  << "\n";
-    auto tmp = Simulator<Config>::dd->multiply(fullIteration,
-                                               Simulator<Config>::rootEdge);
+    auto tmp = dd->multiply(fullIteration, rootEdge);
     for (std::size_t i = 0; i < 7; ++i) {
-      tmp = Simulator<Config>::dd->multiply(fullIteration, tmp);
+      tmp = dd->multiply(fullIteration, tmp);
     }
-    Simulator<Config>::dd->incRef(tmp);
-    Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
-    Simulator<Config>::rootEdge = tmp;
-    Simulator<Config>::dd->garbageCollect();
+    dd->incRef(tmp);
+    dd->decRef(rootEdge);
+    rootEdge = tmp;
+    dd->garbageCollect();
   }
 
-  return Simulator<Config>::measureAllNonCollapsing(shots);
+  return measureAllNonCollapsing(shots);
 }
-
-template class GroverSimulator<dd::DDPackageConfig>;

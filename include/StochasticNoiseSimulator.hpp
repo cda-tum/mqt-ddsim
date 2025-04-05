@@ -1,9 +1,9 @@
 #pragma once
 
 #include "CircuitSimulator.hpp"
-#include "Definitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/NoiseFunctionality.hpp"
+#include "ir/Definitions.hpp"
 #include "ir/QuantumComputation.hpp"
 
 #include <cstddef>
@@ -16,8 +16,7 @@
 #include <utility>
 #include <vector>
 
-class StochasticNoiseSimulator
-    : public CircuitSimulator<dd::StochasticNoiseSimulatorDDPackageConfig> {
+class StochasticNoiseSimulator final : public CircuitSimulator {
 public:
   StochasticNoiseSimulator(
       std::unique_ptr<qc::QuantumComputation>&& qc_,
@@ -25,7 +24,8 @@ public:
       std::string noiseEffects_ = "APD", double noiseProbability_ = 0.001,
       std::optional<double> ampDampingProbability_ = std::nullopt,
       double multiQubitGateFactor_ = 2)
-      : CircuitSimulator(std::move(qc_), approximationInfo_),
+      : CircuitSimulator(std::move(qc_), approximationInfo_,
+                         dd::STOCHASTIC_NOISE_SIMULATOR_DD_PACKAGE_CONFIG),
         noiseProbability(noiseProbability_),
         amplitudeDampingProb((ampDampingProbability_)
                                  ? ampDampingProbability_.value()
@@ -54,7 +54,8 @@ public:
       std::string noiseEffects_ = "APD", double noiseProbability_ = 0.001,
       std::optional<double> ampDampingProbability_ = std::nullopt,
       double multiQubitGateFactor_ = 2)
-      : CircuitSimulator(std::move(qc_), approximationInfo_, seed_),
+      : CircuitSimulator(std::move(qc_), approximationInfo_, seed_,
+                         dd::STOCHASTIC_NOISE_SIMULATOR_DD_PACKAGE_CONFIG),
         noiseProbability(noiseProbability_),
         amplitudeDampingProb((ampDampingProbability_)
                                  ? ampDampingProbability_.value()

@@ -1,9 +1,9 @@
 #include "CircuitSimulator.hpp"
-#include "Definitions.hpp"
 #include "algorithms/BernsteinVazirani.hpp"
 #include "algorithms/QFT.hpp"
 #include "algorithms/QPE.hpp"
 #include "dd/DDDefinitions.hpp"
+#include "ir/Definitions.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "ir/operations/OpType.hpp"
 
@@ -293,7 +293,7 @@ TEST(CircuitSimTest, BernsteinVaziraniDynamicTest) {
   const qc::BVBitString expected{expectedString};
   auto qc = std::make_unique<qc::QuantumComputation>(
       qc::createIterativeBernsteinVazirani(expected, n));
-  const auto circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
+  const auto circSim = std::make_unique<CircuitSimulator>(std::move(qc), 23);
   const auto result = circSim->simulate(1024U);
   EXPECT_EQ(result.size(), 1);
   EXPECT_EQ(result.at(expectedString), 1024);
@@ -302,7 +302,7 @@ TEST(CircuitSimTest, BernsteinVaziraniDynamicTest) {
 TEST(CircuitSimTest, QPEDynamicTest) {
   constexpr std::size_t n = 3;
   auto qc = std::make_unique<qc::QuantumComputation>(qc::createIterativeQPE(n));
-  const auto circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
+  const auto circSim = std::make_unique<CircuitSimulator>(std::move(qc), 23);
   const auto result = circSim->simulate(1024U);
   EXPECT_GE(result.size(), 1);
 }
@@ -310,7 +310,7 @@ TEST(CircuitSimTest, QPEDynamicTest) {
 TEST(CircuitSimTest, QFTDynamicTest) {
   constexpr std::size_t n = 3;
   auto qc = std::make_unique<qc::QuantumComputation>(qc::createIterativeQFT(n));
-  const auto circSim = std::make_unique<CircuitSimulator<>>(std::move(qc), 23);
+  const auto circSim = std::make_unique<CircuitSimulator>(std::move(qc), 23);
   const auto result = circSim->simulate(1024U);
   EXPECT_GE(result.size(), 1);
 }

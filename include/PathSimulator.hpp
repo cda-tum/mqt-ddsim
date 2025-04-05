@@ -3,8 +3,7 @@
 #include "CircuitSimulator.hpp"
 #include "Simulator.hpp"
 #include "circuit_optimizer/CircuitOptimizer.hpp"
-#include "dd/DDpackageConfig.hpp"
-#include "dd/Package_fwd.hpp"
+#include "dd/Node.hpp"
 #include "ir/QuantumComputation.hpp"
 
 #include <cstddef>
@@ -25,8 +24,7 @@
 #include <variant>
 #include <vector>
 
-template <class Config = dd::DDPackageConfig>
-class PathSimulator : public CircuitSimulator<Config> {
+class PathSimulator final : public CircuitSimulator {
 public:
   struct SimulationPath {
     struct Step {
@@ -151,21 +149,19 @@ public:
 
   explicit PathSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
                          Configuration configuration = Configuration())
-      : CircuitSimulator<Config>(std::move(qc_)), executor(1) {
+      : CircuitSimulator(std::move(qc_)), executor(1) {
     if (configuration.seed != 0) {
       // override seed in case a non-trivial one is given
-      Simulator<Config>::mt.seed(Simulator<Config>::seed);
+      Simulator::mt.seed(Simulator::seed);
     }
 
     // remove final measurements implement measurement support for task-based
     // simulation
-    qc::CircuitOptimizer::removeFinalMeasurements(
-        *(CircuitSimulator<Config>::qc));
+    qc::CircuitOptimizer::removeFinalMeasurements(*(CircuitSimulator::qc));
 
     // case distinction for the starting point of the alternating strategy
     if (configuration.startingPoint == 0) {
-      configuration.startingPoint =
-          (CircuitSimulator<Config>::qc->getNops()) / 2;
+      configuration.startingPoint = (CircuitSimulator::qc->getNops()) / 2;
     }
 
     // Add new strategies here
@@ -204,8 +200,8 @@ public:
   void setSimulationPath(const typename SimulationPath::Components& components,
                          bool assumeCorrectOrder = false) {
     simulationPath =
-        SimulationPath(CircuitSimulator<Config>::qc->getNops() + 1, components,
-                       CircuitSimulator<Config>::qc.get(), assumeCorrectOrder);
+        SimulationPath(CircuitSimulator::qc->getNops() + 1, components,
+                       CircuitSimulator::qc.get(), assumeCorrectOrder);
   }
 
   // Add new strategies here
@@ -218,7 +214,7 @@ public:
 
 private:
   std::unordered_map<std::size_t, tf::Task> tasks;
-  std::unordered_map<std::size_t, std::variant<qc::VectorDD, qc::MatrixDD>>
+  std::unordered_map<std::size_t, std::variant<dd::VectorDD, dd::MatrixDD>>
       results;
 
   tf::Taskflow taskflow;

@@ -22,14 +22,17 @@
 #include <utility>
 #include <vector>
 
-template <class Config = dd::DDPackageConfig> class Simulator {
+class Simulator {
 public:
-  explicit Simulator(const std::uint64_t randomSeed)
+  explicit Simulator(const std::uint64_t randomSeed,
+                     const dd::DDPackageConfig& config = dd::DDPackageConfig())
       : seed(randomSeed), hasFixedSeed(true) {
     mt.seed(randomSeed);
-  };
+    dd = std::make_unique<dd::Package>(dd::Package::DEFAULT_QUBITS, config);
+  }
 
-  explicit Simulator() : hasFixedSeed(false) {
+  explicit Simulator(const dd::DDPackageConfig& config = dd::DDPackageConfig())
+      : hasFixedSeed(false) {
     // this is probably overkill but better safe than sorry
     std::array<std::mt19937_64::result_type, std::mt19937_64::state_size>
         randomData{};
@@ -38,7 +41,8 @@ public:
                   [&rd]() { return rd(); });
     std::seed_seq seeds(std::begin(randomData), std::end(randomData));
     mt.seed(seeds);
-  };
+    dd = std::make_unique<dd::Package>(dd::Package::DEFAULT_QUBITS, config);
+  }
 
   virtual ~Simulator() = default;
 
@@ -72,19 +76,19 @@ public:
       std::vector<std::complex<dd::fp>>& amplitudes, std::size_t shots);
 
   [[nodiscard]] virtual std::size_t getActiveNodeCount() const {
-    return dd->template getUniqueTable<dd::vNode>().getNumActiveEntries();
+    return dd->getUniqueTable<dd::vNode>().getNumActiveEntries();
   }
 
   [[nodiscard]] virtual std::size_t getMaxNodeCount() const {
-    return dd->template getUniqueTable<dd::vNode>().getPeakNumActiveEntries();
+    return dd->getUniqueTable<dd::vNode>().getPeakNumActiveEntries();
   }
 
   [[nodiscard]] virtual std::size_t getMaxMatrixNodeCount() const {
-    return dd->template getUniqueTable<dd::mNode>().getPeakNumActiveEntries();
+    return dd->getUniqueTable<dd::mNode>().getPeakNumActiveEntries();
   }
 
   [[nodiscard]] virtual std::size_t getMatrixActiveNodeCount() const {
-    return dd->template getUniqueTable<dd::mNode>().getNumActiveEntries();
+    return dd->getUniqueTable<dd::mNode>().getNumActiveEntries();
   }
 
   [[nodiscard]] virtual std::size_t countNodesFromRoot() {
@@ -116,7 +120,7 @@ public:
                           std::vector<std::pair<double, dd::vNode*>>>>
   getNodeContributions(const dd::vEdge& edge) const;
 
-  double approximateByFidelity(std::unique_ptr<dd::Package<Config>>& localDD,
+  double approximateByFidelity(std::unique_ptr<dd::Package>& localDD,
                                dd::vEdge& edge, double targetFidelity,
                                bool allLevels, bool actuallyRemoveNodes,
                                bool verbose = false);
@@ -126,7 +130,7 @@ public:
                                  removeNodes, verbose);
   }
 
-  double approximateBySampling(std::unique_ptr<dd::Package<Config>>& localDD,
+  double approximateBySampling(std::unique_ptr<dd::Package>& localDD,
                                dd::vEdge& edge, std::size_t nSamples,
                                std::size_t threshold, bool actuallyRemoveNodes,
                                bool verbose = false);
@@ -136,12 +140,11 @@ public:
                                  verbose);
   }
 
-  dd::vEdge static removeNodes(std::unique_ptr<dd::Package<Config>>& localDD,
+  dd::vEdge static removeNodes(std::unique_ptr<dd::Package>& localDD,
                                dd::vEdge edge,
                                std::map<dd::vNode*, dd::vEdge>& dagEdges);
 
-  std::unique_ptr<dd::Package<Config>> dd =
-      std::make_unique<dd::Package<Config>>();
+  std::unique_ptr<dd::Package> dd;
   dd::vEdge rootEdge = dd::vEdge::one();
 
 protected:

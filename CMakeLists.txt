@@ -1,9 +1,9 @@
 # set required cmake version
-cmake_minimum_required(VERSION 3.19...3.30)
+cmake_minimum_required(VERSION 3.24...4.0)
 
 project(
   mqt-ddsim
-  LANGUAGES CXX
+  LANGUAGES C CXX
   DESCRIPTION "MQT DDSIM - A quantum circuit simulator based on decision diagrams")
 
 option(BUILD_MQT_DDSIM_BINDINGS "Build the MQT DDSIM Python bindings" OFF)

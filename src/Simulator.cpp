@@ -3,7 +3,6 @@
 #include "dd/ComplexNumbers.hpp"
 #include "dd/ComplexValue.hpp"
 #include "dd/DDDefinitions.hpp"
-#include "dd/DDpackageConfig.hpp"
 #include "dd/Edge.hpp"
 #include "dd/Node.hpp"
 #include "dd/Package.hpp"
@@ -27,9 +26,7 @@
 
 using CN = dd::ComplexNumbers;
 
-template <class Config>
-std::map<std::string, std::size_t>
-Simulator<Config>::sampleFromAmplitudeVectorInPlace(
+std::map<std::string, std::size_t> Simulator::sampleFromAmplitudeVectorInPlace(
     std::vector<std::complex<dd::fp>>& amplitudes, size_t shots) {
   // in-place prefix-sum calculation of probabilities
   std::inclusive_scan(
@@ -71,10 +68,10 @@ Simulator<Config>::sampleFromAmplitudeVectorInPlace(
  * @return vector of priority queues with each queue corresponding to a level of
  * the decision diagram
  */
-template <class Config>
+
 std::vector<std::priority_queue<std::pair<double, dd::vNode*>,
                                 std::vector<std::pair<double, dd::vNode*>>>>
-Simulator<Config>::getNodeContributions(const dd::vEdge& edge) const {
+Simulator::getNodeContributions(const dd::vEdge& edge) const {
   std::queue<dd::vNode*> q;
   std::map<dd::vNode*, dd::fp> probsMone;
 
@@ -135,11 +132,12 @@ Simulator<Config>::getNodeContributions(const dd::vEdge& edge) const {
  * @param verbose output information about the process and result
  * @return fidelity of the resulting quantum state
  */
-template <class Config>
-double Simulator<Config>::approximateByFidelity(
-    std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge,
-    double targetFidelity, bool allLevels, bool actuallyRemoveNodes,
-    bool verbose) {
+
+double Simulator::approximateByFidelity(std::unique_ptr<dd::Package>& localDD,
+                                        dd::vEdge& edge, double targetFidelity,
+                                        bool allLevels,
+                                        bool actuallyRemoveNodes,
+                                        bool verbose) {
   auto qq = getNodeContributions(edge);
   std::vector<dd::vNode*> nodesToRemove;
 
@@ -212,11 +210,11 @@ double Simulator<Config>::approximateByFidelity(
   return fidelity;
 }
 
-template <class Config>
-double Simulator<Config>::approximateBySampling(
-    std::unique_ptr<dd::Package<Config>>& localDD, dd::vEdge& edge,
-    std::size_t nSamples, std::size_t threshold, bool actuallyRemoveNodes,
-    bool verbose) {
+double Simulator::approximateBySampling(std::unique_ptr<dd::Package>& localDD,
+                                        dd::vEdge& edge, std::size_t nSamples,
+                                        std::size_t threshold,
+                                        bool actuallyRemoveNodes,
+                                        bool verbose) {
   assert(nSamples > threshold);
   std::map<dd::vNode*, unsigned int> visitedNodes;
   std::uniform_real_distribution<dd::fp> dist(0.0, 1.0L);
@@ -301,11 +299,9 @@ double Simulator<Config>::approximateBySampling(
   return fidelity;
 }
 
-template <class Config>
-dd::vEdge
-Simulator<Config>::removeNodes(std::unique_ptr<dd::Package<Config>>& localDD,
-                               dd::vEdge e,
-                               std::map<dd::vNode*, dd::vEdge>& dagEdges) {
+dd::vEdge Simulator::removeNodes(std::unique_ptr<dd::Package>& localDD,
+                                 dd::vEdge e,
+                                 std::map<dd::vNode*, dd::vEdge>& dagEdges) {
   if (e.isTerminal()) {
     return e;
   }
@@ -330,9 +326,8 @@ Simulator<Config>::removeNodes(std::unique_ptr<dd::Package<Config>>& localDD,
   return r;
 }
 
-template <class Config>
 std::pair<dd::ComplexValue, std::string>
-Simulator<Config>::getPathOfLeastResistance() const {
+Simulator::getPathOfLeastResistance() const {
   if (std::abs(dd::ComplexNumbers::mag2(rootEdge.w) - 1.0) > epsilon) {
     if (rootEdge.w.approximatelyZero()) {
       throw std::runtime_error(
@@ -369,8 +364,3 @@ Simulator<Config>::getPathOfLeastResistance() const {
 
   return {pathValue, std::string{result.rbegin(), result.rend()}};
 }
-
-template class Simulator<dd::DDPackageConfig>;
-template class Simulator<dd::UnitarySimulatorDDPackageConfig>;
-template class Simulator<dd::StochasticNoiseSimulatorDDPackageConfig>;
-template class Simulator<dd::DensityMatrixSimulatorDDPackageConfig>;
