@@ -18,8 +18,7 @@
 #include <string>
 #include <utility>
 
-class DeterministicNoiseSimulator
-    : public CircuitSimulator<dd::DensityMatrixSimulatorDDPackageConfig> {
+class DeterministicNoiseSimulator : public CircuitSimulator {
 public:
   DeterministicNoiseSimulator(
       std::unique_ptr<qc::QuantumComputation>&& qc_,
@@ -27,7 +26,8 @@ public:
       std::string noiseEffects_ = "APD", double noiseProbability_ = 0.001,
       std::optional<double> ampDampingProbability_ = std::nullopt,
       double multiQubitGateFactor_ = 2)
-      : CircuitSimulator(std::move(qc_), approximationInfo_),
+      : CircuitSimulator(std::move(qc_), approximationInfo_,
+                         dd::DENSITY_MATRIX_SIMULATOR_DD_PACKAGE_CONFIG),
         noiseEffects(std::move(noiseEffects_)),
         noiseProbSingleQubit(noiseProbability_),
         ampDampingProbSingleQubit(ampDampingProbability_
@@ -37,8 +37,9 @@ public:
         ampDampingProbMultiQubit(ampDampingProbSingleQubit *
                                  multiQubitGateFactor_),
         deterministicNoiseFunctionality(
-            dd, getNumberOfQubits(), noiseProbSingleQubit, noiseProbMultiQubit,
-            ampDampingProbSingleQubit, ampDampingProbMultiQubit, noiseEffects) {
+            *dd, CircuitSimulator::getNumberOfQubits(), noiseProbSingleQubit,
+            noiseProbMultiQubit, ampDampingProbSingleQubit,
+            ampDampingProbMultiQubit, noiseEffects) {
     dd::sanityCheckOfNoiseProbabilities(
         noiseProbability_, ampDampingProbSingleQubit, multiQubitGateFactor_);
   }
@@ -59,7 +60,8 @@ public:
       std::string noiseEffects_ = "APD", double noiseProbability_ = 0.001,
       std::optional<double> ampDampingProbability_ = std::nullopt,
       double multiQubitGateFactor_ = 2)
-      : CircuitSimulator(std::move(qc_), approximationInfo_, seed_),
+      : CircuitSimulator(std::move(qc_), approximationInfo_, seed_,
+                         dd::DENSITY_MATRIX_SIMULATOR_DD_PACKAGE_CONFIG),
         noiseEffects(std::move(noiseEffects_)),
         noiseProbSingleQubit(noiseProbability_),
         ampDampingProbSingleQubit(ampDampingProbability_
@@ -69,8 +71,9 @@ public:
         ampDampingProbMultiQubit(ampDampingProbSingleQubit *
                                  multiQubitGateFactor_),
         deterministicNoiseFunctionality(
-            dd, getNumberOfQubits(), noiseProbSingleQubit, noiseProbMultiQubit,
-            ampDampingProbSingleQubit, ampDampingProbMultiQubit, noiseEffects) {
+            *dd, CircuitSimulator::getNumberOfQubits(), noiseProbSingleQubit,
+            noiseProbMultiQubit, ampDampingProbSingleQubit,
+            ampDampingProbMultiQubit, noiseEffects) {
     dd::sanityCheckOfNoiseProbabilities(
         noiseProbability_, ampDampingProbSingleQubit, multiQubitGateFactor_);
   }
@@ -102,13 +105,13 @@ public:
   }
 
   [[nodiscard]] std::size_t countNodesFromRoot() override {
-    qc::DensityMatrixDD::alignDensityEdge(rootEdge);
+    dd::DensityMatrixDD::alignDensityEdge(rootEdge);
     const std::size_t tmp = rootEdge.size();
-    qc::DensityMatrixDD::setDensityMatrixTrue(rootEdge);
+    dd::DensityMatrixDD::setDensityMatrixTrue(rootEdge);
     return tmp;
   }
 
-  qc::DensityMatrixDD rootEdge{};
+  dd::DensityMatrixDD rootEdge{};
 
 private:
   std::string noiseEffects;

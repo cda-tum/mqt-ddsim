@@ -1,8 +1,6 @@
 #include "CircuitSimulator.hpp"
 
-#include "Simulator.hpp"
 #include "dd/DDDefinitions.hpp"
-#include "dd/DDpackageConfig.hpp"
 #include "dd/FunctionalityConstruction.hpp"
 #include "dd/Node.hpp"
 #include "dd/Operations.hpp"
@@ -19,10 +17,9 @@
 #include <stdexcept>
 #include <string>
 
-template <class Config>
 std::map<std::string, std::size_t>
-CircuitSimulator<Config>::simulate(std::size_t shots) {
-  const auto analysis = CircuitSimulator<Config>::analyseCircuit();
+CircuitSimulator::simulate(std::size_t shots) {
+  const auto analysis = analyseCircuit();
 
   // easiest case: all gates are unitary --> simulate once and sample away on
   // all qubits
@@ -73,8 +70,7 @@ CircuitSimulator<Config>::simulate(std::size_t shots) {
   return measurementCounter;
 }
 
-template <class Config>
-auto CircuitSimulator<Config>::analyseCircuit() -> CircuitAnalysis {
+auto CircuitSimulator::analyseCircuit() -> CircuitAnalysis {
   auto analysis = CircuitAnalysis{};
 
   for (auto& op : *qc) {
@@ -105,51 +101,37 @@ auto CircuitSimulator<Config>::analyseCircuit() -> CircuitAnalysis {
   return analysis;
 }
 
-template <class Config>
-dd::fp CircuitSimulator<Config>::expectationValue(
-    const qc::QuantumComputation& observable) {
+dd::fp
+CircuitSimulator::expectationValue(const qc::QuantumComputation& observable) {
   // simulate the circuit to get the state vector
   singleShot(true);
 
   // construct the DD for the observable
-  const auto observableDD =
-      dd::buildFunctionality(observable, *Simulator<Config>::dd);
+  const auto observableDD = dd::buildFunctionality(observable, *dd);
 
   // calculate the expectation value
-  return Simulator<Config>::dd->expectationValue(observableDD,
-                                                 Simulator<Config>::rootEdge);
+  return dd->expectationValue(observableDD, rootEdge);
 }
 
-template <class Config>
-void CircuitSimulator<Config>::initializeSimulation(const std::size_t nQubits) {
-  Simulator<Config>::rootEdge =
-      Simulator<Config>::dd->makeZeroState(static_cast<dd::Qubit>(nQubits));
+void CircuitSimulator::initializeSimulation(const std::size_t nQubits) {
+  rootEdge = dd->makeZeroState(static_cast<dd::Qubit>(nQubits));
 }
 
-template <class Config>
-char CircuitSimulator<Config>::measure(const dd::Qubit i) {
-  return Simulator<Config>::dd->measureOneCollapsing(
-      Simulator<Config>::rootEdge, static_cast<dd::Qubit>(i),
-      Simulator<Config>::mt);
+char CircuitSimulator::measure(const dd::Qubit i) {
+  return dd->measureOneCollapsing(rootEdge, static_cast<dd::Qubit>(i), mt);
 }
 
-template <class Config>
-void CircuitSimulator<Config>::reset(qc::NonUnitaryOperation* nonUnitaryOp) {
-  Simulator<Config>::rootEdge =
-      dd::applyReset(*nonUnitaryOp, Simulator<Config>::rootEdge,
-                     *Simulator<Config>::dd, Simulator<Config>::mt);
+void CircuitSimulator::reset(qc::NonUnitaryOperation* nonUnitaryOp) {
+  rootEdge = dd::applyReset(*nonUnitaryOp, rootEdge, *dd, mt);
 }
 
-template <class Config>
-void CircuitSimulator<Config>::applyOperationToState(
+void CircuitSimulator::applyOperationToState(
     std::unique_ptr<qc::Operation>& op) {
-  Simulator<Config>::rootEdge = dd::applyUnitaryOperation(
-      *op, Simulator<Config>::rootEdge, *Simulator<Config>::dd);
+  rootEdge = dd::applyUnitaryOperation(*op, rootEdge, *dd);
 }
 
-template <class Config>
 std::map<std::size_t, bool>
-CircuitSimulator<Config>::singleShot(const bool ignoreNonUnitaries) {
+CircuitSimulator::singleShot(const bool ignoreNonUnitaries) {
   singleShots++;
   const auto nQubits = qc->getNqubits();
 
@@ -191,7 +173,7 @@ CircuitSimulator<Config>::singleShot(const bool ignoreNonUnitaries) {
       } else {
         throw std::runtime_error("Dynamic cast to NonUnitaryOperation failed.");
       }
-      Simulator<Config>::dd->garbageCollect();
+      dd->garbageCollect();
     } else {
       if (op->isClassicControlledOperation()) {
         if (auto* classicallyControlledOp =
@@ -225,33 +207,26 @@ CircuitSimulator<Config>::singleShot(const bool ignoreNonUnitaries) {
         if (approximationInfo.strategy == ApproximationInfo::FidelityDriven &&
             (opNum + 1) % approxMod == 0 &&
             approximationRuns < approximationInfo.stepNumber) {
-          [[maybe_unused]] const auto sizeBefore =
-              Simulator<Config>::rootEdge.size();
-          const auto apFid = Simulator<Config>::approximateByFidelity(
+          [[maybe_unused]] const auto sizeBefore = rootEdge.size();
+          const auto apFid = approximateByFidelity(
               approximationInfo.stepFidelity, false, true);
           approximationRuns++;
           finalFidelity *= static_cast<long double>(apFid);
         } else if (approximationInfo.strategy ==
                    ApproximationInfo::MemoryDriven) {
-          [[maybe_unused]] const auto sizeBefore =
-              Simulator<Config>::rootEdge.size();
-          if (Simulator<Config>::dd->template getUniqueTable<dd::vNode>()
+          [[maybe_unused]] const auto sizeBefore = rootEdge.size();
+          if (dd->template getUniqueTable<dd::vNode>()
                   .possiblyNeedsCollection()) {
-            const auto apFid = Simulator<Config>::approximateByFidelity(
+            const auto apFid = approximateByFidelity(
                 approximationInfo.stepFidelity, false, true);
             approximationRuns++;
             finalFidelity *= static_cast<long double>(apFid);
           }
         }
       }
-      Simulator<Config>::dd->garbageCollect();
+      dd->garbageCollect();
     }
     opNum++;
   }
   return classicValues;
 }
-
-template class CircuitSimulator<dd::DDPackageConfig>;
-template class CircuitSimulator<dd::UnitarySimulatorDDPackageConfig>;
-template class CircuitSimulator<dd::DensityMatrixSimulatorDDPackageConfig>;
-template class CircuitSimulator<dd::StochasticNoiseSimulatorDDPackageConfig>;

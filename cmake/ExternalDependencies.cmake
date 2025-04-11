@@ -29,53 +29,34 @@ if(BUILD_MQT_DDSIM_BINDINGS)
   endif()
 
   # add pybind11 library
-  find_package(pybind11 2.13.5 CONFIG REQUIRED)
+  find_package(pybind11 2.13.6 CONFIG REQUIRED)
 endif()
 
 # cmake-format: off
-set(MQT_CORE_VERSION 3.0.0
+set(MQT_CORE_VERSION 3.0.2
     CACHE STRING "MQT Core version")
-set(MQT_CORE_REV "02783e63e81f9cf953e1bafdc536815e968f6c70"
+set(MQT_CORE_REV "9b6e01482cc77f48c828d988407ee4f8e4e93b56"
     CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
-set(MQT_CORE_REPO_OWNER "cda-tum"
+set(MQT_CORE_REPO_OWNER "munich-quantum-toolkit"
     CACHE STRING "MQT Core repository owner (change when using a fork)")
 # cmake-format: on
-if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-  FetchContent_Declare(
-    mqt-core
-    GIT_REPOSITORY https://github.com/${MQT_CORE_REPO_OWNER}/mqt-core.git
-    GIT_TAG ${MQT_CORE_REV}
-    FIND_PACKAGE_ARGS ${MQT_CORE_VERSION})
-  list(APPEND FETCH_PACKAGES mqt-core)
-else()
-  find_package(mqt-core ${MQT_CORE_VERSION} QUIET)
-  if(NOT mqt-core_FOUND)
-    FetchContent_Declare(
-      mqt-core
-      GIT_REPOSITORY https://github.com/${MQT_CORE_REPO_OWNER}/mqt-core.git
-      GIT_TAG ${MQT_CORE_REV})
-    list(APPEND FETCH_PACKAGES mqt-core)
-  endif()
-endif()
+FetchContent_Declare(
+  mqt-core
+  GIT_REPOSITORY https://github.com/${MQT_CORE_REPO_OWNER}/core.git
+  GIT_TAG ${MQT_CORE_REV}
+  FIND_PACKAGE_ARGS ${MQT_CORE_VERSION})
+list(APPEND FETCH_PACKAGES mqt-core)
 
 if(BUILD_MQT_DDSIM_TESTS)
   set(gtest_force_shared_crt
       ON
       CACHE BOOL "" FORCE)
   set(GTEST_VERSION
-      1.14.0
+      1.16.0
       CACHE STRING "Google Test version")
   set(GTEST_URL https://github.com/google/googletest/archive/refs/tags/v${GTEST_VERSION}.tar.gz)
-  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-    FetchContent_Declare(googletest URL ${GTEST_URL} FIND_PACKAGE_ARGS ${GTEST_VERSION} NAMES GTest)
-    list(APPEND FETCH_PACKAGES googletest)
-  else()
-    find_package(googletest ${GTEST_VERSION} QUIET NAMES GTest)
-    if(NOT googletest_FOUND)
-      FetchContent_Declare(googletest URL ${GTEST_URL})
-      list(APPEND FETCH_PACKAGES googletest)
-    endif()
-  endif()
+  FetchContent_Declare(googletest URL ${GTEST_URL} FIND_PACKAGE_ARGS ${GTEST_VERSION} NAMES GTest)
+  list(APPEND FETCH_PACKAGES googletest)
 endif()
 
 set(TF_BUILD_TESTS
@@ -91,16 +72,8 @@ set(TF_VERSION
     3.7.0
     CACHE STRING "Taskflow version")
 set(TF_URL https://github.com/taskflow/taskflow/archive/refs/tags/v${TF_VERSION}.tar.gz)
-if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-  FetchContent_Declare(taskflow URL ${TF_URL} FIND_PACKAGE_ARGS)
-  list(APPEND FETCH_PACKAGES taskflow)
-else()
-  find_package(taskflow ${TF_VERSION} QUIET)
-  if(NOT taskflow_FOUND)
-    FetchContent_Declare(taskflow URL ${TF_URL})
-    list(APPEND FETCH_PACKAGES taskflow)
-  endif()
-endif()
+FetchContent_Declare(taskflow URL ${TF_URL} FIND_PACKAGE_ARGS)
+list(APPEND FETCH_PACKAGES taskflow)
 
 if(BUILD_MQT_DDSIM_CLI)
   set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -111,33 +84,17 @@ if(BUILD_MQT_DDSIM_CLI)
       3.1.1
       CACHE STRING "cxxopts version")
   set(CXXOPTS_URL https://github.com/jarro2783/cxxopts/archive/refs/tags/v${CXXOPTS_VERSION}.tar.gz)
-  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-    FetchContent_Declare(cxxopts URL ${CXXOPTS_URL} FIND_PACKAGE_ARGS ${CXXOPTS_VERSION})
-    list(APPEND FETCH_PACKAGES cxxopts)
-  else()
-    find_package(cxxopts ${CXXOPTS_VERSION} QUIET)
-    if(NOT cxxopts_FOUND)
-      FetchContent_Declare(cxxopts URL ${CXXOPTS_URL})
-      list(APPEND FETCH_PACKAGES cxxopts)
-    endif()
-  endif()
+  FetchContent_Declare(cxxopts URL ${CXXOPTS_URL} FIND_PACKAGE_ARGS ${CXXOPTS_VERSION})
+  list(APPEND FETCH_PACKAGES cxxopts)
 endif()
 
 if(BUILD_MQT_DDSIM_BINDINGS)
   # add pybind11_json library
-  if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-    FetchContent_Declare(
-      pybind11_json
-      GIT_REPOSITORY https://github.com/pybind/pybind11_json
-      FIND_PACKAGE_ARGS)
-    list(APPEND FETCH_PACKAGES pybind11_json)
-  else()
-    find_package(pybind11_json QUIET)
-    if(NOT pybind11_json_FOUND)
-      FetchContent_Declare(pybind11_json GIT_REPOSITORY https://github.com/pybind/pybind11_json)
-      list(APPEND FETCH_PACKAGES pybind11_json)
-    endif()
-  endif()
+  FetchContent_Declare(
+    pybind11_json
+    GIT_REPOSITORY https://github.com/pybind/pybind11_json
+    FIND_PACKAGE_ARGS)
+  list(APPEND FETCH_PACKAGES pybind11_json)
 endif()
 
 # Make all declared dependencies available.

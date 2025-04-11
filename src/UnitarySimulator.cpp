@@ -2,6 +2,7 @@
 
 #include "CircuitSimulator.hpp"
 #include "circuit_optimizer/CircuitOptimizer.hpp"
+#include "dd/DDpackageConfig.hpp"
 #include "dd/FunctionalityConstruction.hpp"
 #include "dd/Node.hpp"
 #include "ir/QuantumComputation.hpp"
@@ -26,22 +27,24 @@ void UnitarySimulator::construct() {
 
 UnitarySimulator::UnitarySimulator(
     std::unique_ptr<qc::QuantumComputation>&& qc_,
-    const ApproximationInfo& approximationInfo_, UnitarySimulator::Mode simMode)
-    : CircuitSimulator(std::move(qc_), approximationInfo_), mode(simMode) {
+    const ApproximationInfo& approximationInfo_, Mode simMode)
+    : CircuitSimulator(std::move(qc_), approximationInfo_,
+                       dd::UNITARY_SIMULATOR_DD_PACKAGE_CONFIG),
+      mode(simMode) {
   // remove final measurements
   qc::CircuitOptimizer::removeFinalMeasurements(*qc);
 }
 
 UnitarySimulator::UnitarySimulator(
-    std::unique_ptr<qc::QuantumComputation>&& qc_,
-    UnitarySimulator::Mode simMode)
+    std::unique_ptr<qc::QuantumComputation>&& qc_, Mode simMode)
     : UnitarySimulator(std::move(qc_), {}, simMode) {}
 
 UnitarySimulator::UnitarySimulator(
     std::unique_ptr<qc::QuantumComputation>&& qc_,
     const ApproximationInfo& approximationInfo_, const std::uint64_t seed_,
-    const UnitarySimulator::Mode simMode)
-    : CircuitSimulator(std::move(qc_), approximationInfo_, seed_),
+    const Mode simMode)
+    : CircuitSimulator(std::move(qc_), approximationInfo_, seed_,
+                       dd::UNITARY_SIMULATOR_DD_PACKAGE_CONFIG),
       mode(simMode) {
   // remove final measurements
   qc::CircuitOptimizer::removeFinalMeasurements(*qc);

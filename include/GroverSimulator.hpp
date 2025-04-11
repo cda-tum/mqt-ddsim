@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Definitions.hpp"
 #include "Simulator.hpp"
-#include "dd/DDpackageConfig.hpp"
+#include "ir/Definitions.hpp"
 
 #include <cmath>
 #include <cstddef>
@@ -11,12 +10,11 @@
 #include <random>
 #include <string>
 
-template <class Config = dd::DDPackageConfig>
-class GroverSimulator : public Simulator<Config> {
+class GroverSimulator final : public Simulator {
 public:
   explicit GroverSimulator(const std::string& oracle_,
                            const std::uint64_t seed_)
-      : Simulator<Config>(seed_), oracle{oracle_.rbegin(), oracle_.rend()},
+      : Simulator(seed_), oracle{oracle_.rbegin(), oracle_.rend()},
         nQubits(static_cast<qc::Qubit>(oracle_.length())),
         iterations(calculateIterations(nQubits)) {}
 
@@ -26,13 +24,13 @@ public:
         iterations(calculateIterations(nQubits)) {}
 
   explicit GroverSimulator(const qc::Qubit nQubits_, const std::uint64_t seed_)
-      : Simulator<Config>(seed_), nQubits{nQubits_},
+      : Simulator(seed_), nQubits{nQubits_},
         iterations(calculateIterations(nQubits_)) {
     // NOLINTNEXTLINE(misc-const-correctness): Using dist is not const
     std::uniform_int_distribution<int> dist(0, 1); // range is inclusive
     oracle = std::string(nQubits_, '0');
     for (qc::Qubit i = 0; i < nQubits_; i++) {
-      if (dist(Simulator<Config>::mt) == 1) {
+      if (dist(Simulator::mt) == 1) {
         oracle[i] = '1';
       }
     }

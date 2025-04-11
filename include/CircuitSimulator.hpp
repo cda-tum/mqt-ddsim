@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Definitions.hpp"
 #include "Simulator.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
+#include "ir/Definitions.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "ir/operations/NonUnitaryOperation.hpp"
 #include "ir/operations/Operation.hpp"
@@ -51,37 +51,42 @@ struct ApproximationInfo {
   ApproximationStrategy strategy = FidelityDriven;
 };
 
-template <class Config = dd::DDPackageConfig>
-class CircuitSimulator : public Simulator<Config> {
+class CircuitSimulator : public Simulator {
 public:
-  explicit CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_)
-      : qc(std::move(qc_)) {
-    Simulator<Config>::dd->resize(qc->getNqubits());
+  explicit CircuitSimulator(
+      std::unique_ptr<qc::QuantumComputation>&& qc_,
+      const dd::DDPackageConfig& config = dd::DDPackageConfig())
+      : Simulator(config), qc(std::move(qc_)) {
+    dd->resize(qc->getNqubits());
   }
 
   CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
-                   const std::uint64_t seed_)
-      : Simulator<Config>(seed_), qc(std::move(qc_)) {
-    Simulator<Config>::dd->resize(qc->getNqubits());
-  }
-
-  CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
-                   const ApproximationInfo& approximationInfo_)
-      : qc(std::move(qc_)), approximationInfo(approximationInfo_) {
-    Simulator<Config>::dd->resize(qc->getNqubits());
+                   const std::uint64_t seed_,
+                   const dd::DDPackageConfig& config = dd::DDPackageConfig())
+      : Simulator(seed_, config), qc(std::move(qc_)) {
+    dd->resize(qc->getNqubits());
   }
 
   CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
                    const ApproximationInfo& approximationInfo_,
-                   const std::uint64_t seed_)
-      : Simulator<Config>(seed_), qc(std::move(qc_)),
+                   const dd::DDPackageConfig& config = dd::DDPackageConfig())
+      : Simulator(config), qc(std::move(qc_)),
         approximationInfo(approximationInfo_) {
-    Simulator<Config>::dd->resize(qc->getNqubits());
+    dd->resize(qc->getNqubits());
+  }
+
+  CircuitSimulator(std::unique_ptr<qc::QuantumComputation>&& qc_,
+                   const ApproximationInfo& approximationInfo_,
+                   const std::uint64_t seed_,
+                   const dd::DDPackageConfig& config = dd::DDPackageConfig())
+      : Simulator(seed_, config), qc(std::move(qc_)),
+        approximationInfo(approximationInfo_) {
+    dd->resize(qc->getNqubits());
   }
 
   std::map<std::string, std::size_t>
   measureAllNonCollapsing(std::size_t shots) override {
-    return Simulator<Config>::measureAllNonCollapsing(shots);
+    return Simulator::measureAllNonCollapsing(shots);
   }
 
   std::map<std::string, std::size_t> simulate(std::size_t shots) override;

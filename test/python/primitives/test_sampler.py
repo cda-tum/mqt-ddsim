@@ -21,7 +21,7 @@ def sampler() -> Sampler:
 @pytest.fixture
 def shots() -> int:
     """Number of shots for the tests in this file."""
-    return 32768
+    return 65536
 
 
 @pytest.fixture
