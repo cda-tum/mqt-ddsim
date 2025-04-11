@@ -33,9 +33,9 @@ if(BUILD_MQT_DDSIM_BINDINGS)
 endif()
 
 # cmake-format: off
-set(MQT_CORE_VERSION 3.0.0
+set(MQT_CORE_VERSION 3.0.2
     CACHE STRING "MQT Core version")
-set(MQT_CORE_REV "02783e63e81f9cf953e1bafdc536815e968f6c70"
+set(MQT_CORE_REV "9b6e01482cc77f48c828d988407ee4f8e4e93b56"
     CACHE STRING "MQT Core identifier (tag, branch or commit hash)")
 set(MQT_CORE_REPO_OWNER "cda-tum"
     CACHE STRING "MQT Core repository owner (change when using a fork)")
