@@ -1,6 +1,5 @@
 #include "HybridSchrodingerFeynmanSimulator.hpp"
 
-#include "CircuitSimulator.hpp"
 #include "Simulator.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/Export.hpp"
@@ -25,7 +24,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <taskflow/core/async.hpp>
+#include <taskflow/core/async.hpp> // IWYU pragma: keep
 #include <taskflow/core/executor.hpp>
 #include <utility>
 #include <vector>
@@ -142,7 +141,7 @@ bool HybridSchrodingerFeynmanSimulator::Slice::apply(
       // other controls are set to the corresponding value
       if (targetInSplit) {
         isSplitOp = true;
-        const bool nextControl = getNextControl();
+        const bool nextControl = getNextControl() != 0;
         // break if control is not activated
         if ((control.type == qc::Control::Type::Pos && !nextControl) ||
             (control.type == qc::Control::Type::Neg && nextControl)) {
@@ -159,7 +158,7 @@ bool HybridSchrodingerFeynmanSimulator::Slice::apply(
     assert(opControls.size() == 1);
 
     isSplitOp = true;
-    const bool control = getNextControl();
+    const bool control = getNextControl() != 0;
     for (const auto& c : opControls) {
       auto tmp = edge;
       edge = sliceDD->deleteEdge(

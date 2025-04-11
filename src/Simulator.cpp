@@ -8,14 +8,17 @@
 #include "dd/Package.hpp"
 #include "dd/RealNumber.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cmath>
 #include <complex>
 #include <cstddef>
 #include <iostream>
+#include <iterator>
 #include <map>
 #include <memory>
+#include <numeric>
 #include <queue>
 #include <random>
 #include <set>
@@ -137,7 +140,7 @@ double Simulator::approximateByFidelity(std::unique_ptr<dd::Package>& localDD,
                                         dd::vEdge& edge, double targetFidelity,
                                         bool allLevels,
                                         bool actuallyRemoveNodes,
-                                        bool verbose) {
+                                        bool verbose) const {
   auto qq = getNodeContributions(edge);
   std::vector<dd::vNode*> nodesToRemove;
 

@@ -1,6 +1,5 @@
 #include "CircuitSimulator.hpp"
 
-#include "Simulator.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/FunctionalityConstruction.hpp"
 #include "dd/Node.hpp"

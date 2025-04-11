@@ -7,7 +7,6 @@
 #include "algorithms/GHZState.hpp"
 #include "algorithms/Grover.hpp"
 #include "algorithms/QFT.hpp"
-#include "dd/DDpackageConfig.hpp"
 #include "dd/Export.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "qasm3/Importer.hpp"

@@ -1,7 +1,5 @@
 #include "PathSimulator.hpp"
 
-#include "CircuitSimulator.hpp"
-#include "Simulator.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/Node.hpp"
 #include "dd/Operations.hpp"
@@ -11,6 +9,7 @@
 
 #include <cmath>
 #include <cstddef>
+#include <iterator>
 #include <list>
 #include <map>
 #include <set>
@@ -23,7 +22,7 @@
 PathSimulator::SimulationPath::SimulationPath(std::size_t nleaves_,
                                               Components components_,
                                               const qc::QuantumComputation* qc_,
-                                              bool assumeCorrectOrder)
+                                              const bool assumeCorrectOrder)
     : components(std::move(components_)), nleaves(nleaves_), qc(qc_) {
   steps.reserve(nleaves_);
   // create empty vector of steps
@@ -461,7 +460,7 @@ void PathSimulator::constructTaskGraph() {
     // add final task for storing the result
     if (i == path.size() - 1) {
       const auto runner = [this, resultStep]() {
-        if (auto res = std::get_if<dd::VectorDD>(&results.at(resultStep.id))) {
+        if (auto* res = std::get_if<dd::VectorDD>(&results.at(resultStep.id))) {
           rootEdge = *res;
         } else {
           throw std::runtime_error("Expected vector DD as result.");

@@ -2,6 +2,7 @@
 
 #include "CircuitSimulator.hpp"
 #include "circuit_optimizer/CircuitOptimizer.hpp"
+#include "dd/DDpackageConfig.hpp"
 #include "dd/FunctionalityConstruction.hpp"
 #include "dd/Node.hpp"
 #include "ir/QuantumComputation.hpp"

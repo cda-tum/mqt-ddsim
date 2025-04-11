@@ -123,7 +123,7 @@ public:
   double approximateByFidelity(std::unique_ptr<dd::Package>& localDD,
                                dd::vEdge& edge, double targetFidelity,
                                bool allLevels, bool actuallyRemoveNodes,
-                               bool verbose = false);
+                               bool verbose = false) const;
   double approximateByFidelity(double targetFidelity, bool allLevels,
                                bool removeNodes, bool verbose = false) {
     return approximateByFidelity(dd, rootEdge, targetFidelity, allLevels,
