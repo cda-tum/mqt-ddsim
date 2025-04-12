@@ -1,16 +1,15 @@
 #include "PathSimulator.hpp"
 
-#include "CircuitSimulator.hpp"
-#include "Definitions.hpp"
-#include "Simulator.hpp"
 #include "dd/DDDefinitions.hpp"
-#include "dd/DDpackageConfig.hpp"
+#include "dd/Node.hpp"
 #include "dd/Operations.hpp"
 #include "dd/Package.hpp"
+#include "ir/Definitions.hpp"
 #include "ir/QuantumComputation.hpp"
 
 #include <cmath>
 #include <cstddef>
+#include <iterator>
 #include <list>
 #include <map>
 #include <set>
@@ -20,10 +19,10 @@
 #include <variant>
 #include <vector>
 
-template <class Config>
-PathSimulator<Config>::SimulationPath::SimulationPath(
-    std::size_t nleaves_, PathSimulator::SimulationPath::Components components_,
-    const qc::QuantumComputation* qc_, bool assumeCorrectOrder)
+PathSimulator::SimulationPath::SimulationPath(std::size_t nleaves_,
+                                              Components components_,
+                                              const qc::QuantumComputation* qc_,
+                                              const bool assumeCorrectOrder)
     : components(std::move(components_)), nleaves(nleaves_), qc(qc_) {
   steps.reserve(nleaves_);
   // create empty vector of steps
@@ -139,10 +138,8 @@ PathSimulator<Config>::SimulationPath::SimulationPath(
   }
 }
 
-template <class Config>
-std::map<std::string, std::size_t>
-PathSimulator<Config>::simulate(std::size_t shots) {
-  if (CircuitSimulator<Config>::qc->isDynamic()) {
+std::map<std::string, std::size_t> PathSimulator::simulate(std::size_t shots) {
+  if (qc->isDynamic()) {
     throw std::invalid_argument(
         "Dynamic quantum circuits containing mid-circuit measurements, resets, "
         "or classical control flow are not supported by this simulator.");
@@ -159,31 +156,28 @@ PathSimulator<Config>::simulate(std::size_t shots) {
   executor.run(taskflow).wait();
 
   // measure resulting DD
-  return CircuitSimulator<Config>::measureAllNonCollapsing(shots);
+  return measureAllNonCollapsing(shots);
 }
 
-template <class Config>
-void PathSimulator<Config>::generateSequentialSimulationPath() {
-  typename SimulationPath::Components components{};
-  components.reserve(CircuitSimulator<Config>::qc->getNops());
+void PathSimulator::generateSequentialSimulationPath() {
+  SimulationPath::Components components{};
+  components.reserve(qc->getNops());
 
-  for (std::size_t i = 0; i < CircuitSimulator<Config>::qc->getNops(); ++i) {
+  for (std::size_t i = 0; i < qc->getNops(); ++i) {
     if (i == 0) {
       components.emplace_back(0, 1);
     } else {
-      components.emplace_back(CircuitSimulator<Config>::qc->getNops() + i,
-                              i + 1);
+      components.emplace_back(qc->getNops() + i, i + 1);
     }
   }
   setSimulationPath(components, true);
 }
 
-template <class Config>
-void PathSimulator<Config>::generatePairwiseRecursiveGroupingSimulationPath() {
-  typename SimulationPath::Components components{};
-  components.reserve(CircuitSimulator<Config>::qc->getNops());
+void PathSimulator::generatePairwiseRecursiveGroupingSimulationPath() {
+  SimulationPath::Components components{};
+  components.reserve(qc->getNops());
 
-  const std::size_t nleaves = CircuitSimulator<Config>::qc->getNops() + 1;
+  const std::size_t nleaves = qc->getNops() + 1;
   auto depth = static_cast<std::size_t>(std::ceil(std::log2(nleaves)));
 
   std::size_t id = nleaves;
@@ -229,11 +223,9 @@ void PathSimulator<Config>::generatePairwiseRecursiveGroupingSimulationPath() {
   setSimulationPath(components, true);
 }
 
-template <class Config>
-void PathSimulator<Config>::generateBracketSimulationPath(
-    std::size_t bracketSize) {
-  typename SimulationPath::Components components{};
-  components.reserve(CircuitSimulator<Config>::qc->getNops());
+void PathSimulator::generateBracketSimulationPath(std::size_t bracketSize) {
+  SimulationPath::Components components{};
+  components.reserve(qc->getNops());
   bool rightSingle = false;
   std::size_t startElemBracket = bracketSize + 1;
   std::size_t strayElem = 0;
@@ -245,16 +237,15 @@ void PathSimulator<Config>::generateBracketSimulationPath(
     if (i == 0) {
       components.emplace_back(0, 1);
     } else {
-      components.emplace_back(CircuitSimulator<Config>::qc->getNops() + i,
-                              1 + i);
+      components.emplace_back(qc->getNops() + i, 1 + i);
     }
   }
-  memoryLeft = CircuitSimulator<Config>::qc->getNops() + bracketSize;
+  memoryLeft = qc->getNops() + bracketSize;
   // Creating the brackets by sequentially adding the individual operations
   while (true) {
     for (auto i = 0U; i < bracketSize - 1; i++) {
       // Checking for stray elements
-      if (startElemBracket == CircuitSimulator<Config>::qc->getNops()) {
+      if (startElemBracket == qc->getNops()) {
         rightSingle = true;
         strayElem = startElemBracket;
         break;
@@ -263,22 +254,21 @@ void PathSimulator<Config>::generateBracketSimulationPath(
       if (i == 0) {
         components.emplace_back(startElemBracket, startElemBracket + 1);
         opMemory++;
-        if (startElemBracket + 1 == CircuitSimulator<Config>::qc->getNops()) {
-          strayElem = CircuitSimulator<Config>::qc->getNops() + bracketSize +
-                      1 + (bracketSize * bracketMemory - bracketMemory);
+        if (startElemBracket + 1 == qc->getNops()) {
+          strayElem = qc->getNops() + bracketSize + 1 +
+                      (bracketSize * bracketMemory - bracketMemory);
           rightSingle = true;
           break;
         }
       } else {
         components.emplace_back(
-            CircuitSimulator<Config>::qc->getNops() + bracketSize + i +
+            qc->getNops() + bracketSize + i +
                 (bracketSize * bracketMemory - bracketMemory),
             startElemBracket + 1 + i);
         opMemory++;
-        if (startElemBracket + 1 + i >=
-            CircuitSimulator<Config>::qc->getNops()) {
-          strayElem = CircuitSimulator<Config>::qc->getNops() + bracketSize +
-                      i + (bracketSize * bracketMemory - bracketMemory) + 1;
+        if (startElemBracket + 1 + i >= qc->getNops()) {
+          strayElem = qc->getNops() + bracketSize + i +
+                      (bracketSize * bracketMemory - bracketMemory) + 1;
           rightSingle = true;
           break;
         }
@@ -309,17 +299,16 @@ void PathSimulator<Config>::generateBracketSimulationPath(
   setSimulationPath(components, true);
 }
 
-template <class Config>
-void PathSimulator<Config>::generateAlternatingSimulationPath(
+void PathSimulator::generateAlternatingSimulationPath(
     std::size_t startingPoint) {
-  typename SimulationPath::Components components{};
-  components.reserve(CircuitSimulator<Config>::qc->getNops());
+  SimulationPath::Components components{};
+  components.reserve(qc->getNops());
   const std::size_t startElem = startingPoint;
   components.emplace_back(startElem, startElem + 1);
   std::size_t leftID = startElem - 1;
   const std::size_t leftEnd = 0;
   std::size_t rightID = startElem + 2;
-  const std::size_t rightEnd = CircuitSimulator<Config>::qc->getNops() + 1;
+  const std::size_t rightEnd = qc->getNops() + 1;
   std::size_t nextID = rightEnd;
   // Alternating between left and right-hand side
   while (leftID != leftEnd && rightID != rightEnd) {
@@ -350,14 +339,13 @@ void PathSimulator<Config>::generateAlternatingSimulationPath(
   setSimulationPath(components, true);
 }
 
-template <class Config>
-void PathSimulator<Config>::generateGatecostSimulationPath(
+void PathSimulator::generateGatecostSimulationPath(
     const std::size_t startingPoint, std::list<std::size_t>& gateCosts) {
-  typename SimulationPath::Components components{};
-  components.reserve(CircuitSimulator<Config>::qc->getNops());
+  SimulationPath::Components components{};
+  components.reserve(qc->getNops());
 
   const std::size_t leftEnd = 0;
-  const std::size_t rightEnd = CircuitSimulator<Config>::qc->getNops() + 1;
+  const std::size_t rightEnd = qc->getNops() + 1;
 
   components.emplace_back(startingPoint, startingPoint + 1);
 
@@ -411,17 +399,16 @@ void PathSimulator<Config>::generateGatecostSimulationPath(
   setSimulationPath(components, true);
 }
 
-template <class Config> void PathSimulator<Config>::constructTaskGraph() {
+void PathSimulator::constructTaskGraph() {
   const auto& path = simulationPath.components;
   const auto& steps = simulationPath.steps;
 
   if (path.empty()) {
-    Simulator<Config>::rootEdge = Simulator<Config>::dd->makeZeroState(
-        static_cast<dd::Qubit>(CircuitSimulator<Config>::qc->getNqubits()));
+    rootEdge = dd->makeZeroState(static_cast<dd::Qubit>(qc->getNqubits()));
     return;
   }
 
-  const std::size_t nleaves = CircuitSimulator<Config>::qc->getNops() + 1;
+  const std::size_t nleaves = qc->getNops() + 1;
 
   for (std::size_t i = 0; i < path.size(); ++i) {
     const auto [leftID, rightID] = path.at(i);
@@ -431,14 +418,14 @@ template <class Config> void PathSimulator<Config>::constructTaskGraph() {
     if (leftID < nleaves) {
       if (leftID == 0) {
         // initial state
-        qc::VectorDD zeroState = Simulator<Config>::dd->makeZeroState(
-            static_cast<dd::Qubit>(CircuitSimulator<Config>::qc->getNqubits()));
-        Simulator<Config>::dd->incRef(zeroState);
+        dd::VectorDD zeroState =
+            dd->makeZeroState(static_cast<dd::Qubit>(qc->getNqubits()));
+        dd->incRef(zeroState);
         results.emplace(leftID, zeroState);
       } else {
-        const auto& op = CircuitSimulator<Config>::qc->at(leftID - 1);
-        qc::MatrixDD opDD = dd::getDD(*op, *Simulator<Config>::dd);
-        Simulator<Config>::dd->incRef(opDD);
+        const auto& op = qc->at(leftID - 1);
+        dd::MatrixDD opDD = dd::getDD(*op, *dd);
+        dd->incRef(opDD);
         results.emplace(leftID, opDD);
       }
     }
@@ -448,9 +435,9 @@ template <class Config> void PathSimulator<Config>::constructTaskGraph() {
         throw std::runtime_error("Initial state must not appear on right side "
                                  "of the simulation path member.");
       }
-      const auto& op = CircuitSimulator<Config>::qc->at(rightID - 1);
-      qc::MatrixDD opDD = dd::getDD(*op, *Simulator<Config>::dd);
-      Simulator<Config>::dd->incRef(opDD);
+      const auto& op = qc->at(rightID - 1);
+      dd::MatrixDD opDD = dd::getDD(*op, *dd);
+      dd->incRef(opDD);
       results.emplace(rightID, opDD);
     }
 
@@ -473,8 +460,8 @@ template <class Config> void PathSimulator<Config>::constructTaskGraph() {
     // add final task for storing the result
     if (i == path.size() - 1) {
       const auto runner = [this, resultStep]() {
-        if (auto res = std::get_if<qc::VectorDD>(&results.at(resultStep.id))) {
-          Simulator<Config>::rootEdge = *res;
+        if (auto* res = std::get_if<dd::VectorDD>(&results.at(resultStep.id))) {
+          rootEdge = *res;
         } else {
           throw std::runtime_error("Expected vector DD as result.");
         }
@@ -486,10 +473,8 @@ template <class Config> void PathSimulator<Config>::constructTaskGraph() {
   }
 }
 
-template <class Config>
-void PathSimulator<Config>::addSimulationTask(std::size_t leftID,
-                                              std::size_t rightID,
-                                              std::size_t resultID) {
+void PathSimulator::addSimulationTask(std::size_t leftID, std::size_t rightID,
+                                      std::size_t resultID) {
   const auto runner = [this, leftID, rightID, resultID]() {
     /// Enable the following statement for printing execution order
     //            std::cout << "Executing " << leftID << " " << rightID << " ->
@@ -497,8 +482,8 @@ void PathSimulator<Config>::addSimulationTask(std::size_t leftID,
     const auto& leftDD = results.at(leftID);
     const auto& rightDD = results.at(rightID);
 
-    const auto leftIsVector = std::holds_alternative<qc::VectorDD>(leftDD);
-    const auto rightIsVector = std::holds_alternative<qc::VectorDD>(rightDD);
+    const auto leftIsVector = std::holds_alternative<dd::VectorDD>(leftDD);
+    const auto rightIsVector = std::holds_alternative<dd::VectorDD>(rightDD);
 
     if (rightIsVector) {
       throw std::runtime_error("Right element in this simulation path member "
@@ -507,24 +492,24 @@ void PathSimulator<Config>::addSimulationTask(std::size_t leftID,
 
     if (leftIsVector) {
       // matrix-vector multiplication
-      const auto& vector = *std::get_if<qc::VectorDD>(&leftDD);
-      const auto& matrix = *std::get_if<qc::MatrixDD>(&rightDD);
-      auto resultDD = Simulator<Config>::dd->multiply(matrix, vector);
-      Simulator<Config>::dd->incRef(resultDD);
-      Simulator<Config>::dd->decRef(vector);
-      Simulator<Config>::dd->decRef(matrix);
+      const auto& vector = *std::get_if<dd::VectorDD>(&leftDD);
+      const auto& matrix = *std::get_if<dd::MatrixDD>(&rightDD);
+      auto resultDD = dd->multiply(matrix, vector);
+      dd->incRef(resultDD);
+      dd->decRef(vector);
+      dd->decRef(matrix);
       results.emplace(resultID, resultDD);
     } else {
       // matrix-matrix multiplication
-      const auto& leftMatrix = *std::get_if<qc::MatrixDD>(&leftDD);
-      const auto& rightMatrix = *std::get_if<qc::MatrixDD>(&rightDD);
-      auto resultDD = Simulator<Config>::dd->multiply(rightMatrix, leftMatrix);
-      Simulator<Config>::dd->incRef(resultDD);
-      Simulator<Config>::dd->decRef(leftMatrix);
-      Simulator<Config>::dd->decRef(rightMatrix);
+      const auto& leftMatrix = *std::get_if<dd::MatrixDD>(&leftDD);
+      const auto& rightMatrix = *std::get_if<dd::MatrixDD>(&rightDD);
+      auto resultDD = dd->multiply(rightMatrix, leftMatrix);
+      dd->incRef(resultDD);
+      dd->decRef(leftMatrix);
+      dd->decRef(rightMatrix);
       results.emplace(resultID, resultDD);
     }
-    Simulator<Config>::dd->garbageCollect();
+    dd->garbageCollect();
     results.erase(leftID);
     results.erase(rightID);
   };
@@ -533,5 +518,3 @@ void PathSimulator<Config>::addSimulationTask(std::size_t leftID,
       taskflow.emplace(runner).name(std::to_string(resultID));
   tasks.emplace(resultID, resultTask);
 }
-
-template class PathSimulator<dd::DDPackageConfig>;

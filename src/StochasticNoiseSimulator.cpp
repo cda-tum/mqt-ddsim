@@ -1,11 +1,11 @@
 #include "StochasticNoiseSimulator.hpp"
 
-#include "Definitions.hpp"
 #include "dd/DDDefinitions.hpp"
 #include "dd/DDpackageConfig.hpp"
 #include "dd/Node.hpp"
 #include "dd/Operations.hpp"
 #include "dd/Package.hpp"
+#include "ir/Definitions.hpp"
 #include "ir/operations/ClassicControlledOperation.hpp"
 #include "ir/operations/NonUnitaryOperation.hpp"
 #include "ir/operations/OpType.hpp"
@@ -65,11 +65,10 @@ void StochasticNoiseSimulator::runStochSimulationForId(
                 (static_cast<double>(approximationInfo.stepNumber + 1))));
 
   for (std::size_t currentRun = 0U; currentRun < numberOfRuns; currentRun++) {
-    auto localDD = std::make_unique<
-        dd::Package<dd::StochasticNoiseSimulatorDDPackageConfig>>(
-        getNumberOfQubits());
+    auto localDD = std::make_unique<dd::Package>(
+        getNumberOfQubits(), dd::STOCHASTIC_NOISE_SIMULATOR_DD_PACKAGE_CONFIG);
     auto stochasticNoiseFunctionality = dd::StochasticNoiseFunctionality(
-        localDD, static_cast<dd::Qubit>(nQubits), noiseProbability,
+        *localDD, static_cast<dd::Qubit>(nQubits), noiseProbability,
         amplitudeDampingProb, multiQubitGateFactor, noiseEffects);
 
     std::vector<bool> classicValues(qc->getNcbits(), false);

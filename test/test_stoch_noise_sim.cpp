@@ -1,5 +1,5 @@
-#include "Definitions.hpp"
 #include "StochasticNoiseSimulator.hpp"
+#include "ir/Definitions.hpp"
 #include "ir/QuantumComputation.hpp"
 #include "ir/operations/OpType.hpp"
 

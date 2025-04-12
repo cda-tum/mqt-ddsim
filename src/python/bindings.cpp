@@ -32,7 +32,7 @@ constructSimulator(const qc::QuantumComputation& circ,
   const auto approx =
       ApproximationInfo{stepFidelity, stepNumber,
                         ApproximationInfo::fromString(approximationStrategy)};
-  if constexpr (std::is_same_v<Simulator, PathSimulator<>>) {
+  if constexpr (std::is_same_v<Simulator, PathSimulator>) {
     return std::make_unique<Simulator>(std::move(qc),
                                        std::forward<Args>(args)...);
   } else {
@@ -99,12 +99,12 @@ PYBIND11_MODULE(pyddsim, m, py::mod_gil_not_used()) {
 
   // Circuit Simulator
   auto circuitSimulator =
-      createSimulator<CircuitSimulator<>>(m, "CircuitSimulator");
+      createSimulator<CircuitSimulator>(m, "CircuitSimulator");
   circuitSimulator
-      .def(py::init<>(&constructSimulator<CircuitSimulator<>>), "circ"_a,
+      .def(py::init<>(&constructSimulator<CircuitSimulator>), "circ"_a,
            "approximation_step_fidelity"_a = 1., "approximation_steps"_a = 1,
            "approximation_strategy"_a = "fidelity", "seed"_a = -1)
-      .def("expectation_value", &CircuitSimulator<>::expectationValue,
+      .def("expectation_value", &CircuitSimulator::expectationValue,
            "observable"_a);
 
   // Stoch simulator
@@ -131,80 +131,78 @@ PYBIND11_MODULE(pyddsim, m, py::mod_gil_not_used()) {
       "amp_damping_probability"_a = 0.02, "multi_qubit_gate_factor"_a = 2);
 
   // Hybrid Schrödinger-Feynman Simulator
-  py::enum_<HybridSchrodingerFeynmanSimulator<>::Mode>(m, "HybridMode")
-      .value("DD", HybridSchrodingerFeynmanSimulator<>::Mode::DD)
-      .value("amplitude", HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude)
+  py::enum_<HybridSchrodingerFeynmanSimulator::Mode>(m, "HybridMode")
+      .value("DD", HybridSchrodingerFeynmanSimulator::Mode::DD)
+      .value("amplitude", HybridSchrodingerFeynmanSimulator::Mode::Amplitude)
       .export_values();
 
-  auto hsfSimulator = createSimulator<HybridSchrodingerFeynmanSimulator<>>(
+  auto hsfSimulator = createSimulator<HybridSchrodingerFeynmanSimulator>(
       m, "HybridCircuitSimulator");
   hsfSimulator
       .def(py::init<>(
-               &constructSimulator<HybridSchrodingerFeynmanSimulator<>,
-                                   HybridSchrodingerFeynmanSimulator<>::Mode&,
+               &constructSimulator<HybridSchrodingerFeynmanSimulator,
+                                   HybridSchrodingerFeynmanSimulator::Mode&,
                                    const std::size_t&>),
            "circ"_a, "approximation_step_fidelity"_a = 1.,
            "approximation_steps"_a = 1, "approximation_strategy"_a = "fidelity",
            "seed"_a = -1,
-           "mode"_a = HybridSchrodingerFeynmanSimulator<>::Mode::Amplitude,
+           "mode"_a = HybridSchrodingerFeynmanSimulator::Mode::Amplitude,
            "nthreads"_a = 2)
-      .def("get_mode", &HybridSchrodingerFeynmanSimulator<>::getMode)
+      .def("get_mode", &HybridSchrodingerFeynmanSimulator::getMode)
       .def("get_final_amplitudes",
-           &HybridSchrodingerFeynmanSimulator<>::getVectorFromHybridSimulation);
+           &HybridSchrodingerFeynmanSimulator::getVectorFromHybridSimulation);
 
   // Path Simulator
-  py::enum_<PathSimulator<>::Configuration::Mode>(m, "PathSimulatorMode")
-      .value("sequential", PathSimulator<>::Configuration::Mode::Sequential)
+  py::enum_<PathSimulator::Configuration::Mode>(m, "PathSimulatorMode")
+      .value("sequential", PathSimulator::Configuration::Mode::Sequential)
       .value("pairwise_recursive",
-             PathSimulator<>::Configuration::Mode::PairwiseRecursiveGrouping)
-      .value("bracket", PathSimulator<>::Configuration::Mode::BracketGrouping)
-      .value("alternating", PathSimulator<>::Configuration::Mode::Alternating)
-      .value("gate_cost", PathSimulator<>::Configuration::Mode::GateCost)
+             PathSimulator::Configuration::Mode::PairwiseRecursiveGrouping)
+      .value("bracket", PathSimulator::Configuration::Mode::BracketGrouping)
+      .value("alternating", PathSimulator::Configuration::Mode::Alternating)
+      .value("gate_cost", PathSimulator::Configuration::Mode::GateCost)
       .export_values()
       .def(py::init(
-          [](const std::string& str) -> PathSimulator<>::Configuration::Mode {
-            return PathSimulator<>::Configuration::modeFromString(str);
+          [](const std::string& str) -> PathSimulator::Configuration::Mode {
+            return PathSimulator::Configuration::modeFromString(str);
           }));
 
-  py::class_<PathSimulator<>::Configuration>(
+  py::class_<PathSimulator::Configuration>(
       m, "PathSimulatorConfiguration",
       "Configuration options for the Path Simulator")
       .def(py::init())
       .def_readwrite(
-          "mode", &PathSimulator<>::Configuration::mode,
+          "mode", &PathSimulator::Configuration::mode,
           R"pbdoc(Setting the mode used for determining a simulation path)pbdoc")
-      .def_readwrite("bracket_size",
-                     &PathSimulator<>::Configuration::bracketSize,
+      .def_readwrite("bracket_size", &PathSimulator::Configuration::bracketSize,
                      R"pbdoc(Size of the brackets one wants to combine)pbdoc")
       .def_readwrite(
-          "starting_point", &PathSimulator<>::Configuration::startingPoint,
+          "starting_point", &PathSimulator::Configuration::startingPoint,
           R"pbdoc(Start of the alternating or gate_cost strategy)pbdoc")
       .def_readwrite(
-          "gate_cost", &PathSimulator<>::Configuration::gateCost,
+          "gate_cost", &PathSimulator::Configuration::gateCost,
           R"pbdoc(A list that contains the number of gates which are considered in each step)pbdoc")
-      .def_readwrite("seed", &PathSimulator<>::Configuration::seed,
+      .def_readwrite("seed", &PathSimulator::Configuration::seed,
                      R"pbdoc(Seed for the simulator)pbdoc")
-      .def("json", &PathSimulator<>::Configuration::json)
-      .def("__repr__", &PathSimulator<>::Configuration::toString);
+      .def("json", &PathSimulator::Configuration::json)
+      .def("__repr__", &PathSimulator::Configuration::toString);
 
   auto pathSimulator =
-      createSimulator<PathSimulator<>>(m, "PathCircuitSimulator");
+      createSimulator<PathSimulator>(m, "PathCircuitSimulator");
   pathSimulator
       .def(py::init<>(
-               &constructSimulatorWithoutSeed<PathSimulator<>,
-                                              PathSimulator<>::Configuration&>),
-           "circ"_a, "config"_a = PathSimulator<>::Configuration())
+               &constructSimulatorWithoutSeed<PathSimulator,
+                                              PathSimulator::Configuration&>),
+           "circ"_a, "config"_a = PathSimulator::Configuration())
       .def(py::init<>(&constructSimulatorWithoutSeed<
-                      PathSimulator<>, PathSimulator<>::Configuration::Mode&,
+                      PathSimulator, PathSimulator::Configuration::Mode&,
                       const std::size_t&, const std::size_t&,
                       const std::list<std::size_t>&, const std::size_t&>),
-           "circ"_a,
-           "mode"_a = PathSimulator<>::Configuration::Mode::Sequential,
+           "circ"_a, "mode"_a = PathSimulator::Configuration::Mode::Sequential,
            "bracket_size"_a = 2, "starting_point"_a = 0,
            "gate_cost"_a = std::list<std::size_t>{}, "seed"_a = 0)
       .def("set_simulation_path",
-           py::overload_cast<const PathSimulator<>::SimulationPath::Components&,
-                             bool>(&PathSimulator<>::setSimulationPath),
+           py::overload_cast<const PathSimulator::SimulationPath::Components&,
+                             bool>(&PathSimulator::setSimulationPath),
            "path"_a, "assume_correct_order"_a = false);
 
   // Unitary Simulator

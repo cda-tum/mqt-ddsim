@@ -1,13 +1,11 @@
 #include "ShorSimulator.hpp"
 
-#include "Definitions.hpp"
-#include "Simulator.hpp"
 #include "dd/ComplexNumbers.hpp"
 #include "dd/DDDefinitions.hpp"
-#include "dd/DDpackageConfig.hpp"
 #include "dd/Edge.hpp"
 #include "dd/Node.hpp"
 #include "dd/Operations.hpp"
+#include "ir/Definitions.hpp"
 #include "ir/operations/OpType.hpp"
 
 #include <array>
@@ -23,22 +21,19 @@
 #include <utility>
 #include <vector>
 
-template <class Config>
 std::map<std::string, std::size_t>
-ShorSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
+ShorSimulator::simulate([[maybe_unused]] std::size_t shots) {
   if (verbose) {
     std::clog << "simulate Shor's algorithm for n=" << compositeN;
   }
 
   nQubits = static_cast<dd::Qubit>(3 * requiredBits);
-  Simulator<Config>::rootEdge =
-      Simulator<Config>::dd->makeZeroState(static_cast<dd::Qubit>(nQubits));
-  Simulator<Config>::dd->incRef(Simulator<Config>::rootEdge);
+  rootEdge = dd->makeZeroState(static_cast<dd::Qubit>(nQubits));
+  dd->incRef(rootEdge);
   // Initialize qubits
   // TODO: other init method where the initial value can be chosen
-  Simulator<Config>::rootEdge = dd::applyUnitaryOperation(
-      qc::StandardOperation(0, qc::X), Simulator<Config>::rootEdge,
-      *Simulator<Config>::dd);
+  rootEdge =
+      dd::applyUnitaryOperation(qc::StandardOperation(0, qc::X), rootEdge, *dd);
 
   if (verbose) {
     std::clog << " (requires " << nQubits << " qubits):\n";
@@ -54,7 +49,7 @@ ShorSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
     std::uniform_int_distribution<std::size_t> distribution(
         1, compositeN - 1); // range is inclusive
     do {
-      coprimeA = distribution(Simulator<Config>::mt);
+      coprimeA = distribution(mt);
     } while (gcd(coprimeA, compositeN) != 1 || coprimeA == 1);
   }
 
@@ -77,9 +72,8 @@ ShorSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
 
   for (std::uint32_t i = 0; i < 2 * requiredBits; i++) {
     const auto target = static_cast<qc::Qubit>(nQubits - 1 - i);
-    Simulator<Config>::rootEdge = dd::applyUnitaryOperation(
-        qc::StandardOperation(target, qc::H), Simulator<Config>::rootEdge,
-        *Simulator<Config>::dd);
+    rootEdge = dd::applyUnitaryOperation(qc::StandardOperation(target, qc::H),
+                                         rootEdge, *dd);
   }
   const auto mod = static_cast<std::int32_t>(
       std::ceil(2.0 * static_cast<double>(requiredBits) /
@@ -100,8 +94,7 @@ ShorSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
   }
 
   if (verbose) {
-    std::clog << "Nodes before QFT: " << Simulator<Config>::rootEdge.size()
-              << "\n";
+    std::clog << "Nodes before QFT: " << rootEdge.size() << "\n";
   }
 
   // EXACT QFT
@@ -109,8 +102,7 @@ ShorSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
        i++) {
     if (verbose) {
       std::clog << "[ " << i + 1 << "/" << 2 * requiredBits
-                << " ] QFT Pass. dd size=" << Simulator<Config>::rootEdge.size()
-                << "\n";
+                << " ] QFT Pass. dd size=" << rootEdge.size() << "\n";
     }
     double q = 2;
 
@@ -118,33 +110,31 @@ ShorSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
       double qR = cosine(1, -q);
       double qI = sine(1, -q);
       const dd::GateMatrix qm{1, 0, 0, {qR, qI}};
-      auto gate = Simulator<Config>::dd->makeGateDD(
+      auto gate = dd->makeGateDD(
           qm,
           qc::Control{static_cast<dd::Qubit>(nQubits - 1 -
                                              static_cast<std::size_t>(j))},
           static_cast<dd::Qubit>(nQubits - 1 - static_cast<std::size_t>(i)));
-      Simulator<Config>::rootEdge = Simulator<Config>::dd->applyOperation(
-          gate, Simulator<Config>::rootEdge);
+      rootEdge = dd->applyOperation(gate, rootEdge);
       q *= 2;
     }
 
     if (approximate && (i + 1) % mod == 0) {
       finalFidelity *= static_cast<long double>(
-          Simulator<Config>::approximateByFidelity(stepFidelity, false, true));
+          approximateByFidelity(stepFidelity, false, true));
       approximationRuns++;
     }
     const auto target =
         static_cast<qc::Qubit>(nQubits - 1 - static_cast<std::size_t>(i));
-    Simulator<Config>::rootEdge = dd::applyUnitaryOperation(
-        qc::StandardOperation(target, qc::H), Simulator<Config>::rootEdge,
-        *Simulator<Config>::dd);
+    rootEdge = dd::applyUnitaryOperation(qc::StandardOperation(target, qc::H),
+                                         rootEdge, *dd);
   }
 
   // Non-Quantum Post Processing
 
   // measure result (involves randomness)
   {
-    std::string sampleReversed = Simulator<Config>::measureAll(false);
+    std::string sampleReversed = measureAll(false);
     const std::string sample{sampleReversed.rbegin(), sampleReversed.rend()};
     simFactors = postProcessing(sample);
     if (simFactors.first != 0 && simFactors.second != 0) {
@@ -158,7 +148,7 @@ ShorSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
   // the path of least resistance result (does not involve randomness)
   {
     const std::pair<dd::ComplexValue, std::string> polrPair =
-        Simulator<Config>::getPathOfLeastResistance();
+        getPathOfLeastResistance();
     std::clog << polrPair.first << " " << polrPair.second << "\n";
     std::string polrReversed = polrPair.second;
     const std::string polr = {polrReversed.rbegin(), polrReversed.rend()};
@@ -184,9 +174,8 @@ ShorSimulator<Config>::simulate([[maybe_unused]] std::size_t shots) {
  * @return pair of integers with the factors in case of success or pair of zeros
  * in case of errors
  */
-template <class Config>
 std::pair<std::uint32_t, std::uint32_t>
-ShorSimulator<Config>::postProcessing(const std::string& sample) const {
+ShorSimulator::postProcessing(const std::string& sample) const {
   std::ostream log{nullptr};
   if (verbose) {
     log.rdbuf(std::clog.rdbuf());
@@ -285,8 +274,7 @@ ShorSimulator<Config>::postProcessing(const std::string& sample) const {
   return {0, 0};
 }
 
-template <class Config>
-dd::mEdge ShorSimulator<Config>::limitTo(std::uint64_t a) {
+dd::mEdge ShorSimulator::limitTo(std::uint64_t a) {
   std::array<dd::mEdge, 4> edges{dd::mEdge::zero(), dd::mEdge::zero(),
                                  dd::mEdge::zero(), dd::mEdge::zero()};
 
@@ -295,27 +283,25 @@ dd::mEdge ShorSimulator<Config>::limitTo(std::uint64_t a) {
   } else {
     edges[0] = dd::mEdge::one();
   }
-  dd::Edge f = Simulator<Config>::dd->makeDDNode(0, edges, false);
+  dd::Edge f = dd->makeDDNode(0, edges, false);
 
   edges[0] = edges[1] = edges[2] = edges[3] = dd::mEdge::zero();
 
   for (std::uint32_t p = 1; p < requiredBits + 1; p++) {
     if (((a >> p) & 1U) > 0) {
-      edges[0] = Simulator<Config>::dd->makeIdent();
+      edges[0] = dd->makeIdent();
       edges[3] = f;
     } else {
       edges[0] = f;
     }
-    f = Simulator<Config>::dd->makeDDNode(static_cast<dd::Qubit>(p), edges,
-                                          false);
+    f = dd->makeDDNode(static_cast<dd::Qubit>(p), edges, false);
     edges[3] = dd::mEdge::zero();
   }
 
   return f;
 }
 
-template <class Config>
-dd::mEdge ShorSimulator<Config>::addConst(std::uint64_t a) {
+dd::mEdge ShorSimulator::addConst(std::uint64_t a) {
   dd::mEdge f = dd::mEdge::one();
   std::array<dd::mEdge, 4> edges{dd::mEdge::zero(), dd::mEdge::zero(),
                                  dd::mEdge::zero(), dd::mEdge::zero()};
@@ -324,8 +310,7 @@ dd::mEdge ShorSimulator<Config>::addConst(std::uint64_t a) {
   while (((a >> p) & 1U) == 0U) {
     edges[0] = f;
     edges[3] = f;
-    f = Simulator<Config>::dd->makeDDNode(static_cast<dd::Qubit>(p), edges,
-                                          false);
+    f = dd->makeDDNode(static_cast<dd::Qubit>(p), edges, false);
     p++;
   }
 
@@ -334,12 +319,10 @@ dd::mEdge ShorSimulator<Config>::addConst(std::uint64_t a) {
 
   edges[0] = edges[1] = edges[2] = edges[3] = dd::mEdge::zero();
   edges[2] = f;
-  left = Simulator<Config>::dd->makeDDNode(static_cast<dd::Qubit>(p), edges,
-                                           false);
+  left = dd->makeDDNode(static_cast<dd::Qubit>(p), edges, false);
   edges[2] = dd::mEdge::zero();
   edges[1] = f;
-  right = Simulator<Config>::dd->makeDDNode(static_cast<dd::Qubit>(p), edges,
-                                            false);
+  right = dd->makeDDNode(static_cast<dd::Qubit>(p), edges, false);
   p++;
 
   dd::mEdge newLeft;
@@ -348,24 +331,20 @@ dd::mEdge ShorSimulator<Config>::addConst(std::uint64_t a) {
     edges[0] = edges[1] = edges[2] = edges[3] = dd::mEdge::zero();
     if (((a >> p) & 1U) != 0U) {
       edges[2] = left;
-      newLeft = Simulator<Config>::dd->makeDDNode(static_cast<dd::Qubit>(p),
-                                                  edges, false);
+      newLeft = dd->makeDDNode(static_cast<dd::Qubit>(p), edges, false);
       edges[2] = dd::mEdge::zero();
       edges[0] = right;
       edges[1] = left;
       edges[3] = right;
-      newRight = Simulator<Config>::dd->makeDDNode(static_cast<dd::Qubit>(p),
-                                                   edges, false);
+      newRight = dd->makeDDNode(static_cast<dd::Qubit>(p), edges, false);
     } else {
       edges[1] = right;
-      newRight = Simulator<Config>::dd->makeDDNode(static_cast<dd::Qubit>(p),
-                                                   edges, false);
+      newRight = dd->makeDDNode(static_cast<dd::Qubit>(p), edges, false);
       edges[1] = dd::mEdge::zero();
       edges[0] = left;
       edges[2] = right;
       edges[3] = left;
-      newLeft = Simulator<Config>::dd->makeDDNode(static_cast<dd::Qubit>(p),
-                                                  edges, false);
+      newLeft = dd->makeDDNode(static_cast<dd::Qubit>(p), edges, false);
     }
     left = newLeft;
     right = newRight;
@@ -376,12 +355,10 @@ dd::mEdge ShorSimulator<Config>::addConst(std::uint64_t a) {
   edges[2] = right;
   edges[3] = left;
 
-  return Simulator<Config>::dd->makeDDNode(static_cast<dd::Qubit>(p), edges,
-                                           false);
+  return dd->makeDDNode(static_cast<dd::Qubit>(p), edges, false);
 }
 
-template <class Config>
-dd::mEdge ShorSimulator<Config>::addConstMod(std::uint64_t a) {
+dd::mEdge ShorSimulator::addConstMod(std::uint64_t a) {
   const auto f = addConst(a);
   const auto f2 = addConst(compositeN);
   const auto f3 = limitTo(compositeN - 1);
@@ -389,23 +366,20 @@ dd::mEdge ShorSimulator<Config>::addConstMod(std::uint64_t a) {
   auto f4 = limitTo(compositeN - 1 - a);
   f4.w = dd::ComplexNumbers::neg(f4.w);
 
-  const auto diff2 = Simulator<Config>::dd->add(f3, f4);
+  const auto diff2 = dd->add(f3, f4);
 
   f4.w = dd::ComplexNumbers::neg(f4.w);
 
-  const auto simEdgeMultiply = Simulator<Config>::dd->multiply(
-      Simulator<Config>::dd->conjugateTranspose(f2), f);
-  const auto simEdgeResult = Simulator<Config>::dd->add(
-      Simulator<Config>::dd->multiply(f, f4),
-      Simulator<Config>::dd->multiply(simEdgeMultiply, diff2));
+  const auto simEdgeMultiply = dd->multiply(dd->conjugateTranspose(f2), f);
+  const auto simEdgeResult =
+      dd->add(dd->multiply(f, f4), dd->multiply(simEdgeMultiply, diff2));
 
   return simEdgeResult.p->e[0]; // NOLINT(clang-analyzer-core.CallAndMessage)
                                 // Function Pointer is not null
 }
 
-template <class Config>
-void ShorSimulator<Config>::uAEmulate(std::uint64_t a, std::int32_t q) {
-  const dd::mEdge limit = Simulator<Config>::dd->makeIdent();
+void ShorSimulator::uAEmulate(std::uint64_t a, std::int32_t q) {
+  const dd::mEdge limit = dd->makeIdent();
 
   dd::mEdge f = dd::mEdge::one();
   std::array<dd::mEdge, 4> edges{dd::mEdge::zero(), dd::mEdge::zero(),
@@ -414,18 +388,17 @@ void ShorSimulator<Config>::uAEmulate(std::uint64_t a, std::int32_t q) {
   for (std::uint32_t p = 0; p < requiredBits; ++p) {
     edges[0] = f;
     edges[1] = f;
-    f = Simulator<Config>::dd->makeDDNode(static_cast<dd::Qubit>(p), edges,
-                                          false);
+    f = dd->makeDDNode(static_cast<dd::Qubit>(p), edges, false);
   }
 
   // TODO: limitTo?
 
-  f = Simulator<Config>::dd->multiply(f, limit);
+  f = dd->multiply(f, limit);
 
   edges[1] = dd::mEdge::zero();
 
-  Simulator<Config>::dd->incRef(f);
-  Simulator<Config>::dd->incRef(limit);
+  dd->incRef(f);
+  dd->incRef(limit);
 
   std::uint64_t t = a;
 
@@ -438,56 +411,51 @@ void ShorSimulator<Config>::uAEmulate(std::uint64_t a, std::int32_t q) {
       } else {
         edges[0] = edges[3] = active;
       }
-      active = Simulator<Config>::dd->makeDDNode(static_cast<dd::Qubit>(p),
-                                                 edges, false);
+      active = dd->makeDDNode(static_cast<dd::Qubit>(p), edges, false);
     }
 
-    active.w = Simulator<Config>::dd->cn.lookup(-1, 0);
-    const dd::mEdge passive = Simulator<Config>::dd->multiply(
-        f, Simulator<Config>::dd->add(limit, active));
+    active.w = dd->cn.lookup(-1, 0);
+    const dd::mEdge passive = dd->multiply(f, dd->add(limit, active));
     active.w = dd::Complex::one();
-    active = Simulator<Config>::dd->multiply(f, active);
+    active = dd->multiply(f, active);
 
     const dd::mEdge tmp = addConstMod(t);
-    active = Simulator<Config>::dd->multiply(tmp, active);
+    active = dd->multiply(tmp, active);
 
-    Simulator<Config>::dd->decRef(f);
-    f = Simulator<Config>::dd->add(active, passive);
-    Simulator<Config>::dd->incRef(f);
-    Simulator<Config>::dd->garbageCollect();
+    dd->decRef(f);
+    f = dd->add(active, passive);
+    dd->incRef(f);
+    dd->garbageCollect();
 
     t = (2 * t) % compositeN;
   }
 
-  Simulator<Config>::dd->decRef(limit);
-  Simulator<Config>::dd->decRef(f);
+  dd->decRef(limit);
+  dd->decRef(f);
 
   dd::mEdge e = f;
 
   for (auto i = static_cast<std::int32_t>(2 * requiredBits - 1); i >= 0; --i) {
     if (i == q) {
       edges[1] = edges[2] = dd::mEdge::zero();
-      edges[0] = Simulator<Config>::dd->makeIdent();
+      edges[0] = dd->makeIdent();
       edges[3] = e;
-      e = Simulator<Config>::dd->makeDDNode(
+      e = dd->makeDDNode(
           static_cast<dd::Qubit>(nQubits - 1 - static_cast<std::size_t>(i)),
           edges, false);
     } else {
       edges[1] = edges[2] = dd::mEdge::zero();
       edges[0] = edges[3] = e;
-      e = Simulator<Config>::dd->makeDDNode(
+      e = dd->makeDDNode(
           static_cast<dd::Qubit>(nQubits - 1 - static_cast<std::size_t>(i)),
           edges, false);
     }
   }
 
-  const dd::vEdge tmp =
-      Simulator<Config>::dd->multiply(e, Simulator<Config>::rootEdge);
-  Simulator<Config>::dd->incRef(tmp);
-  Simulator<Config>::dd->decRef(Simulator<Config>::rootEdge);
-  Simulator<Config>::rootEdge = tmp;
+  const dd::vEdge tmp = dd->multiply(e, rootEdge);
+  dd->incRef(tmp);
+  dd->decRef(rootEdge);
+  rootEdge = tmp;
 
-  Simulator<Config>::dd->garbageCollect();
+  dd->garbageCollect();
 }
-
-template class ShorSimulator<dd::DDPackageConfig>;

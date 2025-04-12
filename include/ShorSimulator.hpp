@@ -2,7 +2,6 @@
 
 #include "Simulator.hpp"
 #include "dd/DDDefinitions.hpp"
-#include "dd/DDpackageConfig.hpp"
 #include "dd/Node.hpp"
 
 #include <cmath>
@@ -13,8 +12,7 @@
 #include <utility>
 #include <vector>
 
-template <class Config = dd::DDPackageConfig>
-class ShorSimulator : public Simulator<Config> {
+class ShorSimulator final : public Simulator {
   static std::uint64_t modpow(std::uint64_t base, std::uint64_t exp,
                               std::uint64_t modulus) {
     base %= modulus;
@@ -84,18 +82,18 @@ class ShorSimulator : public Simulator<Config> {
 public:
   ShorSimulator(const std::size_t compositeNumber,
                 const std::size_t coprimeNumber)
-      : Simulator<Config>(), compositeN(compositeNumber),
-        coprimeA(coprimeNumber), requiredBits(static_cast<std::size_t>(
-                                     std::ceil(std::log2(compositeNumber)))),
+      : compositeN(compositeNumber), coprimeA(coprimeNumber),
+        requiredBits(
+            static_cast<std::size_t>(std::ceil(std::log2(compositeNumber)))),
         verbose(false), approximate(false) {
     ts.resize(nQubits);
   };
 
   ShorSimulator(const std::size_t compositeNumber,
                 const std::size_t coprimeNumber, const std::uint64_t seed_)
-      : Simulator<Config>(seed_), compositeN(compositeNumber),
-        coprimeA(coprimeNumber), requiredBits(static_cast<std::size_t>(
-                                     std::ceil(std::log2(compositeNumber)))),
+      : Simulator(seed_), compositeN(compositeNumber), coprimeA(coprimeNumber),
+        requiredBits(
+            static_cast<std::size_t>(std::ceil(std::log2(compositeNumber)))),
         verbose(false), approximate(false) {
     ts.resize(nQubits);
   };
@@ -103,9 +101,9 @@ public:
   ShorSimulator(const std::size_t compositeNumber,
                 const std::size_t coprimeNumber, const bool verbose_,
                 const bool approximate_)
-      : Simulator<Config>(), compositeN(compositeNumber),
-        coprimeA(coprimeNumber), requiredBits(static_cast<std::size_t>(
-                                     std::ceil(std::log2(compositeNumber)))),
+      : compositeN(compositeNumber), coprimeA(coprimeNumber),
+        requiredBits(
+            static_cast<std::size_t>(std::ceil(std::log2(compositeNumber)))),
         verbose(verbose_), approximate(approximate_) {
     ts.resize(nQubits);
   };
@@ -113,9 +111,9 @@ public:
   ShorSimulator(const std::size_t compositeNumber,
                 const std::size_t coprimeNumber, const std::uint64_t seed_,
                 const bool verbose_, const bool approximate_)
-      : Simulator<Config>(seed_), compositeN(compositeNumber),
-        coprimeA(coprimeNumber), requiredBits(static_cast<std::size_t>(
-                                     std::ceil(std::log2(compositeNumber)))),
+      : Simulator(seed_), compositeN(compositeNumber), coprimeA(coprimeNumber),
+        requiredBits(
+            static_cast<std::size_t>(std::ceil(std::log2(compositeNumber)))),
         verbose(verbose_), approximate(approximate_) {
     ts.resize(nQubits);
   };
