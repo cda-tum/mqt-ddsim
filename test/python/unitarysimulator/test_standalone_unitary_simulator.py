@@ -3,8 +3,8 @@ from __future__ import annotations
 import unittest
 
 import numpy as np
-
 from mqt.core.ir import QuantumComputation
+
 from mqt.ddsim import ConstructionMode, UnitarySimulator
 
 

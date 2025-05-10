@@ -9,13 +9,12 @@ if TYPE_CHECKING:
     from qiskit import QuantumCircuit
 
 import numpy as np
+from mqt.core import load
 from qiskit import QiskitError
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
 from qiskit.utils.multiprocessing import local_hardware_info
-
-from mqt.core import load
 
 from .header import DDSIMHeader
 from .pyddsim import HybridCircuitSimulator, HybridMode

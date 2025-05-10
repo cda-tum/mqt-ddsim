@@ -6,12 +6,12 @@ from itertools import accumulate
 from typing import TYPE_CHECKING, Any, Union, cast
 
 import numpy as np
+from mqt.core import load
 from qiskit.circuit import QuantumCircuit
 from qiskit.primitives import Estimator as QiskitEstimator
 from qiskit.primitives import EstimatorResult
 from qiskit.quantum_info import Pauli, PauliList
 
-from mqt.core import load
 from mqt.ddsim.pyddsim import CircuitSimulator
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
