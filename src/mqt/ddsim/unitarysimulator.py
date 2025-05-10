@@ -6,12 +6,11 @@ import time
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
+from mqt.core import load
 from qiskit import QiskitError
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
-
-from mqt.core import load
 
 from .header import DDSIMHeader
 from .pyddsim import ConstructionMode, UnitarySimulator

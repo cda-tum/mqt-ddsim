@@ -10,11 +10,10 @@ if TYPE_CHECKING:
 
 
 import numpy as np
+from mqt.core import load
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
-
-from mqt.core import load
 
 from .header import DDSIMHeader
 from .pyddsim import PathCircuitSimulator, PathSimulatorConfiguration, PathSimulatorMode
