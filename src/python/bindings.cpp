@@ -1,7 +1,11 @@
 /*
- * This file is part of MQT DDSIM library which is released under the MIT
- * license. See file README.md or go to https://iic.jku.at/eda/research/quantum/
- * for more information.
+ * Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+ * Copyright (c) 2025 Munich Quantum Software Company GmbH
+ * All rights reserved.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Licensed under the MIT License
  */
 
 #include "CircuitSimulator.hpp"
