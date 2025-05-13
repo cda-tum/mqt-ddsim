@@ -153,6 +153,8 @@ jobs:
       enable-ubuntu2204-arm: false
       enable-macos15: false
       enable-windows2025: false
+      # Testing on Windows 11 ARM is not supported yet
+      enable-windows11-arm: false
 
   python-tests-extensive:
     name: 🐍 Test (Extensive)
@@ -175,6 +177,8 @@ jobs:
       enable-macos13: false
       enable-macos14: false
       enable-windows2022: false
+      # Testing on Windows 11 ARM is not supported yet
+      enable-windows11-arm: false
 
   python-linter:
     name: 🐍 Lint
