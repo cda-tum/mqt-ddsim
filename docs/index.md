@@ -41,6 +41,8 @@ quickstart
 simulators
 primitives
 references
+CHANGELOG
+UPGRADING
 ```
 
 ````{only} not latex
