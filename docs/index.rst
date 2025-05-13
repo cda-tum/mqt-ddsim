@@ -1,7 +1,7 @@
 Welcome to MQT DDSIM's documentation!
 =====================================
 
-DDSIM is a tool for quantum circuit simulation developed as part of the `Munich Quantum Toolkit <https://mqt.readthedocs.io>`_ (*MQT*) by the `Chair for Design Automation <https://www.cda.cit.tum.de/>`_ at the `Technical University of Munich <https://www.tum.de>`_. It builds upon `MQT Core <https://github.com/cda-tum/mqt-core>`_, which forms the backbone of the MQT.
+DDSIM is a tool for quantum circuit simulation developed as part of the `Munich Quantum Toolkit <https://mqt.readthedocs.io>`_ (*MQT*) by the `Chair for Design Automation <https://www.cda.cit.tum.de/>`_ at the `Technical University of Munich <https://www.tum.de>`_. It builds upon `MQT Core <https://github.com/munich-quantum-toolkit/core>`_, which forms the backbone of the MQT.
 
 We recommend you to start with the :doc:`installation instructions <Installation>` and then proceed to the :doc:`quickstart guide <Quickstart>`.
 If you are interested in the theory behind QCEC, have a look at the publications in the :doc:`publication list <Publications>`.

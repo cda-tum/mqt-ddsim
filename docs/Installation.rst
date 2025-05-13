@@ -1,7 +1,7 @@
 Installation
 ============
 
-MQT DDSIM is mainly developed as a C++ library that builds upon `MQT Core <https://github.com/cda-tum/mqt-core.git>`_, which forms the backbone of the `MQT <https://mqt.readthedocs.io>`_.
+MQT DDSIM is mainly developed as a C++ library that builds upon `MQT Core <https://github.com/munich-quantum-toolkit/core.git>`_, which forms the backbone of the `MQT <https://mqt.readthedocs.io>`_.
 In order to make the tool as accessible as possible, it comes with an easy-to-use Python interface.
 
 We encourage installing DDSIM via pip (preferably in a `virtual environment <https://docs.python.org/3/library/venv.html>`_):
@@ -95,7 +95,7 @@ In order to get the best performance out of DDSIM and enable platform-specific c
 This requires a `C++ compiler <https://en.wikipedia.org/wiki/List_of_compilers#C++_compilers>`_ supporting C++17 and a minimum `CMake <https://cmake.org/>`_ version of 3.19.
 
 The library is continuously tested under Linux, MacOS, and Windows using the `latest available system versions for GitHub Actions <https://github.com/actions/virtual-environments>`_.
-In order to access the latest build logs, visit `mqt-ddsim/actions/workflows/ci.yml <https://github.com/cda-tum/mqt-ddsim/actions/workflows/ci.yml>`_.
+In order to access the latest build logs, visit `mqt-ddsim/actions/workflows/ci.yml <https://github.com/munich-quantum-toolkit/ddsim/actions/workflows/ci.yml>`_.
 
 .. note::
     We noticed some issues when compiling with Microsoft's MSCV compiler toolchain.
@@ -116,7 +116,7 @@ python bindings) in *Release* mode for DDSIM.
 
 .. code-block:: console
 
-    $ git clone --recurse-submodules https://github.com/cda-tum/mqt-ddsim
+    $ git clone --recurse-submodules https://github.com/munich-quantum-toolkit/ddsim
     [...]
     $ cd mqt-ddsim
     $ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_MQT_DDSIM_BINDINGS=ON

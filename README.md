@@ -1,10 +1,10 @@
 [![PyPI](https://img.shields.io/pypi/v/mqt.ddsim?logo=pypi&style=flat-square)](https://pypi.org/project/mqt.ddsim/)
 ![OS](https://img.shields.io/badge/os-linux%20%7C%20macos%20%7C%20windows-blue?style=flat-square)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![CI](https://img.shields.io/github/actions/workflow/status/cda-tum/mqt-ddsim/ci.yml?branch=main&style=flat-square&logo=github&label=ci)](https://github.com/cda-tum/mqt-ddsim/actions/workflows/ci.yml)
-[![CD](https://img.shields.io/github/actions/workflow/status/cda-tum/mqt-ddsim/cd.yml?style=flat-square&logo=github&label=cd)](https://github.com/cda-tum/mqt-ddsim/actions/workflows/cd.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/munich-quantum-toolkit/ddsim/ci.yml?branch=main&style=flat-square&logo=github&label=ci)](https://github.com/munich-quantum-toolkit/ddsim/actions/workflows/ci.yml)
+[![CD](https://img.shields.io/github/actions/workflow/status/munich-quantum-toolkit/ddsim/cd.yml?style=flat-square&logo=github&label=cd)](https://github.com/munich-quantum-toolkit/ddsim/actions/workflows/cd.yml)
 [![Documentation](https://img.shields.io/readthedocs/ddsim?logo=readthedocs&style=flat-square)](https://mqt.readthedocs.io/projects/ddsim)
-[![codecov](https://img.shields.io/codecov/c/github/cda-tum/mqt-ddsim?style=flat-square&logo=codecov)](https://codecov.io/gh/cda-tum/mqt-ddsim)
+[![codecov](https://img.shields.io/codecov/c/github/munich-quantum-toolkit/ddsim?style=flat-square&logo=codecov)](https://codecov.io/gh/munich-quantum-toolkit/ddsim)
 
 <p align="center">
   <a href="https://mqt.readthedocs.io">
@@ -18,7 +18,7 @@
 # MQT DDSIM - A quantum circuit simulator based on decision diagrams written in C++
 
 A tool for classical quantum circuit simulation developed as part of the [_Munich Quantum Toolkit (MQT)_](https://mqt.readthedocs.io) by the [Chair for Design Automation](https://www.cda.cit.tum.de/) at the [Technical University of Munich](https://www.tum.de/).
-It builds upon [MQT Core](https://github.com/cda-tum/mqt-core), which forms the backbone of the MQT.
+It builds upon [MQT Core](https://github.com/munich-quantum-toolkit/core), which forms the backbone of the MQT.
 
 <p align="center">
   <a href="https://mqt.readthedocs.io/projects/ddsim">
@@ -26,7 +26,7 @@ It builds upon [MQT Core](https://github.com/cda-tum/mqt-core), which forms the 
   </a>
 </p>
 
-If you have any questions, feel free to contact us via [quantum.cda@xcit.tum.de](mailto:quantum.cda@xcit.tum.de) or by creating an [issue](https://github.com/cda-tum/mqt-ddsim/issues) on GitHub.
+If you have any questions, feel free to contact us via [quantum.cda@xcit.tum.de](mailto:quantum.cda@xcit.tum.de) or by creating an [issue](https://github.com/munich-quantum-toolkit/ddsim/issues) on GitHub.
 
 ## Getting Started
 

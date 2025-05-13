@@ -9,7 +9,7 @@ In order to start developing, clone the DDSIM repository using
 
     .. code-block:: console
 
-        $ git clone --recurse-submodules https://github.com/cda-tum/mqt-ddsim
+        $ git clone --recurse-submodules https://github.com/munich-quantum-toolkit/ddsim mqt-ddsim
 
 Note the :code:`--recurse-submodules` flag. It is required to also clone all the required submodules. If you happen to forget passing the flag on your initial clone, you can initialize all the submodules by executing :code:`git submodule update --init --recursive` in the main project directory.
 
@@ -55,5 +55,5 @@ The :code:`mqt.ddsim` Python module can be conveniently built locally by calling
 
 The :code:`--editable` flag ensures that changes in the Python code are instantly available without re-running the command.
 
-`Pybind11 <https://pybind11.readthedocs.io/>`_ is used for providing bindings of the C++ core library to Python (see `bindings.cpp <https://github.com/cda-tum/mqt-ddsim/tree/master/mqt/ddsim/bindings.cpp>`_).
+`Pybind11 <https://pybind11.readthedocs.io/>`_ is used for providing bindings of the C++ core library to Python (see `bindings.cpp <https://github.com/munich-quantum-toolkit/ddsim/tree/master/mqt/ddsim/bindings.cpp>`_).
 If parts of the C++ code have been changed, the above command has to be run again to make the changes visible in Python.

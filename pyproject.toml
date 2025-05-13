@@ -53,10 +53,10 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-Homepage = "https://github.com/cda-tum/mqt-ddsim"
+Homepage = "https://github.com/munich-quantum-toolkit/ddsim"
 Documentation = "https://mqt.readthedocs.io/projects/ddsim"
-Issues = "https://github.com/cda-tum/mqt-ddsim/issues"
-Discussions = "https://github.com/cda-tum/mqt-ddsim/discussions"
+Issues = "https://github.com/munich-quantum-toolkit/ddsim/issues"
+Discussions = "https://github.com/munich-quantum-toolkit/ddsim/discussions"
 
 
 [tool.scikit-build]
