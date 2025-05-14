@@ -14,13 +14,13 @@ concurrency:
 jobs:
   change-detection:
     name: 🔍 Change
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-change-detection.yml@v1.8
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-change-detection.yml@v1.9
 
   cpp-tests:
     name: 🇨‌ Test
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-tests)
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-ci.yml@v1.8
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-ci.yml@v1.9
     with:
       # Runs to enable
       enable-ubuntu2404-gcc-release: true
@@ -28,6 +28,7 @@ jobs:
       enable-macos13-clang-release: true
       enable-macos14-clang-release: true
       enable-windows2022-msvc-release: true
+      enable-windows11-arm-msvc-release: true
       # Runs to disable
       enable-ubuntu2404-gcc-debug: false
       enable-ubuntu2404-clang-release: false
@@ -60,13 +61,16 @@ jobs:
       enable-windows2025-msvc-debug: false
       enable-windows2025-clang-release: false
       enable-windows2025-clang-debug: false
+      enable-windows11-arm-msvc-debug: false
+      enable-windows11-arm-clang-release: false
+      enable-windows11-arm-clang-debug: false
 
   # run extensive C++ tests whenever this is on a PR and the PR has the `extensive-cpp-ci` label
   cpp-tests-extensive:
     name: 🇨‌ Test (Extensive)
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-tests) && github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'extensive-cpp-ci')
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-ci.yml@v1.8
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-ci.yml@v1.9
     with:
       # Runs to enable
       enable-ubuntu2404-gcc-debug: true
@@ -100,18 +104,22 @@ jobs:
       enable-windows2025-msvc-debug: true
       enable-windows2025-clang-release: true
       enable-windows2025-clang-debug: true
+      enable-windows11-arm-msvc-debug: true
+      enable-windows11-arm-clang-release: true
+      enable-windows11-arm-clang-debug: true
       # Runs to disable (these are already enabled in the non-extensive run)
       enable-ubuntu2404-gcc-release: false
       enable-ubuntu2404-arm-gcc-release: false
       enable-macos13-clang-release: false
       enable-macos14-clang-release: false
       enable-windows2022-msvc-release: false
+      enable-windows11-arm-msvc-release: false
 
   cpp-coverage:
     name: 🇨‌ Coverage
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-tests)
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-coverage.yml@v1.8
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-coverage.yml@v1.9
     # Explicitly set permissions so that the workflows also work from forks.
     permissions:
       contents: read # Required for the `actions/checkout` action
@@ -121,14 +129,14 @@ jobs:
     name: 🇨‌ Lint
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-linter)
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-linter.yml@v1.8
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-linter.yml@v1.9
 
   # run extensive Python tests whenever this is on a PR and the PR has the `extensive-python-ci` label
   python-tests:
     name: 🐍 Test
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-python-tests)
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-ci.yml@v1.8
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-ci.yml@v1.9
     # Explicitly set permissions so that the workflows also work from forks.
     permissions:
       contents: read # Required for the `actions/checkout` action
@@ -145,12 +153,14 @@ jobs:
       enable-ubuntu2204-arm: false
       enable-macos15: false
       enable-windows2025: false
+      # Testing on Windows 11 ARM is not supported yet
+      enable-windows11-arm: false
 
   python-tests-extensive:
     name: 🐍 Test (Extensive)
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-python-tests) && github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'extensive-python-ci')
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-ci.yml@v1.8
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-ci.yml@v1.9
     # Explicitly set permissions so that the workflows also work from forks.
     permissions:
       contents: read # Required for the `actions/checkout` action
@@ -167,24 +177,39 @@ jobs:
       enable-macos13: false
       enable-macos14: false
       enable-windows2022: false
+      # Testing on Windows 11 ARM is not supported yet
+      enable-windows11-arm: false
 
   python-linter:
     name: 🐍 Lint
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-python-tests)
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-linter.yml@v1.8
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-linter.yml@v1.9
 
   code-ql:
     name: 📝 CodeQL
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-code-ql)
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-code-ql.yml@v1.8
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-code-ql.yml@v1.9
 
   cd:
     name: 🚀 CD
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cd)
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-packaging.yml@v1.8
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-packaging.yml@v1.9
+    with:
+      # Runs to enable
+      enable-ubuntu2404: true
+      enable-ubuntu2404-arm: true
+      enable-macos13: true
+      enable-macos14: true
+      enable-windows2022: true
+      enable-windows11-arm: true
+      # Runs to disable
+      enable-ubuntu2204: false
+      enable-ubuntu2204-arm: false
+      enable-macos15: false
+      enable-windows2025: false
 
   required-checks-pass: # This job does nothing and is only used for branch protection
     name: 🚦 Check

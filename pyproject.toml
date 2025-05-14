@@ -1,9 +1,17 @@
+# Copyright (c) 2023 - 2025 Chair for Design Automation, TUM
+# Copyright (c) 2025 Munich Quantum Software Company GmbH
+# All rights reserved.
+#
+# SPDX-License-Identifier: MIT
+#
+# Licensed under the MIT License
+
 [build-system]
 requires = [
-    "scikit-build-core>=0.11.1",
-    "setuptools-scm>=8.2",
+    "scikit-build-core>=0.11.2",
+    "setuptools-scm>=8.3.1",
     "pybind11>=2.13.6",
-    "mqt.core>=3.0.2",
+    "mqt.core~=3.0.0",
 ]
 build-backend = "scikit_build_core.build"
 
@@ -39,16 +47,16 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "mqt.core[qiskit]>=3.0.2",
+    "mqt.core[qiskit]>=3.0.0",
     "qiskit<2",  # We still use V1 Primitives that have been removed in Qiskit 2.0
 ]
 dynamic = ["version"]
 
 [project.urls]
-Homepage = "https://github.com/cda-tum/mqt-ddsim"
+Homepage = "https://github.com/munich-quantum-toolkit/ddsim"
 Documentation = "https://mqt.readthedocs.io/projects/ddsim"
-Issues = "https://github.com/cda-tum/mqt-ddsim/issues"
-Discussions = "https://github.com/cda-tum/mqt-ddsim/discussions"
+Issues = "https://github.com/munich-quantum-toolkit/ddsim/issues"
+Discussions = "https://github.com/munich-quantum-toolkit/ddsim/discussions"
 
 
 [tool.scikit-build]
@@ -261,13 +269,16 @@ build = "cp3*"
 skip = "*-musllinux_*"
 archs = "auto64"
 test-command = "python -c \"from mqt import ddsim\""
-test-skip = ["cp313*"] # skip testing on Python 3.13 until our dependencies are ready
 build-frontend = "build[uv]"
 enable = ["cpython-freethreading"]
 manylinux-x86_64-image = "manylinux_2_28"
 manylinux-aarch64-image = "manylinux_2_28"
 manylinux-ppc64le-image = "manylinux_2_28"
 manylinux-s390x-image = "manylinux_2_28"
+test-skip = [
+    "cp3*t-*", # no freethreading qiskit wheels
+    "cp*-win_arm64", # no numpy, qiskit, ... wheels
+]
 
 # The mqt-core shared libraries are provided by the mqt-core Python package.
 # They should not be vendorized into the mqt-qcec wheel. This requires
@@ -311,32 +322,31 @@ mqt-ddsim = { workspace = true }
 [dependency-groups]
 build = [
   "pybind11>=2.13.6",
-  "scikit-build-core>=0.11.1",
-  "setuptools-scm>=8.2",
-  "mqt.core>=3.0.2",
+  "scikit-build-core>=0.11.2",
+  "setuptools-scm>=8.3.1",
+  "mqt.core~=3.0.0",
 ]
 docs = [
   "furo>=2024.8.6",
+  "myst-nb>=1.2.0",
   "qiskit[visualization]>=1.0.0",
-  "setuptools-scm>=8.2",
+  "setuptools-scm>=8.3.1",
   "sphinx-autoapi>=3.6.0",
   "sphinx-copybutton>=0.5.2",
   "sphinx-design>=0.6.1",
   "sphinxcontrib-bibtex>=2.6.3",
   "sphinxcontrib-svg2pdfconverter>=1.3.0",
   "sphinxext-opengraph>=0.10.0",
-  "ipykernel>=6.29.5",
-  "nbsphinx>=0.9.6",
-  "sphinx-autodoc-typehints>=2.3.0",
+  "breathe>=4.36.0",
+  "graphviz>=0.20.3",
   "sphinx>=7.4.7",
   "sphinx>=8.1.3; python_version >= '3.10'",
   "sphinx>=8.2.3; python_version >= '3.11'",
-  "breathe>=4.36.0",
-  "graphviz>=0.20.3",
 ]
 test = [
   "pytest>=8.3.5",
   "pytest-cov>=6.1.1",
+  "numpy>=2.1; python_version >= '3.13'",
 ]
 dev = [
   {include-group = "build"},
