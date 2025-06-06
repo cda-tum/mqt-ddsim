@@ -12,7 +12,6 @@ if(NOT TARGET MQT::DDSim)
   # collect headers and source files
   file(GLOB_RECURSE MQT_DDSIM_HEADERS ${MQT_DDSIM_INCLUDE_BUILD_DIR}/*.hpp)
   file(GLOB_RECURSE MQT_DDSIM_SOURCES **.cpp)
-  list(FILTER MQT_DDSIM_SOURCES EXCLUDE REGEX ".*/python/.*$")
 
   # add DDSim Package library
   add_library(${MQT_DDSIM_TARGET_NAME} ${MQT_DDSIM_HEADERS} ${MQT_DDSIM_SOURCES})
@@ -34,8 +33,4 @@ if(NOT TARGET MQT::DDSim)
 
   # add MQT alias
   add_library(MQT::DDSim ALIAS ${MQT_DDSIM_TARGET_NAME})
-endif()
-
-if(BUILD_MQT_DDSIM_BINDINGS)
-  add_subdirectory(python)
 endif()
