@@ -32,3 +32,6 @@ Alternatively, CMake can be conveniently installed from PyPI using the [`cmake`]
 
 [MQT SyReC]: https://github.com/cda-tum/mqt-syrec
 [unreleased]: https://github.com/munich-quantum-toolkit/qmap/compare/v1.24.0...HEAD
+
+To developers of MQT DDSIM, it is worth mentioning that all Python code (except tests) has been moved to the top-level `python` directory.
+Furthermore, the C++ code for the Python bindings has been moved to the top-level `bindings` directory.

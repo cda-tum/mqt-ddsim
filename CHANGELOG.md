@@ -1,3 +1,5 @@
+<!-- Entries in each category are sorted by merge time, with the latest PRs appearing first. -->
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
@@ -15,6 +17,8 @@ _If you are upgrading: please see [`UPGRADING.md`](UPGRADING.md#Unreleased)._
 
 ### Changed
 
+- ♻️ Move the C++ code for the Python bindings to the top-level `bindings` directory ([#567]) ([**@denialhaag**])
+- ♻️ Move all Python code (no tests) to the top-level `python` directory ([#567]) ([**@denialhaag**])
 - **Breaking**: 🚚 Move MQT DDSIM to the [munich-quantum-toolkit] GitHub organization
 - **Breaking**: ♻️ Use the `mqt-core` Python package for handling circuits ([#336]) ([**@burgholzer**])
 - **Breaking**: ⬆️ Bump minimum required CMake version to `3.24.0` ([#538]) ([**@burgholzer**])
