@@ -131,14 +131,13 @@ dmypy.json
 cython_debug/
 
 # setuptools_scm
-src/*/_version.py
+python/**/_version.py
 
 # SKBuild cache dir
 _skbuild/
 
 # Any build dirs in the tests
 test/**/build/
-/src/mqt/**/_version.py
 
 # Common editor files
 *~

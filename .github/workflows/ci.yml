@@ -129,7 +129,13 @@ jobs:
     name: 🇨‌ Lint
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-linter)
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-linter.yml@v1.9
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-linter.yml@v1.10
+    with:
+      clang-version: 20
+      cmake-args: -DBUILD_MQT_DDSIM_BINDINGS=ON
+      files-changed-only: false
+      install-pkgs: "pybind11==2.13.6"
+      setup-python: true
 
   # run extensive Python tests whenever this is on a PR and the PR has the `extensive-python-ci` label
   python-tests:
