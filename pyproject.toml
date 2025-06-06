@@ -108,7 +108,7 @@ cmake.define.DISABLE_GIL = "1"
 
 
 [tool.check-sdist]
-sdist-only = ["pyhton/mqt/ddsim/_version.py"]
+sdist-only = ["python/mqt/ddsim/_version.py"]
 git-only = [
     "docs/*",
     "extern/*",
