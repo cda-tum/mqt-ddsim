@@ -11,11 +11,10 @@ from __future__ import annotations
 from typing import TypeVar
 
 import pytest
+from mqt.ddsim.primitives import Sampler
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import RealAmplitudes
 from qiskit.primitives import SamplerResult
-
-from mqt.ddsim.primitives import Sampler
 
 T = TypeVar("T", str, int)
 

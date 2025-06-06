@@ -12,7 +12,6 @@ import unittest
 
 import numpy as np
 from mqt.core.ir import QuantumComputation
-
 from mqt.ddsim import ConstructionMode, UnitarySimulator
 
 

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 from qiskit import (
     AncillaRegister,
     ClassicalRegister,
@@ -17,8 +18,6 @@ from qiskit import (
     QuantumRegister,
 )
 from qiskit.circuit import Parameter
-
-from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
 
 @pytest.fixture

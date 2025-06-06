@@ -11,9 +11,8 @@ from __future__ import annotations
 import math
 import unittest
 
-from qiskit import QuantumCircuit, QuantumRegister
-
 from mqt.ddsim.hybridstatevectorsimulator import HybridStatevectorSimulatorBackend
+from qiskit import QuantumCircuit, QuantumRegister
 
 
 class MQTHybridStatevectorSimulatorTest(unittest.TestCase):
