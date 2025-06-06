@@ -11,6 +11,7 @@ from __future__ import annotations
 import unittest
 
 from mqt.core.ir import QuantumComputation
+
 from mqt.ddsim import HybridCircuitSimulator, HybridMode
 
 

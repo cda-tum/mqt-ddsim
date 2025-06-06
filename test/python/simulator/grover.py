@@ -11,10 +11,11 @@ from __future__ import annotations
 import locale
 import pathlib
 
-from mqt.ddsim import DDSIMProvider
 from qiskit import BasicAer
 from qiskit.algorithms import AmplificationProblem, Grover
 from qiskit.circuit.library import PhaseOracle
+
+from mqt.ddsim import DDSIMProvider
 
 input_3sat_instance = """
 c example DIMACS-CNF 3-SAT

@@ -11,8 +11,9 @@ from __future__ import annotations
 import math
 import unittest
 
-from mqt.ddsim.pathstatevectorsimulator import PathStatevectorSimulatorBackend
 from qiskit import QuantumCircuit, QuantumRegister
+
+from mqt.ddsim.pathstatevectorsimulator import PathStatevectorSimulatorBackend
 
 
 class MQTStatevectorSimulatorTest(unittest.TestCase):

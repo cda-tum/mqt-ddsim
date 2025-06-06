@@ -9,8 +9,9 @@
 from __future__ import annotations
 
 import pytest
-from mqt.ddsim.stochasticnoisesimulator import StochasticNoiseSimulatorBackend
 from qiskit import QuantumCircuit, qasm2
+
+from mqt.ddsim.stochasticnoisesimulator import StochasticNoiseSimulatorBackend
 
 
 @pytest.fixture

@@ -12,9 +12,10 @@ import contextlib
 
 import numpy as np
 import pytest
-from mqt.ddsim.target import DDSIMTargetBuilder
 from qiskit import QuantumCircuit, transpile
 from qiskit.transpiler import Target
+
+from mqt.ddsim.target import DDSIMTargetBuilder
 
 
 @pytest.fixture

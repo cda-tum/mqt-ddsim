@@ -11,8 +11,9 @@ from __future__ import annotations
 import unittest
 
 import numpy as np
-from mqt.ddsim.unitarysimulator import UnitarySimulatorBackend
 from qiskit import QuantumCircuit
+
+from mqt.ddsim.unitarysimulator import UnitarySimulatorBackend
 
 
 class MQTUnitarySimulatorTest(unittest.TestCase):

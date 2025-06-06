@@ -10,11 +10,12 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-from mqt.ddsim.primitives.estimator import Estimator
 from qiskit.circuit import QuantumCircuit
 from qiskit.circuit.library import RealAmplitudes
 from qiskit.primitives import EstimatorResult
 from qiskit.quantum_info import Operator, Pauli, SparsePauliOp
+
+from mqt.ddsim.primitives.estimator import Estimator
 
 
 @pytest.fixture

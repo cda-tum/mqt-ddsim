@@ -10,8 +10,9 @@ from __future__ import annotations
 
 import unittest
 
-from mqt.ddsim.pathqasmsimulator import PathQasmSimulatorBackend
 from qiskit import QuantumCircuit
+
+from mqt.ddsim.pathqasmsimulator import PathQasmSimulatorBackend
 
 
 class MQTQasmSimulatorTest(unittest.TestCase):

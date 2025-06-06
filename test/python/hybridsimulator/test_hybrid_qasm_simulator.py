@@ -10,8 +10,9 @@ from __future__ import annotations
 
 import unittest
 
-from mqt.ddsim.hybridqasmsimulator import HybridQasmSimulatorBackend
 from qiskit import QuantumCircuit, QuantumRegister
+
+from mqt.ddsim.hybridqasmsimulator import HybridQasmSimulatorBackend
 
 
 class MQTHybridQasmSimulatorTest(unittest.TestCase):

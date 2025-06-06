@@ -13,10 +13,11 @@ from __future__ import annotations
 import math
 from typing import TYPE_CHECKING, Any, Union
 
-from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 from qiskit.primitives import SamplerResult
 from qiskit.primitives.sampler import Sampler as QiskitSampler
 from qiskit.result import QuasiDistribution, Result
+
+from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
 if TYPE_CHECKING:
     from collections.abc import Mapping, Sequence
