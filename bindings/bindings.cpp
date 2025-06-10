@@ -31,11 +31,14 @@
 namespace py = pybind11;
 using namespace pybind11::literals;
 
+namespace {
+
 template <class Simulator, typename... Args>
-std::unique_ptr<Simulator> static constructSimulator(
-    const qc::QuantumComputation& circ, const double stepFidelity,
-    const unsigned int stepNumber, const std::string& approximationStrategy,
-    const std::int64_t seed, Args&&... args) {
+std::unique_ptr<Simulator>
+constructSimulator(const qc::QuantumComputation& circ,
+                   const double stepFidelity, const unsigned int stepNumber,
+                   const std::string& approximationStrategy,
+                   const std::int64_t seed, Args&&... args) {
   auto qc = std::make_unique<qc::QuantumComputation>(circ);
   const auto approx =
       ApproximationInfo{stepFidelity, stepNumber,
@@ -54,15 +57,16 @@ std::unique_ptr<Simulator> static constructSimulator(
 }
 
 template <class Simulator, typename... Args>
-std::unique_ptr<Simulator> static constructSimulatorWithoutSeed(
-    const qc::QuantumComputation& circ, Args&&... args) {
+std::unique_ptr<Simulator>
+constructSimulatorWithoutSeed(const qc::QuantumComputation& circ,
+                              Args&&... args) {
   return constructSimulator<Simulator>(circ, 1., 1, "fidelity", -1,
                                        std::forward<Args>(args)...);
 }
 
 template <class Sim>
-py::class_<Sim> static createSimulator(py::module_ m, const std::string& name) {
-  auto sim = py::class_<Sim>(m, name.c_str());
+py::class_<Sim> createSimulator(py::module_ m, const std::string& name) {
+  auto sim = py::class_<Sim>(std::move(m), name.c_str());
   sim.def("get_number_of_qubits", &Sim::getNumberOfQubits,
           "Get the number of qubits")
       .def("get_name", &Sim::getName, "Get the name of the simulator")
@@ -99,6 +103,8 @@ py::class_<Sim> static createSimulator(py::module_ m, const std::string& name) {
   }
   return sim;
 }
+
+} // namespace
 
 PYBIND11_MODULE(pyddsim, m, py::mod_gil_not_used()) {
   py::module::import("mqt.core.dd");
