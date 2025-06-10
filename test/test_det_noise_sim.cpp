@@ -26,6 +26,8 @@
 
 using namespace qc::literals;
 
+namespace {
+
 std::unique_ptr<qc::QuantumComputation> detGetAdder4Circuit() {
   // circuit taken from https://github.com/pnnl/qasmbench
   auto quantumComputation = std::make_unique<qc::QuantumComputation>(4);
@@ -54,6 +56,8 @@ std::unique_ptr<qc::QuantumComputation> detGetAdder4Circuit() {
   quantumComputation->h(3);
   return quantumComputation;
 }
+
+} // namespace
 
 TEST(DeterministicNoiseSimTest, TestingBarrierGate) {
   auto quantumComputation = std::make_unique<qc::QuantumComputation>(2);
