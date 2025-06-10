@@ -68,7 +68,7 @@ void StochasticNoiseSimulator::runStochSimulationForId(
   std::mt19937_64 generator(localSeed);
 
   const std::uint64_t numberOfRuns =
-      stochasticRuns / maxInstances +
+      (stochasticRuns / maxInstances) +
       (stochRun < stochasticRuns % maxInstances ? 1U : 0U);
   const auto approxMod = static_cast<unsigned>(
       std::ceil(static_cast<double>(qc->getNops()) /

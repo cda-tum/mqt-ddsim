@@ -298,13 +298,13 @@ void PathSimulator::generateBracketSimulationPath(std::size_t bracketSize) {
     if (i == 0) {
       components.emplace_back(memoryLeft, memoryLeft + (bracketSize - 1));
     } else {
-      components.emplace_back(memoryLeft + (bracketSize - 1) * bracketMemory +
+      components.emplace_back(memoryLeft + ((bracketSize - 1) * bracketMemory) +
                                   opMemory + i,
-                              memoryLeft + (bracketSize - 1) * (i + 1));
+                              memoryLeft + ((bracketSize - 1) * (i + 1)));
     }
   }
   // Adding the last stray element on the right-hand side
-  components.emplace_back(memoryLeft + (bracketSize)*bracketMemory + opMemory,
+  components.emplace_back(memoryLeft + (bracketSize * bracketMemory) + opMemory,
                           strayElem);
   setSimulationPath(components, true);
 }

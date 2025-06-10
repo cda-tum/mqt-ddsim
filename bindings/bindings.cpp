@@ -14,24 +14,28 @@
 #include "PathSimulator.hpp"
 #include "StochasticNoiseSimulator.hpp"
 #include "UnitarySimulator.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <cstddef>
+#include <cstdint>
 #include <list>
 #include <memory>
 #include <optional>
+#include <pybind11/cast.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <pybind11/stl.h> // NOLINT(misc-include-cleaner)
+#include <string>
+#include <utility>
 
 namespace py = pybind11;
 using namespace pybind11::literals;
 
 template <class Simulator, typename... Args>
-std::unique_ptr<Simulator>
-constructSimulator(const qc::QuantumComputation& circ,
-                   const double stepFidelity, const unsigned int stepNumber,
-                   const std::string& approximationStrategy,
-                   const std::int64_t seed, Args&&... args) {
+std::unique_ptr<Simulator> static constructSimulator(
+    const qc::QuantumComputation& circ, const double stepFidelity,
+    const unsigned int stepNumber, const std::string& approximationStrategy,
+    const std::int64_t seed, Args&&... args) {
   auto qc = std::make_unique<qc::QuantumComputation>(circ);
   const auto approx =
       ApproximationInfo{stepFidelity, stepNumber,
@@ -50,15 +54,14 @@ constructSimulator(const qc::QuantumComputation& circ,
 }
 
 template <class Simulator, typename... Args>
-std::unique_ptr<Simulator>
-constructSimulatorWithoutSeed(const qc::QuantumComputation& circ,
-                              Args&&... args) {
+std::unique_ptr<Simulator> static constructSimulatorWithoutSeed(
+    const qc::QuantumComputation& circ, Args&&... args) {
   return constructSimulator<Simulator>(circ, 1., 1, "fidelity", -1,
                                        std::forward<Args>(args)...);
 }
 
 template <class Sim>
-py::class_<Sim> createSimulator(py::module_ m, const std::string& name) {
+py::class_<Sim> static createSimulator(py::module_ m, const std::string& name) {
   auto sim = py::class_<Sim>(m, name.c_str());
   sim.def("get_number_of_qubits", &Sim::getNumberOfQubits,
           "Get the number of qubits")
