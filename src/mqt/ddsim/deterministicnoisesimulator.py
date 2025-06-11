@@ -90,5 +90,5 @@ class DeterministicNoiseSimulatorBackend(QasmSimulatorBackend):
             seed=seed,
             data=data,
             metadata=qc.metadata,
-            header=DDSIMHeader(qc),
+            header=DDSIMHeader.from_quantum_circuit(qc),
         )

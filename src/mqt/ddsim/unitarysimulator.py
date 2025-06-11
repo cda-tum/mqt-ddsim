@@ -102,7 +102,7 @@ class UnitarySimulatorBackend(QasmSimulatorBackend):
             seed=seed,
             data=data,
             metadata=qc.metadata,
-            header=DDSIMHeader(qc),
+            header=DDSIMHeader.from_quantum_circuit(qc),
         )
 
     def _validate(self, quantum_circuits: Sequence[QuantumCircuit]) -> None:

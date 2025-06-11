@@ -10,36 +10,26 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import TYPE_CHECKING
-
-from qiskit.result.models import QobjExperimentHeader
+from collections import UserDict
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
 
 
-@dataclass
-class DDSIMHeader(QobjExperimentHeader):  # type: ignore[misc]
-    """Qiskit experiment header for DDSIM backends."""
+class DDSIMHeader(UserDict[str, Any]):
+    """Header for DDSIM backends."""
 
-    name: str
-    n_qubits: int
-    memory_slots: int
-    global_phase: float
-    creg_sizes: list[tuple[str, int]]
-    clbit_labels: list[tuple[str, int]]
-    qreg_sizes: list[tuple[str, int]]
-    qubit_labels: list[tuple[str, int]]
-
-    def __init__(self, qc: QuantumCircuit) -> None:
-        """Initialize a new DDSIM experiment header."""
-        # no call to super class constructor because this would trigger deprecation warnings
-        self.name = qc.name
-        self.n_qubits = qc.num_qubits
-        self.memory_slots = qc.num_clbits
-        self.global_phase = qc.global_phase
-        self.creg_sizes = [(creg.name, creg.size) for creg in qc.cregs]
-        self.clbit_labels = [(creg.name, j) for creg in qc.cregs for j in range(creg.size)]
-        self.qreg_sizes = [(qreg.name, qreg.size) for qreg in qc.qregs]
-        self.qubit_labels = [(qreg.name, j) for qreg in qc.qregs for j in range(qreg.size)]
+    @classmethod
+    def from_quantum_circuit(cls, qc: QuantumCircuit) -> DDSIMHeader:
+        """Create a DDSIM experiment header from a QuantumCircuit."""
+        user_dict = {}
+        user_dict["name"] = qc.name
+        user_dict["n_qubits"] = qc.num_qubits
+        user_dict["memory_slots"] = qc.num_clbits
+        user_dict["global_phase"] = qc.global_phase
+        user_dict["creg_sizes"] = [(creg.name, creg.size) for creg in qc.cregs]
+        user_dict["clbit_labels"] = [(creg.name, j) for creg in qc.cregs for j in range(creg.size)]
+        user_dict["qreg_sizes"] = [(qreg.name, qreg.size) for qreg in qc.qregs]
+        user_dict["qubit_labels"] = [(qreg.name, j) for qreg in qc.qregs for j in range(qreg.size)]
+        return cls(user_dict)
