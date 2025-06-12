@@ -38,19 +38,19 @@ class Sampler(StatevectorSampler):  # type: ignore[misc]
 
     def _run_pub(self, pub: SamplerPub) -> SamplerPubResult:
         circuit = pub.circuit
-        cregs = circuit.cregs
+        parameter_values = pub.parameter_values
+        shots = pub.shots
 
-        bound_circuits = pub.parameter_values.bind_all(circuit)
+        bound_circuits = parameter_values.bind_all(circuit)
+        bound_circuits_list = np.asarray(bound_circuits, dtype=object).tolist()
+        result = self.backend.run(bound_circuits_list, shots=shots).result()
 
-        counts: dict[str, list[dict[str, int]]] = {creg.name: [] for creg in cregs}
-        for index in np.ndindex(*bound_circuits.shape):
-            bound_circuit = bound_circuits[index]
-            result = self.backend.run(bound_circuit, shots=pub.shots).result()
-            for creg in cregs:
-                counts[creg.name].append(result.get_counts())
+        counts = result.get_counts()
+        if isinstance(counts, dict):
+            counts = [counts]
 
-        meas = {creg.name: BitArray.from_counts(counts[creg.name], creg.size) for creg in cregs}
+        meas = {creg.name: BitArray.from_counts(counts, creg.size) for creg in circuit.cregs}
         return SamplerPubResult(
             DataBin(**meas, shape=pub.shape),
-            metadata={"shots": pub.shots, "circuit_metadata": pub.circuit.metadata},
+            metadata={"shots": shots, "circuit_metadata": circuit.metadata},
         )
