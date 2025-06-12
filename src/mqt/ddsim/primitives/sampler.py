@@ -10,20 +10,16 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
-from qiskit.primitives import StatevectorSampler
+import numpy as np
+from qiskit.primitives import BitArray, DataBin, StatevectorSampler
+from qiskit.primitives.containers import SamplerPubResult
 
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
-
-    import numpy as np
-    from qiskit.circuit import Parameter
-    from qiskit.circuit.parameterexpression import ParameterValueType
-
-    Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
+    from qiskit.primitives.containers import SamplerPub
 
 
 class Sampler(StatevectorSampler):  # type: ignore[misc]
@@ -39,3 +35,22 @@ class Sampler(StatevectorSampler):  # type: ignore[misc]
     def backend(self) -> QasmSimulatorBackend:
         """The backend used by the sampler."""
         return self._BACKEND
+
+    def _run_pub(self, pub: SamplerPub) -> SamplerPubResult:
+        circuit = pub.circuit
+        cregs = circuit.cregs
+
+        bound_circuits = pub.parameter_values.bind_all(circuit)
+
+        counts: dict[str, list[dict[str, int]]] = {creg.name: [] for creg in cregs}
+        for index in np.ndindex(*bound_circuits.shape):
+            bound_circuit = bound_circuits[index]
+            result = self.backend.run(bound_circuit, shots=pub.shots).result()
+            for creg in cregs:
+                counts[creg.name].append(result.get_counts())
+
+        meas = {creg.name: BitArray.from_counts(counts[creg.name], creg.size) for creg in cregs}
+        return SamplerPubResult(
+            DataBin(**meas, shape=pub.shape),
+            metadata={"shots": pub.shots, "circuit_metadata": pub.circuit.metadata},
+        )
