@@ -8,14 +8,19 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
 from qiskit.circuit import QuantumCircuit
 from qiskit.circuit.library import RealAmplitudes
-from qiskit.primitives import PrimitiveResult, PubResult
+from qiskit.primitives import DataBin, PrimitiveResult, PubResult
 from qiskit.quantum_info import Operator, Pauli, SparsePauliOp
 
 from mqt.ddsim.primitives.estimator import Estimator
+
+if TYPE_CHECKING:
+    from numpy.typing import NDArray
 
 
 @pytest.fixture
@@ -71,6 +76,13 @@ def observables() -> list[SparsePauliOp]:
     ]
 
 
+def get_evs(result: PubResult) -> NDArray[float]:
+    """Get the expected values from a PubResult."""
+    assert isinstance(result, PubResult)
+    assert isinstance(result.data, DataBin)
+    return result.data["evs"]
+
+
 def test_run__single_circuit__single_observable__without_parameters(
     circuits: list[QuantumCircuit],
     observables: list[SparsePauliOp],
@@ -82,8 +94,7 @@ def test_run__single_circuit__single_observable__without_parameters(
 
     result = estimator.run([(circuit, [observable])]).result()
     assert isinstance(result, PrimitiveResult)
-    assert isinstance(result[0], PubResult)
-    evs = result[0].data["evs"]
+    evs = get_evs(result[0])
     np.testing.assert_allclose(evs, [-1.284366511861733], rtol=1e-7, atol=1e-7)
 
 
@@ -100,10 +111,10 @@ def test_run__single_circuit__operator_observable__without_parameters(
             [0.1809312, 0.0, 0.0, -1.06365335],
         ])
     )
+
     result = estimator.run([(circuit, [matrix])]).result()
     assert isinstance(result, PrimitiveResult)
-    assert isinstance(result[0], PubResult)
-    evs = result[0].data["evs"]
+    evs = get_evs(result[0])
     np.testing.assert_allclose(evs, [-1.284366511861733], rtol=1e-7, atol=1e-7)
 
 
@@ -118,8 +129,7 @@ def test_run__single_circuit__single_observable__with_parameters(
 
     result = estimator.run([(circuit, [observable], [[0, 1, 1, 2, 3, 5]])]).result()
     assert isinstance(result, PrimitiveResult)
-    assert isinstance(result[0], PubResult)
-    evs = result[0].data["evs"]
+    evs = get_evs(result[0])
     np.testing.assert_allclose(evs, [-1.284366511861733], rtol=1e-7, atol=1e-7)
 
 
@@ -134,9 +144,7 @@ def test_run__single_circuit__multiple_observables__without_parameters(
 
     result = estimator.run([(qc_x, [pauli_x, pauli_y, pauli_z])]).result()
     assert isinstance(result, PrimitiveResult)
-
-    assert isinstance(result[0], PubResult)
-    evs = result[0].data["evs"]
+    evs = get_evs(result[0])
     np.testing.assert_allclose(evs, [1.0, 0.0, 0.0], rtol=1e-7, atol=1e-7)
 
 
@@ -152,16 +160,13 @@ def test_run__multiple_circuits__multiple_observables__without_parameters(
     result = estimator.run([(qc_x, [pauli_x]), (qc_y, [pauli_y]), (qc_z, [pauli_z])]).result()
     assert isinstance(result, PrimitiveResult)
 
-    assert isinstance(result[0], PubResult)
-    evs = result[0].data["evs"]
+    evs = get_evs(result[0])
     np.testing.assert_allclose(evs, [1.0], rtol=1e-7, atol=1e-7)
 
-    assert isinstance(result[1], PubResult)
-    evs = result[1].data["evs"]
+    evs = get_evs(result[1])
     np.testing.assert_allclose(evs, [1.0], rtol=1e-7, atol=1e-7)
 
-    assert isinstance(result[2], PubResult)
-    evs = result[2].data["evs"]
+    evs = get_evs(result[2])
     np.testing.assert_allclose(evs, [1.0], rtol=1e-7, atol=1e-7)
 
 
@@ -180,8 +185,7 @@ def test_run__single_circuit__multiple_observables__with_parameters(
 
     result = estimator.run([(psi_1, [hamiltonian_1, hamiltonian_3], [theta_1, theta_2])]).result()
     assert isinstance(result, PrimitiveResult)
-    assert isinstance(result[0], PubResult)
-    evs = result[0].data["evs"]
+    evs = get_evs(result[0])
     np.testing.assert_allclose(evs, [1.55555728, -1.08766318], rtol=1e-7, atol=1e-7)
 
 
@@ -208,16 +212,13 @@ def test_run__multiple_circuits__multiple_observables__with_parameters(
     ).result()
     assert isinstance(result, PrimitiveResult)
 
-    assert isinstance(result[0], PubResult)
-    evs = result[0].data["evs"]
+    evs = get_evs(result[0])
     np.testing.assert_allclose(evs, [1.55555728], rtol=1e-7, atol=1e-7)
 
-    assert isinstance(result[1], PubResult)
-    evs = result[1].data["evs"]
+    evs = get_evs(result[1])
     np.testing.assert_allclose(evs, [0.17849238], rtol=1e-7, atol=1e-7)
 
-    assert isinstance(result[2], PubResult)
-    evs = result[2].data["evs"]
+    evs = get_evs(result[2])
     np.testing.assert_allclose(evs, [-1.08766318], rtol=1e-7, atol=1e-7)
 
 
@@ -245,20 +246,17 @@ def test_sequential_runs(
     # Second run
     result = estimator.run([(psi_2, [hamiltonian_1], [theta_2])]).result()
     assert isinstance(result, PrimitiveResult)
-    assert isinstance(result[0], PubResult)
-    evs = result[0].data["evs"]
+    evs = get_evs(result[0])
     np.testing.assert_allclose(evs, [2.97797666], rtol=1e-7, atol=1e-7)
 
     # Third run
     result = estimator.run([(psi_1, [hamiltonian_2], [theta_1]), (psi_1, [hamiltonian_3], [theta_1])]).result()
     assert isinstance(result, PrimitiveResult)
 
-    assert isinstance(result[0], PubResult)
-    evs = result[0].data["evs"]
+    evs = get_evs(result[0])
     np.testing.assert_allclose(evs, [-0.551653], rtol=1e-7, atol=1e-7)
 
-    assert isinstance(result[1], PubResult)
-    evs = result[1].data["evs"]
+    evs = get_evs(result[1])
     np.testing.assert_allclose(evs, [0.07535239], rtol=1e-7, atol=1e-7)
 
     # Last run
@@ -269,14 +267,11 @@ def test_sequential_runs(
     ]).result()
     assert isinstance(result, PrimitiveResult)
 
-    assert isinstance(result[0], PubResult)
-    evs = result[0].data["evs"]
+    evs = get_evs(result[0])
     np.testing.assert_allclose(evs, [1.55555728], rtol=1e-7, atol=1e-7)
 
-    assert isinstance(result[1], PubResult)
-    evs = result[1].data["evs"]
+    evs = get_evs(result[1])
     np.testing.assert_allclose(evs, [0.17849238], rtol=1e-7, atol=1e-7)
 
-    assert isinstance(result[2], PubResult)
-    evs = result[2].data["evs"]
+    evs = get_evs(result[2])
     np.testing.assert_allclose(evs, [-1.08766318], rtol=1e-7, atol=1e-7)

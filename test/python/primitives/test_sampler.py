@@ -13,7 +13,7 @@ from typing import TypeVar
 import pytest
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import RealAmplitudes
-from qiskit.primitives import PrimitiveResult, SamplerPubResult
+from qiskit.primitives import BitArray, PrimitiveResult
 
 from mqt.ddsim.primitives import Sampler
 
@@ -55,6 +55,16 @@ def circuits() -> list[QuantumCircuit]:
     return [bell_1, bell_2, param_qc_1, param_qc_2]
 
 
+def get_int_probs(bit_array: BitArray, shots: int) -> dict[int, float]:
+    assert isinstance(bit_array, BitArray)
+    return {key: value / shots for key, value in bit_array.get_int_counts().items()}
+
+
+def get_probs(bit_array: BitArray, shots: int) -> dict[str, float]:
+    assert isinstance(bit_array, BitArray)
+    return {key: value / shots for key, value in bit_array.get_counts().items()}
+
+
 def compare_probs(
     prob: list[dict[T, float]] | dict[T, float],
     target: list[dict[T, float]] | dict[T, float],
@@ -78,20 +88,19 @@ def compare_probs(
 def test_run__single_circuit__without_parameters(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
     """Test single circuit without parameters."""
     bell = circuits[0]
-    target = {0: 0.5, 1: 0, 2: 0, 3: 0.5}
-    target_binary = {"00": 0.5, "11": 0.5, "01": 0, "10": 0}
+    target_int = {0: 0.5, 1: 0, 2: 0, 3: 0.5}
+    target = {"00": 0.5, "11": 0.5, "01": 0, "10": 0}
 
     result = sampler.run([bell], shots=shots).result()
     assert isinstance(result, PrimitiveResult)
-    assert isinstance(result[0], SamplerPubResult)
 
     assert result[0].data["meas"].num_shots == shots
 
-    prob = {key: value / shots for key, value in result[0].data["meas"].get_int_counts().items()}
-    compare_probs(prob, target)
+    probs_int = get_int_probs(result[0].data["meas"], shots)
+    compare_probs(probs_int, target_int)
 
-    prob = {key: value / shots for key, value in result[0].data["meas"].get_counts().items()}
-    compare_probs(prob, target_binary)
+    probs = get_probs(result[0].data["meas"], shots)
+    compare_probs(probs, target)
 
 
 def test_run__multiple_circuits__without_parameters(
@@ -109,17 +118,14 @@ def test_run__multiple_circuits__without_parameters(
     result = sampler.run([bell_1, bell_2, bell_1], shots=shots).result()
     assert isinstance(result, PrimitiveResult)
 
-    assert isinstance(result[0], SamplerPubResult)
-    prob = {key: value / shots for key, value in result[0].data["meas"].get_int_counts().items()}
-    compare_probs(prob, target[0])
+    probs = get_int_probs(result[0].data["meas"], shots)
+    compare_probs(probs, target[0])
 
-    assert isinstance(result[1], SamplerPubResult)
-    prob = {key: value / shots for key, value in result[1].data["meas"].get_int_counts().items()}
-    compare_probs(prob, target[1])
+    probs = get_int_probs(result[1].data["meas"], shots)
+    compare_probs(probs, target[1])
 
-    assert isinstance(result[2], SamplerPubResult)
-    prob = {key: value / shots for key, value in result[2].data["meas"].get_int_counts().items()}
-    compare_probs(prob, target[2])
+    probs = get_int_probs(result[2].data["meas"], shots)
+    compare_probs(probs, target[2])
 
 
 def test_run__single_circuits__with_parameters(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
@@ -145,28 +151,21 @@ def test_run__single_circuits__with_parameters(circuits: list[QuantumCircuit], s
     result = sampler.run([(param_qc, [parameter_values[0]]), (param_qc, [parameter_values[1]])], shots=shots).result()
     assert isinstance(result, PrimitiveResult)
 
-    assert isinstance(result[0], SamplerPubResult)
-    bit_array_0 = result[0].data["meas"]
-    prob = {key: value / shots for key, value in bit_array_0.get_counts().items()}
-    compare_probs(prob, target[0])
+    probs = get_probs(result[0].data["meas"], shots)
+    compare_probs(probs, target[0])
 
-    assert isinstance(result[1], SamplerPubResult)
-    bit_array_1 = result[1].data["meas"]
-    prob = {key: value / shots for key, value in bit_array_1.get_counts().items()}
-    compare_probs(prob, target[1])
+    probs = get_probs(result[1].data["meas"], shots)
+    compare_probs(probs, target[1])
 
     # Test single PUB
     result = sampler.run([(param_qc, parameter_values)], shots=shots).result()
     assert isinstance(result, PrimitiveResult)
-    assert isinstance(result[0], SamplerPubResult)
 
-    bit_array_0 = result[0].data["meas"][0]
-    prob = {key: value / shots for key, value in bit_array_0.get_counts().items()}
-    compare_probs(prob, target[0])
+    probs = get_probs(result[0].data["meas"][0], shots)
+    compare_probs(probs, target[0])
 
-    bit_array_1 = result[0].data["meas"][1]
-    prob = {key: value / shots for key, value in bit_array_1.get_counts().items()}
-    compare_probs(prob, target[1])
+    probs = get_probs(result[0].data["meas"][1], shots)
+    compare_probs(probs, target[1])
 
 
 def test_sequential_runs(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
@@ -203,18 +202,15 @@ def test_sequential_runs(circuits: list[QuantumCircuit], sampler: Sampler, shots
     result = sampler.run([(qc_1, parameter_values[0])], shots=shots).result()
     assert isinstance(result, PrimitiveResult)
 
-    assert isinstance(result[0], SamplerPubResult)
-    prob = {key: value / shots for key, value in result[0].data["meas"].get_counts().items()}
-    compare_probs(prob, target[0])
+    probs = get_probs(result[0].data["meas"], shots)
+    compare_probs(probs, target[0])
 
     # Second run
     result = sampler.run([(qc_2, parameter_values[2]), (qc_1, parameter_values[1])], shots=shots).result()
     assert isinstance(result, PrimitiveResult)
 
-    assert isinstance(result[0], SamplerPubResult)
-    prob = {key: value / shots for key, value in result[0].data["meas"].get_counts().items()}
-    compare_probs(prob, target[2])
+    probs = get_probs(result[0].data["meas"], shots)
+    compare_probs(probs, target[2])
 
-    assert isinstance(result[1], SamplerPubResult)
-    prob = {key: value / shots for key, value in result[1].data["meas"].get_counts().items()}
-    compare_probs(prob, target[1])
+    probs = get_probs(result[1].data["meas"], shots)
+    compare_probs(probs, target[1])
