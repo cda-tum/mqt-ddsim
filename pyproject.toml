@@ -135,10 +135,6 @@ filterwarnings = [
   'ignore:.*``qiskit.circuit.instruction.Instruction.condition`` is deprecated as of qiskit 1.3.0.*:DeprecationWarning:',
   'ignore:.*``qiskit.circuit.library.standard_gates.x.*`` is pending deprecation as of qiskit 1.3.*:PendingDeprecationWarning:',
   'ignore:.*``qiskit.circuit.library.n_local.*`` is pending deprecation as of qiskit 1.3.*:PendingDeprecationWarning:',
-  # The warning filters below are only temporary and should be removed once the Sampler and the Estimator are updated
-  'ignore:.*BaseSamplerV1.*:DeprecationWarning:',
-  'ignore:.*BaseEstimatorV1.*:DeprecationWarning:',
-  'ignore:.*qiskit\.primitives\.utils.*:DeprecationWarning:',
 ]
 
 [tool.coverage]
