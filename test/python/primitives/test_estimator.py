@@ -80,7 +80,7 @@ def test_estimator_run_single_circuit__observable_no_params(
     circuit = circuits[0].assign_parameters([0, 1, 1, 2, 3, 5])
     observable = observables[0]
 
-    result = estimator.run([(circuit, observable)]).result()
+    result = estimator.run([(circuit, [observable])]).result()
     assert isinstance(result, PrimitiveResult)
     assert isinstance(result[0], PubResult)
     evs = result[0].data["evs"]
@@ -98,7 +98,7 @@ def test_run_with_operator(circuits: list[QuantumCircuit], estimator: Estimator)
             [0.1809312, 0.0, 0.0, -1.06365335],
         ])
     )
-    result = estimator.run([(circuit, matrix)]).result()
+    result = estimator.run([(circuit, [matrix])]).result()
     assert isinstance(result, PrimitiveResult)
     assert isinstance(result[0], PubResult)
     evs = result[0].data["evs"]
@@ -114,7 +114,7 @@ def test_estimator_run_single_circuit__observable_with_params(
     circuit = circuits[0]
     observable = observables[0]
 
-    result = estimator.run([(circuit, observable, [0, 1, 1, 2, 3, 5])]).result()
+    result = estimator.run([(circuit, [observable], [[0, 1, 1, 2, 3, 5]])]).result()
     assert isinstance(result, PrimitiveResult)
     assert isinstance(result[0], PubResult)
     evs = result[0].data["evs"]
@@ -130,7 +130,7 @@ def test_estimator_run_multiple_circuits_observables_no_params(
     qc_x, qc_y, qc_z = circuits[2]
     pauli_x, pauli_y, pauli_z = observables[2]
 
-    result = estimator.run([(qc_x, pauli_x), (qc_y, pauli_y), (qc_z, pauli_z)]).result()
+    result = estimator.run([(qc_x, [pauli_x]), (qc_y, [pauli_y]), (qc_z, [pauli_z])]).result()
     assert isinstance(result, PrimitiveResult)
 
     assert isinstance(result[0], PubResult)
@@ -152,7 +152,7 @@ def test_estimator_run_multiple_circuits_observables_with_params(
     estimator: Estimator,
 ) -> None:
     """Test for estimator with multiple circuits/observables with parameters."""
-    psi1, psi2 = circuits[1]
+    psi_1, psi_2 = circuits[1]
     hamiltonian_1, hamiltonian_2, hamiltonian_3 = observables[1]
     theta_1, theta_2, theta_3 = (
         [0, 1, 1, 2, 3, 5],
@@ -161,7 +161,11 @@ def test_estimator_run_multiple_circuits_observables_with_params(
     )
 
     result = estimator.run(
-        [(psi1, hamiltonian_1, theta_1), (psi2, hamiltonian_2, theta_2), (psi1, hamiltonian_3, theta_3)],
+        [
+            (psi_1, [hamiltonian_1], [theta_1]),
+            (psi_2, [hamiltonian_2], [theta_2]),
+            (psi_1, [hamiltonian_3], [theta_3]),
+        ],
     ).result()
     assert isinstance(result, PrimitiveResult)
 
@@ -184,30 +188,30 @@ def test_estimator_sequential_run(
     estimator: Estimator,
 ) -> None:
     """Test for estimator's sequenctial run."""
-    psi1, psi2 = circuits[1]
-    hamiltonian1, hamiltonian2, hamiltonian3 = observables[1]
-    theta1, theta2, theta3 = (
+    psi_1, psi_2 = circuits[1]
+    hamiltonian_1, hamiltonian_2, hamiltonian_3 = observables[1]
+    theta_1, theta_2, theta_3 = (
         [0, 1, 1, 2, 3, 5],
         [0, 1, 1, 2, 3, 5, 8, 13],
         [1, 2, 3, 4, 5, 6],
     )
 
     # First run
-    result = estimator.run([(psi1, hamiltonian1, theta1)]).result()
+    result = estimator.run([(psi_1, [hamiltonian_1], [theta_1])]).result()
     assert isinstance(result, PrimitiveResult)
     assert isinstance(result[0], PubResult)
     evs = result[0].data["evs"]
     np.testing.assert_allclose(evs, [1.5555573817900956], rtol=1e-7, atol=1e-7)
 
     # Second run
-    result = estimator.run([(psi2, hamiltonian1, theta2)]).result()
+    result = estimator.run([(psi_2, [hamiltonian_1], [theta_2])]).result()
     assert isinstance(result, PrimitiveResult)
     assert isinstance(result[0], PubResult)
     evs = result[0].data["evs"]
     np.testing.assert_allclose(evs, [2.97797666], rtol=1e-7, atol=1e-7)
 
     # Third run
-    result = estimator.run([(psi1, hamiltonian2, theta1), (psi1, hamiltonian3, theta1)]).result()
+    result = estimator.run([(psi_1, [hamiltonian_2], [theta_1]), (psi_1, [hamiltonian_3], [theta_1])]).result()
     assert isinstance(result, PrimitiveResult)
 
     assert isinstance(result[0], PubResult)
@@ -220,9 +224,9 @@ def test_estimator_sequential_run(
 
     # Last run
     result = estimator.run([
-        (psi1, hamiltonian1, theta1),
-        (psi2, hamiltonian2, theta2),
-        (psi1, hamiltonian3, theta3),
+        (psi_1, [hamiltonian_1], [theta_1]),
+        (psi_2, [hamiltonian_2], [theta_2]),
+        (psi_1, [hamiltonian_3], [theta_3]),
     ]).result()
     assert isinstance(result, PrimitiveResult)
 

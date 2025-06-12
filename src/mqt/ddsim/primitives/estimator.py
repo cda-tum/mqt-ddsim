@@ -54,12 +54,9 @@ class Estimator(StatevectorEstimator):  # type: ignore[misc]
         observables: ObservablesArray,
     ) -> list[QuantumCircuit]:
         """Perform preprocessing."""
-        bc_circuits, bc_observables = np.broadcast_arrays(circuit, observables)
-
         observable_circuits: list[QuantumCircuit] = []
 
-        for index in np.ndindex(*bc_circuits.shape):
-            observable = bc_observables[index]
+        for observable in observables:
             pauli_strings, coeffs = zip(*observable.items())
             paulis = SparsePauliOp(pauli_strings, coeffs).paulis
 
