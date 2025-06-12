@@ -10,7 +10,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 import numpy as np
 from mqt.core import load
@@ -21,17 +21,10 @@ from qiskit.quantum_info import Pauli, SparsePauliOp
 from mqt.ddsim.pyddsim import CircuitSimulator
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
-
     from numpy.typing import NDArray
-    from qiskit.circuit import Parameter
-    from qiskit.circuit.parameterexpression import ParameterValueType
-    from qiskit.primitives.container.bindings_array import BindingsArray
-    from qiskit.primitives.container.observables_array import ObservablesArray
-    from qiskit.primitives.containers.estimator_pub import EstimatorPub
+    from qiskit.primitives.container import BindingsArray, ObservablesArray
+    from qiskit.primitives.containers import EstimatorPub
     from qiskit.quantum_info import Pauli
-
-    Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
 
 
 class Estimator(StatevectorEstimator):  # type: ignore[misc]
