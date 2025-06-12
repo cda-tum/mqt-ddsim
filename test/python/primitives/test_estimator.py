@@ -71,12 +71,12 @@ def observables() -> list[SparsePauliOp]:
     ]
 
 
-def test_estimator_run_single_circuit__observable_no_params(
+def test_run__single_circuit__single_observable__without_parameters(
     circuits: list[QuantumCircuit],
     observables: list[SparsePauliOp],
     estimator: Estimator,
 ) -> None:
-    """Test for estimator with a single circuit/observable and no parameters."""
+    """Test single circuit and single observable, without parameters."""
     circuit = circuits[0].assign_parameters([0, 1, 1, 2, 3, 5])
     observable = observables[0]
 
@@ -87,8 +87,10 @@ def test_estimator_run_single_circuit__observable_no_params(
     np.testing.assert_allclose(evs, [-1.284366511861733], rtol=1e-7, atol=1e-7)
 
 
-def test_run_with_operator(circuits: list[QuantumCircuit], estimator: Estimator) -> None:
-    """Test for run with Operator as an observable."""
+def test_run__single_circuit__operator_observable__without_parameters(
+    circuits: list[QuantumCircuit], estimator: Estimator
+) -> None:
+    """Test single circuit and an operator observable, without parameters."""
     circuit = circuits[0].assign_parameters([0, 1, 1, 2, 3, 5])
     matrix = SparsePauliOp.from_operator(
         Operator([
@@ -105,12 +107,12 @@ def test_run_with_operator(circuits: list[QuantumCircuit], estimator: Estimator)
     np.testing.assert_allclose(evs, [-1.284366511861733], rtol=1e-7, atol=1e-7)
 
 
-def test_estimator_run_single_circuit__observable_with_params(
+def test_run__single_circuit__single_observable__with_parameters(
     circuits: list[QuantumCircuit],
     observables: list[SparsePauliOp],
     estimator: Estimator,
 ) -> None:
-    """Test for estimator with a single circuit/observable and parameters."""
+    """Test single circuit and single observable, with parameters."""
     circuit = circuits[0]
     observable = observables[0]
 
@@ -121,12 +123,29 @@ def test_estimator_run_single_circuit__observable_with_params(
     np.testing.assert_allclose(evs, [-1.284366511861733], rtol=1e-7, atol=1e-7)
 
 
-def test_estimator_run_multiple_circuits_observables_no_params(
+def test_run__single_circuit__multiple_observables__without_parameters(
     circuits: list[QuantumCircuit],
     observables: list[SparsePauliOp],
     estimator: Estimator,
 ) -> None:
-    """Test for estimator with multiple circuits/observables and no parameters."""
+    """Test single circuit and multiple observables, without parameters."""
+    qc_x, _, _ = circuits[2]
+    pauli_x, pauli_y, pauli_z = observables[2]
+
+    result = estimator.run([(qc_x, [pauli_x, pauli_y, pauli_z])]).result()
+    assert isinstance(result, PrimitiveResult)
+
+    assert isinstance(result[0], PubResult)
+    evs = result[0].data["evs"]
+    np.testing.assert_allclose(evs, [1.0, 0.0, 0.0], rtol=1e-7, atol=1e-7)
+
+
+def test_run__multiple_circuits__multiple_observables__without_parameters(
+    circuits: list[QuantumCircuit],
+    observables: list[SparsePauliOp],
+    estimator: Estimator,
+) -> None:
+    """Test multiple circuits and multiple observables, without parameters."""
     qc_x, qc_y, qc_z = circuits[2]
     pauli_x, pauli_y, pauli_z = observables[2]
 
@@ -146,12 +165,32 @@ def test_estimator_run_multiple_circuits_observables_no_params(
     np.testing.assert_allclose(evs, [1.0], rtol=1e-7, atol=1e-7)
 
 
-def test_estimator_run_multiple_circuits_observables_with_params(
+def test_run__single_circuit__multiple_observables__with_parameters(
     circuits: list[QuantumCircuit],
     observables: list[SparsePauliOp],
     estimator: Estimator,
 ) -> None:
-    """Test for estimator with multiple circuits/observables with parameters."""
+    """Test single circuits and multiple observables, with parameters."""
+    psi_1, _ = circuits[1]
+    hamiltonian_1, _, hamiltonian_3 = observables[1]
+    theta_1, theta_2 = (
+        [0, 1, 1, 2, 3, 5],
+        [1, 2, 3, 4, 5, 6],
+    )
+
+    result = estimator.run([(psi_1, [hamiltonian_1, hamiltonian_3], [theta_1, theta_2])]).result()
+    assert isinstance(result, PrimitiveResult)
+    assert isinstance(result[0], PubResult)
+    evs = result[0].data["evs"]
+    np.testing.assert_allclose(evs, [1.55555728, -1.08766318], rtol=1e-7, atol=1e-7)
+
+
+def test_run__multiple_circuits__multiple_observables__with_parameters(
+    circuits: list[QuantumCircuit],
+    observables: list[SparsePauliOp],
+    estimator: Estimator,
+) -> None:
+    """Test multiple circuits and multiple observables, with parameters."""
     psi_1, psi_2 = circuits[1]
     hamiltonian_1, hamiltonian_2, hamiltonian_3 = observables[1]
     theta_1, theta_2, theta_3 = (
@@ -182,12 +221,12 @@ def test_estimator_run_multiple_circuits_observables_with_params(
     np.testing.assert_allclose(evs, [-1.08766318], rtol=1e-7, atol=1e-7)
 
 
-def test_estimator_sequential_run(
+def test_sequential_runs(
     circuits: list[QuantumCircuit],
     observables: list[SparsePauliOp],
     estimator: Estimator,
 ) -> None:
-    """Test for estimator's sequenctial run."""
+    """Test sequential runs."""
     psi_1, psi_2 = circuits[1]
     hamiltonian_1, hamiltonian_2, hamiltonian_3 = observables[1]
     theta_1, theta_2, theta_3 = (
