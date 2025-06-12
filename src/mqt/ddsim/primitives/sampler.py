@@ -37,6 +37,10 @@ class Sampler(StatevectorSampler):  # type: ignore[misc]
         return self._BACKEND
 
     def _run_pub(self, pub: SamplerPub) -> SamplerPubResult:
+        """Run a primitive unified block (PUB) on the QasmSimulatorBackend.
+
+        Adapted from Qiskit's `StatevectorSampler._run_pub()`.
+        """
         circuit = pub.circuit
         parameter_values = pub.parameter_values
         shots = pub.shots

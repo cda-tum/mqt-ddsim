@@ -22,7 +22,7 @@ from mqt.ddsim.pyddsim import CircuitSimulator
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
-    from qiskit.primitives.container import BindingsArray, ObservablesArray
+    from qiskit.primitives.container import ObservablesArray
     from qiskit.primitives.containers import EstimatorPub
     from qiskit.quantum_info import Pauli
 
@@ -45,10 +45,10 @@ class Estimator(StatevectorEstimator):  # type: ignore[misc]
 
     def _get_observable_circuits(
         self,
-        circuit: QuantumCircuit,
         observables: ObservablesArray,
+        num_qubits: int,
     ) -> NDArray[object]:
-        """Perform preprocessing."""
+        """Get the quantum-circuit representations of the obvervables."""
         observable_circuits = np.zeros_like(observables, dtype=object)
 
         for index in np.ndindex(*observables.shape):
@@ -60,7 +60,7 @@ class Estimator(StatevectorEstimator):  # type: ignore[misc]
             observable_circuits_list = []
             for pauli in paulis:
                 qubit_indices = self._get_qubit_indices(pauli)
-                observable_circuit = self._get_observable_circuit(circuit.num_qubits, qubit_indices, pauli)
+                observable_circuit = self._get_observable_circuit(pauli, num_qubits, qubit_indices)
                 observable_circuits_list.append(observable_circuit)
 
             observable_circuits[index] = (coeffs, observable_circuits_list)
@@ -81,8 +81,8 @@ class Estimator(StatevectorEstimator):  # type: ignore[misc]
         return qubit_indices_list
 
     @staticmethod
-    def _get_observable_circuit(num_qubits: int, qubit_indices: list[int], pauli: Pauli) -> QuantumCircuit:
-        """Creates a quantum circuit representation of the Pauli observable."""
+    def _get_observable_circuit(pauli: Pauli, num_qubits: int, qubit_indices: list[int]) -> QuantumCircuit:
+        """Get the quantum-circuit representation of a Pauli observable."""
         observable_circuit = QuantumCircuit(num_qubits, len(qubit_indices))
         for i in qubit_indices:
             if pauli.x[i]:
@@ -95,20 +95,17 @@ class Estimator(StatevectorEstimator):  # type: ignore[misc]
 
         return observable_circuit
 
-    @staticmethod
-    def _get_bound_circuits(
-        circuit: QuantumCircuit,
-        parameter_values: BindingsArray,
-    ) -> NDArray[object]:
-        return parameter_values.bind_all(circuit)
-
     def _run_pub(self, pub: EstimatorPub) -> PubResult:
+        """Run a primitive unified block (PUB) on the CircuitSimulator.
+
+        Adapted from Qiskit's `StatevectorEstimator._run_pub()`.
+        """
         circuit = pub.circuit
         observables = pub.observables
         parameter_values = pub.parameter_values
 
-        observable_circuits = self._get_observable_circuits(circuit, observables)
-        bound_circuits = self._get_bound_circuits(circuit, parameter_values)
+        observable_circuits = self._get_observable_circuits(observables, circuit.num_qubits)
+        bound_circuits = parameter_values.bind_all(circuit)
         bc_bound_circuits, bc_observable_circuits = np.broadcast_arrays(bound_circuits, observable_circuits)
 
         evs = np.zeros_like(bc_bound_circuits, dtype=np.float64)
