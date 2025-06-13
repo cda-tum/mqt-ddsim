@@ -19,7 +19,7 @@ To address this issue, Qiskit introduced the `qiskit.primitives` module in versi
 
 The two currently available primitives are the `Sampler` and the `Estimator`. The first one computes quasi-probability distributions from circuit measurements, while the second one calculates and interprets expectation values of quantum operators that are required for many near-term quantum algorithms.
 
-DDSIM provides its own version of these Qiskit Primitives that leverage the default circuit simulator based on decision diagrams, while preserving the methods and functionality of the original Qiskit primitives.
+DDSIM provides its own version of these Qiskit primitives that leverage the default circuit simulator based on decision diagrams, while preserving the methods and functionality of the original Qiskit primitives.
 
 +++
 
@@ -27,11 +27,11 @@ DDSIM provides its own version of these Qiskit Primitives that leverage the defa
 
 +++
 
-The `Sampler` takes a list of `QuantumCircuit` objects and simulates them using the `QasmSimulatorBackend` from MQT DDSIM. It then computes the quasi-probability distributions of the circuits in the list and encapsulates the results, along with the job's metadata, within a `SamplerResult` object.
+The [`Sampler`](#mqt.ddsim.primitives.sampler.Sampler) in an extension of Qiskit's [`StatevectorSampler`](#qiskit.*.StatevectorSampler). It takes a list of `QuantumCircuit` objects and simulates them using the `QasmSimulatorBackend` from MQT DDSIM. It then computes the quasi-probability distributions of the circuits in the list and encapsulates the results, along with the job's metadata, within a [`PrimitiveResult`](#qiskit.*.PrimitiveResult) object.
 
 Furthermore, it also handles compilation and parameter binding when working with parametrized circuits.
 
-Here we show an example on how to use this submodule:
+Here, we show an example on how to use this submodule:
 
 ```{code-cell} ipython3
 import numpy as np
@@ -55,18 +55,23 @@ circ.draw("mpl")
 sampler = Sampler()
 ```
 
-The first argument in the `run` method is the circuit to simulate. The second argument contains the parameter values, if needed. The number of shots can be set as an additional argument. If not, the default value is 1024.
+The `run()` method accecpts an iterable of PUB-like objects, where PUB stands for primitive unified bloc. In the example below, the PUB comprises the circuit and an array of parameter values. For more information, see also [`StatevectorSampler.run()`](#qiskit.*.StatevectorSampler.run). The number of shots can be set as an additional argument. If not, the default value is 1024.
 
 ```{code-cell} ipython3
-job = sampler.run(circ, np.pi, shots=int(1e4))
+pubs = [(circ, [np.pi])]
+shots = int(1e4)
+job = sampler.run(pubs, shots=shots)
 result = job.result()
 ```
 
-The `result()` method of the job returns a `SamplerResult` object, which includes both the quasi-probability distribution and job metadata.
+The `result()` method of the job returns a [`PrimitiveResult`](#qiskit.*.PrimitiveResult) object. This object contains a [`SamplerPubResult`](#qiskit.*.SamplerPubResult), which, in turn, contains the necessary information to compute the quasi-probability distribution. It furthermore contains job metadata.
 
 ```{code-cell} ipython3
+bit_array = result[0].data["meas"]
+probabilities = {key: value / shots for key, value in bit_array.get_counts().items()}
+
 print(f">>> {result}")
-print(f"  > Quasi-probability distribution: {result.quasi_dists[0]}")
+print(f"  > Quasi-probability distribution: {probabilities}")
 ```
 
 It is also possible to simulate multiple circuits in one job:
@@ -78,29 +83,34 @@ circ_2.measure_all()
 circ_2.draw("mpl")
 ```
 
-In this case, both the circuits and the parameter values must be entered as a `Sequence`.
+In this case, we have two PUB-like objects.
 
 ```{code-cell} ipython3
-job = sampler.run((circ, circ_2), [[np.pi], []], shots=int(1e4))
+job = sampler.run([(circ, [np.pi]), circ_2], shots=int(1e4))
 result = job.result()
 
+bit_array_1 = result[0].data["meas"]
+probabilities_1 = {key: value / shots for key, value in bit_array_1.get_counts().items()}
+
+bit_array_2 = result[1].data["meas"]
+probabilities_2 = {key: value / shots for key, value in bit_array_2.get_counts().items()}
+
 print(f">>> {result}")
-print(f"  > Quasi-probability distribution for circuit 1: {result.quasi_dists[0]}")
-print(f"  > Quasi-probability distribution for circuit 2: {result.quasi_dists[1]}")
+print(f"  > Quasi-probability distribution for circuit 1: {probabilities_1}")
+print(f"  > Quasi-probability distribution for circuit 2: {probabilities_2}")
 ```
 
-Now let's use the `Sampler` on a more complex circuit. For this example, we will test Grover's algorithm on a 4 qubit circuit where the marked states in the binary representation are "0110" and "1010".
+Now let's use the `Sampler` on a more complex circuit. For this example, we will test Grover's algorithm on a 4-qubit circuit where the marked states in the binary representation are "0110" and "1010".
 
-A similar implementation of Grover's algorithm using Qiskit's sampler can be found here: https://qiskit.org/ecosystem/ibm-runtime/tutorials/grover_with_sampler.html
+A similar implementation of Grover's algorithm using Qiskit's sampler can be found here: <https://learning.quantum.ibm.com/tutorial/grovers-algorithm>
 
 ```{code-cell} ipython3
-# Built-in modules
+# Built-in imports
 import math
 
-# Imports from Qiskit
-from qiskit.circuit.library import MCMT, GroverOperator, ZGate
+# Qiskit imports
+from qiskit.circuit.library import MCMTGate, GroverOperator, ZGate
 from qiskit.visualization import plot_distribution
-
 
 # Define an oracle circuit that marks the input states, which are represented as a list of bitstrings
 def grover_oracle(marked_states: list) -> QuantumCircuit:
@@ -119,10 +129,9 @@ def grover_oracle(marked_states: list) -> QuantumCircuit:
         # Add a multi-controlled Z-gate with pre- and post-applied X-gates (open-controls)
         # where the target bit-string has a '0' entry
         qc.x(zero_inds)
-        qc.compose(MCMT(ZGate(), num_qubits - 1, 1), inplace=True)
+        qc.compose(MCMTGate(ZGate(), num_qubits - 1, 1), inplace=True)
         qc.x(zero_inds)
     return qc
-
 
 # Enter the states to be marked
 marked_states = ["0110", "1010"]
@@ -132,7 +141,6 @@ oracle.draw("mpl")
 
 ```{code-cell} ipython3
 # Build circuit that amplifies the marked states by the oracle
-
 grover_op = GroverOperator(oracle)
 grover_op.decompose().draw("mpl")
 ```
@@ -140,7 +148,6 @@ grover_op.decompose().draw("mpl")
 ```{code-cell} ipython3
 # Compute the optimal number of repetitions of the GroverOperator to amplify the probabilities of the marked states
 optimal_num_iterations = math.floor(math.pi / 4 * math.sqrt(2**grover_op.num_qubits / len(marked_states)))
-
 
 # Build the full Grover circuit
 qc = QuantumCircuit(grover_op.num_qubits)
@@ -156,8 +163,10 @@ qc.draw("mpl")
 After having built the circuit, use the `Sampler` to get the probability distribution.
 
 ```{code-cell} ipython3
-dist = sampler.run(qc, shots=int(1e4)).result().quasi_dists[0]
-plot_distribution(dist.binary_probabilities())
+result = sampler.run([qc], shots=int(1e4)).result()
+bit_array = result[0].data["meas"]
+probabilities = {key: value / shots for key, value in bit_array.get_int_counts().items()}
+plot_distribution(probabilities)
 ```
 
 ## Estimator
