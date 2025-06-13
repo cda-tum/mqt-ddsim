@@ -62,7 +62,7 @@ if(BUILD_MQT_DDSIM_TESTS)
       ON
       CACHE BOOL "" FORCE)
   set(GTEST_VERSION
-      1.16.0
+      1.17.0
       CACHE STRING "Google Test version")
   set(GTEST_URL https://github.com/google/googletest/archive/refs/tags/v${GTEST_VERSION}.tar.gz)
   FetchContent_Declare(googletest URL ${GTEST_URL} FIND_PACKAGE_ARGS ${GTEST_VERSION} NAMES GTest)
