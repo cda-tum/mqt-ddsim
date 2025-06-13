@@ -1612,7 +1612,7 @@ test = [
 [package.metadata]
 requires-dist = [
     { name = "mqt-core", extras = ["qiskit"], specifier = ">=3.0.0" },
-    { name = "qiskit", specifier = "<2" },
+    { name = "qiskit", specifier = ">=2" },
 ]
 
 [package.metadata.requires-dev]
@@ -2519,7 +2519,7 @@ wheels = [
 
 [[package]]
 name = "qiskit"
-version = "1.4.3"
+version = "2.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dill" },
@@ -2535,17 +2535,15 @@ dependencies = [
     { name = "sympy" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b1/ac/25993f01e39cf04c9dccfd83f9b0817b5b8b1766f4afb8c34e6fba85155f/qiskit-1.4.3.tar.gz", hash = "sha256:e4e311190c159578f253d219dc860241ccb71955ca08725bb092c74cf7fbdac5", size = 3939859, upload-time = "2025-05-12T15:28:05.09Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d5/e7/db26a543ce3fe57e1f239e8d5015ec04db53c5801362f1bd2e893a69c99f/qiskit-2.0.2.tar.gz", hash = "sha256:4901496df2d891c8b1b3d79f5b255da6343153cc7dcee1e2caae95be58b8b354", size = 3392590, upload-time = "2025-05-27T20:41:25.824Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/66/d5/126a6ddc7a9138b436cfee3772c5b082ea8f8216feed729f02c5bda32d66/qiskit-1.4.3-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:65caf291bbe93f136b85281cb4a807c138fc4315fc17bdda9382cb4bfa18abdf", size = 6570998, upload-time = "2025-05-12T15:27:51.659Z" },
-    { url = "https://files.pythonhosted.org/packages/67/95/c4bf1fe91c456570c9536e5505ccd878f358f4b8e6b06c8fd8cbc09093a0/qiskit-1.4.3-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:6e9f41eca2f4d522f59e48a47eb8b81ed3fdd35f56cefb41cc0db47768ccde47", size = 6251292, upload-time = "2025-05-12T15:27:53.929Z" },
-    { url = "https://files.pythonhosted.org/packages/23/70/713fae76998831e9cb458e3605a9429915b9f9fbb92244c8699903868be2/qiskit-1.4.3-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a04c6baca379bae8e6fc626bd06f0dda3f2ee7961205839b5a431b7f8d1e3978", size = 6396599, upload-time = "2025-05-12T18:02:22.029Z" },
-    { url = "https://files.pythonhosted.org/packages/d6/93/6cadc22a5184e4e868c28dd6a83beacf6e4641088f106e3cd97e0cd160a8/qiskit-1.4.3-cp39-abi3-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:4ca6eeaf29ae2cf3789e7474b062845c59c6e4164276569949f9170cfcaec6b1", size = 6730964, upload-time = "2025-05-12T15:27:55.962Z" },
-    { url = "https://files.pythonhosted.org/packages/ef/9c/53a7fd3a18ec3526e56fa68d9af1a164ba4cea2302a03be7b621678b1694/qiskit-1.4.3-cp39-abi3-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:bc82934e5b5192a75adca57bfa8194166e6bce1023da3b82e02db6c279a5d0fc", size = 6801019, upload-time = "2025-05-12T18:02:24.857Z" },
-    { url = "https://files.pythonhosted.org/packages/40/a2/1355e3a8a00f9310ea80ab5887095bd3122918c8a61d62895e6519e442c0/qiskit-1.4.3-cp39-abi3-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:03355819fb9747a937bfffb0aba59d44c4654536b87c62dcd00d4e4e1550190f", size = 7895620, upload-time = "2025-05-12T18:02:27.104Z" },
-    { url = "https://files.pythonhosted.org/packages/85/35/a442b69b1507112f4fba392354d933f1ef65f66dc72bfce0c03be27f70c7/qiskit-1.4.3-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8d90b25ad017839b0bf1b5d05d8bd4066b7f83e3c14839947994f5fd56a5f5e2", size = 6762841, upload-time = "2025-05-12T15:27:58.379Z" },
-    { url = "https://files.pythonhosted.org/packages/f1/f8/c9d116275bec7d0942f364ed6461b384e2ccd1c6bb5df8fe5d998d24ae41/qiskit-1.4.3-cp39-abi3-win32.whl", hash = "sha256:74cb30e34189ca9c1263994705a0cf8d97cead5f7375dedab3be4e783173785d", size = 6138538, upload-time = "2025-05-12T15:28:00.754Z" },
-    { url = "https://files.pythonhosted.org/packages/ae/a7/7f736138e67f3f89e4a8b42bb480a9dcd582da9a87f4d723a3c4221766b0/qiskit-1.4.3-cp39-abi3-win_amd64.whl", hash = "sha256:554b5ad8c6198881923998fd0124660eec534c985c731d1e3c09c6421377c29e", size = 6517946, upload-time = "2025-05-12T15:28:03.189Z" },
+    { url = "https://files.pythonhosted.org/packages/5b/4f/4c35b2aae7aa0d90214b72b7db588c1952e89d99769e053f044cde539842/qiskit-2.0.2-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:93e357614eb06277c9dbce9a2ad3b9ebb966402e1f91cea06129f9ddf593247b", size = 6336021, upload-time = "2025-05-27T20:41:14.177Z" },
+    { url = "https://files.pythonhosted.org/packages/65/a4/a97894c2b114e60da2bbeac4fbe57b14e1cee5d5de5701e7ddafea9635ad/qiskit-2.0.2-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:07e380069fa4f10ab3082322aa76c866d3ac61b125a7a1d8eb084425d77aa4f1", size = 5940688, upload-time = "2025-05-27T20:41:17.51Z" },
+    { url = "https://files.pythonhosted.org/packages/c7/bd/efac47348d2ae2321163989af54f24601495fd36d17f8b15fccfd05d1052/qiskit-2.0.2-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ce89ee741463241a0ab0f2a0f68cba2850d00038b25df445b9190668c8961015", size = 6509615, upload-time = "2025-05-27T20:41:20.093Z" },
+    { url = "https://files.pythonhosted.org/packages/dc/dc/412a4becbd97abe07616185339d36952d477ff695cf76919a668d0235ca9/qiskit-2.0.2-cp39-abi3-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:a6f9b8aca280018dc42abd601df862f3444a1ca4863a85571260a8464c279174", size = 6738875, upload-time = "2025-05-27T22:14:37.01Z" },
+    { url = "https://files.pythonhosted.org/packages/93/cb/80ee7d6d704f837b791fbbe952434d113739c000e3ec445e7055e3bd844c/qiskit-2.0.2-cp39-abi3-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:e2422c375cd1cbe2ff8f5b59361479a50c1df1b99ff6a29738bf744a41039dc1", size = 6493706, upload-time = "2025-05-27T22:14:39.562Z" },
+    { url = "https://files.pythonhosted.org/packages/cb/7c/f04c4c6ab93b359fb6ddd9090b8ababa43caa4f4aba4e0a45bd9d85f0680/qiskit-2.0.2-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6e7a52120623788768234fdc47f9c48cb0523f0cb66bb5408c1bc39048007f15", size = 6505135, upload-time = "2025-05-27T20:41:21.782Z" },
+    { url = "https://files.pythonhosted.org/packages/c5/6b/af910210ba1642281990d078f1281784173068c59a81e7fce9982cf98ddf/qiskit-2.0.2-cp39-abi3-win_amd64.whl", hash = "sha256:1764e40a4cf570ad30384c5c530a65c7765062c8e1ac50122b47d863ae8f5376", size = 6243174, upload-time = "2025-05-27T20:41:23.514Z" },
 ]
 
 [package.optional-dependencies]

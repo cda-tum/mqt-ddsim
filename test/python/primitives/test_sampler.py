@@ -13,7 +13,7 @@ from typing import TypeVar
 import pytest
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import RealAmplitudes
-from qiskit.primitives import SamplerResult
+from qiskit.primitives import BitArray, PrimitiveResult
 
 from mqt.ddsim.primitives import Sampler
 
@@ -55,6 +55,16 @@ def circuits() -> list[QuantumCircuit]:
     return [bell_1, bell_2, param_qc_1, param_qc_2]
 
 
+def get_int_probs(bit_array: BitArray, shots: int) -> dict[int, float]:
+    assert isinstance(bit_array, BitArray)
+    return {key: value / shots for key, value in bit_array.get_int_counts().items()}
+
+
+def get_probs(bit_array: BitArray, shots: int) -> dict[str, float]:
+    assert isinstance(bit_array, BitArray)
+    return {key: value / shots for key, value in bit_array.get_counts().items()}
+
+
 def compare_probs(
     prob: list[dict[T, float]] | dict[T, float],
     target: list[dict[T, float]] | dict[T, float],
@@ -75,22 +85,28 @@ def compare_probs(
                 assert abs(t_val) < tolerance
 
 
-def test_sampler_run_single_circuit(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
-    """Test Sampler.run() with single circuits."""
+def test_run__single_circuit__without_parameters(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
+    """Test single circuit without parameters."""
     bell = circuits[0]
-    target = {0: 0.5, 1: 0, 2: 0, 3: 0.5}
-    target_binary = {"00": 0.5, "11": 0.5, "01": 0, "10": 0}
+    target_int = {0: 0.5, 1: 0, 2: 0, 3: 0.5}
+    target = {"00": 0.5, "11": 0.5, "01": 0, "10": 0}
+
     result = sampler.run([bell], shots=shots).result()
+    assert isinstance(result, PrimitiveResult)
 
-    assert isinstance(result, SamplerResult)
-    assert result.quasi_dists[0].shots == shots
+    assert result[0].data["meas"].num_shots == shots
 
-    compare_probs(result.quasi_dists[0], target)
-    compare_probs(result.quasi_dists[0].binary_probabilities(), target_binary)
+    probs_int = get_int_probs(result[0].data["meas"], shots)
+    compare_probs(probs_int, target_int)
+
+    probs = get_probs(result[0].data["meas"], shots)
+    compare_probs(probs, target)
 
 
-def test_sample_run_multiple_circuits(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
-    """Test Sampler.run() with multiple circuits."""
+def test_run__multiple_circuits__without_parameters(
+    circuits: list[QuantumCircuit], sampler: Sampler, shots: int
+) -> None:
+    """Test multiple circuit without parameters."""
     bell_1 = circuits[0]
     bell_2 = circuits[1]
     target = [
@@ -98,12 +114,22 @@ def test_sample_run_multiple_circuits(circuits: list[QuantumCircuit], sampler: S
         {0: 0, 1: 0.5, 2: 0.5, 3: 0},
         {0: 0.5, 1: 0, 2: 0, 3: 0.5},
     ]
+
     result = sampler.run([bell_1, bell_2, bell_1], shots=shots).result()
-    compare_probs(result.quasi_dists, target)
+    assert isinstance(result, PrimitiveResult)
+
+    probs = get_int_probs(result[0].data["meas"], shots)
+    compare_probs(probs, target[0])
+
+    probs = get_int_probs(result[1].data["meas"], shots)
+    compare_probs(probs, target[1])
+
+    probs = get_int_probs(result[2].data["meas"], shots)
+    compare_probs(probs, target[2])
 
 
-def test_sampler_run_with_parameterized_circuits(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
-    """Test Sampler.run() with parameterized circuits."""
+def test_run__single_circuits__with_parameters(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
+    """Test single circuit with parameters."""
     param_qc = circuits[2]
     parameter_values = [[0, 1, 1, 2, 3, 5], [1, 2, 3, 4, 5, 6]]
     target = [
@@ -120,17 +146,30 @@ def test_sampler_run_with_parameterized_circuits(circuits: list[QuantumCircuit],
             "11": 0.3017511554928094,
         },
     ]
-    result = sampler.run([param_qc, param_qc], parameter_values, shots=shots).result()
-    compare_probs(result.quasi_dists[0].binary_probabilities(), target[0])
-    compare_probs(result.quasi_dists[1].binary_probabilities(), target[1])
+
+    # Test multiple PUBs
+    result = sampler.run([(param_qc, [parameter_values[0]]), (param_qc, [parameter_values[1]])], shots=shots).result()
+    assert isinstance(result, PrimitiveResult)
+
+    probs = get_probs(result[0].data["meas"], shots)
+    compare_probs(probs, target[0])
+
+    probs = get_probs(result[1].data["meas"], shots)
+    compare_probs(probs, target[1])
+
+    # Test single PUB
+    result = sampler.run([(param_qc, parameter_values)], shots=shots).result()
+    assert isinstance(result, PrimitiveResult)
+
+    probs = get_probs(result[0].data["meas"][0], shots)
+    compare_probs(probs, target[0])
+
+    probs = get_probs(result[0].data["meas"][1], shots)
+    compare_probs(probs, target[1])
 
 
-def test_sequential_run(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
-    """Sampler stores the information about the circuits in an instance attribute.
-
-    If the same instance is used multiple times, the attribute still keeps the information about the circuits involved in previous runs.
-    This test ensures that if a circuit is analyzed in different runs, the information about this circuit is not saved twice.
-    """
+def test_sequential_runs(circuits: list[QuantumCircuit], sampler: Sampler, shots: int) -> None:
+    """Test sequential runs."""
     qc_1 = circuits[2]
     qc_2 = circuits[3]
     parameter_values = [
@@ -160,14 +199,18 @@ def test_sequential_run(circuits: list[QuantumCircuit], sampler: Sampler, shots:
     ]
 
     # First run
-    result = sampler.run(qc_1, parameter_values[0], shots=shots).result()
-    compare_probs(result.quasi_dists[0].binary_probabilities(), target[0])
-    number_stored_circuits_first_run = sampler.num_circuits
+    result = sampler.run([(qc_1, parameter_values[0])], shots=shots).result()
+    assert isinstance(result, PrimitiveResult)
+
+    probs = get_probs(result[0].data["meas"], shots)
+    compare_probs(probs, target[0])
 
     # Second run
-    result = sampler.run([qc_2, qc_1], [parameter_values[2], parameter_values[1]], shots=shots).result()
-    compare_probs(result.quasi_dists[0].binary_probabilities(), target[2])
-    compare_probs(result.quasi_dists[1].binary_probabilities(), target[1])
-    number_stored_circuits_second_run = sampler.num_circuits
+    result = sampler.run([(qc_2, parameter_values[2]), (qc_1, parameter_values[1])], shots=shots).result()
+    assert isinstance(result, PrimitiveResult)
 
-    assert number_stored_circuits_second_run == number_stored_circuits_first_run + 1
+    probs = get_probs(result[0].data["meas"], shots)
+    compare_probs(probs, target[2])
+
+    probs = get_probs(result[1].data["meas"], shots)
+    compare_probs(probs, target[1])

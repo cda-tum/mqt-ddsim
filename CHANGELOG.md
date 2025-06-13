@@ -11,10 +11,11 @@ _If you are upgrading: please see [`UPGRADING.md`](UPGRADING.md#Unreleased)._
 
 ### Added
 
-- ✨ Add Windows 11 ARM64 wheelsa and C++ testing ([#556]) ([**@burgholzer**])
+- ✨ Add Windows 11 ARM64 wheels and C++ testing ([#556]) ([**@burgholzer**])
 
 ### Changed
 
+- **Breaking**: ⬆️ Support Qiskit 2.0 ([#571]) ([**@denialhaag**])
 - **Breaking**: 🚚 Move MQT DDSIM to the [munich-quantum-toolkit] GitHub organization
 - **Breaking**: ♻️ Use the `mqt-core` Python package for handling circuits ([#336]) ([**@burgholzer**])
 - **Breaking**: ⬆️ Bump minimum required CMake version to `3.24.0` ([#538]) ([**@burgholzer**])
@@ -37,6 +38,7 @@ _📚 Refer to the [GitHub Release Notes] for previous changelogs._
 
 <!-- PR links -->
 
+[#571]: https://github.com/munich-quantum-toolkit/ddsim/pulls/571
 [#556]: https://github.com/munich-quantum-toolkit/ddsim/pulls/556
 [#538]: https://github.com/munich-quantum-toolkit/ddsim/pulls/538
 [#336]: https://github.com/munich-quantum-toolkit/ddsim/pulls/336
@@ -44,6 +46,7 @@ _📚 Refer to the [GitHub Release Notes] for previous changelogs._
 <!-- Contributor -->
 
 [**@burgholzer**]: https://github.com/burgholzer
+[**@denialhaag**]: https://github.com/denialhaag
 
 <!-- General links -->
 

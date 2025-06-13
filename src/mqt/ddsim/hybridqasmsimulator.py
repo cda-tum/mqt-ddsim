@@ -22,7 +22,7 @@ from qiskit import QiskitError
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
 from qiskit.transpiler import Target
-from qiskit.utils.multiprocessing import local_hardware_info
+from qiskit.utils import local_hardware_info
 
 from .header import DDSIMHeader
 from .pyddsim import HybridCircuitSimulator, HybridMode
@@ -120,5 +120,5 @@ class HybridQasmSimulatorBackend(QasmSimulatorBackend):
             seed=seed,
             data=data,
             metadata=qc.metadata,
-            header=DDSIMHeader(qc),
+            header=DDSIMHeader.from_quantum_circuit(qc),
         )

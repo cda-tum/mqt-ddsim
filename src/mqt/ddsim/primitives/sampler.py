@@ -10,95 +10,51 @@
 
 from __future__ import annotations
 
-import math
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING
 
-from qiskit.primitives import SamplerResult
-from qiskit.primitives.sampler import Sampler as QiskitSampler
-from qiskit.result import QuasiDistribution, Result
+import numpy as np
+from qiskit.primitives import BitArray, DataBin, StatevectorSampler
+from qiskit.primitives.containers import SamplerPubResult
 
 from mqt.ddsim.qasmsimulator import QasmSimulatorBackend
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping, Sequence
-
-    from qiskit.circuit import Parameter
-    from qiskit.circuit.parameterexpression import ParameterValueType
-
-    Parameters = Union[Mapping[Parameter, ParameterValueType], Sequence[ParameterValueType]]
+    from qiskit.primitives.containers import SamplerPub
 
 
-class Sampler(QiskitSampler):  # type: ignore[misc]
-    """Sampler implementation using QasmSimulatorBackend."""
+class Sampler(StatevectorSampler):  # type: ignore[misc]
+    """DDSIM implementation of Qiskit's sampler."""
 
     _BACKEND = QasmSimulatorBackend()
 
-    def __init__(
-        self,
-        *,
-        options: dict[str, Any] | None = None,
-    ) -> None:
-        """Initialize a new DDSIM Sampler.
-
-        Args:
-            options: Default options.
-        """
-        super().__init__(options=options)
+    def __init__(self, *, default_shots: int = 1024, seed: np.random.Generator | int | None = None) -> None:
+        """Create a new DDSIM sampler."""
+        super().__init__(default_shots=default_shots, seed=seed)
 
     @property
     def backend(self) -> QasmSimulatorBackend:
         """The backend used by the sampler."""
         return self._BACKEND
 
-    @property
-    def num_circuits(self) -> int:
-        """The number of circuits stored in the sampler."""
-        return len(self._circuits)
+    def _run_pub(self, pub: SamplerPub) -> SamplerPubResult:
+        """Run a primitive unified block (PUB) on the QasmSimulatorBackend.
 
-    def _call(
-        self,
-        circuits: Sequence[int],
-        parameter_values: Sequence[Parameters],
-        **run_options: Any,
-    ) -> SamplerResult:
-        """Runs DDSIM backend.
-
-        Args:
-            circuits: List of circuit indices to simulate
-            parameter_values: List of parameters associated with those circuits
-            run_options: Additional run options.
-
-        Returns:
-            The result of the sampling process.
+        Adapted from Qiskit's `StatevectorSampler._run_pub()`.
         """
-        result = self.backend.run([self._circuits[i] for i in circuits], parameter_values, **run_options).result()
+        circuit = pub.circuit
+        parameter_values = pub.parameter_values
+        shots = pub.shots
 
-        return self._postprocessing(result, circuits)
+        bound_circuits = parameter_values.bind_all(circuit)
+        bound_circuits_list = np.asarray(bound_circuits, dtype=object).tolist()
+        result = self.backend.run(bound_circuits_list, shots=shots).result()
 
-    @staticmethod
-    def _postprocessing(result: Result, circuits: Sequence[int]) -> SamplerResult:
-        """Converts counts into quasi-probability distributions.
-
-        Args:
-            result: Result from DDSIM backend
-            circuits: List of circuit indices
-
-        Returns:
-            The result of the sampling process.
-        """
         counts = result.get_counts()
-        if not isinstance(counts, list):
+        if isinstance(counts, dict):
             counts = [counts]
 
-        shots = sum(counts[0].values())
-        metadata: list[dict[str, Any]] = [{"shots": shots} for _ in range(len(circuits))]
-        probabilities = [
-            QuasiDistribution(
-                {k: v / shots for k, v in count.items()},
-                shots=shots,
-                stddev_upper_bound=1 / math.sqrt(shots),
-            )
-            for count in counts
-        ]
-
-        return SamplerResult(probabilities, metadata)
+        meas = {creg.name: BitArray.from_counts(counts, creg.size) for creg in circuit.cregs}
+        return SamplerPubResult(
+            DataBin(**meas, shape=pub.shape),
+            metadata={"shots": shots, "circuit_metadata": circuit.metadata},
+        )

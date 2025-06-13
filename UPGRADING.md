@@ -30,5 +30,8 @@ MQT DDSIM now requires CMake 3.24 or higher.
 Most modern operating systems should have this version available in their package manager.
 Alternatively, CMake can be conveniently installed from PyPI using the [`cmake`](https://pypi.org/project/cmake/) package.
 
+MQT DDSIM now supports Qiskit 2.0.
+As a result, the return values of the `Estimator` and `Sampler` have been changed to align with Qiskit's implementations.
+
 [MQT SyReC]: https://github.com/cda-tum/mqt-syrec
 [unreleased]: https://github.com/munich-quantum-toolkit/qmap/compare/v1.24.0...HEAD
