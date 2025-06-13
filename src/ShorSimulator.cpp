@@ -72,9 +72,10 @@ ShorSimulator::simulate([[maybe_unused]] std::size_t shots) {
   as.resize(2 * requiredBits);
   assert(as.size() == 2 * requiredBits); // it's quite easy to get the vector
                                          // initialization wrong
-  as[2 * requiredBits - 1] = coprimeA;
+  as[(2 * requiredBits) - 1] = coprimeA;
   std::uint64_t newA = coprimeA;
-  for (auto i = static_cast<std::int64_t>(2 * requiredBits - 2); i >= 0; i--) {
+  for (auto i = static_cast<std::int64_t>((2 * requiredBits) - 2); i >= 0;
+       i--) {
     newA = newA * newA;
     newA = newA % compositeN;
     as[static_cast<std::size_t>(i)] = newA;
@@ -194,7 +195,7 @@ ShorSimulator::postProcessing(const std::string& sample) const {
 
   log << "measurement: ";
   for (std::uint32_t i = 0; i < 2 * requiredBits; i++) {
-    log << sample.at(2 * requiredBits - 1 - i);
+    log << sample.at((2 * requiredBits) - 1 - i);
     res = (res << 1U) + (sample.at(requiredBits + i) == '1' ? 1 : 0);
   }
 
@@ -226,7 +227,7 @@ ShorSimulator::postProcessing(const std::string& sample) const {
     std::uint64_t numerator = 1;
     for (std::int32_t j = static_cast<std::int32_t>(i) - 1; j >= 0; j--) {
       const auto tmp =
-          numerator + cf[static_cast<std::size_t>(j)] * denominator;
+          numerator + (cf[static_cast<std::size_t>(j)] * denominator);
       numerator = denominator;
       denominator = tmp;
     }
@@ -239,8 +240,8 @@ ShorSimulator::postProcessing(const std::string& sample) const {
     }
 
     const double delta =
-        static_cast<double>(oldRes) / static_cast<double>(oldDenom) -
-        static_cast<double>(numerator) / static_cast<double>(denominator);
+        (static_cast<double>(oldRes) / static_cast<double>(oldDenom)) -
+        (static_cast<double>(numerator) / static_cast<double>(denominator));
     if (std::abs(delta) >= 1.0 / (2.0 * static_cast<double>(oldDenom))) {
       log << "delta is too big (" << delta << ")\n";
       continue;
@@ -299,7 +300,7 @@ dd::mEdge ShorSimulator::limitTo(std::uint64_t a) {
 
   for (std::uint32_t p = 1; p < requiredBits + 1; p++) {
     if (((a >> p) & 1U) > 0) {
-      edges[0] = dd->makeIdent();
+      edges[0] = dd::Package::makeIdent();
       edges[3] = f;
     } else {
       edges[0] = f;
@@ -389,7 +390,7 @@ dd::mEdge ShorSimulator::addConstMod(std::uint64_t a) {
 }
 
 void ShorSimulator::uAEmulate(std::uint64_t a, std::int32_t q) {
-  const dd::mEdge limit = dd->makeIdent();
+  const dd::mEdge limit = dd::Package::makeIdent();
 
   dd::mEdge f = dd::mEdge::one();
   std::array<dd::mEdge, 4> edges{dd::mEdge::zero(), dd::mEdge::zero(),
@@ -445,10 +446,11 @@ void ShorSimulator::uAEmulate(std::uint64_t a, std::int32_t q) {
 
   dd::mEdge e = f;
 
-  for (auto i = static_cast<std::int32_t>(2 * requiredBits - 1); i >= 0; --i) {
+  for (auto i = static_cast<std::int32_t>((2 * requiredBits) - 1); i >= 0;
+       --i) {
     if (i == q) {
       edges[1] = edges[2] = dd::mEdge::zero();
-      edges[0] = dd->makeIdent();
+      edges[0] = dd::Package::makeIdent();
       edges[3] = e;
       e = dd->makeDDNode(
           static_cast<dd::Qubit>(nQubits - 1 - static_cast<std::size_t>(i)),

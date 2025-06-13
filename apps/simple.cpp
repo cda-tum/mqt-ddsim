@@ -49,7 +49,7 @@ void from_json( // NOLINT(readability-identifier-naming)
   p.real(j.at(0));
   p.imag(j.at(1));
 }
-} /* namespace std */
+} // namespace std
 
 int main(int argc, char** argv) { // NOLINT(bugprone-exception-escape)
   cxxopts::Options options(

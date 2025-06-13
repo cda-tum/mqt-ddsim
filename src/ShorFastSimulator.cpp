@@ -71,9 +71,10 @@ ShorFastSimulator::simulate([[maybe_unused]] std::size_t shots) {
   as.resize(2 * requiredBits);
   assert(as.size() == 2 * requiredBits); // it's quite easy to get the vector
                                          // initialization wrong
-  as[2 * requiredBits - 1] = coprimeA;
+  as[(2 * requiredBits) - 1] = coprimeA;
   std::uint64_t newA = coprimeA;
-  for (auto i = static_cast<std::int64_t>(2 * requiredBits - 2); i >= 0; i--) {
+  for (auto i = static_cast<std::int64_t>((2 * requiredBits) - 2); i >= 0;
+       i--) {
     newA = newA * newA;
     newA = newA % compositeN;
     as[static_cast<std::size_t>(i)] = newA;
@@ -159,9 +160,9 @@ ShorFastSimulator::postProcessing(const std::string& sample) const {
   std::uint64_t res = 0;
   log << "measurement: ";
   for (std::uint32_t i = 0; i < 2 * requiredBits; i++) {
-    log << sample.at(2 * requiredBits - 1 - i);
-    const auto currentBit =
-        static_cast<std::uint64_t>(sample.at(2 * requiredBits - 1 - i) == '1');
+    log << sample.at((2 * requiredBits) - 1 - i);
+    const auto currentBit = static_cast<std::uint64_t>(
+        sample.at((2 * requiredBits) - 1 - i) == '1');
     res = (res << 1U) + currentBit;
   }
   log << " = " << res << "\n";
@@ -189,7 +190,7 @@ ShorFastSimulator::postProcessing(const std::string& sample) const {
     std::uint64_t numerator = 1;
     for (int j = i - 1; j >= 0; j--) {
       const auto tmp =
-          numerator + cf[static_cast<std::size_t>(j)] * denominator;
+          numerator + (cf[static_cast<std::size_t>(j)] * denominator);
       numerator = denominator;
       denominator = tmp;
     }
@@ -200,8 +201,8 @@ ShorFastSimulator::postProcessing(const std::string& sample) const {
       return {0, 0};
     }
     const double delta =
-        static_cast<double>(oldRes) / static_cast<double>(oldDenom) -
-        static_cast<double>(numerator) / static_cast<double>(denominator);
+        (static_cast<double>(oldRes) / static_cast<double>(oldDenom)) -
+        (static_cast<double>(numerator) / static_cast<double>(denominator));
     if (std::abs(delta) >= 1.0 / (2.0 * static_cast<double>(oldDenom))) {
       log << "delta is too big (" << delta << ")\n";
       continue;
@@ -256,7 +257,7 @@ dd::mEdge ShorFastSimulator::limitTo(std::uint64_t a) {
 
   for (std::uint32_t p = 1; p < requiredBits + 1; p++) {
     if (((a >> p) & 1U) > 0) {
-      edges[0] = dd->makeIdent();
+      edges[0] = dd::Package::makeIdent();
       edges[3] = f;
     } else {
       edges[0] = f;

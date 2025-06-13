@@ -13,11 +13,10 @@ from __future__ import annotations
 import time
 from typing import TYPE_CHECKING, Any, cast
 
+from mqt import ddsim
 from mqt.core import load
 from qiskit.providers import Options
 from qiskit.result.models import ExperimentResult, ExperimentResultData
-
-from mqt import ddsim
 
 from .header import DDSIMHeader
 from .qasmsimulator import QasmSimulatorBackend

@@ -144,7 +144,7 @@ copybutton_line_continuation_character = "\\"
 
 modindex_common_prefix = ["mqt.ddsim."]
 
-autoapi_dirs = ["../src/mqt"]
+autoapi_dirs = ["../python/mqt"]
 autoapi_python_use_implicit_namespaces = True
 autoapi_root = "api"
 autoapi_add_toctree_entry = False

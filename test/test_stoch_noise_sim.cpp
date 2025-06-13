@@ -25,7 +25,10 @@
  * These tests may have to be adjusted if something about the random-number
  * generation changes.
  */
+
 using namespace qc::literals;
+
+namespace {
 
 std::unique_ptr<qc::QuantumComputation> stochGetAdder4Circuit() {
   // circuit taken from https://github.com/pnnl/qasmbench
@@ -60,6 +63,8 @@ std::unique_ptr<qc::QuantumComputation> stochGetAdder4Circuit() {
   quantumComputation->measure(3, 3);
   return quantumComputation;
 }
+
+} // namespace
 
 TEST(StochNoiseSimTest, SingleOneQubitGateOnTwoQubitCircuit) {
   auto quantumComputation = std::make_unique<qc::QuantumComputation>(2, 2);

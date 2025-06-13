@@ -20,7 +20,7 @@ build:
       - (git --no-pager log --pretty="tformat:%s -- %b" -1 | grep -viq "skip ci") || exit 183
       # Skip docs build if there are no changes related to docs
       - |
-        if [ "$READTHEDOCS_VERSION_TYPE" = "external" ] && git diff --quiet origin/main -- docs/ .readthedocs.yaml src/mqt/ src/python include/*/python .github/contributing* .github/support*;
+        if [ "$READTHEDOCS_VERSION_TYPE" = "external" ] && git diff --quiet origin/main -- bindings/ include/ docs/ python/ .github/contributing* .github/support* .readthedocs.yaml;
         then
           exit 183;
         fi

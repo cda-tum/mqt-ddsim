@@ -2,7 +2,7 @@ ignore:
   - "apps/*"
   - "extern/**/*"
   - "include/python/**/*"
-  - "src/python/*.cpp"
+  - "bindings/*.cpp"
   - "test/*.cpp"
 
 coverage:
@@ -28,10 +28,9 @@ flag_management:
       paths:
         - "include"
         - "src"
-        - "!src/python/*.cpp"
     - name: python
       paths:
-        - "src/mqt/**/*.py"
+        - "python/mqt/**/*.py"
       statuses:
         - type: project
           threshold: 0.5%

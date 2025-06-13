@@ -14,17 +14,24 @@
 #include "PathSimulator.hpp"
 #include "StochasticNoiseSimulator.hpp"
 #include "UnitarySimulator.hpp"
+#include "ir/QuantumComputation.hpp"
 
 #include <cstddef>
+#include <cstdint>
 #include <list>
 #include <memory>
 #include <optional>
+#include <pybind11/cast.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <pybind11/stl.h> // NOLINT(misc-include-cleaner)
+#include <string>
+#include <utility>
 
 namespace py = pybind11;
 using namespace pybind11::literals;
+
+namespace {
 
 template <class Simulator, typename... Args>
 std::unique_ptr<Simulator>
@@ -59,7 +66,7 @@ constructSimulatorWithoutSeed(const qc::QuantumComputation& circ,
 
 template <class Sim>
 py::class_<Sim> createSimulator(py::module_ m, const std::string& name) {
-  auto sim = py::class_<Sim>(m, name.c_str());
+  auto sim = py::class_<Sim>(std::move(m), name.c_str());
   sim.def("get_number_of_qubits", &Sim::getNumberOfQubits,
           "Get the number of qubits")
       .def("get_name", &Sim::getName, "Get the name of the simulator")
@@ -96,6 +103,8 @@ py::class_<Sim> createSimulator(py::module_ m, const std::string& name) {
   }
   return sim;
 }
+
+} // namespace
 
 PYBIND11_MODULE(pyddsim, m, py::mod_gil_not_used()) {
   py::module::import("mqt.core.dd");
