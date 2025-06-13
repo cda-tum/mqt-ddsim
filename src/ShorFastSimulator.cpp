@@ -257,7 +257,7 @@ dd::mEdge ShorFastSimulator::limitTo(std::uint64_t a) {
 
   for (std::uint32_t p = 1; p < requiredBits + 1; p++) {
     if (((a >> p) & 1U) > 0) {
-      edges[0] = dd->makeIdent();
+      edges[0] = dd::Package::makeIdent();
       edges[3] = f;
     } else {
       edges[0] = f;

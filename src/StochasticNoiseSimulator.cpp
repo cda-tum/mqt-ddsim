@@ -38,6 +38,7 @@ StochasticNoiseSimulator::simulate(const size_t nshots) {
   stochasticRuns = nshots;
   classicalMeasurementsMaps.resize(maxInstances);
   std::vector<std::thread> threadArray;
+  threadArray.reserve(maxInstances);
   // The stochastic runs are applied in parallel
   const auto t1Stoch = std::chrono::steady_clock::now();
   for (std::size_t runID = 0U; runID < maxInstances; runID++) {
