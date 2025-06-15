@@ -14,13 +14,13 @@ concurrency:
 jobs:
   change-detection:
     name: 🔍 Change
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-change-detection.yml@v1.9
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-change-detection.yml@v1.11
 
   cpp-tests:
     name: 🇨‌ Test
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-tests)
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-ci.yml@v1.9
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-ci.yml@v1.11
     with:
       # Runs to enable
       enable-ubuntu2404-gcc-release: true
@@ -70,7 +70,7 @@ jobs:
     name: 🇨‌ Test (Extensive)
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-tests) && github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'extensive-cpp-ci')
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-ci.yml@v1.9
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-ci.yml@v1.11
     with:
       # Runs to enable
       enable-ubuntu2404-gcc-debug: true
@@ -119,7 +119,7 @@ jobs:
     name: 🇨‌ Coverage
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-tests)
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-coverage.yml@v1.9
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-coverage.yml@v1.11
     # Explicitly set permissions so that the workflows also work from forks.
     permissions:
       contents: read # Required for the `actions/checkout` action
@@ -129,14 +129,14 @@ jobs:
     name: 🇨‌ Lint
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cpp-linter)
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-linter.yml@v1.9
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-cpp-linter.yml@v1.11
 
   # run extensive Python tests whenever this is on a PR and the PR has the `extensive-python-ci` label
   python-tests:
     name: 🐍 Test
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-python-tests)
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-ci.yml@v1.9
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-ci.yml@v1.11
     # Explicitly set permissions so that the workflows also work from forks.
     permissions:
       contents: read # Required for the `actions/checkout` action
@@ -160,7 +160,7 @@ jobs:
     name: 🐍 Test (Extensive)
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-python-tests) && github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'extensive-python-ci')
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-ci.yml@v1.9
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-ci.yml@v1.11
     # Explicitly set permissions so that the workflows also work from forks.
     permissions:
       contents: read # Required for the `actions/checkout` action
@@ -184,19 +184,19 @@ jobs:
     name: 🐍 Lint
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-python-tests)
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-linter.yml@v1.9
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-linter.yml@v1.11
 
   code-ql:
     name: 📝 CodeQL
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-code-ql)
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-code-ql.yml@v1.9
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-code-ql.yml@v1.11
 
   cd:
     name: 🚀 CD
     needs: change-detection
     if: fromJSON(needs.change-detection.outputs.run-cd)
-    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-packaging.yml@v1.9
+    uses: munich-quantum-toolkit/workflows/.github/workflows/reusable-python-packaging.yml@v1.11
     with:
       # Runs to enable
       enable-ubuntu2404: true
